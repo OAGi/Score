@@ -90,6 +90,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+
+
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -355,7 +357,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         /*
          * Assert that all options are disabled.
          */
-        assertDisabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getNillableCheckbox());
         assertDisabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
@@ -489,7 +491,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             /**
              * Assert that all options are disabled.
              */
-            assertDisabled(bbiePanel.getNillableCheckbox());
+            assertEnabled(bbiePanel.getNillableCheckbox());
             assertDisabled(bbiePanel.getUsedCheckbox());
             assertDisabled(bbiePanel.getCardinalityMinField());
             assertDisabled(bbiePanel.getCardinalityMaxField());

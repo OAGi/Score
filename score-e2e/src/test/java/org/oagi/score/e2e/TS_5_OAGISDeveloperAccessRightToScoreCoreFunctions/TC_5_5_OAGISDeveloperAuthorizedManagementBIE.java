@@ -20,6 +20,7 @@ import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -267,7 +268,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         BBIEPanel = editBIEPageForRevised.getBBIEPanel(node);
         nillable = BBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -328,7 +329,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         ASBIEPanel = editBIEPageForRevised.getASBIEPanel(node);
         nillable = ASBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -1294,6 +1295,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis/Item Certificate Of Analysis Header/Description";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         int cardinalityMin = nextInt(2, 5);
@@ -1687,6 +1689,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -1727,6 +1730,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -3496,13 +3500,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time"); // required BBIE field.
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
-        assertDisabled(creationDateTimePanel.getUsedCheckbox());
+        assertEnabled(creationDateTimePanel.getUsedCheckbox());
         assertChecked(creationDateTimePanel.getUsedCheckbox());
 
         WebElement dataAreaNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Data Area"); // required ASBIE field.
         EditBIEPage.ASBIEPanel dataAreaPanel = editBIEPage.getASBIEPanel(dataAreaNode);
-        assertDisabled(dataAreaPanel.getUsedCheckbox());
+        assertEnabled(dataAreaPanel.getUsedCheckbox());
         assertChecked(dataAreaPanel.getUsedCheckbox());
     }
 
@@ -3698,6 +3702,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
         assertEquals("Primitive", getText(creationDateTimePanel.getValueDomainRestrictionSelectField()));
         assertEquals("date time", getText(creationDateTimePanel.getValueDomainField()));

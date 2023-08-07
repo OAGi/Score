@@ -356,6 +356,21 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public WebElement goToNodeByPath(String path) {
+        click(getSearchInputTextField());
+        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        node.sendKeys(Keys.ENTER);
+        click(node);
+        clear(getSearchInputTextField());
+        return node;
+    }
+
+    @Override
     public boolean isDeprecated(WebElement node) {
         try {
             return node.findElement(By.xpath("//*[contains(@class, \"deprecated\")]")).isDisplayed();
@@ -537,7 +552,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(asccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new ASBIEPanelImpl();
         });
     }
@@ -549,7 +564,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIEPanelImpl();
         });
     }
@@ -561,7 +576,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIESCPanelImpl();
         });
     }
@@ -1077,6 +1092,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public void setValueDomain(String valueDomain) {
             click(getValueDomainField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
@@ -1130,8 +1146,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
             String message = valueDomainElement.getAttribute("ng-reflect-message");
+            pressEscape();
             return message;
         }
+    }
+
+    private void pressEscape() {
+        waitFor(Duration.ofMillis(500));
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     private class BBIESCPanelImpl implements BBIESCPanel {
