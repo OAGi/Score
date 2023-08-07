@@ -1092,6 +1092,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public void setValueDomain(String valueDomain) {
             click(getValueDomainField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
