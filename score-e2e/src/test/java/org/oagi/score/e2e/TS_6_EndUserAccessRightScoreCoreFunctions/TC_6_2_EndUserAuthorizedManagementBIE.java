@@ -336,7 +336,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
 
         WebElement node = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Extension/" + asccpToAppend.getPropertyTerm());
-        assertTrue(node.isDisplayed());
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel ASBIEPanel = editBIEPage.getASBIEPanel(node);
 
         /**
@@ -3586,7 +3586,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(node);
         waitFor(Duration.ofMillis(2000));
         assertEnabled(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
         assertDisabled(bbiePanel.getRemarkField());
@@ -3868,7 +3868,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(node);
         waitFor(Duration.ofMillis(2000));
         assertEnabled(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
         assertDisabled(bbiePanel.getRemarkField());
@@ -3911,8 +3911,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertTrue(node.isDisplayed());
         bbiePanel = editBIEPage.getBBIEPanel(node);
         waitFor(Duration.ofMillis(2000));
-        assertDisabled(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
         assertDisabled(bbiePanel.getRemarkField());
@@ -3977,8 +3977,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertTrue(node.isDisplayed());
         bbiePanel = editBIEPage.getBBIEPanel(node);
         waitFor(Duration.ofMillis(2000));
-        assertDisabled(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
         assertDisabled(bbiePanel.getRemarkField());
@@ -4024,8 +4024,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         assertTrue(node.isDisplayed());
         bbiePanel = editBIEPage.getBBIEPanel(node);
         waitFor(Duration.ofMillis(2000));
-        assertDisabled(bbiePanel.getNillableCheckbox());
-        assertDisabled(bbiePanel.getUsedCheckbox());
+        assertEnabled(bbiePanel.getNillableCheckbox());
+        assertEnabled(bbiePanel.getUsedCheckbox());
         assertDisabled(bbiePanel.getCardinalityMinField());
         assertDisabled(bbiePanel.getCardinalityMaxField());
         assertDisabled(bbiePanel.getRemarkField());
