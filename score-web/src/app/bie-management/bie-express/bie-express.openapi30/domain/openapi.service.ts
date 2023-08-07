@@ -54,7 +54,7 @@ export class OpenAPIService {
 
   updateDetails(request: BieForOasDocUpdateRequest): Observable<any> {
     console.log(request);
-    return this.http.put<BieForOasDoc>('/api/oas_doc/' + request.oasDocId + '/bie_list/detail', request);
+    return this.http.put('/api/oas_doc/' + request.oasDocId + '/bie_list/detail', request.json);
   }
 
   delete(...oasDocIds): Observable<any> {

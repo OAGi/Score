@@ -352,7 +352,7 @@ CREATE TABLE `oas_operation`
     `oas_operation_id`      bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
     `oas_resource_id`       bigint(20) unsigned NOT NULL COMMENT 'A reference of the resource record.',
     `verb`                  varchar(30) NOT NULL COMMENT 'verbs, list of values droplist: get, put , post, delete, options, head, patch, trace;',
-    `operation_id`          varchar(50) NOT NULL COMMENT 'Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.',
+    `operation_id`          varchar(1024) NOT NULL COMMENT 'Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.',
     `summary`               text DEFAULT NULL COMMENT 'A short summary of what the operation does.',
     `description`           text COMMENT 'A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.',
     `deprecated`            tinyint(1) DEFAULT '0' COMMENT 'Declares this operation to be deprecated. Consumers SHOULD refrain from usage of the declared operation. Default value is false.',

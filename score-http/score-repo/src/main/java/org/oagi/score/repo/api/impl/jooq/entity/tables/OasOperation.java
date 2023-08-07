@@ -79,7 +79,7 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
      * operation, therefore, it is RECOMMENDED to follow common programming
      * naming conventions.
      */
-    public final TableField<OasOperationRecord, String> OPERATION_ID = createField(DSL.name("operation_id"), SQLDataType.VARCHAR(50).nullable(false), this, "Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.");
+    public final TableField<OasOperationRecord, String> OPERATION_ID = createField(DSL.name("operation_id"), SQLDataType.VARCHAR(1024).nullable(false), this, "Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.");
 
     /**
      * The column <code>oagi.oas_operation.summary</code>. A short summary of

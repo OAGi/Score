@@ -103,7 +103,7 @@ public class OasResourceRecord extends UpdatableRecordImpl<OasResourceRecord> im
 
     /**
      * Setter for <code>oagi.oas_resource.last_updated_by</code>. The user who
-     * last updates the oas_message_bodyrecord.
+     * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(5, value);
@@ -111,7 +111,7 @@ public class OasResourceRecord extends UpdatableRecordImpl<OasResourceRecord> im
 
     /**
      * Getter for <code>oagi.oas_resource.last_updated_by</code>. The user who
-     * last updates the oas_message_bodyrecord.
+     * last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(5);

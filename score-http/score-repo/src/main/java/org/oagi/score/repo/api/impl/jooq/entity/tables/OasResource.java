@@ -84,9 +84,9 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
     /**
      * The column <code>oagi.oas_resource.last_updated_by</code>. The user who
-     * last updates the oas_message_bodyrecord.
+     * last updates the record.
      */
-    public final TableField<OasResourceRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the oas_message_bodyrecord.");
+    public final TableField<OasResourceRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
      * The column <code>oagi.oas_resource.creation_timestamp</code>. The

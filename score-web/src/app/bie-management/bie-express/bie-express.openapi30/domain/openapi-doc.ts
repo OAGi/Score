@@ -269,9 +269,6 @@ export class BieForOasDoc {
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
-  arrayIndicator: boolean;
-  suppressRootIndicator: boolean;
-  messageBody: string;
   private _resourceName: string;
   private _operationId: string;
   private _verb: string;
@@ -310,6 +307,21 @@ export class BieForOasDoc {
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
   }
+
+  get json(): any {
+    return {
+      topLevelAsbiepId: this.topLevelAsbiepId,
+      oasResourceId: this.oasResourceId,
+      oasOperationId: this.oasOperationId,
+      resourceName: this.resourceName,
+      operationId: this.operationId,
+      verb: this.verb,
+      arrayIndicator: this.arrayIndicator,
+      suppressRootIndicator: this.suppressRootIndicator,
+      messageBody: this.messageBody
+    };
+  }
+
   get resourceName(): string {
     return this._resourceName;
   }
@@ -329,6 +341,30 @@ export class BieForOasDoc {
   }
   set verb(value: string) {
     this._verb = value;
+  }
+
+  get arrayIndicator(): boolean {
+    return this._arrayIndicator;
+  }
+
+  set arrayIndicator(arrayIndicator: boolean) {
+    this._arrayIndicator = arrayIndicator;
+  }
+
+  get suppressRootIndicator(): boolean {
+    return this._suppressRootIndicator;
+  }
+
+  set suppressRootIndicator(arrayIndicator: boolean) {
+    this._suppressRootIndicator = arrayIndicator;
+  }
+
+  get messageBody(): string {
+    return this._messageBody;
+  }
+
+  set messageBody(messageBody: string) {
+    this._messageBody = messageBody;
   }
 
   get hashCode(): number {
@@ -363,5 +399,12 @@ export class BieForOasDocUpdateRequest {
   bieForOasDocList: BieForOasDoc[];
   constructor() {
     this.bieForOasDocList = [];
+  }
+
+  get json(): any {
+    return {
+      oasDocId: this.oasDocId,
+      bieForOasDocList: this.bieForOasDocList.map(e => e.json)
+    };
   }
 }
