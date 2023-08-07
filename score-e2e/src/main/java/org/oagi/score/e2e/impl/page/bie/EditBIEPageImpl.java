@@ -1146,8 +1146,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
             String message = valueDomainElement.getAttribute("ng-reflect-message");
+            pressEscape();
             return message;
         }
+    }
+
+    private void pressEscape() {
+        waitFor(Duration.ofMillis(500));
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     private class BBIESCPanelImpl implements BBIESCPanel {

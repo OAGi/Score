@@ -174,7 +174,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public File hitGenerateButton(ExpressionFormat format, boolean compressed) {
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(ofMillis(40000), getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(30000), getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }

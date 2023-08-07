@@ -16,6 +16,7 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 import java.util.*;
@@ -3064,28 +3065,34 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                              * the meaning is the code list is usable but unstable.
                              */
                             assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                            escape(getDriver());
+                            pressEscape();
                         }
                         if (codeList.getState().equals("Deleted")) {
                             /**
                              * If the code list is in Deleted state use Strikethrough font.
                              */
                             assertEquals("This code list is deleted", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
-                            escape(getDriver());
+                            pressEscape();
                         }
                     } else {
-
+                        pressEscape();
                         click(bbiePanel.getValueDomainField());
                         waitFor(ofMillis(1000L));
                         By DROPDOWN_SEARCH_FIELD_LOCATOR =
                                 By.xpath("//input[@aria-label=\"dropdown search\"]");
                         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), codeList.getName());
                         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"" + codeList.getName() + "\")]//ancestor::mat-option[1]")).size());
-                        escape(getDriver());
+                        pressEscape();
                     }
                 }
             }
         }
+    }
+
+    public void pressEscape() {
+        waitFor(Duration.ofMillis(500));
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     @Test
