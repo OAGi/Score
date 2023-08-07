@@ -1,10 +1,8 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.bie.EditBIEPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -481,8 +479,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getTableRecordByCCNameAndOwner(String name, String owner) {
-        defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(),\"" + owner + "\")]"));
+        waitFor(ofMillis(1000L));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(), \"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + owner + "\")]"));
     }
 
     @Override

@@ -1239,7 +1239,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
             SeqKeyRecord prevSeqKeyRecord = seqKeyRecord.copy();
             prevSeqKeyRecord.setSeqKeyId(null);
             prevSeqKeyRecord.setFromAccManifestId(prevAsccManifestRecord.getFromAccManifestId());
-            prevSeqKeyRecord.setAsccManifestId(prevAsccManifestRecord.getToAsccpManifestId());
+            prevSeqKeyRecord.setAsccManifestId(prevAsccManifestRecord.getAsccManifestId());
 
             lastSeqKeyRecord = dslContext.selectFrom(SEQ_KEY)
                     .where(and(
