@@ -25,6 +25,8 @@ import java.time.Duration;
 import java.util.*;
 
 import static java.time.Duration.ofMillis;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -54,45 +56,44 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_1() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prevRelease = "10.9.1";
+        String currRelease = "10.9.2";
+
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
-        upliftBIEPage.setSourceBranch(curr_release);
-        assertThrows(TimeoutException.class, () -> upliftBIEPage.setTargetBranch(prev_release));
+        upliftBIEPage.setSourceBranch(currRelease);
+        assertThrows(TimeoutException.class, () -> upliftBIEPage.setTargetBranch(prevRelease));
     }
 
     @Test
     public void test_TA_29_1_2_BIE_Uplift() {
-        String prev_release = "10.9";
-        String curr_release = "10.9.2";
+        String prevRelease = "10.9";
+        String currRelease = "10.9.2";
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
-        Map<String, TopLevelASBIEPObject> testingBIEs = new HashMap<>();
-        Map<String, TopLevelASBIEPObject> upliftedBIEs = new HashMap<>();
 
-        {
-            preconditions_TA_29_1_2_Uplift_BIEUserbProduction(usera, prev_release, testingBIEs);
-        }
+        Preconditions_TA_29_1_2 preconditionsTa2912 = preconditions_TA_29_1_2_Uplift_BIEUserbProduction(usera, prevRelease);
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        TopLevelASBIEPObject topLevelASBIEPObject = testingBIEs.get("BIEUserbProduction");
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         // Uplift Production BIE
         upliftBIEPage.openPage();
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
-        upliftBIEPage.setSourceBranch(prev_release);
-        upliftBIEPage.setTargetBranch(curr_release);
+        upliftBIEPage.setSourceBranch(prevRelease);
+        upliftBIEPage.setTargetBranch(currRelease);
         upliftBIEPage.setState("Production");
-        upliftBIEPage.setPropertyTerm(topLevelASBIEPObject.getPropertyTerm());
+        upliftBIEPage.setPropertyTerm(preconditionsTa2912.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setOwner(usera.getLoginId());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -109,116 +110,135 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+        TopLevelASBIEPObject upliftedTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .getTopLevelASBIEPByID(topLevelAsbiepId);
 
-        if (!upliftedBIEs.containsKey("BIEUserbProduction")) {
-            upliftedBIEs.put("BIEUserbProduction", topLevelASBIEP);
-        } else {
-            upliftedBIEs.put("BIEUserbProduction", topLevelASBIEP);
-        }
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTopLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
-        WebElement bbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/System Environment Code");
+        WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
         assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
-        assertEquals("Code", getText(bbiePanel.getValueDomainRestrictionSelectField()));
-        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_SystemEnvironmentCode"));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2912.bbieExample, getText(bbiePanel.getExampleField()));
+        assertEquals(preconditionsTa2912.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2912.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
+        assertEquals(preconditionsTa2912.bbieValueDomainRestriction, getText(bbiePanel.getValueDomainRestrictionSelectField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2912.bbieValueDomain));
+        assertEquals(preconditionsTa2912.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
-        WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
+        WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.asbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
         assertNotChecked(asbiePanel.getNillableCheckbox());
         assertEquals("1", getText(asbiePanel.getCardinalityMinField()));
         assertEquals("1", getText(asbiePanel.getCardinalityMaxField()));
-        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
-        assertEquals("defcon", getText(asbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2912.asbieRemark, getText(asbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2912.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
 
-        WebElement bbieScNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
+        WebElement bbieScNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbieScPath);
         waitFor(ofMillis(2000));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         assertChecked(bbiescPanel.getUsedCheckbox());
         assertEquals("0", getText(bbiescPanel.getCardinalityMinField()));
         assertEquals("1", getText(bbiescPanel.getCardinalityMaxField()));
-        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
-        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
-        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
-        assertEquals("Agency", getText(bbiescPanel.getValueDomainRestrictionSelectField()));
-        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm63055D16B_AgencyIdentification"));
-        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
-        viewEditBIEPage.openPage();
-        viewEditBIEPage.setBranch(curr_release);
-        assertTrue(viewEditBIEPage.openEditBIEPage(topLevelASBIEP).isOpened());
+        assertEquals(preconditionsTa2912.bbieScExample, getText(bbiescPanel.getExampleField()));
+        assertEquals(preconditionsTa2912.bbieScRemark, getText(bbiescPanel.getRemarkField()));
+        assertEquals(preconditionsTa2912.bbieScFixedValue, getText(bbiescPanel.getFixedValueField()));
+        assertEquals(preconditionsTa2912.bbieScValueDomainRestriction, getText(bbiescPanel.getValueDomainRestrictionSelectField()));
+        assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(preconditionsTa2912.bbieScValueDomain));
+        assertEquals(preconditionsTa2912.bbieScContextDefinition, getText(bbiescPanel.getContextDefinitionField()));
     }
 
-    private void preconditions_TA_29_1_2_Uplift_BIEUserbProduction(AppUserObject usera, String prev_release, Map<String, TopLevelASBIEPObject> testingBIEs) {
-        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        BIEMenu bieMenu = homePage.getBIEMenu();
-        //BIEuserbProduction previousRelease
-        bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
-        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prev_release);
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
+    private class Preconditions_TA_29_1_2 {
 
-        if (!testingBIEs.containsKey("BIEUserbProduction")) {
-            testingBIEs.put("BIEUserbProduction", topLevelASBIEP);
-        } else {
-            testingBIEs.put("BIEUserbProduction", topLevelASBIEP);
+        private TopLevelASBIEPObject topLevelASBIEP;
+
+        // ASBIE
+        private String asbiePath = "/Change Acknowledge Shipment Status/Application Area";
+        private String asbieRemark = randomPrint(50, 100).trim();
+        private String asbieContextDefinition = randomPrint(50, 100).trim();
+
+        // BBIE
+        private String bbiePath  = "/Change Acknowledge Shipment Status/System Environment Code";
+        private String bbieRemark = randomPrint(50, 100).trim();
+        private String bbieExample = randomPrint(50, 100).trim();
+        private String bbieContextDefinition = randomPrint(50, 100).trim();
+        private String bbieValueConstraint = "Fixed Value";
+        private String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private String bbieValueDomainRestriction = "Code";
+        private String bbieValueDomain = "oacl_SystemEnvironmentCode";
+
+        // BBIE_SC
+        private String bbieScPath = "/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier";
+        private String bbieScRemark = randomPrint(50, 100).trim();
+        private String bbieScExample = randomPrint(50, 100).trim();
+        private String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private String bbieScValueConstraint = "Fixed Value";
+        private String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private String bbieScValueDomainRestriction = "Agency";
+        private String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
+
+        Preconditions_TA_29_1_2(AppUserObject usera, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                    "Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prevRelease);
+            this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
         }
 
-        WebElement bbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/System Environment Code");
+    }
+
+    private Preconditions_TA_29_1_2 preconditions_TA_29_1_2_Uplift_BIEUserbProduction(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_2 preconditionsTa2912 = new Preconditions_TA_29_1_2(usera, prevRelease);
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2912.topLevelASBIEP);
+
+        WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
-        bbiePanel.setRemark("aRemark");
-        bbiePanel.setExample("anExample");
-        bbiePanel.setContextDefinition("defcon");
-        bbiePanel.setValueConstraint("Fixed Value");
-        bbiePanel.setFixedValue("99");
-        bbiePanel.setValueDomainRestriction("Code");
-        bbiePanel.setValueDomain("oacl_SystemEnvironmentCode");
+        bbiePanel.setRemark(preconditionsTa2912.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2912.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2912.bbieContextDefinition);
+        bbiePanel.setValueConstraint(preconditionsTa2912.bbieValueConstraint);
+        bbiePanel.setFixedValue(preconditionsTa2912.bbieFixedValue);
+        bbiePanel.setValueDomainRestriction(preconditionsTa2912.bbieValueDomainRestriction);
+        bbiePanel.setValueDomain(preconditionsTa2912.bbieValueDomain);
         editBIEPage.hitUpdateButton();
 
-        WebElement asbieNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area");
+        WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.asbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.setRemark("aRemark");
-        asbiePanel.setContextDefinition("defcon");
+        asbiePanel.setRemark(preconditionsTa2912.asbieRemark);
+        asbiePanel.setContextDefinition(preconditionsTa2912.asbieContextDefinition);
         editBIEPage.hitUpdateButton();
 
-        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier");
+        WebElement bbieScNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbieScPath);
         waitFor(ofMillis(2000));
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         bbiescPanel.toggleUsed();
-        bbiescPanel.setRemark("aRemark");
-        bbiescPanel.setExample("anExample");
-        bbiescPanel.setValueConstraint("Fixed Value");
-        bbiescPanel.setFixedValue("99");
-        bbiescPanel.setValueDomainRestriction("Agency");
-        bbiescPanel.setValueDomain("clm63055D16B_AgencyIdentification");
-        bbiescPanel.setContextDefinition("defcon");
+        bbiescPanel.setRemark(preconditionsTa2912.bbieScRemark);
+        bbiescPanel.setExample(preconditionsTa2912.bbieScExample);
+        bbiescPanel.setValueConstraint(preconditionsTa2912.bbieScValueConstraint);
+        bbiescPanel.setFixedValue(preconditionsTa2912.bbieScFixedValue);
+        bbiescPanel.setValueDomainRestriction(preconditionsTa2912.bbieScValueDomainRestriction);
+        bbiescPanel.setValueDomain(preconditionsTa2912.bbieScValueDomain);
+        bbiescPanel.setContextDefinition(preconditionsTa2912.bbieScContextDefinition);
         editBIEPage.hitUpdateButton();
         editBIEPage.moveToQA();
         editBIEPage.moveToProduction();
         homePage.logout();
+
+        return preconditionsTa2912;
     }
 
     private void precondition_TA_29_1_BIE1QA(AppUserObject usera, AppUserObject userb, String prev_release, Map<String, TopLevelASBIEPObject> testingBIEs) {
