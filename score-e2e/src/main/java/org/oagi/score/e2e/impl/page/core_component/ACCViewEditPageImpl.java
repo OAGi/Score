@@ -372,10 +372,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public SelectAssociationDialog appendPropertyAtLast(String path) {
+        waitFor(ofMillis(1000L));
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
             click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
-        } catch (TimeoutException e) {
+        } catch (WebDriverException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
             click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
