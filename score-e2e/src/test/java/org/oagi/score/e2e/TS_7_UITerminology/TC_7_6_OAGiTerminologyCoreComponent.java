@@ -153,10 +153,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         accExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
 
         String objectClassTermFieldBIEPageTitleGlobalExtension = accExtensionViewEditPage.getObjectClassTermFieldLabel();
-        assertEquals("Object Class Term (Space Separated Name)", objectClassTermFieldBIEPageTitleGlobalExtension);
+        assertEquals("Object Class Term", objectClassTermFieldBIEPageTitleGlobalExtension);
 
         String denFieldBIEPageTitleGlobalExtension = accExtensionViewEditPage.getDENFieldLabel();
-        assertEquals("DEN (Dictionary Entry Name)", denFieldBIEPageTitleGlobalExtension);
+        assertEquals("DEN", denFieldBIEPageTitleGlobalExtension);
     }
 
     @Test
