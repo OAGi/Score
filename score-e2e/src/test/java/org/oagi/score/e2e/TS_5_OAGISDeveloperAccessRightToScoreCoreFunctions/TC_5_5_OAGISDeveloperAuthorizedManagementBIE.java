@@ -1174,7 +1174,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         click(homePage.getScoreLogo());
         ViewEditBIEPage viewEditBIEPageForCheck = homePage.getBIEMenu().openViewEditBIESubMenu();
         viewEditBIEPageForCheck.setBranch(topLevelASBIEP.getReleaseNumber());
-        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId()).getLoginId());
+        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         viewEditBIEPageForCheck.setDEN(topLevelASBIEP.getPropertyTerm());
         viewEditBIEPageForCheck.hitSearchButton();
 

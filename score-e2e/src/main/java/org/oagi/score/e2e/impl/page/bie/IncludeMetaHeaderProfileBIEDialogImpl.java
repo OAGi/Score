@@ -4,10 +4,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.bie.IncludeMetaHeaderProfileBIEDialog;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -95,7 +92,13 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
         retry(() -> {
             WebElement tr = getTableRecordByValue(metaHeaderASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+            try {
+                click(ele);
+            } catch (ElementNotInteractableException e) {
+                JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+                executor.executeScript("arguments[0].click();", ele);
+            }
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());
