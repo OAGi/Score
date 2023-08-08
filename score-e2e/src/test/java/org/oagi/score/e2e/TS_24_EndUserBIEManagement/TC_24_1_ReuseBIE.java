@@ -132,7 +132,6 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
 
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
-
     }
 
     @Test

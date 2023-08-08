@@ -1693,6 +1693,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
+            viewEditCoreComponentPage.setBranch(branch);
+            waitFor(Duration.ofMillis(1500));
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 

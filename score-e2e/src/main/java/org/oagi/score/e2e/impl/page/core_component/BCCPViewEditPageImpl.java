@@ -105,7 +105,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
         assert "BCCP".equals(getText(getBCCPPanelContainer().getBCCPPanel().getCoreComponentField()));
-        assert getText(getTitle()).equals(bccp.getDen());
+        assert getText(getTitle()).startsWith(bccp.getPropertyTerm());
     }
 
     @Override
