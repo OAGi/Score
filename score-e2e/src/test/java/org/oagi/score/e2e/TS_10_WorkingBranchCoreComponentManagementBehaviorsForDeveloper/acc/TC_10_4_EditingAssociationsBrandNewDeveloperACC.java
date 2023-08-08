@@ -9,6 +9,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -435,6 +436,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"must be greater than\")]")).size());
+        asccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
@@ -927,7 +929,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_4_6_b() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -967,6 +968,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         bccPanel.setCardinalityMaxField("11");
         bccPanel.setCardinalityMinField("111");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"must be less than or equal\")]")).size());
+
+        bccPanel.setCardinalityMinField("0"); // revert
         bccPanel.setDefinition("Test Max >= Min");
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
@@ -2874,7 +2877,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_4_23() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -2889,7 +2891,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
         }
 
-
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -2901,12 +2902,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendAssociationDialog.selectAssociation("Description. Text");
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Free Form Text Group. Details] already has BCCP [Description. Text]"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        appendAssociationDialog.selectAssociation("Description. Description_ Text");
+
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        String snackBarMessage = getText(multiActionSnackBar.getMessageElement());
+        assertTrue(snackBarMessage.contains("Free Form Text Group. Details] already has BCCP [Description. Description_ Text]"));
     }
 
     @Test

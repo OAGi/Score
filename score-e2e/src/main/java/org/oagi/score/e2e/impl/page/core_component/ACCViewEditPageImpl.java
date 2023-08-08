@@ -119,7 +119,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Insert Property After\")]");
 
-    private static final By REFACTOR_OPTIION_LOCATOR =
+    private static final By REFACTOR_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Refactor\")]");
 
     private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
@@ -375,11 +375,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         waitFor(ofMillis(1000L));
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         } catch (WebDriverException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
@@ -527,13 +527,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
         }
         SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = new SelectBaseACCToRefactorDialogImpl(this,
                 associationPropertyTerm);
@@ -545,12 +545,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void unGroup(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
             click(elementToBeClickable(getDriver(), UNGROUP_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), REFACTOR_OPTIION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
             click(elementToBeClickable(getDriver(), UNGROUP_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
