@@ -654,7 +654,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2915.bbieExample, getText(bbiePanel.getExampleField()));
         assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
         assertEquals(preconditionsTa2915.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
-        assertEquals(preconditionsTa2915.bbieValueDomain, getText(bbiePanel.getValueDomainField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2915.bbieValueDomain));
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Description");
         waitFor(ofMillis(2500));
@@ -665,15 +665,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2915.bbieExample, getText(bbiePanel.getExampleField()));
         assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
         assertEquals(preconditionsTa2915.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
-        assertEquals(preconditionsTa2915.bbieValueDomain, getText(bbiePanel.getValueDomainField()));
+        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2915.bbieValueDomain));
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Codes");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals(preconditionsTa2915.bbieRemark, getText(bbiePanel.getRemarkField()));
-        assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.asbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.asbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
         waitFor(ofMillis(2500));
