@@ -494,54 +494,36 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path) {
-        /*return retry(() -> {
-            WebElement node = clickOnDropDownMenuByPath(path);
-            try {
-                click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
-            } catch (TimeoutException e) {
-                click(node);
-                new Actions(getDriver()).sendKeys("O").perform();
-                click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
-            }
-            waitFor(ofMillis(1000L));
-
-            SelectProfileBIEToReusePage selectProfileBIEToReuse = new SelectProfileBIEToReusePageImpl(this);
-            assert selectProfileBIEToReuse.isOpened();
-            return selectProfileBIEToReuse;
-        });*/
-
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         }
         waitFor(ofMillis(1000L));
 
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
-
     }
 
     @Override
     public SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel) {
         WebElement node = clickOnDropDownMenuByPathAndLevel(path, dataLevel);
         try {
-            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         }
         waitFor(ofMillis(1000L));
 
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
-
     }
 
     @Override
