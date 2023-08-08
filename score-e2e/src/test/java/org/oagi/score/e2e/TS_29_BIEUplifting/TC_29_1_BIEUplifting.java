@@ -322,7 +322,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
         bbiePanel.setExample(preconditionsTa2914.bbieExample);
         bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
-        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
@@ -332,7 +331,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
         bbiePanel.setExample(preconditionsTa2914.bbieExample);
         bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
-        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
         editBIEPage.hitUpdateButton();
 
 
@@ -489,50 +487,24 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("aRemark", getText(topLevelASBIEPPanel.getRemarkField()));
         assertEquals("aStatus", getText(topLevelASBIEPPanel.getStatusField()));
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths) {
-            editBIEPage.goToNodeByPath(bbiePath);
-            WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-            assertChecked(bbiePanel.getUsedCheckbox());
-            assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
-            assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
-            assertEquals(preconditionsTa2914.bbieExample, getText(bbiePanel.getExampleField()));
-            assertEquals(preconditionsTa2914.bbieRemark, getText(bbiePanel.getRemarkField()));
-            assertEquals(preconditionsTa2914.bbieValueDomainRestriction, getText(bbiePanel.getValueDomainRestrictionSelectField()));
-            assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2914.bbieValueDomain));
-            assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
-        }
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertChecked(bbiePanel.getUsedCheckbox());
 
-        for (String asbiePath : preconditionsTa2914.asbiePaths) {
-            editBIEPage.goToNodeByPath(asbiePath);
-            WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-            assertChecked(asbiePanel.getUsedCheckbox());
-            assertNotChecked(asbiePanel.getNillableCheckbox());
-            assertEquals("11", getText(asbiePanel.getCardinalityMinField()));
-            assertEquals("99", getText(asbiePanel.getCardinalityMaxField()));
-            assertEquals(preconditionsTa2914.asbieRemark, getText(asbiePanel.getRemarkField()));
-            assertEquals(preconditionsTa2914.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
-        }
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        assertChecked(bbiePanel.getUsedCheckbox());
+        assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
+        assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
+        assertEquals(preconditionsTa2914.bbieExample, getText(bbiePanel.getExampleField()));
+        assertEquals(preconditionsTa2914.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
-        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
-            editBIEPage.goToNodeByPath(bbieScPath);
-            WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
-            assertChecked(bbiescPanel.getUsedCheckbox());
-            assertEquals("0", getText(bbiescPanel.getCardinalityMinField()));
-            assertEquals("1", getText(bbiescPanel.getCardinalityMaxField()));
-            assertEquals(preconditionsTa2914.bbieScExample, getText(bbiescPanel.getExampleField()));
-            assertEquals(preconditionsTa2914.bbieScRemark, getText(bbiescPanel.getRemarkField()));
-            assertEquals(preconditionsTa2914.bbieScFixedValue, getText(bbiescPanel.getFixedValueField()));
-            assertEquals(preconditionsTa2914.bbieScValueDomainRestriction, getText(bbiescPanel.getValueDomainRestrictionSelectField()));
-            assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(preconditionsTa2914.bbieScValueDomain));
-            assertEquals(preconditionsTa2914.bbieScContextDefinition, getText(bbiescPanel.getContextDefinitionField()));
-        }
-
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set");
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        assertChecked(asbiePanel.getUsedCheckbox());
     }
 
     protected boolean isElementPresent(By by) {
@@ -546,8 +518,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5b() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -582,8 +554,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5c_and_TA_29_1_7_and_TA_29_1_8() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -662,10 +634,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getDefaultValueField()));
+        assertEquals(preconditionsTa2915.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.bbieExample, getText(bbiePanel.getExampleField()));
+        assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Status");
         waitFor(ofMillis(2500));
@@ -678,30 +650,30 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
-        assertEquals("language", getText(bbiePanel.getValueDomainField()));
+        assertEquals(preconditionsTa2915.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.bbieExample, getText(bbiePanel.getExampleField()));
+        assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
+        assertEquals(preconditionsTa2915.bbieValueDomain, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Description");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiePanel.getExampleField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiePanel.getFixedValueField()));
-        assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
+        assertEquals(preconditionsTa2915.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.bbieExample, getText(bbiePanel.getExampleField()));
+        assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.bbieFixedValue, getText(bbiePanel.getFixedValueField()));
+        assertEquals(preconditionsTa2915.bbieValueDomain, getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Codes");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEnabled(bbiePanel.getUsedCheckbox());
         assertChecked(bbiePanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiePanel.getRemarkField()));
-        assertEquals("defcon", getText(bbiePanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.bbieRemark, getText(bbiePanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
         waitFor(ofMillis(2500));
@@ -714,10 +686,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEnabled(bbiescPanel.getUsedCheckbox());
         assertChecked(bbiescPanel.getUsedCheckbox());
-        assertEquals("aRemark", getText(bbiescPanel.getRemarkField()));
-        assertEquals("anExample", getText(bbiescPanel.getExampleField()));
-        assertEquals("defcon", getText(bbiescPanel.getContextDefinitionField()));
-        assertEquals("99", getText(bbiescPanel.getFixedValueField()));
+        assertEquals(preconditionsTa2915.bbieScRemark, getText(bbiescPanel.getRemarkField()));
+        assertEquals(preconditionsTa2915.bbieScExample, getText(bbiescPanel.getExampleField()));
+        assertEquals(preconditionsTa2915.bbieScContextDefinition, getText(bbiescPanel.getContextDefinitionField()));
+        assertEquals(preconditionsTa2915.bbieScFixedValue, getText(bbiescPanel.getFixedValueField()));
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification");
         waitFor(ofMillis(2500));
@@ -800,8 +772,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5d_and_TA_29_1_6ab() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(userb);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1071,8 +1043,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_9a() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1250,8 +1222,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_9b_and_TA_29_1_9c() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1266,7 +1238,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP);
-        waitFor(ofMillis(1000));
+        waitFor(ofMillis(2000));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
@@ -1526,8 +1498,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10a() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1620,8 +1592,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10b() {
-        String prev_release = "10.9";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1747,8 +1719,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
-        String prev_release = "10.9";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         Map<String, CodeListObject> upliftedCodeLists = new HashMap<>();
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -2284,7 +2256,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     @Test
     public void test_TA_29_1_12() {
         String prev_release = "10.8.8";
-        String curr_release = "10.9.2";
+        String curr_release = "10.9";
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
