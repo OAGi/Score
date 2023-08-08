@@ -16,6 +16,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +24,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_7_DeletingACodeList extends BaseTest {
@@ -101,9 +101,12 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             String qualifier = "testDataType" + randomAlphabetic(5, 10);
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
-            dtViewEditPage.hitUpdateButton();
             if (definition == null) {
+                click(dtViewEditPage.getUpdateButton(true));
+                waitFor(Duration.ofMillis(500));
                 dtViewEditPage.hitUpdateAnywayButton();
+            } else{
+                dtViewEditPage.hitUpdateButton();
             }
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
@@ -134,6 +137,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     public void test_TA_3() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
+        ACCObject acc;
         ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
@@ -142,6 +146,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developerA, workingBranch, namespace, "WIP");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
@@ -162,9 +167,11 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             String qualifier = "testDataType" + randomAlphabetic(5, 10);
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
-            dtViewEditPage.hitUpdateButton();
             if (definition == null) {
+                click(dtViewEditPage.getUpdateButton(true));
                 dtViewEditPage.hitUpdateAnywayButton();
+            } else{
+                dtViewEditPage.hitUpdateButton();
             }
             /**
              * Create new BCCP that uses previously created BDT
@@ -176,17 +183,18 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             bccpViewEditPage.setNamespace("http://www.openapplications.org/oagis/10");
             bccpViewEditPage.setDefinition("definition");
             definition = getText(bccpViewEditPage.getDefinitionField());
-            bccpViewEditPage.hitUpdateButton();
             if (definition == null) {
+                click(bccpViewEditPage.getUpdateButton(true));
                 bccpViewEditPage.hitUpdateAnywayButton();
+            }else{
+                bccpViewEditPage.hitUpdateButton();
             }
             BCCPObject createdBCCP = getAPIFactory().getCoreComponentAPI().getLatestBCCPCreatedByUser(developerA, workingBranch.getReleaseNumber());
             /**
              * Create ACC that has previously created BCCP
              */
             viewEditCoreComponentPage.openPage();
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.createACC(workingBranch.getReleaseNumber());
-            ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum("Object Class Term. Details", workingBranch.getReleaseNumber());
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             SelectAssociationDialog selectAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
             selectAssociationDialog.selectAssociation(createdBCCP.getDen());
 

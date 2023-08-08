@@ -78,7 +78,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             boolean previousDeprecatedStatus = codeList.isDeprecated();
             if (previousDeprecatedStatus == true) {
-                assertDisabled(editCodeListPage.getDeprecatedSelectField());
+                assertEnabled(editCodeListPage.getDeprecatedSelectField());
             } else {
                 assertEnabled(editCodeListPage.getDeprecatedSelectField());
             }
@@ -147,7 +147,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
                 editCodeListValueDialog.setDefinitionSource("new definition source for value");
                 boolean previousDeprecatedStatusForValue = value.isDeprecated();
                 if (previousDeprecatedStatusForValue == true) {
-                    assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
+                    assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
                 } else {
                     assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
                 }
