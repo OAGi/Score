@@ -15,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1657,6 +1658,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         accViewEditPage.hitAmendButton();
         viewEditCoreComponentPage.openPage();
         {
+            viewEditCoreComponentPage.setBranch(branch);
+            waitFor(Duration.ofMillis(1500));
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 
@@ -1868,7 +1871,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertEquals("2", getText(asccPanel.getRevisionField()));
         assertChecked(asccPanel.getDeprecatedCheckbox());
-        assertDisabled(asccPanel.getDeprecatedCheckbox());
+        assertEnabled(asccPanel.getDeprecatedCheckbox());
     }
 
     @Test

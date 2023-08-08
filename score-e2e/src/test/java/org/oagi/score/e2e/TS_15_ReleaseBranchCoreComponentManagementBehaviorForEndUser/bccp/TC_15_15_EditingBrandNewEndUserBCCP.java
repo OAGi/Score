@@ -96,7 +96,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
 
         String denText = getText(bccpPanel.getDENField());
-        assertEquals("Test Object " + randomPropertyTerm + ". Code", denText);
+        assertEquals("Test Object " + randomPropertyTerm + ". System Environment_ Code", denText);
     }
 
     @Test

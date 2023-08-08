@@ -56,8 +56,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_1() {
-        String prevRelease = "10.9.1";
-        String currRelease = "10.9.2";
+        String prevRelease = "10.8.7.1";
+        String currRelease = "10.9";
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -73,8 +73,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_2_BIE_Uplift() {
-        String prevRelease = "10.9";
-        String currRelease = "10.9.2";
+        String prevRelease = "10.8.7.1";
+        String currRelease = "10.9";
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -240,46 +240,148 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.setBranch(prevRelease);
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2914.topLevelASBIEP);
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths) {
-            editBIEPage.goToNodeByPath(bbiePath);
-            WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-            bbiePanel.toggleUsed();
-            bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
-            bbiePanel.setExample(preconditionsTa2914.bbieExample);
-            bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
-            bbiePanel.setValueConstraint(preconditionsTa2914.bbieValueConstraint);
-            bbiePanel.setFixedValue(preconditionsTa2914.bbieFixedValue);
-            bbiePanel.setValueDomainRestriction(preconditionsTa2914.bbieValueDomainRestriction);
-            bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
-            editBIEPage.hitUpdateButton();
-        }
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Last Modification Date Time");
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
 
-        for (String asbiePath : preconditionsTa2914.asbiePaths) {
-            editBIEPage.getNodeByPath(asbiePath);
-            WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-            asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
-            asbiePanel.setContextDefinition(preconditionsTa2914.asbieContextDefinition);
-            editBIEPage.hitUpdateButton();
-        }
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Identifier");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
 
-        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
-            WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
-            waitFor(ofMillis(2000));
-            EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
-            bbiescPanel.toggleUsed();
-            bbiescPanel.setRemark(preconditionsTa2914.bbieScRemark);
-            bbiescPanel.setExample(preconditionsTa2914.bbieScExample);
-            bbiescPanel.setValueConstraint(preconditionsTa2914.bbieScValueConstraint);
-            bbiescPanel.setFixedValue(preconditionsTa2914.bbieScFixedValue);
-            bbiescPanel.setValueDomainRestriction(preconditionsTa2914.bbieScValueDomainRestriction);
-            bbiescPanel.setValueDomain(preconditionsTa2914.bbieScValueDomain);
-            bbiescPanel.setContextDefinition(preconditionsTa2914.bbieScContextDefinition);
-            editBIEPage.hitUpdateButton();
-        }
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Name");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        bbiePanel.setValueConstraint(preconditionsTa2914.bbieValueConstraint);
+        bbiePanel.setFixedValue(preconditionsTa2914.bbieFixedValue);
+        bbiePanel.setValueDomainRestriction(preconditionsTa2914.bbieValueDomainRestriction);
+        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        bbiePanel.setValueConstraint(preconditionsTa2914.bbieValueConstraint);
+        bbiePanel.setFixedValue(preconditionsTa2914.bbieFixedValue);
+        bbiePanel.setValueDomainRestriction(preconditionsTa2914.bbieValueDomainRestriction);
+        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
+        editBIEPage.hitUpdateButton();
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
+        waitFor(Duration.ofMillis(2000));
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
+        asbiePanel.setContextDefinition(preconditionsTa2914.asbieContextDefinition);
+        editBIEPage.hitUpdateButton();
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
+        waitFor(Duration.ofMillis(2000));
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
+        asbiePanel.setContextDefinition(preconditionsTa2914.asbieContextDefinition);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.setCardinalityMin(11);
+        bbiePanel.setCardinalityMax(99);
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
+        editBIEPage.hitUpdateButton();
+
+
+        WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
+        bbiescPanel.toggleUsed();
+        bbiescPanel.setRemark(preconditionsTa2914.bbieScRemark);
+        bbiescPanel.setExample(preconditionsTa2914.bbieScExample);
+        bbiescPanel.setValueConstraint(preconditionsTa2914.bbieScValueConstraint);
+        bbiescPanel.setFixedValue(preconditionsTa2914.bbieScFixedValue);
+        bbiescPanel.setValueDomainRestriction(preconditionsTa2914.bbieScValueDomainRestriction);
+        bbiescPanel.setValueDomain(preconditionsTa2914.bbieScValueDomain);
+        bbiescPanel.setContextDefinition(preconditionsTa2914.bbieScContextDefinition);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setCardinalityMin(11);
+        bbiePanel.setCardinalityMax(99);
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        editBIEPage.hitUpdateButton();
+
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
+        waitFor(Duration.ofMillis(2000));
+        asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
+        asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
+        asbiePanel.setContextDefinition(preconditionsTa2914.asbieContextDefinition);
+        asbiePanel.setCardinalityMin(11);
+        asbiePanel.setCardinalityMax(99);
+        editBIEPage.hitUpdateButton();
+
+        bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
+        waitFor(Duration.ofMillis(2000));
+        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        bbiePanel.toggleUsed();
+        bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
+        bbiePanel.setExample(preconditionsTa2914.bbieExample);
+        bbiePanel.setContextDefinition(preconditionsTa2914.bbieContextDefinition);
+        bbiePanel.setValueConstraint(preconditionsTa2914.bbieValueConstraint);
+        bbiePanel.setFixedValue(preconditionsTa2914.bbieFixedValue);
+        bbiePanel.setValueDomainRestriction(preconditionsTa2914.bbieValueDomainRestriction);
+        bbiePanel.setValueDomain(preconditionsTa2914.bbieValueDomain);
+        editBIEPage.hitUpdateButton();
 
         editBIEPage.moveToQA();
         homePage.logout();
@@ -288,8 +390,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_3() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -317,8 +419,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -409,8 +511,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
             assertChecked(asbiePanel.getUsedCheckbox());
             assertNotChecked(asbiePanel.getNillableCheckbox());
-            assertEquals("1", getText(asbiePanel.getCardinalityMinField()));
-            assertEquals("1", getText(asbiePanel.getCardinalityMaxField()));
+            assertEquals("11", getText(asbiePanel.getCardinalityMinField()));
+            assertEquals("99", getText(asbiePanel.getCardinalityMaxField()));
             assertEquals(preconditionsTa2914.asbieRemark, getText(asbiePanel.getRemarkField()));
             assertEquals(preconditionsTa2914.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
         }
