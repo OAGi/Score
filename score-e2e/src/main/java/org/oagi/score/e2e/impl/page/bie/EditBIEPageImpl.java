@@ -179,11 +179,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
             }
 
             click(elementToBeClickable(getDriver(), By.xpath(
@@ -198,11 +198,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
             }
 
             click(elementToBeClickable(getDriver(), By.xpath(
@@ -217,11 +217,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             }
 
             String currentUrl = retry(() -> {
@@ -245,11 +245,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
 
             String currentUrl = retry(() -> {
@@ -273,11 +273,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
         });
     }
@@ -497,11 +497,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         /*return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
             }
             waitFor(ofMillis(1000L));
 
@@ -512,11 +512,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         }
         waitFor(ofMillis(1000L));
 
@@ -530,11 +530,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel) {
         WebElement node = clickOnDropDownMenuByPathAndLevel(path, dataLevel);
         try {
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         }
         waitFor(ofMillis(1000L));
 

@@ -283,11 +283,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             String propertyTerm = getText(getBCCPPanelContainer().getBCCPPanel().getPropertyTermField());
             WebElement node = clickOnDropDownMenuByPath("/" + propertyTerm);
             try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
             BCCPChangeBDTDialog bccpChangeBDTDialog = new BCCPChangeBDTDialogImpl(this);
@@ -462,7 +462,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("C").perform();
@@ -502,11 +502,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         String path = "/" + this.bccp.getPropertyTerm();
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         }
         switchToNextTab(getDriver());
 

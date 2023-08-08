@@ -409,11 +409,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public AddCommentDialog hitAddCommentButton(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         }
         AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
@@ -587,11 +587,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void addSupplementaryComponent(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         }
     }
     @Override
@@ -605,11 +605,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void removeSupplementaryComponent(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         }
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Remove anyway\")]//ancestor::button[1]")));
