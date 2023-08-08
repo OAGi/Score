@@ -518,8 +518,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5b() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -554,8 +554,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5c_and_TA_29_1_7_and_TA_29_1_8() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -772,8 +772,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5d_and_TA_29_1_6ab() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(userb);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1043,8 +1043,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_9a() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1222,8 +1222,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_9b_and_TA_29_1_9c() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1238,7 +1238,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP);
-        waitFor(ofMillis(1000));
+        waitFor(ofMillis(2000));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
@@ -1498,8 +1498,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10a() {
-        String prev_release = "10.9.1";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1592,8 +1592,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_10b() {
-        String prev_release = "10.9";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1719,8 +1719,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_11a_and_TA_29_11b() {
-        String prev_release = "10.9";
-        String curr_release = "10.9.2";
+        String prev_release = "10.8.7.1";
+        String curr_release = "10.9";
         Map<String, CodeListObject> upliftedCodeLists = new HashMap<>();
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -2256,7 +2256,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     @Test
     public void test_TA_29_1_12() {
         String prev_release = "10.8.8";
-        String curr_release = "10.9.2";
+        String curr_release = "10.9";
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
