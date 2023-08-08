@@ -14,8 +14,8 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
@@ -81,11 +81,11 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            BIEMenu bieMenu = homePage.getBIEMenu();
-            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
-            getDriver().manage().window().maximize();
             if (topLevelAsbiep.getState().equals("WIP")) {
                 ACCExtensionViewEditPage accExtensionViewEditPage =
                         editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
@@ -109,6 +109,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 });
                 escape(getDriver());
             }
+
+            viewEditBIEPage.openPage();
         }
     }
 
@@ -1154,9 +1156,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            BIEMenu bieMenu = homePage.getBIEMenu();
-            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             ASCCPObject asccp = bieASCCPMap.get(topLevelAsbiep);
             /**
@@ -1200,6 +1202,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                 });
                 escape(getDriver());
             }
+
+            viewEditBIEPage.openPage();
         }
     }
 

@@ -170,16 +170,25 @@ public abstract class PageHelper {
     }
 
     public static WebElement click(WebElement element) {
+        return click(null, element);
+    }
+
+    public static WebElement click(WebDriver driver, WebElement element) {
         if (element != null) {
             String tagName = element.getTagName();
             try {
                 element.click();
-            } catch (ElementClickInterceptedException e) {
+            } catch (ElementNotInteractableException e) {
                 if ("mat-select".equals(tagName)) {
                     WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-select-arrow-wrapper"));
                     click(arrowWrapper);
                 } else {
-                    throw e;
+                    if (driver != null) {
+                        JavascriptExecutor executor = (JavascriptExecutor) driver;
+                        executor.executeScript("arguments[0].click();", element);
+                    } else {
+                        throw e;
+                    }
                 }
             }
             waitFor(DEFAULT_WAIT_DURATION);

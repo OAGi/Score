@@ -94,12 +94,7 @@ public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePag
             WebElement tr = getTableRecordByValue(paginationResponseASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
             WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
-            try {
-                click(ele);
-            } catch (ElementNotInteractableException e) {
-                JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-                executor.executeScript("arguments[0].click();", ele);
-            }
+            click(getDriver(), ele);
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());

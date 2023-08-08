@@ -157,7 +157,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             String[] nodes = path.split("/");
             String nodeName = nodes[nodes.length - 1];
             WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
             try {
                 if (visibilityOfElementLocated(getDriver(),
@@ -298,7 +298,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -307,12 +307,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
-        node.sendKeys(Keys.ENTER);
-        click(node);
-        clear(getSearchInputTextField());
-        return node;
+        return retry(() -> {
+            WebElement searchInput = getSearchInputTextField();
+            click(getDriver(), searchInput);
+            WebElement node = sendKeys(searchInput, path);
+            node.sendKeys(Keys.ENTER);
+            click(getDriver(), node);
+            clear(searchInput);
+            return node;
+        });
     }
 
     public TopLevelASBIEPPanel getTopLevelASBIEPPanel() {
@@ -357,8 +360,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement goToNodeByPath(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         node.sendKeys(Keys.ENTER);
         node.sendKeys(Keys.ENTER);
@@ -366,7 +370,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         node.sendKeys(Keys.ENTER);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 
