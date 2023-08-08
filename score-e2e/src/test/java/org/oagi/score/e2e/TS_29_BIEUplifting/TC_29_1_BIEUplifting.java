@@ -16,13 +16,10 @@ import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
-import org.oagi.score.e2e.page.help.UserGuidePage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
-import javax.swing.*;
-import javax.swing.text.View;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
@@ -168,7 +165,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         private String asbieContextDefinition = randomPrint(50, 100).trim();
 
         // BBIE
-        private String bbiePath  = "/Change Acknowledge Shipment Status/System Environment Code";
+        private String bbiePath = "/Change Acknowledge Shipment Status/System Environment Code";
         private String bbieRemark = randomPrint(50, 100).trim();
         private String bbieExample = randomPrint(50, 100).trim();
         private String bbieContextDefinition = randomPrint(50, 100).trim();
@@ -338,7 +335,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.setBranch(prevRelease);
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2914.topLevelASBIEP);
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths){
+        for (String bbiePath : preconditionsTa2914.bbiePaths) {
             editBIEPage.goToNodeByPath(bbiePath);
             WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
             waitFor(ofMillis(2000));
@@ -354,7 +351,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             editBIEPage.hitUpdateButton();
         }
 
-        for (String asbiePath: preconditionsTa2914.asbiePaths){
+        for (String asbiePath : preconditionsTa2914.asbiePaths) {
             editBIEPage.getNodeByPath(asbiePath);
             WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
             waitFor(ofMillis(2000));
@@ -364,7 +361,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             editBIEPage.hitUpdateButton();
         }
 
-        for (String bbieScPath : preconditionsTa2914.bbieScPaths){
+        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
             WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
             waitFor(ofMillis(2000));
             EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
@@ -493,7 +490,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("aRemark", getText(topLevelASBIEPPanel.getRemarkField()));
         assertEquals("aStatus", getText(topLevelASBIEPPanel.getStatusField()));
 
-        for (String bbiePath : preconditionsTa2914.bbiePaths){
+        for (String bbiePath : preconditionsTa2914.bbiePaths) {
             editBIEPage.goToNodeByPath(bbiePath);
             WebElement bbieNode = editBIEPage.getNodeByPath(bbiePath);
             waitFor(ofMillis(2000));
@@ -505,10 +502,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             assertEquals(preconditionsTa2914.bbieRemark, getText(bbiePanel.getRemarkField()));
             assertEquals(preconditionsTa2914.bbieValueDomainRestriction, getText(bbiePanel.getValueDomainRestrictionSelectField()));
             assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2914.bbieValueDomain));
-            assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()))
+            assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
         }
 
-        for (String asbiePath: preconditionsTa2914.asbiePaths){
+        for (String asbiePath : preconditionsTa2914.asbiePaths) {
             editBIEPage.goToNodeByPath(asbiePath);
             WebElement asbieNode = editBIEPage.getNodeByPath(asbiePath);
             waitFor(ofMillis(2000));
@@ -521,7 +518,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             assertEquals(preconditionsTa2914.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
         }
 
-        for (String bbieScPath: preconditionsTa2914.bbieScPaths){
+        for (String bbieScPath : preconditionsTa2914.bbieScPaths) {
             editBIEPage.goToNodeByPath(bbieScPath);
             WebElement bbieScNode = editBIEPage.getNodeByPath(bbieScPath);
             waitFor(ofMillis(2000));
@@ -538,6 +535,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
 
     }
+
     protected boolean isElementPresent(By by) {
         try {
             getDriver().findElement(by);
@@ -1003,7 +1001,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         private String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
-        private String bbieScPath =  "/Unit Packaging/UPC Packaging Level Code/List Agency Identifier";
+        private String bbieScPath = "/Unit Packaging/UPC Packaging Level Code/List Agency Identifier";
         private String bbieScRemark = randomPrint(50, 100).trim();
         private String bbieScExample = randomPrint(50, 100).trim();
         private String bbieScContextDefinition = randomPrint(50, 100).trim();
@@ -1059,7 +1057,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         }
     }
 
-    private Preconditions_TA_29_1_5d_BIEReusedChild  preconditions_ta_29_1_5d_ReusedChild(AppUserObject usera, String prevRelease){
+    private Preconditions_TA_29_1_5d_BIEReusedChild preconditions_ta_29_1_5d_ReusedChild(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedChild(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1110,7 +1108,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2915d;
     }
 
-    private Preconditions_TA_29_1_5d_BIEReusedParent  preconditions_ta_29_1_5d_ReusedParent(AppUserObject usera, String prevRelease){
+    private Preconditions_TA_29_1_5d_BIEReusedParent preconditions_ta_29_1_5d_ReusedParent(AppUserObject usera, String prevRelease) {
         Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedParent(usera, prevRelease);
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1145,6 +1143,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
         return preconditionsTa2915d;
     }
+
     @Test
     public void test_TA_29_1_9a() {
         String prev_release = "10.9.1";
