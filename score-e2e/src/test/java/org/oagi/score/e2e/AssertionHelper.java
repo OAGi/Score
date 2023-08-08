@@ -51,8 +51,7 @@ public class AssertionHelper {
     public static void assertDisabled(WebElement element) {
         waitFor(ofMillis(500L));
         if ("mat-checkbox".equals(element.getTagName())) {
-            WebElement input = element.findElement(By.tagName("input"));
-            assertEquals("false", input.getAttribute("aria-checked"));
+            assertEquals("true", element.getAttribute("ng-reflect-disabled"));
             return;
         }
 
