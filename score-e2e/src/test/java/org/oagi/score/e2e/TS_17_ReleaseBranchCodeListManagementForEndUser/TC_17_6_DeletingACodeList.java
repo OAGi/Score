@@ -97,12 +97,16 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
             dtViewEditPage.setNamespace(namespaceEU);
-            if (definition == null) {
-                click(dtViewEditPage.getUpdateButton(true));
-                dtViewEditPage.hitUpdateAnywayButton();
-            }else{
+            if (definition != null) {
                 dtViewEditPage.hitUpdateButton();
+            } else {
+                try {
+                    dtViewEditPage.hitUpdateButton();
+                } catch (TimeoutException ignore) {
+                }
+                dtViewEditPage.hitUpdateAnywayButton();
             }
+
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
             editCodeListPage.hitDeleteButton();
