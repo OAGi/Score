@@ -90,11 +90,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-
-
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            BIEMenu bieMenu = homePage.getBIEMenu();
-            ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
             if (topLevelAsbiep.getState().equals("WIP")) {
                 ACCExtensionViewEditPage accExtensionViewEditPage =
@@ -120,6 +118,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
                 });
                 escape(getDriver());
             }
+
+            viewEditBIEPage.openPage();
         }
     }
 
