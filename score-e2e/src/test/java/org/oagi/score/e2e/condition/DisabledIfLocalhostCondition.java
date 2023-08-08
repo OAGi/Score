@@ -15,10 +15,10 @@ import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
-public class DisabledIfBusinessTermPropertyCondition implements ExecutionCondition {
+public class DisabledIfLocalhostCondition implements ExecutionCondition {
 
     private static final ConditionEvaluationResult ENABLED = ConditionEvaluationResult.enabled(
-            "No @DisabledIfBusinessTermProperty conditions resulting in 'disabled' execution encountered");
+            "No @DisabledIfLocalhost conditions resulting in 'disabled' execution encountered");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -30,7 +30,7 @@ public class DisabledIfBusinessTermPropertyCondition implements ExecutionConditi
             Object testInstance = optionalTestInstance.get();
             AnnotatedElement annotatedElement = optionalElement.get();
             if (testInstance instanceof BaseTest) {
-                return findAnnotation(annotatedElement, DisabledIfBusinessTermProperty.class).stream()
+                return findAnnotation(annotatedElement, DisabledIfLocalhost.class).stream()
                         .map(annotation -> {
                             ConditionEvaluationResult result = evaluate((BaseTest) testInstance, annotation);
                             logResult(annotation, annotatedElement, result);
@@ -48,17 +48,17 @@ public class DisabledIfBusinessTermPropertyCondition implements ExecutionConditi
         return ENABLED;
     }
 
-    private void logResult(DisabledIfBusinessTermProperty annotation, AnnotatedElement annotatedElement, ConditionEvaluationResult result) {
+    private void logResult(DisabledIfLocalhost annotation, AnnotatedElement annotatedElement, ConditionEvaluationResult result) {
         logger.trace(() -> format("Evaluation of %s on [%s] resulted in: %s", annotation, annotatedElement, result));
     }
 
-    private ConditionEvaluationResult evaluate(BaseTest testInstance, DisabledIfBusinessTermProperty annotation) {
-        boolean actualBusinessTermEnabled = testInstance.getAPIFactory().getApplicationSettingsAPI().isBusinessTermEnabled();
-        boolean value = annotation.value();
-        if (value != actualBusinessTermEnabled) {
-            return enabled(format("Current business term property sets to [%s]", actualBusinessTermEnabled));
+    private ConditionEvaluationResult evaluate(BaseTest testInstance, DisabledIfLocalhost annotation) {
+        String baseUrl = testInstance.getConfig().getBaseUrl().toString();
+        boolean isLocalhost = baseUrl.contains("localhost") || baseUrl.contains("127.0.0.1");
+        if (!isLocalhost) {
+            return enabled(format("This test case would be enabled in '%s'", baseUrl));
         }
-        return disabled(format("Current business term property sets to [%s]", actualBusinessTermEnabled));
+        return disabled(format("This test case would be disabled in '%s'. Change the base URL to execute the test.", baseUrl));
     }
 
 }
