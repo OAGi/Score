@@ -148,7 +148,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertFalse(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
         accPanel.setComponentType("Base (Abstract)");
-        assertDisabled(accPanel.getAbstractCheckbox());
+        assertEnabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }
 

@@ -199,7 +199,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertEquals(endUser.getLoginId(), accExtensionViewEditPage.getOwnerFieldValue());
         accExtensionViewEditPage.moveToProduction();
         assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]")).size());
     }
 
     @Test
@@ -423,7 +423,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getDeprecatedCheckbox());
-        assertDisabled(asccpPanel.getDeprecatedCheckbox());
+        assertEnabled(asccpPanel.getDeprecatedCheckbox());
     }
 
     @Test
@@ -517,7 +517,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getNillableCheckbox());
-        assertDisabled(asccpPanel.getNillableCheckbox());
+        assertEnabled(asccpPanel.getNillableCheckbox());
     }
 
     @Test
@@ -690,7 +690,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
         assertFalse(bccpPanel.getPropertyTermField().isEnabled());
-        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertEnabled(bccpPanel.getNillableCheckbox());
         assertDisabled(bccpPanel.getDeprecatedCheckbox());
         assertDisabled(bccpPanel.getValueConstraintSelectField());
         assertDisabled(bccpPanel.getNamespaceSelectField());

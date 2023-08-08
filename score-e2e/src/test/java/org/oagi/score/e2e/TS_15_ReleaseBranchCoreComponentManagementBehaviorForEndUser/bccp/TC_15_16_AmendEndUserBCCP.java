@@ -103,7 +103,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         assertEquals(bccp.getDen(), getText(bccpPanel.getDENField()));
 
         assertChecked(bccpPanel.getNillableCheckbox());
-        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertEnabled(bccpPanel.getNillableCheckbox());
 
         assertNotChecked(bccpPanel.getDeprecatedCheckbox());
         assertEnabled(bccpPanel.getDeprecatedCheckbox());
@@ -289,7 +289,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertChecked(bccpPanel.getDeprecatedCheckbox());
-        assertDisabled(bccpPanel.getDeprecatedCheckbox());
+        assertEnabled(bccpPanel.getDeprecatedCheckbox());
     }
 
     @Test
@@ -386,7 +386,7 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(bccp.getBccpManifestId());
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertChecked(bccpPanel.getNillableCheckbox());
-        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertEnabled(bccpPanel.getNillableCheckbox());
     }
 
     @Test
