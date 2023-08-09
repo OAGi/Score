@@ -573,7 +573,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(newModuleSetName);
-        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(newDescription));
+        assertEquals(newDescription, getText(editModuleSetPage.getDescriptionField()));
     }
 
     @AfterEach

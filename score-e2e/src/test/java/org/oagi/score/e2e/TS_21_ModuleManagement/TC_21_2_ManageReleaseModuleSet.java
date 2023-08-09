@@ -29,8 +29,7 @@ import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
+import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -182,7 +181,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
             viewEditModuleSetReleasePage.openPage();
             editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
-            assertDisabled(editModuleSetReleasePage.getDefaultCheckbox());
+            assertNotChecked(editModuleSetReleasePage.getDefaultCheckbox());
         } finally {
             // Roll the 'Default' option back
             getAPIFactory().getModuleSetReleaseAPI().updateModuleSetRelease(moduleSetRelease);
