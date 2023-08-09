@@ -133,6 +133,13 @@ public interface ViewEditBusinessTermPage extends Page {
     WebElement getSelectCheckboxAtIndex(int idx);
 
     /**
+     * Return the total number of items being paged.
+     *
+     * @return the total number of items being paged
+     */
+    int getTotalNumberOfItems();
+
+    /**
      * Move the table to the next page via the pagination.
      */
     void goToNextPage();
