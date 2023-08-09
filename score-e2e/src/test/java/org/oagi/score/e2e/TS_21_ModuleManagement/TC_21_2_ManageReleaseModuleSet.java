@@ -10,6 +10,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.module.*;
@@ -320,6 +321,26 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         editCodeListPage.moveToCandidate();
 
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        viewEditReleasePage.hitSearchButton();
+        if (viewEditReleasePage.getTotalNumberOfItems() > 0){
+            long timeout = Duration.ofSeconds(300L).toMillis();
+            long begin = System.currentTimeMillis();
+            while (System.currentTimeMillis() - begin < timeout) {
+                viewEditReleasePage.openPage();
+                viewEditReleasePage.setState("Draft");
+                viewEditReleasePage.hitSearchButton();
+
+                WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+                EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+                editReleasePage.backToInitialized();
+                String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+                assertNotEquals("Draft", state);
+                if ("Initialized".equals(state)) {
+                    break;
+                }
+            }
+        }
 
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
