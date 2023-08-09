@@ -1,6 +1,9 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -208,7 +211,7 @@ public interface DTViewEditPage extends Page {
 
     WebElement getUpdateAnywayButton();
 
-    WebElement getUpdateButton();
+    WebElement getUpdateButton(boolean enabled);
 
     void setQualifier(String qualifier);
 
@@ -221,4 +224,161 @@ public interface DTViewEditPage extends Page {
     void setDefaultValueDomain(String name);
 
     WebElement getDefaultValueDomainField();
+
+    void setNamespace(NamespaceObject namespace);
+
+    AddCommentDialog hitAddCommentButton(String path);
+
+    WebElement clickOnDropDownMenuByPath(String path);
+
+    WebElement goToNode(String path);
+
+    WebElement getSearchField();
+
+    WebElement getContextMenuIconByNodeName(String nodeName);
+
+    WebElement getReviseButton();
+
+    void hitRestoreButton();
+
+    WebElement getRestoreButton();
+
+    String getBasedDataTypeFieldValue();
+
+    WebElement getBasedDataTypeField();
+
+    String getQualifierFieldValue();
+
+    WebElement getSixHexadecimalIdentifierField();
+
+    String getContentComponentDefinitionFieldValue();
+
+    WebElement getContentComponentDefinitionField();
+
+    void setDefinition(String definition);
+
+    void setDefinitionSource(String definitionSource);
+
+    void setContentComponentDefinition(String contentComponentDefinition);
+
+    WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression);
+
+
+    WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName);
+
+    void discardValueDomain();
+
+    WebElement getDiscardValueDomainButton();
+
+    String getDefinitionWarningDialogMessage();
+
+    WebElement getTableRecordByValue(String value);
+
+    void selectValueDomain(String name);
+
+    void addSupplementaryComponent(String path);
+
+    WebElement getNodeByPath(String path);
+
+    WebElement getMoveToCandidate(boolean enabled);
+
+    void moveToCandidate();
+
+    WebElement getBackToWIPButton(boolean enabled);
+
+    void backToWIP();
+
+    WebElement getDeleteButton();
+
+    void hitDeleteButton();
+
+    WebElement getDeleteAnywayButton();
+
+    DTViewEditPage.SupplementaryComponentPanel getSCPanel(WebElement scNode);
+
+    void removeSupplementaryComponent(String path);
+
+    void hitReviseButton();
+
+    String getDefaultValueDomainFieldValue();
+
+    WebElement getMoveToDraft(boolean enabled);
+
+    void moveToDraft();
+
+    String getDeleteWarningDialogMessage();
+
+    void hitDeleteAnywayButton();
+
+    WebElement getAmendButton();
+
+    void hitAmendButton();
+
+    WebElement getMoveToQAButton(boolean enabled);
+
+    void moveToQA();
+
+    WebElement getMoveToProductionButton(boolean enabled);
+
+    void moveToProduction();
+
+    String getInvalidStateIconText(WebElement node);
+
+    interface SupplementaryComponentPanel {
+        void setCardinality(String cardinality);
+
+        WebElement getCardinalityField();
+
+        void setValueConstraintType(String valueConstraintType);
+
+        WebElement getValueConstraintTypeField();
+
+        void setValueConstraint(String valueConstraint);
+
+        WebElement getValueConstraintField();
+
+        String getCardinalityFieldValue();
+
+        String getValueConstraintTypeFieldValue();
+
+        String getValueConstraintFieldValue();
+
+        String getObjectClassTermFieldValue();
+
+        WebElement getObjectClassTermField();
+
+        String getDefinitionFieldValue();
+
+        String getDefinitionSourceFieldValue();
+
+        void setDefinition(String definition);
+
+        String getPropertyTermFieldValue();
+
+        WebElement getPropertyTermField();
+
+        WebElement getRepresentationSelectField();
+
+        WebElement getDefinitionField();
+
+        WebElement getDefinitionSourceField();
+
+        void selectRepresentationTerm(String representationTerm);
+
+        WebElement getTableRecordByValue(String value);
+
+        String getDefaultValueDomainFieldValue();
+
+        void showValueDomain();
+
+        void setPropertyTerm(String propertyTerm);
+
+        void setDefaultValueDomain(String valueDomain);
+
+        WebElement getDefaultValueDomainField();
+
+        void setDefinitionSource(String definitionSource);
+
+        String getRepresentationSelectFieldValue();
+    }
 }

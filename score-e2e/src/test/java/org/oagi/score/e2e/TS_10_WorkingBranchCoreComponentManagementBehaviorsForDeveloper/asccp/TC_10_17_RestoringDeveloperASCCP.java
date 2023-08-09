@@ -9,7 +9,6 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebElement;
@@ -17,10 +16,8 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.switchToMainTab;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
@@ -127,6 +124,7 @@ public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals(anotherDeveloper.getLoginId(), getText(asccpPanel.getOwnerField()));
+        asccpViewEditPage.hitRestoreButton();
 
         // reload the page
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
@@ -147,18 +145,18 @@ public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
 
         ASCCPObject asccp;
         BCCPObject bccp;
-        ACCObject acc;
+        ACCObject acc, acc_association;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
-            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
+            acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
 
-            ACCObject acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+            acc_association = coreComponentAPI.createRandomACC(developer, release, namespace, "Deleted");
             BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "WIP");
 
@@ -171,7 +169,7 @@ public class TC_10_17_RestoringDeveloperASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen());
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
         assertEquals("Deleted", getText(accPanel.getStateField()));
         asccpViewEditPage.hitDeleteButton();

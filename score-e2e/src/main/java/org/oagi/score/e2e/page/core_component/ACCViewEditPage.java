@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.openqa.selenium.WebElement;
@@ -129,7 +130,6 @@ public interface ACCViewEditPage extends Page {
     WebElement getObjectClassTermField();
 
     /**
-     *
      * @param objectClassTerm
      */
     void setObjectClassTerm(String objectClassTerm);
@@ -193,13 +193,6 @@ public interface ACCViewEditPage extends Page {
     String getDefinitionFieldValue();
 
     /**
-     * Return the UI element of the 'Comment' Icon
-     *
-     * @return the UI element of the 'Comment' Icon
-     */
-    WebElement getCommentsIcon();
-
-    /**
      * Return the UI element of the 'Context Menu' icon for the node.
      *
      * @param nodeName Node name
@@ -213,7 +206,22 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the association selection dialog object
      */
-    SelectAssociationDialog setBaseACC(String path);
+    ACCSetBaseACCDialog setBaseACC(String path);
+
+    /**
+     * remove the base ACC by clicking 'Delete' context menu.
+     *
+     * @param path node path
+     */
+    void deleteBaseACC(String path);
+
+    /**
+     * Open the 'Create Extension Component' dialog by clicking 'Create OAGi Extension Component' context menu.
+     *
+     * @param path node path
+     * @return the ACCViewEditPage
+     */
+    ACCViewEditPage createOAGiExtensionComponent(String path);
 
     /**
      * Open the association selection dialog by clicking 'Append Property at Last' context menu.
@@ -229,7 +237,7 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the find 'Where used' dialog object
      */
-    FindWhereUsedDialog  findWhereUsed(String path);
+    FindWhereUsedDialog findWhereUsed(String path);
 
     /**
      * Open the association selection dialog by clicking 'Create ASCCP from this' context menu.
@@ -237,7 +245,7 @@ public interface ACCViewEditPage extends Page {
      * @param path node path
      * @return the 'Create ASCCP from this' dialog object
      */
-    WebElement  createASCCPfromThis(String path);
+    WebElement createASCCPfromThis(String path);
 
     /**
      * Open the BCCP page through 'Open in new tab' context menu for the given BCC node.
@@ -254,6 +262,47 @@ public interface ACCViewEditPage extends Page {
      * @return the ASCCP page object
      */
     ASCCPViewEditPage openASCCPInNewTab(WebElement accNode);
+
+    /**
+     * Open the association selection dialog by clicking 'Insert Property Before' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog insertPropertyBefore(String path);
+
+
+    /**
+     * Open the association selection dialog by clicking 'Insert Property After' context menu.
+     *
+     * @param path node path
+     * @return the association selection dialog object
+     */
+    SelectAssociationDialog insertPropertyAfter(String path);
+
+    /**
+     * Open the association selection dialog by clicking 'Refactor/Refactor to Base' context menu.
+     *
+     * @param path
+     * @param associationPropertyTerm ASCCP or BCCP propertyTerm
+     * @return
+     */
+    SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm);
+
+    /**
+     * Ungroup the association by clicking 'Refactor/Ungroup' context menu
+     *
+     * @param path
+     */
+    void unGroup(String path);
+
+    /**
+     * Remove the association by clicking 'Remove' context menu.
+     *
+     * @param path node path
+     * @return the ACCViewEditPage
+     */
+    ACCViewEditPage removeAssociation(String path);
 
     /**
      * Click the drop-down menu to open the context menu on the node.
@@ -294,6 +343,18 @@ public interface ACCViewEditPage extends Page {
      * Hit the 'Amend' button.
      */
     void hitAmendButton();
+
+    /**
+     * Return the UI element of the 'Cancel' button. Developers only can see the 'Cancel' button.
+     *
+     * @return the UI element of the 'Cancel' button
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Cancel' button.
+     */
+    void hitCancelButton();
 
     /**
      * Return the UI element of the 'Move to QA' button.
@@ -378,15 +439,45 @@ public interface ACCViewEditPage extends Page {
      */
     WebElement getUpdateButton(boolean enabled);
 
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
 
-    AddCommentDialog hitAddCommentButton();
-
-    WebElement getAddCommentButton();
+    AddCommentDialog openCommentsDialog(String path);
 
     /**
      * Hit the 'Update' button.
      */
     void hitUpdateButton();
+
+    /**
+     * Return the UI element of the 'Delete' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Delete' button
+     */
+    WebElement getDeleteButton(boolean enabled);
+
+    /**
+     *
+     */
+    void hitDeleteButton();
+
+    /**
+     * Return the UI element of the 'Restore' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Restore' button
+     */
+    WebElement getRestoreButton(boolean enabled);
+
+    /**
+     *
+     */
+    void hitRestoreButton();
 
     void expandTree(String nodeName);
 
@@ -497,11 +588,25 @@ public interface ACCViewEditPage extends Page {
         WebElement getObjectClassTermField();
 
         /**
+         * Set the "Object Class Term" field with given text.
+         *
+         * @param objectClassTerm
+         */
+        void setObjectClassTerm(String objectClassTerm);
+
+        /**
          * Return the UI element of the 'Component Type' select field.
          *
          * @return the UI element of the 'Component Type' select field
          */
         WebElement getComponentTypeSelectField();
+
+        /**
+         * Set the 'Component' field with the given text.
+         *
+         * @param componentType "Base" "Semantic" or "Semantic Group"
+         */
+        void setComponentType(String componentType);
 
         /**
          * Return the UI element of the 'Abstract' checkbox.
@@ -525,6 +630,20 @@ public interface ACCViewEditPage extends Page {
         WebElement getNamespaceSelectField();
 
         /**
+         * Set the 'Namespace' field with the given text.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(String namespace);
+
+        /**
+         * Set the 'Namespace' field with the given namespace object.
+         *
+         * @param namespace Namespace
+         */
+        void setNamespace(NamespaceObject namespace);
+
+        /**
          * Return the UI element of the 'Definition Source' field.
          *
          * @return the UI element of the 'Definition Source' field
@@ -532,11 +651,25 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         * Set the 'Definition Source' field with the given text.
+         *
+         * @param definitionSource Definition Source
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * Set the 'Definition' field with the given text.
+         *
+         * @param definition Definition
+         */
+        void setDefinition(String definition);
 
     }
 
@@ -610,11 +743,25 @@ public interface ACCViewEditPage extends Page {
         WebElement getCardinalityMinField();
 
         /**
+         * set the UI element of the 'Cardinality Min' field by the given text
+         *
+         * @param cardinalityMin
+         */
+        void setCardinalityMinField(String cardinalityMin);
+
+        /**
          * Return the UI element of the 'Cardinality Max' field.
          *
          * @return the UI element of the 'Cardinality Max' field
          */
         WebElement getCardinalityMaxField();
+
+        /**
+         * set the UI element of the 'Cardinality Max' field by the given text
+         *
+         * @param cardinalityMax
+         */
+        void setCardinalityMaxField(String cardinalityMax);
 
         /**
          * Return the UI element of the 'Deprecated' checkbox.
@@ -636,6 +783,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * Set the UI element of the 'Definition' field
+         *
+         * @param newDefinition
+         */
+        void setDefinition(String newDefinition);
 
     }
 
@@ -756,13 +910,6 @@ public interface ACCViewEditPage extends Page {
          */
         WebElement getDefinitionField();
 
-        /**
-         * Return the UI element of the 'Comment' Icon.
-         *
-         * @return the UI element of the 'Comment' Icon
-         */
-        WebElement getCommentsIcon();
-
     }
 
     interface BCCPanelContainer {
@@ -842,6 +989,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getCardinalityMinField();
 
         /**
+         * set the UI element of the 'Cardinality Min' field by the given text.
+         *
+         * @param cardinalityMin
+         */
+        void setCardinalityMinField(String cardinalityMin);
+
+        /**
          * Return the UI element of the 'Cardinality Max' field.
          *
          * @return the UI element of the 'Cardinality Max' field
@@ -849,11 +1003,25 @@ public interface ACCViewEditPage extends Page {
         WebElement getCardinalityMaxField();
 
         /**
+         * set the UI element of the 'Cardinality Max' field by the given text.
+         *
+         * @param cardinalityMax
+         */
+        void setCardinalityMaxField(String cardinalityMax);
+
+        /**
          * Return the UI element of the 'Entity Type' select field.
          *
          * @return the UI element of the 'Entity Type' select field
          */
         WebElement getEntityTypeSelectField();
+
+        /**
+         * set the UI element of the 'Entity Type' select field by given text.
+         *
+         * @param entityType Element or Attribute
+         */
+        void setEntityType(String entityType);
 
         /**
          * Return the UI element of the 'Deprecated' checkbox.
@@ -870,6 +1038,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
+         * set the UI element of the 'Value Constraint' select field with the given text
+         *
+         * @param valueConstraint 'Default Value' or 'Fixed Value' or None
+         */
+        void setValueConstraint(String valueConstraint);
+
+        /**
          * Return the UI element of the 'Fixed Value' field.
          *
          * @return the UI element of the 'Fixed Value' field
@@ -882,6 +1057,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Default Value' field
          */
         WebElement getDefaultValueField();
+
+        /**
+         * set the UI element of the 'Default Value' field with the given text.
+         *
+         * @param defaultValue
+         */
+        void setDefaultValue(String defaultValue);
 
         /**
          * Return the UI element of the 'Namespace' select field.
@@ -898,6 +1080,13 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
+         * set the UI element of the 'Definition Source' field with given text
+         *
+         * @param definitionSource
+         */
+        void setDefinitionSource(String definitionSource);
+
+        /**
          * Return the UI element of the 'Definition' field.
          *
          * @return the UI element of the 'Definition' field
@@ -905,11 +1094,11 @@ public interface ACCViewEditPage extends Page {
         WebElement getDefinitionField();
 
         /**
-         * Return the UI element of the 'Comment' Icon.
+         * set the UI element of the 'Definition' field with the given text.
          *
-         * @return the UI element of the 'Comment' Icon
+         * @param definition
          */
-        WebElement getCommentsIcon();
+        void setDefinition(String definition);
 
     }
 
@@ -1029,6 +1218,13 @@ public interface ACCViewEditPage extends Page {
          * @return the UI element of the 'Definition' field
          */
         WebElement getDefinitionField();
+
+        /**
+         * set the UI element of the 'Definition' field with the given text
+         *
+         * @param definition
+         */
+        void setDefinition(String definition);
 
     }
 

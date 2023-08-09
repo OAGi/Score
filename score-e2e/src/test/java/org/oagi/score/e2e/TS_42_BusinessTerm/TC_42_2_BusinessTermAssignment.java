@@ -31,16 +31,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
-    private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
-
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
-
-    private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
-        this.randomBusinessTerms.add(businessTerm);
-    }
-
 
     @BeforeEach
     public void init() {
@@ -55,6 +48,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -103,11 +97,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
@@ -136,7 +129,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
             click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
@@ -160,11 +152,11 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @DisabledIfBusinessTermProperty(value = false)
     @DisplayName("TC_42_2_3")
     public void enduser_can_view_asbies_bbies_on_business_term_assignment_page() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -184,7 +176,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageBBIE = bbiePanel.clickAssignBusinessTermButton();
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         assignBusinessTermBTPageBBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         assignBusinessTermBTPageBBIE.hitSearchButton();
         click(assignBusinessTermBTPageBBIE.getSelectCheckboxAtIndex(1));
@@ -208,7 +199,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         BusinessTermObject randomBusinessTerm2 = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm2);
         assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm2.getBusinessTerm());
         assignBusinessTermBTPageASBIE.hitSearchButton();
         click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
@@ -241,6 +231,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -260,7 +251,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageBBIE = bbiePanel.clickAssignBusinessTermButton();
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         assignBusinessTermBTPageBBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         assignBusinessTermBTPageBBIE.hitSearchButton();
         click(assignBusinessTermBTPageBBIE.getSelectCheckboxAtIndex(1));
@@ -284,7 +274,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         BusinessTermObject randomBusinessTerm2 = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm2);
         assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm2.getBusinessTerm());
         assignBusinessTermBTPageASBIE.hitSearchButton();
         assignBusinessTermBTPageASBIE.setTypeCode("random type code");
@@ -303,6 +292,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         WebElement tdBBIE = trBBIE.findElement(By.xpath("//span[contains(text(), \"BBIE\")]"));
         assertTrue(tdBBIE.isDisplayed());
         //Search by type code
+        btAssignmentPageForSelectedBIE.openPage();
+        assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
+        click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
         btAssignmentPageForSelectedBIE.setTypeCodeField("random type code");
         click(btAssignmentPageForSelectedBIE.getSearchButton());
         WebElement trASBIE = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
@@ -318,6 +310,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -337,11 +330,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
@@ -373,6 +365,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -392,11 +385,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTermsBBIE.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
@@ -422,11 +414,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTermsASBIE.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
             click(assignBusinessTermBTPageASBIE.getSelectCheckboxAtIndex(1));
@@ -459,6 +450,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -478,11 +470,10 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTermsBBIE.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
             click(assignBusinessTermBTPage.getSelectCheckboxAtIndex(1));
@@ -508,10 +499,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             businessTermsASBIE.add(randomBusinessTerm);
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
@@ -540,11 +530,11 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
     @Test
     @DisplayName("TC_42_2_8")
     public void enduser_can_filter_business_terms_already_assigned_to_the_same_core_component_on_assign_business_term_page() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -564,10 +554,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsBBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             businessTermsBBIE.add(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
@@ -594,10 +583,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(asbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
+        List<BusinessTermObject> businessTermsASBIE = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             businessTermsASBIE.add(randomBusinessTerm);
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
@@ -625,7 +613,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
             click(assignBTPageForSelectedBIE.getSearchButton());
             assertEquals(0, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + businessTermName + "\")]")).size());
         }
-
     }
 
     @Test
@@ -635,6 +622,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -658,7 +646,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         AssignBusinessTermBTPage assignBusinessTermBTPageASBIE = asbiePanel.clickAssignBusinessTermButton();
         //assign the same random business term with different type code to selected BIE for testing purpose
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         for (int i = 0; i < 3; i++) {
             assignBusinessTermBTPageASBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPageASBIE.hitSearchButton();
@@ -698,6 +685,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -717,10 +705,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(bbiePanel.getAssignBusinessTermButton(true).isEnabled());
         AssignBusinessTermBTPage assignBusinessTermBTPage = bbiePanel.clickAssignBusinessTermButton();
         //assign up to 3 random business terms to selected BIE for testing purpose
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
             businessTerms.add(randomBusinessTerm);
             assignBusinessTermBTPage.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
             assignBusinessTermBTPage.hitSearchButton();
@@ -747,11 +734,6 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
-        });
-
-        // Delete random business terms
-        this.randomBusinessTerms.forEach(randomBusinessTerm -> {
-            getAPIFactory().getBusinessTermAPI().deleteBusinessTermById(randomBusinessTerm.getBusinessTermId());
         });
     }
 }

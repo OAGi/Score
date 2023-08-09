@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.CcASCCPType;
@@ -14,6 +15,7 @@ import org.oagi.score.repo.component.dt.BdtReadRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
@@ -466,7 +468,7 @@ public class CcNodeRepository {
     }
 
     public CcAccNodeDetail getAccNodeDetail(AuthenticatedPrincipal user, CcAccNode accNode) {
-        return dslContext.select(
+        CcAccNodeDetail accNodeDetail = dslContext.select(
                         ACC.ACC_ID,
                         ACC.GUID,
                         ACC.OBJECT_CLASS_TERM,
@@ -497,6 +499,52 @@ public class CcNodeRepository {
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(accNode.getManifestId())))
                 .fetchOneInto(CcAccNodeDetail.class);
+        fillOutAboutSince(accNodeDetail, accNode.getManifestId());
+        fillOutAboutLastChanged(accNodeDetail, accNode.getManifestId());
+        return accNodeDetail;
+    }
+
+    private void fillOutAboutSince(CcAccNodeDetail accNode, BigInteger accManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID,
+                        ACC_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, ACC_MANIFEST.PREV_ACC_MANIFEST_ID)
+                .from(ACC_MANIFEST)
+                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(accManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevAccManifestId = record.get(ACC_MANIFEST.PREV_ACC_MANIFEST_ID);
+        if (prevAccManifestId != null) {
+            fillOutAboutSince(accNode, prevAccManifestId.toBigInteger());
+        } else {
+            accNode.setSinceManifestId(record.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
+            accNode.setSinceReleaseId(record.get(ACC_MANIFEST.RELEASE_ID).toBigInteger());
+            accNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcAccNodeDetail accNode, BigInteger accManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.ACC_ID,
+                        ACC_MANIFEST.as("prev").ACC_MANIFEST_ID, ACC_MANIFEST.as("prev").ACC_ID,
+                        ACC_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(ACC_MANIFEST)
+                .join(ACC_MANIFEST.as("prev")).on(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID))
+                .join(RELEASE).on(ACC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(accManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(ACC_MANIFEST.ACC_ID).equals(record.get(ACC_MANIFEST.as("prev").ACC_ID))) {
+            fillOutAboutLastChanged(accNode, record.get(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID).toBigInteger());
+        } else {
+            accNode.setLastChangedManifestId(record.get(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID).toBigInteger());
+            accNode.setLastChangedReleaseId(record.get(ACC_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            accNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
     }
 
     public CcAsccpNodeDetail getAsccpNodeDetail(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
@@ -537,10 +585,12 @@ public class CcNodeRepository {
                     .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
                     .fetchOneInto(CcAsccpNodeDetail.Ascc.class);
+            fillOutAboutSince(ascc, asccManifestId);
+            fillOutAboutLastChanged(ascc, asccManifestId);
             asccpNodeDetail.setAscc(ascc);
         }
 
-        BigInteger asccpManifestIdId = asccpNode.getManifestId();
+        BigInteger asccpManifestId = asccpNode.getManifestId();
         CcAsccpNodeDetail.Asccp asccp = dslContext.select(
                         ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifest_id"),
                         ASCCP.ASCCP_ID,
@@ -570,11 +620,99 @@ public class CcNodeRepository {
                 .on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(LOG)
                 .on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestIdId)))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
                 .fetchOneInto(CcAsccpNodeDetail.Asccp.class);
+        fillOutAboutSince(asccp, asccpManifestId);
+        fillOutAboutLastChanged(asccp, asccpManifestId);
         asccpNodeDetail.setAsccp(asccp);
 
         return asccpNodeDetail;
+    }
+
+    private void fillOutAboutSince(CcAsccpNodeDetail.Ascc asccNode, BigInteger asccManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID,
+                        ASCC_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
+                .from(ASCC_MANIFEST)
+                .join(RELEASE).on(ASCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevAsccManifestId = record.get(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID);
+        if (prevAsccManifestId != null) {
+            fillOutAboutSince(asccNode, prevAsccManifestId.toBigInteger());
+        } else {
+            asccNode.setSinceManifestId(record.get(ASCC_MANIFEST.ASCC_MANIFEST_ID).toBigInteger());
+            asccNode.setSinceReleaseId(record.get(ASCC_MANIFEST.RELEASE_ID).toBigInteger());
+            asccNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcAsccpNodeDetail.Ascc asccNode, BigInteger asccManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC_MANIFEST.ASCC_ID,
+                        ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID, ASCC_MANIFEST.as("prev").ASCC_ID,
+                        ASCC_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(ASCC_MANIFEST)
+                .join(ASCC_MANIFEST.as("prev")).on(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID))
+                .join(RELEASE).on(ASCC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(ASCC_MANIFEST.ASCC_ID).equals(record.get(ASCC_MANIFEST.as("prev").ASCC_ID))) {
+            fillOutAboutLastChanged(asccNode, record.get(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID).toBigInteger());
+        } else {
+            asccNode.setLastChangedManifestId(record.get(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID).toBigInteger());
+            asccNode.setLastChangedReleaseId(record.get(ASCC_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            asccNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutSince(CcAsccpNodeDetail.Asccp asccpNode, BigInteger asccpManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                        ASCCP_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID)
+                .from(ASCCP_MANIFEST)
+                .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevAsccpManifestId = record.get(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID);
+        if (prevAsccpManifestId != null) {
+            fillOutAboutSince(asccpNode, prevAsccpManifestId.toBigInteger());
+        } else {
+            asccpNode.setSinceManifestId(record.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger());
+            asccpNode.setSinceReleaseId(record.get(ASCCP_MANIFEST.RELEASE_ID).toBigInteger());
+            asccpNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcAsccpNodeDetail.Asccp asccpNode, BigInteger asccpManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_ID,
+                        ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID, ASCCP_MANIFEST.as("prev").ASCCP_ID,
+                        ASCCP_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(ASCCP_MANIFEST)
+                .join(ASCCP_MANIFEST.as("prev")).on(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID))
+                .join(RELEASE).on(ASCCP_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(ASCCP_MANIFEST.ASCCP_ID).equals(record.get(ASCCP_MANIFEST.as("prev").ASCCP_ID))) {
+            fillOutAboutLastChanged(asccpNode, record.get(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID).toBigInteger());
+        } else {
+            asccpNode.setLastChangedManifestId(record.get(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID).toBigInteger());
+            asccpNode.setLastChangedReleaseId(record.get(ASCCP_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            asccpNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
     }
 
     public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpId) {
@@ -637,6 +775,8 @@ public class CcNodeRepository {
                     .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
                     .fetchOneInto(CcBccpNodeDetail.Bcc.class);
+            fillOutAboutSince(bcc, bccManifestId);
+            fillOutAboutLastChanged(bcc, bccManifestId);
             bccpNodeDetail.setBcc(bcc);
         }
 
@@ -673,6 +813,8 @@ public class CcNodeRepository {
                 .on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchOneInto(CcBccpNodeDetail.Bccp.class);
+        fillOutAboutSince(bccp, bccpManifestId);
+        fillOutAboutLastChanged(bccp, bccpManifestId);
         bccpNodeDetail.setBccp(bccp);
 
         CcBccpNodeDetail.Bdt bdt = dslContext.select(
@@ -706,18 +848,149 @@ public class CcNodeRepository {
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchOneInto(CcBccpNodeDetail.Bdt.class);
+        fillOutAboutSince(bdt, bdt.getManifestId());
+        fillOutAboutLastChanged(bdt, bdt.getManifestId());
         bccpNodeDetail.setBdt(bdt);
 
         int cardinalityMaxOfDtScListSum = dslContext.select(DT_SC.CARDINALITY_MAX)
                 .from(BCCP_MANIFEST)
-                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
-                .join(DT).on(BCCP.BDT_ID.eq(DT.DT_ID))
-                .join(DT_SC).on(DT.DT_ID.eq(DT_SC.OWNER_DT_ID))
+                .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .join(DT_SC_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID))
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchStreamInto(Integer.class).reduce(0, Integer::sum);
         bdt.setHasNoSc(cardinalityMaxOfDtScListSum == 0);
 
         return bccpNodeDetail;
+    }
+
+    private void fillOutAboutSince(CcBccpNodeDetail.Bcc bccNode, BigInteger bccManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID,
+                        BCC_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
+                .from(BCC_MANIFEST)
+                .join(RELEASE).on(BCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevBccManifestId = record.get(BCC_MANIFEST.PREV_BCC_MANIFEST_ID);
+        if (prevBccManifestId != null) {
+            fillOutAboutSince(bccNode, prevBccManifestId.toBigInteger());
+        } else {
+            bccNode.setSinceManifestId(record.get(BCC_MANIFEST.BCC_MANIFEST_ID).toBigInteger());
+            bccNode.setSinceReleaseId(record.get(BCC_MANIFEST.RELEASE_ID).toBigInteger());
+            bccNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcBccpNodeDetail.Bcc bccNode, BigInteger bccManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.BCC_ID,
+                        BCC_MANIFEST.as("prev").BCC_MANIFEST_ID, BCC_MANIFEST.as("prev").BCC_ID,
+                        BCC_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(BCC_MANIFEST)
+                .join(BCC_MANIFEST.as("prev")).on(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID))
+                .join(RELEASE).on(BCC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(BCC_MANIFEST.BCC_ID).equals(record.get(BCC_MANIFEST.as("prev").BCC_ID))) {
+            fillOutAboutLastChanged(bccNode, record.get(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID).toBigInteger());
+        } else {
+            bccNode.setLastChangedManifestId(record.get(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID).toBigInteger());
+            bccNode.setLastChangedReleaseId(record.get(BCC_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            bccNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutSince(CcBccpNodeDetail.Bccp bccpNode, BigInteger bccpManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID,
+                        BCCP_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
+                .from(BCCP_MANIFEST)
+                .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevBccpManifestId = record.get(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID);
+        if (prevBccpManifestId != null) {
+            fillOutAboutSince(bccpNode, prevBccpManifestId.toBigInteger());
+        } else {
+            bccpNode.setSinceManifestId(record.get(BCCP_MANIFEST.BCCP_MANIFEST_ID).toBigInteger());
+            bccpNode.setSinceReleaseId(record.get(BCCP_MANIFEST.RELEASE_ID).toBigInteger());
+            bccpNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcBccpNodeDetail.Bccp bccpNode, BigInteger bccpManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_ID,
+                        BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID, BCCP_MANIFEST.as("prev").BCCP_ID,
+                        BCCP_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(BCCP_MANIFEST)
+                .join(BCCP_MANIFEST.as("prev")).on(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID))
+                .join(RELEASE).on(BCCP_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(BCCP_MANIFEST.BCCP_ID).equals(record.get(BCCP_MANIFEST.as("prev").BCCP_ID))) {
+            fillOutAboutLastChanged(bccpNode, record.get(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID).toBigInteger());
+        } else {
+            bccpNode.setLastChangedManifestId(record.get(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID).toBigInteger());
+            bccpNode.setLastChangedReleaseId(record.get(BCCP_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            bccpNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutSince(CcBccpNodeDetail.Bdt bdtNode, BigInteger dtManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID,
+                        DT_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, DT_MANIFEST.PREV_DT_MANIFEST_ID)
+                .from(DT_MANIFEST)
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(dtManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevDtManifestId = record.get(DT_MANIFEST.PREV_DT_MANIFEST_ID);
+        if (prevDtManifestId != null) {
+            fillOutAboutSince(bdtNode, prevDtManifestId.toBigInteger());
+        } else {
+            bdtNode.setSinceManifestId(record.get(DT_MANIFEST.DT_MANIFEST_ID).toBigInteger());
+            bdtNode.setSinceReleaseId(record.get(DT_MANIFEST.RELEASE_ID).toBigInteger());
+            bdtNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcBccpNodeDetail.Bdt bdtNode, BigInteger bdtManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DT_ID,
+                        DT_MANIFEST.as("prev").DT_MANIFEST_ID, DT_MANIFEST.as("prev").DT_ID,
+                        DT_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(DT_MANIFEST)
+                .join(DT_MANIFEST.as("prev")).on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID))
+                .join(RELEASE).on(DT_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(DT_MANIFEST.DT_ID).equals(record.get(DT_MANIFEST.as("prev").DT_ID))) {
+            fillOutAboutLastChanged(bdtNode, record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger());
+        } else {
+            bdtNode.setLastChangedManifestId(record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger());
+            bdtNode.setLastChangedReleaseId(record.get(DT_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            bdtNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
     }
 
     private Map<String, CcBdtPriRestri> getPriResriMapByDtManifestId(ULong dtManifestId) {
@@ -784,6 +1057,7 @@ public class CcNodeRepository {
                         DT.as("based").DT_ID.as("basedBdtId"),
                         DT_MANIFEST.as("basedManifest").DT_MANIFEST_ID.as("basedBdtManifestId"),
                         DT.as("based").DEN.as("basedBdtDen"),
+                        DT.as("based").STATE.as("basedBdtState"),
                         DT.SIX_DIGIT_ID,
                         DT.CONTENT_COMPONENT_DEFINITION,
                         DT.COMMONLY_USED,
@@ -815,6 +1089,8 @@ public class CcNodeRepository {
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcBdtNodeDetail.class);
+        fillOutAboutSince(detail, manifestId);
+        fillOutAboutLastChanged(detail, manifestId);
 
         List<String> specs = dslContext.select(REF_SPEC.SPEC)
                 .from(DT)
@@ -915,6 +1191,49 @@ public class CcNodeRepository {
         return bdtScPriRestriMap;
     }
 
+    private void fillOutAboutSince(CcBdtNodeDetail bdtNode, BigInteger dtManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID,
+                        DT_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, DT_MANIFEST.PREV_DT_MANIFEST_ID)
+                .from(DT_MANIFEST)
+                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(dtManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevDtManifestId = record.get(DT_MANIFEST.PREV_DT_MANIFEST_ID);
+        if (prevDtManifestId != null) {
+            fillOutAboutSince(bdtNode, prevDtManifestId.toBigInteger());
+        } else {
+            bdtNode.setSinceManifestId(record.get(DT_MANIFEST.DT_MANIFEST_ID).toBigInteger());
+            bdtNode.setSinceReleaseId(record.get(DT_MANIFEST.RELEASE_ID).toBigInteger());
+            bdtNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcBdtNodeDetail bdtNode, BigInteger dtManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DT_ID,
+                        DT_MANIFEST.as("prev").DT_MANIFEST_ID, DT_MANIFEST.as("prev").DT_ID,
+                        DT_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(DT_MANIFEST)
+                .join(DT_MANIFEST.as("prev")).on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID))
+                .join(RELEASE).on(DT_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(dtManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(DT_MANIFEST.DT_ID).equals(record.get(DT_MANIFEST.as("prev").DT_ID))) {
+            fillOutAboutLastChanged(bdtNode, record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger());
+        } else {
+            bdtNode.setLastChangedManifestId(record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger());
+            bdtNode.setLastChangedReleaseId(record.get(DT_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            bdtNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
     public CcBdtScNodeDetail getBdtScNodeDetail(AuthenticatedPrincipal user, CcBdtScNode bdtScNode) {
         BigInteger manifestId = bdtScNode.getManifestId();
         CcBdtScNodeDetail detail = dslContext.select(
@@ -964,6 +1283,8 @@ public class CcNodeRepository {
                 .leftJoin(DT_SC.as("base")).on(DT_SC.BASED_DT_SC_ID.eq(DT_SC.as("base").DT_SC_ID))
                 .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
                 .fetchOneInto(CcBdtScNodeDetail.class);
+        fillOutAboutSince(detail, manifestId);
+        fillOutAboutLastChanged(detail, manifestId);
 
         List<String> specs = dslContext.select(REF_SPEC.SPEC)
                 .from(DT_SC)
@@ -1012,6 +1333,49 @@ public class CcNodeRepository {
         }
 
         return detail;
+    }
+
+    private void fillOutAboutSince(CcBdtScNodeDetail bdtScNode, BigInteger dtScManifestId) {
+        Record4<ULong, ULong, String, ULong> record = dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID,
+                        DT_SC_MANIFEST.RELEASE_ID, RELEASE.RELEASE_NUM, DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID)
+                .from(DT_SC_MANIFEST)
+                .join(RELEASE).on(DT_SC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        ULong prevDtScManifestId = record.get(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID);
+        if (prevDtScManifestId != null) {
+            fillOutAboutSince(bdtScNode, prevDtScManifestId.toBigInteger());
+        } else {
+            bdtScNode.setSinceManifestId(record.get(DT_SC_MANIFEST.DT_SC_MANIFEST_ID).toBigInteger());
+            bdtScNode.setSinceReleaseId(record.get(DT_SC_MANIFEST.RELEASE_ID).toBigInteger());
+            bdtScNode.setSinceReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
+    }
+
+    private void fillOutAboutLastChanged(CcBdtScNodeDetail bdtScNode, BigInteger dtScManifestId) {
+        Record6<ULong, ULong, ULong, ULong, ULong, String> record = dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.DT_SC_ID,
+                        DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID, DT_SC_MANIFEST.as("prev").DT_SC_ID,
+                        DT_SC_MANIFEST.as("prev").RELEASE_ID, RELEASE.RELEASE_NUM)
+                .from(DT_SC_MANIFEST)
+                .join(DT_SC_MANIFEST.as("prev")).on(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID))
+                .join(RELEASE).on(DT_SC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId)))
+                .fetchOptional().orElse(null);
+        if (record == null) {
+            return;
+        }
+
+        if (record.get(DT_SC_MANIFEST.DT_SC_ID).equals(record.get(DT_SC_MANIFEST.as("prev").DT_SC_ID))) {
+            fillOutAboutLastChanged(bdtScNode, record.get(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID).toBigInteger());
+        } else {
+            bdtScNode.setLastChangedManifestId(record.get(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID).toBigInteger());
+            bdtScNode.setLastChangedReleaseId(record.get(DT_SC_MANIFEST.as("prev").RELEASE_ID).toBigInteger());
+            bdtScNode.setLastChangedReleaseNum(record.get(RELEASE.RELEASE_NUM));
+        }
     }
 
     public boolean bdtScHasRepresentationTermSameAs(String representationTerm, BigInteger bdtScManifestId) {

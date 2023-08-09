@@ -43,8 +43,8 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-
     }
+
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }

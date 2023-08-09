@@ -1,5 +1,180 @@
 <div class="container">
   <mat-tab-group>
+    <!-- Core Components -->
+    <mat-tab label="Core Components" *ngIf="isDeveloper">
+      <div class="row m-0">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box total-CCs-by-states">
+            <div class="header">
+              <p>Total core components by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfTotalCCByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box my-CCs-by-states">
+            <div class="header">
+              <p>My core components by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfMyCCByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="box CCs-by-users-and-states">
+            <div class="header">
+              <p>Core components by users and states</p>
+            </div>
+            <div class="content">
+              <div class="container" *ngIf="numberOfCCsByUsers_usernameList.length > 0">
+                <div class="row">
+                  <div class="col-md-2 col-sm-12" style="padding-bottom: 0;">
+                    <mat-form-field>
+                      <mat-label>User</mat-label>
+                      <mat-select [(ngModel)]="numberOfCCsByUsers_usernameModel" multiple
+                                  (ngModelChange)="applyFilter(numberOfCCsByUsersAndStates, numberOfCCsByUsers_usernameModel)">
+                        <mat-option>
+                          <ngx-mat-select-search [formControl]="numberOfCCsByUsers_usernameListFilterCtrl"
+                                                 [placeholderLabel]="'Search...'"
+                                                 [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        </mat-option>
+                        <mat-option *ngFor="let loginId of numberOfCCsByUsers_usernameFilteredList | async" [value]="loginId">
+                          {{ loginId }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <table mat-table matSort #numberOfCCsByUsersAndStatesSort="matSort"
+                     matSortActive="username"
+                     matSortDirection="asc"
+                     [dataSource]="numberOfCCsByUsersAndStates">
+                <ng-container matColumnDef="username">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username}])}">
+                      {{ element.username }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="WIP">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> WIP</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'WIP'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.WIP }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Draft">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Draft</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Draft'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.Draft }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Candidate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Candidate'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.Candidate }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="total">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.total }}
+                    </a>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['username', 'WIP', 'Draft', 'Candidate', 'total']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'WIP', 'Draft', 'Candidate', 'total'];"></tr>
+              </table>
+              <mat-paginator #numberOfCCsByUsersAndStatesPaginator
+                             [hidden]="numberOfCCsByUsersAndStates.data.length <= 5"
+                             [pageSizeOptions]="[5, 10, 20]"
+                             showFirstLastButtons></mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row m-0">
+        <div class="col-lg-12">
+          <div class="box my-recent-CCs">
+            <div class="header">
+              <p>My recent core components</p>
+            </div>
+            <div class="content">
+              <table mat-table matSort #myRecentCCsSort="matSort"
+                     matSortActive="lastUpdateTimestamp"
+                     matSortDirection="desc"
+                     [dataSource]="myRecentCCs">
+                <ng-container matColumnDef="ccType">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Type</th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-chip-list [ngSwitch]="element.type">
+                      <mat-chip *ngSwitchDefault>{{ element.type }}</mat-chip>
+                    </mat-chip-list>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="ccState">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="cc-state {{ element.state }}">{{ element.state }}</span>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="den">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="den word-break-all">
+                      <a routerLink="/core_component/{{ element.type.endsWith('DT') ? 'dt' : element.type.toLowerCase() }}/{{ element.manifestId }}"
+                         matTooltip="{{ element.den }}">
+                        <span>{{ element.den }}</span>
+                      </a>
+                    </div>
+                    <div class="cc-guid">{{ element.guid }}</div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="lastUpdateTimestamp">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['ccType', 'ccState', 'den', 'lastUpdateTimestamp']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['ccType', 'ccState', 'den', 'lastUpdateTimestamp'];"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- BIEs -->
     <mat-tab label="BIEs">
       <div class="row m-0">
         <div class="col-lg-5 col-md-12 col-sm-12">
@@ -75,7 +250,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}])}">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}])}">
                       {{ element.username }}
                     </a>
                   </td>
@@ -88,7 +263,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'WIP'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.WIP }}
                     </a>
                   </td>
@@ -101,7 +276,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'QA'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.QA }}
                     </a>
                   </td>
@@ -114,7 +289,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Production'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.Production }}
                     </a>
                   </td>
@@ -126,7 +301,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.total }}
                     </a>
                   </td>
@@ -207,6 +382,7 @@
       </div>
     </mat-tab>
 
+    <!-- User Extensions -->
     <mat-tab [disabled]="isTenantEnabled" label="User Extensions">
       <div class="row m-0">
         <div [classList]="isDeveloper ? 'col-lg-10 col-md-12 col-sm-12' : 'col-lg-5 col-md-12 col-sm-12'">

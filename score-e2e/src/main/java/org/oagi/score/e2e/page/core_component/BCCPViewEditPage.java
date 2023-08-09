@@ -235,8 +235,6 @@ public interface BCCPViewEditPage extends Page {
      */
     ASCCPanelContainer getASCCPanelContainer(WebElement asccNode);
 
-    WebElement getAddCommentButton();
-
     /**
      * Return the BCC panel container.
      *
@@ -245,7 +243,14 @@ public interface BCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
-    AddCommentDialog hitAddCommentButton();
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
+
+    AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionSourceField();
 
@@ -789,7 +794,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -821,7 +825,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param valueConstraint
          */
         void setValueConstraint(String valueConstraint);
@@ -834,7 +837,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getFixedValueField();
 
         /**
-         *
          * @param fixedValue
          */
         void setFixedValue(String fixedValue);
@@ -847,7 +849,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getDefaultValueField();
 
         /**
-         *
          * @param defaultValue
          */
         void setDefaultValue(String defaultValue);
@@ -858,6 +859,11 @@ public interface BCCPViewEditPage extends Page {
          * @return the UI element of the 'Deprecated' checkbox
          */
         WebElement getDeprecatedCheckbox();
+
+        /**
+         * Toggle the 'Deprecated' checkbox
+         */
+        void toggleDeprecated();
 
         /**
          * Return the UI element of the 'Namespace' select field.

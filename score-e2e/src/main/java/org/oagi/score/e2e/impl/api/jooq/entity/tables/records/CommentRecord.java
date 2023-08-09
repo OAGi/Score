@@ -401,5 +401,6 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
         setCreatedBy(createdBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

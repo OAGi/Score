@@ -588,5 +588,6 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> implements R
         setOwnerUserId(ownerUserId);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

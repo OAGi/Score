@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.util.StringUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -222,5 +224,14 @@ public class Utility {
 
     public static String emptyToNull(String str) {
         return str.equals("") ? null : str;
+    }
+
+    public static boolean isValidURI(String uri) throws URISyntaxException {
+        try {
+            new URI(uri);
+            return true;
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 }

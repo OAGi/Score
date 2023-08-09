@@ -45,12 +45,17 @@ public class CcList {
     private String sixDigitId;
     private String defaultValueDomain;
 
+    private boolean newComponent;
     private List<ShortTag> tagList = Collections.emptyList();
 
     public CcList() {
     }
 
-    public CcList(CcType type, BigInteger manifestId, String guid, String den, String definition, String module, String name, String definitionSource, Optional<String> oagisComponentType, String dtType, String owner, CcState state, String revision, boolean deprecated, String lastUpdateUser, Date lastUpdateTimestamp, String releaseNum, BigInteger id, boolean ownedByDeveloper, String sixDigitId, String defaultValueDomain) {
+    public CcList(CcType type, BigInteger manifestId, String guid, String den, String definition, String module,
+                  String name, String definitionSource, Optional<String> oagisComponentType, String dtType,
+                  String owner, CcState state, String revision, boolean deprecated,
+                  String lastUpdateUser, Date lastUpdateTimestamp, String releaseNum, BigInteger id,
+                  boolean ownedByDeveloper, String sixDigitId, String defaultValueDomain) {
         this.type = type;
         this.manifestId = manifestId;
         this.guid = guid;

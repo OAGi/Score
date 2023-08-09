@@ -30,59 +30,62 @@ public class ReleaseDataProvider implements DataProvider {
     public void init() {
         long s = System.currentTimeMillis();
 
-        findAgencyIdListManifestList = coreComponentRepositoryForRelease.findAllAgencyIdListManifest(ULong.valueOf(releaseId));
+        ULong releaseULongId = ULong.valueOf(releaseId);
+
+        findAgencyIdListManifestList = coreComponentRepositoryForRelease.findAllAgencyIdListManifest(releaseULongId);
         findAgencyIdListManifestMap = findAgencyIdListManifestList.stream()
                 .collect(Collectors.toMap(AgencyIdListManifestRecord::getAgencyIdListManifestId, Function.identity()));
-        findAgencyIdListList = coreComponentRepositoryForRelease.findAllAgencyIdList(ULong.valueOf(releaseId));
+        findAgencyIdListList = coreComponentRepositoryForRelease.findAllAgencyIdList(releaseULongId);
         findAgencyIdListMap = findAgencyIdListList.stream()
                 .collect(Collectors.toMap(AgencyIdListRecord::getAgencyIdListId, Function.identity()));
 
-        findAgencyIdListValueByOwnerListIdMap = coreComponentRepositoryForRelease.findAllAgencyIdListValue(ULong.valueOf(releaseId)).stream()
-                .collect(Collectors.groupingBy(AgencyIdListValueRecord::getOwnerListId));
+        findAgencyIdListValueManifestByAgencyIdListManifestIdMap = coreComponentRepositoryForRelease.findAllAgencyIdListValueManifest(releaseULongId)
+                .stream().collect(Collectors.groupingBy(AgencyIdListValueManifestRecord::getAgencyIdListManifestId));
+        findAgencyIdListValueMap = coreComponentRepositoryForRelease.findAllAgencyIdListValue(releaseULongId)
+                .stream().collect(Collectors.toMap(AgencyIdListValueRecord::getAgencyIdListValueId, Function.identity()));
 
-        findCodeListManifestList = coreComponentRepositoryForRelease.findAllCodeListManifest(ULong.valueOf(releaseId));
+        findCodeListManifestList = coreComponentRepositoryForRelease.findAllCodeListManifest(releaseULongId);
         findCodeListManifestMap = findCodeListManifestList.stream()
                 .collect(Collectors.toMap(CodeListManifestRecord::getCodeListManifestId, Function.identity()));
-        findCodeListList = coreComponentRepositoryForRelease.findAllCodeList(ULong.valueOf(releaseId));
+        findCodeListList = coreComponentRepositoryForRelease.findAllCodeList(releaseULongId);
         findCodeListMap = findCodeListList.stream()
                 .collect(Collectors.toMap(CodeListRecord::getCodeListId, Function.identity()));
 
-        findCodeListValueByCodeListIdMap = coreComponentRepositoryForRelease.findAllCodeListValue(ULong.valueOf(releaseId)).stream()
-                .collect(Collectors.groupingBy(CodeListValueRecord::getCodeListId));
+        findCodeListValueManifestByCodeListManifestIdMap = coreComponentRepositoryForRelease.findAllCodeListValueManifest(releaseULongId).stream()
+                .collect(Collectors.groupingBy(CodeListValueManifestRecord::getCodeListManifestId));
+        findCodeListValueMap = coreComponentRepositoryForRelease.findAllCodeListValue(releaseULongId).stream()
+                .collect(Collectors.toMap(CodeListValueRecord::getCodeListValueId, Function.identity()));
 
-        findDtManifestList = coreComponentRepositoryForRelease.findAllDtManifest(ULong.valueOf(releaseId));
+        findDtManifestList = coreComponentRepositoryForRelease.findAllDtManifest(releaseULongId);
         findDtManifestMap = findDtManifestList.stream()
                 .collect(Collectors.toMap(DtManifestRecord::getDtManifestId, Function.identity()));
 
-        findDtList = coreComponentRepositoryForRelease.findAllDt(ULong.valueOf(releaseId));
+        findDtList = coreComponentRepositoryForRelease.findAllDt(releaseULongId);
         findDtMap = findDtList.stream()
                 .collect(Collectors.toMap(DtRecord::getDtId, Function.identity()));
 
-        findDtScByOwnerDtIdMap = coreComponentRepositoryForRelease.findAllDtSc(ULong.valueOf(releaseId)).stream()
-                .collect(Collectors.groupingBy(DtScRecord::getOwnerDtId));
-
-        findDtScManifestByOwnerDtManifestIdMap = coreComponentRepositoryForRelease.findAllDtScManifest(ULong.valueOf(releaseId)).stream()
+        findDtScManifestByOwnerDtManifestIdMap = coreComponentRepositoryForRelease.findAllDtScManifest(releaseULongId).stream()
                 .collect(Collectors.groupingBy(DtScManifestRecord::getOwnerDtManifestId));
-        findDtScMap = coreComponentRepositoryForRelease.findAllDtSc(ULong.valueOf(releaseId)).stream()
+        findDtScMap = coreComponentRepositoryForRelease.findAllDtSc(releaseULongId).stream()
                 .collect(Collectors.toMap(DtScRecord::getDtScId, Function.identity()));
 
-        List<BdtPriRestriRecord> bdtPriRestriList = coreComponentRepositoryForRelease.findAllBdtPriRestri(ULong.valueOf(releaseId));
+        List<BdtPriRestriRecord> bdtPriRestriList = coreComponentRepositoryForRelease.findAllBdtPriRestri(releaseULongId);
         findBdtPriRestriListByDtManifestIdMap = bdtPriRestriList.stream()
                 .collect(Collectors.groupingBy(BdtPriRestriRecord::getBdtManifestId));
 
-        cdtAwdPriXpsTypeMapMap = coreComponentRepositoryForRelease.findAllCdtAwdPriXpsTypeMap(ULong.valueOf(releaseId)).stream()
+        cdtAwdPriXpsTypeMapMap = coreComponentRepositoryForRelease.findAllCdtAwdPriXpsTypeMap(releaseULongId).stream()
                 .collect(Collectors.toMap(CdtAwdPriXpsTypeMapRecord::getCdtAwdPriXpsTypeMapId, Function.identity()));
 
-        findBdtScPriRestriListByDtScManifestIdMap = coreComponentRepositoryForRelease.findAllBdtScPriRestri(ULong.valueOf(releaseId)).stream()
+        findBdtScPriRestriListByDtScManifestIdMap = coreComponentRepositoryForRelease.findAllBdtScPriRestri(releaseULongId).stream()
                 .collect(Collectors.groupingBy(BdtScPriRestriRecord::getBdtScManifestId));
 
-        findCdtScAwdPriXpsTypeMapMap = coreComponentRepositoryForRelease.findAllCdtScAwdPriXpsTypeMap(ULong.valueOf(releaseId)).stream()
+        findCdtScAwdPriXpsTypeMapMap = coreComponentRepositoryForRelease.findAllCdtScAwdPriXpsTypeMap(releaseULongId).stream()
                 .collect(Collectors.toMap(CdtScAwdPriXpsTypeMapRecord::getCdtScAwdPriXpsTypeMapId, Function.identity()));
 
-        findCdtScAwdPriMap = coreComponentRepositoryForRelease.findAllCdtScAwdPri(ULong.valueOf(releaseId)).stream()
+        findCdtScAwdPriMap = coreComponentRepositoryForRelease.findAllCdtScAwdPri(releaseULongId).stream()
                 .collect(Collectors.toMap(CdtScAwdPriRecord::getCdtScAwdPriId, Function.identity()));
 
-        List<CdtAwdPriRecord> cdtAwdPriList = coreComponentRepositoryForRelease.findAllCdtAwdPri(ULong.valueOf(releaseId));
+        List<CdtAwdPriRecord> cdtAwdPriList = coreComponentRepositoryForRelease.findAllCdtAwdPri(releaseULongId);
         findCdtAwdPriMap = cdtAwdPriList.stream()
                 .collect(Collectors.toMap(CdtAwdPriRecord::getCdtAwdPriId, Function.identity()));
 
@@ -90,41 +93,41 @@ public class ReleaseDataProvider implements DataProvider {
         findCdtPriMap = cdtPriList.stream()
                 .collect(Collectors.toMap(CdtPriRecord::getCdtPriId, Function.identity()));
 
-        findXbtList = coreComponentRepositoryForRelease.findAllXbt(ULong.valueOf(releaseId));
+        findXbtList = coreComponentRepositoryForRelease.findAllXbt(releaseULongId);
         findXbtMap = findXbtList.stream()
                 .collect(Collectors.toMap(XbtRecord::getXbtId, Function.identity()));
 
-        findACCList = coreComponentRepositoryForRelease.findAllAcc(ULong.valueOf(releaseId));
+        findACCList = coreComponentRepositoryForRelease.findAllAcc(releaseULongId);
         findAccMap = findACCList.stream()
                 .collect(Collectors.toMap(AccRecord::getAccId, Function.identity()));
 
-        findACCManifestList = coreComponentRepositoryForRelease.findAllAccManifest(ULong.valueOf(releaseId));
+        findACCManifestList = coreComponentRepositoryForRelease.findAllAccManifest(releaseULongId);
         findAccManifestMap = findACCManifestList.stream()
                 .collect(Collectors.toMap(AccManifestRecord::getAccManifestId, Function.identity()));
 
-        findASCCPList = coreComponentRepositoryForRelease.findAllAsccp(ULong.valueOf(releaseId));
+        findASCCPList = coreComponentRepositoryForRelease.findAllAsccp(releaseULongId);
         findAsccpMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AsccpRecord::getAsccpId, Function.identity()));
         findAsccpByGuidMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AsccpRecord::getGuid, Function.identity()));
 
-        findASCCPManifestList = coreComponentRepositoryForRelease.findAllAsccpManifest(ULong.valueOf(releaseId));
+        findASCCPManifestList = coreComponentRepositoryForRelease.findAllAsccpManifest(releaseULongId);
         findAsccpManifestMap = findASCCPManifestList.stream()
                 .collect(Collectors.toMap(AsccpManifestRecord::getAsccpManifestId, Function.identity()));
 
-        findBCCPManifestList = coreComponentRepositoryForRelease.findAllBccpManifest(ULong.valueOf(releaseId));
+        findBCCPManifestList = coreComponentRepositoryForRelease.findAllBccpManifest(releaseULongId);
         findBccpManifestMap = findBCCPManifestList.stream()
                 .collect(Collectors.toMap(BccpManifestRecord::getBccpManifestId, Function.identity()));
         
-        findBCCPList = coreComponentRepositoryForRelease.findAllBccp(ULong.valueOf(releaseId));
+        findBCCPList = coreComponentRepositoryForRelease.findAllBccp(releaseULongId);
         findBccpMap = findBCCPList.stream()
                 .collect(Collectors.toMap(BccpRecord::getBccpId, Function.identity()));
 
-        findACCManifestList = coreComponentRepositoryForRelease.findAllAccManifest(ULong.valueOf(releaseId));
+        findACCManifestList = coreComponentRepositoryForRelease.findAllAccManifest(releaseULongId);
         findAccManifestMap = findACCManifestList.stream()
                 .collect(Collectors.toMap(AccManifestRecord::getAccManifestId, Function.identity()));
 
-        List<BccRecord> bccList = coreComponentRepositoryForRelease.findAllBcc(ULong.valueOf(releaseId));
+        List<BccRecord> bccList = coreComponentRepositoryForRelease.findAllBcc(releaseULongId);
 
         findBCCByToBccpIdMap = bccList.stream()
                 .collect(Collectors.groupingBy(BccRecord::getToBccpId));
@@ -133,23 +136,23 @@ public class ReleaseDataProvider implements DataProvider {
         findBccMap = bccList.stream()
                 .collect(Collectors.toMap(BccRecord::getBccId, Function.identity()));
 
-        findBccManifestMap = coreComponentRepositoryForRelease.findAllBccManifest(ULong.valueOf(releaseId)).stream()
+        findBccManifestMap = coreComponentRepositoryForRelease.findAllBccManifest(releaseULongId).stream()
                 .collect(Collectors.toMap(BccManifestRecord::getBccManifestId, Function.identity()));
         findBccManifestByAccManifestIdMap = findBccManifestMap.values().stream()
                 .collect(Collectors.groupingBy(BccManifestRecord::getFromAccManifestId));
 
-        findAsccManifestMap = coreComponentRepositoryForRelease.findAllAsccManifest(ULong.valueOf(releaseId)).stream()
+        findAsccManifestMap = coreComponentRepositoryForRelease.findAllAsccManifest(releaseULongId).stream()
                 .collect(Collectors.toMap(AsccManifestRecord::getAsccManifestId, Function.identity()));
         findAsccManifestByAccManifestIdMap = findAsccManifestMap.values().stream()
                 .collect(Collectors.groupingBy(AsccManifestRecord::getFromAccManifestId));
 
-        List<AsccRecord> asccList = coreComponentRepositoryForRelease.findAllAscc(ULong.valueOf(releaseId));
+        List<AsccRecord> asccList = coreComponentRepositoryForRelease.findAllAscc(releaseULongId);
         findAsccByFromAccIdMap = asccList.stream()
                 .collect(Collectors.groupingBy(AsccRecord::getFromAccId));
         findAsccMap = asccList.stream()
                 .collect(Collectors.toMap(AsccRecord::getAsccId, Function.identity()));
 
-        findBlobContentList = coreComponentRepositoryForRelease.findAllBlobContent(ULong.valueOf(releaseId));
+        findBlobContentList = coreComponentRepositoryForRelease.findAllBlobContent(releaseULongId);
 
         findSeqKeyList = coreComponentRepositoryForRelease.findAllSeqKeyRecord();
         findSeqKeyMap = findSeqKeyList.stream()
@@ -196,10 +199,17 @@ public class ReleaseDataProvider implements DataProvider {
         return findAgencyIdListMap.get(agencyIdListId);
     }
 
-    private Map<ULong, List<AgencyIdListValueRecord>> findAgencyIdListValueByOwnerListIdMap;
-    
-    public List<AgencyIdListValueRecord> findAgencyIdListValueByOwnerListId(ULong ownerListId) {
-        return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ? findAgencyIdListValueByOwnerListIdMap.get(ownerListId) : Collections.emptyList();
+    private Map<ULong, List<AgencyIdListValueManifestRecord>> findAgencyIdListValueManifestByAgencyIdListManifestIdMap;
+
+    public List<AgencyIdListValueManifestRecord> findAgencyIdListValueManifestByAgencyIdListManifestId(ULong agencyIdListManifestId) {
+        return (findAgencyIdListValueManifestByAgencyIdListManifestIdMap.containsKey(agencyIdListManifestId)) ?
+                findAgencyIdListValueManifestByAgencyIdListManifestIdMap.get(agencyIdListManifestId) : Collections.emptyList();
+    }
+
+    private Map<ULong, AgencyIdListValueRecord> findAgencyIdListValueMap;
+
+    public AgencyIdListValueRecord findAgencyIdListValue(ULong agencyIdListValueId) {
+        return findAgencyIdListValueMap.get(agencyIdListValueId);
     }
 
     private List<CodeListManifestRecord> findCodeListManifestList;
@@ -226,10 +236,16 @@ public class ReleaseDataProvider implements DataProvider {
         return findCodeListMap.get(codeListId);
     }
 
-    private Map<ULong, List<CodeListValueRecord>> findCodeListValueByCodeListIdMap;
+    private Map<ULong, CodeListValueRecord> findCodeListValueMap;
     
-    public List<CodeListValueRecord> findCodeListValueByCodeListId(ULong codeListId) {
-        return (findCodeListValueByCodeListIdMap.containsKey(codeListId)) ? findCodeListValueByCodeListIdMap.get(codeListId) : Collections.emptyList();
+    public CodeListValueRecord findCodeListValue(ULong codeListValueId) {
+        return findCodeListValueMap.get(codeListValueId);
+    }
+
+    private Map<ULong, List<CodeListValueManifestRecord>> findCodeListValueManifestByCodeListManifestIdMap;
+
+    public List<CodeListValueManifestRecord> findCodeListValueManifestByCodeListManifestId(ULong codeListManifestId) {
+        return (findCodeListValueManifestByCodeListManifestIdMap.containsKey(codeListManifestId)) ? findCodeListValueManifestByCodeListManifestIdMap.get(codeListManifestId) : Collections.emptyList();
     }
 
     private List<DtManifestRecord> findDtManifestList;
@@ -266,12 +282,6 @@ public class ReleaseDataProvider implements DataProvider {
 
     public DtScRecord findDtSc(ULong dtScId) {
         return findDtScMap.get(dtScId);
-    }
-
-    private Map<ULong, List<DtScRecord>> findDtScByOwnerDtIdMap;
-
-    public List<DtScRecord> findDtScByOwnerDtId(ULong ownerDtId) {
-        return (findDtScByOwnerDtIdMap.containsKey(ownerDtId)) ? findDtScByOwnerDtIdMap.get(ownerDtId) : Collections.emptyList();
     }
 
     private Map<ULong, List<BdtPriRestriRecord>> findBdtPriRestriListByDtManifestIdMap;

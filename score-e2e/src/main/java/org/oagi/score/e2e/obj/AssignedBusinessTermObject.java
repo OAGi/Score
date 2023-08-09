@@ -23,7 +23,7 @@ public class AssignedBusinessTermObject {
     private String owner;
     private String lastUpdateUser;
 
-    public static AssignedBusinessTermObject createRandomAssignedBusinessTerm(AppUserObject creator, String bieId,String bieType, String den, String businessTermId, String businessTerm, String externalReferenceUri, String typeCode, Boolean isPrimary) {
+    public static AssignedBusinessTermObject createRandomAssignedBusinessTerm(AppUserObject creator, String bieId, String bieType, String den, String businessTermId, String businessTerm, String externalReferenceUri, String typeCode, Boolean isPrimary) {
         AssignedBusinessTermObject assignedBusinessTerm = new AssignedBusinessTermObject();
         assignedBusinessTerm.setAssignedBizTermId(UUID.randomUUID().toString().replaceAll("-", ""));
         assignedBusinessTerm.setBieId(bieId);

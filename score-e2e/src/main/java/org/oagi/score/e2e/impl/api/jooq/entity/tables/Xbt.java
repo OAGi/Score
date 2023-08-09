@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function16;
+import org.jooq.Function17;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -72,7 +72,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      * The column <code>oagi.xbt.name</code>. Human understandable name of the
      * built-in type.
      */
-    public final TableField<XbtRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45), this, "Human understandable name of the built-in type.");
+    public final TableField<XbtRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Human understandable name of the built-in type.");
 
     /**
      * The column <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
@@ -80,38 +80,43 @@ public class Xbt extends TableImpl<XbtRecord> {
      * for the XML schema namespace is assumed to be 'xsd' and a default prefix
      * for the OAGIS built-int type.
      */
-    public final TableField<XbtRecord, String> BUILTIN_TYPE = createField(DSL.name("builtIn_type"), SQLDataType.VARCHAR(45), this, "Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.");
+    public final TableField<XbtRecord, String> BUILTIN_TYPE = createField(DSL.name("builtIn_type"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.");
 
     /**
      * The column <code>oagi.xbt.jbt_draft05_map</code>.
      */
-    public final TableField<XbtRecord, String> JBT_DRAFT05_MAP = createField(DSL.name("jbt_draft05_map"), SQLDataType.VARCHAR(500), this, "");
+    public final TableField<XbtRecord, String> JBT_DRAFT05_MAP = createField(DSL.name("jbt_draft05_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.xbt.openapi30_map</code>.
      */
-    public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500), this, "");
+    public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>oagi.xbt.avro_map</code>.
+     */
+    public final TableField<XbtRecord, String> AVRO_MAP = createField(DSL.name("avro_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
      * XBT table itself. It indicates a super type of this XSD built-in type.
      */
-    public final TableField<XbtRecord, ULong> SUBTYPE_OF_XBT_ID = createField(DSL.name("subtype_of_xbt_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.");
+    public final TableField<XbtRecord, ULong> SUBTYPE_OF_XBT_ID = createField(DSL.name("subtype_of_xbt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.");
 
     /**
      * The column <code>oagi.xbt.schema_definition</code>.
      */
-    public final TableField<XbtRecord, String> SCHEMA_DEFINITION = createField(DSL.name("schema_definition"), SQLDataType.CLOB, this, "");
+    public final TableField<XbtRecord, String> SCHEMA_DEFINITION = createField(DSL.name("schema_definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.xbt.revision_doc</code>.
      */
-    public final TableField<XbtRecord, String> REVISION_DOC = createField(DSL.name("revision_doc"), SQLDataType.CLOB, this, "");
+    public final TableField<XbtRecord, String> REVISION_DOC = createField(DSL.name("revision_doc"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.xbt.state</code>.
      */
-    public final TableField<XbtRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER, this, "");
+    public final TableField<XbtRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>oagi.xbt.created_by</code>.
@@ -141,7 +146,7 @@ public class Xbt extends TableImpl<XbtRecord> {
     /**
      * The column <code>oagi.xbt.is_deprecated</code>.
      */
-    public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     private Xbt(Name alias, Table<XbtRecord> aliased) {
         this(alias, aliased, null);
@@ -289,18 +294,18 @@ public class Xbt extends TableImpl<XbtRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<ULong, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<ULong, String, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function16<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -308,7 +313,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function16<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

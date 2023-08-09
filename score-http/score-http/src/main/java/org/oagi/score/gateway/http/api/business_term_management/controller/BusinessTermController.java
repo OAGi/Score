@@ -8,6 +8,8 @@ import org.oagi.score.repo.api.businessterm.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.nio.file.FileSystems;
@@ -36,6 +39,8 @@ import static org.oagi.score.repo.api.base.SortDirection.DESC;
 
 @RestController
 public class BusinessTermController {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -220,27 +225,19 @@ public class BusinessTermController {
     @RequestMapping(value = "/csv/business_terms", method = RequestMethod.POST)
     public ResponseEntity uploadFile(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file) throws IOException {
         if (TYPE.equals(file.getContentType())) {
-            try {
-                CreateBulkBusinessTermRequest request = new CreateBulkBusinessTermRequest(authenticationService.asScoreUser(requester));
-                request.setInputStream(file.getInputStream());
-                CreateBulkBusinessTermResponse response = businessTermService.createBusinessTermsFromFile(request);
-                if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
-                    System.out.println("Uploaded the file successfully: " + file.getOriginalFilename()
-                            + "Created record ids: ");
-                    response.getBusinessTermIds().stream().forEach(System.out::println);
-                    return ResponseEntity.noContent().build();
-                } else {
-                    return ResponseEntity.status(200).build();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return ResponseEntity.badRequest().body(
-                        "Could not upload the file: " + file.getOriginalFilename() + ". Error: " + e.getMessage());
+            CreateBulkBusinessTermRequest request = new CreateBulkBusinessTermRequest(authenticationService.asScoreUser(requester));
+            request.setInputStream(file.getInputStream());
+            CreateBulkBusinessTermResponse response = businessTermService.createBusinessTermsFromFile(request);
+            if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
+                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.status(200).build();
             }
         } else {
-            return ResponseEntity.badRequest().body("Please upload a csv file!");
+            return ResponseEntity.status(415).body("Unsupported content type: " + file.getContentType());
         }
     }
 

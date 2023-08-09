@@ -213,10 +213,10 @@ public interface ASCCPCreateDialog extends Dialog {
     WebElement getCreateButton();
 
     /**
-     * Create a new BCCP.
+     * Create a new ASCCP.
      *
      * @param den DEN
-     * @return the BCCP page object
+     * @return the ASCCP page object
      */
     ASCCPViewEditPage create(String den);
 }

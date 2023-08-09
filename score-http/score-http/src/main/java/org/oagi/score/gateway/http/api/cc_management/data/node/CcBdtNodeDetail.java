@@ -22,6 +22,7 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private BigInteger basedBdtId;
     private BigInteger basedBdtManifestId;
     private String basedBdtDen;
+    private String basedBdtState;
     private String contentComponentDefinition;
     private boolean commonlyUsed;
     private boolean deprecated;
@@ -41,6 +42,13 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private int revisionNum;
     private int revisionTrackingNum;
     private String spec;
+
+    private BigInteger sinceManifestId = BigInteger.ZERO;
+    private BigInteger sinceReleaseId = BigInteger.ZERO;
+    private String sinceReleaseNum;
+    private BigInteger lastChangedManifestId = BigInteger.ZERO;
+    private BigInteger lastChangedReleaseId = BigInteger.ZERO;
+    private String lastChangedReleaseNum;
 
     private List<CcBdtPriRestri> bdtPriRestriList;
 }

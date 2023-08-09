@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
+import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
@@ -34,6 +36,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
         super.init();
 
     }
+
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
@@ -51,7 +54,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage  = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openNewCodeList(developer, workingBranch.getReleaseNumber());
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(developer, workingBranch.getReleaseNumber());
         assertEquals("Code List", getText(editCodeListPage.getCodeListNameField()));
         assertEquals("1", getText(editCodeListPage.getVersionField()));

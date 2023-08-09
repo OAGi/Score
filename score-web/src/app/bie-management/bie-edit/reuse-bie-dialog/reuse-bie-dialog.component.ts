@@ -16,6 +16,7 @@ import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {SimpleRelease} from "../../../release-management/domain/release";
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -50,15 +51,17 @@ export class ReuseBieDialogComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
-    @Inject(MAT_DIALOG_DATA) public asbiepNode: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.asccpManifestId = this.asbiepNode.asccpManifestId;
-    this.request.release.releaseId = this.asbiepNode.releaseId;
-    this.request.excludeTopLevelAsbiepIds = [this.asbiepNode.topLevelAsbiepId,];
+    this.request.filters.asccpManifestId = this.data.asccpManifestId;
+    const release = new SimpleRelease();
+    release.releaseId = this.data.releaseId;
+    this.request.releases = [release,];
+    this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;
     }

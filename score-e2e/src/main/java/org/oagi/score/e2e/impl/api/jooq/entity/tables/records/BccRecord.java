@@ -547,5 +547,6 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
         setFixedValue(fixedValue);
         setPrevBccId(prevBccId);
         setNextBccId(nextBccId);
+        resetChangedOnNotNull();
     }
 }

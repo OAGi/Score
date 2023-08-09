@@ -328,5 +328,6 @@ public class BdtScPriRestriRecord extends UpdatableRecordImpl<BdtScPriRestriReco
         setCodeListManifestId(codeListManifestId);
         setAgencyIdListManifestId(agencyIdListManifestId);
         setIsDefault(isDefault);
+        resetChangedOnNotNull();
     }
 }

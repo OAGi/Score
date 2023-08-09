@@ -19,6 +19,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestRecord;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.AppUser;
@@ -82,6 +83,13 @@ public class CcListService {
                     tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList())
             );
         });
+        return response;
+    }
+
+    public CcChangesResponse getCcChanges(ScoreUser requester, BigInteger releaseId) {
+        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester, ULong.valueOf(releaseId));
+        CcChangesResponse response = new CcChangesResponse();
+        response.addCcChangeList(changeList);
         return response;
     }
 
@@ -301,17 +309,22 @@ public class CcListService {
 
     @Transactional
     public void purgeCcs(AuthenticatedPrincipal user, CcUpdateStateListRequest request) {
+        boolean isRequestForSingle = request.getAccManifestIds().size() +
+                request.getAsccpManifestIds().size() +
+                request.getBccpManifestIds().size() +
+                request.getDtManifestIds().size() == 1;
+
         request.getAccManifestIds().forEach(e -> {
-            ccNodeService.purgeAcc(user, e, true);
+            ccNodeService.purgeAcc(user, e, (isRequestForSingle) ? false : true);
         });
         request.getAsccpManifestIds().forEach(e -> {
-            ccNodeService.purgeAsccp(user, e, true, false);
+            ccNodeService.purgeAsccp(user, e, (isRequestForSingle) ? false : true, false);
         });
         request.getBccpManifestIds().forEach(e -> {
-            ccNodeService.purgeBccp(user, e, true);
+            ccNodeService.purgeBccp(user, e, (isRequestForSingle) ? false : true);
         });
         request.getDtManifestIds().forEach(e -> {
-            ccNodeService.purgeDt(user, e, true);
+            ccNodeService.purgeDt(user, e, (isRequestForSingle) ? false : true);
         });
     }
 
@@ -348,7 +361,7 @@ public class CcListService {
     }
 
     @Transactional
-    public void transferOwnershipList(AuthenticatedPrincipal user, CcTransferOwnerShipListRequest request) {
+    public void transferOwnershipList(AuthenticatedPrincipal user, CcTransferOwnershipListRequest request) {
         request.getAccManifestIds().forEach(e -> {
             transferOwnership(user, "ACC", e, request.getTargetLoginId());
         });

@@ -1,6 +1,5 @@
 package org.oagi.score.export.impl;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.export.ExportContext;
 import org.oagi.score.export.model.*;
@@ -87,12 +86,12 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
     private void createAgencyIdList(Map<ULong, SchemaModule> moduleMap) {
         for (AgencyIdListManifestRecord agencyIdListManifest : moduleSetReleaseDataProvider.findAgencyIdListManifest()) {
             AgencyIdListRecord agencyIdList = moduleSetReleaseDataProvider.findAgencyIdList(agencyIdListManifest.getAgencyIdListId());
-            List<AgencyIdListValueRecord> agencyIdListValues =
-                    moduleSetReleaseDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+            List<AgencyIdListValueRecord> agencyIdListValues = moduleSetReleaseDataProvider.findAgencyIdListValueManifestByAgencyIdListManifestId(agencyIdListManifest.getAgencyIdListManifestId())
+                    .stream().map(e -> moduleSetReleaseDataProvider.findAgencyIdListValue(e.getAgencyIdListValueId())).collect(Collectors.toList());
 
             ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAgencyIdList(agencyIdListManifest.getAgencyIdListManifestId());
             if (moduleCCID == null) {
-                throw new IllegalStateException("Did you assign the agency ID list ''" + agencyIdList.getName() + "'?");
+                continue;
             }
             SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
             schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
@@ -109,7 +108,9 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
             schemaCodeList.setName(codeList.getName());
             schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
 
-            for (CodeListValueRecord codeListValue : moduleSetReleaseDataProvider.findCodeListValueByCodeListId(codeList.getCodeListId())) {
+            for (CodeListValueManifestRecord codeListValueManifest : moduleSetReleaseDataProvider.findCodeListValueManifestByCodeListManifestId(
+                    codeListManifest.getCodeListManifestId())) {
+                CodeListValueRecord codeListValue = moduleSetReleaseDataProvider.findCodeListValue(codeListValueManifest.getCodeListValueId());
                 schemaCodeList.addValue(codeListValue.getValue());
             }
 

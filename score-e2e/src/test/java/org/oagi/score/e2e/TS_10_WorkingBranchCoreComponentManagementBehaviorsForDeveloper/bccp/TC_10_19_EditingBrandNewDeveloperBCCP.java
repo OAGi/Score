@@ -118,7 +118,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
 
         String denText = getText(bccpPanel.getDENField());
-        assertEquals("Test Object " + randomPropertyTerm + ". Code", denText);
+        assertEquals("Test Object " + randomPropertyTerm + ". System Environment_ Code", denText);
     }
 
     @Test
@@ -293,14 +293,14 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         bccpCreateDialog.create("Temperature_ Open_ Measure. Type");
         viewEditCoreComponentPage.openPage();
 
-        String den = "Property Term. Measure";
+        String den = "Property Term. Temperature_ Open_ Measure";
         {
             viewEditCoreComponentPage.setDEN(den);
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -324,7 +324,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
             WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
-            assertTrue(td.findElement(By.tagName("button")).isEnabled());
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -363,7 +363,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
         {
             viewEditCoreComponentPage.openPage();
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(randomACC1.getDen(), branch);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC1.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + randomACC1.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(randomPropertyTerm, getText(bccPanelContainer.getBCCPPanel().getPropertyTermField()));
@@ -371,7 +371,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
         {
             viewEditCoreComponentPage.openPage();
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(randomACC2.getDen(), branch);
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(randomACC2.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + randomACC2.getDen() + "/" + randomPropertyTerm);
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(randomPropertyTerm, getText(bccPanelContainer.getBCCPPanel().getPropertyTermField()));

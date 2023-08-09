@@ -33,6 +33,18 @@ export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
     }
   }
 
+  get asbiePath(): string {
+    return (this.type.toUpperCase() === 'ASBIEP') ? (this._node as AsbiepFlatNode).asbiePath : undefined;
+  }
+
+  get bbiePath(): string {
+    return (this.type.toUpperCase() === 'BBIEP') ? (this._node as BbiepFlatNode).bbiePath : undefined;
+  }
+
+  get bbieScPath(): string {
+    return (this.type.toUpperCase() === 'BBIE_SC') ? (this._node as BbieScFlatNode).bbieScPath : undefined;
+  }
+
   get isMapped(): boolean {
     if (this.locked) {
       return true;
@@ -78,6 +90,18 @@ export class BieUpliftTargetFlatNode extends WrappedBieFlatNode {
       default:
         return this._node.path;
     }
+  }
+
+  get asbiePath(): string {
+    return (this.type.toUpperCase() === 'ASBIEP') ? (this._node as AsbiepFlatNode).asbiePath : undefined;
+  }
+
+  get bbiePath(): string {
+    return (this.type.toUpperCase() === 'BBIEP') ? (this._node as BbiepFlatNode).bbiePath : undefined;
+  }
+
+  get bbieScPath(): string {
+    return (this.type.toUpperCase() === 'BBIE_SC') ? (this._node as BbieScFlatNode).bbieScPath : undefined;
   }
 
   equal(node: BieFlatNode) {

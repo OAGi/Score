@@ -16,7 +16,8 @@ import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import static java.time.Duration.ofMillis;
+import java.time.Duration;
+
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreComponentMenu {
@@ -87,6 +88,7 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
     public ViewEditCodeListPage openViewEditCodeListSubMenu() {
         retry(() -> click(getViewEditCodeListSubMenu()));
         ViewEditCodeListPage viewEditCodeListPage = new ViewEditCodeListPageImpl(this);
+        waitFor(Duration.ofMillis(2000));
         assert viewEditCodeListPage.isOpened();
         return viewEditCodeListPage;
     }

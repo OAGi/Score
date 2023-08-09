@@ -4,18 +4,18 @@ import org.jooq.types.ULong;
 
 public interface Component {
 
-    final String GUID_PREFIX = "oagis-id-";
+    String getName();
 
-    public String getName();
+    String getGuid();
 
-    public String getGuid();
+    String getTypeName();
 
-    public String getTypeName();
+    String getDefinition();
 
-    public String getDefinition();
+    String getDefinitionSource();
 
-    public String getDefinitionSource();
+    ULong getNamespaceId();
 
-    public ULong getNamespaceId();
+    ULong getTypeNamespaceId();
 
 }

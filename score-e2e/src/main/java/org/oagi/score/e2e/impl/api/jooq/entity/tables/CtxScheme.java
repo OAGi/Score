@@ -76,13 +76,13 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
      * The column <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
      * the context scheme.
      */
-    public final TableField<CtxSchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(255), this, "Pretty print name of the context scheme.");
+    public final TableField<CtxSchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Pretty print name of the context scheme.");
 
     /**
      * The column <code>oagi.ctx_scheme.description</code>. Description of the
      * context scheme.
      */
-    public final TableField<CtxSchemeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Description of the context scheme.");
+    public final TableField<CtxSchemeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the context scheme.");
 
     /**
      * The column <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
@@ -109,7 +109,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
      * key to the CODE_LIST table. It identifies the code list associated with
      * this context scheme.
      */
-    public final TableField<CtxSchemeRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED, this, "This is the foreign key to the CODE_LIST table. It identifies the code list associated with this context scheme.");
+    public final TableField<CtxSchemeRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is the foreign key to the CODE_LIST table. It identifies the code list associated with this context scheme.");
 
     /**
      * The column <code>oagi.ctx_scheme.created_by</code>. Foreign key to the

@@ -71,44 +71,44 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
      * The column
      * <code>oagi.code_list_manifest.based_code_list_manifest_id</code>.
      */
-    public final TableField<CodeListManifestRecord, ULong> BASED_CODE_LIST_MANIFEST_ID = createField(DSL.name("based_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListManifestRecord, ULong> BASED_CODE_LIST_MANIFEST_ID = createField(DSL.name("based_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column
      * <code>oagi.code_list_manifest.agency_id_list_value_manifest_id</code>.
      */
-    public final TableField<CodeListManifestRecord, ULong> AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListManifestRecord, ULong> AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.code_list_manifest.conflict</code>. This indicates
      * that there is a conflict between self and relationship.
      */
-    public final TableField<CodeListManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<CodeListManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.code_list_manifest.log_id</code>. A foreign key
      * pointed to a log for the current record.
      */
-    public final TableField<CodeListManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
+    public final TableField<CodeListManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key pointed to a log for the current record.");
 
     /**
      * The column
      * <code>oagi.code_list_manifest.replacement_code_list_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<CodeListManifestRecord, ULong> REPLACEMENT_CODE_LIST_MANIFEST_ID = createField(DSL.name("replacement_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<CodeListManifestRecord, ULong> REPLACEMENT_CODE_LIST_MANIFEST_ID = createField(DSL.name("replacement_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column
      * <code>oagi.code_list_manifest.prev_code_list_manifest_id</code>.
      */
-    public final TableField<CodeListManifestRecord, ULong> PREV_CODE_LIST_MANIFEST_ID = createField(DSL.name("prev_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListManifestRecord, ULong> PREV_CODE_LIST_MANIFEST_ID = createField(DSL.name("prev_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column
      * <code>oagi.code_list_manifest.next_code_list_manifest_id</code>.
      */
-    public final TableField<CodeListManifestRecord, ULong> NEXT_CODE_LIST_MANIFEST_ID = createField(DSL.name("next_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CodeListManifestRecord, ULong> NEXT_CODE_LIST_MANIFEST_ID = createField(DSL.name("next_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private CodeListManifest(Name alias, Table<CodeListManifestRecord> aliased) {
         this(alias, aliased, null);

@@ -3,6 +3,7 @@ import {
   ArraySortPipe,
   DateAgoPipe,
   HighlightSearch,
+  PastTensePipe,
   SeparatePipe,
   TruncatePipe,
   UnboundedPipe,
@@ -14,7 +15,7 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ConfirmDialogModule} from './confirm-dialog/confirm-dialog.module';
-import {MultiActionsSnackBarModule} from "./multi-actions-snack-bar/multi-actions-snack-bar.module";
+import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-actions-snack-bar.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import {MultiActionsSnackBarModule} from "./multi-actions-snack-bar/multi-action
     SeparatePipe,
     ArraySortPipe,
     TruncatePipe,
+    PastTensePipe
   ],
   imports: [
     MatDialogModule,
@@ -43,6 +45,7 @@ import {MultiActionsSnackBarModule} from "./multi-actions-snack-bar/multi-action
     SeparatePipe,
     ArraySortPipe,
     TruncatePipe,
+    PastTensePipe,
   ]
 })
 export class ScoreCommonModule {

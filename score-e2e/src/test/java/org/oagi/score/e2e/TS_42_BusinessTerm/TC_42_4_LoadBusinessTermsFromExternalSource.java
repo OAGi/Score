@@ -38,19 +38,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
-    private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
-
-    private static String getDownloadPath() {
-        File fileDestination = new File(System.getProperty("user.home"), "Downloads");
-        return fileDestination.getAbsolutePath();
-    }
-
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
-        this.randomBusinessTerms.add(businessTerm);
     }
 
     @BeforeEach
@@ -93,11 +82,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -135,10 +123,69 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             csvFileForUpload.delete();
         }
     }
-
     @Test
     @DisplayName("TC_42_4_3")
-    public void end_user_cannot_upload_the_csv_file_with_incorrect_format_in_business_term_page() {
+    public void no_business_term_will_be_created_if_invalid_format_in_uploaded_csv_file() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        BIEMenu bieMenu = homePage.getBIEMenu();
+        ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+
+        //generate three random Business Terms for testing
+        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+
+        String randomBT_noTerm_URI = "http://www.hSxyz.com";
+        String randomBT_invalidUri = "123";
+        BusinessTermObject randomBT = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        businessTerms.add(randomBT);
+
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        // write test business terms into csv file and save into a different name for upload
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
+        }
+
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
+
+                csvPrinter.printRecord("", randomBT_noTerm_URI, "683053", ">&!Hi0[lP?}AXNgIir`{,R Q}JMsyc%){sO|>?VuY6YeyiY-2S%g=VknYE4Z+4xPZ&=H+'e*N{`>LT v!`0|gItaw7",
+                        "+Am&) v;M@opO>fi43^VYFdn+;RwpvU2Bt@vl7oW7Di#ro1");
+                csvPrinter.printRecord("hstlbt", randomBT_invalidUri, "68", ">&!Hi0[lP?}AXNgIir`g=VknYE4Z+4xPZ&=H+'e*N{`>LT v!`0|gItaw7",
+                        "+Am&) v;M@opO>fi43^#ro1");
+                csvPrinter.printRecord(randomBT.getBusinessTerm(), randomBT.getExternalReferenceUri(),
+                        randomBT.getExternalReferenceId(), randomBT.getDefinition(), randomBT.getComment());
+                csvPrinter.flush();
+            }
+
+            // upload the modified csv file
+            uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
+            waitFor(ofSeconds(2L));
+
+            //Verify that all test business terms have been saved through bulk upload
+            ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+
+            viewEditBusinessTermPageForCheck.openPage();
+            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT_noTerm_URI);
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertEquals(0, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
+            viewEditBusinessTermPageForCheck.openPage();
+            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT_invalidUri);
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertEquals(0, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
+            viewEditBusinessTermPageForCheck.openPage();
+            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT.getExternalReferenceUri());
+            viewEditBusinessTermPageForCheck.hitSearchButton();
+            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+
+        } finally {
+            csvFileForUpload.delete();
+        }
     }
 
     @Test
@@ -153,11 +200,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -209,11 +255,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -258,7 +303,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             String oldBusinessTermName = businessTerms.get(0).getBusinessTerm();
             viewEditBusinessTermPageForCheck.setTerm(oldBusinessTermName);
             viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(0, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
+            assertEquals(1, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
         } finally {
             csvFileForUpload.delete();
         }
@@ -271,11 +316,6 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
-        });
-
-        // Delete random business terms
-        this.randomBusinessTerms.forEach(randomBusinessTerm -> {
-            getAPIFactory().getBusinessTermAPI().deleteBusinessTermById(randomBusinessTerm.getBusinessTermId());
         });
     }
 }

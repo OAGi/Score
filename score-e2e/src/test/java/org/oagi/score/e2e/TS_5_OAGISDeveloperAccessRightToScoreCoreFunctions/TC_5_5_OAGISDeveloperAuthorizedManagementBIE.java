@@ -2,23 +2,25 @@ package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
-import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
-import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,7 +151,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         );
         BCCObject bccAbsenceTypeCode = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Code", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Open_ Code", nextRelease.getReleaseNumber()),
                 "Published"
         );
         ASCCObject asccFinancialAccountIdentifiersGroup = coreComponentAPI.appendASCC(
@@ -167,7 +169,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", nextRelease.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -266,7 +268,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         BBIEPanel = editBIEPageForRevised.getBBIEPanel(node);
         nillable = BBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -327,7 +329,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         ASBIEPanel = editBIEPageForRevised.getASBIEPanel(node);
         nillable = ASBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -386,7 +388,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 acc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", release.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", release.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -1113,9 +1115,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
             WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-            assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+            assertDisabled(td.findElement(By.tagName("input")));
 
-            assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+            assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
         }
     }
 
@@ -1146,9 +1148,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-        assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+        assertDisabled(td.findElement(By.tagName("input")));
 
-        assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+        assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
     }
 
     @Test
@@ -1173,7 +1175,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         click(homePage.getScoreLogo());
         ViewEditBIEPage viewEditBIEPageForCheck = homePage.getBIEMenu().openViewEditBIESubMenu();
         viewEditBIEPageForCheck.setBranch(topLevelASBIEP.getReleaseNumber());
-        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId()).getLoginId());
+        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         viewEditBIEPageForCheck.setDEN(topLevelASBIEP.getPropertyTerm());
         viewEditBIEPageForCheck.hitSearchButton();
 
@@ -1293,6 +1295,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis/Item Certificate Of Analysis Header/Description";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         int cardinalityMin = nextInt(2, 5);
@@ -1686,6 +1689,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -1726,6 +1730,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -2472,7 +2477,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
                 viewEditBIEPage.openTransferBIEOwnershipDialog(tr);
@@ -2488,7 +2493,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         td = viewEditBIEPage.getColumnByName(tr, "businessContexts");
         assertEquals(randomBusinessContext.getName(), getText(td));
@@ -3495,13 +3500,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time"); // required BBIE field.
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
-        assertDisabled(creationDateTimePanel.getUsedCheckbox());
+        assertEnabled(creationDateTimePanel.getUsedCheckbox());
         assertChecked(creationDateTimePanel.getUsedCheckbox());
 
         WebElement dataAreaNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Data Area"); // required ASBIE field.
         EditBIEPage.ASBIEPanel dataAreaPanel = editBIEPage.getASBIEPanel(dataAreaNode);
-        assertDisabled(dataAreaPanel.getUsedCheckbox());
+        assertEnabled(dataAreaPanel.getUsedCheckbox());
         assertChecked(dataAreaPanel.getUsedCheckbox());
     }
 
@@ -3697,6 +3702,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
         assertEquals("Primitive", getText(creationDateTimePanel.getValueDomainRestrictionSelectField()));
         assertEquals("date time", getText(creationDateTimePanel.getValueDomainField()));

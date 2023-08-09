@@ -70,7 +70,7 @@ public class Module extends TableImpl<ModuleRecord> {
      * The column <code>oagi.module.parent_module_id</code>. This indicates a
      * parent module id. root module will be NULL.
      */
-    public final TableField<ModuleRecord, ULong> PARENT_MODULE_ID = createField(DSL.name("parent_module_id"), SQLDataType.BIGINTUNSIGNED, this, "This indicates a parent module id. root module will be NULL.");
+    public final TableField<ModuleRecord, ULong> PARENT_MODULE_ID = createField(DSL.name("parent_module_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This indicates a parent module id. root module will be NULL.");
 
     /**
      * The column <code>oagi.module.type</code>. This is a type column for
@@ -97,13 +97,13 @@ public class Module extends TableImpl<ModuleRecord> {
      * overrides the release's namespace. However, the NAMESPACE_ID associated
      * with the component takes the highest precedence.
      */
-    public final TableField<ModuleRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release's namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.");
+    public final TableField<ModuleRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release's namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.");
 
     /**
      * The column <code>oagi.module.version_num</code>. This is the version
      * number to be assigned to the schema module.
      */
-    public final TableField<ModuleRecord, String> VERSION_NUM = createField(DSL.name("version_num"), SQLDataType.VARCHAR(45), this, "This is the version number to be assigned to the schema module.");
+    public final TableField<ModuleRecord, String> VERSION_NUM = createField(DSL.name("version_num"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the version number to be assigned to the schema module.");
 
     /**
      * The column <code>oagi.module.created_by</code>. Foreign key to the

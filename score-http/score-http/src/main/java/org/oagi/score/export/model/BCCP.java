@@ -15,7 +15,7 @@ public class BCCP implements Component {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + bccp.getGuid();
+        return bccp.getGuid();
     }
 
     public String getName() {
@@ -45,5 +45,9 @@ public class BCCP implements Component {
 
     public ULong getNamespaceId() {
         return bccp.getNamespaceId();
+    }
+
+    public ULong getTypeNamespaceId() {
+        return bdt.getNamespaceId();
     }
 }

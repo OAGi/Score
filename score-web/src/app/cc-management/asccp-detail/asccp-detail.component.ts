@@ -1,5 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -453,8 +453,26 @@ export class AsccpDetailComponent implements OnInit {
       });
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChanged || this.isUpdating;
+  }
+
   updateDetails() {
-    if (!this.isChanged || this.isUpdating) {
+    if (this.updateDisabled) {
       return;
     }
 
@@ -837,6 +855,12 @@ export class AsccpDetailComponent implements OnInit {
         .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
         this.contextMenuItem = node;
         trigger.openMenu();
+      });
+    } else if ($event.key === 'c' || $event.key === 'C') {
+      this.menuTriggerList.toArray().filter(e => !!e.menuData)
+        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
+        this.contextMenuItem = node;
+        this.openComments(node.type, node);
       });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);

@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +66,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
         if (mergedTopLevelAsbieps.size() == 0) {
-            throw new IllegalArgumentException("Can not found BIEs.");
+            throw new IllegalArgumentException("Cannot found BIEs.");
         }
         BigInteger releaseId = mergedTopLevelAsbieps.get(0).getReleaseId();
 
@@ -126,12 +127,12 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             if (option.isIncludeMetaHeaderForJson()) {
                 TopLevelAsbiep metaHeaderTopLevelAsbiep =
                         topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepId());
-                fillProperties(root, definitions, metaHeaderTopLevelAsbiep, generationContext, false);
+                fillProperties(root, definitions, metaHeaderTopLevelAsbiep, false, generationContext);
             }
             if (option.isIncludePaginationResponseForJson()) {
                 TopLevelAsbiep paginationResponseTopLevelAsbiep =
                         topLevelAsbiepRepository.findById(option.getPaginationResponseTopLevelAsbiepId());
-                fillProperties(root, definitions, paginationResponseTopLevelAsbiep, generationContext, false);
+                fillProperties(root, definitions, paginationResponseTopLevelAsbiep, false, generationContext);
             }
 
             fillProperties(root, definitions, asbiep, typeAbie, generationContext);
@@ -141,24 +142,46 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     }
 
     private void fillProperties(Map<String, Object> parent, Map<String, Object> definitions,
-                                TopLevelAsbiep topLevelAsbiep,
-                                GenerationContext generationContext,
-                                boolean isArray) {
+                                TopLevelAsbiep topLevelAsbiep, boolean isArray,
+                                GenerationContext generationContext) {
 
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        fillProperties(parent, definitions, asbiep, typeAbie, generationContext, isArray);
+        fillProperties(parent, definitions, asbiep, typeAbie, isArray, generationContext);
+    }
+
+    private void suppressRootProperty(Map<String, Object> parent, boolean isArray) {
+        Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
+        // Get the first element from 'properties' property and move all children of the element to the parent.
+        Set<String> keys = properties.keySet();
+        if (keys.isEmpty()) {
+            return;
+        }
+        Map<String, Object> rootProperties = (Map<String, Object>) properties.get(keys.iterator().next());
+        if (!isArray) {
+            parent.put("type", "object");
+        }
+        Arrays.asList("required", "additionalProperties", "properties").stream().forEach(e -> parent.remove(e));
+
+        for (Map.Entry<String, Object> entry : rootProperties.entrySet()) {
+            parent.put(entry.getKey(), entry.getValue());
+        }
     }
 
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> definitions,
                                 ASBIE asbie,
                                 GenerationContext generationContext) {
-        ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
-        ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        ASCC ascc = generationContext.queryBasedASCC(asbie);
+        Map<String, Object> properties = new LinkedHashMap();
+        if (!parent.containsKey("properties")) {
+            parent.put("properties", new LinkedHashMap<String, Object>());
+        }
+
+        ASBIEP asbiep = generationContext.queryAssocToASBIEP(asbie);
+        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
 
         int minVal = asbie.getCardinalityMin();
         int maxVal = asbie.getCardinalityMax();
@@ -166,40 +189,42 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         boolean isArray = (maxVal < 0 || maxVal > 1);
         boolean isNillable = asbie.isNillable();
 
-        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
-        if (minVal > 0) {
-            List<String> parentRequired = (List<String>) parent.get("required");
-            if (parentRequired == null) {
-                throw new IllegalStateException();
+        boolean reused = !asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId());
+        if (reused) {
+            String ref = getReference(definitions, asbiep, generationContext);
+            properties.put("$ref", ref);
+        } else {
+            ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+            ASCC ascc = generationContext.queryBasedASCC(asbie);
+
+            if (minVal > 0) {
+                List<String> parentRequired = (List<String>) parent.get("required");
+                if (parentRequired == null) {
+                    throw new IllegalStateException();
+                }
+                parentRequired.add(name);
             }
-            parentRequired.add(name);
-        }
 
-        Map<String, Object> properties = new LinkedHashMap();
-        if (!parent.containsKey("properties")) {
-            parent.put("properties", new LinkedHashMap<String, Object>());
-        }
-
-        if (option.isBieDefinition()) {
-            String definition = asbie.getDefinition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
+            if (option.isBieDefinition()) {
+                String definition = asbie.getDefinition();
+                if (StringUtils.hasLength(definition)) {
+                    properties.put("description", definition);
+                }
             }
+
+            properties.put("type", "object");
+            properties.put("required", new ArrayList());
+            properties.put("additionalProperties", false);
+            properties.put("properties", new LinkedHashMap<String, Object>());
+
+            fillProperties(properties, definitions, typeAbie, generationContext);
+
+            if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
+                properties.remove("required");
+            }
+
+            properties = oneOf(allOf(properties), isNillable);
         }
-
-        properties.put("type", "object");
-        properties.put("required", new ArrayList());
-        properties.put("additionalProperties", false);
-        properties.put("properties", new LinkedHashMap<String, Object>());
-
-        fillProperties(properties, definitions, typeAbie, generationContext);
-
-        if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
-            properties.remove("required");
-        }
-
-        properties = oneOf(allOf(properties), isNillable);
 
         if (isArray) {
             Map<String, Object> items = new LinkedHashMap();
@@ -219,23 +244,50 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 properties.put("maxItems", maxVal);
             }
             properties.put("items", items);
+
+            // Issue #1483
+            // make a global property for an array
+            if (reused) {
+                properties = makeGlobalPropertyIfArray(definitions, name, properties);
+            }
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private Map<String, Object> makeGlobalPropertyIfArray(Map<String, Object> definitions, String name,
+                                                          Map<String, Object> properties) {
+        if (properties == null || !"array".equals(properties.get("type"))) {
+            return properties;
+        }
+
+        Set<String> keySet = properties.keySet();
+        boolean customized = keySet.contains("minItems") || keySet.contains("maxItems");
+        if (customized) {
+            return properties;
+        }
+
+        String nameForList = name + "List";
+        if (!definitions.containsKey(nameForList)) {
+            definitions.put(nameForList, properties);
+        }
+
+        Map<String, Object> refProperties = new HashMap<>();
+        refProperties.put("$ref", "#/definitions/" + nameForList);
+        return refProperties;
     }
 
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> definitions,
                                 ASBIEP asbiep, ABIE abie,
                                 GenerationContext generationContext) {
-        fillProperties(parent, definitions, asbiep, abie, generationContext, option.isArrayForJsonExpression());
+        fillProperties(parent, definitions, asbiep, abie, option.isArrayForJsonExpression(), generationContext);
     }
 
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> definitions,
-                                ASBIEP asbiep, ABIE abie,
-                                GenerationContext generationContext,
-                                boolean isArray) {
+                                ASBIEP asbiep, ABIE abie, boolean isArray,
+                                GenerationContext generationContext) {
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
         String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
@@ -303,14 +355,17 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         String name = "type_" + guid;
 
         Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getMinLength() != null) {
-            content.put("minLength", facetRestri.getMinLength().longValue());
+        if (facetRestri.getFacetMinLength() != null) {
+            content.put("minLength", facetRestri.getFacetMinLength().longValue());
         }
-        if (facetRestri.getMaxLength() != null) {
-            content.put("maxLength", facetRestri.getMaxLength().longValue());
+        if (facetRestri.getFacetMaxLength() != null) {
+            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
         }
-        if (StringUtils.hasLength(facetRestri.getPattern())) {
-            content.put("pattern", facetRestri.getPattern());
+        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+            // Override 'pattern' and 'format' properties
+            content.remove("pattern");
+            content.remove("format");
+            content.put("pattern", facetRestri.getFacetPattern());
         }
 
         definitions.put(name, content);
@@ -465,6 +520,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             fillProperties(parent, definitions, bbie, generationContext);
         } else {
             ASBIE asbie = (ASBIE) bie;
+
             if (Helper.isAnyProperty(asbie, generationContext)) {
                 parent.put("additionalProperties", true);
             } else {
@@ -620,6 +676,21 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         return properties;
     }
 
+    private String getReference(Map<String, Object> definitions, ASBIEP asbiep,
+                                GenerationContext generationContext) {
+        ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
+        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
+        if (!definitions.containsKey(name)) {
+            TopLevelAsbiep refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.getOwnerTopLevelAsbiepId());
+            Map<String, Object> properties = new LinkedHashMap<>();
+            properties.put("required", new ArrayList());
+            fillProperties(properties, definitions, refTopLevelAsbiep, false, generationContext);
+            suppressRootProperty(properties, false);
+            definitions.put(name, properties);
+        }
+        return "#/definitions/" + name;
+    }
+
     private String getReference(Map<String, Object> definitions, BBIE bbie, DT bdt,
                                 GenerationContext generationContext) {
         CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
@@ -642,7 +713,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = Helper.getXbt(generationContext, bdtPriRestri);
                 }
 
-                if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
                     ref = fillDefinitions(definitions, xbt, bbie);
                 } else {
                     ref = fillDefinitions(definitions, xbt);
@@ -720,7 +791,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 }
 
-                if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || StringUtils.hasLength(bbieSc.getPattern())) {
+                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
                     ref = fillDefinitions(definitions, xbt, bbieSc);
                 } else {
                     ref = fillDefinitions(definitions, xbt);

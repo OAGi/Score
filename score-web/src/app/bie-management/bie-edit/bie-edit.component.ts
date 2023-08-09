@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -33,8 +33,11 @@ import {
 } from '../domain/bie-flat-tree';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from '@angular/forms';
+import {
+  BusinessContext,
+  BusinessContextListRequest
+} from '../../context-management/business-context/domain/business-context';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
@@ -47,9 +50,11 @@ import {PageRequest} from '../../basis/basis';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {AssignedBtListRequest, AssignedBusinessTerm} from '../../business-term-management/domain/business-term';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
+import {ErrorStateMatcher} from '@angular/material/core';
+import {MultiActionsSnackBarComponent} from "../../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
+
 
 @Component({
   selector: 'score-bie-edit',
@@ -98,6 +103,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   bieMinimumLength: FormControl;
   bieMaximumLength: FormControl;
   biePattern: FormControl;
+  biePatternTest: FormControl;
+  biePatternTestErrorStateMatcher: ErrorStateMatcher;
 
   /* valueDomain */
   valueDomainFilterCtrl: FormControl = new FormControl();
@@ -194,7 +201,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this, ]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -316,6 +323,20 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.cursorNode = node;
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
   keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
@@ -323,6 +344,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.cursorNode = this.searcher.prev(this.cursorNode);
     } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
       this.dataSource.toggle(this.cursorNode);
+    } else if ($event.code === 'Space') {
+      this.toggleTreeUsed(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
         .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
@@ -395,19 +418,19 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   get isValid(): boolean {
     if (this.selectedNode && this.selectedNode.bieType !== 'ABIE' && this.selectedNode.used) {
-      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.valid) {
+      if (!!this.bieCardinalityMin && !this.bieCardinalityMin.disabled && !this.bieCardinalityMin.valid) {
         return false;
       }
-      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.valid) {
+      if (!!this.bieCardinalityMax && !this.bieCardinalityMax.disabled && !this.bieCardinalityMax.valid) {
         return false;
       }
-      if (!!this.bieMinimumLength && !this.bieMinimumLength.valid) {
+      if (!!this.bieMinimumLength && !this.bieMinimumLength.disabled && !this.bieMinimumLength.valid) {
         return false;
       }
-      if (!!this.bieMaximumLength && !this.bieMaximumLength.valid) {
+      if (!!this.bieMaximumLength && !this.bieMaximumLength.disabled && !this.bieMaximumLength.valid) {
         return false;
       }
-      if (!!this.biePattern && !this.biePattern.valid) {
+      if (!!this.biePattern && !this.biePattern.disabled && !this.biePattern.valid) {
         return false;
       }
     }
@@ -493,6 +516,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return false;
     }
     return this.rootNode.isChanged || this.dataSource.getChanged().length > 0;
+  }
+
+  get sizeOfChanges(): number {
+    return this.dataSource.getChanged().length;
   }
 
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
@@ -593,7 +620,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     ]).subscribe(([ccGraph, usedBieList, refBieList]) => {
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this, ]);
       this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
@@ -642,6 +669,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (!selectedTopLevelAsbiepId) {
         return;
       }
+
+      if (!asbiepNode.used) {
+        this.toggleTreeUsed(asbiepNode);
+      }
       this.updateDetails(asbiepNode.parents, () => {
         this.isUpdating = true;
         this.service.reuseBIE(asbiepNode, selectedTopLevelAsbiepId)
@@ -659,7 +690,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove reused BIE?';
-    dialogConfig.data.content = ['Are you sure you want to remove reused BIE?'];
+    dialogConfig.data.content = ['Are you sure you want to remove the reused BIE?'];
     dialogConfig.data.action = 'Remove';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -684,6 +715,38 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
+  retainReusedBIE(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Retain reused BIE?';
+    dialogConfig.data.content = ['Are you sure you want to retain the reused BIE?'];
+    dialogConfig.data.action = 'Retain';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .pipe(
+        finalize(() => {
+          this.isUpdating = false;
+        })
+      ).subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      const asbiepNode = (node as AsbiepFlatNode);
+
+      this.isUpdating = true;
+      this.service.retainReusedBIE(this.topLevelAsbiepId, asbiepNode.asbieHashPath)
+        .pipe(finalize(() => {
+          this.isUpdating = false;
+        })).subscribe(_ => {
+        this.reloadTree(node);
+      });
+    });
+  }
+
   createBIEfromThis(node: BieFlatNode) {
     if (!this.canCreateBIEFromThis(node)) {
       return;
@@ -700,35 +763,26 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         } else {
           const asbiepNode = node as AsbiepFlatNode;
-          if (this.canEdit) {
-            this.updateDetails(node.parents, () => {
-              this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
-                .pipe(finalize(() => {
-                  this.isUpdating = false;
-                })).subscribe(_ => {
-
-                this.snackBar.open('Making BIE reusable request queued', '', {
-                  duration: 3000,
-                });
-
-                this.router.navigateByUrl('/profile_bie');
-              });
-            });
-          } else {
+          this.isUpdating = true;
+          this.updateDetails(node.parents, () => {
             this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
               .pipe(finalize(() => {
                 this.isUpdating = false;
               })).subscribe(_ => {
-
-              this.snackBar.open('Making BIE reusable request queued', '', {
-                duration: 3000,
+              this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+                data: {
+                  titleIcon: 'info',
+                  title: 'Info',
+                  message: 'The request for making the BIE is processing. The processed BIE will appear on the BIE list.',
+                  action: 'Go to \'View/Edit BIE\' page',
+                  onAction: (data, snackBarRef) => {
+                    this.router.navigateByUrl('/profile_bie');
+                    snackBarRef.dismissWithAction();
+                  }
+                }
               });
-
-              this.router.navigateByUrl('/profile_bie');
             });
-          }
-
-          this.isUpdating = true;
+          });
         }
       });
   }
@@ -939,7 +993,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   isStringTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['String', 'NormalizedString', 'Token']) {
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
       if (cdtPrimitives.includes(typeName)) {
         return true;
       }
@@ -1071,6 +1125,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     this._setMinLengthFormControl(node);
     this._setMaxLengthFormControl(node);
+    this._setPatternFormControl(node);
   }
 
   initFixedOrDefault(detail?: BieFlatNode) {
@@ -1099,7 +1154,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
     const isWhitespace = control.value.toString().trim().length === 0;
     const isValid = !isWhitespace;
-    return isValid ? null : {'whitespace': true};
+    return isValid ? null : {whitespace: true};
   }
 
   _setCardinalityMinFormControl(detailNode?: BieFlatNode) {
@@ -1261,8 +1316,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(this.selectedNode) ||
-      !this.selectedNode.used || this.selectedNode.locked;
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
@@ -1324,9 +1379,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(this.selectedNode) ||
-      !this.selectedNode.used ||
-      this.selectedNode.locked;
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
@@ -1379,6 +1433,73 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         this._setMinLengthFormControl(detailNode);
       }
     });
+  }
+
+  _setPatternFormControl(detailNode?: BieFlatNode) {
+    if (!detailNode) {
+      detailNode = this.selectedNode;
+    } else if (detailNode !== this.selectedNode) {
+      return;
+    }
+
+    const disabled = !this.isEditable(detailNode) ||
+      !detailNode.used || !!detailNode.locked;
+
+    let biePattern;
+    if (this.isBbiepDetail(detailNode)) {
+      biePattern = this.asBbiepDetail(detailNode).bbie.pattern;
+    } else if (this.isBbieScDetail(detailNode)) {
+      biePattern = this.asBbieScDetail(detailNode).bbieSc.pattern;
+    } else {
+      this.biePattern = undefined;
+      return;
+    }
+
+    this.biePattern = new FormControl({
+      value: biePattern,
+      disabled
+    }, [
+      (control: AbstractControl): ValidationErrors | null => {
+        const value = (!!control.value) ? control.value.toString().trim() : undefined;
+        if (!value) {
+          return null;
+        }
+
+        try {
+          const regexp = new RegExp(value);
+        } catch (e) {
+          return {pattern: 'The pattern \'' + value + '\' is invalid.'};
+        }
+
+        return null;
+      }
+    ]);
+
+    this.biePattern.valueChanges.subscribe(value => {
+      if (this.biePattern.valid) {
+        if (this.isBbiepDetail(detailNode)) {
+          this.asBbiepDetail(detailNode).bbie.pattern = value;
+        } else if (this.isBbieScDetail(detailNode)) {
+          this.asBbieScDetail(detailNode).bbieSc.pattern = value;
+        } else {
+          return;
+        }
+      }
+
+      this._setPatternTestFormControl();
+    });
+
+    this._setPatternTestFormControl();
+  }
+
+  _setPatternTestFormControl() {
+    this.biePatternTest = new FormControl({
+      value: (!!this.biePatternTest) ? this.biePatternTest.value : '',
+      disabled: !this.biePattern || !this.biePattern.value || !this.biePattern.valid
+    }, [
+      (this.biePattern.valid) ? Validators.pattern(this.biePattern.value) : Validators.nullValidator
+    ]);
+    this.biePatternTestErrorStateMatcher = new BiePatternTestShowOnDirtyErrorStateMatcher(this.biePattern);
   }
 
   onChangeFixedOrDefault(value: string) {
@@ -1526,7 +1647,35 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return false;
   }
 
+  updateInverseMode() {
+    const request = new BieDetailUpdateRequest();
+    this.isUpdating = true;
+    request.topLevelAsbiepDetail = this.rootNode;
+
+    this.service.updateDetails(this.topLevelAsbiepId, request).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe((resp: BieDetailUpdateResponse) => {
+      this.rootNode.reset();
+      this.snackBar.open(((this.rootNode.inverseMode) ? 'Inverse mode is turned on' : 'Inverse mode is turned off'), '', {
+        duration: 3000,
+      });
+    });
+  }
+
+  get updateDisabled(): boolean {
+    return this.isUpdating || !this.isChanged || !this.isValid;
+  }
+
   updateDetails(include?: BieFlatNode[], callbackFn?) {
+    if (this.updateDisabled) {
+      if (callbackFn === undefined) {
+        return;
+      } else {
+        return callbackFn && callbackFn();
+      }
+    }
+
     const request = new BieDetailUpdateRequest();
 
     let nodes = this.dataSource.getChanged();
@@ -1626,9 +1775,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
     });
 
-    if (request.length > 10) {
-      this.loading = true;
-    }
+    this.loading = true;
     this.isUpdating = true;
 
     if (this.rootNode.isChanged) {
@@ -1641,7 +1788,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     })).subscribe((resp: BieDetailUpdateResponse) => {
       this.rootNode.reset();
       this.dataSource.update(resp);
-      this.dataSource.getChanged().forEach(e => e.reset());
+      nodes.forEach(e => e.reset());
       this.service.getUsedBieList(this.topLevelAsbiepId).subscribe(usedBieList => {
         this.dataSource.database.setUsedBieList(usedBieList);
       });
@@ -1876,5 +2023,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }, err => {
         this.businessContextUpdating = false;
       });
+  }
+}
+
+class BiePatternTestShowOnDirtyErrorStateMatcher implements ErrorStateMatcher {
+  constructor(private biePattern: FormControl) {
+  }
+  isErrorState(control: AbstractControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return (this.biePattern.dirty || control.dirty) && control.invalid;
   }
 }

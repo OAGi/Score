@@ -78,7 +78,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
     /**
      * The column <code>oagi.bbiep.path</code>.
      */
-    public final TableField<BbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB, this, "");
+    public final TableField<BbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.bbiep.hash_path</code>. hash_path generated from
@@ -92,7 +92,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
      * BCCP's Definition. If NULLl, it means that the definition should be
      * inherited from the based CC.
      */
-    public final TableField<BbiepRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Definition to override the BCCP's Definition. If NULLl, it means that the definition should be inherited from the based CC.");
+    public final TableField<BbiepRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Definition to override the BCCP's Definition. If NULLl, it means that the definition should be inherited from the based CC.");
 
     /**
      * The column <code>oagi.bbiep.remark</code>. This column allows the user to
@@ -105,14 +105,14 @@ public class Bbiep extends TableImpl<BbiepRecord> {
      * captured in the Definition of the ABIE. A remark about that ABIE may be
      * "Type of BOM should be recognized in the BOM/typeCode.
      */
-    public final TableField<BbiepRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the Definition column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.");
+    public final TableField<BbiepRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the Definition column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.");
 
     /**
      * The column <code>oagi.bbiep.biz_term</code>. Business term to indicate
      * what the BIE is called in a particular business context such as in an
      * industry.
      */
-    public final TableField<BbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225), this, "Business term to indicate what the BIE is called in a particular business context such as in an industry.");
+    public final TableField<BbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Business term to indicate what the BIE is called in a particular business context such as in an industry.");
 
     /**
      * The column <code>oagi.bbiep.created_by</code>. A foreign key referring to

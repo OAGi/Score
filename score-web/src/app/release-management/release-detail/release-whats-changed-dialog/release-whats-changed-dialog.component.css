@@ -1,0 +1,49 @@
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-bottom: 8px;
+  padding-top: 7px;
+  border-bottom: 0;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.title {
+}
+
+.new-component, .revised-component {
+  font-size: 14px;
+}
+
+.new-component a, .revised-component a {
+  text-decoration: none;
+  color: rgba(0, 0, 0, .87);
+}
+
+.close {
+  position: relative;
+  top: -5px;
+  right: -12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.tag-list {
+  display: inline-block;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
+}

@@ -18,12 +18,13 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -38,7 +39,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     }
 
-    private void pressEscape(){
+    private void pressEscape() {
         invisibilityOfLoadingContainerElement(getDriver());
         Actions action = new Actions(getDriver());
         action.sendKeys(Keys.ESCAPE).build().perform();
@@ -47,54 +48,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
     }
-    private class RandomCoreComponentWithStateContainer {
-        private AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs= new HashMap<>();
-        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states)
-                                            {
-            this.appUser = appUser;
-            this.states = states;
-
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccp;
-                ACCObject acc;
-                String state = this.states.get(i);
-
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
-                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
-                    bcc.setCardinalityMax(1);
-                    coreComponentAPI.updateBCC(bcc);
-
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
-                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
-                    ascc.setCardinalityMax(1);
-                    coreComponentAPI.updateASCC(ascc);
-                    stateACCs.put(state, acc);
-                    stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state,bccp);
-                }
-            }
-        }
-
-    }
 
     @Test
     @DisplayName("TC_10_1_TA_1")
-    public void test_TA_1(){
+    public void test_TA_1() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -113,7 +70,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -140,7 +97,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_2")
-    public void test_TA_2(){
+    public void test_TA_2() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -176,6 +133,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+        WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+        ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         /**
          * developer can edit the details of a CC that is in WIP state and owned by him
          */
@@ -188,7 +147,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertEnabled(accViewEditPage.getDefinitionField());
         assertEnabled(accViewEditPage.getDefinitionSourceField());
         assertEnabled(accViewEditPage.getNamespaceField());
-        assertEnabled(accViewEditPage.getCoreComponentTypeField());
+        assertEnabled(accPanel.getComponentTypeSelectField());
 
         accViewEditPage.openPage(); // refresh the page to erase the snackbar message
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -197,11 +156,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
         assertDisabled(bccPanelContainer.getBCCPanel().getGUIDField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDENField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getPropertyTermField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
+        assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
         assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
         assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
 
         accViewEditPage.openPage();
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -213,15 +170,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
         assertDisabled(asccPanelContainer.getASCCPanel().getGUIDField());
         assertDisabled(asccPanelContainer.getASCCPanel().getDENField());
-        assertEnabled(asccPanelContainer.getASCCPPanel().getPropertyTermField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        assertEnabled(bccPanelContainer.getBCCPanel().getNamespaceSelectField());
+        assertEnabled(asccPanelContainer.getASCCPanel().getDefinitionField());
+        assertEnabled(asccPanelContainer.getASCCPanel().getDefinitionSourceField());
     }
 
     @Test
     @DisplayName("TC_10_1_TA_3")
-    public void test_TA_3(){
+    public void test_TA_3() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -264,9 +219,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
          * However, he can add comments.
          */
 
-        By COMMENT_FIELD_LOCATOR =
-                By.xpath("//mat-sidenav//textarea");
-
         assertEquals("WIP", getText(accViewEditPage.getStateField()));
         assertDisabled(accViewEditPage.getStateField());
         assertDisabled(accViewEditPage.getGUIDField());
@@ -276,9 +228,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(accViewEditPage.getDefinitionSourceField());
         assertDisabled(accViewEditPage.getNamespaceField());
         assertDisabled(accViewEditPage.getCoreComponentTypeField());
-        click(accViewEditPage.getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+        accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
         accViewEditPage.openPage(); // refresh the page to erase the snackbar message
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -290,8 +240,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
         assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-        click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+        accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
         accViewEditPage.openPage();
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -307,14 +256,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
         assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
         assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-        click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-        assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+        accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
     }
 
     @Test
     @DisplayName("TC_10_1_TA_4")
-    public void test_TA_4(){
+    public void test_TA_4() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -324,7 +271,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Draft");
         ccStates.add("Candidate");
-        ccStates.add("Release Draft");
 
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
@@ -335,7 +281,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -343,14 +289,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             acc = entry.getValue();
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+            viewEditCoreComponentPage.openPage();
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             /**
              * developer can view but CANNOT edit the details of a CC that is in WIP state and owned by another developer
              * However, he can add comments.
              */
-
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
 
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
@@ -361,11 +305,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
-
-            accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+            viewEditCoreComponentPage.openPage();   // refresh the page to erase the snackbar message
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
             assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
@@ -375,10 +318,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
-            accViewEditPage.openPage();
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
             asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -392,15 +335,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_5")
-    public void test_TA_5(){
+    public void test_TA_5() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -420,7 +362,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -434,9 +376,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * However, he can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -446,9 +385,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -460,8 +397,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -477,15 +413,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_6")
-    public void test_TA_6(){
+    public void test_TA_6() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -501,7 +436,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_7")
-    public void test_TA_7(){
+    public void test_TA_7() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -521,7 +456,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -535,9 +470,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * However, he can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//mat-sidenav//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -547,9 +479,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -561,8 +491,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -578,16 +507,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
-
-
     }
 
     @Test
     @DisplayName("TC_10_1_TA_8")
-    public void test_TA_8(){
+    public void test_TA_8() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -604,7 +530,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -617,9 +543,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer cannot edit details of a deleted CC owned by him. He can add comments
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -629,9 +552,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -643,8 +564,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -660,14 +580,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
     }
 
     @Test
     @DisplayName("TC_10_1_TA_9")
-    public void test_TA_9(){
+    public void test_TA_9() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -687,7 +606,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -700,9 +619,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can cannot edit details of a deleted CC owned by another developer. He can add comments.
              */
 
-            By COMMENT_FIELD_LOCATOR =
-                    By.xpath("//span[contains(text(), \"Comment\")]//ancestor::mat-form-field//textarea");
-
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             assertDisabled(accViewEditPage.getGUIDField());
@@ -712,9 +628,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(accViewEditPage.getDefinitionSourceField());
             assertDisabled(accViewEditPage.getNamespaceField());
             assertDisabled(accViewEditPage.getCoreComponentTypeField());
-            click(accViewEditPage.getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
-
+            accViewEditPage.openCommentsDialog("/" + acc.getDen());
 
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
@@ -726,8 +640,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(bccPanelContainer.getBCCPanel().getValueConstraintSelectField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionField());
             assertDisabled(bccPanelContainer.getBCCPanel().getDefinitionSourceField());
-            click(bccPanelContainer.getBCCPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
 
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
@@ -743,21 +656,21 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getDefinitionSourceField());
             assertDisabled(asccPanelContainer.getASCCPPanel().getNamespaceSelectField());
-            click(asccPanelContainer.getASCCPPanel().getCommentsIcon());
-            assertEnabled(visibilityOfElementLocated(getDriver(), COMMENT_FIELD_LOCATOR));
+            accViewEditPage.openCommentsDialog("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         }
 
     }
 
     @Test
     @DisplayName("TC_10_1_TA_10")
-    public void test_TA_10(){
+    public void test_TA_10() {
 
 
     }
+
     @Test
     @DisplayName("TC_10_1_TA_11")
-    public void test_TA_11(){
+    public void test_TA_11() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -779,7 +692,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -791,52 +704,52 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can filter Core Components based on their Type.
              */
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getTypeSelectField().click();
+            waitFor(Duration.ofMillis(3000L));
+            click(viewEditCoreComponentPage.getTypeSelectField());
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+            for (String ccState : Arrays.asList("ASCCP", "BCCP", "CDT", "BDT")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
-            // search by "ACC" type
-            List<WebElement> accOption = options.stream().filter(e -> "ACC".equals(getText(e))).collect(Collectors.toList());
-            accOption.get(0).click();
-            pressEscape();
+            escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
 
             // search by "ASCCP" type
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getTypeSelectField().click();
+            waitFor(Duration.ofMillis(3000L));
+            click(viewEditCoreComponentPage.getTypeSelectField());
             options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+            for (String ccState : Arrays.asList("ACC", "BCCP", "CDT", "BDT")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
-            List<WebElement> asccpOption = options.stream().filter(e -> "ASCCP".equals(getText(e))).collect(Collectors.toList());
-            asccpOption.get(0).click();
-            pressEscape();
+            escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
 
             // search by "BCCP" type
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getTypeSelectField().click();
+            waitFor(Duration.ofMillis(3000L));
+            click(viewEditCoreComponentPage.getTypeSelectField());
             options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ACC","ASCCP", "BCCP", "CDT", "BDT" )){
+            for (String ccState : Arrays.asList("ACC", "ASCCP", "CDT", "BDT")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
-            List<WebElement> bccpOption = options.stream().filter(e -> "BCCP".equals(getText(e))).collect(Collectors.toList());
-            bccpOption.get(0).click();
-            pressEscape();
+            escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
         }
 
     }
+
     @Test
     @DisplayName("TC_10_1_TA_12")
-    public void test_TA_12(){
+    public void test_TA_12() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -858,7 +771,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -870,24 +783,25 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can filter Core Components based on their Type.
              */
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.getStateSelectField().click();
+            waitFor(Duration.ofMillis(3000L));
+            click(viewEditCoreComponentPage.getStateSelectField());
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
 
             // search by state
             List<WebElement> stateOption = options.stream().filter(e -> state.equals(getText(e))).collect(Collectors.toList());
             stateOption.get(0).click();
-            pressEscape();
+            escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
-
         }
-
     }
+
     @Test
     @DisplayName("TC_10_1_TA_13")
-    public void test_TA_13(){
+    public void test_TA_13() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -906,7 +820,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -917,33 +831,48 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             /**
              * developer can filter Core Components based on their Updated Date.
              */
+            LocalDateTime startTime = LocalDateTime.of(
+                    2013,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+            LocalDateTime endTime = LocalDateTime.of(
+                    2015,
+                    RandomUtils.nextInt(1, 13),
+                    RandomUtils.nextInt(1, 29),
+                    RandomUtils.nextInt(0, 24),
+                    RandomUtils.nextInt(0, 60),
+                    RandomUtils.nextInt(0, 60)
+            );
+
             LocalDateTime creationTime = LocalDateTime.of(
-                    2018,
+                    2014,
                     RandomUtils.nextInt(1, 13),
                     RandomUtils.nextInt(1, 29),
                     RandomUtils.nextInt(0, 24),
                     RandomUtils.nextInt(0, 60),
                     RandomUtils.nextInt(0, 60)
             );
-            LocalDateTime updateTime = LocalDateTime.of(
-                    2019,
-                    RandomUtils.nextInt(1, 13),
-                    RandomUtils.nextInt(1, 29),
-                    RandomUtils.nextInt(0, 24),
-                    RandomUtils.nextInt(0, 60),
-                    RandomUtils.nextInt(0, 60)
-            );
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc.setCreationTimestamp(creationTime);
-            acc.setLastUpdateTimestamp(updateTime);
+            acc.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateACC(acc);
             asccp.setCreationTimestamp(creationTime);
-            asccp.setLastUpdateTimestamp(updateTime);
+            asccp.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateASCCP(asccp);
             bccp.setCreationTimestamp(creationTime);
-            bccp.setLastUpdateTimestamp(updateTime);
+            bccp.setLastUpdateTimestamp(creationTime);
+            coreComponentAPI.updateBCCP(bccp);
 
             // search by Updated date
             viewEditCoreComponentPage.openPage();
-            viewEditCoreComponentPage.setUpdatedStartDate(creationTime);
-            viewEditCoreComponentPage.setUpdatedEndDate(updateTime);
+            waitFor(Duration.ofMillis(3000L));
+            viewEditCoreComponentPage.setUpdatedStartDate(startTime);
+            viewEditCoreComponentPage.setUpdatedEndDate(endTime);
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
@@ -951,9 +880,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
         }
     }
+
     @Test
     @DisplayName("TC_10_1_TA_14")
-    public void test_TA_14(){
+    public void test_TA_14() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -961,14 +891,15 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setDEN("\"Action Code\"");
+        viewEditCoreComponentPage.setOwner("oagis");
         viewEditCoreComponentPage.hitSearchButton();
-        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Code", "oagis").isDisplayed());
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Corrective Action Type Code. Code\")]")).size());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Action Code Content_ Code", "oagis").isDisplayed());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Corrective Action Type Code. Open_ Code\")]")).size());
     }
 
     @Test
     @DisplayName("TC_10_1_TA_15")
-    public void test_TA_15(){
+    public void test_TA_15() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -987,9 +918,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Show Receive Delivery. Show Receive Delivery\")]")).size());
     }
+
     @Test
     @DisplayName("TC_10_1_TA_16")
-    public void test_TA_16(){
+    public void test_TA_16() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -999,16 +931,17 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setModule("Model\\Platform\\2_6\\Common\\Components\\Components");
         viewEditCoreComponentPage.hitSearchButton();
-        assertEquals(0, (getDriver().findElement(By.xpath("//*[contains(text(),\"Model\\OAGIS-Nouns\")]"))).getSize());
+        assertEquals(0, (getDriver().findElements(By.xpath("//*[contains(text(),\"Model\\OAGIS-Nouns\")]"))).size());
 
         viewEditCoreComponentPage.openPage();
         viewEditCoreComponentPage.setModule("Master");
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-chip[.=\"BCC\"]")).size());
     }
+
     @Test
     @DisplayName("TC_10_1_TA_17")
-    public void test_TA_17(){
+    public void test_TA_17() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1016,40 +949,43 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         List<WebElement> baseOption = options.stream().filter(e -> "Base (Abstract)".equals(getText(e))).collect(Collectors.toList());
         baseOption.get(0).click();
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Financial Account Reference Identification. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
-        for (String componentState : Arrays.asList( "Base (Abstract)", "Semantics")){
+        for (String componentState : Arrays.asList("Base (Abstract)", "Semantics")) {
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Identification. Details", "oagis").isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
-        for (String componentState : Arrays.asList( "Extension", "Semantics")){
+        for (String componentState : Arrays.asList("Extension", "Semantics")) {
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Financial Account Reference\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Extension. Details", "oagis").isDisplayed());
@@ -1057,41 +993,44 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
 
         viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
-        for (String componentState : Arrays.asList( "Extension", "Semantics")){
+        for (String componentState : Arrays.asList("Extension", "Semantics")) {
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Transaction\"");
         viewEditCoreComponentPage.hitSearchButton();
-        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Inventory Transaction Group. Details", "oagis").isDisplayed());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Inventory Transaction Group. Details\")]")).size());
+        assertTrue(1 <= getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
+        options = getDriver().findElements(By.cssSelector("mat-option"));
+        // developer can search for Core Components based only on their Component Type
+        for (String componentState : Arrays.asList("OAGIS10 Nouns", "Semantic Group")) {
+            List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setDEN("\"Transaction\"");
+        viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         viewEditCoreComponentPage.getComponentTypeSelectField().click();
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
-        for (String componentState : Arrays.asList( "OAGIS10 Nouns", "Semantic Group")){
+        for (String componentState : Arrays.asList("OAGIS10 Nouns", "OAGIS10 BODs")) {
             List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
-        pressEscape();
-        viewEditCoreComponentPage.setDEN("\"Transaction\"");
-        viewEditCoreComponentPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
-
-        viewEditCoreComponentPage.openPage();
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
-        options = getDriver().findElements(By.cssSelector("mat-option"));
-        // developer can search for Core Components based only on their Component Type
-        for (String componentState : Arrays.asList( "OAGIS10 Nouns", "OAGIS10 BODs")){
-            List<WebElement> result = options.stream().filter(e -> componentState.equals(getText(e))).collect(Collectors.toList());
-            result.get(0).click();
-        }
-        pressEscape();
+        escape(getDriver());
         viewEditCoreComponentPage.setDEN("\"Transaction\"");
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
@@ -1100,20 +1039,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
     @Test
     @DisplayName("TC_10_1_TA_18")
-    public void test_TA_18(){
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
-        thisAccountWillBeDeletedAfterTests(developer);
+    public void test_TA_18() {
 
-        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
-        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        WebElement denSortColumn = getDriver().findElement(By.xpath("//th/div/div[.=\" DEN\"]"));
-        getDriver().findElement(By.xpath("//mat-chip[.=\"ACC\"]"));
     }
 
     @Test
     @DisplayName("TC_10_1_TA_19")
-    public void test_TA_19(){
+    public void test_TA_19() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1134,7 +1066,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
-        for (Map.Entry<String, ACCObject> entry: randomCoreComponentWithStateContainer.stateACCs.entrySet()){
+        for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
             ASCCPObject asccp;
             BCCPObject bccp;
@@ -1142,24 +1074,26 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             acc = entry.getValue();
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
-            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
+            ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             /**
              * developer can move states of several CCs in one shot on the view/edit CC page
              */
             assertEquals(state, getText(accViewEditPage.getStateField()));
             assertDisabled(accViewEditPage.getStateField());
             //Transfer the ACC ownership
-            if (state.equals("WIP")){
+            if (state.equals("WIP")) {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                TransferCCOwnershipDialog transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
+
                 //verify the ownership is transferred
                 accViewEditPage.openPage();
                 assertEquals(anotherDeveloper.getLoginId(), getText(accViewEditPage.getOwnerField()));
@@ -1171,11 +1105,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(developer.getLoginId());
                 accViewEditPage.openPage();
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
@@ -1184,40 +1119,46 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             }
 
             //ACC change state
-            if (state.equals("WIP")){
+            viewEditCoreComponentPage.openPage();
+            accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+            WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
+            String accState = getText(accViewEditPage.getACCPanel(accNode).getStateField());
+            if (accState.equals("WIP")) {
                 accViewEditPage.moveToDraft();
-                assertEquals("Draft", getText(accViewEditPage.getStateField()));
-            } else if (state.equals("Draft")){
+                assertEquals("Draft", getText(accViewEditPage.getACCPanel(accNode).getStateField()));
+            } else if (accState.equals("Draft")) {
                 accViewEditPage.moveToCandidate();
-                assertEquals("Candidate", getText(accViewEditPage.getStateField()));
-            } else if (state.equals("Candidate")){
+                assertEquals("Candidate", getText(accViewEditPage.getACCPanel(accNode).getStateField()));
+            } else if (accState.equals("Candidate")) {
                 accViewEditPage.backToWIP();
-                assertEquals("WIP", getText(accViewEditPage.getStateField()));
+                assertEquals("WIP", getText(accViewEditPage.getACCPanel(accNode).getStateField()));
             }
             //BCCP panel
             accViewEditPage.openPage(); // refresh the page to erase the snackbar message
             WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
             ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-            assertEquals(state, getText(bccPanelContainer.getBCCPanel().getStateField()));
+            assertEquals(state, getText(bccPanelContainer.getBCCPPanel().getStateField()));
             assertDisabled(bccPanelContainer.getBCCPPanel().getStateField());
 
             //Transfer the BCCP ownership
-            if (state.equals("WIP")){
+            if (state.equals("WIP")) {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                TransferCCOwnershipDialog transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
                 //verify the ownership is transferred
                 accViewEditPage.openPage();
+                bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
                 bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-                assertEquals(anotherDeveloper.getLoginId(), getText(bccPanelContainer.getBCCPanel().getOwnerField()));
-                assertDisabled(bccPanelContainer.getBCCPanel().getOwnerField());
+                assertEquals(anotherDeveloper.getLoginId(), getText(bccPanelContainer.getBCCPPanel().getOwnerField()));
+                assertDisabled(bccPanelContainer.getBCCPPanel().getOwnerField());
                 homePage.logout();
                 homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
 
@@ -1225,26 +1166,32 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(developer.getLoginId());
                 accViewEditPage.openPage();
+                bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
                 bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-                assertEquals(developer.getLoginId(), getText(bccPanelContainer.getBCCPanel().getOwnerField()));
-                assertDisabled(bccPanelContainer.getBCCPanel().getOwnerField());
+                assertEquals(developer.getLoginId(), getText(bccPanelContainer.getBCCPPanel().getOwnerField()));
+                assertDisabled(bccPanelContainer.getBCCPPanel().getOwnerField());
                 homePage.logout();
                 homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
             }
             //BCCP state change
-            if (state.equals("WIP")){
+            accViewEditPage.openPage();
+            bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+            bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+            String bccState = getText(bccPanelContainer.getBCCPanel().getStateField());
+            if (bccState.equals("WIP")) {
                 accViewEditPage.moveToDraft();
                 assertEquals("Draft", getText(bccPanelContainer.getBCCPanel().getStateField()));
-            } else if (state.equals("Draft")){
+            } else if (bccState.equals("Draft")) {
                 accViewEditPage.moveToCandidate();
                 assertEquals("Candidate", getText(bccPanelContainer.getBCCPanel().getStateField()));
-            } else if (state.equals("Candidate")){
+            } else if (bccState.equals("Candidate")) {
                 accViewEditPage.backToWIP();
                 assertEquals("WIP", getText(bccPanelContainer.getBCCPanel().getStateField()));
             }
@@ -1253,23 +1200,25 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             accViewEditPage.openPage();
             WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
-            assertEquals(state, getText(asccPanelContainer.getASCCPanel().getStateField()));
-            assertDisabled(asccPanelContainer.getASCCPanel().getStateField());
+            assertEquals(state, getText(asccPanelContainer.getASCCPPanel().getStateField()));
+            assertDisabled(asccPanelContainer.getASCCPPanel().getStateField());
 
             //Transfer the ASCCP ownership
-            if (state.equals("WIP")){
+            if (state.equals("WIP")) {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                TransferCCOwnershipDialog transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(anotherDeveloper.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                TransferCCOwnershipDialog transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
                 //verify the ownership is transferred
                 accViewEditPage.openPage();
+                asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
                 asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
                 assertEquals(anotherDeveloper.getLoginId(), getText(asccPanelContainer.getASCCPPanel().getOwnerField()));
                 assertDisabled(asccPanelContainer.getASCCPPanel().getOwnerField());
@@ -1280,12 +1229,14 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 viewEditCoreComponentPage.openPage();
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
-                transferCCOwnershipDialog = viewEditCoreComponentPage.openTransferCCOwnershipDialog(viewEditCoreComponentPage.getTableRecordAtIndex(1));
-                transferCCOwnershipDialog.setLoginID(developer.getLoginId());
-                transferCCOwnershipDialog.hitSearchButton();
-                transferCCOwnershipDialog.getSelectCheckboxAtIndex(1);
-                click(transferCCOwnershipDialog.getTransferButton());
+                tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
+                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+                transferCCOwnershipDialog =
+                        viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
+                transferCCOwnershipDialog.transfer(developer.getLoginId());
                 accViewEditPage.openPage();
+                asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
                 asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
                 assertEquals(developer.getLoginId(), getText(asccPanelContainer.getASCCPPanel().getOwnerField()));
                 assertDisabled(asccPanelContainer.getASCCPPanel().getOwnerField());
@@ -1294,22 +1245,26 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             }
 
             //ASCCP state change
-            if (state.equals("WIP")){
+            accViewEditPage.openPage();
+            asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+            asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
+            String asccState = getText(asccPanelContainer.getASCCPanel().getStateField());
+            if (asccState.equals("WIP")) {
                 accViewEditPage.moveToDraft();
-                assertEquals("Draft", getText(asccPanelContainer.getASCCPPanel().getStateField()));
-            } else if (state.equals("Draft")){
+                assertEquals("Draft", getText(asccPanelContainer.getASCCPanel().getStateField()));
+            } else if (asccState.equals("Draft")) {
                 accViewEditPage.moveToCandidate();
-                assertEquals("Candidate", getText(asccPanelContainer.getASCCPPanel().getStateField()));
-            } else if (state.equals("Candidate")){
+                assertEquals("Candidate", getText(asccPanelContainer.getASCCPanel().getStateField()));
+            } else if (asccState.equals("Candidate")) {
                 accViewEditPage.backToWIP();
-                assertEquals("WIP", getText(asccPanelContainer.getASCCPPanel().getStateField()));
+                assertEquals("WIP", getText(asccPanelContainer.getASCCPanel().getStateField()));
             }
         }
     }
 
     @Test
     @DisplayName("TC_10_1_TA_20")
-    public void test_TA_20(){
+    public void test_TA_20() {
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -1329,6 +1284,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Query Base. Details", release.getReleaseNumber());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + "Query Base. Details" + "/" + "Response Code");
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
@@ -1341,7 +1297,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
 
         release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.test.com/enduser");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -1350,43 +1306,49 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
-        ACCObject ACCendUserWIP, ACCendUserQA;
+        ACCObject ACCendUserWIP, ACCendUserQA, ACCForBase;
         ASCCPObject ASCCPendUserQA;
         BCCPObject BCCPendUserQA;
         ACCendUserWIP = randomCoreComponentWithStateContainer.stateACCs.get("WIP");
         ACCendUserQA = randomCoreComponentWithStateContainer.stateACCs.get("QA");
         ASCCPendUserQA = randomCoreComponentWithStateContainer.stateASCCPs.get("QA");
         BCCPendUserQA = randomCoreComponentWithStateContainer.stateBCCPs.get("QA");
+        ACCForBase = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "QA");
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
-        accViewEditPage.appendPropertyAtLast("/" + ASCCPendUserQA.getPropertyTerm());
-        accViewEditPage.appendPropertyAtLast("/" + BCCPendUserQA.getPropertyTerm());
-        accViewEditPage.setBaseACC("/" + ACCendUserQA.getDen());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + ACCendUserWIP.getDen());
+        appendAssociationDialog.selectAssociation(ASCCPendUserQA.getDen());
+        appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + ACCendUserWIP.getDen());
+        appendAssociationDialog.selectAssociation(BCCPendUserQA.getDen());
 
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + ACCendUserWIP.getDen());
+        accViewEditPage = accSetBaseACCDialog.hitApplyButton(ACCForBase.getDen());
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + ASCCPendUserQA.getPropertyTerm());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserWIP.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCendUserWIP.getAccManifestId());
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserWIP.getDen() + "/" + BCCPendUserQA.getPropertyTerm());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
-        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCendUserQA.getDen());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCForBase.getAccManifestId());
+        findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + ACCForBase.getDen());
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(ACCendUserQA.getDen(), release.getReleaseNumber());
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(ACCForBase.getAccManifestId());
         accViewEditPage.backToWIP();
-        accViewEditPage.setBaseACC("/" + "Customer Credit Base. Details");
+        accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + ACCForBase.getDen());
+        accSetBaseACCDialog.hitApplyButton("Customer Credit Base. Details");
 
         viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
-        accViewEditPage.findWhereUsed("/" + "Customer Credit Base");
-        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCendUserWIP.getDen()).isDisplayed());
+        accViewEditPage.findWhereUsed("/" + "Customer Credit Base. Details");
+        assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCForBase.getDen()).isDisplayed());
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Customer Credit. Details").isDisplayed());
     }
 
@@ -1397,6 +1359,51 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         this.randomAccounts.forEach(newUser -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
+    }
+
+    private class RandomCoreComponentWithStateContainer {
+        private AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
+        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
+        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
+
+        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                ASCCPObject asccp;
+                BCCPObject bccp;
+                ACCObject acc;
+                String state = this.states.get(i);
+
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
+                    bcc.setCardinalityMax(1);
+                    coreComponentAPI.updateBCC(bcc);
+
+                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
+                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
+                    ascc.setCardinalityMax(1);
+                    coreComponentAPI.updateASCC(ascc);
+                    stateACCs.put(state, acc);
+                    stateASCCPs.put(state, asccp);
+                    stateBCCPs.put(state, bccp);
+                }
+            }
+        }
+
     }
 
 

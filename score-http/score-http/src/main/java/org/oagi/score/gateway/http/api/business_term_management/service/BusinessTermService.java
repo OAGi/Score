@@ -25,8 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.oagi.score.gateway.http.helper.Utility.isValidURI;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @Service
 @Transactional(readOnly = true)
@@ -59,11 +63,10 @@ public class BusinessTermService {
 
     public GetBusinessTermListResponse getBusinessTermList(GetBusinessTermListRequest request) {
         GetBusinessTermListResponse response;
-        if(request.getAssignedBies() != null && !request.getAssignedBies().isEmpty()) {
+        if (request.getAssignedBies() != null && !request.getAssignedBies().isEmpty()) {
             response = scoreRepositoryFactory.createBusinessTermReadRepository()
                     .getBusinessTermListByAssignedBie(request);
-        }
-        else {
+        } else {
             response = scoreRepositoryFactory.createBusinessTermReadRepository()
                     .getBusinessTermList(request);
         }
@@ -77,32 +80,195 @@ public class BusinessTermService {
         return response;
     }
 
+    private class BusinessTermTemplateParser {
+
+        private static final String BUSINESS_TERM_HEADER_NAME = "businessTerm";
+        private static final String EXTERNAL_REFERENCE_URI_HEADER_NAME = "externalReferenceUri";
+        private static final String EXTERNAL_REFERENCE_ID_HEADER_NAME = "externalReferenceId";
+        private static final String DEFINITION_HEADER_NAME = "definition";
+        private static final String COMMENT_HEADER_NAME = "comment";
+        private static final int MAX_RECORD_INDEX = 5; // the template should have at most five values for each record.
+
+        private List<String[]> list;
+        private int recordIndex;
+        private int businessTermHeaderIndex = -1;
+        private int externalReferenceUriHeaderIndex = -1;
+        private int externalReferenceIdHeaderIndex = -1;
+        private int definitionHeaderIndex = -1;
+        private int commentHeaderIndex = -1;
+
+        BusinessTermTemplateParser(CSVReader reader) throws IOException {
+            list = reader.readAll();
+            if (list == null || list.isEmpty()) {
+                throw new ScoreDataAccessException("No data in the template.");
+            }
+
+            String[] header = list.get(0);
+            if (header == null || header.length == 0) {
+                throw new ScoreDataAccessException("No header(s) in the template.");
+            }
+
+            int headerIndex = 0;
+            for (String name : header) {
+                switch (name) {
+                    case BUSINESS_TERM_HEADER_NAME:
+                        businessTermHeaderIndex = headerIndex;
+                        break;
+
+                    case EXTERNAL_REFERENCE_URI_HEADER_NAME:
+                        externalReferenceUriHeaderIndex = headerIndex;
+                        break;
+
+                    case EXTERNAL_REFERENCE_ID_HEADER_NAME:
+                        externalReferenceIdHeaderIndex = headerIndex;
+                        break;
+
+                    case DEFINITION_HEADER_NAME:
+                        definitionHeaderIndex = headerIndex;
+                        break;
+
+                    case COMMENT_HEADER_NAME:
+                        commentHeaderIndex = headerIndex;
+                        break;
+
+                    default:
+                        throw new ScoreDataAccessException("Unknown header in the template: " + name);
+                }
+
+                headerIndex++;
+            }
+            recordIndex = 1;
+        }
+
+        public boolean hasNext() {
+            return recordIndex < list.size();
+        }
+
+        public BusinessTermTemplateRecord next() {
+            String[] values = list.get(recordIndex);
+            BusinessTermTemplateRecord record = new BusinessTermTemplateRecord();
+            if (businessTermHeaderIndex >= 0 || businessTermHeaderIndex < MAX_RECORD_INDEX) {
+                record.setBusinessTerm(values[businessTermHeaderIndex]);
+            }
+            if (externalReferenceUriHeaderIndex >= 0 || externalReferenceUriHeaderIndex < MAX_RECORD_INDEX) {
+                record.setExternalReferenceUri(values[externalReferenceUriHeaderIndex]);
+            }
+            if (externalReferenceIdHeaderIndex >= 0 || externalReferenceIdHeaderIndex < MAX_RECORD_INDEX) {
+                record.setExternalReferenceId(values[externalReferenceIdHeaderIndex]);
+            }
+            if (definitionHeaderIndex >= 0 || definitionHeaderIndex < MAX_RECORD_INDEX) {
+                record.setDefinition(values[definitionHeaderIndex]);
+            }
+            if (commentHeaderIndex >= 0 || commentHeaderIndex < MAX_RECORD_INDEX) {
+                record.setComment(values[commentHeaderIndex]);
+            }
+            recordIndex++;
+            return record;
+        }
+
+    }
+
+    private class BusinessTermTemplateRecord {
+
+        private String businessTerm;
+
+        private String externalReferenceUri;
+
+        private String externalReferenceId;
+
+        private String definition;
+
+        private String comment;
+
+        public String getBusinessTerm() {
+            return businessTerm;
+        }
+
+        public void setBusinessTerm(String businessTerm) {
+            this.businessTerm = businessTerm;
+        }
+
+        public String getExternalReferenceUri() {
+            return externalReferenceUri;
+        }
+
+        public void setExternalReferenceUri(String externalReferenceUri) {
+            this.externalReferenceUri = externalReferenceUri;
+        }
+
+        public String getExternalReferenceId() {
+            return externalReferenceId;
+        }
+
+        public void setExternalReferenceId(String externalReferenceId) {
+            this.externalReferenceId = externalReferenceId;
+        }
+
+        public String getDefinition() {
+            return definition;
+        }
+
+        public void setDefinition(String definition) {
+            this.definition = definition;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+    }
+
     @Transactional
     public CreateBulkBusinessTermResponse createBusinessTermsFromFile(CreateBulkBusinessTermRequest request)
             throws ScoreDataAccessException {
+        List<String> formatCheckExceptions = new ArrayList<>();
         try (CSVReader reader = new CSVReader(
                 new BufferedReader(
                         new InputStreamReader(request.getInputStream(), "UTF-8"), ','))) {
             List<BusinessTerm> businessTerms = new ArrayList<BusinessTerm>();
-
-            List<String[]> list = reader.readAll();
-            list.remove(0); // remove header with column names
-            for (String[] recordStr : list) {
+            BusinessTermTemplateParser templateParser = new BusinessTermTemplateParser(reader);
+            while (templateParser.hasNext()) {
+                BusinessTermTemplateRecord record = templateParser.next();
                 BusinessTerm term = new BusinessTerm();
-                term.setBusinessTerm(recordStr[0]);
-                term.setExternalReferenceUri(recordStr[1]);
-                term.setExternalReferenceId(recordStr[2]);
-                term.setDefinition(recordStr[3]);
-                term.setComment(recordStr[4]);
-                if(term.getExternalReferenceUri() != null && !term.getExternalReferenceUri().equals("")
-                        && checkBusinessTermUniqueness(term)) {
+
+                String businessTerm = record.getBusinessTerm();
+                if (!hasLength(businessTerm)) {
+                    formatCheckExceptions.add("The business term is required.");
+                } else if (businessTerm.length() > 255) {
+                    formatCheckExceptions.add(businessTerm + " is longer than 255 characters limit.");
+                } else {
+                    term.setBusinessTerm(businessTerm);
+                }
+
+                String externalReferenceUri = record.getExternalReferenceUri();
+                if (!hasLength(externalReferenceUri)) {
+                    formatCheckExceptions.add("The external reference URI is required.");
+                } else if (!isValidURI(externalReferenceUri)) {
+                    formatCheckExceptions.add(externalReferenceUri + " is not a valid URI.");
+                } else {
+                    term.setExternalReferenceUri(externalReferenceUri);
+                }
+
+                term.setExternalReferenceId(record.getExternalReferenceId());
+                term.setDefinition(record.getDefinition());
+                term.setComment(record.getComment());
+
+                if (formatCheckExceptions.isEmpty() && checkBusinessTermUniqueness(term)) {
                     businessTerms.add(term);
                 }
             }
+
             request.setBusinessTermList(businessTerms);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ScoreDataAccessException("Fail to parse CSV file: " + e.getMessage());
+        } catch (URISyntaxException e) {
+            throw new ScoreDataAccessException("Fail to parse CSV file: " + e.getMessage());
+        }
+        if (!formatCheckExceptions.isEmpty()) {
+            throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", formatCheckExceptions));
         }
 
         CreateBulkBusinessTermResponse response =
@@ -132,6 +298,7 @@ public class BusinessTermService {
         AssignedBusinessTerm response = businessTermRepository.getBusinessTermAssignment(request);
         return response;
     }
+
     public PageResponse<AssignedBusinessTermListRecord> getBusinessTermAssignmentList(AuthenticatedPrincipal user, AssignedBusinessTermListRequest request) {
         PageRequest pageRequest = request.getPageRequest();
         AppUser requester = sessionService.getAppUserByUsername(user);

@@ -5,12 +5,14 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.AppUserAPI;
 import org.oagi.score.e2e.impl.api.helper.BCryptPasswordEncoder;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
 
@@ -20,6 +22,11 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
     public DSLContextAppUserAPIImpl(DSLContext dslContext) {
         this.dslContext = dslContext;
+    }
+
+    @Override
+    public List<AppUserObject> getAppUsers() {
+        return dslContext.selectFrom(APP_USER).fetch(record -> mapper(record));
     }
 
     @Override
@@ -126,20 +133,35 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
     @Override
     public void deleteAppUserById(BigInteger appUserIdBigInteger) {
+        ULong appUserId = ULong.valueOf(appUserIdBigInteger);
+
+        ReleaseRecord publishedRelease = dslContext.selectFrom(RELEASE)
+                .where(and(
+                        RELEASE.CREATED_BY.eq(appUserId),
+                        RELEASE.STATE.eq("Published")
+                ))
+                .orderBy(RELEASE.LAST_UPDATE_TIMESTAMP.desc())
+                .fetchAny();
+        if (publishedRelease != null) {
+            revertWorkingRelease(appUserId, publishedRelease);
+        }
+
         dslContext.transaction(conf -> {
             DSLContext txContext = conf.dsl();
             txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
-
-            ULong appUserId = ULong.valueOf(appUserIdBigInteger);
 
             deleteBusinessTermByAppUserId(txContext, appUserId);
             deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
             deleteCoreComponentByAppUserId(txContext, appUserId);
             deleteCodeListByAppUserId(txContext, appUserId);
+            deleteAgencyIDListListByAppUserId(txContext, appUserId);
             deleteBusinessContextByAppUserId(txContext, appUserId);
             deleteContextSchemeByAppUserId(txContext, appUserId);
             deleteContextCategoryByAppUserId(txContext, appUserId);
+            deleteModuleSetReleaseByAppUserId(txContext, appUserId);
+            deleteModuleSetByAppUserId(txContext, appUserId);
             deleteNamespaceByAppUserId(txContext, appUserId);
+            deleteReleaseByAppUserId(txContext, appUserId);
 
             txContext.deleteFrom(APP_USER)
                     .where(APP_USER.APP_USER_ID.eq(appUserId))
@@ -152,10 +174,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     private void deleteBusinessTermByAppUserId(DSLContext dslContext, ULong appUserId) {
         List<ULong> businessTermIdList = dslContext.select(BUSINESS_TERM.BUSINESS_TERM_ID)
                 .from(BUSINESS_TERM)
-                .where(or(
-                        BUSINESS_TERM.CREATED_BY.eq(appUserId),
-                        BUSINESS_TERM.LAST_UPDATED_BY.eq(appUserId)
-                ))
+                .where(BUSINESS_TERM.CREATED_BY.eq(appUserId))
                 .fetchInto(ULong.class);
         if (businessTermIdList.isEmpty()) {
             return;
@@ -195,10 +214,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     private void deleteBusinessInformationEntityByAppUserId(DSLContext dslContext, ULong appUserId) {
         List<ULong> topLevelAsbiepIdList = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
                 .from(TOP_LEVEL_ASBIEP)
-                .where(or(
-                        TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(appUserId),
-                        TOP_LEVEL_ASBIEP.LAST_UPDATED_BY.eq(appUserId)
-                ))
+                .where(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(appUserId))
                 .fetchInto(ULong.class);
         if (topLevelAsbiepIdList.isEmpty()) {
             return;
@@ -234,13 +250,42 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
     }
 
+    private void deleteDTSCByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> dtScIdList = dslContext.select(DT_SC.DT_SC_ID)
+                .from(DT_SC)
+                .where(or(
+                        DT_SC.OWNER_USER_ID.eq(appUserId),
+                        DT_SC.CREATED_BY.eq(appUserId)
+                ))
+                .fetchInto(ULong.class);
+        if (dtScIdList.isEmpty()) {
+            return;
+        }
+
+        List<ULong> dtScManifestIdList = dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
+                .from(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.DT_SC_ID.in(dtScIdList))
+                .fetchInto(ULong.class);
+        if (!dtScManifestIdList.isEmpty()) {
+            dslContext.deleteFrom(BDT_SC_PRI_RESTRI)
+                    .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.in(dtScManifestIdList))
+                    .execute();
+        }
+
+        dslContext.deleteFrom(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.in(dtScManifestIdList))
+                .execute();
+        dslContext.deleteFrom(DT_SC)
+                .where(DT_SC.DT_SC_ID.in(dtScIdList))
+                .execute();
+    }
+
     private void deleteDTByAppUserId(DSLContext dslContext, ULong appUserId) {
         List<ULong> dtIdList = dslContext.select(DT.DT_ID)
                 .from(DT)
                 .where(or(
                         DT.OWNER_USER_ID.eq(appUserId),
-                        DT.CREATED_BY.eq(appUserId),
-                        DT.LAST_UPDATED_BY.eq(appUserId)
+                        DT.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (dtIdList.isEmpty()) {
@@ -251,6 +296,11 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(DT_MANIFEST)
                 .where(DT_MANIFEST.DT_ID.in(dtIdList))
                 .fetchInto(ULong.class);
+        if (!dtManifestIdList.isEmpty()) {
+            dslContext.deleteFrom(BDT_PRI_RESTRI)
+                    .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.in(dtManifestIdList))
+                    .execute();
+        }
 
         List<String> dtGuidList = dslContext.selectDistinct(DT.GUID)
                 .from(DT)
@@ -277,8 +327,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(BCCP)
                 .where(or(
                         BCCP.OWNER_USER_ID.eq(appUserId),
-                        BCCP.CREATED_BY.eq(appUserId),
-                        BCCP.LAST_UPDATED_BY.eq(appUserId)
+                        BCCP.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (bccpIdList.isEmpty()) {
@@ -315,8 +364,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(ASCCP)
                 .where(or(
                         ASCCP.OWNER_USER_ID.eq(appUserId),
-                        ASCCP.CREATED_BY.eq(appUserId),
-                        ASCCP.LAST_UPDATED_BY.eq(appUserId)
+                        ASCCP.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (asccpIdList.isEmpty()) {
@@ -353,8 +401,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(ASCC)
                 .where(or(
                         ASCC.OWNER_USER_ID.eq(appUserId),
-                        ASCC.CREATED_BY.eq(appUserId),
-                        ASCC.LAST_UPDATED_BY.eq(appUserId)
+                        ASCC.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (asccIdList.isEmpty()) {
@@ -386,8 +433,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(BCC)
                 .where(or(
                         BCC.OWNER_USER_ID.eq(appUserId),
-                        BCC.CREATED_BY.eq(appUserId),
-                        BCC.LAST_UPDATED_BY.eq(appUserId)
+                        BCC.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (bccIdList.isEmpty()) {
@@ -419,8 +465,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .from(ACC)
                 .where(or(
                         ACC.OWNER_USER_ID.eq(appUserId),
-                        ACC.CREATED_BY.eq(appUserId),
-                        ACC.LAST_UPDATED_BY.eq(appUserId)
+                        ACC.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (accIdList.isEmpty()) {
@@ -476,6 +521,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     }
 
     private void deleteCoreComponentByAppUserId(DSLContext dslContext, ULong appUserId) {
+        deleteDTSCByAppUserId(dslContext, appUserId);
         deleteDTByAppUserId(dslContext, appUserId);
         deleteBCCPByAppUserId(dslContext, appUserId);
         deleteASCCPByAppUserId(dslContext, appUserId);
@@ -489,8 +535,8 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         List<ULong> codeListIdList = dslContext.select(CODE_LIST.CODE_LIST_ID)
                 .from(CODE_LIST)
                 .where(or(
-                        CODE_LIST.CREATED_BY.eq(appUserId),
-                        CODE_LIST.LAST_UPDATED_BY.eq(appUserId)
+                        CODE_LIST.OWNER_USER_ID.eq(appUserId),
+                        CODE_LIST.CREATED_BY.eq(appUserId)
                 ))
                 .fetchInto(ULong.class);
         if (codeListIdList.isEmpty()) {
@@ -528,13 +574,53 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
     }
 
+    private void deleteAgencyIDListListByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> agencyIDListIdList = dslContext.select(AGENCY_ID_LIST.AGENCY_ID_LIST_ID)
+                .from(AGENCY_ID_LIST)
+                .where(or(
+                        AGENCY_ID_LIST.OWNER_USER_ID.eq(appUserId),
+                        AGENCY_ID_LIST.CREATED_BY.eq(appUserId)
+                ))
+                .fetchInto(ULong.class);
+        if (agencyIDListIdList.isEmpty()) {
+            return;
+        }
+
+        List<String> agencyIDListListGuidList = dslContext.select(AGENCY_ID_LIST.GUID)
+                .from(AGENCY_ID_LIST)
+                .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.in(agencyIDListIdList))
+                .fetchInto(String.class);
+
+        List<ULong> agencyIDListListManifestIdList = dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.in(agencyIDListIdList))
+                .fetchInto(ULong.class);
+
+        dslContext.update(AGENCY_ID_LIST_MANIFEST)
+                .setNull(AGENCY_ID_LIST_MANIFEST.LOG_ID)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(agencyIDListListManifestIdList))
+                .execute();
+        dslContext.deleteFrom(LOG)
+                .where(LOG.REFERENCE.in(agencyIDListListGuidList))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIDListListManifestIdList))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIDListListManifestIdList))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST_VALUE)
+                .where(AGENCY_ID_LIST_VALUE.OWNER_LIST_ID.in(agencyIDListIdList))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST)
+                .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.in(agencyIDListIdList))
+                .execute();
+    }
+
     private void deleteBusinessContextByAppUserId(DSLContext dslContext, ULong appUserId) {
         List<ULong> bizCtxIdList = dslContext.select(BIZ_CTX.BIZ_CTX_ID)
                 .from(BIZ_CTX)
-                .where(or(
-                        BIZ_CTX.CREATED_BY.eq(appUserId),
-                        BIZ_CTX.LAST_UPDATED_BY.eq(appUserId)
-                ))
+                .where(BIZ_CTX.CREATED_BY.eq(appUserId))
                 .fetchInto(ULong.class);
         if (bizCtxIdList.isEmpty()) {
             return;
@@ -554,10 +640,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     private void deleteContextSchemeByAppUserId(DSLContext dslContext, ULong appUserId) {
         List<ULong> ctxSchemeIdList = dslContext.select(CTX_SCHEME.CTX_SCHEME_ID)
                 .from(CTX_SCHEME)
-                .where(or(
-                        CTX_SCHEME.CREATED_BY.eq(appUserId),
-                        CTX_SCHEME.LAST_UPDATED_BY.eq(appUserId)
-                ))
+                .where(CTX_SCHEME.CREATED_BY.eq(appUserId))
                 .fetchInto(ULong.class);
         if (ctxSchemeIdList.isEmpty()) {
             return;
@@ -586,20 +669,348 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
     private void deleteContextCategoryByAppUserId(DSLContext dslContext, ULong appUserId) {
         dslContext.deleteFrom(CTX_CATEGORY)
-                .where(or(
-                        CTX_CATEGORY.CREATED_BY.eq(appUserId),
-                        CTX_CATEGORY.LAST_UPDATED_BY.eq(appUserId)
-                ))
+                .where(CTX_CATEGORY.CREATED_BY.eq(appUserId))
                 .execute();
     }
 
+    private void deleteModuleSetReleaseByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> moduleSetReleaseIdList = dslContext.select(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID)
+                .from(MODULE_SET_RELEASE)
+                .where(MODULE_SET_RELEASE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (moduleSetReleaseIdList != null && !moduleSetReleaseIdList.isEmpty()) {
+            dslContext.deleteFrom(MODULE_ACC_MANIFEST)
+                    .where(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_AGENCY_ID_LIST_MANIFEST)
+                    .where(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_ASCCP_MANIFEST)
+                    .where(MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_BCCP_MANIFEST)
+                    .where(MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_BLOB_CONTENT_MANIFEST)
+                    .where(MODULE_BLOB_CONTENT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_CODE_LIST_MANIFEST)
+                    .where(MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_DT_MANIFEST)
+                    .where(MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_XBT_MANIFEST)
+                    .where(MODULE_XBT_MANIFEST.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+            dslContext.deleteFrom(MODULE_SET_RELEASE)
+                    .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.in(moduleSetReleaseIdList))
+                    .execute();
+        }
+    }
+
+    private void deleteModuleSetByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> moduleSetIdList = dslContext.select(MODULE_SET.MODULE_SET_ID)
+                .from(MODULE_SET)
+                .where(MODULE_SET.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (moduleSetIdList != null && !moduleSetIdList.isEmpty()) {
+            dslContext.deleteFrom(MODULE_SET)
+                    .where(MODULE_SET.MODULE_SET_ID.in(moduleSetIdList))
+                    .execute();
+        }
+    }
+
     private void deleteNamespaceByAppUserId(DSLContext dslContext, ULong appUserId) {
-        dslContext.deleteFrom(NAMESPACE)
-                .where(or(
-                        NAMESPACE.CREATED_BY.eq(appUserId),
-                        NAMESPACE.LAST_UPDATED_BY.eq(appUserId)
+        List<ULong> namespaceIdList = dslContext.select(NAMESPACE.NAMESPACE_ID)
+                .from(NAMESPACE)
+                .where(NAMESPACE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (namespaceIdList != null && !namespaceIdList.isEmpty()) {
+            dslContext.deleteFrom(NAMESPACE)
+                    .where(NAMESPACE.NAMESPACE_ID.in(namespaceIdList))
+                    .execute();
+        }
+    }
+
+    private void deleteReleaseByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> releaseIdList = dslContext.select(RELEASE.RELEASE_ID)
+                .from(RELEASE)
+                .where(RELEASE.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (releaseIdList != null && !releaseIdList.isEmpty()) {
+            dslContext.deleteFrom(RELEASE)
+                    .where(RELEASE.RELEASE_ID.in(releaseIdList))
+                    .execute();
+        }
+    }
+
+    private void revertWorkingRelease(ULong appUserId, ReleaseRecord publishedRelease) {
+        dslContext.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+        ULong adminId = dslContext.select(APP_USER.APP_USER_ID)
+                .from(APP_USER)
+                .where(and(
+                        APP_USER.IS_ADMIN.eq((byte) 1),
+                        APP_USER.APP_USER_ID.greaterThan(ULong.valueOf(0L))
+                ))
+                .orderBy(APP_USER.APP_USER_ID.asc())
+                .fetchAnyInto(ULong.class);
+        ULong releaseId = publishedRelease.getReleaseId();
+
+        // ACCs
+        dslContext.update(ACC_MANIFEST
+                        .join(ACC_MANIFEST.as("working"))
+                        .on(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("working").ACC_MANIFEST_ID))
+                        .join(ACC_MANIFEST.as("prev"))
+                        .on(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID)))
+                .set(ACC_MANIFEST.as("working").PREV_ACC_MANIFEST_ID, ACC_MANIFEST.PREV_ACC_MANIFEST_ID)
+                .set(ACC_MANIFEST.as("prev").NEXT_ACC_MANIFEST_ID, ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)
+                .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(ACC_MANIFEST)
+                .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(ACC)
+                .set(ACC.OWNER_USER_ID, ACC.LAST_UPDATED_BY)
+                .where(and(
+                        ACC.OWNER_USER_ID.eq(appUserId),
+                        ACC.LAST_UPDATED_BY.ne(appUserId)
                 ))
                 .execute();
+
+        // ASCCs
+        dslContext.update(ASCC_MANIFEST
+                        .join(ASCC_MANIFEST.as("working"))
+                        .on(ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("working").ASCC_MANIFEST_ID))
+                        .join(ASCC_MANIFEST.as("prev"))
+                        .on(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID)))
+                .set(ASCC_MANIFEST.as("working").PREV_ASCC_MANIFEST_ID, ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
+                .set(ASCC_MANIFEST.as("prev").NEXT_ASCC_MANIFEST_ID, ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID)
+                .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(ASCC_MANIFEST)
+                .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(ASCC)
+                .set(ASCC.OWNER_USER_ID, ASCC.LAST_UPDATED_BY)
+                .where(and(
+                        ASCC.OWNER_USER_ID.eq(appUserId),
+                        ASCC.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // BCCs
+        dslContext.update(BCC_MANIFEST
+                        .join(BCC_MANIFEST.as("working"))
+                        .on(BCC_MANIFEST.NEXT_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("working").BCC_MANIFEST_ID))
+                        .join(BCC_MANIFEST.as("prev"))
+                        .on(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID)))
+                .set(BCC_MANIFEST.as("working").PREV_BCC_MANIFEST_ID, BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
+                .set(BCC_MANIFEST.as("prev").NEXT_BCC_MANIFEST_ID, BCC_MANIFEST.NEXT_BCC_MANIFEST_ID)
+                .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(BCC_MANIFEST)
+                .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(BCC)
+                .set(BCC.OWNER_USER_ID, BCC.LAST_UPDATED_BY)
+                .where(and(
+                        BCC.OWNER_USER_ID.eq(appUserId),
+                        BCC.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // ASCCPs
+        dslContext.update(ASCCP_MANIFEST
+                        .join(ASCCP_MANIFEST.as("working"))
+                        .on(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("working").ASCCP_MANIFEST_ID))
+                        .join(ASCCP_MANIFEST.as("prev"))
+                        .on(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID)))
+                .set(ASCCP_MANIFEST.as("working").PREV_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID)
+                .set(ASCCP_MANIFEST.as("prev").NEXT_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID)
+                .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(ASCCP_MANIFEST)
+                .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(ASCCP)
+                .set(ASCCP.OWNER_USER_ID, ASCCP.LAST_UPDATED_BY)
+                .where(and(
+                        ASCCP.OWNER_USER_ID.eq(appUserId),
+                        ASCCP.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // BCCPs
+        dslContext.update(BCCP_MANIFEST
+                        .join(BCCP_MANIFEST.as("working"))
+                        .on(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("working").BCCP_MANIFEST_ID))
+                        .join(BCCP_MANIFEST.as("prev"))
+                        .on(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID)))
+                .set(BCCP_MANIFEST.as("working").PREV_BCCP_MANIFEST_ID, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
+                .set(BCCP_MANIFEST.as("prev").NEXT_BCCP_MANIFEST_ID, BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)
+                .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(BCCP)
+                .set(BCCP.OWNER_USER_ID, BCCP.LAST_UPDATED_BY)
+                .where(and(
+                        BCCP.OWNER_USER_ID.eq(appUserId),
+                        BCCP.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // CODE_LISTs
+        dslContext.update(CODE_LIST_MANIFEST
+                        .join(CODE_LIST_MANIFEST.as("working"))
+                        .on(CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working").CODE_LIST_MANIFEST_ID))
+                        .join(CODE_LIST_MANIFEST.as("prev"))
+                        .on(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID)))
+                .set(CODE_LIST_MANIFEST.as("working").PREV_CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID)
+                .set(CODE_LIST_MANIFEST.as("prev").NEXT_CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID)
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(CODE_LIST)
+                .set(CODE_LIST.OWNER_USER_ID, CODE_LIST.LAST_UPDATED_BY)
+                .where(and(
+                        CODE_LIST.OWNER_USER_ID.eq(appUserId),
+                        CODE_LIST.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // CODE_LIST_VALUEs
+        dslContext.update(CODE_LIST_VALUE_MANIFEST
+                        .join(CODE_LIST_VALUE_MANIFEST.as("working"))
+                        .on(CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("working").CODE_LIST_VALUE_MANIFEST_ID))
+                        .join(CODE_LIST_VALUE_MANIFEST.as("prev"))
+                        .on(CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("prev").CODE_LIST_VALUE_MANIFEST_ID)))
+                .set(CODE_LIST_VALUE_MANIFEST.as("working").PREV_CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID)
+                .set(CODE_LIST_VALUE_MANIFEST.as("prev").NEXT_CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID)
+                .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(CODE_LIST_VALUE_MANIFEST)
+                .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(CODE_LIST_VALUE)
+                .set(CODE_LIST_VALUE.OWNER_USER_ID, CODE_LIST_VALUE.LAST_UPDATED_BY)
+                .where(and(
+                        CODE_LIST_VALUE.OWNER_USER_ID.eq(appUserId),
+                        CODE_LIST_VALUE.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // DTs
+        dslContext.update(DT_MANIFEST
+                        .join(DT_MANIFEST.as("working"))
+                        .on(DT_MANIFEST.NEXT_DT_MANIFEST_ID.eq(DT_MANIFEST.as("working").DT_MANIFEST_ID))
+                        .join(DT_MANIFEST.as("prev"))
+                        .on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID)))
+                .set(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID, DT_MANIFEST.PREV_DT_MANIFEST_ID)
+                .set(DT_MANIFEST.as("prev").NEXT_DT_MANIFEST_ID, DT_MANIFEST.NEXT_DT_MANIFEST_ID)
+                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(DT_MANIFEST)
+                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(DT)
+                .set(DT.OWNER_USER_ID, DT.LAST_UPDATED_BY)
+                .where(and(
+                        DT.OWNER_USER_ID.eq(appUserId),
+                        DT.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        //DT_SCs
+        dslContext.update(DT_SC_MANIFEST
+                        .join(DT_SC_MANIFEST.as("working"))
+                        .on(DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID))
+                        .join(DT_SC_MANIFEST.as("prev"))
+                        .on(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID)))
+                .set(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID)
+                .set(DT_SC_MANIFEST.as("prev").NEXT_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID)
+                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(DT_SC)
+                .set(DT_SC.OWNER_USER_ID, DT_SC.LAST_UPDATED_BY)
+                .where(and(
+                        DT_SC.OWNER_USER_ID.eq(appUserId),
+                        DT_SC.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        //XBTs
+        dslContext.update(XBT_MANIFEST
+                        .join(XBT_MANIFEST.as("working"))
+                        .on(XBT_MANIFEST.NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working").XBT_MANIFEST_ID))
+                        .join(XBT_MANIFEST.as("prev"))
+                        .on(XBT_MANIFEST.PREV_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("prev").XBT_MANIFEST_ID)))
+                .set(XBT_MANIFEST.as("working").PREV_XBT_MANIFEST_ID, XBT_MANIFEST.PREV_XBT_MANIFEST_ID)
+                .set(XBT_MANIFEST.as("prev").NEXT_XBT_MANIFEST_ID, XBT_MANIFEST.NEXT_XBT_MANIFEST_ID)
+                .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(XBT_MANIFEST)
+                .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(XBT)
+                .set(XBT.OWNER_USER_ID, XBT.LAST_UPDATED_BY)
+                .where(and(
+                        XBT.OWNER_USER_ID.eq(appUserId),
+                        XBT.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // AGENCY_ID_LIST
+        dslContext.update(AGENCY_ID_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_MANIFEST.as("working"))
+                        .on(AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working").AGENCY_ID_LIST_MANIFEST_ID))
+                        .join(AGENCY_ID_LIST_MANIFEST.as("prev"))
+                        .on(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID)))
+                .set(AGENCY_ID_LIST_MANIFEST.as("working").PREV_AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID)
+                .set(AGENCY_ID_LIST_MANIFEST.as("prev").NEXT_AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID)
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(AGENCY_ID_LIST)
+                .set(AGENCY_ID_LIST.OWNER_USER_ID, AGENCY_ID_LIST.LAST_UPDATED_BY)
+                .where(and(
+                        AGENCY_ID_LIST.OWNER_USER_ID.eq(appUserId),
+                        AGENCY_ID_LIST.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        // AGENCY_ID_LIST_VALUE
+        dslContext.update(AGENCY_ID_LIST_VALUE_MANIFEST
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("working"))
+                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("working").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev"))
+                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
+                .set(AGENCY_ID_LIST_VALUE_MANIFEST.as("working").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .set(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
+                .execute();
+        dslContext.update(AGENCY_ID_LIST_VALUE)
+                .set(AGENCY_ID_LIST_VALUE.OWNER_USER_ID, AGENCY_ID_LIST_VALUE.LAST_UPDATED_BY)
+                .where(and(
+                        AGENCY_ID_LIST_VALUE.OWNER_USER_ID.eq(appUserId),
+                        AGENCY_ID_LIST_VALUE.LAST_UPDATED_BY.ne(appUserId)
+                ))
+                .execute();
+
+        dslContext.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
 }

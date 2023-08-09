@@ -4,10 +4,12 @@ import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.BCCPObject;
+import org.oagi.score.e2e.obj.LogObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
+import org.oagi.score.e2e.page.core_component.HistoryPage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -18,6 +20,16 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPage {
 
+    public static final By REVISE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -32,6 +44,10 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By CHANGE_BDT_OPTION_LOCATOR =
             By.xpath("//button/span[contains(text(), \"Change BDT\")]");
+    private static final By SHOW_HISTORY_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Show History\")]");
+    private static final By COMMENTS_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Comments\")]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
@@ -58,16 +74,6 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
             By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
-    public static final By REVISE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
-    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
-    public static final By AMEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
-    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
-    public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -99,7 +105,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
         assert "BCCP".equals(getText(getBCCPPanelContainer().getBCCPPanel().getCoreComponentField()));
-        assert getText(getTitle()).equals(bccp.getDen());
+        assert getText(getTitle()).startsWith(bccp.getPropertyTerm());
     }
 
     @Override
@@ -277,11 +283,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             String propertyTerm = getText(getBCCPPanelContainer().getBCCPPanel().getPropertyTermField());
             WebElement node = clickOnDropDownMenuByPath("/" + propertyTerm);
             try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
             BCCPChangeBDTDialog bccpChangeBDTDialog = new BCCPChangeBDTDialogImpl(this);
@@ -307,6 +313,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override
@@ -417,6 +424,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 public ASCCPanel getASCCPanel() {
                     return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public ASCCPPanel getASCCPPanel() {
                     return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
@@ -451,16 +459,18 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     @Override
-    public AddCommentDialog hitAddCommentButton() {
-        click(getAddCommentButton());
+    public AddCommentDialog openCommentsDialog(String path) {
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("C").perform();
+        }
+
         AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
         return addCodeListCommentDialog;
-    }
-
-    @Override
-    public WebElement getAddCommentButton() {
-        return elementToBeClickable(getDriver(), ADD_COMMENT_ICON_LOCATOR);
     }
 
     @Override
@@ -473,16 +483,41 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
                 public BCCPanel getBCCPanel() {
                     return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
                 }
+
                 @Override
                 public BCCPPanel getBCCPPanel() {
                     return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
                 }
+
                 @Override
                 public DTPanel getDTPanel() {
                     return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
                 }
             };
         });
+    }
+
+    @Override
+    public HistoryPage showHistory() {
+        String path = "/" + this.bccp.getPropertyTerm();
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        }
+        switchToNextTab(getDriver());
+
+        LogObject logObject = new LogObject();
+        logObject.setReference(this.bccp.getGuid());
+        logObject.setType("BCCP");
+        logObject.setManifestId(this.bccp.getBccpManifestId());
+
+        HistoryPage historyPage = new HistoryPageImpl(this, logObject);
+        assert historyPage.isOpened();
+        return historyPage;
     }
 
     @Override
@@ -495,16 +530,19 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         waitFor(ofMillis(1000L));
         assert getText(getNamespaceSelectField()).equals(namespace);
     }
+
     @Override
     public WebElement getNamespaceSelectField() {
         return elementToBeClickable(getDriver(), NAMESPACE_FIELD_LOCATOR);
     }
+
     @Override
     public void hitUpdateAnywayButton() {
         retry(() -> click(getUpdateButton(true)));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Updated".equals(getSnackBarMessage(getDriver()));
     }
+
     @Override
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
@@ -964,6 +1002,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         @Override
         public WebElement getDeprecatedCheckbox() {
             return getCheckboxByName(baseXPath, "Deprecated");
+        }
+
+        @Override
+        public void toggleDeprecated() {
+            waitFor(ofMillis(3000L));
+            click(getDeprecatedCheckbox());
         }
 
         @Override

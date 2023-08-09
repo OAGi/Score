@@ -123,7 +123,7 @@
                       </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP' && access === 'CanEdit'"
-                              [disabled]="!isChanged">
+                              [disabled]="updateDisabled">
                         Update
                       </button>
                       <button mat-raised-button color="accent" (click)="updateState('Draft')"
@@ -280,6 +280,10 @@
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
+                        <div class="pl-2 align-self-center" *ngIf="isInvalidState(node)">
+                          <mat-icon matTooltip="Invalid state">error</mat-icon>
+                        </div>
+
                         <span [class]="['pl-2', 'align-self-center']"
                               *ngIf="!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
@@ -331,6 +335,9 @@
                     <button mat-menu-item (click)="openHistory(contextMenuItem)">
                       <span class="context-menu-item">Show History</span>
                     </button>
+                    <button mat-menu-item (click)="openComments(contextMenuItem.type, contextMenuItem)">
+                      <span class="context-menu-item">Comments</span>
+                    </button>
                     <button mat-menu-item [matMenuTriggerFor]="editTagsSubMenu">Tags</button>
                   </mat-menu>
 
@@ -369,6 +376,24 @@
                             <input matInput [(ngModel)]="asBdtDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBdtDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <a [routerLink]="['/core_component/dt/' + asBdtDetail().sinceManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBdtDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBdtDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/dt/' + asBdtDetail().lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBdtDetail().lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -381,16 +406,11 @@
                             <input matInput [(ngModel)]="asBdtDetail().state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBdtDetail().owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('DT')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -662,6 +682,18 @@
                             <input matInput [(ngModel)]="asBdtScDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBdtScDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().sinceReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBdtScDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().lastChangedReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -674,16 +706,11 @@
                             <input matInput [(ngModel)]="asBdtScDetail().state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBdtScDetail().owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('DT_SC')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -775,6 +802,7 @@
                               <mat-option value="Text">Text</mat-option>
                               <mat-option value="Time">Time</mat-option>
                               <mat-option value="Value">Value</mat-option>
+                              <mat-option value="Video">Video</mat-option>
                             </mat-select>
                           </mat-form-field>
                         </div>

@@ -1,15 +1,10 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
-import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.page.core_component.DTCreateDialog;
-import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.openqa.selenium.*;
-
-import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.click;
 
 public class DTCreateDialogImpl implements DTCreateDialog {
     private static final By DEN_FIELD_LOCATOR =
@@ -69,10 +64,12 @@ public class DTCreateDialogImpl implements DTCreateDialog {
         });
 
     }
+
     @Override
     public WebElement getSearchButton() {
         return visibilityOfElementLocated(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
+
     @Override
     public WebElement getCreateButton() {
         return visibilityOfElementLocated(getDriver(), CREATE_BUTTON_LOCATOR);
@@ -103,8 +100,9 @@ public class DTCreateDialogImpl implements DTCreateDialog {
     public WebElement getDENField() {
         return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
     }
+
     private String getDENFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override

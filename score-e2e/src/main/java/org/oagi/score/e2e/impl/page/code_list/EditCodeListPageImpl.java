@@ -2,6 +2,8 @@ package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.obj.AgencyIDListObject;
+import org.oagi.score.e2e.obj.AgencyIDListValueObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -19,6 +21,18 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPage {
 
+    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+    public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By CODE_LIST_NAME_FIELD_LOCATOR =
@@ -39,12 +53,18 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By REMARK_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By BACK_TO_WIP_BUTTON_LOCATOR =
@@ -55,28 +75,22 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
+    private static final By AMEND_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
     private static final By REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
             By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
-    public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
-    public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
-    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
-    public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
             By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select");
-    public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
+    private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[text()= \"Agency ID List Value\"]//ancestor::div[1]/mat-select");
     private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Derive Code List based on this\")]//ancestor::button[1]");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
@@ -94,9 +108,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
 
     @Override
     protected String getPageUrl() {
-        if (this.codeList.getCodeListManifestId()!=null){
+        if (this.codeList.getCodeListManifestId() != null) {
             return getConfig().getBaseUrl().resolve("/code_list/" + this.codeList.getCodeListManifestId()).toString();
-        }else{
+        } else {
             return getConfig().getBaseUrl().resolve("/code_list/" + this.codeList.getCodeListId()).toString();
         }
     }
@@ -130,10 +144,17 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
     }
+
+    @Override
+    public WebElement getRemarkField() {
+        return visibilityOfElementLocated(getDriver(), REMARK_FIELD_LOCATOR);
+    }
+
     @Override
     public WebElement getDefinitionSourceField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_SOURCE_FIELD_LOCATOR);
     }
+
     @Override
     public void hitUpdateButton() {
         retry(() -> {
@@ -142,6 +163,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getUpdateButton() {
         return elementToBeClickable(getDriver(), UPDATE_BUTTON_LOCATOR);
@@ -180,6 +202,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Revised".equals(getSnackBarMessage(getDriver()));
     }
+
     @Override
     public WebElement getReviseButton() {
         return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
@@ -199,14 +222,17 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getDeprecatedSelectField() {
         return visibilityOfElementLocated(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getNamespaceSelectField() {
         return visibilityOfElementLocated(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getReleaseField() {
         return visibilityOfElementLocated(getDriver(), RELEASE_FIELD_LOCATOR);
     }
+
     @Override
     public WebElement getRevisionField() {
         return visibilityOfElementLocated(getDriver(), REVISION_FIELD_LOCATOR);
@@ -215,6 +241,11 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getAgencyIDListField() {
         return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public WebElement getAgencyIDListValueField() {
+        return visibilityOfElementLocated(getDriver(), AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
@@ -230,10 +261,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
         });
     }
+
     @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
+
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
@@ -248,6 +281,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         });
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getRemoveValueButton() {
         return elementToBeClickable(getDriver(), REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR);
@@ -257,6 +291,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getDeriveCodeListBasedOnThisButton() {
         return elementToBeClickable(getDriver(), DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR);
     }
+
     @Override
     public void hitDeriveCodeListBasedOnThisButton() {
         retry(() -> {
@@ -305,8 +340,10 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public EditCodeListValueDialog editCodeListValue(String value) {
         retry(() -> {
             WebElement tr = getTableRecordByValue(value);
-            click(tr);
+            WebElement td = getColumnByName(tr, "value");
+            click(td);
         });
+
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
         return editCodeListValueDialog;
@@ -365,6 +402,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getMoveToDraftButton() {
         return elementToBeClickable(getDriver(), MOVE_TO_DRAFT_BUTTON_LOCATOR);
@@ -391,10 +429,12 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getBackToWIPButton() {
         return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
     }
+
     @Override
     public WebElement getMoveToCandidateButton() {
         return elementToBeClickable(getDriver(), MOVE_TO_CANDIDATE_BUTTON_LOCATOR);
@@ -410,6 +450,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getDeleteButton() {
         return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
@@ -425,8 +466,86 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getRestoreButton() {
         return elementToBeClickable(getDriver(), RESTORE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void setAgencyIDList(AgencyIDListObject agencyIDList) {
+        retry(() -> {
+            click(getAgencyIDListField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDList.getName() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void setAgencyIDListValue(AgencyIDListValueObject agencyIDListValue) {
+        retry(() -> {
+            click(getAgencyIDListValueField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + agencyIDListValue.getValue() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
+    }
+
+    @Override
+    public void hitAmendButton() {
+        click(getAmendButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Amended".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getAmendButton() {
+        return elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void toggleDeprecated() {
+        click(getDeprecatedSelectField());
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        sendKeys(getRemarkField(), remark);
+    }
+
+    @Override
+    public void moveToQA() {
+        retry(() -> {
+            click(getMoveToQAButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getMoveToQAButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void moveToProduction() {
+        retry(() -> {
+            click(getMoveToProductionButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getMoveToProductionButton() {
+        return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
     }
 }

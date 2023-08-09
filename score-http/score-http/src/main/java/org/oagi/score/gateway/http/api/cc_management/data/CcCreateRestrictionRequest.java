@@ -12,13 +12,13 @@ public class CcCreateRestrictionRequest {
     private BigInteger releaseId;
     private BigInteger dtManifestId;
     private String restrictionType;
-    private List<primitiveXbtMap> primitiveXbtMapList;
+    private List<PrimitiveXbtMap> primitiveXbtMapList;
     private BigInteger codeListManifestId;
     private BigInteger agencyIdListManifestId;
     private List<BigInteger> xbtManifestIdList;
 
     @Data
-    public static class primitiveXbtMap {
+    public static class PrimitiveXbtMap {
         private String primitive;
         private List<Xbt> xbtList;
     }

@@ -63,27 +63,27 @@ public class Comment extends TableImpl<CommentRecord> {
     /**
      * The column <code>oagi.comment.reference</code>.
      */
-    public final TableField<CommentRecord, String> REFERENCE = createField(DSL.name("reference"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "");
+    public final TableField<CommentRecord, String> REFERENCE = createField(DSL.name("reference"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.comment.comment</code>.
      */
-    public final TableField<CommentRecord, String> COMMENT_ = createField(DSL.name("comment"), SQLDataType.CLOB, this, "");
+    public final TableField<CommentRecord, String> COMMENT_ = createField(DSL.name("comment"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.comment.is_hidden</code>.
      */
-    public final TableField<CommentRecord, Byte> IS_HIDDEN = createField(DSL.name("is_hidden"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<CommentRecord, Byte> IS_HIDDEN = createField(DSL.name("is_hidden"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.comment.is_deleted</code>.
      */
-    public final TableField<CommentRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<CommentRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.comment.prev_comment_id</code>.
      */
-    public final TableField<CommentRecord, ULong> PREV_COMMENT_ID = createField(DSL.name("prev_comment_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<CommentRecord, ULong> PREV_COMMENT_ID = createField(DSL.name("prev_comment_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.comment.created_by</code>.

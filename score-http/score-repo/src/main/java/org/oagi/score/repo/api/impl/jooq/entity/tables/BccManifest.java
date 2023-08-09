@@ -60,7 +60,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     /**
      * The column <code>oagi.bcc_manifest.release_id</code>.
      */
-    public final TableField<BccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccManifestRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.bcc_manifest.bcc_id</code>.
@@ -70,7 +70,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     /**
      * The column <code>oagi.bcc_manifest.seq_key_id</code>.
      */
-    public final TableField<BccManifestRecord, ULong> SEQ_KEY_ID = createField(DSL.name("seq_key_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccManifestRecord, ULong> SEQ_KEY_ID = createField(DSL.name("seq_key_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.bcc_manifest.from_acc_manifest_id</code>.
@@ -86,23 +86,23 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
      * The column <code>oagi.bcc_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<BccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<BccManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.bcc_manifest.replacement_bcc_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<BccManifestRecord, ULong> REPLACEMENT_BCC_MANIFEST_ID = createField(DSL.name("replacement_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<BccManifestRecord, ULong> REPLACEMENT_BCC_MANIFEST_ID = createField(DSL.name("replacement_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.bcc_manifest.prev_bcc_manifest_id</code>.
      */
-    public final TableField<BccManifestRecord, ULong> PREV_BCC_MANIFEST_ID = createField(DSL.name("prev_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccManifestRecord, ULong> PREV_BCC_MANIFEST_ID = createField(DSL.name("prev_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.bcc_manifest.next_bcc_manifest_id</code>.
      */
-    public final TableField<BccManifestRecord, ULong> NEXT_BCC_MANIFEST_ID = createField(DSL.name("next_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccManifestRecord, ULong> NEXT_BCC_MANIFEST_ID = createField(DSL.name("next_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private BccManifest(Name alias, Table<BccManifestRecord> aliased) {
         this(alias, aliased, null);

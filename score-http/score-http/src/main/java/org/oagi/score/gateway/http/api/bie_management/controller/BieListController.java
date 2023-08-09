@@ -1,10 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import org.oagi.score.data.BizCtx;
-import org.oagi.score.gateway.http.api.bie_management.data.BieEvent;
-import org.oagi.score.gateway.http.api.bie_management.data.BieList;
-import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
-import org.oagi.score.gateway.http.api.bie_management.data.DeleteBieListRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
@@ -43,13 +40,14 @@ public class BieListController {
                                             @RequestParam(name = "access", required = false) String access,
                                             @RequestParam(name = "states", required = false) String states,
                                             @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
+                                            @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
                                             @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
                                             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
                                             @RequestParam(name = "updateStart", required = false) String updateStart,
                                             @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
-                                            @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
+                                            @RequestParam(name = "releaseIds", required = false) String releaseIds,
                                             @RequestParam(name = "sortActive") String sortActive,
                                             @RequestParam(name = "sortDirection") String sortDirection,
                                             @RequestParam(name = "pageIndex") int pageIndex,
@@ -67,18 +65,17 @@ public class BieListController {
                         .map(e -> BieState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
         request.setExcludePropertyTerms(!StringUtils.hasLength(excludePropertyTerms) ? Collections.emptyList() :
                 Arrays.asList(excludePropertyTerms.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+        request.setTopLevelAsbiepIds(!StringUtils.hasLength(topLevelAsbiepIds) ? Collections.emptyList() :
+                Arrays.asList(topLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setExcludeTopLevelAsbiepIds(!StringUtils.hasLength(excludeTopLevelAsbiepIds) ? Collections.emptyList() :
                 Arrays.asList(excludeTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
                 Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
-
         request.setOwnedByDeveloper(ownedByDeveloper);
-
-        if (releaseId != null && releaseId.compareTo(BigInteger.ZERO) > 0) {
-            request.setReleaseId(releaseId);
-        }
+        request.setReleaseIds(!StringUtils.hasLength(releaseIds) ? Collections.emptyList() :
+                Arrays.asList(releaseIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
 
         if (StringUtils.hasLength(updateStart)) {
             request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));
@@ -136,7 +133,7 @@ public class BieListController {
                                                              @RequestParam(name = "updateStart", required = false) String updateStart,
                                                              @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                                              @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
-                                                             @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
+                                                             @RequestParam(name = "releaseIds", required = false) String releaseIds,
                                                              @RequestParam(name = "sortActive") String sortActive,
                                                              @RequestParam(name = "sortDirection") String sortDirection,
                                                              @RequestParam(name = "pageIndex") int pageIndex,
@@ -159,10 +156,8 @@ public class BieListController {
         request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
                 Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setOwnedByDeveloper(ownedByDeveloper);
-
-        if (releaseId != null && releaseId.longValue() > 0L) {
-            request.setReleaseId(releaseId);
-        }
+        request.setReleaseIds(!StringUtils.hasLength(releaseIds) ? Collections.emptyList() :
+                Arrays.asList(releaseIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
 
         if (StringUtils.hasLength(updateStart)) {
             request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));
@@ -260,6 +255,35 @@ public class BieListController {
         event.addProperty("target", targetLoginId);
         event.addProperty("timestamp", LocalDateTime.now());
         bieService.fireBieEvent(event);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/bie_list/state/multiple",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateCcState(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                        @RequestBody BieUpdateStateListRequest request) {
+        bieService.updateStateBieList(user, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/bie_list/transfer_ownership/multiple",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @RequestBody BieTransferOwnershipListRequest request) {
+        bieService.transferOwnershipList(user, request);
+
+        request.getTopLevelAsbiepIds().forEach(topLevelAsbiepId -> {
+            BieEvent event = new BieEvent();
+            event.setAction("UpdateOwnership");
+            event.setTopLevelAsbiepId(topLevelAsbiepId);
+            event.addProperty("actor", user.getName());
+            event.addProperty("target", request.getTargetLoginId());
+            event.addProperty("timestamp", LocalDateTime.now());
+            bieService.fireBieEvent(event);
+        });
 
         return ResponseEntity.noContent().build();
     }

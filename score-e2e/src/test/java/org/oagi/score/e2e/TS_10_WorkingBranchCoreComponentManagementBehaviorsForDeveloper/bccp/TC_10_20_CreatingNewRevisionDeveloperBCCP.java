@@ -9,17 +9,15 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.BCCPCreateDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -66,13 +64,13 @@ public class TC_10_20_CreatingNewRevisionDeveloperBCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         bccpViewEditPage.hitReviseButton();
 
         // reload the page
         viewEditCoreComponentPage.openPage();
         bccpViewEditPage =
-                viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("2", getText(bccpPanel.getRevisionField()));

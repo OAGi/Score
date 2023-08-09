@@ -382,5 +382,6 @@ public class ModuleAccManifestRecord extends UpdatableRecordImpl<ModuleAccManife
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

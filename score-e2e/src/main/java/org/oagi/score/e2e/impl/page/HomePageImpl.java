@@ -26,10 +26,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class HomePageImpl extends BasePageImpl implements HomePage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By USER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"User\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"User\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -165,6 +165,36 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         return new BIEsByUsersAndStatesPanelImpl(this);
     }
 
+    @Override
+    public MyRecentBIEsPanelImpl openMyRecentBIEsPanel() {
+        click(getBIEsTab());
+        return new MyRecentBIEsPanelImpl(this);
+    }
+
+    @Override
+    public TotalUEsByStatesPanel openTotalUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new TotalUEsByStatesPanelImpl(this);
+    }
+
+    @Override
+    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
+        click(getUserExtensionsTab());
+        return new MyUEsByStatesPanelImpl(this);
+    }
+
+    @Override
+    public UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel() {
+        click(getUserExtensionsTab());
+        return new UEsByUsersAndStatesPanelImpl(this);
+    }
+
+    @Override
+    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
+        click(getUserExtensionsTab());
+        return new MyUnusedUEsInBIEsPanelImpl(this);
+    }
+
     private class TotalBIEsByStatesPanelImpl implements TotalBIEsByStatesPanel {
 
         private BasePage parent;
@@ -266,12 +296,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public MyRecentBIEsPanelImpl openMyRecentBIEsPanel() {
-        click(getBIEsTab());
-        return new MyRecentBIEsPanelImpl(this);
-    }
-
     private class BIEsByUsersAndStatesPanelImpl implements BIEsByUsersAndStatesPanel {
 
         private BasePage parent;
@@ -359,12 +383,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public TotalUEsByStatesPanel openTotalUEsByStatesPanel() {
-        click(getUserExtensionsTab());
-        return new TotalUEsByStatesPanelImpl(this);
-    }
-
     private class MyUEsByStatesPanelImpl implements MyUEsByStatesPanel {
 
         private BasePage parent;
@@ -391,13 +409,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             });
         }
     }
-
-    @Override
-    public MyUEsByStatesPanel openMyUEsByStatesPanel() {
-        click(getUserExtensionsTab());
-        return new MyUEsByStatesPanelImpl(this);
-    }
-
 
     private class UEsByUsersAndStatesPanelImpl implements UEsByUsersAndStatesPanel {
 
@@ -458,12 +469,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
     }
 
-    @Override
-    public UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel() {
-        click(getUserExtensionsTab());
-        return new UEsByUsersAndStatesPanelImpl(this);
-    }
-
     private class MyUnusedUEsInBIEsPanelImpl implements MyUnusedUEsInBIEsPanel {
 
         private BasePage parent;
@@ -474,7 +479,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis'][contains(text(), \"" + assocDEN + "\")]//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
+            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis']//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
         }
 
         @Override
@@ -487,12 +492,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             assert viewEditCoreComponentPage.isOpened();
             return viewEditCoreComponentPage;
         }
-    }
-
-    @Override
-    public MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel() {
-        click(getUserExtensionsTab());
-        return new MyUnusedUEsInBIEsPanelImpl(this);
     }
 
 }

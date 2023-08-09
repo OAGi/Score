@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class CodeListRepository implements ScoreRepository<CodeList> {
@@ -37,9 +36,16 @@ public class CodeListRepository implements ScoreRepository<CodeList> {
     }
 
     @Override
-    public List<CodeList> findAllByReleaseId(BigInteger releaseId) {
+    public List<CodeList> findAllByReleaseIds(Collection<BigInteger> releaseIds) {
+        if (releaseIds == null || releaseIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getSelectOnConditionStep()
-                .where(Tables.CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .where(
+                        (releaseIds.size() == 1) ?
+                                Tables.CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseIds.iterator().next())) :
+                                Tables.CODE_LIST_MANIFEST.RELEASE_ID.in(releaseIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                )
                 .fetchInto(CodeList.class);
     }
 

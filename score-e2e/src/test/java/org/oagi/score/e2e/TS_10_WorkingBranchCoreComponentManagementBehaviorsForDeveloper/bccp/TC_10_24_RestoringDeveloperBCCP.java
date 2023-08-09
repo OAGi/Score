@@ -9,16 +9,13 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)

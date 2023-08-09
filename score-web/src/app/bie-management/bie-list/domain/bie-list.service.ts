@@ -6,6 +6,7 @@ import {AsbieBbieList, BieList, BieListRequest, SummaryBieInfo} from './bie-list
 import {PageResponse} from '../../../basis/basis';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieToAssign} from '../../../business-term-management/domain/business-term';
+import {CcList} from "../../../cc-management/cc-list/domain/cc-list";
 
 @Injectable()
 export class BieListService {
@@ -64,11 +65,14 @@ export class BieListService {
     if (request.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
     }
+    if (request.topLevelAsbiepIds.length > 0) {
+      params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
+    }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
     }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId.toString());
+    if (request.releases && request.releases.length > 0) {
+      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
@@ -106,6 +110,22 @@ export class BieListService {
       targetLoginId
     });
   }
+
+  updateStateOnList(actionType: string, toState: string, bieLists: BieList[]): Observable<any> {
+    return this.http.post<any>('/api/bie_list/state/multiple', {
+      action: actionType,
+      toState,
+      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
+    });
+  }
+
+  transferOwnershipOnList(bieLists: BieList[], targetLoginId: string): Observable<any> {
+    return this.http.post<any>('/api/bie_list/transfer_ownership/multiple', {
+      targetLoginId,
+      topLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId)
+    });
+  }
+
   getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieList>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
@@ -142,8 +162,8 @@ export class BieListService {
     if (request.access) {
       params = params.set('access', request.access);
     }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId);
+    if (request.releases) {
+      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());

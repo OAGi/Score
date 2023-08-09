@@ -13,7 +13,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {base64Encode, filter, initFilter, loadBranch, saveBranch} from '../../common/utility';
-import {SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
+import {CcList, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 
@@ -36,10 +36,6 @@ export interface UserStatesItem {
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
 
-  /* BIEs */
-  numberOfTotalBieByStates: StateProgressBarItem[];
-  numberOfMyBieByStates: StateProgressBarItem[];
-
   stateColorList = [{state: 'WIP', color: '#D32F2F'},
     {state: 'Draft', color: '#7B1FA2'},
     {state: 'QA', color: '#7B1FA2'},
@@ -48,6 +44,30 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     {state: 'ReleaseDraft', color: '#689F38'},
     {state: 'Published', color: '#388E3C'},
     {state: 'Deleted', color: '#616161'}];
+
+  /* CCs */
+  numberOfTotalCCByStates: StateProgressBarItem[];
+  numberOfMyCCByStates: StateProgressBarItem[];
+
+  numberOfCCsByUsersAndStates = new MatTableDataSource<UserStatesItem>();
+  @ViewChild('numberOfCCsByUsersAndStatesPaginator', {static: false})
+  numberOfCCsByUsersAndStatesPaginator: MatPaginator;
+  @ViewChild('numberOfCCsByUsersAndStatesSort', {static: false})
+  numberOfCCsByUsersAndStatesSort: MatSort;
+
+  numberOfCCsByUsers_usernameList: string[] = [];
+  numberOfCCsByUsers_usernameListFilterCtrl: FormControl = new FormControl();
+  numberOfCCsByUsers_usernameFilteredList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  numberOfCCsByUsers_usernameModel: string[] = [];
+
+  myRecentCCs = new MatTableDataSource<CcList>();
+  @ViewChild('myRecentCCsSort', {static: false})
+  myRecentCCsSort: MatSort;
+  /* End of CCs */
+
+  /* BIEs */
+  numberOfTotalBieByStates: StateProgressBarItem[];
+  numberOfMyBieByStates: StateProgressBarItem[];
 
   numberOfBiesByUsersAndStates = new MatTableDataSource<UserStatesItem>();
   @ViewChild('numberOfBiesByUsersAndStatesPaginator', {static: false})
@@ -103,20 +123,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     const userToken = this.authService.getUserToken();
     this.releaseService.getSimpleReleases().subscribe(resp => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
-      this.releaseListFilterCtrl.valueChanges
-        .subscribe(() => {
-          let search = this.releaseListFilterCtrl.value.releaseNum;
-          if (!search) {
-            this.releaseFilteredList.next(resp.slice());
-            return;
-          } else {
-            search = search.toLowerCase();
-          }
-          this.releaseFilteredList.next(
-            resp.filter(e => e.releaseNum.toLowerCase().indexOf(search) > -1)
-          );
-        });
-      this.releaseFilteredList.next(resp.slice());
+      initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
+
       const branch = loadBranch(userToken, 'CC');
       if (branch) {
         this.selectedRelease = resp[resp.findIndex(e => e.releaseId === branch)];
@@ -124,6 +132,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       if (this.selectedRelease === undefined) {
         this.selectedRelease = resp[resp.findIndex(e => e.releaseNum === 'All')];
       }
+      this.initSummaryCCs(userToken);
       this.initSummaryBIEs(userToken);
       this.initSummaryUserExtensions(userToken);
     });
@@ -145,6 +154,60 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.initSummaryUserExtensions(userToken);
     saveBranch(userToken, 'CC', this.selectedRelease.releaseId);
     saveBranch(userToken, 'BIE', this.selectedRelease.releaseId);
+  }
+
+  initSummaryCCs(userToken) {
+    this.ccService.getSummaryCcList().subscribe(summaryCcInfo => {
+      this.numberOfTotalCCByStates = [];
+      this.numberOfMyCCByStates = [];
+      for (const item of this.stateColorList) {
+        this.numberOfTotalCCByStates.push({
+          name: item.state,
+          value: summaryCcInfo.numberOfTotalCcByStates[item.state] || 0,
+          href: ['/core_component', [{key: 'states', value: item.state}]],
+          disabled: false,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+        this.numberOfMyCCByStates.push({
+          name: item.state,
+          value: summaryCcInfo.numberOfMyCcByStates[item.state] || 0,
+          href: ['/core_component', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}]],
+          disabled: false,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+      }
+
+      const numberOfCCsByUsersAndStatesData = [];
+      this.numberOfCCsByUsers_usernameList = [];
+      let data = {};
+      let total = 0;
+      for (const username of this.keys(summaryCcInfo.ccByUsersAndStates)) {
+        total = 0;
+        data = {username};
+        for (const item of this.stateColorList) {
+          data[item.state] = summaryCcInfo.ccByUsersAndStates[username][item.state] || 0;
+          total += data[item.state];
+        }
+        data['total'] = total;
+        numberOfCCsByUsersAndStatesData.push(data);
+        this.numberOfCCsByUsers_usernameList.push(username);
+      }
+      this.numberOfCCsByUsersAndStates.data = numberOfCCsByUsersAndStatesData;
+
+      initFilter(
+        this.numberOfCCsByUsers_usernameListFilterCtrl,
+        this.numberOfCCsByUsers_usernameFilteredList,
+        this.numberOfCCsByUsers_usernameList
+      );
+
+      this.myRecentCCs.data = summaryCcInfo.myRecentCCs;
+    });
   }
 
   initSummaryBIEs(userToken) {

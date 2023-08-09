@@ -78,13 +78,13 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
      * The column <code>oagi.bbie_bizterm.primary_indicator</code>. The
      * indicator shows if the business term is primary for the assigned BBIE.
      */
-    public final TableField<BbieBiztermRecord, String> PRIMARY_INDICATOR = createField(DSL.name("primary_indicator"), SQLDataType.CHAR(1), this, "The indicator shows if the business term is primary for the assigned BBIE.");
+    public final TableField<BbieBiztermRecord, Byte> PRIMARY_INDICATOR = createField(DSL.name("primary_indicator"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The indicator shows if the business term is primary for the assigned BBIE.");
 
     /**
      * The column <code>oagi.bbie_bizterm.type_code</code>. The type code of the
      * assignment.
      */
-    public final TableField<BbieBiztermRecord, String> TYPE_CODE = createField(DSL.name("type_code"), SQLDataType.CHAR(30), this, "The type code of the assignment.");
+    public final TableField<BbieBiztermRecord, String> TYPE_CODE = createField(DSL.name("type_code"), SQLDataType.CHAR(30).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CHAR)), this, "The type code of the assignment.");
 
     /**
      * The column <code>oagi.bbie_bizterm.created_by</code>. A foreign key
@@ -237,14 +237,14 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -252,7 +252,7 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

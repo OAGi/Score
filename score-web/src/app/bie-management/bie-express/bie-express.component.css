@@ -64,6 +64,16 @@ tr.element-row:not(.expanded-row):active {
   background: #efefef;
 }
 
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.bie-source {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
 .mat-column-release {
   width: 70px;
 }
@@ -86,6 +96,10 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-column-state {
   width: 100px;
+}
+
+.mat-column-branch {
+  width: 80px;
 }
 
 .mat-column-owner {

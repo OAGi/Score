@@ -1,5 +1,6 @@
 package org.oagi.score.e2e;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import static java.time.Duration.ofMillis;
@@ -49,6 +50,11 @@ public class AssertionHelper {
 
     public static void assertDisabled(WebElement element) {
         waitFor(ofMillis(500L));
+        if ("mat-checkbox".equals(element.getTagName())) {
+            assertEquals("true", element.getAttribute("ng-reflect-disabled"));
+            return;
+        }
+
         try {
             assertEquals("true", element.getAttribute("ng-reflect-disabled"));
         } catch (Error | Exception rerun) {

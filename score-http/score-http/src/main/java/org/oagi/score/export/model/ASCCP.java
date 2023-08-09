@@ -53,7 +53,7 @@ public abstract class ASCCP implements Component {
     }
 
     public String getGuid() {
-        return GUID_PREFIX + asccp.getGuid();
+        return asccp.getGuid();
     }
 
     public boolean isGroup() {
@@ -78,6 +78,10 @@ public abstract class ASCCP implements Component {
 
     public ULong getNamespaceId() {
         return asccp.getNamespaceId();
+    }
+
+    public ULong getTypeNamespaceId() {
+        return roleOfAcc.getNamespaceId();
     }
 
 }

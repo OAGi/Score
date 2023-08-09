@@ -78,7 +78,7 @@ public class Acc extends TableImpl<AccRecord> {
      * The column <code>oagi.acc.type</code>. The Type of the ACC. List:
      * Default, Extension, AllExtension.
      */
-    public final TableField<AccRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.inline("Default", SQLDataType.VARCHAR)), this, "The Type of the ACC. List: Default, Extension, AllExtension.");
+    public final TableField<AccRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("'Default'"), SQLDataType.VARCHAR)), this, "The Type of the ACC. List: Default, Extension, AllExtension.");
 
     /**
      * The column <code>oagi.acc.object_class_term</code>. Object class name of
@@ -100,13 +100,13 @@ public class Acc extends TableImpl<AccRecord> {
      * description of the ACC. Since ACC is business context independent, this
      * is a business context independent description of the ACC concept.
      */
-    public final TableField<AccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "This is a documentation or description of the ACC. Since ACC is business context independent, this is a business context independent description of the ACC concept.");
+    public final TableField<AccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This is a documentation or description of the ACC. Since ACC is business context independent, this is a business context independent description of the ACC concept.");
 
     /**
      * The column <code>oagi.acc.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<AccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<AccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.acc.based_acc_id</code>. BASED_ACC_ID is a foreign
@@ -114,13 +114,13 @@ public class Acc extends TableImpl<AccRecord> {
      * this ACC. In general CCS sense, a qualification can be a content
      * extension or restriction, but the current scope supports only extension.
      */
-    public final TableField<AccRecord, ULong> BASED_ACC_ID = createField(DSL.name("based_acc_id"), SQLDataType.BIGINTUNSIGNED, this, "BASED_ACC_ID is a foreign key to the ACC table itself. It represents the ACC that is qualified by this ACC. In general CCS sense, a qualification can be a content extension or restriction, but the current scope supports only extension.");
+    public final TableField<AccRecord, ULong> BASED_ACC_ID = createField(DSL.name("based_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "BASED_ACC_ID is a foreign key to the ACC table itself. It represents the ACC that is qualified by this ACC. In general CCS sense, a qualification can be a content extension or restriction, but the current scope supports only extension.");
 
     /**
      * The column <code>oagi.acc.object_class_qualifier</code>. This column
      * stores the qualifier of an ACC, particularly when it has a based ACC. 
      */
-    public final TableField<AccRecord, String> OBJECT_CLASS_QUALIFIER = createField(DSL.name("object_class_qualifier"), SQLDataType.VARCHAR(100), this, "This column stores the qualifier of an ACC, particularly when it has a based ACC. ");
+    public final TableField<AccRecord, String> OBJECT_CLASS_QUALIFIER = createField(DSL.name("object_class_qualifier"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column stores the qualifier of an ACC, particularly when it has a based ACC. ");
 
     /**
      * The column <code>oagi.acc.oagis_component_type</code>. The value can be 0
@@ -134,7 +134,7 @@ public class Acc extends TableImpl<AccRecord> {
      * defined in the database, for example, the Any Structured Content ACC that
      * corresponds to the xsd:any.  Other cases are assigned SEMANTICS. 
      */
-    public final TableField<AccRecord, Integer> OAGIS_COMPONENT_TYPE = createField(DSL.name("oagis_component_type"), SQLDataType.INTEGER, this, "The value can be 0 = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 = USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the OBJECT_CLASS_TERM contains \"Base\" at the end. EXTENSION is assigned with the OBJECT_CLASS_TERM contains \"Extension\" at the end. SEMANTIC_GROUP is assigned when an ACC is imported from an XSD Group. USER_EXTENSION_GROUP is a wrapper ACC (a virtual ACC) for segregating user's extension content. EMBEDDED is used for an ACC whose content is not explicitly defined in the database, for example, the Any Structured Content ACC that corresponds to the xsd:any.  Other cases are assigned SEMANTICS. ");
+    public final TableField<AccRecord, Integer> OAGIS_COMPONENT_TYPE = createField(DSL.name("oagis_component_type"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "The value can be 0 = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 = USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the OBJECT_CLASS_TERM contains \"Base\" at the end. EXTENSION is assigned with the OBJECT_CLASS_TERM contains \"Extension\" at the end. SEMANTIC_GROUP is assigned when an ACC is imported from an XSD Group. USER_EXTENSION_GROUP is a wrapper ACC (a virtual ACC) for segregating user's extension content. EMBEDDED is used for an ACC whose content is not explicitly defined in the database, for example, the Any Structured Content ACC that corresponds to the xsd:any.  Other cases are assigned SEMANTICS. ");
 
     /**
      * The column <code>oagi.acc.namespace_id</code>. Foreign key to the
@@ -143,7 +143,7 @@ public class Acc extends TableImpl<AccRecord> {
      * component because there is also a namespace assigned at the release
      * level.
      */
-    public final TableField<AccRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
+    public final TableField<AccRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
      * The column <code>oagi.acc.created_by</code>. Foreign key to the APP_USER
@@ -193,20 +193,20 @@ public class Acc extends TableImpl<AccRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<AccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ACC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<AccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ACC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.acc.is_deprecated</code>. Indicates whether the CC
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be allowed).
      */
-    public final TableField<AccRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
+    public final TableField<AccRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
      * The column <code>oagi.acc.replacement_acc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<AccRecord, ULong> REPLACEMENT_ACC_ID = createField(DSL.name("replacement_acc_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<AccRecord, ULong> REPLACEMENT_ACC_ID = createField(DSL.name("replacement_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.acc.is_abstract</code>. This is the XML Schema
@@ -215,19 +215,19 @@ public class Acc extends TableImpl<AccRecord> {
      * this flag may not apply to some ACCs such as those that are xsd:group. It
      * is still have a false value.
      */
-    public final TableField<AccRecord, Byte> IS_ABSTRACT = createField(DSL.name("is_abstract"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This is the XML Schema abstract flag. Default is false. If it is true, the abstract flag will be set to true when generating a corresponding xsd:complexType. So although this flag may not apply to some ACCs such as those that are xsd:group. It is still have a false value.");
+    public final TableField<AccRecord, Byte> IS_ABSTRACT = createField(DSL.name("is_abstract"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This is the XML Schema abstract flag. Default is false. If it is true, the abstract flag will be set to true when generating a corresponding xsd:complexType. So although this flag may not apply to some ACCs such as those that are xsd:group. It is still have a false value.");
 
     /**
      * The column <code>oagi.acc.prev_acc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<AccRecord, ULong> PREV_ACC_ID = createField(DSL.name("prev_acc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<AccRecord, ULong> PREV_ACC_ID = createField(DSL.name("prev_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.acc.next_acc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<AccRecord, ULong> NEXT_ACC_ID = createField(DSL.name("next_acc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<AccRecord, ULong> NEXT_ACC_ID = createField(DSL.name("next_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Acc(Name alias, Table<AccRecord> aliased) {
         this(alias, aliased, null);

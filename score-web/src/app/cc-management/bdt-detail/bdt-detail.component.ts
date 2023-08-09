@@ -1,5 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatTableDataSource} from '@angular/material/table';
@@ -293,6 +293,19 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
+  isInvalidState(node: CcFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+
+    if (!(node instanceof DtFlatNode) || !node.detail) {
+      return false;
+    }
+
+    const detail = node.detail as CcDtNodeDetail;
+    return detail.basedBdtState === 'Deleted';
+  }
+
   copyLink(node: CcFlatNode, $event?) {
     if ($event) {
       $event.preventDefault();
@@ -557,8 +570,26 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       });
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateDetails();
+    }
+  }
+
+  get updateDisabled(): boolean {
+    return this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChanged || this.isUpdating;
+  }
+
   updateDetails() {
-    if (!this.isChanged || this.isUpdating) {
+    if (this.updateDisabled) {
       return;
     }
 
@@ -936,6 +967,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.contextMenuItem = node;
         trigger.openMenu();
       });
+    } else if ($event.key === 'c' || $event.key === 'C') {
+      this.menuTriggerList.toArray().filter(e => !!e.menuData)
+        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
+        this.contextMenuItem = node;
+        this.openComments(node.type, node);
+      });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {
@@ -1186,6 +1223,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.restrictionDataSource.data = detail.valueDomains;
       return;
     }
+
+    // Test Assertion #38.6.1.b
+    // When the Representation Term is changed the Value Constraint should be reset.
+    detail.fixedOrDefault = 'none';
+    detail.fixedValue = undefined;
+    detail.defaultValue = undefined;
 
     this.service.getPrimitiveListByRepresentationTerm(detail.representationTerm, detail.manifestId)
       .subscribe(resp => {

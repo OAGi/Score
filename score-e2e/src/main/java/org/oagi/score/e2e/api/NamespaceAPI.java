@@ -3,6 +3,9 @@ package org.oagi.score.e2e.api;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+
 /**
  * APIs for the namespace management.
  */
@@ -26,4 +29,9 @@ public interface NamespaceAPI {
 
     NamespaceObject createRandomDeveloperNamespace(AppUserObject creator);
 
+    ArrayList<NamespaceObject> getStandardNamespacesURIs();
+
+    NamespaceObject getNamespaceById(BigInteger namespaceId);
+
+    ArrayList<NamespaceObject> getNonStandardNamespacesURIs();
 }

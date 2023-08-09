@@ -1,18 +1,13 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.bie.TransferBIEOwnershipDialogImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
-import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -27,24 +22,24 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
 
+    public static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+    public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button/span");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(),\"ACC, ASCCP, BCCP, CDT, BDT\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//span[contains(text(), \"ACC, ASCCP, BCCP, CDT, BDT\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+    private static final By OWNER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(),\"Owner\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Component Type\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
-
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
-
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
@@ -82,17 +77,54 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
+            escape(getDriver());
         });
     }
 
     @Override
-    public WebElement getTypeSelectField(){
+    public WebElement getTypeSelectField() {
         return visibilityOfElementLocated(getDriver(), CC_TYPE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
-    public WebElement getStateSelectField(){
+    public void setTypeSelect(String type) {
+
+        click(getTypeSelectField());
+        waitFor(ofMillis(2000L));
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[text() = \"" + type + "\"]"));
+        click(optionField);
+    }
+
+    @Override
+    public WebElement getStateSelectField() {
         return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setState(String state) {
+        click(getStateSelectField());
+        waitFor(ofMillis(2000L));
+        WebElement optionField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//span[.=\""+state+"\"]//ancestor::mat-option[1]"));
+        click(optionField);
+    }
+
+    @Override
+    public WebElement getOwnerSelectField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        retry(() -> {
+            click(getOwnerSelectField());
+            waitFor(ofMillis(2000L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[.=\"" + owner + "\"]//ancestor::mat-option[1]"));
+            click(optionField);
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -158,7 +190,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
-    public WebElement getComponentTypeSelectField(){
+    public WebElement getComponentTypeSelectField() {
         return elementToBeClickable(getDriver(), COMPONENT_TYPE_SELECT_FIELD_LOCATOR);
     }
 
@@ -171,6 +203,28 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
+    }
+
+    @Override
+    public ACCViewEditPage openACCViewEditPage(WebElement tr) {
+        return retry(() -> {
+            WebElement td;
+            try {
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an ACC using the table record", e);
+            }
+            WebElement link = td.findElement(By.tagName("a"));
+
+            String href = link.getAttribute("href");
+            String accId = href.substring(href.indexOf("/acc/") + "/acc/".length());
+            ACCObject accObject = getAPIFactory().getCoreComponentAPI().getACCByManifestId(new BigInteger(accId));
+            click(link);
+
+            ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, accObject);
+            assert accViewEditPage.isOpened();
+            return accViewEditPage;
+        });
     }
 
     @Override
@@ -191,6 +245,30 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
         assert asccpViewEditPage.isOpened();
         return asccpViewEditPage;
+    }
+
+    @Override
+    public ASCCPViewEditPage openASCCPViewEditPage(WebElement tr) {
+        return retry(() -> {
+            WebElement td;
+            try {
+                td = getColumnByName(tr, "den");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate an ASCCP using the table record", e);
+            }
+            WebElement link = td.findElement(By.tagName("a"));
+
+            String href = link.getAttribute("href");
+            String asccpId = href.substring(href.indexOf("/asccp/") + "/asccp/".length());
+            ASCCPObject asccpObject = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(new BigInteger(asccpId));
+
+            click(link);
+
+            ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccpObject);
+
+            assert asccpViewEditPage.isOpened();
+            return asccpViewEditPage;
+        });
     }
 
     @Override
@@ -248,7 +326,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
-        click(td.findElement(By.tagName("button")));
+        click(td.findElement(By.className("mat-icon")));
 
         TransferCCOwnershipDialog transferCCOwnershipDialog =
                 new TransferCCOwnershipDialogImpl(this);
@@ -365,6 +443,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void hitSearchButton() {
+        waitFor(ofMillis(3000L));
         retry(() -> {
             click(getSearchButton());
             waitFor(ofMillis(1000L));
@@ -379,9 +458,9 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
-    public WebElement getTableRecordByValue(String value){
+    public WebElement getTableRecordByValue(String value) {
         defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\""+value+"\")]//ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
@@ -390,18 +469,18 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     private String getDENFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override
     public int getNumberOfOnlyCCsPerStateAreListed(String state) {
-        return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][contains(@class, '"+state+"')]")).size();
+        return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][contains(@class, '" + state + "')]")).size();
     }
 
     @Override
-    public WebElement getTableRecordByCCNameAndOwner(String name, String owner){
-        defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\""+name+"\")]//ancestor::tr//td[8]//*[contains(text(),\""+owner+"\")]"));
+    public WebElement getTableRecordByCCNameAndOwner(String name, String owner) {
+        waitFor(ofMillis(1000L));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(), \"" + name + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + owner + "\")]"));
     }
 
     @Override
@@ -468,5 +547,100 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
         BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
         assert bccpViewEditPage.isOpened();
         return bccpViewEditPage;
+    }
+
+    @Override
+    public WebElement getMoveToQAButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to QA\")]"));
+    }
+
+    @Override
+    public void hitMoveToQAButton() {
+        click(getMoveToQAButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getMoveToProductionButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to Production\")]"));
+    }
+
+    @Override
+    public void hitMoveToProductionButton() {
+        click(getMoveToProductionButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getBackToWIPButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Back to WIP\")]"));
+    }
+
+    @Override
+    public void hitBackToWIPButton() {
+        click(getBackToWIPButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public void hitMoveToDraftButton() {
+        click(getMoveToDraftButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getMoveToDraftButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to Draft\")]"));
+    }
+
+    @Override
+    public void hitMoveToCandidateButton() {
+        click(getMoveToCandidateButton());
+        click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getMoveToCandidateButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Move to Candidate\")]"));
+    }
+
+    @Override
+    public TransferCCOwnershipDialog hitTransferOwnershipButton() {
+        click(getTransferOwnershipButton());
+        TransferCCOwnershipDialog transferCCOwnershipDialog =
+                new TransferCCOwnershipDialogImpl(this);
+        assert transferCCOwnershipDialog.isOpened();
+        return transferCCOwnershipDialog;
+    }
+
+    @Override
+    public WebElement getTransferOwnershipButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Transfer Ownership\")]"));
+    }
+
+    @Override
+    public void hitDeleteButton() {
+        retry(() -> {
+            click(getDeleteButton());
+            waitFor(ofMillis(1000L));
+            click(elementToBeClickable(getDriver(), CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR));
+        });
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(500L));
+    }
+
+    @Override
+    public WebElement getDeleteButton() {
+        return elementToBeClickable(getDriver(), By.xpath("//button[contains(@mattooltip, \"Delete\")]"));
     }
 }

@@ -172,6 +172,14 @@ public interface ASCCPViewEditPage extends Page {
     void hitUpdateButton();
 
     /**
+     * Open the ACC page through 'Open in new tab' context menu for the given ACC node.
+     *
+     * @param accNode ACC node
+     * @return the ACC page object
+     */
+    ACCViewEditPage openACCInNewTab(WebElement accNode);
+
+    /**
      * Return the UI element of the 'Deprecated' checkbox.
      *
      * @return the UI element of the 'Deprecated' checkbox
@@ -192,11 +200,12 @@ public interface ASCCPViewEditPage extends Page {
     WebElement getNodeByPath(String path);
 
     /**
-     * Open the association selection dialog by clicking 'Change ACC' context menu.
+     * Open the ASCCPChangeACC dialog by clicking 'Change ACC' context menu.
      *
-     * @param path node path
-     * @return the association selection dialog object
+     * @return the ASCCPChangeACCDialog  object
      */
+    ASCCPChangeACCDialog openChangeACCDialog(String path);
+
     SelectAssociationDialog changeACC(String path);
 
     /**
@@ -247,8 +256,6 @@ public interface ASCCPViewEditPage extends Page {
      */
     ASCCPanelContainer getASCCPanelContainer(WebElement asccNode);
 
-    WebElement getAddCommentButton();
-
     /**
      * Return the BCC panel container.
      *
@@ -257,7 +264,14 @@ public interface ASCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
-    AddCommentDialog hitAddCommentButton();
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
+
+    AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionField();
 
@@ -540,7 +554,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -558,6 +571,11 @@ public interface ASCCPViewEditPage extends Page {
          * @return the UI element of the 'Reusable' checkbox
          */
         WebElement getReusableCheckbox();
+
+        /**
+         * Toggle the 'Reusable' checkbox.
+         */
+        void toggleReusable();
 
         /**
          * Return the UI element of the 'Nillable' checkbox.
@@ -600,7 +618,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
-         *
          * @param definitionSource
          */
         void setDefinitionSource(String definitionSource);
@@ -613,7 +630,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionField();
 
         /**
-         *
          * @param definition
          */
         void setDefinition(String definition);

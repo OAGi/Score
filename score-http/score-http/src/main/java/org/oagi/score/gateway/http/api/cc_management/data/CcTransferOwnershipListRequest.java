@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Data
-public class CcTransferOwnerShipListRequest {
+public class CcTransferOwnershipListRequest {
     private String targetLoginId;
     private List<BigInteger> accManifestIds;
     private List<BigInteger> bccpManifestIds;

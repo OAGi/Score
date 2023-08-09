@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
@@ -197,8 +196,6 @@ public class BieGenerateService {
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(result.get(ASBIEP.BASED_ASCCP_MANIFEST_ID)))
                 .fetchOneInto(String.class);
 
-        String asbiepGuid = getGuidWithPrefix(result.get(ASBIEP.GUID));
-
         /*
          * Issue 1267
          */
@@ -247,6 +244,9 @@ public class BieGenerateService {
                 break;
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);
+                break;
+            case "AVRO":
+                generateExpression = applicationContext.getBean(BieAvroGenerateExpression.class);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown expression option: " + expressionOption);

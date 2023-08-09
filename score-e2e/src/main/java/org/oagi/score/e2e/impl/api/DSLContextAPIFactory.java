@@ -6,7 +6,6 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DefaultDSLContext;
 import org.oagi.score.e2e.Configuration;
 import org.oagi.score.e2e.api.*;
-import org.oagi.score.e2e.impl.api.jooq.entity.DSLContextAssignedBusinessTermAPIImpl;
 
 public class DSLContextAPIFactory implements APIFactory {
 
@@ -82,12 +81,12 @@ public class DSLContextAPIFactory implements APIFactory {
 
     @Override
     public AgencyIDListAPI getAgencyIDListAPI() {
-        return new DSLContextAgencyIDListAPIImpl(dslContext);
+        return new DSLContextAgencyIDListAPIImpl(dslContext, this);
     }
 
     @Override
     public AgencyIDListValueAPI getAgencyIDListValueAPI() {
-        return new DSLContextAgencyIDListValueAPIImpl(dslContext);
+        return new DSLContextAgencyIDListValueAPIImpl(dslContext, this);
     }
 
     @Override
@@ -113,6 +112,21 @@ public class DSLContextAPIFactory implements APIFactory {
     @Override
     public BusinessInformationEntityAPI getBusinessInformationEntityAPI() {
         return new DSLContextBusinessInformationEntityAPIImpl(dslContext, this);
+    }
+
+    @Override
+    public ModuleSetAPI getModuleSetAPI() {
+        return new DSLContextModuleSetAPIImpl(dslContext, this);
+    }
+
+    @Override
+    public ModuleAPI getModuleAPI() {
+        return new DSLContextModuleAPIImpl(dslContext, this);
+    }
+
+    @Override
+    public ModuleSetReleaseAPI getModuleSetReleaseAPI() {
+        return new DSLContextModuleSetReleaseAPIImpl(dslContext, this);
     }
 
     @Override

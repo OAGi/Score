@@ -22,7 +22,7 @@
         </mat-form-field>
         <div class="row action-group m-0">
           <div class="actions-wrap">
-            <button (click)="updateModuleSet()" [disabled]="!roles.includes('developer') || !canUpdate"
+            <button (click)="updateModuleSet()" [disabled]="updateDisabled"
                     mat-raised-button class="float-right" color="primary">Update</button>
           </div>
         </div>

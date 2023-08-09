@@ -14,6 +14,10 @@
   padding-top: 13px;
 }
 
+.additional-selection {
+  opacity: 0.75;
+}
+
 tr.detail-row {
   height: 0;
 }
@@ -36,6 +40,11 @@ tr.element-row:not(.expanded-row):active {
   color: #767676 !important;
 }
 
+.bie-source {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
 .mat-card-content p {
   font-family: 'Roboto', 'sans-serif';
   margin-bottom: 0.5rem;
@@ -43,6 +52,13 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-card-content {
   margin-bottom: 0;
+}
+
+mat-toolbar > .mat-icon-button {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  outline: none;
 }
 
 .mat-icon-button {
@@ -78,6 +94,10 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-column-state {
   width: 100px;
+}
+
+.mat-column-branch {
+  width: 80px;
 }
 
 .mat-column-owner {

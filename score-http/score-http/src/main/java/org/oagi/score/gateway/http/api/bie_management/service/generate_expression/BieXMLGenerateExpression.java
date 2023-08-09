@@ -25,7 +25,6 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.oagi.score.gateway.http.helper.ScoreGuid.getGuidWithPrefix;
 import static org.oagi.score.gateway.http.helper.Utility.toZuluTimeString;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -35,6 +34,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
     private static final String OAGI_NS = "http://www.openapplications.org/oagis/10";
     private static final org.jdom2.Namespace XSD_NAMESPACE = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+    private static final String ID_ATTRIBUTE_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Document document;
@@ -136,7 +136,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private String key(BIE bie) {
-        return bie.getClass().getSimpleName() + getGuidWithPrefix(bie.getGuid());
+        return bie.getClass().getSimpleName() + ID_ATTRIBUTE_PREFIX + bie.getGuid();
     }
 
     private String key(Xbt xbt) {
@@ -144,11 +144,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private String key(CodeList codeList) {
-        return "CodeList" + getGuidWithPrefix(codeList.getGuid());
+        return "CodeList" + ID_ATTRIBUTE_PREFIX + codeList.getGuid();
     }
 
     private String key(AgencyIdList agencyIdList) {
-        return "AgencyIdList" + getGuidWithPrefix(agencyIdList.getGuid());
+        return "AgencyIdList" + ID_ATTRIBUTE_PREFIX + agencyIdList.getGuid();
     }
 
     private boolean isProcessed(BIE bie) {
@@ -240,7 +240,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
             Element ccts_BusinessContextGUID = new Element("ccts_GUID", OAGI_NS);
             ccts_BusinessContext.addContent(ccts_BusinessContextGUID);
-            ccts_BusinessContextGUID.setText(getGuidWithPrefix(bizCtx.getGuid()));
+            ccts_BusinessContextGUID.setText(bizCtx.getGuid());
 
             Element ccts_BusinessContextName = new Element("ccts_Name", OAGI_NS);
             ccts_BusinessContext.addContent(ccts_BusinessContextName);
@@ -253,7 +253,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 Element ccts_ContextSchemeValueGUID = new Element("ccts_GUID", OAGI_NS);
                 ccts_ContextValue.addContent(ccts_ContextSchemeValueGUID);
-                ccts_ContextSchemeValueGUID.setText(getGuidWithPrefix(contextSchemeValue.getGuid()));
+                ccts_ContextSchemeValueGUID.setText(contextSchemeValue.getGuid());
 
                 Element ccts_ContextSchemeValue = new Element("ccts_Value", OAGI_NS);
                 ccts_ContextValue.addContent(ccts_ContextSchemeValue);
@@ -270,7 +270,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 Element ccts_ClassificationSchemeGUID = new Element("ccts_GUID", OAGI_NS);
                 ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeGUID);
-                ccts_ClassificationSchemeGUID.setText(getGuidWithPrefix(contextScheme.getGuid()));
+                ccts_ClassificationSchemeGUID.setText(contextScheme.getGuid());
 
                 {
                     ContextCategory contextCategory = generationContext.findContextCategory(contextScheme.getCtxCategoryId());
@@ -280,7 +280,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     Element ccts_ContextCategoryGUID = new Element("ccts_GUID", OAGI_NS);
                     ccts_ContextCategory.addContent(ccts_ContextCategoryGUID);
-                    ccts_ContextCategoryGUID.setText(getGuidWithPrefix(contextCategory.getGuid()));
+                    ccts_ContextCategoryGUID.setText(contextCategory.getGuid());
 
                     Element ccts_ContextCategoryName = new Element("ccts_Name", OAGI_NS);
                     ccts_ContextCategory.addContent(ccts_ContextCategoryName);
@@ -516,7 +516,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         if (basedCcMetaData) {
             CcType ccType = bieDocumentation.ccType();
 
-            String guid = getGuidWithPrefix(bieDocumentation.getGuid());
+            String guid = bieDocumentation.getGuid();
             Element ccts_Based_GUID = new Element("ccts_Based" + ccType + "_GUID", OAGI_NS);
             documentation.addContent(ccts_Based_GUID);
             ccts_Based_GUID.setText(guid);
@@ -554,7 +554,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         rootEleNode.setAttribute("name", asccp.getPropertyTerm().replaceAll(" ", ""));
         if (option.isBieGuid()) {
-            rootEleNode.setAttribute("id", getGuidWithPrefix(asbiep.getGuid()));
+            rootEleNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + asbiep.getGuid());
         }
 
         setDefinition(rootEleNode, asbiep.getDefinition());
@@ -570,7 +570,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private Element generateABIE(ABIE abie, Element parentNode) {
         Element complexType = newElement("complexType");
         if (option.isBieGuid()) {
-            complexType.setAttribute("id", getGuidWithPrefix(abie.getGuid()));
+            complexType.setAttribute("id", ID_ATTRIBUTE_PREFIX + abie.getGuid());
         }
         parentNode.addContent(complexType);
 
@@ -637,7 +637,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             element.setAttribute("nillable", String.valueOf(asbie.isNillable()));
 
         if (option.isBieGuid()) {
-            element.setAttribute("id", getGuidWithPrefix(asbie.getGuid()));
+            element.setAttribute("id", ID_ATTRIBUTE_PREFIX + asbie.getGuid());
         }
 
         parent.addContent(element);
@@ -653,7 +653,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element extNode = newElement("extension");
 
         if (option.isBieGuid()) {
-            complexType.setAttribute("id", ScoreGuid.randomGuid());
+            complexType.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
         }
 
         setDefinition(complexType, bbie.getDefinition());
@@ -682,7 +682,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -713,7 +713,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findXbt(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -730,7 +730,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element extNode = newElement("extension");
 
         if (option.isBieGuid()) {
-            complexType.setAttribute("id", ScoreGuid.randomGuid());
+            complexType.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
         }
 
         DT bdt = generationContext.queryAssocBDT(bbie);
@@ -752,7 +752,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     public Element generateASBIE(ASBIE asbie, Element parent) {
         Element element = newElement("element");
         if (option.isBieGuid()) {
-            element.setAttribute("id", getGuidWithPrefix(asbie.getGuid()));
+            element.setAttribute("id", ID_ATTRIBUTE_PREFIX + asbie.getGuid());
         }
         element.setAttribute("minOccurs", String.valueOf(asbie.getCardinalityMin()));
         if (asbie.getCardinalityMax() == -1)
@@ -788,7 +788,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         BCC bcc = generationContext.queryBasedBCC(bbie);
         eNode.setAttribute("name", Utility.second(bcc.getDen(), true));
         if (option.isBieGuid()) {
-            eNode.setAttribute("id", getGuidWithPrefix(bbie.getGuid()));
+            eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + bbie.getGuid());
         }
 
         if (bbie.isNillable()) {
@@ -818,7 +818,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         BCC bcc = generationContext.queryBasedBCC(bbie);
         eNode.setAttribute("name", Utility.second(bcc.getDen(), false));
         if (option.isBieGuid()) {
-            eNode.setAttribute("id", getGuidWithPrefix(bbie.getGuid()));
+            eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + bbie.getGuid());
         }
 
         // Attribute 'nillable' is not allowed in element <xsd:attribute>
@@ -860,7 +860,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
         Xbt xbt = Helper.getXbt(generationContext, bdtPriRestri);
         String typeName = null;
-        if (bbie.getMinLength() != null || bbie.getMaxLength() != null || StringUtils.hasLength(bbie.getPattern())) {
+        if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
             typeName = addXbtSimpleType(xbt, bbie);
         } else {
             addXbtSimpleType(xbt);
@@ -885,26 +885,30 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element xbtNode = newElement("simpleType");
         xbtNode.setAttribute("name", name);
         if (option.isBieGuid()) {
-            xbtNode.setAttribute("id", ScoreGuid.randomGuid());
+            xbtNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
         }
 
         Element restrictionNode = newElement("restriction");
-        restrictionNode.setAttribute("base", xbt.getBuiltinType());
+        String builtinType = xbt.getBuiltinType();
+        if (!builtinType.startsWith(XSD_NAMESPACE.getPrefix())) {
+            builtinType = XSD_NAMESPACE.getPrefix() + ":" + "token";
+        }
+        restrictionNode.setAttribute("base", builtinType);
         xbtNode.addContent(restrictionNode);
 
-        if (facetRestri.getMinLength() != null) {
+        if (facetRestri.getFacetMinLength() != null) {
             Element minLengthNode = newElement("minLength");
-            minLengthNode.setAttribute("value", facetRestri.getMinLength().toString());
+            minLengthNode.setAttribute("value", facetRestri.getFacetMinLength().toString());
             restrictionNode.addContent(minLengthNode);
         }
-        if (facetRestri.getMaxLength() != null) {
+        if (facetRestri.getFacetMaxLength() != null) {
             Element maxLengthNode = newElement("maxLength");
-            maxLengthNode.setAttribute("value", facetRestri.getMaxLength().toString());
+            maxLengthNode.setAttribute("value", facetRestri.getFacetMaxLength().toString());
             restrictionNode.addContent(maxLengthNode);
         }
-        if (facetRestri.getPattern() != null) {
+        if (facetRestri.getFacetPattern() != null) {
             Element patternNode = newElement("pattern");
-            patternNode.setAttribute("value", facetRestri.getPattern().toString());
+            patternNode.setAttribute("value", facetRestri.getFacetPattern().toString());
             restrictionNode.addContent(patternNode);
         }
 
@@ -934,7 +938,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Element xbtNode = newElement("simpleType");
         xbtNode.setAttribute("name", name);
         if (option.isBieGuid()) {
-            xbtNode.setAttribute("id", ScoreGuid.randomGuid());
+            xbtNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
         }
 
         try {
@@ -978,7 +982,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 AgencyIdList agencyIdList = generationContext.getAgencyIdList(bbie);
                 if (agencyIdList != null) {
                     if (option.isBieGuid()) {
-                        eNode.setAttribute("id", ScoreGuid.randomGuid());
+                        eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                     }
 
                     AgencyIdListValue agencyIdListValue =
@@ -1008,7 +1012,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 }
             } else {
                 if (option.isBieGuid()) {
-                    eNode.setAttribute("id", ScoreGuid.randomGuid());
+                    eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                 }
                 generateCodeList(codeList, bbie);
 
@@ -1029,7 +1033,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     eNode = createAttributeNodeForBBIE(bbie, parent);
 
                     if (option.isBieGuid()) {
-                        eNode.setAttribute("id", ScoreGuid.randomGuid());
+                        eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                     }
 
                     AgencyIdListValue agencyIdListValue =
@@ -1061,7 +1065,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 eNode = createAttributeNodeForBBIE(bbie, parent);
 
                 if (option.isBieGuid()) {
-                    eNode.setAttribute("id", ScoreGuid.randomGuid());
+                    eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                 }
                 generateCodeList(codeList, bbie);
 
@@ -1148,7 +1152,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         AgencyIdListValue agencyIdListValue = generationContext.findAgencyIdListValue(codeList.getAgencyIdListValueManifestId());
         stNode.setAttribute("name", Helper.getCodeListTypeName(codeList, agencyIdListValue));
         if (option.isBieGuid()) {
-            stNode.setAttribute("id", getGuidWithPrefix(codeList.getGuid()));
+            stNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + codeList.getGuid());
         }
 
         Element rtNode = newElement("restriction");
@@ -1200,7 +1204,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         if (option.isBieGuid()) {
-            aNode.setAttribute("id", getGuidWithPrefix(bbieSc.getGuid()));
+            aNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + bbieSc.getGuid());
         }
         setDefinition(aNode, bbieSc.getDefinition());
 
@@ -1224,7 +1228,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
 
                     String typeName = null;
-                    if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+                    if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || bbieSc.getFacetPattern() != null) {
                         typeName = addXbtSimpleType(xbt, bbieSc);
                     } else {
                         addXbtSimpleType(xbt);
@@ -1245,7 +1249,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         Xbt xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
 
         String typeName = null;
-        if (bbieSc.getMinLength() != null || bbieSc.getMaxLength() != null || bbieSc.getPattern() != null) {
+        if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || bbieSc.getFacetPattern() != null) {
             typeName = addXbtSimpleType(xbt, bbieSc);
         } else {
             addXbtSimpleType(xbt);
@@ -1293,7 +1297,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         aNode = setBBIESCType2(bbieSc, aNode);
                 } else {
                     if (option.isBieGuid()) {
-                        aNode.setAttribute("id", ScoreGuid.randomGuid());
+                        aNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                     }
 
                     AgencyIdListValue agencyIdListValue =
@@ -1307,7 +1311,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 }
             } else {
                 if (option.isBieGuid()) {
-                    aNode.setAttribute("id", ScoreGuid.randomGuid());
+                    aNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
                 }
 
                 generateCodeList(codeList, bbieSc);
@@ -1333,7 +1337,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         stNode.setAttribute("name", agencyListTypeName);
         if (option.isBieGuid()) {
-            stNode.setAttribute("id", getGuidWithPrefix(agencyIdList.getGuid()));
+            stNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + agencyIdList.getGuid());
         }
 
         Element rtNode = newElement("restriction");

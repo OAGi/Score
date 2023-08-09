@@ -1,8 +1,6 @@
 package org.oagi.score.repo.component.dt;
 
-import org.jooq.DSLContext;
-import org.jooq.UpdateSetFirstStep;
-import org.jooq.UpdateSetMoreStep;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcBdtPriRestri;
 import org.oagi.score.gateway.http.api.cc_management.data.node.PrimitiveRestriType;
@@ -12,6 +10,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
+import org.oagi.score.repo.component.bcc.UpdateBccPropertiesRepositoryRequest;
+import org.oagi.score.repo.component.bccp.UpdateBccpPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.log.LogRepository;
@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
-import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -410,35 +409,40 @@ public class DtWriteRepository {
                 ))
                 .fetchOne();
 
-        DtRecord dtRecord = dslContext.selectFrom(DT)
+        DtRecord originalDtRecord = dslContext.selectFrom(DT)
                 .where(DT.DT_ID.eq(bdtManifestRecord.getDtId()))
                 .fetchOne();
 
-        if (!CcState.WIP.equals(CcState.valueOf(dtRecord.getState()))) {
+        if (!CcState.WIP.equals(CcState.valueOf(originalDtRecord.getState()))) {
             throw new IllegalArgumentException("Only the core component in 'WIP' state can be modified.");
         }
 
-        if (!dtRecord.getOwnerUserId().equals(userId)) {
+        if (!originalDtRecord.getOwnerUserId().equals(userId)) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
 
         // update bdt record.
         UpdateSetFirstStep<DtRecord> firstStep = dslContext.update(DT);
         UpdateSetMoreStep<DtRecord> moreStep = null;
-        if (compare(dtRecord.getQualifier_(), request.getQualifier()) != 0) {
+        boolean denChanged = false;
+        String newDen = null;
+        if (compare(originalDtRecord.getQualifier_(), request.getQualifier()) != 0) {
             if (StringUtils.hasLength(request.getQualifier())) {
+                newDen = request.getQualifier() + "_ " + originalDtRecord.getRepresentationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.QUALIFIER, request.getQualifier())
-                        .set(DT.DEN, request.getQualifier() + "_ " + dtRecord.getRepresentationTerm() + ". Type");
+                        .set(DT.DEN, newDen);
             } else {
+                newDen = originalDtRecord.getRepresentationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .setNull(DT.QUALIFIER)
-                        .set(DT.DEN, dtRecord.getRepresentationTerm() + ". Type");
+                        .set(DT.DEN, newDen);
             }
+            denChanged = true;
         }
-        if (compare(dtRecord.getSixDigitId(), request.getSixDigitId()) != 0) {
+        if (compare(originalDtRecord.getSixDigitId(), request.getSixDigitId()) != 0) {
             DtRecord exist = dslContext.selectFrom(DT)
-                    .where(and(DT.GUID.notEqual(dtRecord.getGuid()),
+                    .where(and(DT.GUID.notEqual(originalDtRecord.getGuid()),
                             DT.SIX_DIGIT_ID.eq(request.getSixDigitId()))).fetchOne();
             if (exist != null) {
                 throw new IllegalArgumentException("Six Digit Id '" + request.getSixDigitId() + "' already exist.");
@@ -446,7 +450,7 @@ public class DtWriteRepository {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(DT.SIX_DIGIT_ID, request.getSixDigitId());
         }
-        if (compare(dtRecord.getContentComponentDefinition(), request.getContentComponentDefinition()) != 0) {
+        if (compare(originalDtRecord.getContentComponentDefinition(), request.getContentComponentDefinition()) != 0) {
             if (StringUtils.hasLength(request.getContentComponentDefinition())) {
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.CONTENT_COMPONENT_DEFINITION, request.getContentComponentDefinition());
@@ -455,7 +459,7 @@ public class DtWriteRepository {
                         .setNull(DT.CONTENT_COMPONENT_DEFINITION);
             }
         }
-        if (compare(dtRecord.getDefinition(), request.getDefinition()) != 0) {
+        if (compare(originalDtRecord.getDefinition(), request.getDefinition()) != 0) {
             if (StringUtils.hasLength(request.getDefinition())) {
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.DEFINITION, request.getDefinition());
@@ -464,7 +468,7 @@ public class DtWriteRepository {
                         .setNull(DT.DEFINITION);
             }
         }
-        if (compare(dtRecord.getDefinitionSource(), request.getDefinitionSource()) != 0) {
+        if (compare(originalDtRecord.getDefinitionSource(), request.getDefinitionSource()) != 0) {
             if (StringUtils.hasLength(request.getDefinitionSource())) {
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.DEFINITION_SOURCE, request.getDefinitionSource());
@@ -473,7 +477,7 @@ public class DtWriteRepository {
                         .setNull(DT.DEFINITION_SOURCE);
             }
         }
-        if ((dtRecord.getIsDeprecated() == 1) != request.isDeprecated()) {
+        if ((originalDtRecord.getIsDeprecated() == 1) != request.isDeprecated()) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(DT.IS_DEPRECATED, (byte) ((request.isDeprecated()) ? 1 : 0));
         }
@@ -488,37 +492,66 @@ public class DtWriteRepository {
         if (moreStep != null) {
             moreStep.set(DT.LAST_UPDATED_BY, userId)
                     .set(DT.LAST_UPDATE_TIMESTAMP, timestamp)
-                    .where(DT.DT_ID.eq(dtRecord.getDtId()))
+                    .where(DT.DT_ID.eq(bdtManifestRecord.getDtId()))
                     .execute();
 
-            dtRecord = dslContext.selectFrom(DT)
+            DtRecord dtRecord = dslContext.selectFrom(DT)
                     .where(DT.DT_ID.eq(bdtManifestRecord.getDtId()))
                     .fetchOne();
+
+            updateBdtPriList(bdtManifestRecord.getDtManifestId(), request.getBdtPriRestriList());
+
+            // creates new log for updated record.
+            LogRecord logRecord =
+                    logRepository.insertBdtLog(
+                            bdtManifestRecord,
+                            dtRecord, bdtManifestRecord.getLogId(),
+                            LogAction.Modified,
+                            userId, timestamp);
+
+            bdtManifestRecord.setLogId(logRecord.getLogId());
+            bdtManifestRecord.update(DT_MANIFEST.LOG_ID);
+
+            for (DtManifestRecord derivedDtManifestRecord : dslContext.selectFrom(DT_MANIFEST)
+                    .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
+                    .fetch()) {
+                propagateUpdateDtRecord(originalDtRecord, derivedDtManifestRecord, request, user);
+            }
         }
 
-        updateBdtPriList(bdtManifestRecord.getDtManifestId(), request.getBdtPriRestriList());
+        if (denChanged) {
+            for (Record3<ULong, ULong, String> bccp : dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.BCCP_ID, BCCP.PROPERTY_TERM)
+                    .from(BCCP_MANIFEST)
+                    .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                    .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
+                    .fetch()) {
+                String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + newDen.replaceAll(". Type", "");
+                dslContext.update(BCCP)
+                        .set(BCCP.DEN, newBccpDen)
+                        .where(BCCP.BCCP_ID.eq(bccp.get(BCCP.BCCP_ID)))
+                        .execute();
 
-        // creates new log for updated record.
-        LogRecord logRecord =
-                logRepository.insertBdtLog(
-                        bdtManifestRecord,
-                        dtRecord, bdtManifestRecord.getLogId(),
-                        LogAction.Modified,
-                        userId, timestamp);
-
-        bdtManifestRecord.setLogId(logRecord.getLogId());
-        bdtManifestRecord.update(DT_MANIFEST.LOG_ID);
-
-        for (DtManifestRecord derivedDtManifestRecord : dslContext.selectFrom(DT_MANIFEST)
-                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
-                .fetch()) {
-            propagateUpdateDtRecord(derivedDtManifestRecord, request, user);
+                for (Record2<ULong, String> bcc : dslContext.select(BCC.BCC_ID, ACC.OBJECT_CLASS_TERM)
+                        .from(BCC_MANIFEST)
+                        .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                        .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                        .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                        .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
+                        .fetch()) {
+                    String newBccDen = bcc.get(ACC.OBJECT_CLASS_TERM) + ". " + newBccpDen;
+                    dslContext.update(BCC)
+                            .set(BCC.DEN, newBccDen)
+                            .where(BCC.BCC_ID.eq(bcc.get(BCC.BCC_ID)))
+                            .execute();
+                }
+            }
         }
 
         return new UpdateDtPropertiesRepositoryResponse(bdtManifestRecord.getDtManifestId().toBigInteger());
     }
 
-    private void propagateUpdateDtRecord(DtManifestRecord dtManifestRecord,
+    private void propagateUpdateDtRecord(DtRecord originalDtRecord,
+                                         DtManifestRecord dtManifestRecord,
                                          UpdateDtPropertiesRepositoryRequest request,
                                          AppUser user) {
         DtRecord dtRecord = dslContext.selectFrom(DT)
@@ -527,15 +560,15 @@ public class DtWriteRepository {
 
         UpdateSetFirstStep<DtRecord> firstStep = dslContext.update(DT);
         UpdateSetMoreStep<DtRecord> moreStep = null;
-        if (compare(dtRecord.getContentComponentDefinition(), request.getContentComponentDefinition()) != 0) {
+        if (compare(dtRecord.getContentComponentDefinition(), originalDtRecord.getContentComponentDefinition()) == 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(DT.CONTENT_COMPONENT_DEFINITION, request.getContentComponentDefinition());
         }
-        if (compare(dtRecord.getDefinition(), request.getDefinition()) != 0) {
+        if (compare(dtRecord.getDefinition(), originalDtRecord.getDefinition()) == 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(DT.DEFINITION, request.getDefinition());
         }
-        if (compare(dtRecord.getDefinitionSource(), request.getDefinitionSource()) != 0) {
+        if (compare(dtRecord.getDefinitionSource(), originalDtRecord.getDefinitionSource()) == 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(DT.DEFINITION_SOURCE, request.getDefinitionSource());
         }
@@ -548,7 +581,7 @@ public class DtWriteRepository {
         for (DtManifestRecord derivedDtManifestRecord : dslContext.selectFrom(DT_MANIFEST)
                 .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch()) {
-            propagateUpdateDtRecord(derivedDtManifestRecord, request, user);
+            propagateUpdateDtRecord(originalDtRecord, derivedDtManifestRecord, request, user);
         }
     }
 
@@ -568,20 +601,16 @@ public class DtWriteRepository {
         for (DtManifestRecord dtManifest : derivedDtManifestList) {
             deleteDerivedValueDomain(dtManifest.getDtManifestId(), deleteList);
 
-            BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
-                    BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
-                    BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
-
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.in(cdtAwdPriXpsTypeMapIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.in(codeListManifestIdList))
                     .execute();
             dslContext.deleteFrom(BDT_PRI_RESTRI).where(
-                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId)),
+                            and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId())),
                             BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIdListManifestIdList))
                     .execute();
 
@@ -590,6 +619,10 @@ public class DtWriteRepository {
                     BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)).fetchOne();
 
             if (defaultRecord == null) {
+                BdtPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_PRI_RESTRI).where(and(
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(basedDtManifestId),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
+
                 if (baseDefaultRecord.getCdtAwdPriXpsTypeMapId() != null) {
                     dslContext.update(BDT_PRI_RESTRI).set(BDT_PRI_RESTRI.IS_DEFAULT, (byte) 1)
                             .where(and(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifest.getDtManifestId()),
@@ -695,7 +728,7 @@ public class DtWriteRepository {
                 }
             }
 
-            insertDerivedValueDomain(dtManifest.getDtId(), insertList);
+            insertDerivedValueDomain(dtManifest.getDtManifestId(), insertList);
         }
     }
 
@@ -926,11 +959,23 @@ public class DtWriteRepository {
             }
         }
 
+        List<DtManifestRecord> derivationDtManifestRecords = dslContext.selectFrom(DT_MANIFEST)
+                .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
+                .fetch();
+        if (!derivationDtManifestRecords.isEmpty()) {
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the DT '" + dtRecord.getDen() + "'.");
+            if (request.isIgnoreOnError()) {
+                return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
+            } else {
+                throw e;
+            }
+        }
+
         List<BccpManifestRecord> bccpManifestRecords = dslContext.selectFrom(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!bccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge deleted BCCPs used the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCPs first before purging the DT '" + dtRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
             } else {
@@ -1108,8 +1153,7 @@ public class DtWriteRepository {
         DtRecord prevDtRecord = dslContext.selectFrom(DT)
                 .where(DT.DT_ID.eq(bdtRecord.getPrevDtId())).fetchOne();
 
-        dslContext.deleteFrom(BDT_PRI_RESTRI)
-                .where(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId())).execute();
+        // TODO: Revert BDT_PRI_RESTRI in the previous settings
 
         // unlink prev DT
         prevDtRecord.setNextDtId(null);
@@ -1117,8 +1161,7 @@ public class DtWriteRepository {
 
         // remove revised DT_SCs
         for(DtScManifestRecord dtScManifestRecord : dtScManifestRecords) {
-            dslContext.deleteFrom(BDT_SC_PRI_RESTRI)
-                    .where(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifestRecord.getDtScManifestId())).execute();
+            // TODO: Revert BDT_SC_PRI_RESTRI in the previous settings
 
             DtScRecord currentDtSc = dslContext.selectFrom(DT_SC)
                     .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId())).fetchOne();

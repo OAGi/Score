@@ -68,7 +68,7 @@ public class Dt extends TableImpl<DtRecord> {
      * in the DTC specification. This column is derived from the Based_DT_ID
      * when the column is not blank. 
      */
-    public final TableField<DtRecord, String> DATA_TYPE_TERM = createField(DSL.name("data_type_term"), SQLDataType.VARCHAR(45), this, "This is the data type term assigned to the DT. The allowed set of data type terms are defined in the DTC specification. This column is derived from the Based_DT_ID when the column is not blank. ");
+    public final TableField<DtRecord, String> DATA_TYPE_TERM = createField(DSL.name("data_type_term"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the data type term assigned to the DT. The allowed set of data type terms are defined in the DTC specification. This column is derived from the Based_DT_ID when the column is not blank. ");
 
     /**
      * The column <code>oagi.dt.qualifier</code>. This column shall be blank
@@ -83,25 +83,25 @@ public class Dt extends TableImpl<DtRecord> {
      * wrapped with another type definition that has a simpler name such as
      * CodeType and NormalizedString type - we call these "unqualified BDTs". 
      */
-    public final TableField<DtRecord, String> QUALIFIER = createField(DSL.name("qualifier"), SQLDataType.VARCHAR(100), this, "This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these \"unqualified BDTs\". ");
+    public final TableField<DtRecord, String> QUALIFIER = createField(DSL.name("qualifier"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these \"unqualified BDTs\". ");
 
     /**
      * The column <code>oagi.dt.representation_term</code>.
      */
-    public final TableField<DtRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(100), this, "");
+    public final TableField<DtRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.dt.six_digit_id</code>. The six number suffix comes
      * from the UN/CEFACT XML Schema NDR.
      */
-    public final TableField<DtRecord, String> SIX_DIGIT_ID = createField(DSL.name("six_digit_id"), SQLDataType.VARCHAR(45), this, "The six number suffix comes from the UN/CEFACT XML Schema NDR.");
+    public final TableField<DtRecord, String> SIX_DIGIT_ID = createField(DSL.name("six_digit_id"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The six number suffix comes from the UN/CEFACT XML Schema NDR.");
 
     /**
      * The column <code>oagi.dt.based_dt_id</code>. Foreign key pointing to the
      * DT table itself. This column must be blank when the DT_TYPE is CDT. This
      * column must not be blank when the DT_TYPE is BDT.
      */
-    public final TableField<DtRecord, ULong> BASED_DT_ID = createField(DSL.name("based_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key pointing to the DT table itself. This column must be blank when the DT_TYPE is CDT. This column must not be blank when the DT_TYPE is BDT.");
+    public final TableField<DtRecord, ULong> BASED_DT_ID = createField(DSL.name("based_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key pointing to the DT table itself. This column must be blank when the DT_TYPE is CDT. This column must not be blank when the DT_TYPE is BDT.");
 
     /**
      * The column <code>oagi.dt.den</code>. Dictionary Entry Name of the data
@@ -112,13 +112,13 @@ public class Dt extends TableImpl<DtRecord> {
     /**
      * The column <code>oagi.dt.definition</code>. Description of the data type.
      */
-    public final TableField<DtRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Description of the data type.");
+    public final TableField<DtRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the data type.");
 
     /**
      * The column <code>oagi.dt.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<DtRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(200), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<DtRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.dt.namespace_id</code>. Foreign key to the
@@ -127,13 +127,13 @@ public class Dt extends TableImpl<DtRecord> {
      * component because there is also a namespace assigned at the release
      * level.
      */
-    public final TableField<DtRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
+    public final TableField<DtRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
      * The column <code>oagi.dt.content_component_definition</code>. Description
      * of the content component of the data type.
      */
-    public final TableField<DtRecord, String> CONTENT_COMPONENT_DEFINITION = createField(DSL.name("content_component_definition"), SQLDataType.CLOB, this, "Description of the content component of the data type.");
+    public final TableField<DtRecord, String> CONTENT_COMPONENT_DEFINITION = createField(DSL.name("content_component_definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the content component of the data type.");
 
     /**
      * The column <code>oagi.dt.state</code>. Deleted, WIP, Draft, QA,
@@ -143,13 +143,13 @@ public class Dt extends TableImpl<DtRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<DtRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the DT.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<DtRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the DT.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.dt.commonly_used</code>. This is a flag to indicate
      * commonly used DT(s) by BCCPs.
      */
-    public final TableField<DtRecord, Byte> COMMONLY_USED = createField(DSL.name("commonly_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This is a flag to indicate commonly used DT(s) by BCCPs.");
+    public final TableField<DtRecord, Byte> COMMONLY_USED = createField(DSL.name("commonly_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This is a flag to indicate commonly used DT(s) by BCCPs.");
 
     /**
      * The column <code>oagi.dt.created_by</code>. Foreign key to the APP_USER
@@ -198,25 +198,25 @@ public class Dt extends TableImpl<DtRecord> {
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
-    public final TableField<DtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
+    public final TableField<DtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
      * The column <code>oagi.dt.replacement_dt_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<DtRecord, ULong> REPLACEMENT_DT_ID = createField(DSL.name("replacement_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<DtRecord, ULong> REPLACEMENT_DT_ID = createField(DSL.name("replacement_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.dt.prev_dt_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<DtRecord, ULong> PREV_DT_ID = createField(DSL.name("prev_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<DtRecord, ULong> PREV_DT_ID = createField(DSL.name("prev_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.dt.next_dt_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<DtRecord, ULong> NEXT_DT_ID = createField(DSL.name("next_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<DtRecord, ULong> NEXT_DT_ID = createField(DSL.name("next_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Dt(Name alias, Table<DtRecord> aliased) {
         this(alias, aliased, null);

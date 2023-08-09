@@ -16,13 +16,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class BCCPCreateDialogImpl implements BCCPCreateDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By COMMONLY_USED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Commonly Used\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Commonly Used\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-container//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -286,7 +286,7 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
         });
 
         click(getCreateButton());
-        waitFor(ofMillis(1000L));
+        waitFor(ofMillis(2000L));
 
         String url = getDriver().getCurrentUrl();
         BigInteger bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
@@ -316,8 +316,9 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
             click(tr);
         });
     }
+
     private String getDENFieldFromTheTable(WebElement tableData) {
-        return getText(tableData.findElement(By.cssSelector("div.den")));
+        return getText(tableData.findElement(By.cssSelector("div.den > a > span")));
     }
 
     @Override

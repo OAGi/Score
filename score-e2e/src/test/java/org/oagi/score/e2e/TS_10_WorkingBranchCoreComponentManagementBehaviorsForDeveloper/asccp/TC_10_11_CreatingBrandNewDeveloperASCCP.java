@@ -112,7 +112,7 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
 
         acc.setDefinition("definition changed");
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" +asccp.getPropertyTerm() + "/" +  acc.getDen());
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc.getDen());
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
         assertEquals("definition changed", getText(accPanel.getDefinitionField()));
     }
@@ -131,13 +131,13 @@ public class TC_10_11_CreatingBrandNewDeveloperASCCP extends BaseTest {
     }
 
     @Test
-    public void test_TA_10_11_4(){
+    public void test_TA_10_11_4() {
 
 
     }
 
     @Test
-    public void test_TA_10_11_5(){
+    public void test_TA_10_11_5() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 

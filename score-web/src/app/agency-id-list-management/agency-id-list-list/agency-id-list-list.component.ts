@@ -28,6 +28,7 @@ import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SimpleNamespace} from "../../namespace-management/domain/namespace";
 import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {BieList} from "../../bie-management/bie-list/domain/bie-list";
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -52,7 +53,8 @@ export class AgencyIdListListComponent implements OnInit {
     'select', 'state', 'name', 'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<AgencyIdList>();
-  selection = new SelectionModel<AgencyIdList>(true, []);
+  selection = new SelectionModel<AgencyIdList>(true, [],
+    true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
   expandedElement: AgencyIdList | null;
   canSelect = ['WIP', 'Deleted'];
   loading = false;
@@ -233,6 +235,11 @@ export class AgencyIdListListComponent implements OnInit {
     return this.selection.isSelected(row);
   }
 
+  selectionClear() {
+    this.selection = new SelectionModel<AgencyIdList>(true, [],
+      true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
+  }
+
   get currentUser(): string {
     const userToken = this.auth.getUserToken();
     return (userToken) ? userToken.username : undefined;
@@ -290,7 +297,7 @@ export class AgencyIdListListComponent implements OnInit {
             this.snackBar.open('Deleted', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }
@@ -313,7 +320,7 @@ export class AgencyIdListListComponent implements OnInit {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }
@@ -341,8 +348,8 @@ export class AgencyIdListListComponent implements OnInit {
     return item.owner.username === this.currentUser && item.state === 'Deleted';
   }
 
-  openTransferDialog() {
-    if (!this.isEditable(this.contextMenuItem)) {
+  openTransferDialog(item: AgencyIdList, event?: MouseEvent) {
+    if (!this.isEditable(item)) {
       return;
     }
 
@@ -353,7 +360,7 @@ export class AgencyIdListListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(this.contextMenuItem.agencyIdListManifestId, result.loginId).subscribe(_ => {
+        this.service.transferOwnership(item.agencyIdListManifestId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
@@ -403,7 +410,7 @@ export class AgencyIdListListComponent implements OnInit {
     return;
   }
 
-  openDialogCcListRestore() {
+  openDialogCcListRestore(item: AgencyIdList) {
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore agency ID list';
@@ -415,11 +422,11 @@ export class AgencyIdListListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.restore(this.contextMenuItem.agencyIdListManifestId).subscribe(_ => {
+          this.service.restore(item.agencyIdListManifestId).subscribe(_ => {
             this.snackBar.open('Restored', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadAgencyIdList();
           });
         }

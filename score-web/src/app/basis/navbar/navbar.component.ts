@@ -48,6 +48,17 @@ export class NavbarComponent implements OnInit {
     return userToken.businessTerm.enabled;
   }
 
+  get backgroundColor(): string {
+    const userToken = this.auth.getUserToken();
+    if (userToken.roles.includes(this.auth.ROLE_ADMIN)) {
+      return '#FFE4E1'; // Light red
+    } else if (userToken.roles.includes(this.auth.ROLE_DEVELOPER)) {
+      return '#FAFAD2'; // Light yellow
+    } else {
+      return '';
+    }
+  }
+
   ngOnInit() {
     this.reloadNotiCount();
 

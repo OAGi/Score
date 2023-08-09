@@ -29,4 +29,6 @@ public interface EditCodeListValueDialog extends Dialog {
     void hitSaveButton();
 
     WebElement getSaveButton();
+
+    void toggleDeprecated();
 }

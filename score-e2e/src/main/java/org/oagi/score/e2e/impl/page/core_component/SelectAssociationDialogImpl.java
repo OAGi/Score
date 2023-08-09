@@ -4,7 +4,6 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.openqa.selenium.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -318,7 +317,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
             click(getSelectButton());
 
             assert parent.isOpened();
-            waitFor(ofMillis(500));
+            waitFor(ofMillis(1000L));
         });
     }
 

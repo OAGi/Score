@@ -405,5 +405,6 @@ public class DtScManifestRecord extends UpdatableRecordImpl<DtScManifestRecord> 
         setReplacementDtScManifestId(replacementDtScManifestId);
         setPrevDtScManifestId(prevDtScManifestId);
         setNextDtScManifestId(nextDtScManifestId);
+        resetChangedOnNotNull();
     }
 }

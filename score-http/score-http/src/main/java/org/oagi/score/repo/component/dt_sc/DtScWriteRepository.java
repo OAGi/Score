@@ -42,7 +42,8 @@ public class DtScWriteRepository {
     @Autowired
     private LogSerializer serializer;
 
-    private void updateDerivedSc(DtScManifestRecord baseDtScManifestRecord, DtScRecord baseDtScRecord) {
+    private void updateDerivedSc(DtScManifestRecord baseDtScManifestRecord, DtScRecord baseDtScRecord,
+                                 boolean isRepresentationTermChanged) {
 
         dslContext.selectFrom(DT_SC_MANIFEST).where(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(baseDtScManifestRecord.getDtScManifestId()))
                 .fetchStream().forEach(dtScManifestRecord -> {
@@ -92,8 +93,13 @@ public class DtScWriteRepository {
                                 .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId()))
                                 .execute();
 
+                        if (isRepresentationTermChanged) {
+                            deleteCdtScAwdPriByDtScId(dtScRecord.getDtScId());
+                        }
+
                         updateDerivedSc(dtScManifestRecord, dslContext.selectFrom(DT_SC)
-                                .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId())).fetchOne());
+                                .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId())).fetchOne(),
+                                isRepresentationTermChanged);
                     }
                 });
     }
@@ -137,8 +143,8 @@ public class DtScWriteRepository {
         int cnt = dslContext.selectCount()
                 .from(DT_SC)
                 .where(and(
-                        DT_SC.OWNER_DT_ID.eq(dtId),
                         DT_SC.PROPERTY_TERM.eq(propertyTerm),
+                        DT_SC.OWNER_DT_ID.eq(dtId),
                         DT_SC.DT_SC_ID.notEqual(dtScRecord.getDtScId())
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0);
@@ -151,39 +157,26 @@ public class DtScWriteRepository {
                                        String objectClassTerm,
                                        String propertyTerm,
                                        String representationTerm) {
-        while (dtScRecord.getBasedDtScId() != null) {
-            dtScRecord = dslContext.selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getBasedDtScId()))
-                    .fetchOne();
-        }
-
-        Queue<DtScRecord> dtScHierarchy = new LinkedList();
-        dtScHierarchy.add(dtScRecord);
-
-        Set<ULong> dtScIdSet = new HashSet();
-        while (!dtScHierarchy.isEmpty()) {
-            dtScRecord = dtScHierarchy.poll();
-            dtScIdSet.add(dtScRecord.getDtScId());
-
-            dtScHierarchy.addAll(
-                    dslContext.selectFrom(DT_SC)
-                            .where(DT_SC.BASED_DT_SC_ID.eq(dtScRecord.getDtScId()))
-                            .fetch()
-            );
-        }
-
         int cnt = dslContext.selectCount()
                 .from(DT_SC)
                 .where(and(
                         DT_SC.OBJECT_CLASS_TERM.eq(objectClassTerm),
                         DT_SC.PROPERTY_TERM.eq(propertyTerm),
                         DT_SC.REPRESENTATION_TERM.eq(representationTerm),
-                        DT_SC.DT_SC_ID.notIn(dtScIdSet)
+                        DT_SC.OWNER_DT_ID.eq(dtScRecord.getOwnerDtId()),
+                        DT_SC.DT_SC_ID.notEqual(dtScRecord.getDtScId())
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0);
         if (cnt > 0) {
             String den = getDen(objectClassTerm, propertyTerm, representationTerm);
             throw new IllegalArgumentException("There is an another supplementary component whose DEN is same with the request: " + den);
+        }
+
+        if (dtScRecord.getBasedDtScId() != null) {
+            dtScRecord = dslContext.selectFrom(DT_SC)
+                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getBasedDtScId()))
+                    .fetchOne();
+            ensureUniquenessOfDen(dtScRecord, objectClassTerm, propertyTerm, representationTerm);
         }
     }
 
@@ -285,8 +278,10 @@ public class DtScWriteRepository {
                     .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId()))
                     .execute();
 
-            updateDerivedSc(dtScManifestRecord, dslContext.selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(dtScRecord.getDtScId())).fetchOne());
+            dtScRecord = dslContext.selectFrom(DT_SC)
+                    .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId()))
+                    .fetchOne();
+            updateDerivedSc(dtScManifestRecord, dtScRecord, isRepresentationTermChanged);
         }
 
         if (isRepresentationTermChanged) {
@@ -318,44 +313,44 @@ public class DtScWriteRepository {
         List<ULong> agencyIdListManifestId = deleteList.stream().filter(e -> e.getAgencyIdListManifestId() != null)
                 .map(BdtScPriRestriRecord::getAgencyIdListManifestId).collect(Collectors.toList());
 
-        for (DtScManifestRecord dtScManifest : derivedDtScManifestList) {
-            deleteDerivedValueDomain(dtScManifest.getDtScManifestId(), deleteList);
+        for (DtScManifestRecord derivedDtScManifest : derivedDtScManifestList) {
+            deleteDerivedValueDomain(derivedDtScManifest.getDtScManifestId(), deleteList);
 
             dslContext.deleteFrom(BDT_SC_PRI_RESTRI).where(
-                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId())),
+                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId())),
                             BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.in(cdtScAwdPriXpsTypeMapIdList))
                     .execute();
             dslContext.deleteFrom(BDT_SC_PRI_RESTRI).where(
-                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId())),
+                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId())),
                             BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID.in(codeListManifestId))
                     .execute();
             dslContext.deleteFrom(BDT_SC_PRI_RESTRI).where(
-                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId())),
+                            and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId())),
                             BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.in(agencyIdListManifestId))
                     .execute();
 
             BdtScPriRestriRecord defaultRecord = dslContext.selectFrom(BDT_SC_PRI_RESTRI).where(
-                    and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId())),
+                    and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId())),
                     BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)).fetchOne();
 
-            if (defaultRecord == null) {
-                BdtScPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_SC_PRI_RESTRI).where(and(
-                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifestId),
-                        BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
+            BdtScPriRestriRecord baseDefaultRecord = dslContext.selectFrom(BDT_SC_PRI_RESTRI).where(and(
+                    BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifestId),
+                    BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1))).fetchOne();
 
+            if (defaultRecord == null && baseDefaultRecord != null) {
                 if (baseDefaultRecord.getCdtScAwdPriXpsTypeMapId() != null) {
                     dslContext.update(BDT_SC_PRI_RESTRI).set(BDT_SC_PRI_RESTRI.IS_DEFAULT, (byte) 1)
-                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId()),
+                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId()),
                                     BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.eq(baseDefaultRecord.getCdtScAwdPriXpsTypeMapId())))
                             .execute();
                 } else if (baseDefaultRecord.getCodeListManifestId() != null) {
                     dslContext.update(BDT_SC_PRI_RESTRI).set(BDT_SC_PRI_RESTRI.IS_DEFAULT, (byte) 1)
-                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId()),
+                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId()),
                                     BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(baseDefaultRecord.getCodeListManifestId())))
                             .execute();
                 } else {
                     dslContext.update(BDT_SC_PRI_RESTRI).set(BDT_SC_PRI_RESTRI.IS_DEFAULT, (byte) 1)
-                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(dtScManifest.getDtScManifestId()),
+                            .where(and(BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(derivedDtScManifest.getDtScManifestId()),
                                     BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.eq(baseDefaultRecord.getAgencyIdListManifestId())))
                             .execute();
                 }
@@ -774,6 +769,7 @@ public class DtScWriteRepository {
                 logRepository.insertBdtLog(
                         dtManifestRecord,
                         dtRecord,
+                        dtManifestRecord.getLogId(),
                         LogAction.Modified,
                         userId, timestamp);
         dtManifestRecord.setLogId(logRecord.getLogId());

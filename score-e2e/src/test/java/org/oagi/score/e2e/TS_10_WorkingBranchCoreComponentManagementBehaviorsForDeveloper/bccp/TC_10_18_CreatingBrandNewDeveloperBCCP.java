@@ -18,8 +18,8 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.click;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)

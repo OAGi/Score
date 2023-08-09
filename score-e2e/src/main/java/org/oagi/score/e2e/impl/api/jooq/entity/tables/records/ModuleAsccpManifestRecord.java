@@ -384,5 +384,6 @@ public class ModuleAsccpManifestRecord extends UpdatableRecordImpl<ModuleAsccpMa
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

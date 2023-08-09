@@ -71,7 +71,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * The column <code>oagi.asccp.type</code>. The Type of the ASCCP. List:
      * Default, Extension 
      */
-    public final TableField<AsccpRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.inline("Default", SQLDataType.VARCHAR)), this, "The Type of the ASCCP. List: Default, Extension ");
+    public final TableField<AsccpRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("'Default'"), SQLDataType.VARCHAR)), this, "The Type of the ASCCP. List: Default, Extension ");
 
     /**
      * The column <code>oagi.asccp.property_term</code>. The role (or property)
@@ -79,30 +79,30 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * by another ACC. There must be only one ASCCP without a Property_Term for
      * a particular ACC.
      */
-    public final TableField<AsccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), SQLDataType.VARCHAR(100), this, "The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.");
+    public final TableField<AsccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.");
 
     /**
      * The column <code>oagi.asccp.definition</code>. Description of the ASCCP.
      */
-    public final TableField<AsccpRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Description of the ASCCP.");
+    public final TableField<AsccpRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the ASCCP.");
 
     /**
      * The column <code>oagi.asccp.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<AsccpRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<AsccpRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.asccp.role_of_acc_id</code>. The ACC from which
      * this ASCCP is created (ASCCP applies role to the ACC).
      */
-    public final TableField<AsccpRecord, ULong> ROLE_OF_ACC_ID = createField(DSL.name("role_of_acc_id"), SQLDataType.BIGINTUNSIGNED, this, "The ACC from which this ASCCP is created (ASCCP applies role to the ACC).");
+    public final TableField<AsccpRecord, ULong> ROLE_OF_ACC_ID = createField(DSL.name("role_of_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "The ACC from which this ASCCP is created (ASCCP applies role to the ACC).");
 
     /**
      * The column <code>oagi.asccp.den</code>. The dictionary entry name of the
      * ASCCP.
      */
-    public final TableField<AsccpRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200), this, "The dictionary entry name of the ASCCP.");
+    public final TableField<AsccpRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The dictionary entry name of the ASCCP.");
 
     /**
      * The column <code>oagi.asccp.created_by</code>. Foreign key to the
@@ -159,7 +159,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<AsccpRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ASCCP.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<AsccpRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ASCCP.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.asccp.namespace_id</code>. Foreign key to the
@@ -168,14 +168,14 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * component because there is also a namespace assigned at the release
      * level.
      */
-    public final TableField<AsccpRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the Namespace table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
+    public final TableField<AsccpRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the Namespace table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
      * The column <code>oagi.asccp.reusable_indicator</code>. This indicates
      * whether the ASCCP can be used by more than one ASCC. This maps directly
      * to the XML schema local element declaration.
      */
-    public final TableField<AsccpRecord, Byte> REUSABLE_INDICATOR = createField(DSL.name("reusable_indicator"), SQLDataType.TINYINT.defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "This indicates whether the ASCCP can be used by more than one ASCC. This maps directly to the XML schema local element declaration.");
+    public final TableField<AsccpRecord, Byte> REUSABLE_INDICATOR = createField(DSL.name("reusable_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "This indicates whether the ASCCP can be used by more than one ASCC. This maps directly to the XML schema local element declaration.");
 
     /**
      * The column <code>oagi.asccp.is_deprecated</code>. Indicates whether the
@@ -188,7 +188,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * The column <code>oagi.asccp.replacement_asccp_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<AsccpRecord, ULong> REPLACEMENT_ASCCP_ID = createField(DSL.name("replacement_asccp_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<AsccpRecord, ULong> REPLACEMENT_ASCCP_ID = createField(DSL.name("replacement_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.asccp.is_nillable</code>. This is corresponding to
@@ -196,19 +196,19 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * certain cases of the ASCCP (e.g., when it corresponds to an XSD group),
      * the value is default to false for simplification.
      */
-    public final TableField<AsccpRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT, this, "This is corresponding to the XML schema nillable flag. Although the nillable may not apply in certain cases of the ASCCP (e.g., when it corresponds to an XSD group), the value is default to false for simplification.");
+    public final TableField<AsccpRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "This is corresponding to the XML schema nillable flag. Although the nillable may not apply in certain cases of the ASCCP (e.g., when it corresponds to an XSD group), the value is default to false for simplification.");
 
     /**
      * The column <code>oagi.asccp.prev_asccp_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<AsccpRecord, ULong> PREV_ASCCP_ID = createField(DSL.name("prev_asccp_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<AsccpRecord, ULong> PREV_ASCCP_ID = createField(DSL.name("prev_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.asccp.next_asccp_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<AsccpRecord, ULong> NEXT_ASCCP_ID = createField(DSL.name("next_asccp_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<AsccpRecord, ULong> NEXT_ASCCP_ID = createField(DSL.name("next_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Asccp(Name alias, Table<AsccpRecord> aliased) {
         this(alias, aliased, null);

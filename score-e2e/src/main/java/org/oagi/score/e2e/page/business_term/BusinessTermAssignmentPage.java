@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.page.business_term;
+
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
-import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -145,18 +145,18 @@ public interface BusinessTermAssignmentPage extends Page {
     WebElement getTypeCodeField();
 
     /**
-     * Return the text of the 'Type Code' field.
-     *
-     * @return the text of the 'Type Code' field
-     */
-    String getTypeCodeFieldText();
-
-    /**
      * Set {@code typeCode} text to the 'Type Code' field.
      *
      * @param typeCode input for 'Type Code' field
      */
     void setTypeCodeField(String typeCode);
+
+    /**
+     * Return the text of the 'Type Code' field.
+     *
+     * @return the text of the 'Type Code' field
+     */
+    String getTypeCodeFieldText();
 
     /**
      * Return the UI element of the 'Preferred Only' checkbox.
@@ -217,9 +217,9 @@ public interface BusinessTermAssignmentPage extends Page {
     /**
      * Remove the assignment of business term from the given BIE.
      *
-     * @param bieDEN BIE Dictionary Entry Name
+     * @param bieDEN       BIE Dictionary Entry Name
      * @param businessTerm Business Term Object
-     * @param typeCode Type Code set in the Assign Business Term page
+     * @param typeCode     Type Code set in the Assign Business Term page
      */
     void discardAssignment(String bieDEN, BusinessTermObject businessTerm, String typeCode);
 

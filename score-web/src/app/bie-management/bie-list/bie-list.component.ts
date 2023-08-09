@@ -15,11 +15,13 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -34,12 +36,13 @@ export class BieListComponent implements OnInit {
   title = 'BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner',
+    'select', 'state', 'branch', 'den', 'owner',
     'transferOwnership', 'businessContexts', 'version',
     'status', 'bizTerm', 'remark', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<number>(true, []);
+  selection = new SelectionModel<BieList>(true, [],
+    true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   loading = false;
 
   loginIdList: string[] = [];
@@ -94,23 +97,7 @@ export class BieListComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-      if (this.releases.length > 0) {
-        if (this.request.release.releaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
-        } else {
-          const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
-          if (savedReleaseId) {
-            this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-            if (!this.request.release) {
-              this.request.release = this.releases[0];
-              saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
-            }
-          } else {
-            this.request.release = this.releases[0];
-          }
-        }
-      }
-
+      this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
       this.loadBieList(true);
     });
   }
@@ -165,6 +152,14 @@ export class BieListComponent implements OnInit {
     }
   }
 
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    if (selectAllValue) {
+      this.request.releases = this.releases;
+    } else {
+      this.request.releases = [];
+    }
+  }
+
   loadBieList(isInit?: boolean) {
     this.loading = true;
 
@@ -193,8 +188,8 @@ export class BieListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => row.access === 'CanEdit').length;
-    return numSelected === numRows;
+    const numRows = this.dataSource.data.filter(row => row.owner === this.username).length;
+    return numSelected > 0 && numSelected === numRows;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
@@ -205,14 +200,14 @@ export class BieListComponent implements OnInit {
   }
 
   select(row: BieList) {
-    if (row.access === 'CanEdit') {
-      this.selection.select(row.topLevelAsbiepId);
+    if (row.owner === this.username) {
+      this.selection.select(row);
     }
   }
 
   toggle(row: BieList) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAsbiepId);
+      this.selection.deselect(row);
     } else {
       this.select(row);
     }
@@ -222,7 +217,12 @@ export class BieListComponent implements OnInit {
     if (!row) {
       return false;
     }
-    return this.selection.isSelected(row.topLevelAsbiepId);
+    return this.selection.isSelected(row);
+  }
+
+  selectionClear() {
+    this.selection = new SelectionModel<BieList>(true, [],
+      true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   }
 
   isEditable(element: BieList): boolean {
@@ -237,15 +237,15 @@ export class BieListComponent implements OnInit {
   }
 
   discard(bieList: BieList) {
-    this.openDialogBieDiscard([bieList.topLevelAsbiepId,]);
+    this.openDialogBieDiscard([bieList, ]);
   }
 
-  openDialogBieDiscard(topLevelAsbiepIds: number[]) {
+  openDialogBieDiscard(bieLists: BieList[]) {
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Discard ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?';
+    dialogConfig.data.header = 'Discard ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard the ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?',
-      'The ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
+      'Are you sure you want to discard the ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + '?',
+      'The ' + (bieLists.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
     ];
     dialogConfig.data.action = 'Discard';
 
@@ -253,13 +253,13 @@ export class BieListComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.loading = true;
-          this.service.delete(topLevelAsbiepIds).pipe(finalize(() => {
+          this.service.delete(bieLists.map(e => e.topLevelAsbiepId)).pipe(finalize(() => {
             this.loading = false;
           })).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
-            this.selection.clear();
+            this.selectionClear();
             this.loadBieList();
           });
         }
@@ -282,14 +282,15 @@ export class BieListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
         this.loading = true;
-        this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).pipe(finalize(() => {
-          this.loading = false;
-        })).subscribe(_ => {
+        this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
-          this.selection.clear();
+          this.selectionClear();
           this.loadBieList();
+          this.loading = false;
+        }, error => {
+          this.loading = false;
         });
       }
     });
@@ -305,4 +306,117 @@ export class BieListComponent implements OnInit {
     };
     const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
+
+  canToolbarAction(action: string) {
+    if (this.selection.selected.length === 0) {
+      return false;
+    }
+    switch (action) {
+      case 'BackWIP':
+        return this.selection.selected.filter(e => {
+          if (['QA'].indexOf(e.state) > -1 && e.owner === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'QA':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Transfer':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Production':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'QA' && e.owner === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Transfer':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.username) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      default :
+        return false;
+    }
+  }
+
+  multipleUpdate(action: string) {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    const dialogConfig = this.confirmDialogService.newConfig();
+    let notiMsg = 'Updated';
+    let toState = action;
+    let actionType = 'Update';
+
+    switch (action) {
+      case 'WIP':
+      case 'QA':
+      case 'Production':
+        dialogConfig.data.header = 'Update state to \'' + action + '\'?';
+        dialogConfig.data.content = ['Are you sure you want to update the state to \'' + action + '\'?'];
+        dialogConfig.data.action = 'Update';
+        break;
+      default:
+        return false;
+    }
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.loading = true;
+        this.service.updateStateOnList(actionType, toState, this.selection.selected)
+          .pipe(
+            finalize(() => {
+              this.loading = false;
+            })
+          )
+          .subscribe(_ => {
+            this.loadBieList();
+            this.snackBar.open(notiMsg, '', {
+              duration: 3000
+            });
+            this.selectionClear();
+          }, error => {
+          });
+      });
+  }
+
+  openTransferDialogMultiple() {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
+    const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result: AccountList) => {
+      if (result) {
+        this.loading = true;
+        this.service.transferOwnershipOnList(this.selection.selected, result.loginId).subscribe(_ => {
+          this.snackBar.open('Transferred', '', {
+            duration: 3000,
+          });
+          this.loadBieList();
+          this.selectionClear();
+          this.loading = false;
+        }, error => {
+          this.loading = false;
+        });
+      }
+    });
+  }
+
 }

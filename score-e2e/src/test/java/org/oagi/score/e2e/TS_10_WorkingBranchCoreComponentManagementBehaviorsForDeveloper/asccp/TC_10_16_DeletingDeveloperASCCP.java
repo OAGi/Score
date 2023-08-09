@@ -12,11 +12,11 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -84,9 +84,8 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         assertTrue(viewEditCoreComponentPage.isOpened());
 
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        assertEquals("Deleted", asccpPanel.getStateField());
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
+        assertEquals("Deleted", getText(asccpPanel.getStateField()));
     }
 
     @Test
@@ -189,6 +188,8 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         switchToMainTab(getDriver());
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         assertFalse(accViewEditPage.isDeleted(asccNode));
+        viewEditCoreComponentPage.openPage();
+        asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals("WIP", getText(asccpPanel.getStateField()));
         assertEquals(anotherDeveloper.getLoginId(), getText(asccpPanel.getOwnerField()));
@@ -228,13 +229,12 @@ public class TC_10_16_DeletingDeveloperASCCP extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), branch);
+        ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         asccpViewEditPage.hitReviseButton();
 
         //reload the page to verify
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
-        WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
+        ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPPanel();
         assertEquals("2", getText(asccpPanel.getRevisionField()));
         ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.getDeleteButton());

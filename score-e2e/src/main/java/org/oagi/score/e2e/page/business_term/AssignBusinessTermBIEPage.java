@@ -1,12 +1,9 @@
 package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.page.BasePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
-
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 /**
  * An interface for 'Assign Business Term' page
@@ -51,7 +48,7 @@ public interface AssignBusinessTermBIEPage extends BasePage {
     /**
      * Set the 'Owner' select field with the given text.
      *
-     * @param  owner Owner
+     * @param owner Owner
      */
     void setOwner(String owner);
 
@@ -71,26 +68,30 @@ public interface AssignBusinessTermBIEPage extends BasePage {
     void setUpdater(String updater);
 
     /**
-     *Return the UI element of the 'DEN' field
+     * Return the UI element of the 'DEN' field
+     *
      * @return the UI element of the 'DEN' field
      */
     WebElement getBIEDenField();
 
     /**
      * Set the 'BIE DEN' field with the given BIE DEN
-     * @param bieDen  BIE DEN
+     *
+     * @param bieDen BIE DEN
      */
     void setBIEDenField(String bieDen);
 
     /**
-     *Return the UI element of the 'Top Level BIE' field
+     * Return the UI element of the 'Top Level BIE' field
+     *
      * @return the UI element of the 'Top Level BIE' field
      */
     WebElement getTopLevelBIEField();
 
     /**
      * Set the 'Top Level BIE' field with the given Top Level BIE
-     * @param topLevelBIE  Top Level BIE
+     *
+     * @param topLevelBIE Top Level BIE
      */
     void setTopLevelBIE(String topLevelBIE);
 
@@ -188,6 +189,7 @@ public interface AssignBusinessTermBIEPage extends BasePage {
 
     /**
      * Return the UI checkbox element in front of the given name
+     *
      * @param name
      * @return the UI checkbox element
      */
@@ -195,6 +197,7 @@ public interface AssignBusinessTermBIEPage extends BasePage {
 
     /**
      * Return the UI checkbox for select at given index
+     *
      * @param idx index
      * @return the UI checkbox element
      */
@@ -219,6 +222,7 @@ public interface AssignBusinessTermBIEPage extends BasePage {
 
     /**
      * Return Assign Business Term page with subtitle: Select Business Term
+     *
      * @return Assign Business Term page
      */
     AssignBusinessTermBTPage hitNextButton();

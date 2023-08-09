@@ -86,13 +86,13 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
      * allows for a primitive restriction based on a built-in type of schema
      * expressions.
      */
-    public final TableField<BdtScPriRestriRecord, ULong> CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID = createField(DSL.name("cdt_sc_awd_pri_xps_type_map_id"), SQLDataType.BIGINTUNSIGNED, this, "This column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It allows for a primitive restriction based on a built-in type of schema expressions.");
+    public final TableField<BdtScPriRestriRecord, ULong> CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID = createField(DSL.name("cdt_sc_awd_pri_xps_type_map_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It allows for a primitive restriction based on a built-in type of schema expressions.");
 
     /**
      * The column <code>oagi.bdt_sc_pri_restri.code_list_manifest_id</code>.
      * Foreign key to the CODE_LIST_MANIFEST table.
      */
-    public final TableField<BdtScPriRestriRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the CODE_LIST_MANIFEST table.");
+    public final TableField<BdtScPriRestriRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the CODE_LIST_MANIFEST table.");
 
     /**
      * The column
@@ -100,7 +100,7 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
      * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
      * that the BDT content can be restricted to an agency identification.
      */
-    public final TableField<BdtScPriRestriRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case that the BDT content can be restricted to an agency identification.");
+    public final TableField<BdtScPriRestriRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case that the BDT content can be restricted to an agency identification.");
 
     /**
      * The column <code>oagi.bdt_sc_pri_restri.is_default</code>. This column

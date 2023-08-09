@@ -123,7 +123,7 @@
                       </button>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP' && access === 'CanEdit'"
-                              [disabled]="!isChanged">
+                              [disabled]="updateDisabled">
                         Update
                       </button>
                       <button mat-raised-button color="accent" (click)="updateState('Draft')"
@@ -321,6 +321,9 @@
                     <button mat-menu-item (click)="openHistory(contextMenuItem)">
                       <span class="context-menu-item">Show History</span>
                     </button>
+                    <button mat-menu-item (click)="openComments(contextMenuItem.type, contextMenuItem)">
+                      <span class="context-menu-item">Comments</span>
+                    </button>
                     <button mat-menu-item (click)="findUsages(contextMenuItem)"
                             [disabled]="!visibleFindUsages(contextMenuItem)">
                       <span class="context-menu-item">Where Used</span>
@@ -361,6 +364,24 @@
                             <input matInput [(ngModel)]="asAccDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asAccDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <a [routerLink]="['/core_component/acc/' + asAccDetail().sinceManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asAccDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asAccDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/acc/' + asAccDetail().lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asAccDetail().lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -373,16 +394,11 @@
                             <input matInput [(ngModel)]="asAccDetail().state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asAccDetail().owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('ACC')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -510,6 +526,18 @@
                             <input matInput [(ngModel)]="asAsccpDetail().ascc.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asAsccpDetail().ascc.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.sinceReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asAsccpDetail().ascc.lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.lastChangedReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -522,16 +550,11 @@
                             <input matInput [(ngModel)]="asAsccpDetail().ascc.state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asAsccpDetail().ascc.owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('ASCC')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -621,6 +644,24 @@
                             <input matInput [(ngModel)]="asAsccpDetail().asccp.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asAsccpDetail().asccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <a [routerLink]="['/core_component/asccp/' + asAsccpDetail().asccp.sinceManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asAsccpDetail().asccp.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asAsccpDetail().asccp.lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/asccp/' + asAsccpDetail().asccp.lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -633,16 +674,11 @@
                             <input matInput [(ngModel)]="asAsccpDetail().asccp.state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asAsccpDetail().asccp.owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('ASCCP')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -768,6 +804,18 @@
                             <input matInput [(ngModel)]="asBccpDetail().bcc.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBccpDetail().bcc.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.sinceReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBccpDetail().bcc.lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.lastChangedReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -780,16 +828,11 @@
                             <input matInput [(ngModel)]="asBccpDetail().bcc.state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBccpDetail().bcc.owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('BCC')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -925,6 +968,24 @@
                             <input matInput [(ngModel)]="asBccpDetail().bccp.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBccpDetail().bccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <a [routerLink]="['/core_component/bccp/' + asBccpDetail().bccp.sinceManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBccpDetail().bccp.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBccpDetail().bccp.lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/bccp/' + asBccpDetail().bccp.lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBccpDetail().bccp.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -937,16 +998,11 @@
                             <input matInput [(ngModel)]="asBccpDetail().bccp.state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBccpDetail().bccp.owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('BCCP')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -1107,6 +1163,24 @@
                             <input matInput [(ngModel)]="asBccpDetail().bdt.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBccpDetail().bdt.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <a [routerLink]="['/core_component/dt/' + asBccpDetail().bdt.sinceManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBccpDetail().bdt.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBccpDetail().bdt.lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <a [routerLink]="['/core_component/dt/' + asBccpDetail().bdt.lastChangedManifestId]"
+                               target="_blank" rel="noopener noreferrer">
+                              <input matInput [(ngModel)]="asBccpDetail().bdt.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
+                            </a>
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -1119,16 +1193,11 @@
                             <input matInput [(ngModel)]="asBccpDetail().bdt.state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBccpDetail().bdt.owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('DT')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
@@ -1226,6 +1295,18 @@
                             <input matInput [(ngModel)]="asBdtScDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
+                        <div class="{{ asBdtScDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                          <mat-form-field>
+                            <mat-label>Since</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().sinceReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-1" *ngIf="asBdtScDetail().lastChangedManifestId > 0">
+                          <mat-form-field>
+                            <mat-label>Last Changed</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().lastChangedReleaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
                         <div class="col-2">
                           <mat-form-field>
                             <mat-label>Revision</mat-label>
@@ -1238,16 +1319,11 @@
                             <input matInput [(ngModel)]="asBdtScDetail().state" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput [(ngModel)]="asBdtScDetail().owner" [disabled]="true">
                           </mat-form-field>
-                        </div>
-                        <div class="col-1">
-                          <button mat-icon-button (click)="openComments('DT_SC')">
-                            <mat-icon>comments</mat-icon>
-                          </button>
                         </div>
                       </div>
 
