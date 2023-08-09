@@ -38,19 +38,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
-    private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
-
-    private static String getDownloadPath() {
-        File fileDestination = new File(System.getProperty("user.home"), "Downloads");
-        return fileDestination.getAbsolutePath();
-    }
-
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
-        this.randomBusinessTerms.add(businessTerm);
     }
 
     @BeforeEach
@@ -93,11 +82,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -153,11 +141,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -209,11 +196,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
             businessTerms.add(randomBusinessTerm);
-            thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
         }
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -271,11 +257,6 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
-        });
-
-        // Delete random business terms
-        this.randomBusinessTerms.forEach(randomBusinessTerm -> {
-            getAPIFactory().getBusinessTermAPI().deleteBusinessTermById(randomBusinessTerm.getBusinessTermId());
         });
     }
 }

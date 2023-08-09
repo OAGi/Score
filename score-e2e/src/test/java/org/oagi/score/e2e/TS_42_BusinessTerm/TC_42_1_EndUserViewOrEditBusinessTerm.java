@@ -31,14 +31,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
-    private final List<BusinessTermObject> randomBusinessTerms = new ArrayList<>();
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private void thisRandomBusinessTermWillBeDeletedAfterTests(BusinessTermObject businessTerm) {
-        this.randomBusinessTerms.add(businessTerm);
     }
 
     @BeforeEach
@@ -103,9 +98,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     public void enduser_can_search_for_business_term_based_only_on_its_term() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
-        getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -120,9 +113,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
     public void enduser_can_search_for_business_term_based_on_external_reference_uri() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser);
-        getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(randomBusinessTerm, endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -169,8 +160,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
 
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
-
         assertThrows(NoSuchElementException.class, () -> bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(oldTermName));
 
         editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
@@ -187,7 +176,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -204,7 +192,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -225,7 +212,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -275,7 +262,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        thisRandomBusinessTermWillBeDeletedAfterTests(randomBusinessTerm);
+
         //use pre-existing BBIE node
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
@@ -344,11 +331,6 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
-        });
-
-        // Delete random business terms
-        this.randomBusinessTerms.forEach(randomBusinessTerm -> {
-            getAPIFactory().getBusinessTermAPI().deleteBusinessTermById(randomBusinessTerm.getBusinessTermId());
         });
     }
 
