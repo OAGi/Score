@@ -479,7 +479,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis'][contains(text(), \"" + assocDEN + "\")]//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
+            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis']//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
         }
 
         @Override

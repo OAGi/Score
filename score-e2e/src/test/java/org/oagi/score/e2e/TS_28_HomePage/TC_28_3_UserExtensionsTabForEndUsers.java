@@ -17,15 +17,16 @@ import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
@@ -573,8 +574,9 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         HomePage.MyUnusedUEsInBIEsPanel myUnusedUEsInBIEsPanel = homePage.openMyUnusedUEsInBIEsPanel();
         String ueName = asccp.getPropertyTerm() + " User Extension Group";
         WebElement td = myUnusedUEsInBIEsPanel.getTableRecordByUEAndDEN(ueName, bccpToAppend.getDen());
-        ACCExtensionViewEditPage accExtensionViewEditPage = (ACCExtensionViewEditPage) click(td);
-        assertTrue(accExtensionViewEditPage.getAmendButton(true).isDisplayed());
+        click(td);
+        By AMEND_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
+        assertTrue(elementToBeClickable(getDriver(), AMEND_BUTTON_LOCATOR).isDisplayed());
     }
 
     @AfterEach
