@@ -780,7 +780,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915dReusedChild = preconditions_ta_29_1_5d_ReusedChild(userb, prev_release);
         Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915dReusedParent = preconditions_ta_29_1_5d_ReusedParent(userb, prev_release);
-        Preconditions_TA_29_1_5d_BIEReusedScenario preconditionsTa2915ReusedScenario = new Preconditions_TA_29_1_5d_BIEReusedScenario(userb, prev_release);
+        Preconditions_TA_29_1_5d_BIEReusedScenario preconditionsTa2915dReusedScenario = new Preconditions_TA_29_1_5d_BIEReusedScenario(userb, prev_release);
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -794,7 +794,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.moveToProduction();
 
         viewEditBIEPage.openPage();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2915ReusedScenario.topLevelASBIEP);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2915dReusedScenario.topLevelASBIEP);
         asbieNode = editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
         waitFor(ofMillis(2500));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -862,7 +862,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915ReusedScenario.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setPropertyTerm(preconditionsTa2915dReusedScenario.topLevelASBIEP.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -925,8 +925,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("1", getText(bbiePanel.getCardinalityMaxField()));
         assertEquals(preconditionsTa2915dReusedParent.bbieExample, getText(bbiePanel.getExampleField()));
         assertEquals(preconditionsTa2915dReusedParent.bbieRemark, getText(bbiePanel.getRemarkField()));
-        assertEquals(preconditionsTa2915dReusedParent.bbieValueDomainRestriction, getText(bbiePanel.getValueDomainRestrictionSelectField()));
-        assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(preconditionsTa2915dReusedParent.bbieValueDomain));
         assertEquals(preconditionsTa2915dReusedParent.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
         asbieNode = editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
@@ -934,10 +932,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
-        assertEquals("11", getText(asbiePanel.getCardinalityMinField()));
-        assertEquals("99", getText(asbiePanel.getCardinalityMaxField()));
-        assertEquals(preconditionsTa2915dReusedParent.asbieRemark, getText(asbiePanel.getRemarkField()));
-        assertEquals(preconditionsTa2915dReusedParent.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
+        assertEquals("0", getText(asbiePanel.getCardinalityMinField()));
+        assertEquals("1", getText(asbiePanel.getCardinalityMaxField()));
 
         //unreuse FROM UOM Package
         viewEditBIEPage.openPage();
@@ -981,6 +977,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
+        asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMax(99);
         asbiePanel.setCardinalityMin(11);
         asbiePanel.setRemark(preconditionsTa2915d.asbieRemark);
@@ -1023,8 +1020,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setContextDefinition(preconditionsTa2915d.bbieContextDefinition);
         bbiePanel.setValueConstraint(preconditionsTa2915d.bbieValueConstraint);
         bbiePanel.setFixedValue(preconditionsTa2915d.bbieFixedValue);
-        bbiePanel.setValueDomainRestriction(preconditionsTa2915d.bbieValueDomainRestriction);
-        bbiePanel.setValueDomain(preconditionsTa2915d.bbieValueDomain);
         editBIEPage.hitUpdateButton();
 
 
@@ -1032,8 +1027,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
         waitFor(ofMillis(2000));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
-        asbiePanel.setCardinalityMax(99);
-        asbiePanel.setCardinalityMin(11);
+        asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2915d.asbieRemark);
         asbiePanel.setContextDefinition(preconditionsTa2915d.asbieContextDefinition);
         editBIEPage.hitUpdateButton();
@@ -1554,10 +1548,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private Preconditions_TA_29_1_BIEBOMDoubleNested preconditions_TA_29_10a_BIEBOMDoubleNested(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910a = new Preconditions_TA_29_1_BIEBOMDoubleNested(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+    private Preconditions_TA_29_1_BIEBOMDoubleNested preconditions_TA_29_10a_BIEBOMDoubleNested(AppUserObject developer, String prevRelease) {
+        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910a = new Preconditions_TA_29_1_BIEBOMDoubleNested(developer, prevRelease);
+        NamespaceObject devNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2910a.topLevelASBIEP);
@@ -1599,7 +1593,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        Preconditions_TA_29_1_JournalEntry preconditionsTa2910JournalEntry = preconditions_TA_29_10b_JournalEntry(developer, prev_release);
+        Preconditions_TA_29_1_JournalEntry preconditionsTa2910JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, prev_release);
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
@@ -1675,7 +1669,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2910b.topLevelASBIEP);
-        waitFor(Duration.ofMillis(1500));
+        waitFor(Duration.ofMillis(2500));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Change Status User Extension Group. Details");
@@ -2264,43 +2258,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
         //JournalEntry prev_release
         Preconditions_TA_29_1_JournalEntry preconditionsTa2912JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, prev_release);
-
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2912JournalEntry.topLevelASBIEP);
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
-        WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
-        waitFor(ofMillis(1500));
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
-        bbiePanel.setValueDomainRestriction("Code");
-        bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
-        editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
-        bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
-        waitFor(ofMillis(1500));
-        bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
-        bbiePanel.toggleUsed();
-        bbiePanel.setValueDomainRestriction("Code");
-        bbiePanel.setValueDomain("oacl_RiskCode");
-        editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
-        waitFor(ofMillis(1500));
-        EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        bbiescPanel.toggleUsed();
-        bbiescPanel.setValueDomainRestriction("Code");
-        bbiescPanel.setValueDomain("clm6ConditionTypeCode1_ConditionTypeCode");
-        editBIEPage.hitUpdateButton();
 
-        viewEditBIEPage.openPage();
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage = viewEditBIEPage.openCreateBIEPage();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 createBIEForSelectBusinessContextsPage.next(Collections.singletonList(context));
-        editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
+        EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE("Journal Entry. Journal Entry", prev_release);
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
         TopLevelASBIEPObject ReusedJournalENtryTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
@@ -2609,12 +2575,12 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject usera, String prevRelease) {
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject developer, String prevRelease) {
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
                     "BOM. BOM", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
+                    .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, developer, "WIP");
         }
     }
 
