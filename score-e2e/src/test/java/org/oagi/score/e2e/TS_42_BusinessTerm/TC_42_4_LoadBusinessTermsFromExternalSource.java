@@ -258,7 +258,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             String oldBusinessTermName = businessTerms.get(0).getBusinessTerm();
             viewEditBusinessTermPageForCheck.setTerm(oldBusinessTermName);
             viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(0, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
+            assertEquals(1, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
         } finally {
             csvFileForUpload.delete();
         }

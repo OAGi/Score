@@ -303,6 +303,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         WebElement tdBBIE = trBBIE.findElement(By.xpath("//span[contains(text(), \"BBIE\")]"));
         assertTrue(tdBBIE.isDisplayed());
         //Search by type code
+        btAssignmentPageForSelectedBIE.openPage();
+        assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
+        click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
         btAssignmentPageForSelectedBIE.setTypeCodeField("random type code");
         click(btAssignmentPageForSelectedBIE.getSearchButton());
         WebElement trASBIE = btAssignmentPageForSelectedBIE.getTableRecordAtIndex(1);
