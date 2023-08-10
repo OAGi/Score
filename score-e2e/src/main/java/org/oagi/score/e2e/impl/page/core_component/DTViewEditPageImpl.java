@@ -3,6 +3,7 @@ package org.oagi.score.e2e.impl.page.core_component;
 import org.oagi.score.e2e.impl.PageHelper;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
+import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.DTObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -362,12 +363,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
-    public void codeListIdMarkedAsDeleted(String name) {
-        WebElement tr = getTheLastTableRecord();
+    public void codeListIdMarkedAsDeleted(CodeListObject codeList) {
+        String codeListName = codeList.getName();
+        WebElement tr = getTableRecordByValue(codeListName);
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
-        WebElement codeList = findElement(getDriver(), By.xpath("//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]"));
-        codeList.findElement(By.xpath("//span[@class=\"text-line-through\"]"));
+
+        visibilityOfElementLocated(getDriver(), By.xpath(
+                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]//span[@class=\"text-line-through\"]"));
     }
 
     @Override
@@ -569,7 +572,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \""+value+"\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//span[contains(text(), \""+value+"\")]/ancestor::tr"));
     }
 
     @Override
