@@ -75,61 +75,45 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     @Test
     @DisplayName("TC_11_7_TA_2")
     public void test_TA_2() {
-        AppUserObject developerA;
-        ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
-        {
-            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerA);
+        AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developerA);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-
-            CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
-            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
-            codeListForTesting.add(codeList);
-        }
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        for (CodeListObject codeList : codeListForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
-            dtViewEditPage.showValueDomain();
-            dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            String qualifier = "testDataType" + randomAlphabetic(5, 10);
-            dtViewEditPage.setQualifier(qualifier);
-            String definition = getText(dtViewEditPage.getDefinitionField());
-            if (definition == null) {
-                click(dtViewEditPage.getUpdateButton(true));
-                waitFor(Duration.ofMillis(500));
-                dtViewEditPage.hitUpdateAnywayButton();
-            } else{
-                dtViewEditPage.hitUpdateButton();
-            }
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
-            editCodeListPage.hitDeleteButton();
-
-            viewEditCoreComponentPage.openPage();
-            DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
-            dtViewEditPageNew.showValueDomain();
-            assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
-            escape(getDriver());
-            CodeListObject oagiCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_StateCode", workingBranch.getReleaseNumber());
-            dtViewEditPageNew.changeCodeListValueDomain(oagiCodeList.getName());
-
-            editCodeListPage.openPage();
-            editCodeListPage.hitRestoreButton();
-
-            dtViewEditPageNew.openPage();
-            dtViewEditPageNew.showValueDomain();
-            assertThrows(NoSuchElementException.class, () -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
-            escape(getDriver());
-
-            viewEditCoreComponentPage.openPage();
+        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
+        dtViewEditPage.showValueDomain();
+        dtViewEditPage.addCodeListValueDomain(codeList.getName());
+        String qualifier = "testDataType" + randomAlphabetic(5, 10);
+        dtViewEditPage.setQualifier(qualifier);
+        String definition = getText(dtViewEditPage.getDefinitionField());
+        if (definition == null) {
+            click(dtViewEditPage.getUpdateButton(true));
+            waitFor(Duration.ofMillis(500));
+            dtViewEditPage.hitUpdateAnywayButton();
+        } else{
+            dtViewEditPage.hitUpdateButton();
         }
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
+        editCodeListPage.hitDeleteButton();
+
+        viewEditCoreComponentPage.openPage();
+        DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
+        dtViewEditPageNew.showValueDomain();
+        assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
+        escape(getDriver());
+        dtViewEditPageNew.changeCodeListValueDomain(codeList.getName());
+
+        editCodeListPage.openPage();
+        editCodeListPage.hitRestoreButton();
+
+        dtViewEditPageNew.openPage();
+        dtViewEditPageNew.showValueDomain();
+        assertThrows(TimeoutException.class, () -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
     }
 
     @Test

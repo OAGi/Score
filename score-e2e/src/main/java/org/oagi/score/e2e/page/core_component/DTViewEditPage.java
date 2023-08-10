@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.core_component;
 
+import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
@@ -217,7 +218,7 @@ public interface DTViewEditPage extends Page {
 
     WebElement getQualifierField();
 
-    void codeListIdMarkedAsDeleted(String name);
+    void codeListIdMarkedAsDeleted(CodeListObject codeList);
 
     void changeCodeListValueDomain(String codeListName);
 
