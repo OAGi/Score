@@ -6,6 +6,7 @@ import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * APIs for the agency ID list management.
@@ -16,6 +17,14 @@ public interface AgencyIDListAPI {
                                                 ReleaseObject release, String state);
 
     AgencyIDListObject getAgencyIDListByManifestId(BigInteger agencyIdListManifestId);
+
+    /**
+     * Return the list of agency ID list objects.
+     *
+     * @param release the release object
+     * @return the list of agency ID list objects
+     */
+    List<AgencyIDListObject> getAgencyIDListsByRelease(ReleaseObject release);
 
     /**
      * Return the agency ID list object by given name and branch

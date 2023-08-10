@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -356,22 +357,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             String[] nodes = path.split("/");
             return getNodeByName(nodes[nodes.length - 1]);
         });
-    }
-
-    @Override
-    public WebElement goToNodeByPath(String path) {
-        WebElement searchInput = getSearchInputTextField();
-        click(searchInput);
-        WebElement node = sendKeys(searchInput, path);
-        node.sendKeys(Keys.ENTER);
-        node.sendKeys(Keys.ENTER);
-        node.sendKeys(Keys.ENTER);
-        node.sendKeys(Keys.ENTER);
-        node.sendKeys(Keys.ENTER);
-        node.sendKeys(Keys.ENTER);
-        click(node);
-        clear(searchInput);
-        return node;
     }
 
     @Override

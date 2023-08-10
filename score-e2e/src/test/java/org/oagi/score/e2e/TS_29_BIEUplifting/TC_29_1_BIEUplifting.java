@@ -119,7 +119,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
         WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
@@ -132,7 +132,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2912.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.asbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
         assertNotChecked(asbiePanel.getNillableCheckbox());
@@ -142,7 +142,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2912.asbieContextDefinition, getText(asbiePanel.getContextDefinitionField()));
 
         WebElement bbieScNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbieScPath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         assertChecked(bbiescPanel.getUsedCheckbox());
         assertEquals("0", getText(bbiescPanel.getCardinalityMinField()));
@@ -164,7 +164,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2912.topLevelASBIEP);
 
         WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2912.bbieRemark);
@@ -177,14 +177,14 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.asbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.setRemark(preconditionsTa2912.asbieRemark);
         asbiePanel.setContextDefinition(preconditionsTa2912.asbieContextDefinition);
         editBIEPage.hitUpdateButton();
 
         WebElement bbieScNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbieScPath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark(preconditionsTa2912.bbieScRemark);
@@ -241,39 +241,39 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2914.topLevelASBIEP);
 
         WebElement bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Last Modification Date Time");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Identifier");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Name");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set/Scheme Version Identifier");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
@@ -286,7 +286,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Usage Description");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
@@ -299,7 +299,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Incorporation Location/Physical Address");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
@@ -307,7 +307,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Code List/Code List Value");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
@@ -315,7 +315,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.setCardinalityMin(11);
         bbiePanel.setCardinalityMax(99);
@@ -325,7 +325,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
@@ -335,7 +335,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark(preconditionsTa2914.bbieScRemark);
@@ -348,7 +348,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Indicator");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setCardinalityMin(11);
@@ -359,7 +359,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2914.asbieRemark);
@@ -369,7 +369,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Extension/Revised Item Status/Reason Code");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2914.bbieRemark);
@@ -412,7 +412,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setPropertyTerm(topLevelASBIEP.getPropertyTerm());
         upliftBIEPage.hitSearchButton();
-        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(),\"" + topLevelASBIEP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(), \"" + topLevelASBIEP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
 
     @Test
@@ -447,7 +447,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                         "/Enterprise Unit/Name",
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
-            waitFor(ofMillis(2000));
+            waitFor(ofMillis(2000L));
             assertFalse(isElementPresent(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         }
 
@@ -458,9 +458,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                         "/Enterprise Unit/Name",
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
-            waitFor(ofMillis(2000));
+            waitFor(ofMillis(2000L));
             WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE(path);
-            waitFor(ofMillis(2000));
+            waitFor(ofMillis(2000L));
             assertChecked(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
             assertTrue(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]//input[@disabled]")).isDisplayed());
         }
@@ -492,7 +492,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertChecked(bbiePanel.getUsedCheckbox());
 
         bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Type Code");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEquals("0", getText(bbiePanel.getCardinalityMinField()));
@@ -502,7 +502,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2914.bbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
         WebElement asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier Set");
-        waitFor(Duration.ofMillis(2000));
+        waitFor(Duration.ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertChecked(asbiePanel.getUsedCheckbox());
     }
@@ -869,7 +869,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(td);
         upliftBIEVerificationPage = upliftBIEPage.Next();
         selectProfileBIEToReuseDialog = upliftBIEVerificationPage.reuseBIEOnNode("/UOM Code Conversion Rate/From UOM Package", "From UOM Package");
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Unit Packaging\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Unit Packaging\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
         selectProfileBIEToReuseDialog.selectBIEToReuse(upliftedReusedParentTopLevelASBIEP);
 
         upliftBIEVerificationPage.next();
@@ -940,8 +940,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
         editBIEPage.clickOnDropDownMenuByPath("/UOM Code Conversion Rate/From UOM Package");
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove Reused BIE\")]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
         waitFor(ofMillis(2500));
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
         assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
@@ -958,9 +958,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2915d.topLevelASBIEP);
 
-        editBIEPage.goToNodeByPath(preconditionsTa2915d.bbiePath);
+        editBIEPage.getNodeByPath(preconditionsTa2915d.bbiePath);
         WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.bbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2915d.bbieRemark);
@@ -975,7 +975,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMax(99);
@@ -985,7 +985,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         WebElement bbieScNode = editBIEPage.getNodeByPath(preconditionsTa2915d.bbieScPath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieScNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setRemark(preconditionsTa2915d.bbieScRemark);
@@ -1010,9 +1010,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2915d.topLevelASBIEP);
 
-        editBIEPage.goToNodeByPath(preconditionsTa2915d.bbiePath);
+        editBIEPage.getNodeByPath(preconditionsTa2915d.bbiePath);
         WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.bbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setRemark(preconditionsTa2915d.bbieRemark);
@@ -1025,7 +1025,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
         WebElement asbieNode = editBIEPage.getNodeByPath(preconditionsTa2915d.asbiePath);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         asbiePanel.toggleUsed();
         asbiePanel.setRemark(preconditionsTa2915d.asbieRemark);
@@ -1081,19 +1081,19 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         waitFor(ofMillis(2500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("gregorian month", getText(bbiescPanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         waitFor(ofMillis(2500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1141,7 +1141,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1155,7 +1155,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1163,23 +1163,23 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("gregorian month");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("normalized string");
         editBIEPage.hitUpdateButton();
 
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Inclusive Indicator");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Batch Size Quantity");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1187,7 +1187,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("integer");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Effectivity/Effective Range/Range Count Number");
         waitFor(ofMillis(2500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1232,7 +1232,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP);
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Get BOM/Data Area/BOM/BOM Option/Extension");
         SelectAssociationDialog selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/BOM Option User Extension Group. Details");
@@ -1265,20 +1265,20 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP);
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
         WebElement bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1286,76 +1286,76 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("language");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Total Number");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Total Number");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Total Number");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("positive integer");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Latest Start Date Time");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Latest Start Date Time");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Latest Start Date Time");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("gregorian day");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("float");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("string");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("string");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier/Scheme Agency Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier/Scheme Agency Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier/Scheme Agency Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("normalized string");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Save Indicator");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Save Indicator");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Save Indicator");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1445,44 +1445,44 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //Verification after uplifting
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTOPBIEGETBOMTopLevelASBIEP);
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Revision Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Revision Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Revision Identifier");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Intermediary/Component Identifier");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("any URI", getText(bbiePanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Application Area/Sender/Authorization Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Authorization Identifier");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Authorization Identifier");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("language", getText(bbiePanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Size Quantity");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Size Quantity");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Size Quantity");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("positive integer", getText(bbiePanel.getValueDomainField()));
 
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("token", getText(bbiePanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
-        editBIEPage.goToNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
+        editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
@@ -1529,18 +1529,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIEBOMDoubleNestedTopLevelASBIEP);
 
-        editBIEPage.goToNodeByPath("/BOM/BOM Option/Default Indicator");
+        editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
         WebElement bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
 
-        editBIEPage.goToNodeByPath("/BOM/BOM Option/Description/Language Code");
+        editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
-        editBIEPage.goToNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
@@ -1563,7 +1563,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("/BOM/BOM Option/Description/Language Code");
+        editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Description/Language Code");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
@@ -1572,7 +1572,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiescPanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
         editBIEPage.hitUpdateButton();
 
-        editBIEPage.goToNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
+        editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         bbieSCNode = editBIEPage.getNodeByPath("//BOM/BOM Option/Identifier/Scheme Agency Identifier");
         waitFor(ofMillis(1500));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
@@ -1643,18 +1643,18 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedJournalEntryTopLevelASBIEP);
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
         WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertChecked(bbiePanel.getUsedCheckbox());
         assertEnabled(bbiePanel.getUsedCheckbox());
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Tax Base Functional Amount");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("oacl_RiskCode"));
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Application Area/Sender/Logical Identifier/Scheme Identifier");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
@@ -1683,7 +1683,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2910b.topLevelASBIEP);
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
         WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1691,7 +1691,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomainRestriction("Code");
         bbiePanel.setValueDomain("clm6TimeFormatCode1_TimeFormatCode");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
         bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category");
         waitFor(ofMillis(1500));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1699,7 +1699,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.setValueDomainRestriction("Code");
         bbiePanel.setValueDomain("oacl_RiskCode");
         editBIEPage.hitUpdateButton();
-        editBIEPage.goToNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
+        editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Control Objective Category/List Version Identifier");
         waitFor(ofMillis(1500));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
@@ -1947,77 +1947,77 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIECAGUpliftTopLevelASBIEP);
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("decimal", getText(bbiePanel.getValueDomainField()));
 
         WebElement bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Primary Entry Route/Type Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
@@ -2134,72 +2134,72 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIECAGUplift2);
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserqa));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/DODAACID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserproduction));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/SCACID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserdeleted));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CCRID");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessUseraDeprecated.getName()));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/Account Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("CLuserderived_BIEUp"));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(CLaccessendUserwip));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Endorsement");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(CLaccessendUserqa));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Placard Notation");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserproduction));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Marine Pollution Level Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("CLuserderived_BIEUp"));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Toxicity Zone Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessendUserdeleted));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Flashpoint Temperature");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith(CLaccessUseraDeprecated.getName()));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Version Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith("CLuserderived_BIEUp"));
 
         bbieSCNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/MFAGID/Scheme Agency Identifier");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbieSCNode);
         assertTrue(getText(bbiescPanel.getValueDomainField()).startsWith(CLaccessendUserqa));
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Export Control/Encryption Status Code");
-        waitFor(ofMillis(2000));
+        waitFor(ofMillis(2000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
         homePage.logout();
@@ -2294,15 +2294,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
         upliftBIEVerificationPage.next();
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Usage Description\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Control Objective Category\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"List Version Identifier\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"BCCP\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"DT_SC\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"ASCCP\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Not selected\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"System\")]")).isDisplayed());
-        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(),\"Unmatched\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Usage Description\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Control Objective Category\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"List Version Identifier\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"BCCP\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"DT_SC\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"ASCCP\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Not selected\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"System\")]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Unmatched\")]")).isDisplayed());
     }
 
     private class Preconditions_TA_29_1_2 {

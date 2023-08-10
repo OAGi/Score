@@ -167,7 +167,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -329,6 +329,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         WebElement node = getNodeByName(nodeName);
         click(node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -680,17 +681,18 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
         WebElement node = retry(() -> {
-            WebElement e = sendKeys(getSearchInputTextField(), path);
-            if (!path.equals(getText(getSearchInputTextField()))) {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
             return e;
         });
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 

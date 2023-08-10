@@ -5,7 +5,6 @@ import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -79,14 +78,6 @@ public interface EditBIEPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
-
-    /**
-     * Return the UI element of the tree node by the node path.
-     *
-     * @param path the node path
-     * @return the UI element of the tree node
-     */
-    WebElement goToNodeByPath(String path);
 
     /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.

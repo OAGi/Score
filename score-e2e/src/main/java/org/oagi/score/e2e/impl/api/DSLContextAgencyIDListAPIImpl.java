@@ -17,10 +17,7 @@ import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -130,6 +127,24 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
                 .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                 .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(ULong.valueOf(agencyIdListManifestId)))
                 .fetchOne(record -> agencyIDListListMapper(record));
+    }
+
+    @Override
+    public List<AgencyIDListObject> getAgencyIDListsByRelease(ReleaseObject release) {
+        if (release == null) {
+            return Collections.emptyList();
+        }
+        List<Field<?>> fields = new ArrayList();
+        fields.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(AGENCY_ID_LIST.fields()));
+        return dslContext.select(fields)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())))
+                .fetch(record -> agencyIDListListMapper(record));
     }
 
     @Override
