@@ -14,7 +14,6 @@ import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
-
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,10 +49,10 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
         List<Field<?>> oasRequestChangedField = new ArrayList();
         List<Field<?>> oasResponseChangedField = new ArrayList();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
-            if (bieForOasDoc.getMessageBody().equals("Request")){
+            if (bieForOasDoc.getMessageBody().equals("Request")) {
                 //update oas_resource
-                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("req_oas_resource")).where(and(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.as("req_oas_resource_id").eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.as("req_oas_doc_id").eq(ULong.valueOf(oasDocId)))).fetchOptional().orElse(null);
+                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("req_oas_resource")).where(and(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))).fetchOptional().orElse(null);
                 if (oasResourceRecord == null) {
                     throw new ScoreDataAccessException(new IllegalArgumentException());
                 }
@@ -70,8 +69,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     }
                 }
                 //update oas_operation
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("req_oas_operation")).where(and(OAS_OPERATION.as("req_oas_operation").OAS_RESOURCE_ID.as("req_oas_resource_id").eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.as("req_oas_operation_id").eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
+                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("req_oas_operation")).where(and(OAS_OPERATION.as("req_oas_operation").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
                 if (oasOperationRecord == null) {
                     throw new ScoreDataAccessException(new IllegalArgumentException());
                 }
@@ -93,10 +92,39 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 }
 
                 //update arrayIndicator and SuppressRootIndicator
+                ULong oasRequestId = null;
+                ULong oasResponseId = null;
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                if (oasRequestRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
+                OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                if (oasResponseRecord != null) {
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
+                    dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                 }
+                if (oasRequestRecord == null) {
+                    ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
+                            .set(OAS_MESSAGE_BODY.CREATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, ULong.valueOf(bieForOasDoc.getTopLevelAsbiepId()))
+                            .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
+                            .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
+                            .fetchOne().value1();
+
+                    oasRequestId = dslContext().insertInto(OAS_REQUEST)
+                            .set(OAS_REQUEST.CREATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_REQUEST.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_REQUEST.CREATION_TIMESTAMP, timestamp)
+                            .set(OAS_REQUEST.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .set(OAS_REQUEST.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
+                            .set(OAS_REQUEST.OAS_OPERATION_ID, ULong.valueOf(bieForOasDoc.getOasOperationId()))
+                            .set(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
+                            .set(OAS_REQUEST.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
+                            .set(OAS_REQUEST.IS_CALLBACK, (byte) 0)
+                            .set(OAS_REQUEST.REQUIRED, (byte) (1))
+                            .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
+                            .fetchOne().value1();
+                }
+
                 if (oasRequestRecord != null && BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
                     oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
                     oasRequestRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
@@ -117,10 +145,10 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 }
             }
 
-            if (bieForOasDoc.getMessageBody().equals("Response")){
+            if (bieForOasDoc.getMessageBody().equals("Response")) {
                 //update oas_resource
-                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("res_oas_resource")).where(and(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.as("res_oas_resource_id").eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.as("res_oas_resource").OAS_DOC_ID.as("res_oas_doc_id").eq(ULong.valueOf(bieForOasDoc.getOasDocId())))).fetchOptional().orElse(null);
+                OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("res_oas_resource")).where(and(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_RESOURCE.as("res_oas_resource").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))).fetchOptional().orElse(null);
                 if (oasResourceRecord == null) {
                     throw new ScoreDataAccessException(new IllegalArgumentException());
                 }
@@ -137,8 +165,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     }
                 }
                 //update oas_operation
-                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("res_oas_operation")).where(and(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.as("res_oas_resource_id").eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.as("res_oas_operation_id").eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
+                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("res_oas_operation")).where(and(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
+                        OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
                 if (oasOperationRecord == null) {
                     throw new ScoreDataAccessException(new IllegalArgumentException());
                 }
@@ -160,10 +188,39 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 }
 
                 //update arrayIndicator and SuppressRootIndicator
+                //update arrayIndicator and SuppressRootIndicator
+                ULong oasRequestId = null;
+                ULong oasResponseId = null;
+                OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
-                if (oasResponseRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
+                if (oasRequestRecord != null) {
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
+                    dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                 }
+                if (oasResponseRecord == null) {
+                    ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
+                            .set(OAS_MESSAGE_BODY.CREATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_MESSAGE_BODY.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID, ULong.valueOf(bieForOasDoc.getTopLevelAsbiepId()))
+                            .set(OAS_MESSAGE_BODY.CREATION_TIMESTAMP, timestamp)
+                            .set(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .returningResult(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
+                            .fetchOne().value1();
+
+                    oasResponseId = dslContext().insertInto(OAS_RESPONSE)
+                            .set(OAS_RESPONSE.CREATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_RESPONSE.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                            .set(OAS_RESPONSE.CREATION_TIMESTAMP, timestamp)
+                            .set(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP, timestamp)
+                            .set(OAS_RESPONSE.OAS_MESSAGE_BODY_ID, oasMessageBodyId)
+                            .set(OAS_RESPONSE.OAS_OPERATION_ID, ULong.valueOf(bieForOasDoc.getOasOperationId()))
+                            .set(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR, (byte) (bieForOasDoc.isSuppressRootIndicator() ? 1 : 0))
+                            .set(OAS_RESPONSE.MAKE_ARRAY_INDICATOR, (byte) (bieForOasDoc.isArrayIndicator() ? 1 : 0))
+                            .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
+                            .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
+                            .fetchOne().value1();
+                }
+
                 if (oasResponseRecord != null && BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
                     oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
                     oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
