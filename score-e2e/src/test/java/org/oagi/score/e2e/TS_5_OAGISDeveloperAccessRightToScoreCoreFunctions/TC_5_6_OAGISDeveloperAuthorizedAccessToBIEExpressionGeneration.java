@@ -7,29 +7,135 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.bie.ExpressBIEPage;
+import org.openqa.selenium.TimeoutException;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
 
-    private AppUserObject appUser;
+    private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
     public void init() {
         super.init();
+    }
 
-        // Create random end-user
-        appUser = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
+        this.randomAccounts.add(appUser);
     }
 
     @Test
     @DisplayName("TC_5_6_TA_1")
     public void test_TA_1() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                "Price List. Price List", "10.6");
+
+        for (String state : Arrays.asList("WIP", "QA", "Production")) {
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                    Arrays.asList(randomBusinessContext), asccp, developer, state);
+
+            expressBIEPage.openPage();
+            expressBIEPage.selectBIEForExpression(topLevelASBIEP);
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                assertNotNull(generatedBIEExpression);
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
+        }
     }
 
     @Test
     @DisplayName("TC_5_6_TA_2")
     public void test_TA_2() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Person Name. Person Name",
+                latestRelease.getReleaseNumber());
+
+        for (String state : Arrays.asList("WIP", "QA", "Production")) {
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                    Arrays.asList(randomBusinessContext), asccp, developer, state);
+
+            expressBIEPage.openPage();
+            expressBIEPage.selectBIEForExpression(topLevelASBIEP);
+            File generatedBIEExpression = null;
+            try {
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                assertNotNull(generatedBIEExpression);
+            } finally {
+                if (generatedBIEExpression != null) {
+                    generatedBIEExpression.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("TC_5_6_TA_2 (Verify BIE per Branch)")
+    public void test_TA_2_verify_BIE_per_branch() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject nonLatestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+                "Price List. Price List", nonLatestRelease.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP_nonLatest = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Person Name. Person Name",
+                latestRelease.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP_latest = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
+        expressBIEPage.setBranch(nonLatestRelease.getReleaseNumber());
+        expressBIEPage.setOwner(developer.getLoginId());
+        expressBIEPage.hitSearchButton();
+
+        assertNotNull(expressBIEPage.getTableRecordByValue(topLevelASBIEP_nonLatest.getPropertyTerm()));
+        assertThrows(TimeoutException.class, () -> expressBIEPage.getTableRecordByValue(topLevelASBIEP_latest.getPropertyTerm()));
+
+        expressBIEPage.openPage();
+        expressBIEPage.setBranch(latestRelease.getReleaseNumber());
+        expressBIEPage.setOwner(developer.getLoginId());
+        expressBIEPage.hitSearchButton();
+
+        assertNotNull(expressBIEPage.getTableRecordByValue(topLevelASBIEP_latest.getPropertyTerm()));
+        assertThrows(TimeoutException.class, () -> expressBIEPage.getTableRecordByValue(topLevelASBIEP_nonLatest.getPropertyTerm()));
     }
 
     @Test
@@ -261,10 +367,10 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
     public void tearDown() {
         super.tearDown();
 
-        // Delete random developer
-        if (appUser != null) {
-            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(appUser.getLoginId());
-        }
+        // Delete random accounts
+        this.randomAccounts.forEach(newUser -> {
+            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
+        });
     }
 
 }
