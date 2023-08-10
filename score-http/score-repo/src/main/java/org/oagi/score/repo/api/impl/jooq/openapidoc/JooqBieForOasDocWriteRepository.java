@@ -97,8 +97,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 if (oasResponseRecord != null) {
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
                     dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
                 }
                 if (oasRequestRecord == null) {
                     ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
@@ -123,26 +123,28 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                             .set(OAS_REQUEST.REQUIRED, (byte) (1))
                             .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
                             .fetchOne().value1();
+                }else{
+
+                    if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
+                        oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
+                        oasRequestRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
+                    }
+
+                    if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasRequestRecord.getSuppressRootIndicator()) {
+                        oasRequestChangedField.add(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR);
+                        oasRequestRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
+                    }
+
+                    oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATED_BY);
+                    oasRequestRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
+                    oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATE_TIMESTAMP);
+                    oasRequestRecord.setLastUpdateTimestamp(timestamp);
+                    affectedRows = oasRequestRecord.update(oasRequestChangedField);
+                    if (affectedRows != 1) {
+                        throw new ScoreDataAccessException(new IllegalStateException());
+                    }
                 }
 
-                if (oasRequestRecord != null && BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
-                    oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
-                    oasRequestRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
-                }
-
-                if (oasRequestRecord != null && BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasRequestRecord.getSuppressRootIndicator()) {
-                    oasRequestChangedField.add(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR);
-                    oasRequestRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
-                }
-
-                oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATED_BY);
-                oasRequestRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
-                oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATE_TIMESTAMP);
-                oasRequestRecord.setLastUpdateTimestamp(timestamp);
-                affectedRows = oasRequestRecord.update(oasRequestChangedField);
-                if (affectedRows != 1) {
-                    throw new ScoreDataAccessException(new IllegalStateException());
-                }
             }
 
             if (bieForOasDoc.getMessageBody().equals("Response")) {
@@ -194,8 +196,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 if (oasRequestRecord != null) {
-                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
                     dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
                 }
                 if (oasResponseRecord == null) {
                     ULong oasMessageBodyId = dslContext().insertInto(OAS_MESSAGE_BODY)
@@ -219,25 +221,26 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                             .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
                             .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                             .fetchOne().value1();
-                }
+                } else{
+                    if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
+                        oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
+                        oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
+                    }
 
-                if (oasResponseRecord != null && BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
-                    oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
-                    oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
-                }
+                    if (BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasResponseRecord.getSuppressRootIndicator()) {
+                        oasResponseChangedField.add(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR);
+                        oasResponseRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
+                    }
 
-                if (oasResponseRecord != null && BooleanToByte(bieForOasDoc.isSuppressRootIndicator()) != oasResponseRecord.getSuppressRootIndicator()) {
-                    oasResponseChangedField.add(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR);
-                    oasResponseRecord.setSuppressRootIndicator(BooleanToByte(bieForOasDoc.isSuppressRootIndicator()));
-                }
+                    oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATED_BY);
+                    oasResponseRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
+                    oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP);
+                    oasResponseRecord.setLastUpdateTimestamp(timestamp);
+                    affectedRows = oasResponseRecord.update(oasResponseChangedField);
+                    if (affectedRows != 1) {
+                        throw new ScoreDataAccessException(new IllegalStateException());
+                    }
 
-                oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATED_BY);
-                oasResponseRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
-                oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP);
-                oasResponseRecord.setLastUpdateTimestamp(timestamp);
-                affectedRows = oasResponseRecord.update(oasResponseChangedField);
-                if (affectedRows != 1) {
-                    throw new ScoreDataAccessException(new IllegalStateException());
                 }
             }
 
