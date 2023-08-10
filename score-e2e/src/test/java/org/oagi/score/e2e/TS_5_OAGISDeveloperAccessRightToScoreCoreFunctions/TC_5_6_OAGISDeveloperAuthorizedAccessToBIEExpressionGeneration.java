@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.*;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
 
     private List<AppUserObject> randomAccounts = new ArrayList<>();

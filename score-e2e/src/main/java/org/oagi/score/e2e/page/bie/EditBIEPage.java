@@ -178,6 +178,10 @@ public interface EditBIEPage extends Page {
      */
     void moveToProduction();
 
+    void enableChildren(String path);
+
+    void setChildrenMaxCardinalityToOne(String path);
+
     /**
      * Make the local user extension on the 'Extension' node.
      *
@@ -395,6 +399,18 @@ public interface EditBIEPage extends Page {
          */
         WebElement getTypeDefinitionField();
 
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
+
     }
 
     /**
@@ -494,6 +510,18 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
+
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
     }
 
     interface ReusedASBIEPanel {
@@ -699,6 +727,18 @@ public interface EditBIEPage extends Page {
         String getResetDialogMessage();
 
         String getValueDomainWarningMessage(String valueDomain);
+
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
     }
 
     interface BBIESCPanel {

@@ -3747,18 +3747,179 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_52")
-    public void test_TA_52() {
+    @DisplayName("TC_5_5_TA_52 (Enable Children - ASBIE)")
+    public void test_TA_52_asbie() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String asbieChild : Arrays.asList("Sender", "Intermediary", "Receiver", "Signature", "Extension")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + asbieChild);
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(childPanel);
+            assertEnabled(asbiePanel.getUsedCheckbox());
+        }
+        for (String bbieChild : Arrays.asList("Creation Date Time", "Scenario Identifier", "Correlation Identifier", "BOD Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + bbieChild);
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(childPanel);
+            assertEnabled(bbiePanel.getUsedCheckbox());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_52 (Enable Children - BBIE)")
+    public void test_TA_52_bbie() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area/Sender/Component Identifier";
+        WebElement componentIdentifier = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIEPanel componentIdentifierPanel = editBIEPage.getBBIEPanel(componentIdentifier);
+        componentIdentifierPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String child : Arrays.asList("Scheme Agency Identifier", "Scheme Identifier", "Scheme Version Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + child);
+            EditBIEPage.BBIESCPanel bbieScPanel = editBIEPage.getBBIESCPanel(childPanel);
+            assertEnabled(bbieScPanel.getUsedCheckbox());
+        }
     }
 
     @Test
     @DisplayName("TC_5_5_TA_53")
     public void test_TA_53() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.setChildrenMaxCardinalityToOne(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String asbieChild : Arrays.asList("Sender", "Intermediary", "Receiver", "Signature", "Extension")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + asbieChild);
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(childPanel);
+            assertEquals(1, Integer.valueOf(getText(asbiePanel.getCardinalityMaxField())));
+        }
+        for (String bbieChild : Arrays.asList("Creation Date Time", "Scenario Identifier", "Correlation Identifier", "BOD Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + bbieChild);
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(childPanel);
+            assertEquals(1, Integer.valueOf(getText(bbiePanel.getCardinalityMaxField())));
+        }
     }
 
     @Test
     @DisplayName("TC_5_5_TA_54")
     public void test_TA_54() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.setRemark(randomPrint(50, 100).trim());
+        topLevelASBIEPPanel.setVersion("version_" + randomAlphanumeric(5, 10));
+        topLevelASBIEPPanel.setStatus("status_" + randomAlphanumeric(5, 10));
+        topLevelASBIEPPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        topLevelASBIEPPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getVersionField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getStatusField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getContextDefinitionField())));
+
+        editBIEPage.openPage();
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        applicationAreaPanel.setRemark(randomPrint(50, 100).trim());
+        applicationAreaPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        applicationAreaPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(applicationAreaPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(applicationAreaPanel.getContextDefinitionField())));
+
+        editBIEPage.openPage();
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier";
+        WebElement scenarioIdentifier = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIEPanel scenarioIdentifierPanel = editBIEPage.getBBIEPanel(scenarioIdentifier);
+        scenarioIdentifierPanel.toggleUsed();
+        scenarioIdentifierPanel.setRemark(randomPrint(50, 100).trim());
+        scenarioIdentifierPanel.setExample(randomPrint(50, 100).trim());
+        scenarioIdentifierPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        scenarioIdentifierPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getExampleField())));
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getContextDefinitionField())));
     }
 
     @Test

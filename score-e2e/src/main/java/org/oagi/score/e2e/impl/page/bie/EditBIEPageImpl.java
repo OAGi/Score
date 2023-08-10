@@ -35,6 +35,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
+    private static final By ENABLE_CHILDREN_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Enable Children\")]");
+
+    private static final By SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Set Children Max Cardinality to 1\")]");
+
     private static final By ABIE_LOCAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Locally\")]");
 
@@ -238,6 +244,36 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
             assert ACCExtensionViewEditPage.isOpened();
             return ACCExtensionViewEditPage;
+        });
+    }
+
+    @Override
+    public void enableChildren(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+
+            try {
+                click(elementToBeClickable(getDriver(), ENABLE_CHILDREN_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), ENABLE_CHILDREN_OPTION_LOCATOR));
+            }
+        });
+    }
+
+    @Override
+    public void setChildrenMaxCardinalityToOne(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+
+            try {
+                click(elementToBeClickable(getDriver(), SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR));
+            }
         });
     }
 
@@ -567,6 +603,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
     }
 
+    private WebElement getIconButtonByName(String iconName) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//mat-icon[contains(text(), \"" + iconName + "\")]//ancestor::button"));
+    }
+
     private class TopLevelASBIEPPanelImpl implements TopLevelASBIEPPanel {
         @Override
         public WebElement getReleaseField() {
@@ -687,6 +728,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getTypeDefinitionField() {
             return getTextAreaFieldByName("Type Definition");
+        }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
         }
     }
 
@@ -879,6 +932,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             } else {
                 return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
             }
+        }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
         }
     }
 
@@ -1119,6 +1184,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             String message = valueDomainElement.getAttribute("ng-reflect-message");
             pressEscape();
             return message;
+        }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
         }
     }
 
