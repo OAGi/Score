@@ -1430,8 +1430,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());
+        retry(() -> {
+            // The Angular error matcher showed a different error message sometimes.
+            assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());
+        });
     }
 
     @Test

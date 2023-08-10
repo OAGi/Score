@@ -11,6 +11,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
+
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -55,6 +57,15 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNum(name, branch);
         waitFor(ofMillis(500L));
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
+        assert editCodeListPage.isOpened();
+        return editCodeListPage;
+    }
+
+    @Override
+    public EditCodeListPage openCodeListViewEditPageByManifestId(BigInteger codeListManifestId) {
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListManifestId);
+        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
+        editCodeListPage.openPage();
         assert editCodeListPage.isOpened();
         return editCodeListPage;
     }

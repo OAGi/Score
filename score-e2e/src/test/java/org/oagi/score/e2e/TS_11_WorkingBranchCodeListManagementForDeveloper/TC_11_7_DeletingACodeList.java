@@ -109,8 +109,9 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
                 dtViewEditPage.hitUpdateButton();
             }
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
             editCodeListPage.hitDeleteButton();
+
             viewEditCoreComponentPage.openPage();
             DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
             dtViewEditPageNew.showValueDomain();
@@ -119,8 +120,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             CodeListObject oagiCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_StateCode", workingBranch.getReleaseNumber());
             dtViewEditPageNew.changeCodeListValueDomain(oagiCodeList.getName());
 
-            viewEditCodeListPage.openPage();
-            editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            editCodeListPage.openPage();
             editCodeListPage.hitRestoreButton();
 
             dtViewEditPageNew.openPage();
