@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.business_term_management.controller.BusinessTermController;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
@@ -9,9 +10,10 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermRequest;
+import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
-import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -29,10 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
@@ -213,6 +212,44 @@ public class OpenAPIDocController {
         return oasDocService.selectBieForOasDoc(requester, request);
     }
 
+    @RequestMapping(value = "//oas_doc/{oasDocId:[\\d]+}/bie_list/delete", method = RequestMethod.POST)
+    public ResponseEntity deletes(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody DeleteBieForOasDocRequestData requestData) {
+
+        DeleteBieForOasDocRequest request = new DeleteBieForOasDocRequest(authenticationService.asScoreUser(requester))
+                .withBieForOasDocList(requestData.getBieForOasDocList());
+
+        DeleteBieForOasDocResponse response = oasDocService.deleteBieForOasDoc(request);
+
+        if (response.containsAll(requestData.getBieForOasDocList())) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public static class DeleteBieForOasDocRequestData {
+
+        private BigInteger oasDocId;
+        private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
+
+        public BigInteger getOasDocId() {
+            return oasDocId;
+        }
+
+        public void setOasDocId(BigInteger oasDocId) {
+            this.oasDocId = oasDocId;
+        }
+
+        public List<BieForOasDoc> getBieForOasDocList() {
+            return bieForOasDocList;
+        }
+        public void setBieForOasDocList(List<BieForOasDoc> bieForOasDocList) {
+            this.bieForOasDocList = bieForOasDocList;
+        }
+    }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieForOasDoc> getBieListForOasDoc(
@@ -229,21 +266,21 @@ public class OpenAPIDocController {
 
         bieForOasDocList.getResults().forEach(bieList -> {
 
-                    GetBusinessContextListRequest getBusinessContextListRequest =
-                            new GetBusinessContextListRequest(authenticationService.asScoreUser(requester))
-                                    .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
-                                    .withName(request.getBusinessContext());
+            GetBusinessContextListRequest getBusinessContextListRequest =
+                    new GetBusinessContextListRequest(authenticationService.asScoreUser(requester))
+                            .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
+                            .withName(request.getBusinessContext());
 
-                    getBusinessContextListRequest.setPageIndex(-1);
-                    getBusinessContextListRequest.setPageSize(-1);
+            getBusinessContextListRequest.setPageIndex(-1);
+            getBusinessContextListRequest.setPageSize(-1);
 
-                    GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                            .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
 
-                    bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
-                    bieList.setAccess(AccessPrivilege.toAccessPrivilege(appUser, bieList.getOwnerUserId(), bieList.getState()).toString()
-                    );
-                });
+            bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieList.setAccess(AccessPrivilege.toAccessPrivilege(appUser, bieList.getOwnerUserId(), bieList.getState()).toString()
+            );
+        });
 
         PageResponse<BieForOasDoc> pageResponse = new PageResponse<>();
         pageResponse.setList(bieForOasDocList.getResults());
@@ -254,6 +291,7 @@ public class OpenAPIDocController {
         return pageResponse;
 
     }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/{topLevelAsbiepId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BieForOasDoc getBieForOasDoc(

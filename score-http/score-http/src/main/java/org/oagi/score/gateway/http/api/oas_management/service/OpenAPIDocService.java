@@ -244,6 +244,15 @@ public class OpenAPIDocService {
                                            oasResponseId != null ? oasResponseId.toBigInteger(): null);
     }
 
+    @Transactional
+    public DeleteBieForOasDocResponse deleteBieForOasDoc(DeleteBieForOasDocRequest request) {
+        DeleteBieForOasDocResponse response =
+                scoreRepositoryFactory.createBieForOasDocWriteRepository()
+                        .deleteBieForOasDoc(request);
+        return response;
+
+    }
+
     public boolean checkOasDocUniqueness(OasDoc oasDoc) {
         return oasDocRepository.checkOasDocUniqueness(oasDoc);
     }

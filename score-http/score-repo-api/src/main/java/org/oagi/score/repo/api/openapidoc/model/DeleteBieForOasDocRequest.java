@@ -3,41 +3,48 @@ package org.oagi.score.repo.api.openapidoc.model;
 import org.oagi.score.repo.api.base.Request;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class DeleteBieForOasDocRequest extends Request {
-    private List<BieForOasDoc> assignedBieList = Collections.emptyList();
+    private BigInteger oasDocId;
+    private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
 
-    public DeleteBieForOasDocRequest(ScoreUser requester, List<BieForOasDoc> assignedBieList) {
+    public DeleteBieForOasDocRequest(ScoreUser requester) {
         super(requester);
-        this.assignedBieList = assignedBieList;
     }
 
-    public void setBieForOasDocId(BieForOasDoc assignedBieId) {
-        if (assignedBieId != null) {
-            this.assignedBieList = Arrays.asList(assignedBieId);
+    public void setBieForOasDoc(BieForOasDoc bieForOasDoc) {
+        if (bieForOasDoc != null) {
+            this.bieForOasDocList = Arrays.asList(bieForOasDoc);
         }
     }
 
-    public DeleteBieForOasDocRequest withAssignedBieId(BieForOasDoc assignedBieId) {
-        this.setBieForOasDocId(assignedBieId);
+    public DeleteBieForOasDocRequest withBieForOasDoc(BieForOasDoc bieForOasDoc) {
+        this.setBieForOasDoc(bieForOasDoc);
         return this;
     }
 
-    public List<BieForOasDoc> getAssignedBieList() {
-        return assignedBieList;
+    public BigInteger getOasDocId() {
+        return oasDocId;
     }
 
-    public void setAssignedBieList(List<BieForOasDoc> assignedBieList) {
-        this.assignedBieList = assignedBieList;
+    public void setOasDocId(BigInteger oasDocId) {
+        this.oasDocId = oasDocId;
     }
 
-    public DeleteBieForOasDocRequest withAssignedBieId(List<BieForOasDoc> assignedBieId) {
-        this.setAssignedBieList(assignedBieId);
+    public List<BieForOasDoc> getBieForOasDocList() {
+        return bieForOasDocList;
+    }
+
+    public void setBieForOasDocList(List<BieForOasDoc> bieForOasDocList) {
+        this.bieForOasDocList = bieForOasDocList;
+    }
+
+    public DeleteBieForOasDocRequest withBieForOasDocList(List<BieForOasDoc> bieForOasDocList) {
+        this.setBieForOasDocList(bieForOasDocList);
         return this;
     }
-
-
 }

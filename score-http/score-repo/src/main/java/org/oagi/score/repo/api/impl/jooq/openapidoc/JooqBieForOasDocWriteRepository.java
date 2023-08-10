@@ -4,6 +4,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasOperationRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasRequestRecord;
@@ -12,16 +13,22 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResponseRecord
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.resultQuery;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.BooleanUtils.BooleanToByte;
+import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
+import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
 public class JooqBieForOasDocWriteRepository extends JooqScoreRepository implements BieForOasDocWriteRepository {
     public JooqBieForOasDocWriteRepository(DSLContext dslContext) {
@@ -250,7 +257,13 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
     }
 
     @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public DeleteBieForOasDocResponse deleteBieForOasDoc(DeleteBieForOasDocRequest request) throws ScoreDataAccessException {
+        List<BieForOasDoc> bieForOasDocList = request.getBieForOasDocList();
+        if (bieForOasDocList == null || bieForOasDocList.isEmpty()) {
+            return new DeleteBieForOasDocResponse(Collections.emptyList());
+        }
+        // based on the message type , delete from oas_request or oas_response
         return null;
     }
 }
