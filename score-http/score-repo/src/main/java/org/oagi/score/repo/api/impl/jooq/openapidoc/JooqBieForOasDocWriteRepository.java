@@ -53,7 +53,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             if (bieForOasDoc.getMessageBody().equals("Request")){
                 //update oas_resource
                 OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("req_oas_resource")).where(and(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.as("req_oas_resource_id").eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.as("req_oas_doc_id").eq(ULong.valueOf(bieForOasDoc.getOasDocId())))).fetchOptional().orElse(null);
+                        OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.as("req_oas_doc_id").eq(ULong.valueOf(oasDocId)))).fetchOptional().orElse(null);
                 if (oasResourceRecord == null) {
                     throw new ScoreDataAccessException(new IllegalArgumentException());
                 }
@@ -185,7 +185,8 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             }
 
         }
-        return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty());
+        return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
+                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty());
     }
 
     @Override
