@@ -75,9 +75,21 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
-    int getNumberOfBIEsInIndexBox();
+    /**
+     * Set the size of items to the 'Items per page' select field.
+     *
+     * @param items the size of items; 10, 25, 50
+     */
+    void setItemsPerPage(int items);
 
-    int getNumberfBIEsInTable();
+    /**
+     * Return the total number of items being paged.
+     *
+     * @return the total number of items being paged
+     */
+    int getTotalNumberOfItems();
+
+    int getNumberOfBIEsInTable();
 
     WebElement getXMLSchemaExpressionRadioButton();
 
@@ -172,6 +184,14 @@ public interface ExpressBIEPage extends Page {
     void selectPutEachSchemaInAnIndividualFile();
 
     WebElement getPutEachSchemaInAnIndividualFileRadioButton();
+
+    void toggleIncludeBusinessContextInFilename();
+
+    WebElement getIncludeBusinessContextInFilenameCheckbox();
+
+    void toggleIncludeVersionInFilename();
+
+    WebElement getIncludeVersionInFilenameCheckbox();
 
     enum ExpressionFormat {
         XML,

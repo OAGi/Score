@@ -1376,9 +1376,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BIEMenu bieMenu = homePage.getBIEMenu();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.setBranch(release.getReleaseNumber());
-        int numberOfBIEsDisplayed = expressBIEPage.getNumberfBIEsInTable();
-        int numberofBIEsInIndexBox = expressBIEPage.getNumberOfBIEsInIndexBox();
-        assertEquals(numberOfBIEsDisplayed, numberofBIEsInIndexBox);
+        int numberOfBIEsDisplayed = expressBIEPage.getNumberOfBIEsInTable();
+        int numberOfBIEsInIndexBox = expressBIEPage.getTotalNumberOfItems();
+        assertEquals(numberOfBIEsDisplayed, numberOfBIEsInIndexBox);
     }
 
     @Test
