@@ -10,8 +10,6 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotInteractableException;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +42,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
     private static final By DEN_FIELD_LOCATOR =
@@ -92,6 +90,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP) {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelASBIEP.getReleaseId());
         setBranch(release.getReleaseNumber());
+        setState(topLevelASBIEP.getState());
         setDEN(topLevelASBIEP.getDen());
         hitSearchButton();
 
@@ -130,6 +129,37 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public WebElement getBranchSelectField() {
         return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setState(String state) {
+        retry(() -> {
+            click(getStateSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
+            click(optionField);
+            escape(getDriver());
+        });
+    }
+
+    @Override
+    public WebElement getStateSelectField() {
+        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        click(getOwnerSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
+    }
+
+    @Override
+    public WebElement getOwnerSelectField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
     @Override

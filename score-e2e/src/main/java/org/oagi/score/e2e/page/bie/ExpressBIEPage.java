@@ -19,9 +19,47 @@ public interface ExpressBIEPage extends Page {
 
     void selectBIEForExpression(String releaseNum, String topLevelASBIPDEN);
 
+    /**
+     * Set the value to the 'Branch' select field.
+     *
+     * @param branch branch value
+     */
     void setBranch(String branch);
 
+    /**
+     * Return the UI element of the 'Branch' select field.
+     *
+     * @return the UI element of the 'Branch' select field
+     */
     WebElement getBranchSelectField();
+
+    /**
+     * Set the value to the 'State' select field.
+     *
+     * @param state state value
+     */
+    void setState(String state);
+
+    /**
+     * Return the UI element of the 'State' select field.
+     *
+     * @return the UI element of the 'State' select field
+     */
+    WebElement getStateSelectField();
+
+    /**
+     * Set the value to the 'Owner' select field.
+     *
+     * @param owner owner value
+     */
+    void setOwner(String owner);
+
+    /**
+     * Return the UI element of the 'Owner' select field.
+     *
+     * @return the UI element of the 'Owner' select field
+     */
+    WebElement getOwnerSelectField();
 
     WebElement getOpenAPIFormatSelectField();
 
