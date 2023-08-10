@@ -199,6 +199,26 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(Duration.ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(Duration.ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
     public File hitGenerateButton(ExpressionFormat format) {
         return hitGenerateButton(format, null, false);
     }
@@ -529,15 +549,27 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public int getNumberOfBIEsInIndexBox() {
-        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
-        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
-        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    public void toggleIncludeBusinessContextInFilename() {
+        click(getIncludeBusinessContextInFilenameCheckbox());
     }
 
     @Override
-    public int getNumberfBIEsInTable() {
+    public WebElement getIncludeBusinessContextInFilenameCheckbox() {
+        return getCheckboxByName("Include a business context in the filename");
+    }
+
+    @Override
+    public void toggleIncludeVersionInFilename() {
+        click(getIncludeVersionInFilenameCheckbox());
+    }
+
+    @Override
+    public WebElement getIncludeVersionInFilenameCheckbox() {
+        return getCheckboxByName("Include a version in the filename");
+    }
+
+    @Override
+    public int getNumberOfBIEsInTable() {
         List<WebElement> rows = getDriver().findElements(By.xpath("//td//span/ancestor::tr"));
         int numberOfBIEs = rows.size();
         return numberOfBIEs;

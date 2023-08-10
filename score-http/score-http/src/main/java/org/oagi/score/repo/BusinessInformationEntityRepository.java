@@ -733,7 +733,9 @@ public class BusinessInformationEntityRepository {
         }
 
         public SelectBieListArguments setReleaseIds(List<BigInteger> releaseIds) {
-            conditions.add(RELEASE.RELEASE_NUM.notEqual("Working"));
+            if (releaseIds != null && !releaseIds.isEmpty()) {
+                releaseIds = releaseIds.stream().filter(e -> e.longValue() > 0L).collect(Collectors.toList());
+            }
 
             if (releaseIds != null && !releaseIds.isEmpty()) {
                 if (releaseIds.size() == 1) {
