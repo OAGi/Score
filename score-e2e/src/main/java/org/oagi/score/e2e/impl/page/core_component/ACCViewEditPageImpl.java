@@ -336,8 +336,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             }
         } catch (WebDriverException ignore) {
         }
+
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
@@ -464,11 +466,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void deleteBaseACC(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]")).isDisplayed();
@@ -566,11 +568,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public ACCViewEditPage removeAssociation(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
