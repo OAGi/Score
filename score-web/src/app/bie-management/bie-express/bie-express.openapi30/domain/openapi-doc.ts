@@ -408,3 +408,18 @@ export class BieForOasDocUpdateRequest {
     };
   }
 }
+
+export class BieForOasDocDeleteRequest {
+  oasDocId: number;
+  bieForOasDocList: BieForOasDoc[];
+  constructor() {
+    this.bieForOasDocList = [];
+  }
+
+  get json(): any {
+    return {
+      oasDocId: this.oasDocId,
+      bieForOasDocList: this.bieForOasDocList.map(e => e.json)
+    };
+  }
+}

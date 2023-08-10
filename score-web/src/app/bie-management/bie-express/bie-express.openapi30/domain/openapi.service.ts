@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {
   AssignBieForOasDoc,
-  BieForOasDoc,
+  BieForOasDoc, BieForOasDocDeleteRequest,
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
@@ -235,14 +235,8 @@ export class OpenAPIService {
         messageBody: assignBieForOasDoc.messageBody
       });
   }
-  removeBieForOasDoc(oasDocId: number, ...topLevelAsbiepIds): Observable<any>{
-    if (topLevelAsbiepIds.length === 1) {
-      return this.http.delete('/api/oas_doc/' + oasDocId + '/bie_list/' + topLevelAsbiepIds[0]);
-    } else {
-      return this.http.post<any>('/api/oas_doc/' + oasDocId + 'bie_list/delete', {
-        topLevelAsbiepIdList: topLevelAsbiepIds
-      });
-    }
+  removeBieForOasDoc(request: BieForOasDocDeleteRequest): Observable<any>{
+    return this.http.post<any>('/api/oas_doc/' + request.oasDocId + 'bie_list/delete', request.json);
   }
 
   generate(topLevelAsbiepIds: number[], option: BieExpressOption, oasDoc: OasDoc): Observable<HttpResponse<Blob>> {

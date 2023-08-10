@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  BieForOasDoc,
+  BieForOasDoc, BieForOasDocDeleteRequest,
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
@@ -51,7 +51,7 @@ export class OasDocDetailComponent implements OnInit {
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
-  selection = new SelectionModel<number>(true, []);
+  selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
   request: BieForOasDocListRequest;
   loading = false;
@@ -357,16 +357,16 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   select(row: BieForOasDoc) {
-    this.selection.select(row.topLevelAsbiepId);
+    this.selection.select(row);
   }
 
   isSelected(row: BieForOasDoc) {
-    return this.selection.isSelected(row.topLevelAsbiepId);
+    return this.selection.isSelected(row);
   }
 
   toggle(row: BieForOasDoc) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAsbiepId);
+      this.selection.deselect(row);
     } else {
       this.select(row);
     }
@@ -408,7 +408,11 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   removeBieForOasDoc() {
-    const topLevelAsbiepIds = this.selection.selected;
+    const request = new BieForOasDocDeleteRequest();
+    const nodes = this.selection.selected;
+    request.oasDocId = this.oasDoc.oasDocId;
+    request.bieForOasDocList = nodes;
+
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove selected BIE from the OpenAPI Doc?';
     dialogConfig.data.content = ['Are you sure you want to remove the selected BIE?'];
@@ -417,14 +421,14 @@ export class OasDocDetailComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.openAPIService.removeBieForOasDoc(this.oasDoc.oasDocId, ...topLevelAsbiepIds).subscribe(_ => {
+          this.openAPIService.removeBieForOasDoc(request).subscribe(_ => {
             this.snackBar.open('Removed', '', {
               duration: 3000,
             });
           });
           const newData = [];
           this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row.topLevelAsbiepId)) {
+            if (!this.selection.isSelected(row)) {
               newData.push(row);
             }
           });
