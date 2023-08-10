@@ -408,6 +408,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   removeBieForOasDoc() {
+    const topLevelAsbiepIds = this.selection.selected;
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove selected BIE from the OpenAPI Doc?';
     dialogConfig.data.content = ['Are you sure you want to remove the selected BIE?'];
@@ -416,6 +417,11 @@ export class OasDocDetailComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
+          this.openAPIService.removeBieForOasDoc(this.oasDoc.oasDocId, ...topLevelAsbiepIds).subscribe(_ => {
+            this.snackBar.open('Removed', '', {
+              duration: 3000,
+            });
+          });
           const newData = [];
           this.dataSource.data.forEach(row => {
             if (!this.selection.isSelected(row.topLevelAsbiepId)) {
@@ -423,12 +429,10 @@ export class OasDocDetailComponent implements OnInit {
             }
           });
           this.selection.clear();
-
           this._updateDataSource(newData);
         }
       });
   }
-
   get sizeOfChanges(): number {
     return this.getChanged().length;
   }
