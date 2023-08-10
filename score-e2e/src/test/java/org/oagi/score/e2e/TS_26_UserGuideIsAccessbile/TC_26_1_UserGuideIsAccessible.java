@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.condition.DisabledIfLocalhost;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.help.UserGuidePage;
@@ -42,6 +43,7 @@ public class TC_26_1_UserGuideIsAccessible extends BaseTest {
     }
 
     @Test
+    @DisabledIfLocalhost
     @DisplayName("TC_26_1_1")
     public void link_to_user_guide_is_available_to_oagis_developer_and_is_resolved() {
         HomePage homePage = loginPage().signIn(appDevUser.getLoginId(), appDevUser.getPassword());
@@ -50,6 +52,7 @@ public class TC_26_1_UserGuideIsAccessible extends BaseTest {
     }
 
     @Test
+    @DisabledIfLocalhost
     @DisplayName("TC_26_1_2")
     public void link_to_user_guide_is_available_to_end_user_and_is_resolved() {
         HomePage homePage = loginPage().signIn(appEndUser.getLoginId(), appEndUser.getPassword());

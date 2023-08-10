@@ -105,7 +105,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         getDriver().get(url);
         invisibilityOfLoadingContainerElement(getDriver());
         assert "BCCP".equals(getText(getBCCPPanelContainer().getBCCPPanel().getCoreComponentField()));
-        assert getText(getTitle()).equals(bccp.getDen());
+        assert getText(getTitle()).startsWith(bccp.getPropertyTerm());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -283,11 +283,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             String propertyTerm = getText(getBCCPPanelContainer().getBCCPPanel().getPropertyTermField());
             WebElement node = clickOnDropDownMenuByPath("/" + propertyTerm);
             try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_BDT_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
             BCCPChangeBDTDialog bccpChangeBDTDialog = new BCCPChangeBDTDialogImpl(this);
@@ -391,11 +391,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 
@@ -462,7 +463,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("C").perform();
@@ -502,11 +503,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         String path = "/" + this.bccp.getPropertyTerm();
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         }
         switchToNextTab(getDriver());
 

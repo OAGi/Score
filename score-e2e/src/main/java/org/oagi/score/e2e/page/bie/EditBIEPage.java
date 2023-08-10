@@ -5,7 +5,6 @@ import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;

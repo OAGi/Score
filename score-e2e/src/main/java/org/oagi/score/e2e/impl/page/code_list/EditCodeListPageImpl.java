@@ -340,8 +340,10 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public EditCodeListValueDialog editCodeListValue(String value) {
         retry(() -> {
             WebElement tr = getTableRecordByValue(value);
-            click(tr);
+            WebElement td = getColumnByName(tr, "value");
+            click(td);
         });
+
         EditCodeListValueDialog editCodeListValueDialog = new EditCodeListValueDialogImpl(this);
         assert editCodeListValueDialog.isOpened();
         return editCodeListValueDialog;

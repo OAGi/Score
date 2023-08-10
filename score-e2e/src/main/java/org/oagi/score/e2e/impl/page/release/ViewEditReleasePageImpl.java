@@ -396,11 +396,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
             }
             WebElement node = clickOnDropDownMenu(tr);
             try {
-                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), DISCARD_RELEASE_OPTION_LOCATOR));
             }
         });
 

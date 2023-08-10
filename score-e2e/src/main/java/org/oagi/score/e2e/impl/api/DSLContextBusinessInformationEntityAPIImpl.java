@@ -92,7 +92,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
         topLevelASBIEPObject.setLastUpdatedBy(record.get(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY).toBigInteger());
         topLevelASBIEPObject.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
         topLevelASBIEPObject.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
-        topLevelASBIEPObject.setOwnwerUserId(record.get(TOP_LEVEL_ASBIEP.OWNER_USER_ID).toBigInteger());
+        topLevelASBIEPObject.setOwnerUserId(record.get(TOP_LEVEL_ASBIEP.OWNER_USER_ID).toBigInteger());
         topLevelASBIEPObject.setLastUpdateTimestamp(record.get(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP));
         topLevelASBIEPObject.setDen(record.get(ASCCP.DEN));
         topLevelASBIEPObject.setReleaseNumber(record.get(RELEASE.RELEASE_NUM));

@@ -7,7 +7,8 @@ import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * An interface of 'Express BIE' page.
@@ -63,6 +64,15 @@ public interface ExpressBIEPage extends Page {
     File hitGenerateButton(ExpressionFormat format);
 
     /**
+     * Hit the 'Generate' button for a single BIE selection.
+     *
+     * @param format BIE Expression format
+     * @param expectedFilenameMatcher expected file matcher. If it exists, the downloaded file should match the filename with this matcher.
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher);
+
+    /**
      * Hit the 'Generate' button.
      *
      * @param format     BIE Expression format
@@ -70,6 +80,16 @@ public interface ExpressBIEPage extends Page {
      * @return generate file
      */
     File hitGenerateButton(ExpressionFormat format, boolean compressed);
+
+    /**
+     * Hit the 'Generate' button.
+     *
+     * @param format     BIE Expression format
+     * @param expectedFilenameMatcher expected file matcher. If it exists, the downloaded file should match the filename with this matcher.
+     * @param compressed {@code true} if it checks multiple BIEs, otherwise {@code false}
+     * @return generate file
+     */
+    File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher, boolean compressed);
 
     WebElement getGenerateButton();
 
@@ -109,7 +129,7 @@ public interface ExpressBIEPage extends Page {
 
     WebElement getPutAllSchemasInTheSameFileRadioButton();
 
-    void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection);
+    void selectMultipleBIEsForExpression(ReleaseObject release, List<TopLevelASBIEPObject> biesForSelection);
 
     void selectPutEachSchemaInAnIndividualFile();
 

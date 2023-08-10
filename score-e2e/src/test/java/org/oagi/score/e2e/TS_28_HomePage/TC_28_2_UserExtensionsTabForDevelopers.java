@@ -100,6 +100,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openTotalUEsByStatesPanel()
@@ -182,8 +183,9 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser1);
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
+        String branch = "10.8.4";
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
 
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
 
@@ -191,7 +193,8 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        homePage.setBranch(release.getReleaseNumber());
+        click(homePage.getBIEsTab());
+        homePage.setBranch(branch);
 
         HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
         // both endUsers are displayed
@@ -253,6 +256,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
@@ -310,6 +314,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();

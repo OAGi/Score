@@ -271,11 +271,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public SelectAssociationDialog appendPropertyAtLast(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
@@ -307,7 +307,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement getSearchField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_FIELD_LOCATOR);
     }
 
     @Override
@@ -328,11 +328,12 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchField());
+        clear(searchInput);
         return node;
     }
 

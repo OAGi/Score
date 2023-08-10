@@ -57,7 +57,9 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.7.1");
+        String branch = "10.8.7.1";
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
         NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
         List<String> ccStates = new ArrayList<>();
@@ -83,6 +85,8 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(1500));
+            viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
@@ -473,7 +477,9 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.7.1");
+        String branch = "10.8.7.1";
+
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
         NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         ASCCPObject asccp;
@@ -503,6 +509,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.setBranch(branch);
         WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
         WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "select");
         assertEnabled(td.findElement(By.tagName("mat-checkbox")));
@@ -542,6 +549,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         viewEditCoreComponentPage.hitBackToWIPButton();
         viewEditCoreComponentPage.openPage();
         waitFor(Duration.ofMillis(3000L));
+        viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("WIP");
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
@@ -565,6 +573,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         viewEditCoreComponentPage.hitMoveToQAButton();
         viewEditCoreComponentPage.openPage();
         waitFor(Duration.ofMillis(3000L));
+        viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("QA");
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();
@@ -585,6 +594,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
         viewEditCoreComponentPage.hitMoveToProductionButton();
         viewEditCoreComponentPage.openPage();
         waitFor(Duration.ofMillis(3000L));
+        viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("Production");
         escape(getDriver());
         viewEditCoreComponentPage.hitSearchButton();

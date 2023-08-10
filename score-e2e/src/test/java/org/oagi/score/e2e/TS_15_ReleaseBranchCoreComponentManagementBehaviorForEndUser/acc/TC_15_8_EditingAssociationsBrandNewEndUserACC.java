@@ -15,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1573,6 +1574,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
         {
+            waitFor(Duration.ofMillis(1500));
+            viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 
@@ -1607,6 +1610,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
+            viewEditCoreComponentPage.setBranch(branch);
+            waitFor(Duration.ofMillis(1500));
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 

@@ -10,6 +10,8 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +25,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
@@ -38,9 +40,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
@@ -58,7 +60,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
@@ -96,7 +98,8 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         retry(() -> {
             WebElement tr = getTableRecordByValue(topLevelASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+            click(getDriver(), ele);
         });
     }
 
@@ -167,14 +170,24 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public File hitGenerateButton(ExpressionFormat format) {
-        return hitGenerateButton(format, false);
+        return hitGenerateButton(format, null, false);
+    }
+
+    @Override
+    public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher) {
+        return hitGenerateButton(format, expectedFilenameMatcher, false);
     }
 
     @Override
     public File hitGenerateButton(ExpressionFormat format, boolean compressed) {
+        return hitGenerateButton(format, null, compressed);
+    }
+
+    @Override
+    public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher, boolean compressed) {
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(ofMillis(30000), getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(60000L), expectedFilenameMatcher, getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -285,9 +298,18 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         };
     }
 
-    private File waitForDownloadFile(Duration duration, Function<File, Boolean> validator) throws IOException, InterruptedException {
+    private File waitForDownloadFile(Duration duration,
+                                     Function<String, Boolean> expectedFilenameMatcher,
+                                     Function<File, Boolean> validator) throws IOException, InterruptedException {
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
+        if (expectedFilenameMatcher != null) {
+            Optional<Path> matchedFile = Files.list(path)
+                    .filter(child -> expectedFilenameMatcher.apply(child.toFile().getName())).findFirst();
+            if (matchedFile.isPresent()) {
+                return matchedFile.get().toFile();
+            }
+        }
 
         WatchService watchService = FileSystems.getDefault().newWatchService();
         path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
@@ -300,6 +322,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             if (key != null && key.isValid()) {
                 for (WatchEvent<?> event : key.pollEvents()) {
                     downloadedFile = new File(path.toFile(), event.context().toString());
+                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(downloadedFile.getName())) {
+                        break;
+                    }
                     if (validator.apply(downloadedFile)) {
                         return downloadedFile;
                     }
@@ -452,7 +477,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection) {
+    public void selectMultipleBIEsForExpression(ReleaseObject release, List<TopLevelASBIEPObject> biesForSelection) {
         setBranch(release.getReleaseNumber());
         for (TopLevelASBIEPObject bie : biesForSelection) {
             retry(() -> {
@@ -513,6 +538,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleMakeAsAnArray() {
             click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+            waitFor(ofMillis(500L));
         }
 
         @Override
@@ -530,6 +556,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                 IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
                         new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
                 assert includeMetaHeaderProfileBIEDialog.isOpened();
+                waitFor(ofMillis(1000L));
                 includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
             }
         }
@@ -549,6 +576,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                 IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
                         new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
                 assert includePaginationResponseProfileBIEDialog.isOpened();
+                waitFor(ofMillis(1000L));
                 includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
             }
         }

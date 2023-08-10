@@ -262,6 +262,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     public EditBIEPage createBIE(String asccpDEN, String branch) {
         setDEN(asccpDEN);
         setBranch(branch);
+        waitFor(Duration.ofMillis(5000));
         hitSearchButton();
 
         WebElement tr;

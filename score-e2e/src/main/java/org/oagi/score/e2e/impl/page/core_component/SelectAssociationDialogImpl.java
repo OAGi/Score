@@ -317,7 +317,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
             click(getSelectButton());
 
             assert parent.isOpened();
-            waitFor(ofMillis(500));
+            waitFor(ofMillis(1000L));
         });
     }
 

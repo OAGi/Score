@@ -27,6 +27,7 @@ import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_25_1_ReuseBIE extends BaseTest {
@@ -271,9 +272,18 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")));
-        ArrayList<String> tabs = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(tabs.get(1));
+        String currentTab = getDriver().getWindowHandle();
+        retry(() -> {
+            click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon[@mattooltip=\"Reused\"]")));
+            defaultWait(getDriver()).until(numberOfWindowsToBe(2));
+        });
+        // Loop through until we find a new window handle
+        for (String windowHandle : getDriver().getWindowHandles()) {
+            if (!currentTab.contentEquals(windowHandle)) {
+                getDriver().switchTo().window(windowHandle);
+                break;
+            }
+        }
 
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));

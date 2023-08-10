@@ -344,19 +344,6 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
-    public List<String> getOAGISOwnedLists(BigInteger releaseId) {
-        return dslContext.select(AGENCY_ID_LIST.NAME)
-                .from(AGENCY_ID_LIST)
-                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
-                .join(APP_USER).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                .where(and(
-                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                        APP_USER.LOGIN_ID.eq("oagis")
-                ))
-                .fetchInto(String.class);
-    }
-
-    @Override
     public boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList) {
         List<Result<Record>> records = dslContext.select(CODE_LIST.CODE_LIST_ID)
                 .from(CODE_LIST)

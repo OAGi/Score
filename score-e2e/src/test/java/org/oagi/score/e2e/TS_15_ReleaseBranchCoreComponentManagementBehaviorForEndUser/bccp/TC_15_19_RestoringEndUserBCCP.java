@@ -13,11 +13,13 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
@@ -124,7 +126,8 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
         DTObject cdt = coreComponentAPI.getCDTByDENAndReleaseNum("Code. Type", release.getReleaseNumber());
         DTObject randomBDT = coreComponentAPI.createRandomBDT(cdt, endUser, namespace, "Deleted");
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(randomBDT, endUser, namespace, "WIP");
-
+        viewEditCoreComponentPage.setBranch(branch);
+        waitFor(Duration.ofMillis(1500));
         BCCPViewEditPage bccpViewEditPage =
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
         BCCPViewEditPage.DTPanel dtPanel = bccpViewEditPage.getBCCPPanelContainer().getDTPanel();

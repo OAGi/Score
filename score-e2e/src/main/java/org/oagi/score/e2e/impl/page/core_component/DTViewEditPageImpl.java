@@ -84,7 +84,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Default\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(), \"Default\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
@@ -284,7 +284,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void showValueDomain() {
-        click(getShowValueDomain());
+        click(getDriver(), getShowValueDomain());
     }
     @Override
     public WebElement getShowValueDomain() {
@@ -409,11 +409,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public AddCommentDialog hitAddCommentButton(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         }
         AddCommentDialog addCodeListCommentDialog = new AddCommentDialogImpl(this);
         assert addCodeListCommentDialog.isOpened();
@@ -587,11 +587,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void addSupplementaryComponent(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         }
     }
     @Override
@@ -605,11 +605,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void removeSupplementaryComponent(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         }
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Remove anyway\")]//ancestor::button[1]")));
@@ -908,7 +908,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void showValueDomain() {
-            click(getShowValueDomain());
+            click(getDriver(), getShowValueDomain());
         }
 
         @Override

@@ -21,8 +21,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_17_6_DeletingACodeList extends BaseTest {
@@ -98,10 +97,16 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
             dtViewEditPage.setNamespace(namespaceEU);
-            dtViewEditPage.hitUpdateButton();
-            if (definition == null) {
+            if (definition != null) {
+                dtViewEditPage.hitUpdateButton();
+            } else {
+                try {
+                    dtViewEditPage.hitUpdateButton();
+                } catch (TimeoutException ignore) {
+                }
                 dtViewEditPage.hitUpdateAnywayButton();
             }
+
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
             editCodeListPage.hitDeleteButton();

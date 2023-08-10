@@ -103,7 +103,9 @@ public class DSLContextBusinessTermAPIImpl implements BusinessTermAPI {
     @Override
     public void deleteBusinessTermById(BigInteger businessTermId) {
         ULong btIDLong = ULong.valueOf(businessTermId);
-        dslContext.deleteFrom(BUSINESS_TERM).where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(btIDLong)).execute();
+        if (btIDLong != null){
+            dslContext.deleteFrom(BUSINESS_TERM).where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(btIDLong)).execute();
+        }
     }
 
 }

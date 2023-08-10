@@ -206,7 +206,7 @@ The end user can upload and attach the csv file with the correct format as speci
 
 #### Test Assertion #42.4.3
 
-The end user can not upload a csv file if the csv file does not obey the format as specified in the template such as missing columns, missing header row, extra columns and invalid data format. 
+No new business term will be created if the uploaded csv file does not obey the format as specified in the template such as missing columns, missing header row, extra columns and invalid data format. 
 
 #### Test Assertion #42.4.4
 

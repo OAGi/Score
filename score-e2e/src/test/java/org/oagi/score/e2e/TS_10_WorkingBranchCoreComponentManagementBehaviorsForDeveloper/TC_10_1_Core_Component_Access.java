@@ -712,6 +712,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 result.get(0).click();
             }
             escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
 
@@ -725,6 +726,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 result.get(0).click();
             }
             escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
 
@@ -738,6 +740,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 result.get(0).click();
             }
             escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
         }
@@ -788,13 +791,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             List<WebElement> stateOption = options.stream().filter(e -> state.equals(getText(e))).collect(Collectors.toList());
             stateOption.get(0).click();
             escape(getDriver());
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(bccp.getDen(), developer.getLoginId()).isDisplayed());
-
         }
-
     }
 
     @Test
@@ -870,6 +872,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             waitFor(Duration.ofMillis(3000L));
             viewEditCoreComponentPage.setUpdatedStartDate(startTime);
             viewEditCoreComponentPage.setUpdatedEndDate(endTime);
+            viewEditCoreComponentPage.setOwner(developer.getLoginId());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(acc.getDen(), developer.getLoginId()).isDisplayed());
             assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(asccp.getDen(), developer.getLoginId()).isDisplayed());
@@ -888,9 +891,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setDEN("\"Action Code\"");
+        viewEditCoreComponentPage.setOwner("oagis");
         viewEditCoreComponentPage.hitSearchButton();
-        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Code", "oagis").isDisplayed());
-        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Corrective Action Type Code. Code\")]")).size());
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Action Code Content_ Code", "oagis").isDisplayed());
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Corrective Action Type Code. Open_ Code\")]")).size());
     }
 
     @Test

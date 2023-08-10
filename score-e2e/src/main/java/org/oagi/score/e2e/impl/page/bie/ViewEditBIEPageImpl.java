@@ -285,7 +285,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         setBranch(release.getReleaseNumber());
         setDEN(topLevelASBIEP.getDen());
         setState(topLevelASBIEP.getState());
-        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId());
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId());
         setOwner(owner.getLoginId());
         hitSearchButton();
 
@@ -350,7 +350,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public void discard(TopLevelASBIEPObject topLevelASBIEP) {
         setBranch(topLevelASBIEP.getReleaseNumber());
-        setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId()).getLoginId());
+        setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         setDEN(topLevelASBIEP.getPropertyTerm());
         hitSearchButton();
 
