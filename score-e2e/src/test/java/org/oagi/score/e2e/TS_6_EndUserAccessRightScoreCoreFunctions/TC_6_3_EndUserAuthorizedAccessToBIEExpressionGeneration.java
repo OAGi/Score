@@ -120,6 +120,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     generatedBIEExpression.delete();
                 }
             }
+
+            expressBIEPage.openPage();
         }
     }
 
