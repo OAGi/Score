@@ -2,10 +2,7 @@ package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -3922,29 +3919,168 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getContextDefinitionField())));
     }
 
+    @Disabled
     @Test
     @DisplayName("TC_5_5_TA_55")
     public void test_TA_55() {
+        // 'Exclude SCs' option has been removed.
     }
 
     @Test
     @DisplayName("TC_5_5_issue1234")
     public void test_issue1234() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject prevRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        ReleaseObject curRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+
+        /*
+         * 'Alternate UOM Code. Unit_ Code' in 10.6 changed to 'Alternate UOM Code. Open_ Code' in 10.7.0.1
+         */
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(
+                "Alternate UOM Code. Unit_ Code", prevRelease.getReleaseNumber());
+        bccp.setDefaultValue(randomAlphabetic(5, 10));
+        getAPIFactory().getCoreComponentAPI().updateBCCP(bccp);
+        try {
+            BusinessContextObject randomBusinessContext =
+                    getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", prevRelease.getReleaseNumber());
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+            HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+            String path = "/" + asccp.getPropertyTerm() + "/Alternate UOM Code";
+            WebElement node = editBIEPage.getNodeByPath(path);
+            waitFor(Duration.ofMillis(2000));
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            assertEquals(bccp.getDefaultValue(), getText(bbiePanel.getDefaultValueField()));
+
+            asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", curRelease.getReleaseNumber());
+            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+            editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+            node = editBIEPage.getNodeByPath(path);
+            waitFor(Duration.ofMillis(2000));
+            bbiePanel = editBIEPage.getBBIEPanel(node);
+
+            assertEquals("None", getText(bbiePanel.getValueConstraintSelectField()));
+        } finally {
+            bccp.setDefaultValue(null);
+            getAPIFactory().getCoreComponentAPI().updateBCCP(bccp);
+        }
     }
 
     @Test
     public void test_TA_5_5_56() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm();
+        WebElement node = editBIEPage.getNodeByPath(path);
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains(asccp.getPropertyTerm()));
+        assertTrue(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertTrue(nodeText.contains("0..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertTrue(nodeText.contains("0..∞"));
     }
 
     @Test
     public void test_TA_5_5_56a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        editBIEPage.toggleHideCardinality(); // Turn off cardinality
+
+        String path = "/" + asccp.getPropertyTerm();
+        WebElement node = editBIEPage.getNodeByPath(path);
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains(asccp.getPropertyTerm()));
+        assertFalse(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertFalse(nodeText.contains("0..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertFalse(nodeText.contains("0..∞"));
     }
 
     @Test
     public void test_TA_5_5_56b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        WebElement node = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        bbiePanel.setCardinalityMin(1);
+        waitFor(ofMillis(1000L));
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertTrue(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(node);
+        asbiePanel.toggleUsed();
+        int randomCardinalityMax = Integer.valueOf(randomNumeric(2, 3));
+        asbiePanel.setCardinalityMax(randomCardinalityMax);
+        waitFor(ofMillis(1000L));
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertTrue(nodeText.contains("0.." + randomCardinalityMax));
     }
 
     @AfterEach
