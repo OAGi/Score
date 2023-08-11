@@ -80,6 +80,15 @@ public interface EditBIEPage extends Page {
     WebElement getNodeByPath(String path);
 
     /**
+     * Return the UI element of the tree node by the node path.
+     *
+     * @param path the node path
+     * @param retry the number of retry
+     * @return the UI element of the tree node
+     */
+    WebElement getNodeByPath(String path, int retry);
+
+    /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
      *
      * @param node the node

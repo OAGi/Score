@@ -344,11 +344,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement goToNode(String path) {
+        return goToNode(path, 0);
+    }
+
+    private WebElement goToNode(String path, int retry) {
         return retry(() -> {
             WebElement searchInput = getSearchInputTextField();
             click(getDriver(), searchInput);
             WebElement node = sendKeys(searchInput, path);
-            node.sendKeys(Keys.ENTER);
+            for (int i = 0; i < (retry + 1); ++i) {
+                node.sendKeys(Keys.ENTER);
+                waitFor(ofMillis(500L));
+            }
             click(getDriver(), node);
             clear(searchInput);
             return node;
@@ -388,8 +395,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement getNodeByPath(String path) {
+        return getNodeByPath(path, 0);
+    }
+
+    @Override
+    public WebElement getNodeByPath(String path, int retry) {
         return retry(() -> {
-            goToNode(path);
+            goToNode(path, retry);
             String[] nodes = path.split("/");
             return getNodeByName(nodes[nodes.length - 1]);
         });
