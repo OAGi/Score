@@ -10,6 +10,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.code_list.EditCodeListPage;
+import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.module.*;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
@@ -50,6 +52,164 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         this.randomAccounts.forEach(newUser -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(newUser.getLoginId());
         });
+    }
+
+    @Test
+    @DisplayName("TC_21_2_TA_6a_and_6c")
+    public void test_TA_6a_and_6c() {
+        /*
+         * This test case has been separated from TC_21_2 because Score allows only one active release.
+         * Thus, it should be executed in this class to use the SAME_THREAD concurrent condition.
+         */
+        AppUserObject developer;
+        NamespaceObject namespace;
+        CodeListObject codeListCandidate;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            codeListCandidate = getAPIFactory().getCodeListAPI().
+                    createRandomCodeList(developer, namespace, workingBranch, "Published");
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
+        editCodeListPage.hitRevise();
+        editCodeListPage.setVersion("99");
+        editCodeListPage.setDefinition("random code list in candidate state");
+        editCodeListPage.hitUpdateButton();
+        editCodeListPage.moveToDraft();
+        editCodeListPage.moveToCandidate();
+
+        ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.setState("Draft");
+        viewEditReleasePage.hitSearchButton();
+        if (viewEditReleasePage.getTotalNumberOfItems() > 0){
+            long timeout = Duration.ofSeconds(300L).toMillis();
+            long begin = System.currentTimeMillis();
+            while (System.currentTimeMillis() - begin < timeout) {
+                viewEditReleasePage.openPage();
+                viewEditReleasePage.setState("Draft");
+                viewEditReleasePage.hitSearchButton();
+
+                WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+                EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+                editReleasePage.backToInitialized();
+                String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+                assertNotEquals("Draft", state);
+                if ("Initialized".equals(state)) {
+                    break;
+                }
+            }
+        }
+
+        CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
+        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        createReleasePage.setReleaseNumber(newReleaseNum);
+        createReleasePage.setReleaseNamespace(namespace);
+        createReleasePage.hitCreateButton();
+
+        viewEditReleasePage.openPage();
+        EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
+        ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
+
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Initialized", state);
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
+
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        assertEquals("Draft", newDraftRelease.getState());
+
+        /**
+         * Test Assertion #21.2.6
+         */
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        createModuleSetReleasePage.setName(moduleSetReleaseName);
+        String description = randomPrint(50, 100);
+        createModuleSetReleasePage.setDescription(description);
+        createModuleSetReleasePage.setModuleSet("10.8.1");
+        createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
+        createModuleSetReleasePage.hitCreateButton();
+
+        viewEditModuleSetReleasePage.openPage();
+        ModuleSetReleaseObject moduleSetRelease = getAPIFactory().getModuleSetReleaseAPI().getModuleSetReleaseByName(moduleSetReleaseName);
+        EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
+        CoreComponentAssignmentPage coreComponentAssignmentPage = editModuleSetReleasePage.hitAssignCCsButton(moduleSetRelease);
+        assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
+        coreComponentAssignmentPage.hitAssignButton();
+
+        /**
+         * Test Assertion #21.2.6.a
+         */
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Draft");
+        editReleasePage.backToInitialized();
+
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            if ("Initialized".equals(getText(viewEditReleasePage.getColumnByName(tr, "state")))) {
+                break;
+            }
+        }
+
+        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        assertEquals("Initialized", newDraftRelease.getState());
+
+        viewEditModuleSetReleasePage.openPage();
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
+        coreComponentAssignmentPage.openPage();
+        assertThrows(WebDriverException.class, () -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
+
+        /**
+         * Test Assertion #21.2.6.c
+         */
+        viewEditReleasePage.openPage();
+        editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized");
+        editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitCreateButton();
+
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            assertNotEquals("Initialized", state);
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
+
+        viewEditModuleSetReleasePage.openPage();
+        viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
+        coreComponentAssignmentPage.openPage();
+        assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
     }
 
     @Test
