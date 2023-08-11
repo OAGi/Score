@@ -79,7 +79,7 @@ public class TC_37_1_AgencyIdListAccess extends BaseTest {
         assertEquals("Production", getText(viewEditAgencyIDListPage.getColumnByName(tr, "state")));
 
         viewEditAgencyIDListPage.openPage();
-        viewEditAgencyIDListPage.setOwner("oagis");
+        viewEditAgencyIDListPage.setName("clm63055D16B_AgencyIdentification");
         viewEditAgencyIDListPage.hitSearchButton();
         tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
         assertEquals("Published", getText(viewEditAgencyIDListPage.getColumnByName(tr, "state")));

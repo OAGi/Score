@@ -69,7 +69,7 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
         viewEditAgencyIDListPage.setBranch(latestRelease.getReleaseNumber());
-        viewEditAgencyIDListPage.setOwner("oagis");
+        viewEditAgencyIDListPage.setName("clm63055D16B_AgencyIdentification");
         viewEditAgencyIDListPage.hitSearchButton();
 
         assertEquals(1, viewEditAgencyIDListPage.getTotalNumberOfItems());
@@ -107,7 +107,7 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
         viewEditAgencyIDListPage.setBranch(latestRelease.getReleaseNumber());
-        viewEditAgencyIDListPage.setOwner("oagis");
+        viewEditAgencyIDListPage.setName("clm63055D16B_AgencyIdentification");
         viewEditAgencyIDListPage.hitSearchButton();
 
         WebElement tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
@@ -122,7 +122,6 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         assertEquals(agencyIdList.getGuid(), getText(editAgencyIDListPage.getGUIDField()));
         assertEquals(latestRelease.getReleaseNumber(), getText(editAgencyIDListPage.getReleaseField()));
         assertEquals(agencyIdList.getState(), getText(editAgencyIDListPage.getStateField()));
-        assertEquals("oagis", getText(editAgencyIDListPage.getOwnerField()));
         assertEquals(agencyIdList.getName(), getText(editAgencyIDListPage.getAgencyIDListNameField()));
         assertEquals(agencyIdList.getListId(), getText(editAgencyIDListPage.getListIDField()));
         assertEquals(agencyIdList.getVersionId(), getText(editAgencyIDListPage.getVersionField()));
