@@ -1460,25 +1460,33 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         sendKeys(bbieScPanel.getCardinalityMinField(), "");
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMinField(), randStrForCardinalityMin);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         sendKeys(bbieScPanel.getCardinalityMaxField(), "");
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMaxField(), randStrForCardinalityMax);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
     }
 
     @Test
@@ -1842,7 +1850,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Maintenance Order. Cancel Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1883,7 +1891,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Process Maintenance Order. Process Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1937,7 +1945,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Cancel Maintenance Order. Cancel Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1984,7 +1992,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Maintenance Order. Sync Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2035,7 +2043,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Notify Maintenance Order. Notify Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2067,7 +2075,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Show Maintenance Order. Show Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2123,7 +2131,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Change Maintenance Order. Change Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2171,7 +2179,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Get Maintenance Order. Get Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "WIP");
 
@@ -2237,7 +2245,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "QA");
 
@@ -2510,7 +2518,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
         // end of the pre-condition
@@ -2539,7 +2547,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "Production");
         // end of the pre-condition
