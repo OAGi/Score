@@ -99,24 +99,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        click(upliftBIEPage.getNextButton());
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By NEXT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), NEXT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTopLevelASBIEP);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+        EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
         WebElement bbieNode = editBIEPage.getNodeByPath(preconditionsTa2912.bbiePath);
@@ -443,7 +427,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
         for (String path :
                 Arrays.asList("/Enterprise Unit", "/Enterprise Unit/Type Code", "/Enterprise Unit/Identifier",
                         "/Enterprise Unit/Identifier Set/Scheme Version Identifier",
@@ -470,22 +454,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             assertTrue(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]//input[@disabled]")).isDisplayed());
         }
         escape(getDriver());
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        waitFor(ofMillis(1000L));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upiftedTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        bieMenu = homePage.getBIEMenu();
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upiftedTopLevelASBIEP);
+        EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         assertEquals(developer.getLoginId(), getText(topLevelASBIEPPanel.getOwnerField()));
         assertEquals(preconditionsTa2914.topLevelASBIEPBusinessTerm, getText(topLevelASBIEPPanel.getBusinessTermField()));
@@ -523,7 +492,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5b() {
-        String prev_release = "10.8.7.1";
+        String prev_release = "10.8.6";
         String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -545,7 +514,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Indicator");
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Version Identifier");
@@ -580,7 +549,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
         //different green
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Incorporation Location/CAGEID");
         clickOn(sourceNode);
@@ -620,21 +589,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Reason Code"));
         escape(getDriver());
         waitFor(ofMillis(3000));
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTopLevelASBIEP);
+        EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
         WebElement bbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Status/Reason Code");
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -712,21 +667,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage = upliftBIEPage.next();
         upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Revised Item Status");
         upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("General Ledger Element"));
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedTopLevelASBIEP2 = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTopLevelASBIEP2);
+        editBIEPage = upliftBIEVerificationPage.uplift();
         asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/General Ledger Element");
         waitFor(ofMillis(1000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -819,21 +764,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedReusedChildTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedChildTopLevelASBIEP);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+        editBIEPage = upliftBIEVerificationPage.uplift();
         editBIEPage.moveToQA();
         editBIEPage.moveToProduction();
 
@@ -846,20 +778,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage = upliftBIEPage.next();
         selectProfileBIEToReuseDialog = upliftBIEVerificationPage.reuseBIEOnNode("/From UOM Package/Unit Packaging", "Unit Packaging");
         selectProfileBIEToReuseDialog.selectBIEToReuse(preconditionsTa2915dReusedChild.topLevelASBIEP);
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedReusedParentTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedParentTopLevelASBIEP);
+        editBIEPage = upliftBIEVerificationPage.uplift();
+        TopLevelASBIEPObject upliftedReusedParentTopLevelASBIEP = editBIEPage.getTopLevelASBIEP();
         editBIEPage.moveToQA();
         editBIEPage.moveToProduction();
 
@@ -873,23 +796,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage = upliftBIEPage.next();
         selectProfileBIEToReuseDialog = upliftBIEVerificationPage.reuseBIEOnNode("/UOM Code Conversion Rate/From UOM Package", "From UOM Package");
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Unit Packaging\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
         selectProfileBIEToReuseDialog.selectBIEToReuse(upliftedReusedParentTopLevelASBIEP);
 
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedReusedScenarioTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
-
+        editBIEPage = upliftBIEVerificationPage.uplift();
+        TopLevelASBIEPObject upliftedReusedScenarioTopLevelASBIEP = editBIEPage.getTopLevelASBIEP();
         asbieNode = editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging/Dimensions");
         waitFor(ofMillis(1000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
@@ -1063,19 +976,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedTOPBIEGETBOMTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTOPBIEGETBOMTopLevelASBIEP);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+        EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
         WebElement bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area /BOM/BOM Header/Document Date Time");
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1111,18 +1013,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedBIEPrimitiveDateTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIEPrimitiveDateTopLevelASBIEP);
+        upliftBIEVerificationPage = upliftBIEPage.next();
+        editBIEPage = upliftBIEVerificationPage.uplift();
         bbieNode = editBIEPage.getNodeByPath("/Start Separate Date Time/Date");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1367,7 +1259,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
         //match BBIE or BBIEsc nodes
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code");
         clickOn(sourceNode);
@@ -1428,19 +1320,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Version Identifier"));
         escape(getDriver());
 
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedTOPBIEGETBOMTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-        //Verification after uplifting
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedTOPBIEGETBOMTopLevelASBIEP);
+        editBIEPage = upliftBIEVerificationPage.uplift();
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Revision Identifier", 3);
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1508,21 +1388,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedBIEBOMDoubleNestedTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIEBOMDoubleNestedTopLevelASBIEP);
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+        editBIEPage = upliftBIEVerificationPage.uplift();
 
         editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
         WebElement bbieNode = editBIEPage.getNodeByPath("/BOM/BOM Option/Default Indicator");
@@ -1602,7 +1469,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Post Acknowledge Journal Entry/Data Area/Post Acknowledge/Response Criteria/Change Status/Extension/Usage Description");
         clickOn(sourceNode);
@@ -1622,19 +1489,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Scheme Identifier"));
 
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedJournalEntryTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedJournalEntryTopLevelASBIEP);
+        EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
         WebElement bbieNode = editBIEPage.getNodeByPath("/Post Acknowledge Journal Entry/Data Area/Journal Entry/Journal Entry Line/Debit Credit Code");
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
@@ -1875,7 +1730,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Latest Start Date Time");
         clickOn(sourceNode);
@@ -1914,19 +1769,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Revision Identifier"));
 
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        By UPLIFT_BUTTON_LOCATOR =
-                By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        String currentUrl = getDriver().getCurrentUrl();
-        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedBIECAGUpliftTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIECAGUpliftTopLevelASBIEP);
+        editBIEPage = upliftBIEVerificationPage.uplift();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Hazardous Material/Technical Name");
         waitFor(ofMillis(1000L));
@@ -2024,7 +1867,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                 }
             });
 
-            currentUrl = getDriver().getCurrentUrl();
+            String currentUrl = getDriver().getCurrentUrl();
             BigInteger codeListManifestId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/code_list/") + "/code_list/".length()));
             CodeListObject upliftedCodeList = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListManifestId);
             String codeListName = codeList.getName();
@@ -2047,7 +1890,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        upliftBIEVerificationPage = upliftBIEPage.Next();
+        upliftBIEVerificationPage = upliftBIEPage.next();
 
         sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Child Item Reference/Extension/Effectivity Relation Code");
         clickOn(sourceNode);
@@ -2093,16 +1936,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         clickOn(targetNode);
         click(upliftBIEVerificationPage.getCheckBoxOfNodeInTargetBIE("Account Identifier"));
 
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        click(elementToBeClickable(getDriver(), UPLIFT_BUTTON_LOCATOR));
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
-        currentUrl = getDriver().getCurrentUrl();
-        topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/profile_bie/") + "/profile_bie/".length()));
-        TopLevelASBIEPObject upliftedBIECAGUplift2 = getAPIFactory().getBusinessInformationEntityAPI()
-                .getTopLevelASBIEPByID(topLevelAsbiepId);
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedBIECAGUplift2);
+        editBIEPage = upliftBIEVerificationPage.uplift();
 
         bbieNode = editBIEPage.getNodeByPath("/Child Item Reference/Child Item/Manufacturing Party/CAGEID");
         waitFor(ofMillis(1000L));
@@ -2261,9 +2095,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
-        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.Next();
-        upliftBIEVerificationPage.next();
-        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
+        UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
+        upliftBIEVerificationPage.uplift();
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Usage Description\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Control Objective Category\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"List Version Identifier\")]")).isDisplayed());

@@ -182,6 +182,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
+    public TopLevelASBIEPObject getTopLevelASBIEP() {
+        return asbiep;
+    }
+
+    @Override
     public void RetainReusedBIEOnNode(String path) {
         retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);

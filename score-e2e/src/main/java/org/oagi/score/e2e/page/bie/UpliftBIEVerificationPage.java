@@ -10,6 +10,7 @@ public interface UpliftBIEVerificationPage extends Page {
     void expandNodeInTargetBIE(String node);
 
     WebElement goToNodeInSourceBIE(String nodePath);
+
     WebElement goToNodeInTargetBIE(String nodePath);
 
     WebElement getSearchInputOfSourceTree();
@@ -17,14 +18,26 @@ public interface UpliftBIEVerificationPage extends Page {
     WebElement getSearchInputOfTargetTree();
 
     WebElement getCheckBoxOfNodeInTargetBIE(String node);
+
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path, String nodeName);
+
     /**
-     * Return the UI element of the 'Next' button in the paginator.
+     * Return the UI element of the 'Reused' icon of the node in the target BIE.
      *
-     * @return the UI element of the 'Next' button in the paginator
+     * @return the UI element of the 'Reused' icon of the node in the target BIE
      */
     WebElement getReusedIconOfNodeInTargetBIE(String nodeName);
+
+    /**
+     * Return the UI element of the 'Next' button.
+     *
+     * @return the UI element of the 'Next' button
+     */
     WebElement getNextButton();
 
-    void next();
+    /**
+     * Uplift the BIE.
+     */
+    EditBIEPage uplift();
+
 }

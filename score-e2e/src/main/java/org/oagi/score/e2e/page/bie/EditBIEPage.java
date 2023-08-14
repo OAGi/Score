@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.obj.BusinessContextObject;
+import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
@@ -56,6 +57,13 @@ public interface EditBIEPage extends Page {
      * @return node UI element
      */
     WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel);
+
+    /**
+     * Return the Top-level ASBIEP.
+     *
+     * @return the Top-level ASBIEP
+     */
+    TopLevelASBIEPObject getTopLevelASBIEP();
 
     /**
      * Return the panel for 'Top-Level ASBIEP' node.

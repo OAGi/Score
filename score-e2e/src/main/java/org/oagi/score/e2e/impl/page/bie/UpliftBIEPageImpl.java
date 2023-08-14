@@ -221,7 +221,7 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     }
 
     @Override
-    public UpliftBIEVerificationPage Next() {
+    public UpliftBIEVerificationPage next() {
         click(getNextButton());
         invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), Duration.ofSeconds(180L), ofMillis(500L)));
         UpliftBIEVerificationPage upliftBIEVerificationPage = new UpliftBIEVerificationPageImpl(this);
