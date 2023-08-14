@@ -292,6 +292,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         WebElement node = getNodeByName(nodeName);
         click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -301,6 +302,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
         click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
