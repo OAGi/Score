@@ -1143,7 +1143,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time", 10);
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Alternate BOM Reference/Status/Effective Time Period/Start Time", 5);
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
@@ -1211,7 +1211,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_9b_and_TA_29_1_9c() {
-        String prev_release = "10.8.7.1";
+        String prev_release = "10.8.8";
         String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1260,84 +1260,99 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP);
-        WebElement bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code", 5);
+        WebElement bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Effectivity Relation Code", 6);
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Validation Indicator");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Method Consequence Text");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("any URI");
         editBIEPage.hitUpdateButton();
 
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier", 3);
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Reference Identifier");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("language");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Total Number", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Total Number");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("positive integer");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Latest Start Date Time", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Latest Start Date Time");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("gregorian day");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier", 10);
+
+        editBIEPage.expandTree("Request Language Code");
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Agency Identifier");
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         editBIEPage.hitUpdateButton();
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier", 3);
+
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Request Language Code/List Version Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("token");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("float");
         editBIEPage.hitUpdateButton();
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code", 3);
+
+        editBIEPage.expandTree("Transport Temperature");
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Transport Temperature/Unit Code");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("string");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
         bbiePanel.setValueDomain("string");
         editBIEPage.hitUpdateButton();
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier/Scheme Agency Identifier", 3);
+
+        editBIEPage.expandTree("Correlation Identifier");
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Correlation Identifier/Scheme Agency Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         bbiescPanel.toggleUsed();
         bbiescPanel.setValueDomain("normalized string");
         editBIEPage.hitUpdateButton();
-        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Save Indicator", 3);
+
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Option/Extension/Record Set Save Indicator");
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         bbiePanel.toggleUsed();
@@ -1444,19 +1459,25 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("positive integer", getText(bbiePanel.getValueDomainField()));
 
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier", 3);
-        waitFor(ofMillis(1000L));
-        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
+        editBIEPage.openPage();
         bbieNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code", 3);
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertEquals("token", getText(bbiePanel.getValueDomainField()));
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier", 3);
+        editBIEPage.expandTree("File Type Code");
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Agency Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("token", getText(bbiescPanel.getValueDomainField()));
-        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier", 3);
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Attachment/File Type Code/List Version Identifier");
+        waitFor(ofMillis(1000L));
+        bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
+        assertEquals("token", getText(bbiescPanel.getValueDomainField()));
+
+        editBIEPage.openPage();
+        bbieNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier", 3);
+        editBIEPage.expandTree("Logical Identifier");
+        bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Application Area/Sender/Logical Identifier/Scheme Version Identifier");
         waitFor(ofMillis(1000L));
         bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEquals("normalized string", getText(bbiescPanel.getValueDomainField()));
