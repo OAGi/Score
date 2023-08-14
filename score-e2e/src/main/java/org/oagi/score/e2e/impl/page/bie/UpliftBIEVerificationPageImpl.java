@@ -71,7 +71,6 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
             e.sendKeys(Keys.ENTER);
             e.sendKeys(Keys.ENTER);
             e.sendKeys(Keys.ENTER);
-
         });
 
         String[] nodes = nodePath.split("/");

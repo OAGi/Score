@@ -1710,13 +1710,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911BIECAGUplift = preconditions_TA_29_11_BIECAGUplift(usera, prev_release);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        List<String> euCLStates = new ArrayList<>();
-        euCLStates.add("WIP");
-        euCLStates.add("QA");
-        euCLStates.add("Production");
-        euCLStates.add("Deleted");
         ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
-        RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(usera, prev_releaseObject, euNamespace, euCLStates);
+        RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(
+                usera, prev_releaseObject, euNamespace, Arrays.asList("WIP", "QA", "Production", "Deleted"));
         CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
         CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -2008,48 +2004,37 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         //Uplift codeList page
+        ReleaseObject sourceRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(curr_release);
+        UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
 
-        for (String codeListName : Arrays.asList(CLaccessendUserwip, CLaccessendUserqa, CLaccessendUserproduction, CLaccessendUserdeleted,
-                CLaccessUseraDeprecated.getName())) {
-            UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
-            upliftCodeListPage.setSourceRelease(prev_release);
-            upliftCodeListPage.setTargetRelease(curr_release);
-            upliftCodeListPage.setCodeList(codeListName);
-            upliftCodeListPage.hitSearchButton();
-            tr = upliftCodeListPage.getTableRecordAtIndex(1);
-            td = upliftCodeListPage.getColumnByName(tr, "select");
-            click(td);
-            click(upliftCodeListPage.getUpliftButton(true));
+        for (CodeListObject codeList : Arrays.asList(
+                euCodeListWithStateContainer.stateCodeLists.get("WIP"),
+                euCodeListWithStateContainer.stateCodeLists.get("QA"),
+                euCodeListWithStateContainer.stateCodeLists.get("Production"),
+                euCodeListWithStateContainer.stateCodeLists.get("Deleted"),
+                CLaccessUseraDeprecated,
+                getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("CLuserderived_BIEUp", prev_release))) {
+            retry(() -> {
+                try {
+                    upliftCodeListPage.hitUpliftButton(codeList, sourceRelease, targetRelease);
+                } catch (WebDriverException e) {
+                    upliftCodeListPage.openPage();
+                    throw e;
+                }
+            });
 
             currentUrl = getDriver().getCurrentUrl();
-            BigInteger codeListId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/code_list/") + "/code_list/".length()));
-            CodeListObject codeListObject = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListId);
-
+            BigInteger codeListManifestId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/code_list/") + "/code_list/".length()));
+            CodeListObject upliftedCodeList = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListManifestId);
+            String codeListName = codeList.getName();
             if (!upliftedCodeLists.containsKey(codeListName)) {
-                upliftedCodeLists.put(codeListName, codeListObject);
+                upliftedCodeLists.put(codeListName, upliftedCodeList);
             } else {
-                upliftedCodeLists.put(codeListName, codeListObject);
+                upliftedCodeLists.put(codeListName, upliftedCodeList);
             }
-        }
 
-        UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
-        upliftCodeListPage.setSourceRelease(prev_release);
-        upliftCodeListPage.setTargetRelease(curr_release);
-        upliftCodeListPage.setCodeList("CLuserderived_BIEUp");
-        upliftCodeListPage.hitSearchButton();
-        tr = upliftCodeListPage.getTableRecordAtIndex(1);
-        td = upliftCodeListPage.getColumnByName(tr, "select");
-        click(td);
-        click(upliftCodeListPage.getUpliftButton(true));
-
-        currentUrl = getDriver().getCurrentUrl();
-        BigInteger codeListId = new BigInteger(currentUrl.substring(currentUrl.indexOf("/code_list/") + "/code_list/".length()));
-        CodeListObject codeListObject = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListId);
-
-        if (!upliftedCodeLists.containsKey("CLuserderived_BIEUp")) {
-            upliftedCodeLists.put("CLuserderived_BIEUp", codeListObject);
-        } else {
-            upliftedCodeLists.put("CLuserderived_BIEUp", codeListObject);
+            upliftCodeListPage.openPage();
         }
 
         //Uplift BIECAGUplift after CodeList uplift
@@ -2188,7 +2173,6 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(ofMillis(1000L));
         bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
-        homePage.logout();
     }
 
     private Preconditions_TA_29_1_BIECAGUplift preconditions_TA_29_11_BIECAGUplift(AppUserObject usera, String prevRelease) {
@@ -2207,15 +2191,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Validation Indicator. Indicator");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Method Consequence Text. Text");
+        selectCCPropertyPage.selectAssociation("Method Consequence Text. Open_ Text");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Record Set Reference Identifier. Identifier");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Record Set Total Number. Number");
+        selectCCPropertyPage.selectAssociation("Record Set Total Number. Positive Integer Number_ Number");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Latest Start Date Time. Date Time");
+        selectCCPropertyPage.selectAssociation("Latest Start Date Time. Open_ Date Time");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
-        selectCCPropertyPage.selectAssociation("Request Language Code. Code");
+        selectCCPropertyPage.selectAssociation("Request Language Code. Language_ Code");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
         selectCCPropertyPage.selectAssociation("Transport Temperature. Measure");
         selectCCPropertyPage = accExtensionViewEditPage.appendPropertyAtLast("/Child Item Reference User Extension Group. Details");
