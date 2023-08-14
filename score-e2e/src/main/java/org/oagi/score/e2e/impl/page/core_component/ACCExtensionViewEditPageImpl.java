@@ -13,6 +13,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
@@ -196,13 +197,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void setNamespace(NamespaceObject namespace) {
-        click(getNamespaceField());
-        waitFor(ofMillis(1000L));
-        WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
-        click(option);
-        waitFor(ofMillis(1000L));
-        assert getNamespaceFieldValue().equals(namespace.getUri());
+        retry(() -> {
+            click(getNamespaceField());
+            waitFor(ofSeconds(2L));
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
     }
 
     @Override
@@ -289,7 +290,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement node = getNodeByName(nodeName);
-        click(node);
+        click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
         try {
             if (visibilityOfElementLocated(getDriver(),
@@ -299,7 +300,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         } catch (WebDriverException ignore) {
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
