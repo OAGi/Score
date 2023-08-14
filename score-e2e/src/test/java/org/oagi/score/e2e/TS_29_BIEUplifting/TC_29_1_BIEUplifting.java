@@ -200,7 +200,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         topLevelASBIEPPanel.setStatus(preconditionsTa2914.topLevelASBIEPStatus);
         editBIEPage.hitUpdateButton();
 
-        waitFor(ofMillis(3000));
+        waitFor(ofMillis(3000L));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
         accExtensionViewEditPage.setNamespace(euNamespace);
@@ -636,13 +636,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2915.asbieRemark, getText(bbiePanel.getRemarkField()));
         assertEquals(preconditionsTa2915.asbieContextDefinition, getText(bbiePanel.getContextDefinitionField()));
 
-        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value/Identifier Set");
+        editBIEPage.openPage();
+        asbieNode = editBIEPage.getNodeByPath("/Enterprise Unit/Classification/Code List Value");
         waitFor(ofMillis(1000L));
         asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
         assertEnabled(asbiePanel.getUsedCheckbox());
         assertChecked(asbiePanel.getUsedCheckbox());
 
-        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Identifier/Scheme Agency Identifier");
+        editBIEPage.openPage();
+        WebElement bbiescNode = editBIEPage.getNodeByPath("/Enterprise Unit/Cost Center Identifier/Scheme Agency Identifier");
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
         assertEnabled(bbiescPanel.getUsedCheckbox());
