@@ -861,6 +861,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
         editBIEPage.clickOnDropDownMenuByPath("/UOM Code Conversion Rate/From UOM Package");
+        waitFor(ofMillis(1000L));
         click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove Reused BIE\")]")));
         click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
         waitFor(ofMillis(1000L));
@@ -1006,7 +1007,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("integer", getText(bbiePanel.getValueDomainField()));
 
         //BIEPrimitiveDate
-        upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.openPage();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
 
@@ -2098,7 +2099,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
         click(td);
         UpliftBIEVerificationPage upliftBIEVerificationPage = upliftBIEPage.next();
-        upliftBIEVerificationPage.uplift();
+        click(upliftBIEVerificationPage.getNextButton());
+        invisibilityOfLoadingContainerElement(PageHelper.wait(getDriver(), ofSeconds(900L), ofMillis(500L)));
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Usage Description\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"Control Objective Category\")]")).isDisplayed());
         assertTrue(getDriver().findElement(By.xpath("//*[contains(text(), \"List Version Identifier\")]")).isDisplayed());
