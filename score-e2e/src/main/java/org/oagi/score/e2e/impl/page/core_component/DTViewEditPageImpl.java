@@ -601,9 +601,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override

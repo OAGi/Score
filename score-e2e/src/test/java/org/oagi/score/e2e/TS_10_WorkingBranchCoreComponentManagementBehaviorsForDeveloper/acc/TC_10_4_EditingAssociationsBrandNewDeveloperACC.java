@@ -2312,7 +2312,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
     @Test
     public void test_TA_10_4_17() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2350,6 +2349,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -2361,7 +2361,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         String nodePath;
-
         {
             nodePath = "/" + acc.getDen() + "/" + asccp.getPropertyTerm();
             SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, asccp.getPropertyTerm());
@@ -2377,7 +2376,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBase.getDen() + "/" + asccp.getPropertyTerm());
             assertTrue(movedASCCPNode.isDisplayed());
-
         }
 
         {
@@ -2400,6 +2398,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accForBase.getAccManifestId());
         accViewEditPage.hitCancelButton();
+
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitCancelButton();
@@ -2409,7 +2408,6 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
             WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
             assertTrue(movedASCCPNode.isDisplayed());
-
         }
 
         {

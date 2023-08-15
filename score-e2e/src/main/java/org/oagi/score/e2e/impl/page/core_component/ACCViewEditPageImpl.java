@@ -596,7 +596,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span")));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
-
     }
 
     @Override
@@ -774,9 +773,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
