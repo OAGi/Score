@@ -4,7 +4,6 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
-import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasOperationRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasRequestRecord;
@@ -21,10 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.jooq.impl.DSL.resultQuery;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.BooleanUtils.BooleanToByte;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
@@ -130,7 +127,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                             .set(OAS_REQUEST.REQUIRED, (byte) (1))
                             .returningResult(OAS_REQUEST.OAS_REQUEST_ID)
                             .fetchOne().value1();
-                }else{
+                } else {
 
                     if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasRequestRecord.getMakeArrayIndicator()) {
                         oasRequestChangedField.add(OAS_REQUEST.MAKE_ARRAY_INDICATOR);
@@ -228,7 +225,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                             .set(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR, (byte) 0)
                             .returningResult(OAS_RESPONSE.OAS_RESPONSE_ID)
                             .fetchOne().value1();
-                } else{
+                } else {
                     if (BooleanToByte(bieForOasDoc.isArrayIndicator()) != oasResponseRecord.getMakeArrayIndicator()) {
                         oasResponseChangedField.add(OAS_RESPONSE.MAKE_ARRAY_INDICATOR);
                         oasResponseRecord.setMakeArrayIndicator(BooleanToByte(bieForOasDoc.isArrayIndicator()));
@@ -264,6 +261,29 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             return new DeleteBieForOasDocResponse(Collections.emptyList());
         }
         // based on the message type , delete from oas_request or oas_response
-        return null;
+        for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
+            if (bieForOasDoc.getMessageBody().equals("Request")) {
+                //delete oas_request
+                OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                if (oasRequestRecord != null) {
+                    dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
+                    dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(request.getOasDocId()))).execute();
+                }
+            }
+
+            if (bieForOasDoc.getMessageBody().equals("Response")) {
+                //delete oas_response
+                OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                if (oasResponseRecord != null) {
+                    dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                    dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
+                    dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(request.getOasDocId()))).execute();
+                }
+            }
+        }
+
+        DeleteBieForOasDocResponse response = new DeleteBieForOasDocResponse(bieForOasDocList);
+        return response;
     }
 }
