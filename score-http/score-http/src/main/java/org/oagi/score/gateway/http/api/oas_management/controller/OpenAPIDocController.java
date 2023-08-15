@@ -212,7 +212,7 @@ public class OpenAPIDocController {
         return oasDocService.selectBieForOasDoc(requester, request);
     }
 
-    @RequestMapping(value = "//oas_doc/{oasDocId:[\\d]+}/bie_list/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/oas_doc/{oasDocId:[\\d]+}/bie_list/delete", method = RequestMethod.POST)
     public ResponseEntity deletes(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody DeleteBieForOasDocRequestData requestData) {

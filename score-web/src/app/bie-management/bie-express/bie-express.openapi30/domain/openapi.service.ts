@@ -236,7 +236,7 @@ export class OpenAPIService {
       });
   }
   removeBieForOasDoc(request: BieForOasDocDeleteRequest): Observable<any>{
-    return this.http.post<any>('/api/oas_doc/' + request.oasDocId + 'bie_list/delete', request.json);
+    return this.http.post<any>('/api/oas_doc/' + request.oasDocId + '/bie_list/delete', request.json);
   }
 
   generate(topLevelAsbiepIds: number[], option: BieExpressOption, oasDoc: OasDoc): Observable<HttpResponse<Blob>> {
