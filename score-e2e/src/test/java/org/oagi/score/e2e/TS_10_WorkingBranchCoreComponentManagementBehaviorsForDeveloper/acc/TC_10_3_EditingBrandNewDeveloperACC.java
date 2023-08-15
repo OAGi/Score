@@ -13,6 +13,7 @@ import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -128,7 +129,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         accNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
         accPanel = accViewEditPage.getACCPanel(accNode);
         ACCViewEditPage.ACCPanel finalAccPanel = accPanel;
-        assertThrows(TimeoutException.class, () -> finalAccPanel.setNamespace(endUserNamespace.getUri()));
+        assertThrows(WebDriverException.class, () -> finalAccPanel.setNamespace(endUserNamespace.getUri()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
