@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -18,11 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
@@ -41,73 +41,67 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
     @Test
     @DisplayName("TC_41_3_TA_1")
     public void test_TA_1() {
-        AppUserObject endUserA;
-        ReleaseObject branch;
-        ArrayList<DTObject> dtForTesting = new ArrayList<>();
-        CodeListObject codeList;
-        {
-            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(endUserA);
+        AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
 
-            codeList = getAPIFactory().getCodeListAPI().
-                    createRandomCodeList(endUserA, namespace, branch, "WIP");
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().
+                createRandomCodeList(endUserA, endUserNamespace, branch, "WIP");
 
-            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
-            DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, endUserA, namespace, "WIP");
-            dtForTesting.add(randomBDT);
-        }
+        DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+        DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, endUserA, endUserNamespace, "WIP");
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        for (DTObject dt : dtForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
+        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(randomBDT.getDen(), branch.getReleaseNumber());
 
-            /**
-             * Test Assertion #41.3.1.a
-             */
-            assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
-            ArrayList<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs();
-            for (NamespaceObject namespace : standardNamespaces) {
-                assertDoesNotThrow(() -> {
-                    dtViewEditPage.setNamespace(namespace);
-                });
-            }
+        /**
+         * Test Assertion #41.3.1.a
+         */
+        assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
+        List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs();
+        for (NamespaceObject namespace : standardNamespaces) {
+            click(dtViewEditPage.getNamespaceField());
+            waitFor(ofMillis(1000L));
+            WebElement option = elementToBeClickable(getDriver(), By.xpath(
+                    "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
+            assertNotNull(option);
+            waitFor(ofMillis(1000L));
             escape(getDriver());
-
-            dtViewEditPage.showValueDomain();
-            assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "NormalizedString", "normalized string"));
-            assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "String", "any URI, string"));
-
-            assertDisabled(dtViewEditPage.getCheckboxForValueDomainByTypeAndName("Primitive", "NormalizedString"));
-            dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            dtViewEditPage.selectValueDomain(codeList.getName());
-            dtViewEditPage.discardValueDomain();
-
-            /**
-             * Test Assertion #41.3.1.b
-             */
-            dtViewEditPage.setQualifier("newQualifier, " + dt.getQualifier());
-
-            /**
-             * Test Assertion #41.3.1.c
-             */
-            assertEquals("false", dtViewEditPage.getSixHexadecimalIdentifierField().getAttribute("aria-required"));
-
-            /**
-             * Test Assertion #41.3.1.d
-             */
-            assertEquals("false", dtViewEditPage.getContentComponentDefinitionField().getAttribute("aria-required"));
-            assertEquals("false", dtViewEditPage.getDefinitionField().getAttribute("aria-required"));
-            assertEquals("false", dtViewEditPage.getDefinitionSourceField().getAttribute("aria-required"));
-            dtViewEditPage.setDefinition("");
-            click(dtViewEditPage.getUpdateButton(true));
-            assertEquals("Are you sure you want to update this without definitions?",
-                    dtViewEditPage.getDefinitionWarningDialogMessage());
-            dtViewEditPage.hitUpdateAnywayButton();
         }
+
+        dtViewEditPage.showValueDomain();
+        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "NormalizedString", "normalized string"));
+        assertDoesNotThrow(() -> dtViewEditPage.getValueDomainByTypeNameAndXSDExpression("Primitive", "String", "any URI, string"));
+
+        assertDisabled(dtViewEditPage.getCheckboxForValueDomainByTypeAndName("Primitive", "NormalizedString"));
+        dtViewEditPage.addCodeListValueDomain(codeList.getName());
+        dtViewEditPage.selectValueDomain(codeList.getName());
+        dtViewEditPage.discardValueDomain();
+
+        /**
+         * Test Assertion #41.3.1.b
+         */
+        dtViewEditPage.setQualifier("newQualifier, " + randomBDT.getQualifier());
+
+        /**
+         * Test Assertion #41.3.1.c
+         */
+        assertEquals("false", dtViewEditPage.getSixHexadecimalIdentifierField().getAttribute("aria-required"));
+
+        /**
+         * Test Assertion #41.3.1.d
+         */
+        assertEquals("false", dtViewEditPage.getContentComponentDefinitionField().getAttribute("aria-required"));
+        assertEquals("false", dtViewEditPage.getDefinitionField().getAttribute("aria-required"));
+        assertEquals("false", dtViewEditPage.getDefinitionSourceField().getAttribute("aria-required"));
+        dtViewEditPage.setDefinition("");
+        click(dtViewEditPage.getUpdateButton(true));
+        assertEquals("Are you sure you want to update this without definitions?",
+                dtViewEditPage.getDefinitionWarningDialogMessage());
+        dtViewEditPage.hitUpdateAnywayButton();
     }
 
     @Test
