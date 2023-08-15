@@ -16,7 +16,6 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
-import org.openqa.selenium.By;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,10 +23,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +84,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         //generate three random Business Terms for testing
         List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
             businessTerms.add(randomBusinessTerm);
         }
 
@@ -125,6 +124,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             csvFileForUpload.delete();
         }
     }
+
     @Test
     @DisplayName("TC_42_4_3")
     public void no_business_term_will_be_created_if_invalid_format_in_uploaded_csv_file() throws IOException {
@@ -137,11 +137,11 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         //generate three random Business Terms for testing
-        ArrayList<BusinessTermObject> businessTerms = new ArrayList<>();
+        List<BusinessTermObject> businessTerms = new ArrayList<>();
 
         String randomBT_noTerm_URI = "http://www.hSxyz.com";
         String randomBT_invalidUri = "123";
-        BusinessTermObject randomBT = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        BusinessTermObject randomBT = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
         businessTerms.add(randomBT);
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
@@ -171,20 +171,20 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             assertTrue(getSnackBarMessage(getDriver()).contains("Fail to parse CSV file"));
 
             //Verify that all test business terms have been saved through bulk upload
-            ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.setExternalReferenceURI(randomBT_noTerm_URI);
+            viewEditBusinessTermPage.hitSearchButton();
+            assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
 
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT_noTerm_URI);
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(0, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT_invalidUri);
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(0, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setExternalReferenceURI(randomBT.getExternalReferenceUri());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.setExternalReferenceURI(randomBT_invalidUri);
+            viewEditBusinessTermPage.hitSearchButton();
+            assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
+
+            viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.setExternalReferenceURI(randomBT.getExternalReferenceUri());
+            viewEditBusinessTermPage.hitSearchButton();
+            assertTrue(viewEditBusinessTermPage.getSelectCheckboxAtIndex(1).isDisplayed());
 
         } finally {
             csvFileForUpload.delete();
@@ -205,7 +205,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         //generate three random Business Terms for testing
         List<BusinessTermObject> businessTerms = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+            BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
             businessTerms.add(randomBusinessTerm);
         }
 
@@ -260,10 +260,15 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         //generate three random Business Terms for testing
         List<BusinessTermObject> businessTerms = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+        int sizeOfSamples = 3;
+        for (int i = 0; i < sizeOfSamples; i++) {
+            BusinessTermObject randomBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
             businessTerms.add(randomBusinessTerm);
         }
+        // change the last record URI to be the same as the first record
+        businessTerms.get(businessTerms.size() - 1).setExternalReferenceUri(
+                businessTerms.get(0).getExternalReferenceUri()
+        );
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         // write test business terms into csv file and save into a different name for upload
@@ -277,14 +282,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
                  CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withEscape('\\').withQuoteMode(QuoteMode.ALL)
                          .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
 
-                for (int i = 0; i < 2; i++) {
-                    csvPrinter.printRecord(businessTerms.get(i).getBusinessTerm(), businessTerms.get(i).getExternalReferenceUri(),
-                            businessTerms.get(i).getExternalReferenceId(), businessTerms.get(i).getDefinition(), businessTerms.get(i).getComment());
+                for (BusinessTermObject businessTerm : businessTerms) {
+                    csvPrinter.printRecord(businessTerm.getBusinessTerm(), businessTerm.getExternalReferenceUri(),
+                            businessTerm.getExternalReferenceId(), businessTerm.getDefinition(), businessTerm.getComment());
                 }
-
-                //change the last record URI to be the same as the first record
-                csvPrinter.printRecord(businessTerms.get(2).getBusinessTerm(), businessTerms.get(0).getExternalReferenceUri(),
-                        businessTerms.get(2).getExternalReferenceId(), businessTerms.get(2).getDefinition(), businessTerms.get(2).getComment());
                 csvPrinter.flush();
             }
 
@@ -293,22 +294,16 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             waitFor(ofMillis(1000L));
             assertTrue(getSnackBarMessage(getDriver()).contains("Uploaded"));
 
-            //Verify that all test business terms have been saved through bulk upload
-            ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
-            viewEditBusinessTermPageForCheck.setTerm(businessTerms.get(2).getBusinessTerm());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
+            int totalNumberOfItems = 0;
+            // Either the first BT or the last BT should be existed.
+            for (BusinessTermObject businessTerm : businessTerms) {
+                viewEditBusinessTermPage.openPage();
+                viewEditBusinessTermPage.setTerm(businessTerm.getBusinessTerm());
+                viewEditBusinessTermPage.hitSearchButton();
+                totalNumberOfItems += viewEditBusinessTermPage.getTotalNumberOfItems();
+            }
 
-            viewEditBusinessTermPageForCheck.openPage();
-            viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(1).getExternalReferenceUri());
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());
-
-            viewEditBusinessTermPageForCheck.openPage();
-            String oldBusinessTermName = businessTerms.get(0).getBusinessTerm();
-            viewEditBusinessTermPageForCheck.setTerm(oldBusinessTermName);
-            viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(1, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
+            assertEquals(businessTerms.size() - 1, totalNumberOfItems);
         } finally {
             csvFileForUpload.delete();
         }
