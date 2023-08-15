@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,18 +35,14 @@ import static org.oagi.score.repo.api.base.SortDirection.DESC;
 @RestController
 public class BusinessTermController {
 
+    private static String TYPE = "text/csv";
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private ResourceLoader resourceLoader;
-
     @Autowired
     private AuthenticationService authenticationService;
-
     @Autowired
     private BusinessTermService businessTermService;
-
-    private static String TYPE = "text/csv";
 
     @RequestMapping(value = "/business_terms", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -230,11 +221,15 @@ public class BusinessTermController {
             CreateBulkBusinessTermRequest request = new CreateBulkBusinessTermRequest(authenticationService.asScoreUser(requester));
             request.setInputStream(file.getInputStream());
             CreateBulkBusinessTermResponse response = businessTermService.createBusinessTermsFromFile(request);
-            if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
-                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
-                return ResponseEntity.noContent().build();
+            if (response.getFormatCheckExceptions() == null) {
+                if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
+                    logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
+                    return ResponseEntity.noContent().build();
+                } else {
+                    return ResponseEntity.status(200).build();
+                }
             } else {
-                return ResponseEntity.status(200).build();
+                throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", response.getFormatCheckExceptions()));
             }
         } else {
             return ResponseEntity.status(415).body("Unsupported content type: " + file.getContentType());
@@ -293,18 +288,6 @@ public class BusinessTermController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.badRequest().build();
-        }
-    }
-
-    public static class DeleteBusinessTermRequestData {
-        private List<BigInteger> businessTermIdList = Collections.emptyList();
-
-        public List<BigInteger> getBusinessTermIdList() {
-            return businessTermIdList;
-        }
-
-        public void setBusinessTermIdList(List<BigInteger> businessTermIdList) {
-            this.businessTermIdList = businessTermIdList;
         }
     }
 
@@ -424,18 +407,6 @@ public class BusinessTermController {
         }
     }
 
-    public static class DeleteBusinessTermAssignmentRequestData {
-        private List<BieToAssign> assignedBtList = Collections.emptyList();
-
-        public List<BieToAssign> getAssignedBtList() {
-            return assignedBtList;
-        }
-
-        public void setAssignedBtList(List<BieToAssign> assignedBtList) {
-            this.assignedBtList = assignedBtList;
-        }
-    }
-
     @RequestMapping(value = "/business_terms/assign/delete", method = RequestMethod.POST)
     public ResponseEntity deleteAssignments(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
@@ -450,6 +421,30 @@ public class BusinessTermController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public static class DeleteBusinessTermRequestData {
+        private List<BigInteger> businessTermIdList = Collections.emptyList();
+
+        public List<BigInteger> getBusinessTermIdList() {
+            return businessTermIdList;
+        }
+
+        public void setBusinessTermIdList(List<BigInteger> businessTermIdList) {
+            this.businessTermIdList = businessTermIdList;
+        }
+    }
+
+    public static class DeleteBusinessTermAssignmentRequestData {
+        private List<BieToAssign> assignedBtList = Collections.emptyList();
+
+        public List<BieToAssign> getAssignedBtList() {
+            return assignedBtList;
+        }
+
+        public void setAssignedBtList(List<BieToAssign> assignedBtList) {
+            this.assignedBtList = assignedBtList;
         }
     }
 
