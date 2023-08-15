@@ -140,7 +140,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         List<BusinessTermObject> businessTerms = new ArrayList<>();
 
         String randomBT_noTerm_URI = "http://www.hSxyz.com";
-        String randomBT_invalidUri = "123";
+        String randomBT_invalidUri = "http://api.google.com/q?exp=a|b";
         BusinessTermObject randomBT = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
         businessTerms.add(randomBT);
 
