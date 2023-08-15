@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage {
@@ -1029,13 +1030,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setNamespace(String namespace) {
-            click(getNamespaceSelectField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
-            click(option);
-            waitFor(ofMillis(1000L));
-            assert getText(getNamespaceSelectField()).equals(namespace);
+            retry(() -> {
+                click(getNamespaceSelectField());
+                waitFor(ofSeconds(2L));
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option[1]"));
+                click(optionField);
+            });
         }
 
         @Override

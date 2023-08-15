@@ -11,7 +11,6 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.openqa.selenium.WebDriverException;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

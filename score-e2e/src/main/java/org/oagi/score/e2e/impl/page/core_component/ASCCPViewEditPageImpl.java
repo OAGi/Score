@@ -371,8 +371,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement node = getNodeByName(nodeName);
-        click(node);
+        click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -381,7 +382,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         } catch (WebDriverException ignore) {
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;

@@ -184,5 +184,5 @@ public interface UpliftBIEPage extends Page {
      *
      * @return 'UpliftBIEVerification' page object
      */
-    UpliftBIEVerificationPage Next();
+    UpliftBIEVerificationPage next();
 }

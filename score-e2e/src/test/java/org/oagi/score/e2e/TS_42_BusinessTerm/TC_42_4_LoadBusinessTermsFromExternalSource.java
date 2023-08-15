@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_42_BusinessTerm;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,13 +26,13 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
@@ -97,7 +98,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         try {
             try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
-                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withEscape('\\').withQuoteMode(QuoteMode.ALL)
                          .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
 
                 for (int i = 0; i < 3; i++) {
@@ -109,7 +110,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             // upload the modified csv file
             uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
-            waitFor(ofSeconds(2L));
+            waitFor(ofMillis(1000L));
+            assertTrue(getSnackBarMessage(getDriver()).contains("Uploaded"));
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
@@ -151,7 +153,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         try {
             try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
-                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withEscape('\\').withQuoteMode(QuoteMode.ALL)
                          .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
 
                 csvPrinter.printRecord("", randomBT_noTerm_URI, "683053", ">&!Hi0[lP?}AXNgIir`{,R Q}JMsyc%){sO|>?VuY6YeyiY-2S%g=VknYE4Z+4xPZ&=H+'e*N{`>LT v!`0|gItaw7",
@@ -165,7 +167,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             // upload the modified csv file
             uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
-            waitFor(ofSeconds(2L));
+            waitFor(ofMillis(1000L));
+            assertTrue(getSnackBarMessage(getDriver()).contains("Fail to parse CSV file"));
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
@@ -215,7 +218,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         try {
             try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
-                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withEscape('\\').withQuoteMode(QuoteMode.ALL)
                          .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
 
                 for (int i = 0; i < 3; i++) {
@@ -227,7 +230,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             // upload the modified csv file
             uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
-            waitFor(ofSeconds(2L));
+            waitFor(ofMillis(1000L));
+            assertTrue(getSnackBarMessage(getDriver()).contains("Uploaded"));
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
@@ -270,7 +274,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         try {
             try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
-                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withEscape('\\').withQuoteMode(QuoteMode.ALL)
                          .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
 
                 for (int i = 0; i < 2; i++) {
@@ -286,7 +290,8 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             // upload the modified CSV file
             uploadBusinessTermsPage.getFileUploadInput().sendKeys(csvFileForUpload.getAbsolutePath());
-            waitFor(ofSeconds(2L));
+            waitFor(ofMillis(1000L));
+            assertTrue(getSnackBarMessage(getDriver()).contains("Uploaded"));
 
             //Verify that all test business terms have been saved through bulk upload
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
@@ -303,7 +308,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             String oldBusinessTermName = businessTerms.get(0).getBusinessTerm();
             viewEditBusinessTermPageForCheck.setTerm(oldBusinessTermName);
             viewEditBusinessTermPageForCheck.hitSearchButton();
-            assertEquals(1, getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + oldBusinessTermName + "\")]")).size());
+            assertEquals(1, viewEditBusinessTermPageForCheck.getTotalNumberOfItems());
         } finally {
             csvFileForUpload.delete();
         }
