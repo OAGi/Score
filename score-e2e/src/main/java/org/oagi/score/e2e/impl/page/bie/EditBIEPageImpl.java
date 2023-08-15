@@ -408,7 +408,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             goToNode(path, retry);
             String[] nodes = path.split("/");
-            return getNodeByNameAndDataLevel(nodes[nodes.length - 1], nodes.length - 2);
+            int dataLevel = nodes.length - 2;
+            if (dataLevel > 0) {
+                return getNodeByNameAndDataLevel(nodes[nodes.length - 1], dataLevel);
+            } else {
+                return getNodeByName(nodes[nodes.length - 1]);
+            }
         });
     }
 
