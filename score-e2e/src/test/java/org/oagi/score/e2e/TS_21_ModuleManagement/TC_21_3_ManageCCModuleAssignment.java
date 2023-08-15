@@ -17,8 +17,7 @@ import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -208,8 +207,13 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
         viewEditModuleSetReleasePage.openPage();
         viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetRelease);
+
         coreComponentAssignmentPage.openPage();
-        assertDoesNotThrow(() -> coreComponentAssignmentPage.selectUnassignedCCByDEN(codeListCandidate.getName()));
+        coreComponentAssignmentPage.setDenUnassigned(codeListCandidate.getName());
+        WebElement tr = coreComponentAssignmentPage.getTableRecordAtIndexUnassignedCC(1);
+        WebElement td = coreComponentAssignmentPage.getColumnByName(tr, "den");
+        String denColumn = getText(td.findElement(By.tagName("a")));
+        assertTrue(denColumn.contains(codeListCandidate.getName()));
     }
 
     @Test
