@@ -219,7 +219,7 @@ public class OpenAPIDocController {
 
         DeleteBieForOasDocRequest request = new DeleteBieForOasDocRequest(authenticationService.asScoreUser(requester))
                 .withBieForOasDocList(requestData.getBieForOasDocList());
-
+        request.setOasDocId(requestData.getOasDocId());
         DeleteBieForOasDocResponse response = oasDocService.deleteBieForOasDoc(request);
 
         if (response.containsAll(requestData.getBieForOasDocList())) {

@@ -257,6 +257,11 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public DeleteBieForOasDocResponse deleteBieForOasDoc(DeleteBieForOasDocRequest request) throws ScoreDataAccessException {
         List<BieForOasDoc> bieForOasDocList = request.getBieForOasDocList();
+        BigInteger oasDocId = request.getOasDocId();
+        if (oasDocId == null) {
+            throw new IllegalArgumentException("`oasDocId` parameter must not be null.");
+        }
+
         if (bieForOasDocList == null || bieForOasDocList.isEmpty()) {
             return new DeleteBieForOasDocResponse(Collections.emptyList());
         }
@@ -265,20 +270,28 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
             if (bieForOasDoc.getMessageBody().equals("Request")) {
                 //delete oas_request
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 if (oasRequestRecord != null) {
                     dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                     dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
-                    dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(request.getOasDocId()))).execute();
+                    if (oasOperationRecord != null){
+                        dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                        dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
+                    }
                 }
             }
 
             if (bieForOasDoc.getMessageBody().equals("Response")) {
                 //delete oas_response
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 if (oasResponseRecord != null) {
                     dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                     dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
-                    dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(request.getOasDocId()))).execute();
+                    if (oasOperationRecord != null){
+                        dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                        dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
+                    }
                 }
             }
         }
