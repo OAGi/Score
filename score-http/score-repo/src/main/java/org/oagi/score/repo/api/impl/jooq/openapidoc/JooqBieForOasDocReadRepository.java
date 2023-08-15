@@ -149,23 +149,19 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
         List<BieForOasDoc> bieListForOasDoc = new ArrayList<>();
-
         List<Condition> conditions = new ArrayList<>();
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
             conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
                     OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))));
         }
-        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
-        if (topLevelAsbiepId != null) {
-            conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)));
-        }
         if (!conditions.isEmpty()) {
             bieListForOasDoc = select()
                     .where(conditions)
                     .fetch(mapper());
         }
-        return new GetBieForOasDocResponse(bieListForOasDoc, 1, 1, bieListForOasDoc.size());
+
+        return new GetBieForOasDocResponse(bieListForOasDoc, request.getPageIndex(), request.getPageSize(), bieListForOasDoc.size());
     }
     private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
         List<Condition> conditions = new ArrayList();

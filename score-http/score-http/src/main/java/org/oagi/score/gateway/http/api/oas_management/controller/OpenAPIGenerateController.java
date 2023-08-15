@@ -4,9 +4,7 @@ import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerat
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
-import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
-import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
-import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
+import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;

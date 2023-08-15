@@ -87,41 +87,15 @@ public class OpenAPIDocService {
         return response;
     }
 
-    public PageResponse<BieForOasDoc> getBieListForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
-        PageRequest pageRequest = request.getPageRequest();
-        AppUser requester = sessionService.getAppUserByUsername(user);
+    public GetBieForOasDocListResponse getBieListForOasDoc(GetBieForOasDocListRequest request) {
         PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
                 .setOasDocId(request.getOasDocId())
-                .setBusinessContext(request.getBusinessContext())
-                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
-                .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
+                .setSort(request.getSortActive(), request.getSortDirection().toString())
                 .fetchInto(BieForOasDoc.class);
 
         List<BieForOasDoc> bieForOasDocList = result.getResult();
-        bieForOasDocList.forEach(bieForOasDoc -> {
-
-            GetBusinessContextListRequest getBusinessContextListRequest =
-                    new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
-                            .withTopLevelAsbiepIdList(Arrays.asList(bieForOasDoc.getTopLevelAsbiepId()))
-                            .withName(request.getBusinessContext());
-
-            getBusinessContextListRequest.setPageIndex(-1);
-            getBusinessContextListRequest.setPageSize(-1);
-
-            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
-                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
-
-            bieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
-            bieForOasDoc.setAccess(
-                    AccessPrivilege.toAccessPrivilege(requester, bieForOasDoc.getOwnerUserId(), bieForOasDoc.getState()).toString()
-            );
-        });
-
-        PageResponse<BieForOasDoc> response = new PageResponse();
-        response.setList(bieForOasDocList);
-        response.setPage(pageRequest.getPageIndex());
-        response.setSize(pageRequest.getPageSize());
-        response.setLength(result.getPageCount());
+        GetBieForOasDocListResponse response = new GetBieForOasDocListResponse(bieForOasDocList, request.getPageIndex(), request.getPageSize(),
+                request.getPageOffset());
         return response;
     }
 

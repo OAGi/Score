@@ -9,7 +9,6 @@ import java.util.Collection;
 
 public class GetBieForOasDocListRequest extends PaginationRequest<BieForOasDoc> {
     private BigInteger oasDocId;
-
     public GetBieForOasDocListRequest(ScoreUser requester) {
         super(requester, BieForOasDoc.class);
     }
