@@ -108,23 +108,7 @@
         </button>
       </div>
     </mat-card-header>
-
     <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>
-          <mat-form-field>
-            <mat-label>Selected Business Contexts</mat-label>
-            <input matInput [(ngModel)]="bizCtxSearch" (keyup.enter)="applyFilter(bizCtxSearch)" maxlength="100"/>
-            <button mat-icon-button matSuffix (click)="applyFilter(bizCtxSearch)">
-              <mat-icon>search</mat-icon>
-            </button>
-            <button mat-icon-button matSuffix *ngIf="bizCtxSearch && bizCtxSearch.length > 0" (click)="clearFilter()">
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-form-field>
-        </mat-card-subtitle>
-      </mat-card-header>
-
       <mat-card-content class="mat-card-container">
         <div class="mat-elevation-z1">
           <table mat-table matSort [dataSource]="dataSource">
