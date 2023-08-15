@@ -36,7 +36,7 @@ public class OpenAPIGenerateService {
     private DSLContext dslContext;
 
     public BieGenerateExpressionResult generate(
-            AuthenticatedPrincipal user, Map<BigInteger, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
+            AuthenticatedPrincipal user, Map<String, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
         File file = generateSchemaForAll(params);
         return toResult(file);
     }
@@ -66,23 +66,19 @@ public class OpenAPIGenerateService {
         return result;
     }
 
-    public File generateSchemaForAll(Map<BigInteger, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
-        List<BigInteger> topLevelAsbiepIds = new ArrayList<>();
-        for (BigInteger key : params.keySet()) {
-            topLevelAsbiepIds.add(key);
-        }
-        List<TopLevelAsbiep> topLevelAsbiepList = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
+    public File generateSchemaForAll(Map<String, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
         BieGenerateOpenApiExpression generateExpression = createBieGenerateOpenAPIExpression();
         // leave metaHeader and pagination response untouched at this time for OpenAPI generation
         // need to pass the params
         OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
-        for (TopLevelAsbiep topLevelAsbiep : topLevelAsbiepList) {
-            option = params.get(topLevelAsbiep.getTopLevelAsbiepId());
+        for (String resourceName: params.keySet()) {
+            option = params.get(resourceName);
             if (option.getVerb().equals("GET")){
-                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(params.get(topLevelAsbiepIds.get(0)).isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate());
+                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate());
             } else if (option.getVerb().equals("POST")){
-                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(params.get(topLevelAsbiepIds.get(0)).isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate());
+                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate());
             }
+            TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
             GenerationContext generationContext = generateExpression.generateContext(Arrays.asList(topLevelAsbiep), option);
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }

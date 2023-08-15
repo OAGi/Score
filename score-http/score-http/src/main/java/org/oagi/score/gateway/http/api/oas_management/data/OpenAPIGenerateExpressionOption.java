@@ -9,6 +9,7 @@ import java.util.Map;
 @Data
 public class OpenAPIGenerateExpressionOption {
     private String filename;
+    private BigInteger topLevelAsbiepId;
     private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;

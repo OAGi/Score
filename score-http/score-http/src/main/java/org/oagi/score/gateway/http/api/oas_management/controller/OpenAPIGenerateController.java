@@ -45,10 +45,11 @@ public class OpenAPIGenerateController {
         GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
 
         List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
-        Map<BigInteger, OpenAPIGenerateExpressionOption> params = new HashMap<>();
+        Map<String, OpenAPIGenerateExpressionOption> params = new HashMap<>();
         if (bieListForOasDoc != null) {
             for (BieForOasDoc bieForOasDoc : bieListForOasDoc) {
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
+                openAPIGenerateExpressionOption.setTopLevelAsbiepId(bieForOasDoc.getTopLevelAsbiepId());
                 openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 switch (verbOption) {
@@ -65,10 +66,10 @@ public class OpenAPIGenerateController {
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
                 }
-                if (!params.containsKey(bieForOasDoc.getTopLevelAsbiepId())) {
-                    params.put(bieForOasDoc.getTopLevelAsbiepId(), openAPIGenerateExpressionOption);
+                if (!params.containsKey(bieForOasDoc.getResourceName())) {
+                    params.put(bieForOasDoc.getResourceName(), openAPIGenerateExpressionOption);
                 } else {
-                    params.put(bieForOasDoc.getTopLevelAsbiepId(), openAPIGenerateExpressionOption);
+                    params.put(bieForOasDoc.getResourceName(), openAPIGenerateExpressionOption);
                 }
 
             }
