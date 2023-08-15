@@ -63,22 +63,28 @@ public class TC_37_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setName(wipAgencyIdList.getName());
         viewEditAgencyIDListPage.hitSearchButton();
         WebElement tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
         assertEquals("WIP", getText(viewEditAgencyIDListPage.getColumnByName(tr, "state")));
 
+        viewEditAgencyIDListPage.openPage();
+        viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setName(qaAgencyIdList.getName());
         viewEditAgencyIDListPage.hitSearchButton();
         tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
         assertEquals("QA", getText(viewEditAgencyIDListPage.getColumnByName(tr, "state")));
 
+        viewEditAgencyIDListPage.openPage();
+        viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setName(productionAgencyIdList.getName());
         viewEditAgencyIDListPage.hitSearchButton();
         tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
         assertEquals("Production", getText(viewEditAgencyIDListPage.getColumnByName(tr, "state")));
 
         viewEditAgencyIDListPage.openPage();
+        viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setName("clm63055D16B_AgencyIdentification");
         viewEditAgencyIDListPage.hitSearchButton();
         tr = viewEditAgencyIDListPage.getTableRecordAtIndex(1);
