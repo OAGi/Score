@@ -72,19 +72,19 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
      * The column <code>oagi.blob_content_manifest.conflict</code>. This
      * indicates that there is a conflict between self and relationship.
      */
-    public final TableField<BlobContentManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<BlobContentManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column
      * <code>oagi.blob_content_manifest.prev_blob_content_manifest_id</code>.
      */
-    public final TableField<BlobContentManifestRecord, ULong> PREV_BLOB_CONTENT_MANIFEST_ID = createField(DSL.name("prev_blob_content_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BlobContentManifestRecord, ULong> PREV_BLOB_CONTENT_MANIFEST_ID = createField(DSL.name("prev_blob_content_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column
      * <code>oagi.blob_content_manifest.next_blob_content_manifest_id</code>.
      */
-    public final TableField<BlobContentManifestRecord, ULong> NEXT_BLOB_CONTENT_MANIFEST_ID = createField(DSL.name("next_blob_content_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BlobContentManifestRecord, ULong> NEXT_BLOB_CONTENT_MANIFEST_ID = createField(DSL.name("next_blob_content_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private BlobContentManifest(Name alias, Table<BlobContentManifestRecord> aliased) {
         this(alias, aliased, null);

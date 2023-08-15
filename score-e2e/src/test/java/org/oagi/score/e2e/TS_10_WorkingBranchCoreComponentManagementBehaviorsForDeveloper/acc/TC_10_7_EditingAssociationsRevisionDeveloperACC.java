@@ -51,51 +51,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         this.randomAccounts.add(appUser);
     }
 
-    private class RandomCoreComponentWithStateContainer {
-        private AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
-        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
-            this.appUser = appUser;
-            this.states = states;
-
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccp;
-                ACCObject acc;
-                String state = this.states.get(i);
-
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
-                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
-                    bcc.setCardinalityMax(1);
-                    coreComponentAPI.updateBCC(bcc);
-
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
-                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
-                    ascc.setCardinalityMax(1);
-                    coreComponentAPI.updateASCC(ascc);
-                    stateACCs.put(state, acc);
-                    stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state, bccp);
-                }
-            }
-        }
-
-    }
-
     @Test
     public void test_TA_10_7_1_a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -416,7 +371,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
     }
 
-
     @Test
     public void test_TA_10_7_3_b() {
 
@@ -460,6 +414,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        asccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
@@ -468,7 +423,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         assertEquals("111", getText(asccPanel.getCardinalityMinField()));
     }
-
 
     @Test
     public void test_TA_10_7_3_c() {
@@ -552,7 +506,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         asccPanel.getCardinalityMaxField().clear();
         assertEquals("true", asccPanel.getCardinalityMaxField().getAttribute("aria-required"));
     }
-
 
     @Test
     public void test_TA_10_7_3_e() {
@@ -790,7 +743,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         assertEnabled(asccPanel.getDeprecatedCheckbox());
     }
 
-
     @Test
     public void test_TA_10_7_4_d() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -829,6 +781,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMaxField("11");
         asccPanel.setDefinition(null);
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        asccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
@@ -1272,6 +1225,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setCardinalityMinField("111");
         bccPanel.setDefinition("Test cardinality min must be less than or equal to cardinality max");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Cardinality Min must be less than or equals to\")]")).size());
+        bccPanel.setCardinalityMinField("0"); // revert
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
@@ -1720,6 +1674,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setCardinalityMinField("111");
         bccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        bccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
@@ -1852,7 +1807,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
-        SelectAssociationDialog  appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
+        SelectAssociationDialog appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
 
         viewEditCoreComponentPage.openPage();
@@ -2264,7 +2219,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
     }
 
-
     @Test
     public void test_TA_10_7_15() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2370,6 +2324,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
 
     }
+
     @Test
     public void test_TA_10_7_16() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -2470,7 +2425,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
             viewEditCoreComponentPage.openPage();
             accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBaseLv1.getDen() +"/" + accForBaseLv2.getDen() + "/" + accForBaseLv3.getDen() + "/" + asccp.getPropertyTerm());
+            WebElement movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + accForBaseLv1.getDen() + "/" + accForBaseLv2.getDen() + "/" + accForBaseLv3.getDen() + "/" + asccp.getPropertyTerm());
             assertTrue(movedASCCPNode.isDisplayed());
 
             viewEditCoreComponentPage.openPage();
@@ -2478,6 +2433,51 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             movedASCCPNode = accViewEditPage.getNodeByPath("/" + acc.getDen());
             String xpathExpr = "//cdk-virtual-scroll-viewport//div//span[contains(@class, \"search-index\")]//*[contains(text(),\"" + asccp.getPropertyTerm() + "\")]";
             assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
+        }
+
+    }
+
+    private class RandomCoreComponentWithStateContainer {
+        private AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
+        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
+        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
+
+        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                ASCCPObject asccp;
+                BCCPObject bccp;
+                ACCObject acc;
+                String state = this.states.get(i);
+
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
+                    bcc.setCardinalityMax(1);
+                    coreComponentAPI.updateBCC(bcc);
+
+                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
+                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
+                    ascc.setCardinalityMax(1);
+                    coreComponentAPI.updateASCC(ascc);
+                    stateACCs.put(state, acc);
+                    stateASCCPs.put(state, asccp);
+                    stateBCCPs.put(state, bccp);
+                }
+            }
         }
 
     }

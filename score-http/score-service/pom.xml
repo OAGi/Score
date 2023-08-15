@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-service</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0-alpha</version>
 
     <name>score-service</name>
     <description>Score Service</description>
@@ -22,7 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
 
-        <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
+        <mariadb-client.version>3.1.4</mariadb-client.version>
         <jOOQ.version>3.18.4</jOOQ.version>
         <gson.version>2.10.1</gson.version>
         <snakeyaml.version>2.0</snakeyaml.version>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-repo</artifactId>
-            <version>3.0.4</version>
+            <version>3.1.0-alpha</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -84,9 +84,9 @@
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql-connector-java.version}</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb-client.version}</version>
         </dependency>
 
         <!-- jOOQ -->

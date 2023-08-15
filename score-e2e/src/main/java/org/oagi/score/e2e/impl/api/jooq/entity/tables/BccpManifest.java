@@ -76,29 +76,29 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
      * The column <code>oagi.bccp_manifest.conflict</code>. This indicates that
      * there is a conflict between self and relationship.
      */
-    public final TableField<BccpManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
+    public final TableField<BccpManifestRecord, Byte> CONFLICT = createField(DSL.name("conflict"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates that there is a conflict between self and relationship.");
 
     /**
      * The column <code>oagi.bccp_manifest.log_id</code>. A foreign key pointed
      * to a log for the current record.
      */
-    public final TableField<BccpManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED, this, "A foreign key pointed to a log for the current record.");
+    public final TableField<BccpManifestRecord, ULong> LOG_ID = createField(DSL.name("log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key pointed to a log for the current record.");
 
     /**
      * The column <code>oagi.bccp_manifest.replacement_bccp_manifest_id</code>.
      * This refers to a replacement manifest if the record is deprecated.
      */
-    public final TableField<BccpManifestRecord, ULong> REPLACEMENT_BCCP_MANIFEST_ID = createField(DSL.name("replacement_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement manifest if the record is deprecated.");
+    public final TableField<BccpManifestRecord, ULong> REPLACEMENT_BCCP_MANIFEST_ID = createField(DSL.name("replacement_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement manifest if the record is deprecated.");
 
     /**
      * The column <code>oagi.bccp_manifest.prev_bccp_manifest_id</code>.
      */
-    public final TableField<BccpManifestRecord, ULong> PREV_BCCP_MANIFEST_ID = createField(DSL.name("prev_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccpManifestRecord, ULong> PREV_BCCP_MANIFEST_ID = createField(DSL.name("prev_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.bccp_manifest.next_bccp_manifest_id</code>.
      */
-    public final TableField<BccpManifestRecord, ULong> NEXT_BCCP_MANIFEST_ID = createField(DSL.name("next_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<BccpManifestRecord, ULong> NEXT_BCCP_MANIFEST_ID = createField(DSL.name("next_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private BccpManifest(Name alias, Table<BccpManifestRecord> aliased) {
         this(alias, aliased, null);

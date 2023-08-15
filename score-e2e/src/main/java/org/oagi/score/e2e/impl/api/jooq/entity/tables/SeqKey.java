@@ -67,22 +67,22 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
     /**
      * The column <code>oagi.seq_key.ascc_manifest_id</code>.
      */
-    public final TableField<SeqKeyRecord, ULong> ASCC_MANIFEST_ID = createField(DSL.name("ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<SeqKeyRecord, ULong> ASCC_MANIFEST_ID = createField(DSL.name("ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.seq_key.bcc_manifest_id</code>.
      */
-    public final TableField<SeqKeyRecord, ULong> BCC_MANIFEST_ID = createField(DSL.name("bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<SeqKeyRecord, ULong> BCC_MANIFEST_ID = createField(DSL.name("bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.seq_key.prev_seq_key_id</code>.
      */
-    public final TableField<SeqKeyRecord, ULong> PREV_SEQ_KEY_ID = createField(DSL.name("prev_seq_key_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<SeqKeyRecord, ULong> PREV_SEQ_KEY_ID = createField(DSL.name("prev_seq_key_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.seq_key.next_seq_key_id</code>.
      */
-    public final TableField<SeqKeyRecord, ULong> NEXT_SEQ_KEY_ID = createField(DSL.name("next_seq_key_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<SeqKeyRecord, ULong> NEXT_SEQ_KEY_ID = createField(DSL.name("next_seq_key_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private SeqKey(Name alias, Table<SeqKeyRecord> aliased) {
         this(alias, aliased, null);

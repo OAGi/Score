@@ -5,12 +5,10 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.code_list.AddCommentDialogImpl;
 import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.ASCCPObject;
+import org.oagi.score.e2e.obj.LogObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
-import org.oagi.score.e2e.page.core_component.ASCCPChangeACCDialog;
-import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
-import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -22,12 +20,6 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEditPage {
 
-    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
-    private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
@@ -48,6 +40,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By SEARCH_BUTTON_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
+    private static final By UPDATE_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
@@ -66,6 +64,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//span[contains(text(), \"Change ACC\")]");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
+    private static final By SHOW_HISTORY_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Show History\")]");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -76,6 +76,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
     private final ASCCPObject asccp;
+
     public ASCCPViewEditPageImpl(BasePage parent, ASCCPObject asccp) {
         super(parent);
         this.asccp = asccp;
@@ -104,7 +105,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -303,11 +304,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     @Override
     public ACCViewEditPage openACCInNewTab(WebElement accNode) {
         try {
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(accNode);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         }
 
         switchToNextTab(getDriver());
@@ -326,11 +327,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
             ASCCPChangeACCDialog asccpChangeACCDialog =
@@ -342,9 +343,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
@@ -352,11 +355,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Change ACC");
@@ -370,8 +373,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement node = getNodeByName(nodeName);
-        click(node);
+        click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -380,7 +384,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         } catch (WebDriverException ignore) {
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
@@ -393,11 +398,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 
@@ -450,6 +456,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             };
         });
     }
+
     @Override
     public WebElement getDefinitionField() {
         return visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR);
@@ -474,7 +481,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("C").perform();
@@ -507,6 +514,29 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 }
             };
         });
+    }
+
+    @Override
+    public HistoryPage showHistory() {
+        String path = "/" + this.asccp.getPropertyTerm();
+        WebElement node = clickOnDropDownMenuByPath(path);
+        try {
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        } catch (TimeoutException e) {
+            click(node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+        }
+        switchToNextTab(getDriver());
+
+        LogObject logObject = new LogObject();
+        logObject.setReference(this.asccp.getGuid());
+        logObject.setType("ASCCP");
+        logObject.setManifestId(this.asccp.getAsccpManifestId());
+
+        HistoryPage historyPage = new HistoryPageImpl(this, logObject);
+        assert historyPage.isOpened();
+        return historyPage;
     }
 
     private WebElement getInputFieldByName(String baseXPath, String name) {

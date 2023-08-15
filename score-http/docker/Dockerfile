@@ -13,13 +13,13 @@ ENV REDIS_PORT 6379
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-COPY mysql-connector-j-8.0.33.jar /usr/local/tomcat/lib/mysql-connector-j-8.0.33.jar
+COPY mariadb-java-client-3.1.4.jar /usr/local/tomcat/lib/mariadb-java-client-3.1.4.jar
 
 RUN rm -rf /usr/local/tomcat/webapps/* && \
     chgrp -R 0 /usr/local/tomcat/ && \
     chmod -R g=u /usr/local/tomcat/
 
 USER 1001
-COPY score-http-3.0.4.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http-3.1.0-alpha.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

@@ -14,21 +14,16 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Branch</mat-label>
-                <mat-select [(ngModel)]="request.release"
-                            (ngModelChange)="onChange('branch', request.release);
+                <mat-select [(ngModel)]="selectedRelease"
+                            (ngModelChange)="onChange('branch', selectedRelease);
                                             this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
                   <mat-select-trigger class="d-flex">
-                    <span>{{ request.release.releaseNum }}</span>
-                    <span class="f12 ml-auto {{ request.release.state }}">
-                      {{ request.release.state | separate }}
+                    <span>{{ selectedRelease?.releaseNum }}</span>
+                    <span class="f12 ml-auto {{ selectedRelease?.state }}">
+                      {{ selectedRelease?.state | separate }}
                     </span>
                   </mat-select-trigger>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+                  <mat-option *ngFor="let release of releases" [value]="release">
                     <div class="d-flex">
                       <span class="release-num">{{ release.releaseNum }}</span>
                       <span class="f12 ml-auto {{ release.state }}">
@@ -174,6 +169,13 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="branch">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="den">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
             <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
@@ -183,7 +185,17 @@
                   <span>{{ element.den }}</span>
                 </a>
               </div>
-              <div class="description">{{ element.guid }}</div>
+              <div class="bie-guid">{{ element.guid }}</div>
+              <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId">
+                <a target="_blank" rel="noopener noreferrer"
+                   href="/profile_bie?{{ request.toQuery({
+                    den: element.sourceDen,
+                    releaseIds: element.sourceReleaseId,
+                    topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
+                  {{ element.sourceAction | pastTense }} from {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                </a>
+                at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+              </div>
             </td>
           </ng-container>
 
@@ -428,6 +440,9 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
+                <mat-radio-button class="option-radio-button" value="AVRO">
+                  Avro™ Schema
+                </mat-radio-button>
               </mat-radio-group>
             </div>
           </div>
@@ -438,7 +453,7 @@
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
                 <mat-radio-button class="option-radio-button" value="ALL"
                                   [disabled]="(option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)) ||
-                                              (option.expressionOption === 'ODF')">
+                                              (option.expressionOption === 'ODF') || (option.expressionOption === 'AVRO')">
                   Put all schemas in the same file
                 </mat-radio-button>
                 <mat-radio-button class="option-radio-button" value="EACH">

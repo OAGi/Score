@@ -20,7 +20,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm;
  * bbie_bizterm and BBIE. TODO: Placeholder, definition is missing.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> implements Record9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> {
+public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> implements Record9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -76,7 +76,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
      * Setter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
      * indicator shows if the business term is primary for the assigned BBIE.
      */
-    public void setPrimaryIndicator(String value) {
+    public void setPrimaryIndicator(Byte value) {
         set(3, value);
     }
 
@@ -84,8 +84,8 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
      * Getter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
      * indicator shows if the business term is primary for the assigned BBIE.
      */
-    public String getPrimaryIndicator() {
-        return (String) get(3);
+    public Byte getPrimaryIndicator() {
+        return (Byte) get(3);
     }
 
     /**
@@ -186,12 +186,12 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 
     @Override
-    public Row9<ULong, ULong, ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
+    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
         return (Row9) super.valuesRow();
     }
 
@@ -211,7 +211,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public Field<String> field4() {
+    public Field<Byte> field4() {
         return BbieBizterm.BBIE_BIZTERM.PRIMARY_INDICATOR;
     }
 
@@ -256,7 +256,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public String component4() {
+    public Byte component4() {
         return getPrimaryIndicator();
     }
 
@@ -301,7 +301,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public String value4() {
+    public Byte value4() {
         return getPrimaryIndicator();
     }
 
@@ -349,7 +349,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public BbieBiztermRecord value4(String value) {
+    public BbieBiztermRecord value4(Byte value) {
         setPrimaryIndicator(value);
         return this;
     }
@@ -385,7 +385,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     }
 
     @Override
-    public BbieBiztermRecord values(ULong value1, ULong value2, ULong value3, String value4, String value5, ULong value6, ULong value7, LocalDateTime value8, LocalDateTime value9) {
+    public BbieBiztermRecord values(ULong value1, ULong value2, ULong value3, Byte value4, String value5, ULong value6, ULong value7, LocalDateTime value8, LocalDateTime value9) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -412,7 +412,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
     /**
      * Create a detached, initialised BbieBiztermRecord
      */
-    public BbieBiztermRecord(ULong bbieBiztermId, ULong bccBiztermId, ULong bbieId, String primaryIndicator, String typeCode, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public BbieBiztermRecord(ULong bbieBiztermId, ULong bccBiztermId, ULong bbieId, Byte primaryIndicator, String typeCode, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(BbieBizterm.BBIE_BIZTERM);
 
         setBbieBiztermId(bbieBiztermId);
@@ -424,5 +424,6 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> im
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

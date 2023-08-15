@@ -70,6 +70,7 @@ public interface APIFactory extends AutoCloseable {
 
     /**
      * Return the assigned business term API
+     *
      * @return the assigned business term API
      */
     AssignedBusinessTermAPI getAssignedBusinessTermAPI();
@@ -123,4 +124,9 @@ public interface APIFactory extends AutoCloseable {
      */
     BusinessInformationEntityAPI getBusinessInformationEntityAPI();
 
+    ModuleSetAPI getModuleSetAPI();
+
+    ModuleAPI getModuleAPI();
+
+    ModuleSetReleaseAPI getModuleSetReleaseAPI();
 }

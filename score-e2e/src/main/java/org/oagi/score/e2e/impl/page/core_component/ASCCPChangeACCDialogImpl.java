@@ -56,7 +56,9 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
     private ASCCPViewEditPageImpl parent;
 
-    public ASCCPChangeACCDialogImpl(ASCCPViewEditPageImpl parent){this.parent = parent;}
+    public ASCCPChangeACCDialogImpl(ASCCPViewEditPageImpl parent) {
+        this.parent = parent;
+    }
 
     private WebDriver getDriver() {
         return this.parent.getDriver();

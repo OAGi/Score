@@ -69,6 +69,7 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
         }
 
     }
+
     @Test
     @DisplayName("TC_11_8_TA_2")
     public void test_TA_2() {

@@ -70,13 +70,13 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
      * The column <code>oagi.ctx_category.name</code>. Short name of the context
      * category.
      */
-    public final TableField<CtxCategoryRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45), this, "Short name of the context category.");
+    public final TableField<CtxCategoryRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Short name of the context category.");
 
     /**
      * The column <code>oagi.ctx_category.description</code>. Explanation of
      * what the context category is.
      */
-    public final TableField<CtxCategoryRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Explanation of what the context category is.");
+    public final TableField<CtxCategoryRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Explanation of what the context category is.");
 
     /**
      * The column <code>oagi.ctx_category.created_by</code>. Foreign key to the
@@ -95,13 +95,13 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
      * The column <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
      * when the context category was created.
      */
-    public final TableField<CtxCategoryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was created.");
+    public final TableField<CtxCategoryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was created.");
 
     /**
      * The column <code>oagi.ctx_category.last_update_timestamp</code>.
      * Timestamp when the context category was last updated.
      */
-    public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
+    public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
 
     private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased) {
         this(alias, aliased, null);

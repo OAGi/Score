@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.api;
 
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
@@ -27,6 +29,14 @@ public interface ReleaseAPI {
     ReleaseObject getReleaseByReleaseNumber(String releaseNumber);
 
     /**
+     * Return releases by the given states.
+     *
+     * @param states states
+     * @return release objects
+     */
+    List<ReleaseObject> getReleasesByStates(List<String> states);
+
+    /**
      * Return the releases.
      *
      * @return release objects.
@@ -34,5 +44,16 @@ public interface ReleaseAPI {
     List<ReleaseObject> getReleases();
 
     ReleaseObject getTheLatestRelease();
+
+    List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
+
+    /**
+     * Create a random release object.
+     *
+     * @param creator a creator
+     * @param namespace a namespace
+     * @return a random release object
+     */
+    ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace);
 
 }

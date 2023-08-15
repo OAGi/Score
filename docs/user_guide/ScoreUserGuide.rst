@@ -8593,10 +8593,14 @@ To make a BIE reusable:
 
 4. Click on the "Make BIE Reusable" option.
 
-5. Click the "Make" button in the returned confirmation dialog
+5. Click the "Make" button in the returned confirmation dialog.
 
-At this point the BIE list page is returned where you can see the new
-BIE listed. Until this BIE is successfully created, it is in the
+6. A new message box is prompted asking if the user wants to proceed to "View/Edit BIE" page to see the newly created BIE.
+
+7. Click the "Go to View/Edit BIE page" option.
+
+At this point the BIE list page is returned where the new
+BIE is listed. Until this BIE is successfully created, it is in the
 Initiating state; a state that indicates that the BIE is being created.
 Once the creation process is finished, the BIE goes to the WIP state
 (refresh the page or click "Search" button to see if the creation is

@@ -256,7 +256,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Base (Abstract)"));
         assertChecked(accPanel.getAbstractCheckbox());
-        assertDisabled(accPanel.getAbstractCheckbox());
+        assertEnabled(accPanel.getAbstractCheckbox());
     }
 
     @Test
@@ -316,7 +316,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertTrue(getText(accPanel.getComponentTypeSelectField()).contains("Semantics"));
         assertChecked(accPanel.getDeprecatedCheckbox());
-        assertDisabled(accPanel.getDeprecatedCheckbox());
+        assertEnabled(accPanel.getDeprecatedCheckbox());
     }
 
     @Test

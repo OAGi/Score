@@ -378,5 +378,6 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> implem
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

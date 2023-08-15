@@ -584,5 +584,6 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

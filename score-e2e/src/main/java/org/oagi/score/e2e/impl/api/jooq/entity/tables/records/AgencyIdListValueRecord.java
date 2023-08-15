@@ -763,5 +763,6 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevAgencyIdListValueId(prevAgencyIdListValueId);
         setNextAgencyIdListValueId(nextAgencyIdListValueId);
+        resetChangedOnNotNull();
     }
 }

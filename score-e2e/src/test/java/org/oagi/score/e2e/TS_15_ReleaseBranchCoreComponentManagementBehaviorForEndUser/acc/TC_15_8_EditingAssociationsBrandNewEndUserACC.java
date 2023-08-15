@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.acc;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,51 +47,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
-    }
-
-    private class RandomCoreComponentWithStateContainer {
-        private AppUserObject appUser;
-        private List<String> states = new ArrayList<>();
-        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
-        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
-        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
-
-        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
-            this.appUser = appUser;
-            this.states = states;
-
-
-            for (int i = 0; i < this.states.size(); ++i) {
-                ASCCPObject asccp;
-                BCCPObject bccp;
-                ACCObject acc;
-                String state = this.states.get(i);
-
-                {
-                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-
-                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
-                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
-                    bcc.setCardinalityMax(1);
-                    coreComponentAPI.updateBCC(bcc);
-
-                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
-                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
-
-                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
-                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
-                    ascc.setCardinalityMax(1);
-                    coreComponentAPI.updateASCC(ascc);
-                    stateACCs.put(state, acc);
-                    stateASCCPs.put(state, asccp);
-                    stateBCCPs.put(state, bccp);
-                }
-            }
-        }
-
     }
 
     @Test
@@ -179,6 +134,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]"))));
 
     }
+
     @Test
     public void test_TA_15_8_1_c() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -236,6 +192,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         assertEquals("WIP", getText(asccPanel.getStateField()));
     }
+
     @Test
     public void test_TA_15_8_1_e() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -848,7 +805,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
             DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp_endUser = coreComponentAPI.createRandomBCCP(dataType, endUser, enduserNamespace, "Production");
         }
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser,  release, enduserNamespace, "WIP");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, enduserNamespace, "WIP");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         BCCPObject bccp, bccp_before, bccp_after;
 
@@ -1231,7 +1188,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
     }
 
-
     @Test
     public void test_TA_15_8_8() {
 
@@ -1576,7 +1532,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
-
     @Test
     public void test_TA_15_8_12() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -1619,6 +1574,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
         {
+            waitFor(Duration.ofMillis(1500));
+            viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 
@@ -1653,6 +1610,8 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
+            viewEditCoreComponentPage.setBranch(branch);
+            waitFor(Duration.ofMillis(1500));
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
 
@@ -1663,6 +1622,51 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
             TransferCCOwnershipDialog transferCCOwnershipDialog =
                     viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
             assertThrows(NoSuchElementException.class, () -> transferCCOwnershipDialog.transfer(developer.getLoginId()));
+        }
+
+    }
+
+    private class RandomCoreComponentWithStateContainer {
+        private AppUserObject appUser;
+        private List<String> states = new ArrayList<>();
+        private HashMap<String, ACCObject> stateACCs = new HashMap<>();
+        private HashMap<String, ASCCPObject> stateASCCPs = new HashMap<>();
+        private HashMap<String, BCCPObject> stateBCCPs = new HashMap<>();
+
+        public RandomCoreComponentWithStateContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace, List<String> states) {
+            this.appUser = appUser;
+            this.states = states;
+
+
+            for (int i = 0; i < this.states.size(); ++i) {
+                ASCCPObject asccp;
+                BCCPObject bccp;
+                ACCObject acc;
+                String state = this.states.get(i);
+
+                {
+                    CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+
+                    acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
+                    bcc.setCardinalityMax(1);
+                    coreComponentAPI.updateBCC(bcc);
+
+                    ACCObject acc_association = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
+                    BCCPObject bccp_to_append = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
+                    coreComponentAPI.appendBCC(acc_association, bccp_to_append, state);
+
+                    asccp = coreComponentAPI.createRandomASCCP(acc_association, this.appUser, namespace, state);
+                    ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, state);
+                    ascc.setCardinalityMax(1);
+                    coreComponentAPI.updateASCC(ascc);
+                    stateACCs.put(state, acc);
+                    stateASCCPs.put(state, asccp);
+                    stateBCCPs.put(state, bccp);
+                }
+            }
         }
 
     }

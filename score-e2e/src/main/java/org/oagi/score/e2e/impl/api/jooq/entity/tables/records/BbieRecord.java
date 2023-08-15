@@ -614,5 +614,6 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setSeqKey(seqKey);
         setIsUsed(isUsed);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

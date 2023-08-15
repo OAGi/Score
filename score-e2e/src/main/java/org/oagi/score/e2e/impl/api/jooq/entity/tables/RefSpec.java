@@ -58,7 +58,7 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
     /**
      * The column <code>oagi.ref_spec.spec</code>.
      */
-    public final TableField<RefSpecRecord, String> SPEC = createField(DSL.name("spec"), SQLDataType.VARCHAR(30).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "");
+    public final TableField<RefSpecRecord, String> SPEC = createField(DSL.name("spec"), SQLDataType.VARCHAR(30).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
     private RefSpec(Name alias, Table<RefSpecRecord> aliased) {
         this(alias, aliased, null);

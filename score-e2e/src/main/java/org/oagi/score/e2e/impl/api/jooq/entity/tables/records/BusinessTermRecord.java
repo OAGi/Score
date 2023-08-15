@@ -502,5 +502,6 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
         setExternalRefUri(externalRefUri);
         setExternalRefId(externalRefId);
         setComment(comment);
+        resetChangedOnNotNull();
     }
 }

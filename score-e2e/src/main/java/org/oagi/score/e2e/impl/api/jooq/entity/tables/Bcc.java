@@ -74,7 +74,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * the TO_BCCP_ID. The valid values are integer -1 and up. Specifically, -1
      * means unbounded. 0 means prohibited or not to use.',
      */
-    public final TableField<BccRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER, this, "Maximum cardinality of the TO_BCCP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.',");
+    public final TableField<BccRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "Maximum cardinality of the TO_BCCP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.',");
 
     /**
      * The column <code>oagi.bcc.to_bccp_id</code>. TO_BCCP_ID is a foreign key
@@ -103,7 +103,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs
      * of the former ACC starts at 1 again.
      */
-    public final TableField<BccRecord, Integer> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.INTEGER, this, "@deprecated since 2.0.0. This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again.");
+    public final TableField<BccRecord, Integer> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "@deprecated since 2.0.0. This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again.");
 
     /**
      * The column <code>oagi.bcc.entity_type</code>. This is a code list: 0 =
@@ -111,7 +111,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * this information. This column is necessary because some of the BCCs are
      * xsd:attribute and some are xsd:element in the OAGIS 10.x. 
      */
-    public final TableField<BccRecord, Integer> ENTITY_TYPE = createField(DSL.name("entity_type"), SQLDataType.INTEGER, this, "This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. ");
+    public final TableField<BccRecord, Integer> ENTITY_TYPE = createField(DSL.name("entity_type"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. ");
 
     /**
      * The column <code>oagi.bcc.den</code>. DEN (dictionary entry name) of the
@@ -129,13 +129,13 @@ public class Bcc extends TableImpl<BccRecord> {
      * BDT under that BCCP, the definition in the BCC is a specific description
      * about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.
      */
-    public final TableField<BccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.");
+    public final TableField<BccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.");
 
     /**
      * The column <code>oagi.bcc.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<BccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<BccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.bcc.created_by</code>. Foreign key to the APP_USER
@@ -191,7 +191,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<BccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<BccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
      * The column <code>oagi.bcc.is_deprecated</code>. Indicates whether the CC
@@ -204,7 +204,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * The column <code>oagi.bcc.replacement_bcc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<BccRecord, ULong> REPLACEMENT_BCC_ID = createField(DSL.name("replacement_bcc_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<BccRecord, ULong> REPLACEMENT_BCC_ID = createField(DSL.name("replacement_bcc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.bcc.is_nillable</code>. @deprecated since 2.0.0 in
@@ -214,32 +214,32 @@ public class Bcc extends TableImpl<BccRecord> {
      * Indicate whether the field can have a NULL This is corresponding to the
      * nillable flag in the XML schema.
      */
-    public final TableField<BccRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "@deprecated since 2.0.0 in favor of impossibility of nillable association (element reference) in XML schema.\n\nIndicate whether the field can have a NULL This is corresponding to the nillable flag in the XML schema.");
+    public final TableField<BccRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "@deprecated since 2.0.0 in favor of impossibility of nillable association (element reference) in XML schema.\n\nIndicate whether the field can have a NULL This is corresponding to the nillable flag in the XML schema.");
 
     /**
      * The column <code>oagi.bcc.default_value</code>. This set the default
      * value at the association level. 
      */
-    public final TableField<BccRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB, this, "This set the default value at the association level. ");
+    public final TableField<BccRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This set the default value at the association level. ");
 
     /**
      * The column <code>oagi.bcc.fixed_value</code>. This column captures the
      * fixed value constraint. Default and fixed value constraints cannot be
      * used at the same time.
      */
-    public final TableField<BccRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB, this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
+    public final TableField<BccRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
      * The column <code>oagi.bcc.prev_bcc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<BccRecord, ULong> PREV_BCC_ID = createField(DSL.name("prev_bcc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<BccRecord, ULong> PREV_BCC_ID = createField(DSL.name("prev_bcc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.bcc.next_bcc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<BccRecord, ULong> NEXT_BCC_ID = createField(DSL.name("next_bcc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<BccRecord, ULong> NEXT_BCC_ID = createField(DSL.name("next_bcc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Bcc(Name alias, Table<BccRecord> aliased) {
         this(alias, aliased, null);

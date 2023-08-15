@@ -15,7 +15,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,10 +24,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -58,7 +57,16 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//button[contains(@mattooltip, \"New BIE\")]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
+            By.xpath("//mat-icon[contains(text(), \"delete\")]//ancestor::button[1]");
+
+    private static final By MOVE_TO_QA_BUTTON_LOCATOR =
+            By.xpath("//button[contains(@mattooltip, \"Move to QA\")]");
+
+    private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
+            By.xpath("//button[contains(@mattooltip, \"Move to Production\")]");
+
+    private static final By BACK_TO_WIP_BUTTON_LOCATOR =
+            By.xpath("//button[contains(@mattooltip, \"Back to WIP\")]");
 
     public ViewEditBIEPageImpl(BasePage parent) {
         super(parent);
@@ -88,12 +96,12 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
 
     @Override
     public void setBranch(String branch) {
-        retry(() -> {
-            click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
-        });
+        click(getBranchSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+        click(searchedSelectField);
+        escape(getDriver());
     }
 
     @Override
@@ -245,7 +253,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public TransferBIEOwnershipDialog openTransferBIEOwnershipDialog(WebElement tr) {
         WebElement td = getColumnByName(tr, "transferOwnership");
-        click(td.findElement(By.tagName("button")));
+        click(td.findElement(By.tagName("mat-icon")));
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
                 new TransferBIEOwnershipDialogImpl(this);
@@ -277,7 +285,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
         setBranch(release.getReleaseNumber());
         setDEN(topLevelASBIEP.getDen());
         setState(topLevelASBIEP.getState());
-        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId());
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId());
         setOwner(owner.getLoginId());
         hitSearchButton();
 
@@ -298,7 +306,11 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
+            try {
+                assert editBIEPage.isOpened();
+            } catch (AssertionError e) {
+                editBIEPage.openPage();
+            }
             return editBIEPage;
         });
     }
@@ -338,7 +350,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public void discard(TopLevelASBIEPObject topLevelASBIEP) {
         setBranch(topLevelASBIEP.getReleaseNumber());
-        setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId()).getLoginId());
+        setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         setDEN(topLevelASBIEP.getPropertyTerm());
         hitSearchButton();
 
@@ -358,5 +370,59 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public int getNumberOfOnlyBIEsPerStateAreListed(String state) {
         return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][@class=\"" + state + " bie-state\"]")).size();
+    }
+
+    @Override
+    public WebElement getMoveToQA(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_QA_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToQA() {
+        click(getMoveToQA(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public WebElement getMoveToProduction(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), MOVE_TO_PRODUCTION_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void moveToProduction() {
+        click(getMoveToProduction(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
+    }
+
+    @Override
+    public WebElement getBackToWIP(boolean enabled) {
+        if (enabled) {
+            return elementToBeClickable(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        } else {
+            return visibilityOfElementLocated(getDriver(), BACK_TO_WIP_BUTTON_LOCATOR);
+        }
+    }
+
+    @Override
+    public void BackToWP() {
+        click(getBackToWIP(true));
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 }

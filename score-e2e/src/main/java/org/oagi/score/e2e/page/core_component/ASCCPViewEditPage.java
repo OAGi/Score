@@ -264,6 +264,13 @@ public interface ASCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
+
     AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionField();
@@ -547,7 +554,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -612,7 +618,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionSourceField();
 
         /**
-         *
          * @param definitionSource
          */
         void setDefinitionSource(String definitionSource);
@@ -625,7 +630,6 @@ public interface ASCCPViewEditPage extends Page {
         WebElement getDefinitionField();
 
         /**
-         *
          * @param definition
          */
         void setDefinition(String definition);

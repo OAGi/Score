@@ -140,5 +140,6 @@ public class RefSpecRecord extends UpdatableRecordImpl<RefSpecRecord> implements
 
         setRefSpecId(refSpecId);
         setSpec(spec);
+        resetChangedOnNotNull();
     }
 }

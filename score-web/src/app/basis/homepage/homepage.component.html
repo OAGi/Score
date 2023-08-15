@@ -250,7 +250,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}])}">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}])}">
                       {{ element.username }}
                     </a>
                   </td>
@@ -263,7 +263,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'WIP'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.WIP }}
                     </a>
                   </td>
@@ -276,7 +276,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'QA'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.QA }}
                     </a>
                   </td>
@@ -289,7 +289,7 @@
                        [queryParams]="{q: q([
                        {key: 'states', value: 'Production'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.Production }}
                     </a>
                   </td>
@@ -301,7 +301,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                       {key: 'releaseIds', value: selectedRelease.releaseId}]) }">
                       {{ element.total }}
                     </a>
                   </td>

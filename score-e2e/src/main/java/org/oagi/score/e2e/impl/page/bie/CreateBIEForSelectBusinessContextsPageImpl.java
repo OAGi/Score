@@ -8,7 +8,6 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectTopLevelConceptPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -163,7 +162,9 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
     }
 
     @Override
-    public WebElement getCreateButton() {return elementToBeClickable(getDriver(), CREATE_BUTTON_LOCATOR);}
+    public WebElement getCreateButton() {
+        return elementToBeClickable(getDriver(), CREATE_BUTTON_LOCATOR);
+    }
 
     @Override
     public CreateBIEForSelectTopLevelConceptPage next(List<BusinessContextObject> businessContexts) {

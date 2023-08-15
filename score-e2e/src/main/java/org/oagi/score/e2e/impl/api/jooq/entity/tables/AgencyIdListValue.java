@@ -76,20 +76,20 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
      * The column <code>oagi.agency_id_list_value.name</code>. Descriptive or
      * short name of the value.
      */
-    public final TableField<AgencyIdListValueRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(150), this, "Descriptive or short name of the value.");
+    public final TableField<AgencyIdListValueRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(150).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Descriptive or short name of the value.");
 
     /**
      * The column <code>oagi.agency_id_list_value.definition</code>. The meaning
      * of the value.
      */
-    public final TableField<AgencyIdListValueRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "The meaning of the value.");
+    public final TableField<AgencyIdListValueRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The meaning of the value.");
 
     /**
      * The column <code>oagi.agency_id_list_value.definition_source</code>. This
      * is typically a URL which indicates the source of the agency id list value
      * DEFINITION.
      */
-    public final TableField<AgencyIdListValueRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL which indicates the source of the agency id list value DEFINITION.");
+    public final TableField<AgencyIdListValueRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL which indicates the source of the agency id list value DEFINITION.");
 
     /**
      * The column <code>oagi.agency_id_list_value.owner_list_id</code>. Foreign
@@ -105,21 +105,21 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
      * when the AGENCY_ID_LIST_VALUE is derived from the based
      * AGENCY_ID_LIST_VALUE.
      */
-    public final TableField<AgencyIdListValueRecord, ULong> BASED_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("based_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used when the AGENCY_ID_LIST_VALUE is derived from the based AGENCY_ID_LIST_VALUE.");
+    public final TableField<AgencyIdListValueRecord, ULong> BASED_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("based_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the AGENCY_ID_LIST_VALUE table itself. This column is used when the AGENCY_ID_LIST_VALUE is derived from the based AGENCY_ID_LIST_VALUE.");
 
     /**
      * The column <code>oagi.agency_id_list_value.is_deprecated</code>.
      * Indicates whether the code list value is deprecated and should not be
      * reused (i.e., no new reference to this record should be allowed).
      */
-    public final TableField<AgencyIdListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
+    public final TableField<AgencyIdListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
      * This refers to a replacement if the record is deprecated.
      */
-    public final TableField<AgencyIdListValueRecord, ULong> REPLACEMENT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("replacement_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<AgencyIdListValueRecord, ULong> REPLACEMENT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("replacement_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.agency_id_list_value.created_by</code>. Foreign key
@@ -149,27 +149,27 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
      * The column <code>oagi.agency_id_list_value.creation_timestamp</code>.
      * Timestamp when the code list was created.
      */
-    public final TableField<AgencyIdListValueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
+    public final TableField<AgencyIdListValueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
 
     /**
      * The column <code>oagi.agency_id_list_value.last_update_timestamp</code>.
      * Timestamp when the code list was last updated.
      */
-    public final TableField<AgencyIdListValueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
+    public final TableField<AgencyIdListValueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value.prev_agency_id_list_value_id</code>. A
      * self-foreign key to indicate the previous history record.
      */
-    public final TableField<AgencyIdListValueRecord, ULong> PREV_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("prev_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<AgencyIdListValueRecord, ULong> PREV_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("prev_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column
      * <code>oagi.agency_id_list_value.next_agency_id_list_value_id</code>. A
      * self-foreign key to indicate the next history record.
      */
-    public final TableField<AgencyIdListValueRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("next_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<AgencyIdListValueRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("next_agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private AgencyIdListValue(Name alias, Table<AgencyIdListValueRecord> aliased) {
         this(alias, aliased, null);

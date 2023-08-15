@@ -246,9 +246,55 @@ public interface ViewEditBIEPage extends Page {
 
     /**
      * Return the number of only BIEs by state
+     *
      * @param state the BIE state: WIP, QA or Production
      * @return the quantity of Only BIEs by state
      */
     int getNumberOfOnlyBIEsPerStateAreListed(String state);
+
+    /**
+     * Return the UI element of the 'Move to QA' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to QA' button
+     */
+    WebElement getMoveToQA(boolean enabled);
+
+    /**
+     * Make the BIE to the QA state. It works only if the BIE is in the WIP state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the WIP state or the 'Update' button is enabled.
+     */
+    void moveToQA();
+
+    /**
+     * Return the UI element of the 'Move to Production' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Move to Production' button
+     */
+    WebElement getMoveToProduction(boolean enabled);
+
+    /**
+     * Make the BIE to the Production state. It works only if the BIE is in the QA state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state or the 'Update' button is enabled.
+     */
+    void moveToProduction();
+
+    /**
+     * Return the UI element of the 'Back to WIP' button.
+     *
+     * @param enabled {@code true} if the button should be enabled, otherwise {@code false}
+     * @return the UI element of the 'Back to WIP' button
+     */
+    WebElement getBackToWIP(boolean enabled);
+
+    /**
+     * Make the BIE to the WIP state. It works only if the BIE is in the QA state and the 'Update' button is disabled.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state or the 'Update' button is enabled.
+     */
+    void BackToWP();
 
 }

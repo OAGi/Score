@@ -179,5 +179,6 @@ public class BizCtxAssignmentRecord extends UpdatableRecordImpl<BizCtxAssignment
         setBizCtxAssignmentId(bizCtxAssignmentId);
         setBizCtxId(bizCtxId);
         setTopLevelAsbiepId(topLevelAsbiepId);
+        resetChangedOnNotNull();
     }
 }

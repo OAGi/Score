@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST_VALUE;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CODE_LIST_VALUE_MANIFEST;
 
 public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
 

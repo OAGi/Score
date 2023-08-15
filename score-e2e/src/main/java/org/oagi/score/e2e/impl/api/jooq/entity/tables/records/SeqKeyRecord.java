@@ -288,5 +288,6 @@ public class SeqKeyRecord extends UpdatableRecordImpl<SeqKeyRecord> implements R
         setBccManifestId(bccManifestId);
         setPrevSeqKeyId(prevSeqKeyId);
         setNextSeqKeyId(nextSeqKeyId);
+        resetChangedOnNotNull();
     }
 }

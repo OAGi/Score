@@ -72,13 +72,13 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * generation. Null or empty means the same thing like the default prefix in
      * an XML schema.
      */
-    public final TableField<NamespaceRecord, String> PREFIX = createField(DSL.name("prefix"), SQLDataType.VARCHAR(45), this, "This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.");
+    public final TableField<NamespaceRecord, String> PREFIX = createField(DSL.name("prefix"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.");
 
     /**
      * The column <code>oagi.namespace.description</code>. Description or
      * explanation about the namespace or use of the namespace.
      */
-    public final TableField<NamespaceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Description or explanation about the namespace or use of the namespace.");
+    public final TableField<NamespaceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description or explanation about the namespace or use of the namespace.");
 
     /**
      * The column <code>oagi.namespace.is_std_nmsp</code>. This indicates
@@ -86,7 +86,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * an OAGIS namespace). If it is true, then end users cannot user the
      * namespace for the end user CCs.
      */
-    public final TableField<NamespaceRecord, Byte> IS_STD_NMSP = createField(DSL.name("is_std_nmsp"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.");
+    public final TableField<NamespaceRecord, Byte> IS_STD_NMSP = createField(DSL.name("is_std_nmsp"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.");
 
     /**
      * The column <code>oagi.namespace.owner_user_id</code>. Foreign key to the

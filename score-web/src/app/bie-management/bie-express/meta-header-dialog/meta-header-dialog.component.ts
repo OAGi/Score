@@ -25,7 +25,7 @@ import {finalize} from 'rxjs/operators';
 export class MetaHeaderDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'businessContexts',
+    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -58,7 +58,7 @@ export class MetaHeaderDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.den = 'Meta Header. Meta Header';
     this.request.access = 'CanView';
-    this.request.release = this.release;
+    this.request.releases = [this.release,];
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

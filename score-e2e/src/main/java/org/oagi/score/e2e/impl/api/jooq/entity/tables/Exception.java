@@ -65,25 +65,25 @@ public class Exception extends TableImpl<ExceptionRecord> {
      * The column <code>oagi.exception.tag</code>. A tag of the exception for
      * the purpose of the searching facilitation
      */
-    public final TableField<ExceptionRecord, String> TAG = createField(DSL.name("tag"), SQLDataType.VARCHAR(50), this, "A tag of the exception for the purpose of the searching facilitation");
+    public final TableField<ExceptionRecord, String> TAG = createField(DSL.name("tag"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A tag of the exception for the purpose of the searching facilitation");
 
     /**
      * The column <code>oagi.exception.message</code>. The exception message.
      */
-    public final TableField<ExceptionRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB, this, "The exception message.");
+    public final TableField<ExceptionRecord, String> MESSAGE = createField(DSL.name("message"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The exception message.");
 
     /**
      * The column <code>oagi.exception.stacktrace</code>. The serialized
      * stacktrace object.
      */
-    public final TableField<ExceptionRecord, byte[]> STACKTRACE = createField(DSL.name("stacktrace"), SQLDataType.BLOB, this, "The serialized stacktrace object.");
+    public final TableField<ExceptionRecord, byte[]> STACKTRACE = createField(DSL.name("stacktrace"), SQLDataType.BLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BLOB)), this, "The serialized stacktrace object.");
 
     /**
      * The column <code>oagi.exception.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who is working on when the
      * exception occurs.
      */
-    public final TableField<ExceptionRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.");
+    public final TableField<ExceptionRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the APP_USER table. It indicates the user who is working on when the exception occurs.");
 
     /**
      * The column <code>oagi.exception.creation_timestamp</code>. Timestamp when

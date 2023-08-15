@@ -83,7 +83,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * Foreign key to the CODE_LIST_VALUE table itself. This column is used when
      * the CODE_LIST is derived from the based CODE_LIST.
      */
-    public final TableField<CodeListValueRecord, ULong> BASED_CODE_LIST_VALUE_ID = createField(DSL.name("based_code_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the CODE_LIST_VALUE table itself. This column is used when the CODE_LIST is derived from the based CODE_LIST.");
+    public final TableField<CodeListValueRecord, ULong> BASED_CODE_LIST_VALUE_ID = createField(DSL.name("based_code_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the CODE_LIST_VALUE table itself. This column is used when the CODE_LIST is derived from the based CODE_LIST.");
 
     /**
      * The column <code>oagi.code_list_value.value</code>. The code list value
@@ -96,7 +96,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * explanation of the code list value, e.g., 'Each' for EA, 'English' for
      * EN.
      */
-    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.VARCHAR(100), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
+    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
 
     /**
      * The column <code>oagi.code_list_value.definition</code>. Long description
@@ -104,27 +104,27 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * for counting each unit of an item, such as, 2 shampoo bottles, 3 box of
      * cereals'.
      */
-    public final TableField<CodeListValueRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Long description or explannation of the code list value, e.g., 'EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals'.");
+    public final TableField<CodeListValueRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Long description or explannation of the code list value, e.g., 'EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals'.");
 
     /**
      * The column <code>oagi.code_list_value.definition_source</code>. This is
      * typically a URL identifying the source of the DEFINITION column.
      */
-    public final TableField<CodeListValueRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<CodeListValueRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.code_list_value.is_deprecated</code>. Indicates
      * whether the code list value is deprecated and should not be reused (i.e.,
      * no new reference to this record should be allowed).
      */
-    public final TableField<CodeListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
+    public final TableField<CodeListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
      * The column
      * <code>oagi.code_list_value.replacement_code_list_value_id</code>. This
      * refers to a replacement if the record is deprecated.
      */
-    public final TableField<CodeListValueRecord, ULong> REPLACEMENT_CODE_LIST_VALUE_ID = createField(DSL.name("replacement_code_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<CodeListValueRecord, ULong> REPLACEMENT_CODE_LIST_VALUE_ID = createField(DSL.name("replacement_code_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.code_list_value.created_by</code>. Foreign key to
@@ -153,25 +153,25 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * The column <code>oagi.code_list_value.creation_timestamp</code>.
      * Timestamp when the code list was created.
      */
-    public final TableField<CodeListValueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
+    public final TableField<CodeListValueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
 
     /**
      * The column <code>oagi.code_list_value.last_update_timestamp</code>.
      * Timestamp when the code list was last updated.
      */
-    public final TableField<CodeListValueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
+    public final TableField<CodeListValueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
 
     /**
      * The column <code>oagi.code_list_value.prev_code_list_value_id</code>. A
      * self-foreign key to indicate the previous history record.
      */
-    public final TableField<CodeListValueRecord, ULong> PREV_CODE_LIST_VALUE_ID = createField(DSL.name("prev_code_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<CodeListValueRecord, ULong> PREV_CODE_LIST_VALUE_ID = createField(DSL.name("prev_code_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.code_list_value.next_code_list_value_id</code>. A
      * self-foreign key to indicate the next history record.
      */
-    public final TableField<CodeListValueRecord, ULong> NEXT_CODE_LIST_VALUE_ID = createField(DSL.name("next_code_list_value_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<CodeListValueRecord, ULong> NEXT_CODE_LIST_VALUE_ID = createField(DSL.name("next_code_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private CodeListValue(Name alias, Table<CodeListValueRecord> aliased) {
         this(alias, aliased, null);

@@ -68,7 +68,7 @@ public abstract class AbstractJooqScoreRepositoryTest {
 
         this.driver = driver;
         this.dataSource = dataSource;
-        this.dslContext = new DefaultDSLContext(dataSource, SQLDialect.MYSQL);
+        this.dslContext = new DefaultDSLContext(dataSource, SQLDialect.MARIADB);
         this.scoreRepositoryFactory =
                 new JooqAccessControlScoreRepositoryFactory(new JooqScoreRepositoryFactory(dslContext));
 

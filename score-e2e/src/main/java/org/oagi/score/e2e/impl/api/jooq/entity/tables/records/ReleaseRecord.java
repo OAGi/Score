@@ -507,5 +507,6 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setState(state);
+        resetChangedOnNotNull();
     }
 }

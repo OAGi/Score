@@ -1057,6 +1057,7 @@ public class CcNodeRepository {
                         DT.as("based").DT_ID.as("basedBdtId"),
                         DT_MANIFEST.as("basedManifest").DT_MANIFEST_ID.as("basedBdtManifestId"),
                         DT.as("based").DEN.as("basedBdtDen"),
+                        DT.as("based").STATE.as("basedBdtState"),
                         DT.SIX_DIGIT_ID,
                         DT.CONTENT_COMPONENT_DEFINITION,
                         DT.COMMONLY_USED,

@@ -452,5 +452,6 @@ public class CodeListManifestRecord extends UpdatableRecordImpl<CodeListManifest
         setReplacementCodeListManifestId(replacementCodeListManifestId);
         setPrevCodeListManifestId(prevCodeListManifestId);
         setNextCodeListManifestId(nextCodeListManifestId);
+        resetChangedOnNotNull();
     }
 }

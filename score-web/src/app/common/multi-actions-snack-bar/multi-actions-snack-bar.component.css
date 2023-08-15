@@ -6,6 +6,7 @@
   display: flex;
   font-size: 14px;
   font-weight: bold;
+  align-items: center;
 }
 
 .actions {

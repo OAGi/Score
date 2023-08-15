@@ -17,9 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {

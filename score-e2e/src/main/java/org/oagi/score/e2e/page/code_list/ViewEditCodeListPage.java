@@ -5,12 +5,16 @@ import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
+
 /**
  * An interface of 'View/Edit Code List' page.
  */
 public interface ViewEditCodeListPage extends Page {
 
     EditCodeListPage openCodeListViewEditPageByNameAndBranch(String name, String branch);
+
+    EditCodeListPage openCodeListViewEditPageByManifestId(BigInteger codeListManifestId);
 
     WebElement getNameField();
 

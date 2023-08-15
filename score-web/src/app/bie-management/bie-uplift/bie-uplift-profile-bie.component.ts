@@ -30,7 +30,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
   subtitle = 'Select BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'branch', 'propertyTerm', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -46,10 +46,11 @@ export class BieUpliftProfileBieComponent implements OnInit {
   request: BieListRequest;
 
   releases: SimpleRelease[] = [];
+  sourceRelease: SimpleRelease;
   targetRelease: SimpleRelease;
 
   get targetReleaseList(): SimpleRelease[] {
-    const sourceRelease: SimpleRelease = this.request.release;
+    const sourceRelease: SimpleRelease = this.request.releases[0];
     if (!!sourceRelease) {
       return this.releases.filter(val => val.releaseId > sourceRelease.releaseId);
     }
@@ -98,13 +99,13 @@ export class BieUpliftProfileBieComponent implements OnInit {
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
         if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+          this.sourceRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+          if (!this.sourceRelease) {
+            this.sourceRelease = this.releases[0];
+            saveBranch(this.auth.getUserToken(), 'BIE', this.sourceRelease.releaseId);
           }
         } else {
-          this.request.release = this.releases[0];
+          this.sourceRelease = this.releases[0];
         }
       }
 
@@ -163,6 +164,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+    this.request.releases = (!!this.sourceRelease) ? [this.sourceRelease,] : [];
 
     this.bieListService.getBieListWithRequest(this.request).pipe(
       finalize(() => {

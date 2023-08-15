@@ -67,34 +67,34 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * The column <code>oagi.app_user.password</code>. Password to authenticate
      * the user.
      */
-    public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100), this, "Password to authenticate the user.");
+    public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Password to authenticate the user.");
 
     /**
      * The column <code>oagi.app_user.name</code>. Full name of the user.
      */
-    public final TableField<AppUserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Full name of the user.");
+    public final TableField<AppUserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Full name of the user.");
 
     /**
      * The column <code>oagi.app_user.organization</code>. The company the user
      * represents.
      */
-    public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100), this, "The company the user represents.");
+    public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The company the user represents.");
 
     /**
      * The column <code>oagi.app_user.is_developer</code>.
      */
-    public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT, this, "");
+    public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "");
 
     /**
      * The column <code>oagi.app_user.is_admin</code>. Indicator whether the
      * user has an admin role or not.
      */
-    public final TableField<AppUserRecord, Byte> IS_ADMIN = createField(DSL.name("is_admin"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicator whether the user has an admin role or not.");
+    public final TableField<AppUserRecord, Byte> IS_ADMIN = createField(DSL.name("is_admin"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicator whether the user has an admin role or not.");
 
     /**
      * The column <code>oagi.app_user.is_enabled</code>.
      */
-    public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "");
+    public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "");
 
     private AppUser(Name alias, Table<AppUserRecord> aliased) {
         this(alias, aliased, null);

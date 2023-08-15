@@ -2,6 +2,8 @@ package org.oagi.score.e2e.page.core_component;
 
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -35,6 +37,7 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Set the UI element of the 'Type' select field with the given type.
+     *
      * @param type
      */
     void setTypeSelect(String type);
@@ -48,9 +51,24 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Set the UI element of the 'State' select field with the given type.
+     *
      * @param state
      */
     void setState(String state);
+
+    /**
+     * Return the UI element of the 'Owner' select field.
+     *
+     * @return the UI element of the 'Owner' select field
+     */
+    WebElement getOwnerSelectField();
+
+    /**
+     * Set the UI element of the 'Owner' select field with the given type.
+     *
+     * @param owner
+     */
+    void setOwner(String owner);
 
     /**
      * Return the UI element of the 'Updated Start Date' field.
@@ -158,11 +176,20 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the ACC filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the ACC page object
      */
     ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the 'ACC' page by the table record.
+     *
+     * @param tr the table record
+     * @return the 'ACC' page object
+     *
+     */
+    ACCViewEditPage openACCViewEditPage(WebElement tr);
 
     /**
      * Open the page of the ACC by its manifest ID.
@@ -175,11 +202,20 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the ASCCP filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the ASCCP page object
      */
     ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the 'ASCCP' page by the table record.
+     *
+     * @param tr the table record
+     * @return the 'ASCCP' page object
+     *
+     */
+    ASCCPViewEditPage openASCCPViewEditPage(WebElement tr);
 
     /**
      * Open the page of the ASCCP by its manifest ID.
@@ -192,7 +228,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the BCCP filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the BCCP page object
      */
@@ -209,7 +245,7 @@ public interface ViewEditCoreComponentPage extends Page {
     /**
      * Open the page of the DT filtered by `den` and `branch`.
      *
-     * @param den DEN text
+     * @param den    DEN text
      * @param branch Branch text
      * @return the DT page object
      */
@@ -326,6 +362,7 @@ public interface ViewEditCoreComponentPage extends Page {
 
     /**
      * Return a unique table record based on the Core Component name and the owner
+     *
      * @param name  the Core Component name
      * @param owner
      * @return a single table record based on the Core Component name and the owner

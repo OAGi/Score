@@ -382,5 +382,6 @@ public class ModuleDtManifestRecord extends UpdatableRecordImpl<ModuleDtManifest
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

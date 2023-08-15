@@ -140,5 +140,6 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> implements R
 
         setTenantId(tenantId);
         setName(name);
+        resetChangedOnNotNull();
     }
 }

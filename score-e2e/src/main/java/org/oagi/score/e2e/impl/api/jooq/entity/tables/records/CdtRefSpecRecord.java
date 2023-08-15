@@ -177,5 +177,6 @@ public class CdtRefSpecRecord extends UpdatableRecordImpl<CdtRefSpecRecord> impl
         setCdtRefSpecId(cdtRefSpecId);
         setCdtId(cdtId);
         setRefSpecId(refSpecId);
+        resetChangedOnNotNull();
     }
 }

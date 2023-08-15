@@ -296,5 +296,6 @@ public class BlobContentManifestRecord extends UpdatableRecordImpl<BlobContentMa
         setConflict(conflict);
         setPrevBlobContentManifestId(prevBlobContentManifestId);
         setNextBlobContentManifestId(nextBlobContentManifestId);
+        resetChangedOnNotNull();
     }
 }

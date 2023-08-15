@@ -405,5 +405,6 @@ public class AccManifestRecord extends UpdatableRecordImpl<AccManifestRecord> im
         setReplacementAccManifestId(replacementAccManifestId);
         setPrevAccManifestId(prevAccManifestId);
         setNextAccManifestId(nextAccManifestId);
+        resetChangedOnNotNull();
     }
 }

@@ -123,20 +123,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     const userToken = this.authService.getUserToken();
     this.releaseService.getSimpleReleases().subscribe(resp => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
-      this.releaseListFilterCtrl.valueChanges
-        .subscribe(() => {
-          let search = this.releaseListFilterCtrl.value.releaseNum;
-          if (!search) {
-            this.releaseFilteredList.next(resp.slice());
-            return;
-          } else {
-            search = search.toLowerCase();
-          }
-          this.releaseFilteredList.next(
-            resp.filter(e => e.releaseNum.toLowerCase().indexOf(search) > -1)
-          );
-        });
-      this.releaseFilteredList.next(resp.slice());
+      initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
+
       const branch = loadBranch(userToken, 'CC');
       if (branch) {
         this.selectedRelease = resp[resp.findIndex(e => e.releaseId === branch)];

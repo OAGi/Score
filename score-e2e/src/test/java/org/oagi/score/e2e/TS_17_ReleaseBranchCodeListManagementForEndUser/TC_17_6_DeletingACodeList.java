@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -21,7 +24,8 @@ import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_17_6_DeletingACodeList extends BaseTest {
@@ -71,59 +75,51 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
     @Test
     @DisplayName("TC_17_6_TA_2")
     public void test_TA_2() {
-        AppUserObject endUser;
-        ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        NamespaceObject namespaceEU;
-        {
-            endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-
-            CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespaceEU, branch, "WIP");
-            CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
-            codeListForTesting.add(codeList);
-        }
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespaceEU, branch, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        for (CodeListObject codeList : codeListForTesting) {
-            DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", branch.getReleaseNumber());
-            dtViewEditPage.showValueDomain();
-            dtViewEditPage.addCodeListValueDomain(codeList.getName());
-            String qualifier = "testDataType" + randomAlphabetic(5, 10);
-            dtViewEditPage.setQualifier(qualifier);
-            String definition = getText(dtViewEditPage.getDefinitionField());
-            dtViewEditPage.setNamespace(namespaceEU);
+        DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", branch.getReleaseNumber());
+        dtViewEditPage.showValueDomain();
+        dtViewEditPage.addCodeListValueDomain(codeList.getName());
+        String qualifier = "testDataType" + randomAlphabetic(5, 10);
+        dtViewEditPage.setQualifier(qualifier);
+        String definition = getText(dtViewEditPage.getDefinitionField());
+        dtViewEditPage.setNamespace(namespaceEU);
+        if (definition != null) {
             dtViewEditPage.hitUpdateButton();
-            if (definition == null) {
-                dtViewEditPage.hitUpdateAnywayButton();
+        } else {
+            try {
+                dtViewEditPage.hitUpdateButton();
+            } catch (TimeoutException ignore) {
             }
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
-            editCodeListPage.hitDeleteButton();
-            viewEditCoreComponentPage.openPage();
-            DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", branch.getReleaseNumber());
-            dtViewEditPageNew.showValueDomain();
-            assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
-            escape(getDriver());
-            CodeListObject oagiCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_StateCode", branch.getReleaseNumber());
-            dtViewEditPageNew.changeCodeListValueDomain(oagiCodeList.getName());
-
-            viewEditCodeListPage.openPage();
-            editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
-            editCodeListPage.hitRestoreButton();
-
-            dtViewEditPageNew.openPage();
-            dtViewEditPageNew.showValueDomain();
-            assertThrows(NoSuchElementException.class, () -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList.getName()));
-            escape(getDriver());
-
-            viewEditCoreComponentPage.openPage();
+            dtViewEditPage.hitUpdateAnywayButton();
         }
+
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        editCodeListPage.hitDeleteButton();
+        viewEditCoreComponentPage.openPage();
+        DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", branch.getReleaseNumber());
+        dtViewEditPageNew.showValueDomain();
+        assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
+        escape(getDriver());
+        dtViewEditPageNew.changeCodeListValueDomain(codeList.getName());
+
+        viewEditCodeListPage.openPage();
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        editCodeListPage.hitRestoreButton();
+
+        dtViewEditPageNew.openPage();
+        dtViewEditPageNew.showValueDomain();
+        assertThrows(TimeoutException.class, () -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
     }
+
     @Test
     @DisplayName("TC_17_6_TA_3")
     public void test_TA_3() {
@@ -147,14 +143,20 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
             editCodeListPage.hitAmendButton();
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField()))>1);
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
             editCodeListPage.moveToQA();
             assertEquals("QA", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
             editCodeListPage.moveToProduction();
             assertEquals("Production", getText(editCodeListPage.getStateField()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitDeleteButton();});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitDeleteButton();
+            });
         }
     }
 

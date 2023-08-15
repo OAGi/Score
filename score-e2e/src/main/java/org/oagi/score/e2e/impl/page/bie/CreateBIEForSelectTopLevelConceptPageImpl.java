@@ -23,13 +23,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl implements CreateBIEForSelectTopLevelConceptPage {
 
     private static final By SELECTED_BUSINESS_CONTEXTS_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
@@ -262,38 +262,36 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     public EditBIEPage createBIE(String asccpDEN, String branch) {
         setDEN(asccpDEN);
         setBranch(branch);
+        waitFor(Duration.ofMillis(5000));
         hitSearchButton();
 
-        return retry(() -> {
-            WebElement tr;
-            WebElement td;
-            try {
-                tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "den");
-            } catch (TimeoutException e) {
-                throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN, e);
-            }
-            if (!asccpDEN.equals(getText(td.findElement(By.tagName("a"))))) {
-                throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN);
-            }
-            WebElement select = getColumnByName(tr, "select");
-            click(select);
-            click(getCreateButton());
-            assert "Created".equals(getSnackBarMessage(getDriver()));
+        WebElement tr;
+        WebElement td;
+        try {
+            tr = getTableRecordAtIndex(1);
+            td = getColumnByName(tr, "den");
+        } catch (TimeoutException e) {
+            throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN, e);
+        }
+        if (!asccpDEN.equals(getText(td.findElement(By.tagName("a"))))) {
+            throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN);
+        }
+        WebElement select = getColumnByName(tr, "select");
+        click(select);
+        click(getCreateButton());
+        waitFor(Duration.ofMillis(500));
+        assert "Created".equals(getSnackBarMessage(getDriver()));
 
-            // Wait for BIE creation
-            waitFor(Duration.ofMillis(1000));
-            invisibilityOfLoadingContainerElement(getDriver());
+        // Wait for BIE creation
+        invisibilityOfLoadingContainerElement(getDriver());
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
 
-            String currentUrl = getDriver().getCurrentUrl();
-            BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-
-            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
-                    .getTopLevelASBIEPByID(topLevelAsbiepId);
-            EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
-            assert editBIEPage.isOpened();
-            return editBIEPage;
-        });
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .getTopLevelASBIEPByID(topLevelAsbiepId);
+        EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
+        assert editBIEPage.isOpened();
+        return editBIEPage;
     }
 
 }

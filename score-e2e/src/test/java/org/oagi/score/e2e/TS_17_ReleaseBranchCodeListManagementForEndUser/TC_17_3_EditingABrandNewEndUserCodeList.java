@@ -101,6 +101,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
                 editCodeListPage.getDefinitionWarningDialogMessage());
         editCodeListPage.hitUpdateAnywayButton();
     }
+
     @Test
     @DisplayName("TC_17_3_TA_2")
     public void test_TA_2() {
@@ -145,6 +146,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         String message = enteredValue + " already exist";
         assert message.equals(getSnackBarMessage(getDriver()));
     }
+
     @Test
     @DisplayName("TC_17_3_TA_3")
     public void test_TA_3() {
@@ -172,11 +174,12 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
         editCodeListPage.selectCodeListValue(values.get(1).getValue());
         editCodeListPage.removeCodeListValue();
         editCodeListPage.hitUpdateButton();
     }
+
     @Test
     @DisplayName("TC_17_3_TA_4")
     public void test_TA_4() {
@@ -212,6 +215,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         editCodeListValueDialog.hitSaveButton();
         editCodeListPage.hitUpdateButton();
     }
+
     @Test
     @DisplayName("TC_17_3_TA_5")
     public void test_TA_5() {
@@ -230,7 +234,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
              */
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, namespaceEU, branch, "WIP");
-           getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -245,6 +249,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         editCodeListValueDialog.hitAddButton();
         editCodeListPage.hitUpdateButton();
     }
+
     @Test
     @DisplayName("TC_17_3_TA_6")
     public void test_TA_6() {
@@ -276,6 +281,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         editCodeListPage.selectCodeListValue("new value code");
         editCodeListPage.removeCodeListValue();
     }
+
     @Test
     @DisplayName("TC_17_3_TA_7")
     public void test_TA_7() {

@@ -212,6 +212,7 @@ public interface ACCSetBaseACCDialog extends Dialog {
 
     /**
      * Return ACCViewEditPage after a new ACC is selected and applied
+     *
      * @param accDen ACC DEN
      * @return ACCViewEditPage
      */

@@ -293,6 +293,19 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
+  isInvalidState(node: CcFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+
+    if (!(node instanceof DtFlatNode) || !node.detail) {
+      return false;
+    }
+
+    const detail = node.detail as CcDtNodeDetail;
+    return detail.basedBdtState === 'Deleted';
+  }
+
   copyLink(node: CcFlatNode, $event?) {
     if ($event) {
       $event.preventDefault();
@@ -1210,6 +1223,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.restrictionDataSource.data = detail.valueDomains;
       return;
     }
+
+    // Test Assertion #38.6.1.b
+    // When the Representation Term is changed the Value Constraint should be reset.
+    detail.fixedOrDefault = 'none';
+    detail.fixedValue = undefined;
+    detail.defaultValue = undefined;
 
     this.service.getPrimitiveListByRepresentationTerm(detail.representationTerm, detail.manifestId)
       .subscribe(resp => {

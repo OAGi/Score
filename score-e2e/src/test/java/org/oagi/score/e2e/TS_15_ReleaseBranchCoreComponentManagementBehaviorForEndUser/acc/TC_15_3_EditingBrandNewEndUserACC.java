@@ -148,7 +148,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         ACCViewEditPage.ACCPanel accPanel = accViewEditPage.getACCPanel(accNode);
         assertFalse(getText(accPanel.getComponentTypeSelectField()).contains("Base"));
         accPanel.setComponentType("Base (Abstract)");
-        assertDisabled(accPanel.getAbstractCheckbox());
+        assertEnabled(accPanel.getAbstractCheckbox());
         assertChecked(accPanel.getAbstractCheckbox());
     }
 
@@ -211,6 +211,7 @@ public class TC_15_3_EditingBrandNewEndUserACC extends BaseTest {
         isHidden("//mat-option//span[.=\" OAGIS10 BODs \"]//ancestor::mat-option");
         escape(getDriver());
     }
+
     private void isHidden(String xpath) {
         try {
             getDriver().findElement(By.xpath(xpath + "[@hidden]"));

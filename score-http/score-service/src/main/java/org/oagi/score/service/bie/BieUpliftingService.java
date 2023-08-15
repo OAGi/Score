@@ -835,6 +835,9 @@ public class BieUpliftingService {
                             })
                             .collect(Collectors.toList()));
 
+            createBieRequest.setSourceTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId());
+            createBieRequest.setSourceAction("Uplift");
+
             targetTopLevelAsbiepId = scoreRepositoryFactory.createBieWriteRepository()
                     .createBie(createBieRequest)
                     .getTopLevelAsbiepId();
