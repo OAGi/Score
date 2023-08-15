@@ -25,6 +25,60 @@
           </div>
           <div class="col-2">
             <mat-form-field>
+              <mat-label>Open API Version</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.openAPIVersion" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Doc Version</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.version" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Terms of Service</mat-label>
+              <input matInput [(ngModel)]="oasDoc.termsOfService" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact Name</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactName" maxlength="255">
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact Url</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactUrl" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact Email</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>License Name</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.licenseName" maxlength="255">
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>License Url</mat-label>
+              <input matInput [(ngModel)]="oasDoc.licenseUrl" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
               <mat-label>Description</mat-label>
               <textarea rows="1" cols="200" matInput [(ngModel)]="oasDoc.description"></textarea>
             </mat-form-field>
