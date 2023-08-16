@@ -1,8 +1,10 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -18,6 +20,7 @@ import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
+
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -25,9 +28,11 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Code List\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
+    private static final By OWNER_SELECT_FIELD_LOCATOR =
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
 
     public ViewEditCodeListPageImpl(BasePage parent) {
         super(parent);
@@ -48,6 +53,21 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(getDriver(), By.className("title"));
+    }
+
+    @Override
+    public EditCodeListPage openCodeListViewEditPage(CodeListObject codeList) {
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(codeList.getReleaseId());
+        setBranch(release.getReleaseNumber());
+        setState(codeList.getState());
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
+        setOwner(owner.getLoginId());
+        openCodeListByName(codeList.getName());
+
+        waitFor(ofMillis(500L));
+        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
+        assert editCodeListPage.isOpened();
+        return editCodeListPage;
     }
 
     @Override
@@ -245,7 +265,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     }
 
     @Override
-    public void toggleState(String state) {
+    public void setState(String state) {
         retry(() -> {
             click(getStateSelectField());
             waitFor(ofSeconds(2L));
@@ -260,6 +280,24 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getStateSelectField() {
         return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        retry(() -> {
+            click(getOwnerSelectField());
+            waitFor(ofSeconds(2L));
+
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+            click(optionField);
+            escape(getDriver());
+        });
+    }
+
+    @Override
+    public WebElement getOwnerSelectField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
     @Override

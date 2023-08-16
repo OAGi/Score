@@ -633,13 +633,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             if (previousState.equals("")) {
                 String currentState = cl.getState();
                 previousState = cl.getState();
-                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.setState(currentState);
                 viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             } else {
-                viewEditCodeListPage.toggleState(previousState);
+                viewEditCodeListPage.setState(previousState);
                 String currentState = cl.getState();
                 previousState = cl.getState();
-                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.setState(currentState);
                 viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             }
         }

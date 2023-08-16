@@ -12,6 +12,8 @@ import java.math.BigInteger;
  */
 public interface ViewEditCodeListPage extends Page {
 
+    EditCodeListPage openCodeListViewEditPage(CodeListObject codeList);
+
     EditCodeListPage openCodeListViewEditPageByNameAndBranch(String name, String branch);
 
     EditCodeListPage openCodeListViewEditPageByManifestId(BigInteger codeListManifestId);
@@ -38,9 +40,13 @@ public interface ViewEditCodeListPage extends Page {
 
     WebElement getDeprecatedSelectField();
 
-    void toggleState(String state);
+    void setState(String state);
 
     WebElement getStateSelectField();
+
+    void setOwner(String owner);
+
+    WebElement getOwnerSelectField();
 
     void searchCodeListByDefinitionAndBranch(CodeListObject codeList, String releaseNumber);
 
