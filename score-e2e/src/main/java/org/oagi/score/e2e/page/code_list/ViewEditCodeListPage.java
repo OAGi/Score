@@ -5,8 +5,6 @@ import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
-
 /**
  * An interface of 'View/Edit Code List' page.
  */
@@ -14,11 +12,18 @@ public interface ViewEditCodeListPage extends Page {
 
     EditCodeListPage openCodeListViewEditPage(CodeListObject codeList);
 
-    EditCodeListPage openCodeListViewEditPageByNameAndBranch(String name, String branch);
-
-    EditCodeListPage openCodeListViewEditPageByManifestId(BigInteger codeListManifestId);
+    /**
+     * Open the code list edit page by the given code list.
+     *
+     * @param codeList             code list
+     * @param openWithoutSearching {@code true} if it needs to open without searching through the UI, otherwise {@code false}
+     * @return the code list edit page
+     */
+    EditCodeListPage openCodeListViewEditPage(CodeListObject codeList, boolean openWithoutSearching);
 
     WebElement getNameField();
+
+    void setName(String name);
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 

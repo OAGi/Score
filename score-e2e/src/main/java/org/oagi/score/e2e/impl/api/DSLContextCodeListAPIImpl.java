@@ -83,6 +83,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         codeList.setLastUpdatedBy(codeListRecord.getLastUpdatedBy().toBigInteger());
         codeList.setCreationTimestamp(codeListRecord.getCreationTimestamp());
         codeList.setLastUpdateTimestamp(codeListRecord.getLastUpdateTimestamp());
+        codeList.setReleaseId(codeListManifestRecord.getReleaseId().toBigInteger());
         return codeList;
     }
 

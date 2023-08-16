@@ -1574,7 +1574,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
         CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(CLaccessUseraDeprecated.getName(), prev_release);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(CLaccessUseraDeprecated);
         editCodeListPage.hitAmendButton();
         click(editCodeListPage.getDeprecatedSelectField());
         editCodeListPage.setDefinition("Check the Deprecated Checkbox");
@@ -1583,7 +1583,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editCodeListPage.moveToProduction();
 
         viewEditCodeListPage.openPage();
-        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(
+                getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_MatchDocumentCode", prev_release)
+        );
         editCodeListPage.hitDeriveCodeListBasedOnThisButton();
         editCodeListPage.setName("CLuserderived_BIEUp");
         editCodeListPage.setNamespace(euNamespace);

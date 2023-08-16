@@ -59,7 +59,7 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.setDefinition("new definition");
         editCodeListPage.setDefinitionSource("new definition source");
         assertThrows(TimeoutException.class, () -> {
@@ -89,7 +89,7 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.setDefinition("new definition");
         editCodeListPage.setDefinitionSource("new definition source");
         editCodeListPage.hitUpdateButton();

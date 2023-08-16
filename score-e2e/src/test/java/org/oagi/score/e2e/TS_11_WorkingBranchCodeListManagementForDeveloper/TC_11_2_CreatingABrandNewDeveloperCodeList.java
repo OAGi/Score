@@ -179,7 +179,7 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
     }
 

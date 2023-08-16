@@ -79,7 +79,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_2")
     public void test_TA_2() {
         AppUserObject endUser;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -301,7 +301,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        EditCodeListPage editCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu().openCodeListViewEditPageByNameAndBranch(codeList.getName(), release.getReleaseNumber());
+        EditCodeListPage editCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu().openCodeListViewEditPage(codeList);
         editCodeListPage.hitAmendButton();
         waitFor(ofMillis(500L));
         CodeListObject amendedCL = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUser, release.getReleaseNumber());

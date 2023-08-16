@@ -63,12 +63,15 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         assertTrue(getText(editCodeListPage.getRevisionField()).equals("1"));
         assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
         assertTrue(getText(editCodeListPage.getOwnerField()).equals(endUser.getLoginId()));
         editCodeListPage.hitDeleteButton();
-        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        codeList.setState("Deleted");
+
+        viewEditCodeListPage.openPage();
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         assertEquals("Deleted", getText(editCodeListPage.getStateField()));
     }
 
@@ -102,8 +105,10 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         }
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.hitDeleteButton();
+        codeList.setState("Deleted");
+
         viewEditCoreComponentPage.openPage();
         DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", branch.getReleaseNumber());
         dtViewEditPageNew.showValueDomain();
@@ -112,7 +117,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         dtViewEditPageNew.changeCodeListValueDomain(codeList.getName());
 
         viewEditCodeListPage.openPage();
-        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.hitRestoreButton();
 
         dtViewEditPageNew.openPage();
@@ -125,7 +130,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
     public void test_TA_3() {
         AppUserObject endUser;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
@@ -140,7 +145,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitAmendButton();
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);

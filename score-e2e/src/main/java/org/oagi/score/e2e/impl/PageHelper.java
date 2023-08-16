@@ -178,7 +178,7 @@ public abstract class PageHelper {
             String tagName = element.getTagName();
             try {
                 element.click();
-            } catch (ElementNotInteractableException e) {
+            } catch (ElementClickInterceptedException e) {
                 if ("mat-select".equals(tagName)) {
                     WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-select-arrow-wrapper"));
                     click(arrowWrapper);

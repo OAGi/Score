@@ -71,7 +71,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         editCodeListPage.hitRevise();
         editCodeListPage.setVersion("99");
         editCodeListPage.setDefinition("random code list in candidate state");
@@ -256,7 +256,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         viewEditCodeListPage.setBranch(existingReleaseNum);
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         assertEquals("99", getText(editCodeListPage.getVersionField()));
         assertEquals("random code list in candidate state", getText(editCodeListPage.getDefinitionField()));
     }

@@ -75,7 +75,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), "Working");
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         editCodeListPage.hitRevise();
         editCodeListPage.setVersion("99");
         editCodeListPage.setDefinition("random code list in candidate state");

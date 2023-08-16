@@ -109,7 +109,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
         CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         assertDisabled(editCodeListPage.getNamespaceSelectField());
         assertDisabled(editCodeListPage.getListIDField());
         assertDisabled(editCodeListPage.getAgencyIDListField());
@@ -160,7 +160,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
         CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         assertDisabled(editCodeListPage.getNamespaceSelectField());
         assertDisabled(editCodeListPage.getListIDField());
         assertDisabled(editCodeListPage.getAgencyIDListField());

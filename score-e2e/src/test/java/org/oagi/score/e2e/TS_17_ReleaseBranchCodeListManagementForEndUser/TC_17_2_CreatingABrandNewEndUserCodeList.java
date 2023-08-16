@@ -206,7 +206,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListPublished);
         AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeListPublished.getOwnerUserId());
         assertTrue(codeListPublished.getState().equals("Published"));
         assertTrue(owner.isDeveloper());
@@ -220,7 +220,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
     public void test_TA_6() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -249,10 +249,11 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListProduction, endUserB);
             codeListForTesting.add(codeListProduction);
         }
+
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         for (CodeListObject cl : codeListForTesting) {
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl, true);
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
             assertFalse(owner.isDeveloper());
             assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
@@ -288,7 +289,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branchTwo.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListPublished);
         assertDoesNotThrow(() -> {
             editCodeListPage.hitDeriveCodeListBasedOnThisButton();
         });

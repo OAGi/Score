@@ -12,10 +12,10 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,8 +45,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -56,18 +56,22 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertEquals(developerA.getLoginId(), getText(editCodeListPage.getOwnerField()));
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             editCodeListPage.hitDeleteButton();
-            editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            codeList.setState("Deleted");
+
+            viewEditCodeListPage.openPage();
+            editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Deleted", getText(editCodeListPage.getStateField()));
         }
     }
@@ -97,9 +101,11 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         } else{
             dtViewEditPage.hitUpdateButton();
         }
+
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.hitDeleteButton();
+        codeList.setState("Deleted");
 
         viewEditCoreComponentPage.openPage();
         DTViewEditPage dtViewEditPageNew = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(qualifier + "_ Code. Type", workingBranch.getReleaseNumber());
@@ -122,8 +128,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         AppUserObject developerA;
         ReleaseObject workingBranch;
         ACCObject acc;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -134,7 +140,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
 
@@ -186,7 +192,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
              * Delete Code List
              */
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitDeleteButton();
             /*TODO:
             As the developer expands the tree down to the BCCP using the BDT that the deleted CL, the CL shall be flagged as deleted.
@@ -203,8 +209,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     public void test_TA_4() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -216,21 +222,24 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
 
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
-            viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+
+            viewEditCodeListPage.openPage();
+            codeList = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeList.getCodeListManifestId());
+            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertThrows(TimeoutException.class, () -> {
