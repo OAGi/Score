@@ -73,11 +73,6 @@ public class OpenAPIGenerateService {
         OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
         for (String resourceName: params.keySet()) {
             option = params.get(resourceName);
-            if (option.getVerb().equals("GET")){
-                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate());
-            } else if (option.getVerb().equals("POST")){
-                option.setIncludeMetaHeaderForJsonForOpenAPI30GetTemplate(option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate());
-            }
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
             GenerationContext generationContext = generateExpression.generateContext(Arrays.asList(topLevelAsbiep), option);
             generateExpression.generate(topLevelAsbiep, generationContext, option);
