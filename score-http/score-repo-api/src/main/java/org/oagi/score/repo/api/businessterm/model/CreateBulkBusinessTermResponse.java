@@ -9,6 +9,7 @@ import java.util.List;
 public class CreateBulkBusinessTermResponse extends Auditable {
 
     private final List<BigInteger> businessTermIds;
+
     private List<String> formatCheckExceptions = Collections.emptyList();
 
     public CreateBulkBusinessTermResponse(List<BigInteger> businessTermIds) {
@@ -22,7 +23,14 @@ public class CreateBulkBusinessTermResponse extends Auditable {
     public List<String> getFormatCheckExceptions() {
         return formatCheckExceptions;
     }
+
     public void setFormatCheckExceptions(List<String> formatCheckExceptions) {
-        this.formatCheckExceptions = formatCheckExceptions;
+        if (formatCheckExceptions != null && !formatCheckExceptions.isEmpty()) {
+            this.formatCheckExceptions = formatCheckExceptions;
+        }
+    }
+
+    public boolean hasErrors() {
+        return formatCheckExceptions != null && !formatCheckExceptions.isEmpty();
     }
 }

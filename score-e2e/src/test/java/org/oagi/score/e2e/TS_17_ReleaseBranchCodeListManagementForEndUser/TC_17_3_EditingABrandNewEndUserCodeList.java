@@ -207,7 +207,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(values.get(1).getValue());
         editCodeListValueDialog.setMeaning("changed meaning");
         editCodeListValueDialog.setDefinition("changed definition");
