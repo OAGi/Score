@@ -225,33 +225,30 @@ public class BusinessTermService {
     public CreateBulkBusinessTermResponse createBusinessTermsFromFile(CreateBulkBusinessTermRequest request)
             throws ScoreDataAccessException {
         List<String> formatCheckExceptions = new ArrayList<>();
-        List<String> termCheckExceptions = new ArrayList<>();
         try (CSVReader reader = new CSVReader(
                 new BufferedReader(
                         new InputStreamReader(request.getInputStream(), "UTF-8"), ','))) {
-            List<BusinessTerm> businessTerms = new ArrayList<BusinessTerm>();
+            String errorMessage;
+            List<BusinessTerm> businessTerms = new ArrayList<>();
             BusinessTermTemplateParser templateParser = new BusinessTermTemplateParser(reader);
             while (templateParser.hasNext()) {
+                errorMessage = null;
                 BusinessTermTemplateRecord record = templateParser.next();
                 BusinessTerm term = new BusinessTerm();
                 String businessTerm = record.getBusinessTerm();
                 if (!hasLength(businessTerm)) {
-                    formatCheckExceptions.add("The business term is required.");
-                    termCheckExceptions.add("The business term is required.");
+                    errorMessage = "The business term is required.";
                 } else if (businessTerm.length() > 255) {
-                    formatCheckExceptions.add(businessTerm + " is longer than 255 characters limit.");
-                    termCheckExceptions.add(businessTerm + " is longer than 255 characters limit.");
+                    errorMessage = businessTerm + " is longer than 255 characters limit.";
                 } else {
                     term.setBusinessTerm(businessTerm);
                 }
 
                 String externalReferenceUri = record.getExternalReferenceUri();
                 if (!hasLength(externalReferenceUri)) {
-                    formatCheckExceptions.add("The external reference URI is required.");
-                    termCheckExceptions.add("The external reference URI is required.");
+                    errorMessage = "The external reference URI is required.";
                 } else if (!isValidURI(externalReferenceUri)) {
-                    formatCheckExceptions.add(externalReferenceUri + " is not a valid URI.");
-                    termCheckExceptions.add(externalReferenceUri + " is not a valid URI.");
+                    errorMessage = externalReferenceUri + " is not a valid URI.";
                 } else {
                     term.setExternalReferenceUri(externalReferenceUri);
                 }
@@ -259,26 +256,23 @@ public class BusinessTermService {
                 term.setExternalReferenceId(record.getExternalReferenceId());
                 term.setDefinition(record.getDefinition());
                 term.setComment(record.getComment());
-                if (termCheckExceptions.isEmpty() && checkBusinessTermUniqueness(term)) {
+
+                if (errorMessage == null && checkBusinessTermUniqueness(term)) {
                     businessTerms.add(term);
-                }else{
-                    termCheckExceptions.clear();
+                } else {
+                    formatCheckExceptions.add(errorMessage);
                 }
             }
 
             request.setBusinessTermList(businessTerms);
         } catch (IOException e) {
             throw new ScoreDataAccessException("Fail to parse CSV file: " + e.getMessage());
-        } catch (URISyntaxException e) {
-            formatCheckExceptions.add("Fail to parse CSV file: " + e.getMessage());
         }
+
         CreateBulkBusinessTermResponse response =
                 scoreRepositoryFactory.createBusinessTermWriteRepository()
                         .createBusinessTermsFromFile(request);
-
-        if (!formatCheckExceptions.isEmpty()) {
-            response.setFormatCheckExceptions(formatCheckExceptions);
-        }
+        response.setFormatCheckExceptions(formatCheckExceptions);
         return response;
     }
 

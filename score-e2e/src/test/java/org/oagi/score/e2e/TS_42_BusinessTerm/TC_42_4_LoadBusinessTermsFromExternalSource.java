@@ -170,7 +170,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             waitFor(ofMillis(1000L));
             assertTrue(getSnackBarMessage(getDriver()).contains("Fail to parse CSV file"));
 
-            //Verify that all test business terms have been saved through bulk upload
+            // Verify that only valid test business terms have been saved through bulk upload
             viewEditBusinessTermPage.openPage();
             viewEditBusinessTermPage.setExternalReferenceURI(randomBT_noTerm_URI);
             viewEditBusinessTermPage.hitSearchButton();

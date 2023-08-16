@@ -46,7 +46,7 @@ public class BusinessTermController {
     @Autowired
     private BusinessTermService businessTermService;
 
-    private static String TYPE = "text/csv";
+    private static String DEFAULT_ALLOWED_CONTENT_TYPE = "text/csv";
 
     @RequestMapping(value = "/business_terms", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -221,19 +221,19 @@ public class BusinessTermController {
     public ResponseEntity uploadFile(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestParam("file") MultipartFile file) throws IOException {
-        if (TYPE.equals(file.getContentType())) {
+        if (DEFAULT_ALLOWED_CONTENT_TYPE.equals(file.getContentType())) {
             CreateBulkBusinessTermRequest request = new CreateBulkBusinessTermRequest(authenticationService.asScoreUser(requester));
             request.setInputStream(file.getInputStream());
             CreateBulkBusinessTermResponse response = businessTermService.createBusinessTermsFromFile(request);
-            if (response.getFormatCheckExceptions() == null) {
+            if (response.hasErrors()) {
+                throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", response.getFormatCheckExceptions()));
+            } else {
                 if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
                     logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
                     return ResponseEntity.noContent().build();
                 } else {
                     return ResponseEntity.status(200).build();
                 }
-            } else {
-                throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", response.getFormatCheckExceptions()));
             }
         } else {
             return ResponseEntity.status(415).body("Unsupported content type: " + file.getContentType());

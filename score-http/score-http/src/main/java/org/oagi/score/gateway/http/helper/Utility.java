@@ -226,7 +226,7 @@ public class Utility {
         return str.equals("") ? null : str;
     }
 
-    public static boolean isValidURI(String uri) throws URISyntaxException {
+    public static boolean isValidURI(String uri) {
         try {
             new URI(uri);
             return true;

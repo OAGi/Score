@@ -25,6 +25,12 @@ public class CreateBulkBusinessTermResponse extends Auditable {
     }
 
     public void setFormatCheckExceptions(List<String> formatCheckExceptions) {
-        this.formatCheckExceptions = formatCheckExceptions;
+        if (formatCheckExceptions != null && !formatCheckExceptions.isEmpty()) {
+            this.formatCheckExceptions = formatCheckExceptions;
+        }
+    }
+
+    public boolean hasErrors() {
+        return formatCheckExceptions != null && !formatCheckExceptions.isEmpty();
     }
 }
