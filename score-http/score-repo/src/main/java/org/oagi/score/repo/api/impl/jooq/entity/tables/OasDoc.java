@@ -82,7 +82,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.description</code>. A short description of
      * the API. CommonMark syntax MAY be used for rich text representation.
      */
-    public final TableField<OasDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.nullable(false), this, "A short description of the API. CommonMark syntax MAY be used for rich text representation.");
+    public final TableField<OasDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A short description of the API. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oagi.oas_doc.terms_of_service</code>. A URL to the Terms

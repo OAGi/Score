@@ -107,7 +107,8 @@
           <mat-icon>delete</mat-icon>
           Remove
         </button>
-        <button mat-raised-button color="primary" (click)="generate()">
+        <button mat-raised-button color="primary" (click)="generate()"
+                [disabled]="isDisabled(oasDoc) || dataSource.data.length == 0">
           Generate
         </button>
       </div>

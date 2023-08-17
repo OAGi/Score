@@ -98,6 +98,10 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
             record.setOpenApiVersion(request.getOpenAPIVersion());
             changedField.add(OAS_DOC.OPEN_API_VERSION);
         }
+        if (!StringUtils.equals(request.getTermsOfService(), record.getTermsOfService())) {
+            record.setOpenApiVersion(request.getTermsOfService());
+            changedField.add(OAS_DOC.TERMS_OF_SERVICE);
+        }
         if (!StringUtils.equals(request.getLicenseName(), record.getLicenseName())) {
             record.setLicenseName(request.getLicenseName());
             changedField.add(OAS_DOC.LICENSE_NAME);
