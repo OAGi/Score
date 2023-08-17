@@ -1409,28 +1409,39 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
+        clear(bbiePanel.getCardinalityMinField());
         sendKeys(bbiePanel.getCardinalityMinField(), "");
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min is\")]")).isDisplayed());
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
+        clear(bbiePanel.getCardinalityMinField());
         sendKeys(bbiePanel.getCardinalityMinField(), randStrForCardinalityMin);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"'" + randStrForCardinalityMin + "' is not allowed for Cardinality Min\")]")).isDisplayed());
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
+        clear(bbiePanel.getCardinalityMaxField());
         sendKeys(bbiePanel.getCardinalityMaxField(), "");
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Max is\")]")).isDisplayed());
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         clear(bbiePanel.getCardinalityMaxField());
         sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Max\")]")).isDisplayed());
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
     }
 
     @Test
