@@ -15,7 +15,6 @@ import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRespo
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -215,7 +214,7 @@ public class OpenAPIDocService {
                     .execute();
         }
         return new AddBieForOasDocResponse(oasRequestId != null ? oasRequestId.toBigInteger() : null,
-                                           oasResponseId != null ? oasResponseId.toBigInteger(): null);
+                oasResponseId != null ? oasResponseId.toBigInteger() : null);
     }
 
     @Transactional
@@ -244,6 +243,7 @@ public class OpenAPIDocService {
         return response;
     }
 
+    @Transactional
     public GetOasOperationResponse getOasOperation(GetOasOperationRequest request) {
         GetOasOperationResponse response = scoreRepositoryFactory.createOasDocReadRepository().getOasOperation(request);
         return response;

@@ -22,20 +22,6 @@ public class OasOperation extends Auditable {
     public OasOperation(){
 
     }
-    public OasOperation(BigInteger oasOperationId, BigInteger oasResourceId, String verb, String operationId, String summary, String description, boolean deprecated, Date lastUpdateTimestamp, Date creationTimestamp, ScoreUser createdBy, ScoreUser lastUpdatedBy) {
-        this.oasOperationId = oasOperationId;
-        this.oasResourceId = oasResourceId;
-        this.verb = verb;
-        this.operationId = operationId;
-        this.summary = summary;
-        this.description = description;
-        this.deprecated = deprecated;
-        this.lastUpdateTimestamp = lastUpdateTimestamp;
-        this.creationTimestamp = creationTimestamp;
-        this.createdBy = createdBy;
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
     public BigInteger getOasOperationId() {
         return oasOperationId;
     }
@@ -140,7 +126,7 @@ public class OasOperation extends Auditable {
                 ", operationId='" + operationId + '\'' +
                 ", summary='" + summary + '\'' +
                 ", description='" + description + '\'' +
-                ", deprecated='" + deprecated + '\'' +
+                ", deprecated=" + deprecated +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +

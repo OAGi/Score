@@ -1,56 +1,59 @@
 package org.oagi.score.gateway.http.api.oas_management.data;
 
-import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
+import org.apache.commons.lang3.StringUtils;
 
 public class UpdateOperationIdWhenVerbChanged {
     private String verb;
-    private String biePropertyTerm;
-    private String operationId;
+    private String newOperationId;
+    private String oldOperationId;
     private boolean isArray;
-    public UpdateOperationIdWhenVerbChanged(String changedVerb, String assignedBiePropertyName, boolean isArray){
+
+    public UpdateOperationIdWhenVerbChanged(String changedVerb, String oldOperationId, boolean isArray) {
         this.verb = changedVerb;
-        this.biePropertyTerm = assignedBiePropertyName;
+        this.oldOperationId = oldOperationId;
         this.isArray = isArray;
     }
+
     public String verbToOperationId() {
-        String biePropertyTermCamelCase = camelCase(this.biePropertyTerm);
-        String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
+        String[] splittedBiePropertyTerms = StringUtils.split(this.oldOperationId, "_");
+        String biePropertyTermCamelCase = splittedBiePropertyTerms[0];
+        String biePropertyTerm = Character.toUpperCase(biePropertyTermCamelCase.charAt(0)) + biePropertyTermCamelCase.substring(1);
         switch (this.verb) {
             case "GET":
-                this.operationId = biePropertyTermCamelCase + "_get" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_get" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "POST":
-                this.operationId = biePropertyTermCamelCase + "_create" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_create" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "PUT":
-                this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "PATCH":
-                this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "DELETE":
-                this.operationId = biePropertyTermCamelCase + "_delete" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_delete" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "OPTIONS":
-                this.operationId = biePropertyTermCamelCase + "_options" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_options" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "HEAD":
-                this.operationId = biePropertyTermCamelCase + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_head" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             case "TRACE":
-                this.operationId = biePropertyTermCamelCase + "_trace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                        biePropertyTermWithoutSpace);
+                this.newOperationId = biePropertyTermCamelCase + "_trace" + ((isArray) ? biePropertyTerm + "List" :
+                        biePropertyTerm);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown verb option: " + this.verb);
         }
-        return this.operationId;
+        return this.newOperationId;
     }
 }

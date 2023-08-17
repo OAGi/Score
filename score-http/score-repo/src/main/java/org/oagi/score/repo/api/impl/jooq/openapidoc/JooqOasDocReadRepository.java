@@ -266,7 +266,7 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_OPERATION.CREATION_TIMESTAMP,
                         OAS_OPERATION.LAST_UPDATE_TIMESTAMP)
                 .from(OAS_OPERATION)
-                .join(APP_USER.as("creator")).on(OAS_DOC.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
-                .join(APP_USER.as("updater")).on(OAS_DOC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+                .join(APP_USER.as("creator")).on(OAS_OPERATION.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(OAS_OPERATION.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
     }
 }

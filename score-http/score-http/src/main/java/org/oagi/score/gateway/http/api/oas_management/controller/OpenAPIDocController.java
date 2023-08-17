@@ -1,9 +1,11 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.jooq.impl.QOM;
+import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
+import org.oagi.score.gateway.http.api.oas_management.data.SetOperationIdWithVerb;
 import org.oagi.score.gateway.http.api.oas_management.data.UpdateOperationIdWhenVerbChanged;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -19,6 +21,7 @@ import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
+import org.redisson.transaction.operation.set.SetOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -345,9 +348,9 @@ public class OpenAPIDocController {
         }
         request.setPath(resoureName);
         request.setVerb(verbOption);
-        UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(verbOption, assignBieForOasDoc.getPropertyTerm(),
+        SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, assignBieForOasDoc.getPropertyTerm(),
                 isArray);
-        String operationId = updateOperationIdWhenVerbChanged.verbToOperationId();
+        String operationId = setOperationIdWithVerb.verbToOperationId();
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
@@ -378,8 +381,9 @@ public class OpenAPIDocController {
                         .withOasResourceId(bieForOasDoc.getOasResourceId());
                 GetOasOperationResponse  oasOperationResponse = oasDocService.getOasOperation(getOasOperationRequest);
                 if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())){
+
                     UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(
-                            bieForOasDoc.getVerb(), bieForOasDoc.getPropertyTerm(), bieForOasDoc.isArrayIndicator());
+                            bieForOasDoc.getVerb(), bieForOasDoc.getOperationId(), bieForOasDoc.isArrayIndicator());
                     String updatedOperationId = updateOperationIdWhenVerbChanged.verbToOperationId();
                     bieForOasDoc.setOperationId(updatedOperationId);
                 }
