@@ -316,7 +316,6 @@ public class OpenAPIDocController {
     public ResponseEntity addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
-
         AddBieForOasDocRequest request = new AddBieForOasDocRequest(authenticationService.asScoreUser(requester));
         request.setOasRequest(assignBieForOasDoc.isOasRequest());
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
@@ -343,46 +342,10 @@ public class OpenAPIDocController {
                     bieForOasDocPropertyTermWithDash.toLowerCase());
         }
         request.setPath(resoureName);
-        String bieForOasDocPropertyTermCamelCase = camelCase(assignBieForOasDoc.getPropertyTerm());
-        String bieForOasDocPropertyTermWithoutSpace = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "");
-        String operationId = null;
         request.setVerb(verbOption);
-        switch (verbOption) {
-            case "GET":
-                operationId = bieForOasDocPropertyTermCamelCase + "_get" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "POST":
-                operationId = bieForOasDocPropertyTermCamelCase + "_create" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "PUT":
-                operationId = bieForOasDocPropertyTermCamelCase + "_update" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "PATCH":
-                operationId = bieForOasDocPropertyTermCamelCase + "_update" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "DELETE":
-                operationId = bieForOasDocPropertyTermCamelCase + "_delete" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "OPTIONS":
-                operationId = bieForOasDocPropertyTermCamelCase + "_options" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "HEAD":
-                operationId = bieForOasDocPropertyTermCamelCase + "_head" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            case "TRACE":
-                operationId = bieForOasDocPropertyTermCamelCase + "_trace" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
-                        bieForOasDocPropertyTermWithoutSpace);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown verb option: " + verbOption);
-        }
+        UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(verbOption, assignBieForOasDoc.getPropertyTerm(),
+                isArray);
+        String operationId = updateOperationIdWhenVerbChanged.verbToOperationId();
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
@@ -396,6 +359,58 @@ public class OpenAPIDocController {
         }
     }
 
+    private class UpdateOperationIdWhenVerbChanged{
+        private String verb;
+        private String biePropertyTerm;
+        private String operationId;
+        private boolean isArray;
+        public UpdateOperationIdWhenVerbChanged(String changedVerb, String assignedBiePropertyName, boolean isArray){
+            this.verb = changedVerb;
+            this.biePropertyTerm = assignedBiePropertyName;
+            this.isArray = isArray;
+        }
+        public String verbToOperationId() {
+            String biePropertyTermCamelCase = camelCase(this.biePropertyTerm);
+            String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
+            switch (this.verb) {
+                case "GET":
+                    this.operationId = biePropertyTermCamelCase + "_get" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "POST":
+                    this.operationId = biePropertyTermCamelCase + "_create" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "PUT":
+                    this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "PATCH":
+                    this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "DELETE":
+                    this.operationId = biePropertyTermCamelCase + "_delete" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "OPTIONS":
+                    this.operationId = biePropertyTermCamelCase + "_options" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "HEAD":
+                    this.operationId = biePropertyTermCamelCase + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                case "TRACE":
+                    this.operationId = biePropertyTermCamelCase + "_trace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                            biePropertyTermWithoutSpace);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown verb option: " + this.verb);
+            }
+            return this.operationId;
+        }
+    }
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateBieForOasDoc(

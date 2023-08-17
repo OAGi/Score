@@ -10,15 +10,15 @@
 
       <mat-form-field>
         <mat-label>Title</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.title" maxlength="255"/>
+        <input matInput required [(ngModel)]="oasDoc.title" maxlength="65536"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Open API Version</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.openAPIVersion" maxlength="255"/>
+        <input matInput required [(ngModel)]="oasDoc.openAPIVersion" maxlength="20"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Doc Version</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.version" maxlength="255"/>
+        <input matInput required [(ngModel)]="oasDoc.version" maxlength="20"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Terms Of Service</mat-label>
@@ -26,7 +26,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Name</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactName" maxlength="255"/>
+        <input matInput [(ngModel)]="oasDoc.contactName" maxlength="65536"/>
       </mat-form-field>
 
       <mat-form-field>
@@ -35,11 +35,11 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Email</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="255"/>
+        <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="65536"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>License Name</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.licenseName" maxlength="255"/>
+        <input matInput required [(ngModel)]="oasDoc.licenseName" maxlength="100"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>License Url</mat-label>
