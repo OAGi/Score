@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.page.agency_id_list;
 
+import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
@@ -14,6 +15,14 @@ public interface ViewEditAgencyIDListPage extends Page {
     EditAgencyIDListPage openNewAgencyIDList(AppUserObject user, String release);
 
     WebElement getNewAgencyIDListButton();
+
+    /**
+     * Open the 'Edit Agency ID List' page by the agency ID list.
+     *
+     * @param agencyIDList the agency ID list
+     * @return the 'Edit Agency ID List' page
+     */
+    EditAgencyIDListPage openEditAgencyIDListPage(AgencyIDListObject agencyIDList);
 
     /**
      * Open the 'Edit Agency ID List' page by the name of the agency ID list and the branch.

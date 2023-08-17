@@ -35,6 +35,16 @@ public interface AgencyIDListAPI {
      */
     AgencyIDListObject getAgencyIDListByNameAndBranch(String name, String branch);
 
+    /**
+     * Return the agency ID list object by given name and branch
+     *
+     * @param name   the name of the agency ID list.
+     * @param branch the branch
+     * @param state  the state of the agency ID list.
+     * @return the agency ID list object
+     */
+    AgencyIDListObject getAgencyIDListByNameAndBranchAndState(String name, String branch, String state);
+
     AgencyIDListObject getNewlyCreatedAgencyIDList(AppUserObject user, String release);
 
     void updateAgencyIDList(AgencyIDListObject agencyIDList);
