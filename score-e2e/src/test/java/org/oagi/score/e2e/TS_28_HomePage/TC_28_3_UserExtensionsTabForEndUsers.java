@@ -20,7 +20,6 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
 import java.util.*;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
@@ -79,7 +78,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
     @Test
     @DisplayName("TC_28_3_2")
     public void end_user_can_click_state_to_view_extensions_of_that_state_in_total_user_extensions_panel() {
-
         AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser1);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
@@ -104,7 +102,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         for (int i = 0; i < container1.numberOfWIPUEGs; i++) {
             String ccName = container1.ccWIPList.get(i).getKey();
             String ownerName = container1.ccWIPList.get(i).getValue();
-            assertTrue(viewEditCCPageForWIP.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+
+            WebElement tr = viewEditCCPageForWIP.getTableRecordByValue(ccName);
+            WebElement td = viewEditCCPageForWIP.getColumnByName(tr, "owner");
+            assertEquals(ownerName, getText(td));
         }
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -121,7 +122,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         for (int i = 0; i < container1.numberOfQAUEGs; i++) {
             String ccName = container1.ccQAList.get(i).getKey();
             String ownerName = container1.ccQAList.get(i).getValue();
-            assertTrue(viewEditCCPageForQA.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+
+            WebElement tr = viewEditCCPageForQA.getTableRecordByValue(ccName);
+            WebElement td = viewEditCCPageForQA.getColumnByName(tr, "owner");
+            assertEquals(ownerName, getText(td));
         }
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -139,7 +143,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         for (int i = 0; i < container1.numberOfProductionUEGs; i++) {
             String ccName = container1.ccProductionList.get(i).getKey();
             String ownerName = container1.ccProductionList.get(i).getValue();
-            assertTrue(viewEditCCPageForProduction.getTableRecordByCCNameAndOwner(ccName, ownerName).isDisplayed());
+
+            WebElement tr = viewEditCCPageForProduction.getTableRecordByValue(ccName);
+            WebElement td = viewEditCCPageForProduction.getColumnByName(tr, "owner");
+            assertEquals(ownerName, getText(td));
         }
 
     }
@@ -263,9 +270,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         click(homePage.getUserExtensionsTab());
 
         HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
-        assertTrue(uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId()).isDisplayed());
-        assertTrue(uesByUsersAndStatesPanel.getTableRecordByValue(endUser2.getLoginId()).isDisplayed());
-
+        uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId());
         WebElement tr = uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId());
         WebElement td_WIP = uesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
         WebElement td_QA = uesByUsersAndStatesPanel.getColumnByName(tr, "QA");
@@ -279,7 +284,9 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         container1.numberOfQAUEGs +
                         container1.numberOfProductionUEGs,
                 Integer.valueOf(getText(td_Total)));
+        uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId()); // toggle the username
 
+        uesByUsersAndStatesPanel.setUsername(endUser2.getLoginId());
         WebElement tr2 = uesByUsersAndStatesPanel.getTableRecordByValue(endUser2.getLoginId());
         WebElement td2_WIP = uesByUsersAndStatesPanel.getColumnByName(tr2, "WIP");
         WebElement td2_QA = uesByUsersAndStatesPanel.getColumnByName(tr2, "QA");
@@ -293,7 +300,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         container2.numberOfQAUEGs +
                         container2.numberOfProductionUEGs,
                 Integer.valueOf(getText(td2_Total)));
-
     }
 
     @Test
@@ -348,8 +354,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
                         container2.numberOfQAUEGs +
                         container2.numberOfProductionUEGs,
                 Integer.valueOf(getText(td2_Total)));
-
-
     }
 
     @Test
