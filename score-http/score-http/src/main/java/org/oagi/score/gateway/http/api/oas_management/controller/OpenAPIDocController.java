@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
-import org.oagi.score.gateway.http.api.business_term_management.controller.BusinessTermController;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
@@ -10,8 +9,6 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermRequest;
-import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
@@ -34,6 +31,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
 
@@ -245,6 +243,7 @@ public class OpenAPIDocController {
         public List<BieForOasDoc> getBieForOasDocList() {
             return bieForOasDocList;
         }
+
         public void setBieForOasDocList(List<BieForOasDoc> bieForOasDocList) {
             this.bieForOasDocList = bieForOasDocList;
         }
@@ -322,34 +321,64 @@ public class OpenAPIDocController {
         request.setOasRequest(assignBieForOasDoc.isOasRequest());
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
+        request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
+        request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
         String verbOption = assignBieForOasDoc.getVerb();
-        String operationId = null;
+        String resoureName = null;
+        GetOasDocRequest oasDocRequest = new GetOasDocRequest(authenticationService.asScoreUser(requester));
+        oasDocRequest.setOasDocId(assignBieForOasDoc.getOasDocId());
+        GetOasDocResponse oasDocResponse = oasDocService.getOasDoc(oasDocRequest);
+        String oasDocVersion = null;
+        if (oasDocResponse != null) {
+            oasDocVersion = oasDocResponse.getOasDoc().getVersion();
+        }
+        String bieForOasDocPropertyTermWithDash = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "-");
+        boolean isArray = request.isMakeArrayIndicator();
+        if (oasDocVersion != null) {
+            resoureName = "/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+                    bieForOasDocPropertyTermWithDash.toLowerCase());
+
+        } else {
+            resoureName = "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+                    bieForOasDocPropertyTermWithDash.toLowerCase());
+        }
+        request.setPath(resoureName);
+        String bieForOasDocPropertyTermCamelCase = camelCase(assignBieForOasDoc.getPropertyTerm());
         String bieForOasDocPropertyTermWithoutSpace = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "");
+        String operationId = null;
         request.setVerb(verbOption);
         switch (verbOption) {
             case "GET":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_get" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_get" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "POST":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_create" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_create" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "PUT":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_update" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_update" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "PATCH":
-                operationId =bieForOasDocPropertyTermWithoutSpace + "_update" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_update" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "DELETE":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_delete" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_delete" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "OPTIONS":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_options" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_options" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "HEAD":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_head" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_head" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             case "TRACE":
-                operationId = bieForOasDocPropertyTermWithoutSpace + "_trace" + bieForOasDocPropertyTermWithoutSpace;
+                operationId = bieForOasDocPropertyTermCamelCase + "_trace" + ((isArray) ? bieForOasDocPropertyTermWithoutSpace + "List" :
+                        bieForOasDocPropertyTermWithoutSpace);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown verb option: " + verbOption);
@@ -358,11 +387,6 @@ public class OpenAPIDocController {
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
         request.setRequiredForRequestBody(assignBieForOasDoc.isRequired());
-        if (request.isMakeArrayIndicator()) {
-            request.setPath("/" + bieForOasDocPropertyTermWithoutSpace + "-list");
-        } else {
-            request.setPath("/" + bieForOasDocPropertyTermWithoutSpace);
-        }
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
         if (response.getOasResponseId() != null || response.getOasRequestId() != null) {

@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-class Helper {
+public class Helper {
     private static final String CODE_LIST_NAME_PREFIX = "cl";
 
     private static final String AGENCY_ID_LIST_NAME_PREFIX = "il";
