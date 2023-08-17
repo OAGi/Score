@@ -649,15 +649,16 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @DisplayName("TC_11_1_TA_13")
     public void test_TA_13() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
-        AppUserObject developerB;
+        AppUserObject developerA, developerB;
         ReleaseObject workingBranch;
         {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerA);
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
@@ -680,6 +681,8 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setOwner(developerA.getLoginId());
+        viewEditCodeListPage.setItemsPerPage(50);
         for (CodeListObject cl : codeListForTesting) {
             viewEditCodeListPage.searchCodeListByUpdatedDateAndBranch(cl, workingBranch.getReleaseNumber());
         }

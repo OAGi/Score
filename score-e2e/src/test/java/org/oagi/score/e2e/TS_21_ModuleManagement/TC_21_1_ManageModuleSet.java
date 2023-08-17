@@ -15,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +76,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        waitFor(Duration.ofSeconds(2L)); // wait loading for the description
         assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
     }
 
@@ -104,6 +106,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        waitFor(Duration.ofSeconds(2L)); // wait loading for the description
         assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
@@ -132,6 +135,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        waitFor(Duration.ofSeconds(2L)); // wait loading for the description
         assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
 
         String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
@@ -142,7 +146,8 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         viewEditModuleSetPage.openPage();
         editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(newModuleSetName);
-        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(newDescription));
+        waitFor(Duration.ofSeconds(2L)); // wait loading for the description
+        assertEquals(newDescription, getText(editModuleSetPage.getDescriptionField()));
     }
 
     @Test

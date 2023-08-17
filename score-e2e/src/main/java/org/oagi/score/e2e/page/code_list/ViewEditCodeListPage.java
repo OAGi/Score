@@ -27,6 +27,13 @@ public interface ViewEditCodeListPage extends Page {
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);
 
+    /**
+     * Set the size of items to the 'Items per page' select field.
+     *
+     * @param items the size of items; 10, 25, 50
+     */
+    void setItemsPerPage(int items);
+
     WebElement getTableRecordByValue(String value);
 
     void hitSearchButton();

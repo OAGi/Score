@@ -12,6 +12,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -117,6 +119,18 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(Duration.ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(Duration.ofMillis(500L));
     }
 
     private String getNameFieldFromTheTable(WebElement tableData) {
