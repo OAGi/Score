@@ -359,9 +359,9 @@ public class OpenAPIDocController {
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
         request.setRequiredForRequestBody(assignBieForOasDoc.isRequired());
         if (request.isMakeArrayIndicator()) {
-            request.setPath("/" + assignBieForOasDoc.getPropertyTerm() + "-list");
+            request.setPath("/" + bieForOasDocPropertyTermWithoutSpace + "-list");
         } else {
-            request.setPath("/" + assignBieForOasDoc.getPropertyTerm());
+            request.setPath("/" + bieForOasDocPropertyTermWithoutSpace);
         }
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
