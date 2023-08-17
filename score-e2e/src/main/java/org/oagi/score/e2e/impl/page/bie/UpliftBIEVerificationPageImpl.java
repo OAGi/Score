@@ -74,10 +74,11 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement goToNodeInSourceBIE(String nodePath) {
-        click(getSearchInputOfSourceTree());
+        WebElement ele = getSearchInputOfSourceTree();
+        click(ele);
         retry(() -> {
-            WebElement e = sendKeys(getSearchInputOfSourceTree(), nodePath);
-            if (!nodePath.equals(getText(getSearchInputOfSourceTree()))) {
+            WebElement e = sendKeys(ele, nodePath);
+            if (!nodePath.equals(getText(ele))) {
                 throw new WebDriverException();
             }
             e.sendKeys(Keys.ENTER);
@@ -101,10 +102,11 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement goToNodeInTargetBIE(String nodePath) {
-        click(getSearchInputOfTargetTree());
+        WebElement ele = getSearchInputOfTargetTree();
+        click(ele);
         retry(() -> {
-            WebElement e = sendKeys(getSearchInputOfTargetTree(), nodePath);
-            if (!nodePath.equals(getText(getSearchInputOfTargetTree()))) {
+            WebElement e = sendKeys(ele, nodePath);
+            if (!nodePath.equals(getText(ele))) {
                 throw new WebDriverException();
             }
             e.sendKeys(Keys.ENTER);
@@ -129,12 +131,12 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement getSearchInputOfSourceTree() {
-        return visibilityOfElementLocated(getDriver(), SOURCE_SEARCH_INPUT_LOCATOR);
+        return elementToBeClickable(getDriver(), SOURCE_SEARCH_INPUT_LOCATOR);
     }
 
     @Override
     public WebElement getSearchInputOfTargetTree() {
-        return visibilityOfElementLocated(getDriver(), TARGET_SEARCH_INPUT_LOCATOR);
+        return elementToBeClickable(getDriver(), TARGET_SEARCH_INPUT_LOCATOR);
     }
 
     @Override
