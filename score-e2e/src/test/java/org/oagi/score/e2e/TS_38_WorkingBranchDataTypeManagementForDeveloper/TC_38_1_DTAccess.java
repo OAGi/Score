@@ -16,8 +16,10 @@ import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -446,7 +448,14 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("WIP");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("WIP"));
@@ -483,7 +492,14 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("Draft");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Draft"));
@@ -520,7 +536,14 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("Draft");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             assertTrue(dt.getState().equals("Draft"));
@@ -557,7 +580,14 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("WIP");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
@@ -592,7 +622,14 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("WIP");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
             assertTrue(dt.getOwnerUserId().equals(developerA.getAppUserId()));
             click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
@@ -603,14 +640,14 @@ public class TC_38_1_DTAccess extends BaseTest {
     @Test
     @DisplayName("TC_38_1_TA_13")
     public void test_TA_13() {
-        AppUserObject developerA;
+        AppUserObject developerA, developerB;
         ReleaseObject branch;
-        ArrayList<DTObject> dtForTesting = new ArrayList<>();
+        List<DTObject> dtForTesting = new ArrayList<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
             branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
@@ -630,9 +667,19 @@ public class TC_38_1_DTAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        for (String typeToBeDeselected : Arrays.asList("ACC", "ASCCP", "BCCP", "CDT")) {
+            viewEditCoreComponentPage.setTypeSelect(typeToBeDeselected);
+        }
         viewEditCoreComponentPage.setBranch(branch.getReleaseNumber());
+        viewEditCoreComponentPage.setState("WIP");
+        viewEditCoreComponentPage.setOwner(developerA.getLoginId());
+        viewEditCoreComponentPage.setOwner(developerB.getLoginId());
+        viewEditCoreComponentPage.hitSearchButton();
+
         for (DTObject dt : dtForTesting) {
-            click(viewEditCoreComponentPage.getTableRecordByValue(dt.getDen()));
+            WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(dt.getDen());
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "select");
+            click(td);
         }
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getTransferOwnershipButton());
         assertThrows(TimeoutException.class, () -> viewEditCoreComponentPage.getDeleteButton());
