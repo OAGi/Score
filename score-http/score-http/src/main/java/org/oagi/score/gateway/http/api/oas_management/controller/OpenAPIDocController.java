@@ -324,31 +324,32 @@ public class OpenAPIDocController {
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
         String verbOption = assignBieForOasDoc.getVerb();
         String operationId = null;
+        String bieForOasDocPropertyTermWithoutSpace = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "");
         request.setVerb(verbOption);
         switch (verbOption) {
             case "GET":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_get" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_get" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "POST":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_create" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_create" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "PUT":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_update" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "PATCH":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_update" + assignBieForOasDoc.getPropertyTerm();
+                operationId =bieForOasDocPropertyTermWithoutSpace + "_update" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "DELETE":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_delete" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_delete" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "OPTIONS":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_options" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_options" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "HEAD":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_head" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_head" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             case "TRACE":
-                operationId = assignBieForOasDoc.getPropertyTerm() + "_trace" + assignBieForOasDoc.getPropertyTerm();
+                operationId = bieForOasDocPropertyTermWithoutSpace + "_trace" + bieForOasDocPropertyTermWithoutSpace;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown verb option: " + verbOption);
