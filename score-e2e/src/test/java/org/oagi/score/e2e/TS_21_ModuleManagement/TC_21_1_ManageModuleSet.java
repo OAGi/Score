@@ -350,6 +350,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         assertNotNull(editModuleSetPage.getModuleByName(selectedModule.getName()));
         click(editModuleSetPage.getModuleByName(selectedModule.getName()));
+        waitFor(Duration.ofSeconds(2L)); // wait for complete loading of sub-modules
         List<ModuleObject> submodules = getAPIFactory().getModuleAPI().getSubmodules(selectedModule.getModuleId());
         for (ModuleObject submodule : submodules) {
             assertNotNull(editModuleSetPage.getModuleByName(submodule.getName()));
@@ -578,6 +579,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(newModuleSetName);
+        waitFor(Duration.ofSeconds(2L)); // wait loading for the description
         assertEquals(newDescription, getText(editModuleSetPage.getDescriptionField()));
     }
 
