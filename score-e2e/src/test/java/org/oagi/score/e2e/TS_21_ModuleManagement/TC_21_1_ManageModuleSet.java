@@ -69,13 +69,13 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
-        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+        assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
 
         createModuleSetPage.toggleCreateModuleSetRelease();
@@ -104,7 +104,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
-        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+        assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetName);
@@ -126,17 +126,17 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
         viewEditModuleSetPage.openPage();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
-        assertTrue(getText(editModuleSetPage.getDescriptionField()).contains(description));
+        assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
 
         String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
         editModuleSetPage.setName(newModuleSetName);
-        String newDescription = randomPrint(50, 100);
+        String newDescription = randomPrint(50, 100).trim();
         editModuleSetPage.setDescription(newDescription);
         editModuleSetPage.hitUpdateButton();
 
@@ -161,7 +161,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -199,7 +199,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -253,7 +253,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -283,7 +283,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -326,7 +326,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -365,7 +365,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -403,7 +403,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -460,7 +460,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -485,7 +485,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -493,7 +493,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
         String moduleSetReleaseName = "Test Module Set Release for " + moduleSetName;
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String moduleSetReleaseDescription = randomPrint(50, 100);
+        String moduleSetReleaseDescription = randomPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(moduleSetReleaseDescription);
         createModuleSetReleasePage.setModuleSet(moduleSetName);
         createModuleSetReleasePage.setRelease(release.getReleaseNumber());
@@ -523,7 +523,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
         homePage.logout();
@@ -554,7 +554,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
         String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
         homePage.logout();
@@ -565,7 +565,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
         editModuleSetPage.setName(newModuleSetName);
-        String newDescription = randomPrint(50, 100);
+        String newDescription = randomPrint(50, 100).trim();
         editModuleSetPage.setDescription(newDescription);
         editModuleSetPage.hitUpdateButton();
         homePage.logout();

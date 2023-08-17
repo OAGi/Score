@@ -72,7 +72,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         WebElement productionStateInTotalTab = totalUEsByStatesPanel.getStateProgressBarByState("Production");
         assertTrue(productionStateInTotalTab.isDisplayed());
         assertTrue(container1.numberOfProductionUEGs <= extractNumberFromText(getText(productionStateInTotalTab)));
-
     }
 
     @Test
@@ -88,11 +87,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
         homePage.setBranch(release.getReleaseNumber());
-
         click(homePage.getUserExtensionsTab());
-        ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openTotalUEsByStatesPanel()
-                .clickStateProgressBar("WIP");
-        click(viewEditCCPageForWIP.getSearchButton());
+        ViewEditCoreComponentPage viewEditCCPageForWIP = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("WIP");
+        viewEditCCPageForWIP.hitSearchButton();
+        viewEditCCPageForWIP.setItemsPerPage(50);
 
         assertTrue(container1.numberOfWIPUEGs <= viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertEquals(0, viewEditCCPageForWIP.getNumberOfOnlyCCsPerStateAreListed("QA"));
@@ -110,9 +108,9 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         click(homePage.getScoreLogo()); // to go to the home page again.
         click(homePage.getUserExtensionsTab());
-        ViewEditCoreComponentPage viewEditCCPageForQA = homePage.openTotalUEsByStatesPanel()
-                .clickStateProgressBar("QA");
-        click(viewEditCCPageForQA.getSearchButton());
+        ViewEditCoreComponentPage viewEditCCPageForQA = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("QA");
+        viewEditCCPageForQA.hitSearchButton();
+        viewEditCCPageForQA.setItemsPerPage(50);
 
         assertEquals(0, viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertTrue(container1.numberOfQAUEGs <= viewEditCCPageForQA.getNumberOfOnlyCCsPerStateAreListed("QA"));
@@ -130,9 +128,9 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
         click(homePage.getScoreLogo()); // to go to the home page again.
         click(homePage.getUserExtensionsTab());
-        ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openTotalUEsByStatesPanel()
-                .clickStateProgressBar("Production");
-        click(viewEditCCPageForProduction.getSearchButton());
+        ViewEditCoreComponentPage viewEditCCPageForProduction = homePage.openTotalUEsByStatesPanel().clickStateProgressBar("Production");
+        viewEditCCPageForProduction.hitSearchButton();
+        viewEditCCPageForProduction.setItemsPerPage(50);
 
         assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("WIP"));
         assertEquals(0, viewEditCCPageForProduction.getNumberOfOnlyCCsPerStateAreListed("QA"));
@@ -148,7 +146,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
             WebElement td = viewEditCCPageForProduction.getColumnByName(tr, "owner");
             assertEquals(ownerName, getText(td));
         }
-
     }
 
     @Test
@@ -158,13 +155,10 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser1);
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-
         NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
-
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(endUser1.getLoginId(), endUser1.getPassword());
-
         HomePage.MyUEsByStatesPanel myUEsByStatesPanel = homePage.openMyUEsByStatesPanel();
         click(homePage.getUserExtensionsTab());
         WebElement wipStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("WIP");
@@ -178,8 +172,6 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
         WebElement productionStateInTotalTab = myUEsByStatesPanel.getStateProgressBarByState("Production");
         assertTrue(productionStateInTotalTab.isDisplayed());
         assertTrue(container1.numberOfProductionUEGs <= extractNumberFromText(getText(productionStateInTotalTab)));
-
-
     }
 
     @Test
