@@ -1,8 +1,10 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.jooq.impl.QOM;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
 import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
+import org.oagi.score.gateway.http.api.oas_management.data.UpdateOperationIdWhenVerbChanged;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -358,59 +360,6 @@ public class OpenAPIDocController {
             return ResponseEntity.badRequest().build();
         }
     }
-
-    private class UpdateOperationIdWhenVerbChanged{
-        private String verb;
-        private String biePropertyTerm;
-        private String operationId;
-        private boolean isArray;
-        public UpdateOperationIdWhenVerbChanged(String changedVerb, String assignedBiePropertyName, boolean isArray){
-            this.verb = changedVerb;
-            this.biePropertyTerm = assignedBiePropertyName;
-            this.isArray = isArray;
-        }
-        public String verbToOperationId() {
-            String biePropertyTermCamelCase = camelCase(this.biePropertyTerm);
-            String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
-            switch (this.verb) {
-                case "GET":
-                    this.operationId = biePropertyTermCamelCase + "_get" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "POST":
-                    this.operationId = biePropertyTermCamelCase + "_create" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "PUT":
-                    this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "PATCH":
-                    this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "DELETE":
-                    this.operationId = biePropertyTermCamelCase + "_delete" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "OPTIONS":
-                    this.operationId = biePropertyTermCamelCase + "_options" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "HEAD":
-                    this.operationId = biePropertyTermCamelCase + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                case "TRACE":
-                    this.operationId = biePropertyTermCamelCase + "_trace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
-                            biePropertyTermWithoutSpace);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown verb option: " + this.verb);
-            }
-            return this.operationId;
-        }
-    }
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateBieForOasDoc(
@@ -422,6 +371,20 @@ public class OpenAPIDocController {
         updateBieForOasDocRequest.setOasDocId(request.getOasDocId());
 
         updateBieForOasDocRequest.setBieForOasDocList(request.getBieForOasDocList());
+
+        for (BieForOasDoc bieForOasDoc : updateBieForOasDocRequest.getBieForOasDocList()){
+            if (bieForOasDoc.getOasResourceId() != null){
+                GetOasOperationRequest getOasOperationRequest = new GetOasOperationRequest(authenticationService.asScoreUser(requester))
+                        .withOasResourceId(bieForOasDoc.getOasResourceId());
+                GetOasOperationResponse  oasOperationResponse = oasDocService.getOasOperation(getOasOperationRequest);
+                if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())){
+                    UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(
+                            bieForOasDoc.getVerb(), bieForOasDoc.getPropertyTerm(), bieForOasDoc.isArrayIndicator());
+                    String updatedOperationId = updateOperationIdWhenVerbChanged.verbToOperationId();
+                    bieForOasDoc.setOperationId(updatedOperationId);
+                }
+            }
+        }
 
         UpdateBieForOasDocResponse response = oasDocService.updateDetails(requester, updateBieForOasDocRequest);
 

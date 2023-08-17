@@ -243,4 +243,9 @@ public class OpenAPIDocService {
                         .updateBieForOasDoc(request);
         return response;
     }
+
+    public GetOasOperationResponse getOasOperation(GetOasOperationRequest request) {
+        GetOasOperationResponse response = scoreRepositoryFactory.createOasDocReadRepository().getOasOperation(request);
+        return response;
+    }
 }
