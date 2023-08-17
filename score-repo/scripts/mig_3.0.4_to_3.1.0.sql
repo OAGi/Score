@@ -151,7 +151,7 @@ CREATE TABLE `oas_doc`
     `guid`                  varchar(41) NOT NULL COMMENT 'The GUID of the record.',
     `open_api_version`      varchar(20) NOT NULL COMMENT 'REQUIRED. This string MUST be the semantic version number of the OpenAPI Specification version that the OpenAPI document uses. The openapi field SHOULD be used by tooling specifications and clients to interpret the OpenAPI document. This is not related to the API info.version string.',
     `title`                 text        NOT NULL COMMENT 'The title of the API.',
-    `description`           text        NOT NULL COMMENT 'A short description of the API. CommonMark syntax MAY be used for rich text representation.',
+    `description`           text        DEFAULT NULL COMMENT 'A short description of the API. CommonMark syntax MAY be used for rich text representation.',
     `terms_of_service`      varchar(250) DEFAULT NULL COMMENT 'A URL to the Terms of Service for the API. MUST be in the format of a URL.',
     `version`               varchar(20) NOT NULL COMMENT 'REQUIRED. The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version).',
     `contact_name`          text COMMENT 'The identifying name of the contact person/organization.',
