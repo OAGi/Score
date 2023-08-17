@@ -10,6 +10,8 @@ import java.util.Map;
 public class OpenAPIGenerateExpressionOption {
     private String filename;
     private BigInteger topLevelAsbiepId;
+    private String resourceName;
+    private String operationId;
     private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;

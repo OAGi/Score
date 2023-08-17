@@ -11,6 +11,10 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BDT_PRI_RESTRI;
 
 @Repository
 public class BdtPriRestriRepository implements ScoreRepository<BdtPriRestri> {
@@ -20,13 +24,13 @@ public class BdtPriRestriRepository implements ScoreRepository<BdtPriRestri> {
 
     private SelectJoinStep<Record6<ULong, ULong, ULong, ULong, ULong, Byte>> getSelectJoinStep() {
         return dslContext.select(
-                Tables.BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
-                Tables.BDT_PRI_RESTRI.BDT_MANIFEST_ID,
-                Tables.BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                Tables.BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
-                Tables.BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
-                Tables.BDT_PRI_RESTRI.IS_DEFAULT.as("defaulted")
-        ).from(Tables.BDT_PRI_RESTRI);
+                BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,
+                BDT_PRI_RESTRI.BDT_MANIFEST_ID,
+                BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
+                BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                BDT_PRI_RESTRI.IS_DEFAULT.as("defaulted")
+        ).from(BDT_PRI_RESTRI);
     }
 
     @Override
@@ -40,7 +44,7 @@ public class BdtPriRestriRepository implements ScoreRepository<BdtPriRestri> {
             return null;
         }
         return getSelectJoinStep()
-                .where(Tables.BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID.eq(ULong.valueOf(id)))
+                .where(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID.eq(ULong.valueOf(id)))
                 .fetchOptionalInto(BdtPriRestri.class).orElse(null);
     }
 }

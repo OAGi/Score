@@ -36,8 +36,8 @@ public class OpenAPIGenerateService {
     private DSLContext dslContext;
 
     public BieGenerateExpressionResult generate(
-            AuthenticatedPrincipal user, Map<String, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
-        File file = generateSchemaForAll(params);
+            AuthenticatedPrincipal user, Map<String, OpenAPIGenerateExpressionOption> params, List<BigInteger> topLevelAsbiepIds) throws BieGenerateFailureException {
+        File file = generateSchemaForAll(params, topLevelAsbiepIds);
         return toResult(file);
     }
 
@@ -66,15 +66,16 @@ public class OpenAPIGenerateService {
         return result;
     }
 
-    public File generateSchemaForAll(Map<String, OpenAPIGenerateExpressionOption> params) throws BieGenerateFailureException {
+    public File generateSchemaForAll(Map<String, OpenAPIGenerateExpressionOption> params, List<BigInteger> topLevelAsbiepIds) throws BieGenerateFailureException {
         BieGenerateOpenApiExpression generateExpression = createBieGenerateOpenAPIExpression();
         // leave metaHeader and pagination response untouched at this time for OpenAPI generation
         // need to pass the params
+        List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
+        GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps);
         OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
-        for (String resourceName: params.keySet()) {
-            option = params.get(resourceName);
+        for (String paramsKey: params.keySet()) {
+            option = params.get(paramsKey);
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
-            GenerationContext generationContext = generateExpression.generateContext(Arrays.asList(topLevelAsbiep), option);
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }
 

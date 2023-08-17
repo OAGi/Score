@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface BieGenerateOpenApiExpression {
-    GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, OpenAPIGenerateExpressionOption option);
+    GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps);
 
     void reset() throws Exception;
 

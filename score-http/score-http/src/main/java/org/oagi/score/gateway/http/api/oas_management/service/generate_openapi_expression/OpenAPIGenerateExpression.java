@@ -68,39 +68,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
     }
 
     @Override
-    public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, OpenAPIGenerateExpressionOption option) {
+    public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps) {
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
         if (mergedTopLevelAsbieps.size() == 0) {
             throw new IllegalArgumentException("Cannot found BIEs.");
-        }
-        BigInteger releaseId = mergedTopLevelAsbieps.get(0).getReleaseId();
-        /*
-         * Issue #587
-         */
-        if (option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()) {
-            TopLevelAsbiep getMetaHeaderTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate());
-            if (!releaseId.equals(getMetaHeaderTopLevelAsbiep.getReleaseId())) {
-                throw new IllegalArgumentException("Meta Header release does not match.");
-            }
-            mergedTopLevelAsbieps.add(getMetaHeaderTopLevelAsbiep);
-        }
-        if (option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
-            TopLevelAsbiep postMetaHeaderTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate());
-            if (!releaseId.equals(postMetaHeaderTopLevelAsbiep.getReleaseId())) {
-                throw new IllegalArgumentException("Meta Header release does not match.");
-            }
-            mergedTopLevelAsbieps.add(postMetaHeaderTopLevelAsbiep);
-        }
-        if (option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
-            TopLevelAsbiep paginationResponseTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getPaginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate());
-            if (!releaseId.equals(paginationResponseTopLevelAsbiep.getReleaseId())) {
-                throw new IllegalArgumentException("Pagination Response release does not match.");
-            }
-            mergedTopLevelAsbieps.add(paginationResponseTopLevelAsbiep);
         }
 
         return applicationContext.getBean(GenerationContext.class, mergedTopLevelAsbieps);
@@ -128,7 +100,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         }
         expressionMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        generateTopLevelAsbiep(topLevelAsbiep);
+        generateTopLevelAsbiep(topLevelAsbiep, option);
     }
 
     private boolean isFriendly() {
@@ -193,7 +165,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return replacer.apply(basedAsccp.getPropertyTerm());
     }
 
-    private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep) {
+    private void generateTopLevelAsbiep(TopLevelAsbiep topLevelAsbiep, OpenAPIGenerateExpressionOption option) {
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         generationContext.referenceCounter().increase(asbiep);
         try {
@@ -286,7 +258,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 .put("OAuth2", Arrays.asList(bieName + "Read"))
                                 .build()))
                         .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                        .put("operationId", getOperationId("get", topLevelAsbiep))
+                        .put("operationId", option.getOperationId())
                         .put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
                                         .put("name", "id")
@@ -359,7 +331,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 .put("OAuth2", Arrays.asList(bieName + "Write"))
                                 .build()))
                         .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                        .put("operationId", getOperationId("create", topLevelAsbiep))
+                        .put("operationId", option.getOperationId())
                         .put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
                                 .put("content", ImmutableMap.<String, Object>builder()

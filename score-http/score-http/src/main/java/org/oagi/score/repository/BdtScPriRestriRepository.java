@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
 
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BDT_PRI_RESTRI;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BDT_SC_PRI_RESTRI;
+
 @Repository
 public class BdtScPriRestriRepository implements ScoreRepository<BdtScPriRestri> {
 
@@ -20,13 +23,13 @@ public class BdtScPriRestriRepository implements ScoreRepository<BdtScPriRestri>
 
     private SelectJoinStep<Record6<ULong, ULong, ULong, ULong, ULong, Byte>> getSelectJoinStep() {
         return dslContext.select(
-                Tables.BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
-                Tables.BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
-                Tables.BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
-                Tables.BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
-                Tables.BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
-                Tables.BDT_SC_PRI_RESTRI.IS_DEFAULT.as("defaulted")
-        ).from(Tables.BDT_SC_PRI_RESTRI);
+                BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
+                BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID,
+                BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
+                BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID,
+                BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID,
+                BDT_SC_PRI_RESTRI.IS_DEFAULT.as("defaulted")
+        ).from(BDT_SC_PRI_RESTRI);
     }
 
     @Override
@@ -40,7 +43,7 @@ public class BdtScPriRestriRepository implements ScoreRepository<BdtScPriRestri>
             return null;
         }
         return getSelectJoinStep()
-                .where(Tables.BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID.eq(ULong.valueOf(id)))
+                .where(BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID.eq(ULong.valueOf(id)))
                 .fetchOptionalInto(BdtScPriRestri.class).orElse(null);
     }
 }

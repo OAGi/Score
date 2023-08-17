@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,13 +44,20 @@ public class OpenAPIGenerateController {
         request.setOasDocId(oasDocId);
 
         GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
-
+        List<BigInteger> topLevelAsbiepIds = Collections.emptyList();
         List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
         Map<String, OpenAPIGenerateExpressionOption> params = new HashMap<>();
         if (bieListForOasDoc != null) {
             for (BieForOasDoc bieForOasDoc : bieListForOasDoc) {
+                String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName();
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
-                openAPIGenerateExpressionOption.setTopLevelAsbiepId(bieForOasDoc.getTopLevelAsbiepId());
+                BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                if (!topLevelAsbiepIds.contains(topLevelAsbiepId)){
+                    topLevelAsbiepIds.add(topLevelAsbiepId);
+                }
+                openAPIGenerateExpressionOption.setTopLevelAsbiepId(topLevelAsbiepId);
+                openAPIGenerateExpressionOption.setResourceName(bieForOasDoc.getResourceName());
+                openAPIGenerateExpressionOption.setOperationId(bieForOasDoc.getOperationId());
                 openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 switch (verbOption) {
@@ -66,16 +74,16 @@ public class OpenAPIGenerateController {
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
                 }
-                if (!params.containsKey(bieForOasDoc.getResourceName())) {
-                    params.put(bieForOasDoc.getResourceName(), openAPIGenerateExpressionOption);
+                if (!params.containsKey(paramsKey)) {
+                    params.put(paramsKey, openAPIGenerateExpressionOption);
                 } else {
-                    params.put(bieForOasDoc.getResourceName(), openAPIGenerateExpressionOption);
+                    params.put(paramsKey, openAPIGenerateExpressionOption);
                 }
 
             }
         }
 
-        BieGenerateExpressionResult bieGenerateExpressionResult = generateService.generate(user, params);
+        BieGenerateExpressionResult bieGenerateExpressionResult = generateService.generate(user, params, topLevelAsbiepIds);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bieGenerateExpressionResult.getFilename() + "\"")
