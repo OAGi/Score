@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class OpenAPIGenerateController {
@@ -44,7 +41,7 @@ public class OpenAPIGenerateController {
         request.setOasDocId(oasDocId);
 
         GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
-        List<BigInteger> topLevelAsbiepIds = Collections.emptyList();
+        List<BigInteger> topLevelAsbiepIds = new ArrayList<>();
         List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
         Map<String, OpenAPIGenerateExpressionOption> params = new HashMap<>();
         if (bieListForOasDoc != null) {
@@ -52,7 +49,7 @@ public class OpenAPIGenerateController {
                 String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName();
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
                 BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!topLevelAsbiepIds.contains(topLevelAsbiepId)){
+                if (topLevelAsbiepIds != null && !topLevelAsbiepIds.contains(topLevelAsbiepId)){
                     topLevelAsbiepIds.add(topLevelAsbiepId);
                 }
                 openAPIGenerateExpressionOption.setTopLevelAsbiepId(topLevelAsbiepId);
