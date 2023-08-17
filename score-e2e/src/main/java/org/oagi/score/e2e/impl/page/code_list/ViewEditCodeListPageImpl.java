@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
@@ -13,7 +12,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
+import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
@@ -22,7 +21,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
@@ -57,35 +58,25 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public EditCodeListPage openCodeListViewEditPage(CodeListObject codeList) {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(codeList.getReleaseId());
-        setBranch(release.getReleaseNumber());
-        setState(codeList.getState());
-        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
-        setOwner(owner.getLoginId());
-        openCodeListByName(codeList.getName());
-
-        waitFor(ofMillis(500L));
-        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
-        assert editCodeListPage.isOpened();
-        return editCodeListPage;
+        return openCodeListViewEditPage(codeList, false);
     }
 
     @Override
-    public EditCodeListPage openCodeListViewEditPageByNameAndBranch(String name, String branch) {
-        setBranch(branch);
-        openCodeListByName(name);
-        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByNameAndReleaseNum(name, branch);
-        waitFor(ofMillis(500L));
+    public EditCodeListPage openCodeListViewEditPage(CodeListObject codeList, boolean openWithoutSearching) {
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
-        assert editCodeListPage.isOpened();
-        return editCodeListPage;
-    }
+        if (openWithoutSearching) {
+            editCodeListPage.openPage();
+        } else {
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(codeList.getReleaseId());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
+            setBranch(release.getReleaseNumber());
+            setState(codeList.getState());
+            setOwner(owner.getLoginId());
+            openCodeListByName(codeList.getName());
 
-    @Override
-    public EditCodeListPage openCodeListViewEditPageByManifestId(BigInteger codeListManifestId) {
-        CodeListObject codeList = getAPIFactory().getCodeListAPI().getCodeListByManifestId(codeListManifestId);
-        EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, codeList);
-        editCodeListPage.openPage();
+            waitFor(ofMillis(500L));
+        }
+
         assert editCodeListPage.isOpened();
         return editCodeListPage;
     }
@@ -95,8 +86,13 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
         return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Name\")]"));
     }
 
-    private void openCodeListByName(String name) {
+    @Override
+    public void setName(String name) {
         sendKeys(getNameField(), name);
+    }
+
+    private void openCodeListByName(String name) {
+        setName(name);
 
         retry(() -> {
             hitSearchButton();
@@ -123,6 +119,18 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
+    }
+
+    @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(Duration.ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(Duration.ofMillis(500L));
     }
 
     private String getNameFieldFromTheTable(WebElement tableData) {
@@ -153,16 +161,17 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
-            waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            click(searchedSelectField);
+            escape(getDriver());
         });
     }
 
     @Override
     public WebElement getBranchSelectField() {
-        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
     }
 
     @Override
@@ -279,7 +288,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getStateSelectField() {
-        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), STATE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
@@ -297,7 +306,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getOwnerSelectField() {
-        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
     @Override

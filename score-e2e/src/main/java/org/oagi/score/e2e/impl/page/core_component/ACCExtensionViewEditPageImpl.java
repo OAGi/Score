@@ -48,6 +48,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Append Property at Last\")]");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -199,7 +201,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public void setNamespace(NamespaceObject namespace) {
         retry(() -> {
             click(getNamespaceField());
-            waitFor(ofSeconds(2L));
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
             click(optionField);

@@ -29,11 +29,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"ACC, ASCCP, BCCP, CDT, BDT\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Type\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Owner\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Owner\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
@@ -83,17 +83,17 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getTypeSelectField() {
-        return visibilityOfElementLocated(getDriver(), CC_TYPE_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), CC_TYPE_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setTypeSelect(String type) {
-
-        click(getTypeSelectField());
+        click(getDriver(), getTypeSelectField());
         waitFor(ofMillis(2000L));
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
+        WebElement optionField = elementToBeClickable(getDriver(),
                 By.xpath("//mat-option//span[text() = \"" + type + "\"]"));
-        click(optionField);
+        click(getDriver(), optionField);
+        escape(getDriver());
     }
 
     @Override
@@ -103,11 +103,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void setState(String state) {
-        click(getStateSelectField());
+        click(getDriver(), getStateSelectField());
         waitFor(ofMillis(2000L));
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//span[.=\""+state+"\"]//ancestor::mat-option[1]"));
-        click(optionField);
+        WebElement optionField = elementToBeClickable(getDriver(),
+                By.xpath("//span[.=\"" + state + "\"]//ancestor::mat-option[1]"));
+        click(getDriver(), optionField);
+        escape(getDriver());
     }
 
     @Override
@@ -118,11 +119,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void setOwner(String owner) {
         retry(() -> {
-            click(getOwnerSelectField());
+            click(getDriver(), getOwnerSelectField());
             waitFor(ofMillis(2000L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
+            WebElement optionField = elementToBeClickable(getDriver(),
                     By.xpath("//span[.=\"" + owner + "\"]//ancestor::mat-option[1]"));
-            click(optionField);
+            click(getDriver(), optionField);
             escape(getDriver());
         });
     }
@@ -453,14 +454,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        defaultWait(getDriver());
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        defaultWait(getDriver());
-        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(),\"" + value + "\")]//ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

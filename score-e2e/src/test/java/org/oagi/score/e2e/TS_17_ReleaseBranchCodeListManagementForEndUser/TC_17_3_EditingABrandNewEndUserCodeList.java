@@ -62,7 +62,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         /**
          * Test Assertion #11.3.1.a
          */
@@ -124,7 +124,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode("new value code");
         editCodeListValueDialog.setMeaning("new value meaning");
@@ -170,11 +170,11 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().
                     createDerivedCodeList(baseCodeList, endUser, namespaceEU, branch, "WIP");
             values = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(codeList.getCodeListManifestId());
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByManifestId(codeList.getCodeListManifestId());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.selectCodeListValue(values.get(1).getValue());
         editCodeListPage.removeCodeListValue();
         editCodeListPage.hitUpdateButton();
@@ -238,7 +238,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         assertEquals("true", editCodeListValueDialog.getCodeField().getAttribute("aria-required"));
         assertEquals("true", editCodeListValueDialog.getMeaningField().getAttribute("aria-required"));
@@ -272,7 +272,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode("new value code");
         editCodeListValueDialog.setMeaning("new value meaning");
@@ -304,7 +304,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode("new value code");
         editCodeListValueDialog.setMeaning("new value meaning");
@@ -364,7 +364,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         assertTrue(agencyIDList.getState().equals("Production"));
         assertFalse(owner.isDeveloper());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.setAgencyIDList(agencyIDList);
         editCodeListPage.setAgencyIDListValue(agencyIDListValues.get(0));
         editCodeListPage.hitUpdateButton();

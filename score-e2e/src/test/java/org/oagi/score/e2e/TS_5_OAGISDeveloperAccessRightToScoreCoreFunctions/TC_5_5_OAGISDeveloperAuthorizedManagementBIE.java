@@ -32,6 +32,7 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
@@ -1425,9 +1426,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 "//mat-error[contains(text(), \"Cardinality Max is\")]")).isDisplayed());
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
-        sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
-        waitFor(ofMillis(1000L)); // wait for popping the error message up
         retry(() -> {
+            clear(bbiePanel.getCardinalityMaxField());
+            sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
+            waitFor(ofMillis(1000L)); // wait for popping the error message up
             // The Angular error matcher showed a different error message sometimes.
             assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                     "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());

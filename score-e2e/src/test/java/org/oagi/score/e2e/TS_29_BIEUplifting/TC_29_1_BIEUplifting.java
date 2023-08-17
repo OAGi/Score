@@ -203,6 +203,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         waitFor(ofMillis(3000L));
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/Enterprise Unit/Extension");
+        assertEquals("WIP", getText(accExtensionViewEditPage.getStateField()));
         accExtensionViewEditPage.setNamespace(euNamespace);
         accExtensionViewEditPage.hitUpdateButton();
 
@@ -406,7 +407,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_4_and_TA_29_1_5a_and_TA_29_1_6a() {
-        String prev_release = "10.8.7.1";
+        String prev_release = "10.8.6";
         String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -492,7 +493,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5b() {
-        String prev_release = "10.8.6";
+        String prev_release = "10.8.7.1";
         String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -528,7 +529,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     @Test
     public void test_TA_29_1_5c_and_TA_29_1_7_and_TA_29_1_8() {
-        String prev_release = "10.8.7.1";
+        String prev_release = "10.8.8";
         String curr_release = "10.9";
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1574,7 +1575,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
         CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(CLaccessUseraDeprecated, usera);
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(CLaccessUseraDeprecated.getName(), prev_release);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(CLaccessUseraDeprecated);
         editCodeListPage.hitAmendButton();
         click(editCodeListPage.getDeprecatedSelectField());
         editCodeListPage.setDefinition("Check the Deprecated Checkbox");
@@ -1583,7 +1584,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editCodeListPage.moveToProduction();
 
         viewEditCodeListPage.openPage();
-        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch("oacl_MatchDocumentCode", prev_release);
+        editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(
+                getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum("oacl_MatchDocumentCode", prev_release)
+        );
         editCodeListPage.hitDeriveCodeListBasedOnThisButton();
         editCodeListPage.setName("CLuserderived_BIEUp");
         editCodeListPage.setNamespace(euNamespace);

@@ -98,11 +98,13 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        AgencyIDListObject agencyIDListObject =
+                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranchAndState(
+                        "clm63055D16B_AgencyIdentification", release.getReleaseNumber(), "Published");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(agencyIDListObject);
         editAgencyIDListPage.hitDeriveAgencyIDListButton();
 
         assertDisabled(editAgencyIDListPage.getBasedAgencyIDListField());
@@ -163,14 +165,14 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
 
         AgencyIDListObject agencyIDListObject =
-                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranchAndState(
+                        "clm63055D16B_AgencyIdentification", release.getReleaseNumber(), "Published");
         List<AgencyIDListValueObject> agencyIDListValueList =
                 getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDListObject);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(agencyIDListObject);
         editAgencyIDListPage.hitDeriveAgencyIDListButton();
 
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
@@ -196,20 +198,15 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         AgencyIDListObject agencyIDListObject =
-                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranchAndState(
+                        "clm63055D16B_AgencyIdentification", release.getReleaseNumber(), "Published");
         List<AgencyIDListValueObject> agencyIDListValueList =
                 getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDListObject);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        /*
-         * In multi-testing scenarios, other test cases could make it can't find 'Derive Agency ID List' button.
-         */
-        EditAgencyIDListPage editAgencyIDListPage = retry(() -> {
-            ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-            EditAgencyIDListPage page = viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
-            page.hitDeriveAgencyIDListButton();
-            return page;
-        });
+        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(agencyIDListObject);
+        editAgencyIDListPage.hitDeriveAgencyIDListButton();
 
         String listId = randomNumeric(5, 10);
         String versionId = randomAlphanumeric(5, 10);
@@ -231,7 +228,6 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         editAgencyIDListPage.hitRemoveAgencyIDListValueButton();
         editAgencyIDListPage.hitUpdateButton();
 
-        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
         viewEditAgencyIDListPage.openPage();
         editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(name, release.getReleaseNumber());
@@ -250,14 +246,14 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
 
         AgencyIDListObject agencyIDListObject =
-                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranchAndState(
+                        "clm63055D16B_AgencyIdentification", release.getReleaseNumber(), "Published");
         List<AgencyIDListValueObject> agencyIDListValueList =
                 getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDListObject);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(agencyIDListObject);
         editAgencyIDListPage.hitDeriveAgencyIDListButton();
 
         String listId = randomNumeric(5, 10);
@@ -286,6 +282,7 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         editAgencyIDListValueDialog.setDefinitionSource(definitionSource);
         editAgencyIDListValueDialog.hitSaveButton();
         editAgencyIDListPage.hitUpdateButton();
+
         viewEditAgencyIDListPage.openPage();
         editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(name, release.getReleaseNumber());

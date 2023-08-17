@@ -224,8 +224,7 @@ public class TC_37_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(productionAgencyIdList.getName(), release.getReleaseNumber());
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(productionAgencyIdList);
 
         assertEquals(productionAgencyIdList.getState(), getText(editAgencyIDListPage.getStateField()));
         assertDisabled(editAgencyIDListPage.getAgencyIDListNameField());
@@ -253,14 +252,14 @@ public class TC_37_1_AgencyIdListAccess extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
 
         AgencyIDListObject publishedAgencyIdList =
-                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranch("clm63055D16B_AgencyIdentification", release.getReleaseNumber());
+                getAPIFactory().getAgencyIDListAPI().getAgencyIDListByNameAndBranchAndState(
+                        "clm63055D16B_AgencyIdentification", release.getReleaseNumber(), "Published");
         List<AgencyIDListValueObject> agencyIDListValueList =
                 getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(publishedAgencyIdList);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage =
-                viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(publishedAgencyIdList.getName(), release.getReleaseNumber());
+        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openEditAgencyIDListPage(publishedAgencyIdList);
 
         assertEquals(publishedAgencyIdList.getState(), getText(editAgencyIDListPage.getStateField()));
         assertDisabled(editAgencyIDListPage.getAgencyIDListNameField());

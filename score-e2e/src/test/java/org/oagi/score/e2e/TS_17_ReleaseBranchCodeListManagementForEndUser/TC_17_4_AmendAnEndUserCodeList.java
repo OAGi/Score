@@ -52,7 +52,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -85,7 +85,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             CodeListValueObject value = codeListValueMap.get(cl);
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -124,7 +124,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_2() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -149,13 +149,12 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
             assertTrue(owner.isDeveloper());
             assertThrows(TimeoutException.class, () -> {
                 editCodeListPage.hitAmendButton();
             });
-
         }
     }
 
@@ -164,7 +163,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_3() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -198,7 +197,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -240,7 +239,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_4() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -274,7 +273,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             waitFor(ofSeconds(1L));
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
@@ -307,7 +306,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_5() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         List<CodeListValueObject> values = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -334,7 +333,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -366,7 +365,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_6() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -389,7 +388,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -413,7 +412,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_7() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -436,7 +435,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -456,7 +455,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_8() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -481,7 +480,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -517,7 +516,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         AppUserObject developer;
         ReleaseObject branch;
         NamespaceObject namespace;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -551,7 +550,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));

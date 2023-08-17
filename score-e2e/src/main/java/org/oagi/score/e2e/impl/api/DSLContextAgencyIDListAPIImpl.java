@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -149,6 +151,22 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
 
     @Override
     public AgencyIDListObject getAgencyIDListByNameAndBranch(String name, String branch) {
+        return getAgencyIDListByNameAndBranchAndState(name, branch, null);
+    }
+
+    @Override
+    public AgencyIDListObject getAgencyIDListByNameAndBranchAndState(String name, String branch, String state) {
+        List<Condition> conditions = new ArrayList<>();
+        if (!StringUtils.isEmpty(name)) {
+            conditions.add(AGENCY_ID_LIST.NAME.eq(name));
+        }
+        if (!StringUtils.isEmpty(branch)) {
+            conditions.add(RELEASE.RELEASE_NUM.eq(branch));
+        }
+        if (!StringUtils.isEmpty(state)) {
+            conditions.add(AGENCY_ID_LIST.STATE.eq(state));
+        }
+
         List<Field<?>> fields = new ArrayList();
         fields.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
         fields.add(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID);
@@ -158,10 +176,7 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
                 .from(AGENCY_ID_LIST_MANIFEST)
                 .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(and(
-                        AGENCY_ID_LIST.NAME.eq(name),
-                        RELEASE.RELEASE_NUM.eq(branch)
-                ))
+                .where(and(conditions))
                 .fetchOne(record -> agencyIDListListMapper(record));
     }
 

@@ -43,7 +43,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_17_1_TA_1")
     public void test_TA_1() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;
         ReleaseObject branch;
         {
@@ -132,7 +132,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_17_1_TA_2")
     public void test_TA_2() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserA;
         ReleaseObject branch;
@@ -158,7 +158,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertFalse(endUserA.isDeveloper());
             assertTrue(cl.getState().equals("WIP"));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             editCodeListPage.setDefinition("new definition");
             editCodeListPage.setDefinitionSource("new definition source");
             editCodeListPage.setName("new name");
@@ -180,7 +180,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_17_1_TA_3")
     public void test_TA_3() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserB;
         ReleaseObject branch;
@@ -210,7 +210,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertFalse(owner.isDeveloper());
             assertTrue(cl.getState().equals("WIP"));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getCodeListNameField());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
@@ -229,7 +229,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_17_1_TA_4")
     public void test_TA_4() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject endUserB;
         ReleaseObject branch;
@@ -265,7 +265,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertFalse(owner.isDeveloper());
             assertTrue(List.of("QA", "Production").contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getCodeListNameField());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
@@ -285,7 +285,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
     @DisplayName("TC_17_1_TA_5")
     public void test_TA_5() {
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;
         ReleaseObject branch;
         {
@@ -314,7 +314,7 @@ public class TC_17_1_CodeListAccess extends BaseTest {
             assertTrue(owner.isDeveloper());
             assertTrue(cl.getState().equals("Published"));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getCodeListNameField());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
