@@ -91,6 +91,10 @@
   <mat-card>
     <mat-card-header class="align-items-baseline">
       <mat-card-title>BIE List</mat-card-title>
+      <mat-card-content class="mat-card-container">
+        <div class="loading-container" *ngIf="loading">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
       <div style="padding: 8px 0 8px 12px;">
         <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary">
           <mat-icon>add</mat-icon>
@@ -107,6 +111,7 @@
           Generate
         </button>
       </div>
+      </mat-card-content>
     </mat-card-header>
     <mat-card>
       <mat-card-content class="mat-card-container">

@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -79,8 +80,7 @@ public class OpenAPIGenerateService {
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }
 
-        String filename = option.getFilename();
-
+        String filename = ScoreGuid.randomGuid();
         File schemaExpressionFile;
         try {
             schemaExpressionFile = generateExpression.asFile(filename);
