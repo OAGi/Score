@@ -5,6 +5,8 @@ import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasRequestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResponseRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.OasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
@@ -274,13 +276,19 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) throws ScoreDataAccessException {
         OasRequest oasRequest = null;
+        OasRequestRecord oasRequestRecord = null;
         BigInteger oasOperationId = request.getOasOperationId();
         if (oasOperationId != null) {
+            oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID
+                    .eq(ULong.valueOf(oasOperationId))).fetchOptional().orElse(null);
+        }
+        if (oasRequestRecord != null){
             oasRequest = (OasRequest) selectForOasRequestTable()
                     .where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
                     .fetchOne(mapperForOasRequestTable());
+            return new GetOasRequestTableResponse(oasRequest);
         }
-        return new GetOasRequestTableResponse(oasRequest);
+        return null;
     }
 
     private SelectOnConditionStep selectForOasRequestTable() {
@@ -292,8 +300,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_REQUEST.OAS_MESSAGE_BODY_ID,
                         OAS_REQUEST.MAKE_ARRAY_INDICATOR,
                         OAS_REQUEST.SUPPRESS_ROOT_INDICATOR,
-                        OAS_REQUEST.META_HEADER_TOP_LEVEL_ASBIEP_ID,
-                        OAS_REQUEST.PAGINATION_TOP_LEVEL_ASBIEP_ID,
                         OAS_REQUEST.IS_CALLBACK,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
@@ -318,8 +324,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasRequest.setOasMessageBodyId(record.get(OAS_REQUEST.OAS_MESSAGE_BODY_ID).toBigInteger());
             oasRequest.setMakeArrayIndicator((byte) 1 == record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR));
             oasRequest.setSuppressRootIndicator((byte) 1 == record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR));
-            oasRequest.setMetaHeaderTopLevelAsbiepId(record.get(OAS_REQUEST.META_HEADER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
-            oasRequest.setPaginationTopLevelAsbiepId(record.get(OAS_REQUEST.PAGINATION_TOP_LEVEL_ASBIEP_ID).toBigInteger());
             oasRequest.setCallback((byte) 1 == record.get(OAS_REQUEST.IS_CALLBACK));
             oasRequest.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
@@ -343,8 +347,13 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) throws ScoreDataAccessException {
         OasResponse oasResponse = null;
+        OasResponseRecord oasResponseRecord = null;
         BigInteger oasOperationId = request.getOasOperationId();
-        if (oasOperationId != null) {
+        if (oasOperationId != null){
+            oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).
+                    where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId))).fetchOptional().orElse(null);
+        }
+        if (oasResponseRecord != null) {
             oasResponse = (OasResponse) selectForOasResponseTable()
                     .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
                     .fetchOne(mapperForOasResponseTable());
@@ -361,8 +370,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_RESPONSE.OAS_MESSAGE_BODY_ID,
                         OAS_RESPONSE.MAKE_ARRAY_INDICATOR,
                         OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR,
-                        OAS_RESPONSE.META_HEADER_TOP_LEVEL_ASBIEP_ID,
-                        OAS_RESPONSE.PAGINATION_TOP_LEVEL_ASBIEP_ID,
                         OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
@@ -387,8 +394,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasResponse.setOasMessageBodyId(record.get(OAS_RESPONSE.OAS_MESSAGE_BODY_ID).toBigInteger());
             oasResponse.setMakeArrayIndicator((byte) 1 == record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR));
             oasResponse.setSuppressRootIndicator((byte) 1 == record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR));
-            oasResponse.setMetaHeaderTopLevelAsbiepId(record.get(OAS_RESPONSE.META_HEADER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
-            oasResponse.setPaginationTopLevelAsbiepId(record.get(OAS_RESPONSE.PAGINATION_TOP_LEVEL_ASBIEP_ID).toBigInteger());
             oasResponse.setIncludeConfirmIndicator((byte) 1 == record.get(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR));
             oasResponse.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
