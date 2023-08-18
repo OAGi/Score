@@ -496,19 +496,15 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void selectAllComponentTypes() {
-        click(getTypeSelectField());
-        ArrayList<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
+        click(getDriver(), getTypeSelectField());
+        List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
         boolean selected;
         for (String componentType : componentTypes) {
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//span[text()=\"" + componentType + "\"]//ancestor::mat-option"));
-            if (optionField.getAttribute("aria-selected").equals("true")) {
-                selected = true;
-            } else {
-                selected = false;
-            }
+            selected = optionField.getAttribute("aria-selected").equals("true");
             if (!selected) {
-                click(optionField);
+                click(getDriver(), optionField);
             }
         }
         escape(getDriver());
