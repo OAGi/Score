@@ -4,8 +4,24 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Function4;
+import org.jooq.Identity;
+import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Records;
+import org.jooq.Row4;
+import org.jooq.Schema;
+import org.jooq.SelectField;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -14,46 +30,54 @@ import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CdtAwdPriXpsTypeMapRecord;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
 
 /**
  * This table allows for concrete mapping between the CDT Primitives and types
  * in a particular expression such as XML Schema, JSON. At this point, it is not
  * clear whether a separate table will be needed for each expression. The
- * current table holds the map to XML Schema built-in types.
- * <p>
+ * current table holds the map to XML Schema built-in types. 
+ * 
  * For each additional expression, a column similar to the XBT_ID column will
  * need to be added to this table for mapping to data types in another
  * expression.
- * <p>
+ * 
  * If we use a separate table for each expression, then we need binding all the
  * way to BDT (or even BBIE) for every new expression. That would be almost like
  * just store a BDT file. But using a column may not work with all kinds of
  * expressions, particulary if it does not map well to the XML schema data
- * types.
+ * types. 
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi.cdt_awd_pri_xps_type_map</code>
      */
     public static final CdtAwdPriXpsTypeMap CDT_AWD_PRI_XPS_TYPE_MAP = new CdtAwdPriXpsTypeMap();
-    private static final long serialVersionUID = 1L;
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<CdtAwdPriXpsTypeMapRecord> getRecordType() {
+        return CdtAwdPriXpsTypeMapRecord.class;
+    }
+
     /**
      * The column
      * <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_xps_type_map_id</code>.
      * Internal, primary database key.
      */
     public final TableField<CdtAwdPriXpsTypeMapRecord, ULong> CDT_AWD_PRI_XPS_TYPE_MAP_ID = createField(DSL.name("cdt_awd_pri_xps_type_map_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
+
     /**
      * The column <code>oagi.cdt_awd_pri_xps_type_map.cdt_awd_pri_id</code>.
      * Foreign key to the CDT_AWD_PRI table.
      */
     public final TableField<CdtAwdPriXpsTypeMapRecord, ULong> CDT_AWD_PRI_ID = createField(DSL.name("cdt_awd_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CDT_AWD_PRI table.");
+
     /**
      * The column <code>oagi.cdt_awd_pri_xps_type_map.xbt_id</code>. Foreign key
      * and to the XBT table. It identifies the XML schema built-in types that
@@ -62,13 +86,12 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
      * to more than one XML schema built-in types.
      */
     public final TableField<CdtAwdPriXpsTypeMapRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key and to the XBT table. It identifies the XML schema built-in types that can be mapped to the CDT primivite identified in the CDT_AWD_PRI_ID column. The CDT primitives are typically broad and hence it usually maps to more than one XML schema built-in types.");
+
     /**
      * The column <code>oagi.cdt_awd_pri_xps_type_map.is_default</code>.
      * Indicating a default value domain mapping.
      */
-    public final TableField<CdtAwdPriXpsTypeMapRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicating a default value domain mapping.");
-    private transient CdtAwdPri _cdtAwdPri;
-    private transient Xbt _xbt;
+    public final TableField<CdtAwdPriXpsTypeMapRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicating a default value domain mapping.");
 
     private CdtAwdPriXpsTypeMap(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased) {
         this(alias, aliased, null);
@@ -105,14 +128,6 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
         super(child, key, CDT_AWD_PRI_XPS_TYPE_MAP);
     }
 
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<CdtAwdPriXpsTypeMapRecord> getRecordType() {
-        return CdtAwdPriXpsTypeMapRecord.class;
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Oagi.OAGI;
@@ -132,6 +147,9 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
     public List<ForeignKey<CdtAwdPriXpsTypeMapRecord, ?>> getReferences() {
         return Arrays.asList(Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
     }
+
+    private transient CdtAwdPri _cdtAwdPri;
+    private transient Xbt _xbt;
 
     /**
      * Get the implicit join path to the <code>oagi.cdt_awd_pri</code> table.

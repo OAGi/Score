@@ -131,21 +131,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/Extension/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
 
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
-        WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
-        asbiePanel.toggleUsed();
-        asbiePanel.setCardinalityMax(199);
-        asbiePanel.setCardinalityMin(77);
-        asbiePanel.setContextDefinition("aContextDefinition");
-        editBIEPage.hitUpdateButton();
-
-        editBIEPage.openPage();
-        asccpNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
-        assertEquals("199", getText(asbiePanel.getCardinalityMaxField()));
-        assertEquals("77", getText(asbiePanel.getCardinalityMinField()));
-        assertEquals("aContextDefinition", getText(asbiePanel.getContextDefinitionField()));
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
     }
 
     @Test

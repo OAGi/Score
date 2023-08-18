@@ -1,7 +1,9 @@
 package org.oagi.score.e2e.impl.api;
 
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -328,7 +330,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(acc.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"acc\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"acc\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(acc.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(acc.getCreationTimestamp());
 
@@ -437,6 +439,10 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     @Override
     public ASCCPObject createRandomASCCP(ACCObject roleOfAcc, AppUserObject creator,
                                          NamespaceObject namespace, String state) {
+        if (roleOfAcc == null) {
+            throw new IllegalArgumentException("'roleOfAcc' parameter must not be null.");
+        }
+
         ASCCPObject asccp = ASCCPObject.createRandomASCCP(roleOfAcc, creator, namespace, state);
         asccp.setReleaseId(roleOfAcc.getReleaseId());
 
@@ -476,7 +482,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(asccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"asccp\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"asccp\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(asccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(asccp.getCreationTimestamp());
 
@@ -568,7 +574,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(bccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"bccp\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"bccp\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(bccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bccp.getCreationTimestamp());
 
@@ -665,7 +671,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(bdt.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{}"));
+        dummyLogRecord.setSnapshot("{}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bdt.getCreationTimestamp());
 
@@ -871,7 +877,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(acc.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"acc\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"acc\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(acc.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(acc.getCreationTimestamp());
 
@@ -953,7 +959,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(asccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"asccp\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"asccp\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(asccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(asccp.getCreationTimestamp());
 
@@ -1041,7 +1047,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(bccp.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"bccp\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"bccp\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(bccp.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bccp.getCreationTimestamp());
 
@@ -1233,7 +1239,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
             SeqKeyRecord prevSeqKeyRecord = seqKeyRecord.copy();
             prevSeqKeyRecord.setSeqKeyId(null);
             prevSeqKeyRecord.setFromAccManifestId(prevAsccManifestRecord.getFromAccManifestId());
-            prevSeqKeyRecord.setAsccManifestId(prevAsccManifestRecord.getToAsccpManifestId());
+            prevSeqKeyRecord.setAsccManifestId(prevAsccManifestRecord.getAsccManifestId());
 
             lastSeqKeyRecord = dslContext.selectFrom(SEQ_KEY)
                     .where(and(

@@ -166,6 +166,14 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
     }
 
     @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
     public void goToNextPage() {
         ((JavascriptExecutor) getDriver())
                 .executeScript("window.scrollTo(0, document.body.scrollHeight)");

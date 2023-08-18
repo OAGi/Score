@@ -14,9 +14,12 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,16 +136,16 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
     @Override
     public WebElement getBranchSelectField() {
-        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
-            click(optionField);
+            click(getDriver(), optionField);
             waitFor(ofMillis(500L));
         });
     }
@@ -306,17 +309,17 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getUsernameSelectField() {
-            return visibilityOfElementLocated(getDriver(), USER_SELECT_FIELD_LOCATOR);
+            return elementToBeClickable(getDriver(), USER_SELECT_FIELD_LOCATOR);
         }
 
         @Override
         public void setUsername(String username) {
             retry(() -> {
-                click(getUsernameSelectField());
+                click(getDriver(), getUsernameSelectField());
                 sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), username);
                 WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"" + username + "\")]"));
-                click(searchedSelectField);
+                click(getDriver(), searchedSelectField);
                 escape(getDriver());
             });
         }
@@ -334,7 +337,6 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByValue(String value) {
-            defaultWait(getDriver());
             return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
         }
 
@@ -344,10 +346,28 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
 
         @Override
+        public void setItemsPerPage(int items) {
+            try {
+                retry(() -> {
+                    WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                    click(getDriver(), itemsPerPageField);
+                    waitFor(Duration.ofMillis(500L));
+                    WebElement itemField = elementToBeClickable(getDriver(),
+                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+                    click(getDriver(), itemField);
+                    waitFor(Duration.ofMillis(500L));
+                });
+            } catch (WebDriverException e) {
+                // ignore
+            }
+        }
+
+        @Override
         public ViewEditBIEPage openViewEditBIEPageByUsernameAndColumnName(String user, String columnName) {
             WebElement tr = getTableRecordByValue(user);
             WebElement td = getColumnByName(tr, columnName);
-            click(td.findElement(By.tagName("a")));
+            click(getDriver(), td.findElement(By.tagName("a")));
             waitFor(ofMillis(500L));
 
             ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this.parent);
@@ -457,6 +477,24 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         }
 
         @Override
+        public void setItemsPerPage(int items) {
+            try {
+                retry(() -> {
+                    WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                    click(getDriver(), itemsPerPageField);
+                    waitFor(Duration.ofMillis(500L));
+                    WebElement itemField = elementToBeClickable(getDriver(),
+                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+                    click(getDriver(), itemField);
+                    waitFor(Duration.ofMillis(500L));
+                });
+            } catch (WebDriverException e) {
+                // ignore
+            }
+        }
+
+        @Override
         public ViewEditCoreComponentPage openViewEditCCPageByUsernameAndColumnName(String user, String columnName) {
             WebElement tr = getTableRecordByValue(user);
             WebElement td = getColumnByName(tr, columnName);
@@ -479,7 +517,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
         @Override
         public WebElement getTableRecordByUEAndDEN(String ueName, String assocDEN) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis'][contains(text(), \"" + assocDEN + "\")]//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
+            return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class='ellipsis']//ancestor::tr//td[2]//span[contains(text(),\"" + ueName + "\")]"));
         }
 
         @Override

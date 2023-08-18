@@ -24,6 +24,9 @@ public class BaseTest {
         System.setProperty("org.jooq.no-logo", "true");
         System.setProperty("org.jooq.no-tips", "true");
 
+        // Set a default log level
+        // System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG");
+
         BaseTest.config = Configuration.load();
         BaseTest.apiFactory = DSLContextAPIFactory.build(BaseTest.config);
     }

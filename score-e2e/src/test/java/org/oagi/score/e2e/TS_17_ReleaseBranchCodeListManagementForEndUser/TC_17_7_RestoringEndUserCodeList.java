@@ -12,6 +12,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,6 @@ public class TC_17_7_RestoringEndUserCodeList extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -40,8 +40,8 @@ public class TC_17_7_RestoringEndUserCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -55,21 +55,21 @@ public class TC_17_7_RestoringEndUserCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserA, namespaceEUa, branch, "Deleted");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
 
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserB, namespaceEUb, branch, "Deleted");
             codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Deleted", getText(editCodeListPage.getStateField()));
             editCodeListPage.hitRestoreButton();
-            CodeListValueObject value = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             assertDoesNotThrow(() -> editCodeListPage.valueExists(value.getValue()));
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));

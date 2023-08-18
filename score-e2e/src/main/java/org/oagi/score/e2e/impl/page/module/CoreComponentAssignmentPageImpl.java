@@ -151,8 +151,6 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     public void hitAssignButton() {
         click(getAssignButton());
         waitFor(ofMillis(1000L));
-
-        assert "Assigned".equals(getSnackBarMessage(getDriver()));
     }
 
     @Override

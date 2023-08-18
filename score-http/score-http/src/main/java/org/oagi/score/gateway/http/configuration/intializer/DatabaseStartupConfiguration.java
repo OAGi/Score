@@ -23,7 +23,7 @@ public class DatabaseStartupConfiguration {
     public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource) {
         DatabaseStartupValidator validator = new DatabaseStartupValidator();
         validator.setDataSource(dataSource);
-        validator.setValidationQuery(DatabaseDriver.MYSQL.getValidationQuery());
+        validator.setValidationQuery(DatabaseDriver.MARIADB.getValidationQuery());
         return validator;
     }
 

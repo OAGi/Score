@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage {
@@ -119,7 +120,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Insert Property After\")]");
 
-    private static final By REFACTOR_OPTIION_LOCATOR =
+    private static final By REFACTOR_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Refactor\")]");
 
     private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
@@ -167,7 +168,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -329,6 +330,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         WebElement node = getNodeByName(nodeName);
         click(node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -336,8 +338,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             }
         } catch (WebDriverException ignore) {
         }
+
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
@@ -358,11 +362,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public ACCSetBaseACCDialog setBaseACC(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), SET_BASE_ACC_OPTION_LOCATOR));
         }
         ACCSetBaseACCDialog accSetBaseACCDialog =
                 new ACCSetBaseACCDialogImpl(this);
@@ -372,13 +376,14 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public SelectAssociationDialog appendPropertyAtLast(String path) {
+        waitFor(ofMillis(1000L));
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
-        } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+        } catch (WebDriverException e) {
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
@@ -389,11 +394,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public BCCPViewEditPage openBCCPInNewTab(WebElement bccNode) {
         try {
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(bccNode);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         }
 
         switchToNextTab(getDriver());
@@ -410,11 +415,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public ASCCPViewEditPage openASCCPInNewTab(WebElement accNode) {
         try {
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(accNode);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         }
 
         switchToNextTab(getDriver());
@@ -432,11 +437,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public FindWhereUsedDialog findWhereUsed(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), WHERE_USED_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), WHERE_USED_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), WHERE_USED_OPTION_LOCATOR));
         }
         FindWhereUsedDialog findWhereUsedDialog =
                 new FindWhereUsedDialogImpl(this, "Where Used");
@@ -449,11 +454,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         WebElement confirmDialog;
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+            confirmDialog = click(elementToBeClickable(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            confirmDialog = click(visibilityOfElementLocated(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
+            confirmDialog = click(elementToBeClickable(getDriver(), CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR));
         }
         return confirmDialog;
 
@@ -463,11 +468,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void deleteBaseACC(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), DELETE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), DELETE_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]")).isDisplayed();
@@ -480,11 +485,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public ACCViewEditPage createOAGiExtensionComponent(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR));
         }
         assert this.isOpened();
         return this;
@@ -494,11 +499,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public SelectAssociationDialog insertPropertyBefore(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), INSERT_PROPERTY_BEFORE_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Insert Property Before");
@@ -510,11 +515,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public SelectAssociationDialog insertPropertyAfter(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), INSERT_PROPERTY_AFTER_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Insert Property After");
@@ -526,13 +531,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public SelectBaseACCToRefactorDialog refactorToBaseACC(String path, String associationPropertyTerm) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REFACTOR_TO_BASE_OPTION_LOCATOR));
         }
         SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = new SelectBaseACCToRefactorDialogImpl(this,
                 associationPropertyTerm);
@@ -544,13 +549,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void unGroup(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(visibilityOfElementLocated(getDriver(), UNGROUP_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), UNGROUP_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REFACTOR_OPTIION_LOCATOR));
-            click(visibilityOfElementLocated(getDriver(), UNGROUP_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), REFACTOR_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), UNGROUP_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//score-confirm-dialog//div[contains(@class, \"header\")]")).isDisplayed();
@@ -565,11 +570,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public ACCViewEditPage removeAssociation(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REMOVE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REMOVE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REMOVE_OPTION_LOCATOR));
         }
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]")).isDisplayed();
@@ -591,7 +596,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span")));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
-
     }
 
     @Override
@@ -677,17 +681,18 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
         WebElement node = retry(() -> {
-            WebElement e = sendKeys(getSearchInputTextField(), path);
-            if (!path.equals(getText(getSearchInputTextField()))) {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
                 throw new WebDriverException();
             }
             return e;
         });
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 
@@ -768,9 +773,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
@@ -824,7 +831,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("C").perform();
@@ -884,11 +891,11 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         String path = "/" + this.acc.getDen();
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         }
         switchToNextTab(getDriver());
 
@@ -1024,13 +1031,13 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setNamespace(String namespace) {
-            click(getNamespaceSelectField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option"));
-            click(option);
-            waitFor(ofMillis(1000L));
-            assert getText(getNamespaceSelectField()).equals(namespace);
+            retry(() -> {
+                click(getNamespaceSelectField());
+                waitFor(ofSeconds(2L));
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//span[contains(text(), \"" + namespace + "\")]//ancestor::mat-option[1]"));
+                click(optionField);
+            });
         }
 
         @Override

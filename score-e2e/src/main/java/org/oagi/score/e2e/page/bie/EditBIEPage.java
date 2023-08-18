@@ -1,11 +1,11 @@
 package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.obj.BusinessContextObject;
+import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
-import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -59,6 +59,13 @@ public interface EditBIEPage extends Page {
     WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel);
 
     /**
+     * Return the Top-level ASBIEP.
+     *
+     * @return the Top-level ASBIEP
+     */
+    TopLevelASBIEPObject getTopLevelASBIEP();
+
+    /**
      * Return the panel for 'Top-Level ASBIEP' node.
      *
      * @return 'Top-Level ASBIEP' node panel
@@ -79,6 +86,15 @@ public interface EditBIEPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
+
+    /**
+     * Return the UI element of the tree node by the node path.
+     *
+     * @param path the node path
+     * @param retry the number of retry
+     * @return the UI element of the tree node
+     */
+    WebElement getNodeByPath(String path, int retry);
 
     /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
@@ -178,6 +194,10 @@ public interface EditBIEPage extends Page {
      * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state.
      */
     void moveToProduction();
+
+    void enableChildren(String path);
+
+    void setChildrenMaxCardinalityToOne(String path);
 
     /**
      * Make the local user extension on the 'Extension' node.
@@ -396,6 +416,18 @@ public interface EditBIEPage extends Page {
          */
         WebElement getTypeDefinitionField();
 
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
+
     }
 
     /**
@@ -495,6 +527,18 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
+
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
     }
 
     interface ReusedASBIEPanel {
@@ -700,6 +744,18 @@ public interface EditBIEPage extends Page {
         String getResetDialogMessage();
 
         String getValueDomainWarningMessage(String valueDomain);
+
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
     }
 
     interface BBIESCPanel {

@@ -105,7 +105,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -304,11 +304,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     @Override
     public ACCViewEditPage openACCInNewTab(WebElement accNode) {
         try {
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(accNode);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), OPEN_IN_NEW_TAB_OPTION_LOCATOR));
         }
 
         switchToNextTab(getDriver());
@@ -327,11 +327,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
             }
             waitFor(ofMillis(500L));
             ASCCPChangeACCDialog asccpChangeACCDialog =
@@ -343,9 +343,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
@@ -353,11 +355,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), CHANGE_ACC_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Change ACC");
@@ -371,8 +373,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement node = getNodeByName(nodeName);
-        click(node);
+        click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -381,7 +384,8 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         } catch (WebDriverException ignore) {
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
@@ -394,11 +398,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchInputTextField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchInputTextField());
+        clear(searchInput);
         return node;
     }
 
@@ -476,7 +481,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public AddCommentDialog openCommentsDialog(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), COMMENTS_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), COMMENTS_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("C").perform();
@@ -516,11 +521,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         String path = "/" + this.asccp.getPropertyTerm();
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            retry(() -> click(visibilityOfElementLocated(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
+            retry(() -> click(elementToBeClickable(getDriver(), SHOW_HISTORY_OPTION_LOCATOR)));
         }
         switchToNextTab(getDriver());
 

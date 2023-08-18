@@ -73,24 +73,24 @@ public class Message extends TableImpl<MessageRecord> {
     /**
      * The column <code>oagi.message.subject</code>. A subject of the message
      */
-    public final TableField<MessageRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.CLOB, this, "A subject of the message");
+    public final TableField<MessageRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A subject of the message");
 
     /**
      * The column <code>oagi.message.body</code>. A body of the message.
      */
-    public final TableField<MessageRecord, String> BODY = createField(DSL.name("body"), SQLDataType.CLOB, this, "A body of the message.");
+    public final TableField<MessageRecord, String> BODY = createField(DSL.name("body"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A body of the message.");
 
     /**
      * The column <code>oagi.message.body_content_type</code>. A content type of
      * the body
      */
-    public final TableField<MessageRecord, String> BODY_CONTENT_TYPE = createField(DSL.name("body_content_type"), SQLDataType.VARCHAR(50).nullable(false).defaultValue(DSL.inline("text/plain", SQLDataType.VARCHAR)), this, "A content type of the body");
+    public final TableField<MessageRecord, String> BODY_CONTENT_TYPE = createField(DSL.name("body_content_type"), SQLDataType.VARCHAR(50).nullable(false).defaultValue(DSL.field(DSL.raw("'text/plain'"), SQLDataType.VARCHAR)), this, "A content type of the body");
 
     /**
      * The column <code>oagi.message.is_read</code>. An indicator whether this
      * record is read or not.
      */
-    public final TableField<MessageRecord, Byte> IS_READ = createField(DSL.name("is_read"), SQLDataType.TINYINT.defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "An indicator whether this record is read or not.");
+    public final TableField<MessageRecord, Byte> IS_READ = createField(DSL.name("is_read"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "An indicator whether this record is read or not.");
 
     /**
      * The column <code>oagi.message.creation_timestamp</code>. The timestamp

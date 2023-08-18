@@ -186,6 +186,13 @@ public interface HomePage extends Page {
         WebElement getColumnByName(WebElement tableRecord, String columnName);
 
         /**
+         * Set the size of items to the 'Items per page' select field.
+         *
+         * @param items the size of items; 5, 10, 20
+         */
+        void setItemsPerPage(int items);
+
+        /**
          * Open the 'View/Edit BIE' page by clicking the cell in the table based on the username and the column name.
          *
          * @param user       the username
@@ -295,6 +302,13 @@ public interface HomePage extends Page {
          * @return the UI element of the column
          */
         WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+        /**
+         * Set the size of items to the 'Items per page' select field.
+         *
+         * @param items the size of items; 5, 10, 20
+         */
+        void setItemsPerPage(int items);
 
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the username and the column name.

@@ -14,7 +14,7 @@ public class TopLevelASBIEPObject {
 
     private BigInteger asbiepId;
 
-    private BigInteger ownwerUserId;
+    private BigInteger ownerUserId;
 
     private LocalDateTime lastUpdateTimestamp;
 
@@ -43,7 +43,7 @@ public class TopLevelASBIEPObject {
     public static TopLevelASBIEPObject createRandomTopLevelAsbiepInRelease(ReleaseObject release, AppUserObject user,
                                                                            String state) {
         TopLevelASBIEPObject topLevelAsbiep = new TopLevelASBIEPObject();
-        topLevelAsbiep.setOwnwerUserId(user.getAppUserId());
+        topLevelAsbiep.setOwnerUserId(user.getAppUserId());
         topLevelAsbiep.setLastUpdateTimestamp(LocalDateTime.now());
         topLevelAsbiep.setLastUpdatedBy(user.getAppUserId());
         topLevelAsbiep.setReleaseId(release.getReleaseId());

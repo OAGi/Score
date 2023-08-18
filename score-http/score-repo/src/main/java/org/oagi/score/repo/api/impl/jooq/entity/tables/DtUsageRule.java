@@ -74,13 +74,13 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
      * the DT_ID for assigning a usage rule to the corresponding DT content
      * component.
      */
-    public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_ID = createField(DSL.name("target_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.");
+    public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_ID = createField(DSL.name("target_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.");
 
     /**
      * The column <code>oagi.dt_usage_rule.target_dt_sc_id</code>. Foreing key
      * to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.
      */
-    public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_SC_ID = createField(DSL.name("target_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.");
+    public final TableField<DtUsageRuleRecord, ULong> TARGET_DT_SC_ID = createField(DSL.name("target_dt_sc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.");
 
     private DtUsageRule(Name alias, Table<DtUsageRuleRecord> aliased) {
         this(alias, aliased, null);

@@ -4,34 +4,123 @@
 package org.oagi.score.e2e.impl.api.jooq.entity;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifestTag;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValueManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppOauth2User;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsbieBizterm;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifestTag;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccBizterm;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContent;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContentManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BusinessTerm;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPriXpsTypeMap;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtRefSpec;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPriXpsTypeMap;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScRefSpec;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValueManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Comment;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Configuration;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxCategory;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Exception;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Message;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Module;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.*;
-
-import java.util.Arrays;
-import java.util.List;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAccManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAgencyIdListManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAsccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBlobContentManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleCodeListManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleDtManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSet;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleXbtManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2App;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2AppScope;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.RefSpec;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest;
 
 
 /**
  * This class is generated by jOOQ.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oagi extends SchemaImpl {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>oagi</code>
      */
     public static final Oagi OAGI = new Oagi();
-    private static final long serialVersionUID = 1L;
+
     /**
      * The ABIE table stores information about an ABIE, which is a
      * contextualized ACC. The context is represented by the BUSINESS_CTX_ID
      * column that refers to a business context. Each ABIE must have a business
      * context and a based ACC.
-     * <p>
+     * 
      * It should be noted that, per design document, there is no corresponding
      * ABIE created for an ACC which will not show up in the instance document
      * such as ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP",
@@ -43,11 +132,11 @@ public class Oagi extends SchemaImpl {
      * The ACC table holds information about complex data structured concepts.
      * For example, OAGIS's Components, Nouns, and BODs are captured in the ACC
      * table.
-     * <p>
+     * 
      * Note that only Extension is supported when deriving ACC from another ACC.
      * (So if there is a restriction needed, maybe that concept should placed
      * higher in the derivation hierarchy rather than lower.)
-     * <p>
+     * 
      * In OAGIS, all XSD extensions will be treated as a qualification of an
      * ACC.
      */
@@ -57,6 +146,11 @@ public class Oagi extends SchemaImpl {
      * The table <code>oagi.acc_manifest</code>.
      */
     public final AccManifest ACC_MANIFEST = AccManifest.ACC_MANIFEST;
+
+    /**
+     * The table <code>oagi.acc_manifest_tag</code>.
+     */
+    public final AccManifestTag ACC_MANIFEST_TAG = AccManifestTag.ACC_MANIFEST_TAG;
 
     /**
      * The AGENCY_ID_LIST table stores information about agency identification
@@ -110,7 +204,7 @@ public class Oagi extends SchemaImpl {
 
     /**
      * An ASCC represents a relationship/association between two ACCs through an
-     * ASCCP.
+     * ASCCP. 
      */
     public final Ascc ASCC = Ascc.ASCC;
 
@@ -137,6 +231,11 @@ public class Oagi extends SchemaImpl {
     public final AsccpManifest ASCCP_MANIFEST = AsccpManifest.ASCCP_MANIFEST;
 
     /**
+     * The table <code>oagi.asccp_manifest_tag</code>.
+     */
+    public final AsccpManifestTag ASCCP_MANIFEST_TAG = AsccpManifestTag.ASCCP_MANIFEST_TAG;
+
+    /**
      * A BBIE represents a relationship/association between an ABIE and a BBIEP.
      * It is a contextualization of a BCC. The BBIE table also stores some
      * information about the specific constraints related to the BDT associated
@@ -157,7 +256,7 @@ public class Oagi extends SchemaImpl {
      * Because there is no single table that is a contextualized counterpart of
      * the DT table (which stores both CDT and BDT), The context specific
      * constraints associated with the DT are stored in the BBIE table, while
-     * this table stores the constraints associated with the DT's SCs.
+     * this table stores the constraints associated with the DT's SCs. 
      */
     public final BbieSc BBIE_SC = BbieSc.BBIE_SC;
 
@@ -169,7 +268,7 @@ public class Oagi extends SchemaImpl {
 
     /**
      * A BCC represents a relationship/association between an ACC and a BCCP. It
-     * creates a data element for an ACC.
+     * creates a data element for an ACC. 
      */
     public final Bcc BCC = Bcc.BCC;
 
@@ -196,6 +295,11 @@ public class Oagi extends SchemaImpl {
     public final BccpManifest BCCP_MANIFEST = BccpManifest.BCCP_MANIFEST;
 
     /**
+     * The table <code>oagi.bccp_manifest_tag</code>.
+     */
+    public final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
+
+    /**
      * This table captures the allowed primitives for a BDT. The allowed
      * primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID,
      * CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the
@@ -216,7 +320,7 @@ public class Oagi extends SchemaImpl {
      * specifies the primitive, which is a code list, while the last one
      * specifies the primitive which is an agency identification list. Only one
      * column among the three can have a value in a particular record.
-     * <p>
+     * 
      * It should be noted that the table does not store the fact about primitive
      * restriction hierarchical relationships. In other words, if a BDT SC is
      * derived from another BDT SC and the derivative BDT SC applies some
@@ -284,7 +388,7 @@ public class Oagi extends SchemaImpl {
     public final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
 
     /**
-     * This table capture allowed primitives of the CDT?s Content Component.
+     * This table capture allowed primitives of the CDT?s Content Component. 
      * The information in this table is captured from the Allowed Primitive
      * column in each of the CDT Content Component section/table in CCTS DTC3.
      */
@@ -295,17 +399,17 @@ public class Oagi extends SchemaImpl {
      * types in a particular expression such as XML Schema, JSON. At this point,
      * it is not clear whether a separate table will be needed for each
      * expression. The current table holds the map to XML Schema built-in types.
-     * <p>
-     * <p>
+     * 
+     * 
      * For each additional expression, a column similar to the XBT_ID column
      * will need to be added to this table for mapping to data types in another
      * expression.
-     * <p>
+     * 
      * If we use a separate table for each expression, then we need binding all
      * the way to BDT (or even BBIE) for every new expression. That would be
      * almost like just store a BDT file. But using a column may not work with
      * all kinds of expressions, particulary if it does not map well to the XML
-     * schema data types.
+     * schema data types. 
      */
     public final CdtAwdPriXpsTypeMap CDT_AWD_PRI_XPS_TYPE_MAP = CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP;
 
@@ -331,7 +435,7 @@ public class Oagi extends SchemaImpl {
      * The purpose of this table is the same as that of the
      * CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC).
      * It allows for the concrete mapping between the CDT Primitives and types
-     * in a particular expression such as XML Schema, JSON.
+     * in a particular expression such as XML Schema, JSON. 
      */
     public final CdtScAwdPriXpsTypeMap CDT_SC_AWD_PRI_XPS_TYPE_MAP = CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP;
 
@@ -408,10 +512,15 @@ public class Oagi extends SchemaImpl {
     public final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
 
     /**
+     * The table <code>oagi.dt_manifest_tag</code>.
+     */
+    public final DtManifestTag DT_MANIFEST_TAG = DtManifestTag.DT_MANIFEST_TAG;
+
+    /**
      * This table represents the supplementary component (SC) of a DT. Revision
      * is not tracked at the supplementary component. It is considered intrinsic
      * part of the DT. In other words, when a new revision of a DT is created a
-     * new set of supplementary components is created along with it.
+     * new set of supplementary components is created along with it. 
      */
     public final DtSc DT_SC = DtSc.DT_SC;
 
@@ -532,6 +641,11 @@ public class Oagi extends SchemaImpl {
     public final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
+     * The table <code>oagi.tag</code>.
+     */
+    public final Tag TAG = Tag.TAG;
+
+    /**
      * This table about the user tenant role.
      */
     public final Tenant TENANT = Tenant.TENANT;
@@ -598,91 +712,96 @@ public class Oagi extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-                Abie.ABIE,
-                Acc.ACC,
-                AccManifest.ACC_MANIFEST,
-                AgencyIdList.AGENCY_ID_LIST,
-                AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST,
-                AgencyIdListValue.AGENCY_ID_LIST_VALUE,
-                AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST,
-                AppOauth2User.APP_OAUTH2_USER,
-                AppUser.APP_USER,
-                Asbie.ASBIE,
-                AsbieBizterm.ASBIE_BIZTERM,
-                Asbiep.ASBIEP,
-                Ascc.ASCC,
-                AsccBizterm.ASCC_BIZTERM,
-                AsccManifest.ASCC_MANIFEST,
-                Asccp.ASCCP,
-                AsccpManifest.ASCCP_MANIFEST,
-                Bbie.BBIE,
-                BbieBizterm.BBIE_BIZTERM,
-                BbieSc.BBIE_SC,
-                Bbiep.BBIEP,
-                Bcc.BCC,
-                BccBizterm.BCC_BIZTERM,
-                BccManifest.BCC_MANIFEST,
-                Bccp.BCCP,
-                BccpManifest.BCCP_MANIFEST,
-                BdtPriRestri.BDT_PRI_RESTRI,
-                BdtScPriRestri.BDT_SC_PRI_RESTRI,
-                BieUsageRule.BIE_USAGE_RULE,
-                BieUserExtRevision.BIE_USER_EXT_REVISION,
-                BizCtx.BIZ_CTX,
-                BizCtxAssignment.BIZ_CTX_ASSIGNMENT,
-                BizCtxValue.BIZ_CTX_VALUE,
-                BlobContent.BLOB_CONTENT,
-                BlobContentManifest.BLOB_CONTENT_MANIFEST,
-                BusinessTerm.BUSINESS_TERM,
-                CdtAwdPri.CDT_AWD_PRI,
-                CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP,
-                CdtPri.CDT_PRI,
-                CdtRefSpec.CDT_REF_SPEC,
-                CdtScAwdPri.CDT_SC_AWD_PRI,
-                CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP,
-                CdtScRefSpec.CDT_SC_REF_SPEC,
-                CodeList.CODE_LIST,
-                CodeListManifest.CODE_LIST_MANIFEST,
-                CodeListValue.CODE_LIST_VALUE,
-                CodeListValueManifest.CODE_LIST_VALUE_MANIFEST,
-                Comment.COMMENT,
-                Configuration.CONFIGURATION,
-                CtxCategory.CTX_CATEGORY,
-                CtxScheme.CTX_SCHEME,
-                CtxSchemeValue.CTX_SCHEME_VALUE,
-                Dt.DT,
-                DtManifest.DT_MANIFEST,
-                DtSc.DT_SC,
-                DtScManifest.DT_SC_MANIFEST,
-                DtUsageRule.DT_USAGE_RULE,
-                Exception.EXCEPTION,
-                Log.LOG,
-                Message.MESSAGE,
-                Module.MODULE,
-                ModuleAccManifest.MODULE_ACC_MANIFEST,
-                ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST,
-                ModuleAsccpManifest.MODULE_ASCCP_MANIFEST,
-                ModuleBccpManifest.MODULE_BCCP_MANIFEST,
-                ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST,
-                ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST,
-                ModuleDtManifest.MODULE_DT_MANIFEST,
-                ModuleSet.MODULE_SET,
-                ModuleSetRelease.MODULE_SET_RELEASE,
-                ModuleXbtManifest.MODULE_XBT_MANIFEST,
-                Namespace.NAMESPACE,
-                Oauth2App.OAUTH2_APP,
-                Oauth2AppScope.OAUTH2_APP_SCOPE,
-                RefSpec.REF_SPEC,
-                Release.RELEASE,
-                SeqKey.SEQ_KEY,
-                Tenant.TENANT,
-                TenantBusinessCtx.TENANT_BUSINESS_CTX,
-                TopLevelAsbiep.TOP_LEVEL_ASBIEP,
-                UsageRule.USAGE_RULE,
-                UsageRuleExpression.USAGE_RULE_EXPRESSION,
-                UserTenant.USER_TENANT,
-                Xbt.XBT,
-                XbtManifest.XBT_MANIFEST
+            Abie.ABIE,
+            Acc.ACC,
+            AccManifest.ACC_MANIFEST,
+            AccManifestTag.ACC_MANIFEST_TAG,
+            AgencyIdList.AGENCY_ID_LIST,
+            AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST,
+            AgencyIdListValue.AGENCY_ID_LIST_VALUE,
+            AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST,
+            AppOauth2User.APP_OAUTH2_USER,
+            AppUser.APP_USER,
+            Asbie.ASBIE,
+            AsbieBizterm.ASBIE_BIZTERM,
+            Asbiep.ASBIEP,
+            Ascc.ASCC,
+            AsccBizterm.ASCC_BIZTERM,
+            AsccManifest.ASCC_MANIFEST,
+            Asccp.ASCCP,
+            AsccpManifest.ASCCP_MANIFEST,
+            AsccpManifestTag.ASCCP_MANIFEST_TAG,
+            Bbie.BBIE,
+            BbieBizterm.BBIE_BIZTERM,
+            BbieSc.BBIE_SC,
+            Bbiep.BBIEP,
+            Bcc.BCC,
+            BccBizterm.BCC_BIZTERM,
+            BccManifest.BCC_MANIFEST,
+            Bccp.BCCP,
+            BccpManifest.BCCP_MANIFEST,
+            BccpManifestTag.BCCP_MANIFEST_TAG,
+            BdtPriRestri.BDT_PRI_RESTRI,
+            BdtScPriRestri.BDT_SC_PRI_RESTRI,
+            BieUsageRule.BIE_USAGE_RULE,
+            BieUserExtRevision.BIE_USER_EXT_REVISION,
+            BizCtx.BIZ_CTX,
+            BizCtxAssignment.BIZ_CTX_ASSIGNMENT,
+            BizCtxValue.BIZ_CTX_VALUE,
+            BlobContent.BLOB_CONTENT,
+            BlobContentManifest.BLOB_CONTENT_MANIFEST,
+            BusinessTerm.BUSINESS_TERM,
+            CdtAwdPri.CDT_AWD_PRI,
+            CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP,
+            CdtPri.CDT_PRI,
+            CdtRefSpec.CDT_REF_SPEC,
+            CdtScAwdPri.CDT_SC_AWD_PRI,
+            CdtScAwdPriXpsTypeMap.CDT_SC_AWD_PRI_XPS_TYPE_MAP,
+            CdtScRefSpec.CDT_SC_REF_SPEC,
+            CodeList.CODE_LIST,
+            CodeListManifest.CODE_LIST_MANIFEST,
+            CodeListValue.CODE_LIST_VALUE,
+            CodeListValueManifest.CODE_LIST_VALUE_MANIFEST,
+            Comment.COMMENT,
+            Configuration.CONFIGURATION,
+            CtxCategory.CTX_CATEGORY,
+            CtxScheme.CTX_SCHEME,
+            CtxSchemeValue.CTX_SCHEME_VALUE,
+            Dt.DT,
+            DtManifest.DT_MANIFEST,
+            DtManifestTag.DT_MANIFEST_TAG,
+            DtSc.DT_SC,
+            DtScManifest.DT_SC_MANIFEST,
+            DtUsageRule.DT_USAGE_RULE,
+            Exception.EXCEPTION,
+            Log.LOG,
+            Message.MESSAGE,
+            Module.MODULE,
+            ModuleAccManifest.MODULE_ACC_MANIFEST,
+            ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST,
+            ModuleAsccpManifest.MODULE_ASCCP_MANIFEST,
+            ModuleBccpManifest.MODULE_BCCP_MANIFEST,
+            ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST,
+            ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST,
+            ModuleDtManifest.MODULE_DT_MANIFEST,
+            ModuleSet.MODULE_SET,
+            ModuleSetRelease.MODULE_SET_RELEASE,
+            ModuleXbtManifest.MODULE_XBT_MANIFEST,
+            Namespace.NAMESPACE,
+            Oauth2App.OAUTH2_APP,
+            Oauth2AppScope.OAUTH2_APP_SCOPE,
+            RefSpec.REF_SPEC,
+            Release.RELEASE,
+            SeqKey.SEQ_KEY,
+            Tag.TAG,
+            Tenant.TENANT,
+            TenantBusinessCtx.TENANT_BUSINESS_CTX,
+            TopLevelAsbiep.TOP_LEVEL_ASBIEP,
+            UsageRule.USAGE_RULE,
+            UsageRuleExpression.USAGE_RULE_EXPRESSION,
+            UserTenant.USER_TENANT,
+            Xbt.XBT,
+            XbtManifest.XBT_MANIFEST
         );
     }
 }

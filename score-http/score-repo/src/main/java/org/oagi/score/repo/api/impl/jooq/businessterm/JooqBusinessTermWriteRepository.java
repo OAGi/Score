@@ -68,7 +68,8 @@ public class JooqBusinessTermWriteRepository
         BigInteger requesterUserId = requester.getUserId();
         LocalDateTime timestamp = LocalDateTime.now();
 
-        List<BigInteger> createdRecordIds = request.getBusinessTermList().stream().map(businessTerm -> {
+        List<BigInteger> createdRecordIds = new ArrayList<>();
+        for (BusinessTerm businessTerm : request.getBusinessTermList()) {
             BusinessTermRecord record = new BusinessTermRecord();
             record.setGuid(randomGuid());
             record.setBusinessTerm(businessTerm.getBusinessTerm());
@@ -92,16 +93,16 @@ public class JooqBusinessTermWriteRepository
                         .set(BUSINESS_TERM.COMMENT, record.getComment())
                         .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, record.getLastUpdateTimestamp())
                         .set(BUSINESS_TERM.LAST_UPDATED_BY, record.getLastUpdatedBy())
-                        .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(record.getExternalRefUri()))
+                        .where(BUSINESS_TERM.BUSINESS_TERM_ID.eq(record.getBusinessTermId()))
                         .execute();
-                return null;
             } else {
-                return dslContext().insertInto(BUSINESS_TERM)
+                ULong createdBusinessTermId = dslContext().insertInto(BUSINESS_TERM)
                         .set(record)
                         .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
-                        .fetchOne().getBusinessTermId().toBigInteger();
+                        .fetchOne().getBusinessTermId();
+                createdRecordIds.add(createdBusinessTermId.toBigInteger());
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }
 
         return new CreateBulkBusinessTermResponse(createdRecordIds);
     }

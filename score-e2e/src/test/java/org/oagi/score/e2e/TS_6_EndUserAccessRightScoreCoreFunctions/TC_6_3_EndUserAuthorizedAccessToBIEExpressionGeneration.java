@@ -22,11 +22,14 @@ import org.openqa.selenium.TimeoutException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends BaseTest {
 
     private List<AppUserObject> randomAccounts = new ArrayList<>();
@@ -35,7 +38,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -46,7 +48,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_1")
     public void test_TA_1() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject earilerRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
@@ -100,21 +102,26 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccpThree, usera, "QA");
             biesForTesting.add(useraBIEQA);
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
+            assertEquals(usera.getAppUserId(), topLevelAsbiep.getOwnerUserId());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
+                waitFor(ofMillis(1000L));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
                 }
             }
+
+            expressBIEPage.openPage();
         }
     }
 
@@ -122,12 +129,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_2")
     public void test_TA_2() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -140,14 +147,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "WIP");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnerUserId());
             assertEquals("WIP", topLevelAsbiep.getState());
             assertThrows(TimeoutException.class, () -> {
                 expressBIEPage.selectBIEForExpression(topLevelAsbiep);
@@ -159,12 +166,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_3")
     public void test_TA_3() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -177,19 +184,20 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnerUserId());
             assertEquals("QA", topLevelAsbiep.getState());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -202,12 +210,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_4")
     public void test_TA_4() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -220,19 +228,20 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
-            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), topLevelAsbiep.getOwnerUserId());
             assertEquals("Production", topLevelAsbiep.getState());
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -245,12 +254,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_5")
     public void test_TA_5() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -263,11 +272,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -285,7 +293,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -298,12 +308,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_6")
     public void test_TA_6() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -316,11 +326,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -343,7 +352,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -356,12 +367,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_7")
     public void test_TA_7() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -398,7 +409,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -411,12 +424,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_8")
     public void test_TA_8() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -429,11 +442,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -454,7 +466,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -467,12 +481,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_9")
     public void test_TA_9() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -485,11 +499,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(userb);
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -507,12 +520,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_10")
     public void test_TA_10() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -526,11 +539,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             TopLevelASBIEPObject useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "Production");
             biesForTesting.add(useraBIEWIP);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -548,12 +560,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_11")
     public void test_TA_11() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -589,7 +601,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -602,12 +616,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_12")
     public void test_TA_12() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -625,7 +639,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -642,7 +655,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -655,12 +670,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_13")
     public void test_TA_13() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -678,7 +693,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             assertDoesNotThrow(() -> expressBIEPage.selectBIEForExpression(topLevelAsbiep));
@@ -695,7 +709,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File generatedBIEExpression = null;
             try {
-                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (generatedBIEExpression != null) {
                     generatedBIEExpression.delete();
@@ -708,13 +724,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_14")
     public void test_TA_14() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -740,7 +756,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
 
@@ -761,7 +776,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         File generatedBIEExpression = null;
         try {
-            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                    (filename) -> Pattern.matches("[0-9a-f]{32}.xsd", filename));
         } finally {
             if (generatedBIEExpression != null) {
                 generatedBIEExpression.delete();
@@ -773,13 +789,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_15")
     public void test_TA_15() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -805,7 +821,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
 
@@ -838,13 +853,13 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_16")
     public void test_TA_16() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            ;
+
             thisAccountWillBeDeletedAfterTests(usera);
             thisAccountWillBeDeletedAfterTests(userb);
 
@@ -870,7 +885,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
 
@@ -880,7 +894,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         File generatedBIEExpression = null;
         try {
-            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON, true);
+            generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                    (filename) -> Pattern.matches("[0-9a-f]{32}.json", filename));
         } finally {
             if (generatedBIEExpression != null) {
                 generatedBIEExpression.delete();
@@ -892,7 +907,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_17")
     public void test_TA_17() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
@@ -920,11 +935,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
 
@@ -946,7 +960,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_18")
     public void test_TA_18() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         BusinessContextObject context;
@@ -978,7 +992,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -990,7 +1003,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1010,7 +1025,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_18a")
     public void test_TA_18a() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         BusinessContextObject context;
@@ -1038,11 +1053,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -1055,7 +1069,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1075,7 +1091,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_18b")
     public void test_TA_18b() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
@@ -1109,11 +1125,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -1125,7 +1140,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1145,7 +1162,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_18c")
     public void test_TA_18c() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
@@ -1179,11 +1196,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -1196,7 +1212,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1216,7 +1234,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_19")
     public void test_TA_19() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         BusinessContextObject context;
@@ -1253,10 +1271,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
@@ -1279,7 +1296,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_20")
     public void test_TA_20() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         BusinessContextObject context;
         ASCCPObject asccp;
         {
@@ -1310,10 +1327,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -1326,7 +1342,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_21")
     public void test_TA_21() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         BusinessContextObject context;
         ASCCPObject asccp;
         ReleaseObject release;
@@ -1357,22 +1373,21 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         expressBIEPage.setBranch(release.getReleaseNumber());
-        int numberOfBIEsDisplayed = expressBIEPage.getNumberfBIEsInTable();
-        int numberofBIEsInIndexBox = expressBIEPage.getNumberOfBIEsInIndexBox();
-        assertEquals(numberOfBIEsDisplayed, numberofBIEsInIndexBox);
+        int numberOfBIEsDisplayed = expressBIEPage.getNumberOfBIEsInTable();
+        int numberOfBIEsInIndexBox = expressBIEPage.getTotalNumberOfItems();
+        assertEquals(numberOfBIEsDisplayed, numberOfBIEsInIndexBox);
     }
 
     @Test
     @DisplayName("TC_6_3_TA_22")
     public void test_TA_22() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         {
             ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
@@ -1400,8 +1415,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -1412,7 +1425,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.toggleBusinessContext();
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -1426,7 +1441,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_23() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
@@ -1463,8 +1478,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -1475,14 +1488,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
             getOperationOptions.toggleMakeAsAnArray();
-            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
-            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnerUserId());
             assertFalse(userb.isDeveloper());
             List<String> acceptedStates = Arrays.asList("QA", "Production");
             assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
             getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
-            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
-            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnerUserId());
             assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
             getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
 
@@ -1491,7 +1504,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -1505,7 +1520,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_24() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
@@ -1542,8 +1557,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -1554,14 +1567,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
             getOperationOptions.toggleMakeAsAnArray();
-            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
-            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), metaHeaderASBIEP.getOwnerUserId());
+            assertEquals(userb.getAppUserId(), metaHeaderASBIEP.getOwnerUserId());
             assertTrue(userb.isDeveloper());
             List<String> acceptedStates = Arrays.asList("QA", "Production");
             assertTrue(acceptedStates.contains(metaHeaderASBIEP.getState()));
             getOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
-            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
-            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnwerUserId());
+            assertNotEquals(usera.getAppUserId(), paginationResponseASBIEP.getOwnerUserId());
+            assertEquals(userb.getAppUserId(), paginationResponseASBIEP.getOwnerUserId());
             assertTrue(acceptedStates.contains(paginationResponseASBIEP.getState()));
             getOperationOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
 
@@ -1570,7 +1583,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -1583,7 +1598,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_25")
     public void test_TA_25() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject paginationResponseASBIEP;
         BusinessContextObject context;
@@ -1615,7 +1630,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -1625,7 +1639,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1645,7 +1661,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_25a")
     public void test_TA_25a() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject paginationResponseASBIEP;
         BusinessContextObject context;
@@ -1677,7 +1693,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
             assertDoesNotThrow(() -> {
@@ -1688,7 +1703,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(file);
                 JsonNode rootNode = root.path("properties");
@@ -1708,7 +1725,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_26")
     public void test_TA_26() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         TopLevelASBIEPObject paginationResponseASBIEP;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -1743,12 +1760,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
-
         }
+
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
@@ -1765,7 +1780,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     @DisplayName("TC_6_3_TA_27")
     public void test_TA_27() {
         AppUserObject usera;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject reusableASCCP;
         BusinessContextObject context;
         ReleaseObject release;
@@ -1790,7 +1805,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             reusableBIE = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), reusableASCCP, usera, "QA");
 
-
             ACCObject accOne = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
             coreComponentAPI.appendASCC(accOne, reusableASCCP, "Published");
             ASCCPObject asccpOne = coreComponentAPI.createRandomASCCP(accOne, usera, namespace, "Published");
@@ -1814,8 +1828,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         for (TopLevelASBIEPObject bie : biesForTesting) {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(bie);
@@ -1824,15 +1836,17 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
                     editBIEPage.reuseBIEOnNode("/" + asccp.getPropertyTerm() + "/" + reusableASCCP.getPropertyTerm());
             selectProfileBIEToReuse.selectBIEToReuse(reusableBIE);
         }
-        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
 
+        ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         assertDoesNotThrow(() -> {
             expressBIEPage.selectBIEForExpression(reusableBIE);
         });
         expressBIEPage.selectXMLSchemaExpression();
         File file = null;
         try {
-            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML);
+            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
+                    (filename) -> expectedFilename.equals(filename));
         } finally {
             if (file != null) {
                 file.delete();
@@ -1842,7 +1856,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         expressBIEPage.selectJSONSchemaExpression();
         file = null;
         try {
-            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll(" ", "") + ".json";
+            file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                    (filename) -> expectedFilename.equals(filename));
         } finally {
             if (file != null) {
                 file.delete();
@@ -1855,7 +1871,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_28() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         {
@@ -1880,8 +1896,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -1893,7 +1907,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -1907,7 +1923,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_29() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -1941,10 +1957,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -1967,7 +1980,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_30() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         {
@@ -1992,8 +2005,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2005,7 +2016,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2019,7 +2032,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_31() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2053,10 +2066,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2080,7 +2090,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_32() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         {
@@ -2105,8 +2115,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2120,7 +2128,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2134,7 +2144,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_33() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2168,10 +2178,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2197,7 +2204,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_34() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2228,8 +2235,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2243,7 +2248,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2257,7 +2264,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_35() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2297,10 +2304,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2317,7 +2321,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             if (file != null) {
                 file.delete();
             }
-
         }
     }
 
@@ -2326,7 +2329,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_36() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2363,8 +2366,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2379,7 +2380,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2393,7 +2396,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_37() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2439,10 +2442,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2460,7 +2460,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             if (file != null) {
                 file.delete();
             }
-
         }
     }
 
@@ -2469,7 +2468,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_38() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         {
@@ -2494,8 +2493,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2509,7 +2506,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2523,7 +2522,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_39() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2557,10 +2556,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2577,7 +2573,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             if (file != null) {
                 file.delete();
             }
-
         }
     }
 
@@ -2586,7 +2581,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_40() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2617,8 +2612,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2632,7 +2625,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2646,7 +2641,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_41() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         ReleaseObject release;
@@ -2686,10 +2681,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2706,7 +2698,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             if (file != null) {
                 file.delete();
             }
-
         }
     }
 
@@ -2715,7 +2706,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_42() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2752,8 +2743,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2769,7 +2758,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2783,7 +2774,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_43() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2828,10 +2819,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -2858,7 +2846,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_44() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2895,8 +2883,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -2916,7 +2902,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -2930,7 +2918,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_45() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -2975,10 +2963,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });
@@ -3009,7 +2994,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_46() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -3046,8 +3031,6 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
         for (TopLevelASBIEPObject bie : biesForTesting) {
             assertDoesNotThrow(() -> {
@@ -3067,7 +3050,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON);
+                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
+                        (filename) -> expectedFilename.equals(filename));
             } finally {
                 if (file != null) {
                     file.delete();
@@ -3081,7 +3066,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
     public void test_TA_47() {
         AppUserObject usera;
         AppUserObject userb;
-        ArrayList<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
+        List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
@@ -3126,10 +3111,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
-        getDriver().manage().window().maximize();
-
         ExpressBIEPage expressBIEPage = bieMenu.openExpressBIESubMenu();
-
         assertDoesNotThrow(() -> {
             expressBIEPage.selectMultipleBIEsForExpression(release, biesForTesting);
         });

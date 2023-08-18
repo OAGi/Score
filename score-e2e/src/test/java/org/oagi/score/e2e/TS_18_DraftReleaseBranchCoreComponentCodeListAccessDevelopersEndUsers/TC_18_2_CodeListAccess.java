@@ -18,7 +18,6 @@ import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
-import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_18_2_CodeListAccess extends BaseTest {
@@ -111,7 +109,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
         CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         assertDisabled(editCodeListPage.getNamespaceSelectField());
         assertDisabled(editCodeListPage.getListIDField());
         assertDisabled(editCodeListPage.getAgencyIDListField());
@@ -146,7 +144,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         viewEditCodeListPage.setBranch(existingReleaseNum);
 
         for (String state : clStates) {
-            viewEditCodeListPage.toggleState(state);
+            viewEditCodeListPage.setState(state);
             viewEditCodeListPage.hitSearchButton();
             assertEquals(0, getDriver().findElements(By.xpath("//score-cc-list//table//tbody//tr")).size());
         }
@@ -162,7 +160,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"New Code List\")]//ancestor::button[1]")).size());
 
         CodeListObject codeListCandidate = developerCodeListWithStateContainer.stateCodeLists.get("Candidate");
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListCandidate.getName(), existingReleaseNum);
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
         assertDisabled(editCodeListPage.getNamespaceSelectField());
         assertDisabled(editCodeListPage.getListIDField());
         assertDisabled(editCodeListPage.getAgencyIDListField());

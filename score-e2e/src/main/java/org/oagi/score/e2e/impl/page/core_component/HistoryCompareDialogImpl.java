@@ -10,7 +10,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.visibilityOfAllElementsLocatedBy;
 
 public class HistoryCompareDialogImpl implements HistoryCompareDialog {
 

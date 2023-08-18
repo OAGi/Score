@@ -13,6 +13,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.time.Duration;
 
 import static java.time.Duration.ofMillis;
+import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
@@ -47,6 +48,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
+            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Append Property at Last\")]");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -196,13 +199,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public void setNamespace(NamespaceObject namespace) {
-        click(getNamespaceField());
-        waitFor(ofMillis(1000L));
-        WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
-        click(option);
-        waitFor(ofMillis(1000L));
-        assert getNamespaceFieldValue().equals(namespace.getUri());
+        retry(() -> {
+            click(getNamespaceField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option[1]"));
+            click(optionField);
+        });
     }
 
     @Override
@@ -230,9 +233,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            return getNodeByName(nodes[nodes.length - 1]);
+        });
     }
 
     @Override
@@ -271,11 +276,11 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public SelectAssociationDialog appendPropertyAtLast(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         } catch (TimeoutException e) {
             click(node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
+            click(elementToBeClickable(getDriver(), APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR));
         }
         SelectAssociationDialog selectAssociationDialog =
                 new SelectAssociationDialogImpl(this, "Append Property at Last");
@@ -289,8 +294,9 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
         WebElement node = getNodeByName(nodeName);
-        click(node);
+        click(getDriver(), node);
         new Actions(getDriver()).sendKeys("O").perform();
+        waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
                     By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
@@ -299,7 +305,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         } catch (WebDriverException ignore) {
         }
         WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
+        click(getDriver(), contextMenuIcon);
+        waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
         return node;
@@ -307,7 +314,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public WebElement getSearchField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_FIELD_LOCATOR);
     }
 
     @Override
@@ -328,11 +335,12 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR), path);
+        WebElement searchInput = getSearchField();
+        click(searchInput);
+        WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);
-        clear(getSearchField());
+        clear(searchInput);
         return node;
     }
 

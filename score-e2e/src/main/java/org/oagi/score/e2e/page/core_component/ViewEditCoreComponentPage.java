@@ -2,6 +2,8 @@ package org.oagi.score.e2e.page.core_component;
 
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -53,6 +55,20 @@ public interface ViewEditCoreComponentPage extends Page {
      * @param state
      */
     void setState(String state);
+
+    /**
+     * Return the UI element of the 'Owner' select field.
+     *
+     * @return the UI element of the 'Owner' select field
+     */
+    WebElement getOwnerSelectField();
+
+    /**
+     * Set the UI element of the 'Owner' select field with the given type.
+     *
+     * @param owner
+     */
+    void setOwner(String owner);
 
     /**
      * Return the UI element of the 'Updated Start Date' field.
@@ -167,6 +183,15 @@ public interface ViewEditCoreComponentPage extends Page {
     ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch);
 
     /**
+     * Open the 'ACC' page by the table record.
+     *
+     * @param tr the table record
+     * @return the 'ACC' page object
+     *
+     */
+    ACCViewEditPage openACCViewEditPage(WebElement tr);
+
+    /**
      * Open the page of the ACC by its manifest ID.
      *
      * @param accManifestID manifest ID
@@ -182,6 +207,15 @@ public interface ViewEditCoreComponentPage extends Page {
      * @return the ASCCP page object
      */
     ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch);
+
+    /**
+     * Open the 'ASCCP' page by the table record.
+     *
+     * @param tr the table record
+     * @return the 'ASCCP' page object
+     *
+     */
+    ASCCPViewEditPage openASCCPViewEditPage(WebElement tr);
 
     /**
      * Open the page of the ASCCP by its manifest ID.

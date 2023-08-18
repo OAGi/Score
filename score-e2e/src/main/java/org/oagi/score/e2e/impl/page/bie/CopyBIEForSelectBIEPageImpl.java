@@ -263,6 +263,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
             }
             WebElement select = getColumnByName(tr, "select");
             click(select);
+            waitFor(Duration.ofMillis(1000L));
             click(getCopyButton());
             assert "Copying request queued".equals(getSnackBarMessage(getDriver()));
 

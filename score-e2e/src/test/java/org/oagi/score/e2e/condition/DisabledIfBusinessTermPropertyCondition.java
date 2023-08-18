@@ -18,7 +18,7 @@ import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 public class DisabledIfBusinessTermPropertyCondition implements ExecutionCondition {
 
     private static final ConditionEvaluationResult ENABLED = ConditionEvaluationResult.enabled(
-            "No @DisabledIfApplicationSettings conditions resulting in 'disabled' execution encountered");
+            "No @DisabledIfBusinessTermProperty conditions resulting in 'disabled' execution encountered");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override

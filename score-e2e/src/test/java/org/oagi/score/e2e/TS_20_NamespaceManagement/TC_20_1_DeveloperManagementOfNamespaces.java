@@ -28,7 +28,7 @@ import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
-public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
+public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
@@ -150,7 +150,7 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertDisabled(editNamespacePage.getDescriptionField());
         assertChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]")).size());
         homePage.logout();
 
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -159,9 +159,9 @@ public class TC_20_1_DeveloperManagementOFNamespaces extends BaseTest {
         assertDisabled(editNamespacePage.getURIField());
         assertDisabled(editNamespacePage.getPrefixField());
         assertDisabled(editNamespacePage.getDescriptionField());
-        assertNotChecked(editNamespacePage.getStandardCheckboxField());
+        assertChecked(editNamespacePage.getStandardCheckboxField());
         assertDisabled(editNamespacePage.getStandardCheckboxField());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]")).size());
         homePage.logout();
     }
 

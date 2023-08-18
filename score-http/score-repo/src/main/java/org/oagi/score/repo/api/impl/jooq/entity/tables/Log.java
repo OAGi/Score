@@ -9,12 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import org.jooq.Check;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Function11;
 import org.jooq.Identity;
 import org.jooq.Index;
-import org.jooq.JSON;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.UInteger;
@@ -74,7 +75,7 @@ public class Log extends TableImpl<LogRecord> {
      * component after it has been published, the component receives a new
      * revision number. Revision number can be 1, 2, and so on.
      */
-    public final TableField<LogRecord, UInteger> REVISION_NUM = createField(DSL.name("revision_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGERUNSIGNED)), this, "This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.");
+    public final TableField<LogRecord, UInteger> REVISION_NUM = createField(DSL.name("revision_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.field(DSL.raw("1"), SQLDataType.INTEGERUNSIGNED)), this, "This is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 1, 2, and so on.");
 
     /**
      * The column <code>oagi.log.revision_tracking_num</code>. This supports the
@@ -82,33 +83,33 @@ public class Log extends TableImpl<LogRecord> {
      * from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM
      * can be 1, 2, and so on.
      */
-    public final TableField<LogRecord, UInteger> REVISION_TRACKING_NUM = createField(DSL.name("revision_tracking_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGERUNSIGNED)), this, "This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.");
+    public final TableField<LogRecord, UInteger> REVISION_TRACKING_NUM = createField(DSL.name("revision_tracking_num"), SQLDataType.INTEGERUNSIGNED.nullable(false).defaultValue(DSL.field(DSL.raw("1"), SQLDataType.INTEGERUNSIGNED)), this, "This supports the ability to undo changes during a revision (life cycle of a revision is from the component's WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.");
 
     /**
      * The column <code>oagi.log.log_action</code>. This indicates the action
      * associated with the record.
      */
-    public final TableField<LogRecord, String> LOG_ACTION = createField(DSL.name("log_action"), SQLDataType.VARCHAR(20), this, "This indicates the action associated with the record.");
+    public final TableField<LogRecord, String> LOG_ACTION = createField(DSL.name("log_action"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This indicates the action associated with the record.");
 
     /**
      * The column <code>oagi.log.reference</code>.
      */
-    public final TableField<LogRecord, String> REFERENCE = createField(DSL.name("reference"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "");
+    public final TableField<LogRecord, String> REFERENCE = createField(DSL.name("reference"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.log.snapshot</code>.
      */
-    public final TableField<LogRecord, JSON> SNAPSHOT = createField(DSL.name("snapshot"), SQLDataType.JSON, this, "");
+    public final TableField<LogRecord, String> SNAPSHOT = createField(DSL.name("snapshot"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>oagi.log.prev_log_id</code>.
      */
-    public final TableField<LogRecord, ULong> PREV_LOG_ID = createField(DSL.name("prev_log_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<LogRecord, ULong> PREV_LOG_ID = createField(DSL.name("prev_log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.log.next_log_id</code>.
      */
-    public final TableField<LogRecord, ULong> NEXT_LOG_ID = createField(DSL.name("next_log_id"), SQLDataType.BIGINTUNSIGNED, this, "");
+    public final TableField<LogRecord, ULong> NEXT_LOG_ID = createField(DSL.name("next_log_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     /**
      * The column <code>oagi.log.created_by</code>.
@@ -215,6 +216,13 @@ public class Log extends TableImpl<LogRecord> {
     }
 
     @Override
+    public List<Check<LogRecord>> getChecks() {
+        return Arrays.asList(
+            Internal.createCheck(this, DSL.name("snapshot"), "json_valid(`snapshot`)", true)
+        );
+    }
+
+    @Override
     public Log as(String alias) {
         return new Log(DSL.name(alias), this);
     }
@@ -258,14 +266,14 @@ public class Log extends TableImpl<LogRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<ULong, String, UInteger, UInteger, String, String, JSON, ULong, ULong, ULong, LocalDateTime> fieldsRow() {
+    public Row11<ULong, String, UInteger, UInteger, String, String, String, ULong, ULong, ULong, LocalDateTime> fieldsRow() {
         return (Row11) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super JSON, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -273,7 +281,7 @@ public class Log extends TableImpl<LogRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super JSON, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

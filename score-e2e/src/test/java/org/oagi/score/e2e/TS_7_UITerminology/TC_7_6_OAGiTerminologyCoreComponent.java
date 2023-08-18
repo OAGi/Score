@@ -120,7 +120,6 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
-
         homePage.getLoginIDMenu().checkOAGISTerminology();
 
         String objectClassTermFieldACCPageTitle = accViewEditPage.getObjectClassTermFieldLabel();
@@ -136,6 +135,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
         ACCExtensionViewEditPage accExtensionViewEditPage =
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        homePage.getLoginIDMenu().checkOAGISTerminology();
 
         String objectClassTermFieldBIEPageTitleLocalExtension = accExtensionViewEditPage.getObjectClassTermFieldLabel();
         assertEquals("Object Class Term (Space Separated Name)", objectClassTermFieldBIEPageTitleLocalExtension);
@@ -147,10 +147,10 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
         BusinessContextObject contextGlobalExtension = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
         TopLevelASBIEPObject topLevelAsbiepGlobalExtension = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(contextGlobalExtension), asccp, endUser, "WIP");
-        bieMenu = homePage.getBIEMenu();
-        viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
+        viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiepGlobalExtension);
         accExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        homePage.getLoginIDMenu().checkOAGISTerminology();
 
         String objectClassTermFieldBIEPageTitleGlobalExtension = accExtensionViewEditPage.getObjectClassTermFieldLabel();
         assertEquals("Object Class Term (Space Separated Name)", objectClassTermFieldBIEPageTitleGlobalExtension);

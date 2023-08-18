@@ -27,6 +27,7 @@ import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_25_1_ReuseBIE extends BaseTest {
@@ -271,9 +272,18 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")));
-        ArrayList<String> tabs = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(tabs.get(1));
+        String currentTab = getDriver().getWindowHandle();
+        retry(() -> {
+            click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon[@mattooltip=\"Reused\"]")));
+            defaultWait(getDriver()).until(numberOfWindowsToBe(2));
+        });
+        // Loop through until we find a new window handle
+        for (String windowHandle : getDriver().getWindowHandles()) {
+            if (!currentTab.contentEquals(windowHandle)) {
+                getDriver().switchTo().window(windowHandle);
+                break;
+            }
+        }
 
         String currentUrl = getDriver().getCurrentUrl();
         BigInteger topLevelAsbiepId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
@@ -297,7 +307,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         AppUserObject anotherDeveloper, developer;
         NamespaceObject developerNamespace;
         BusinessContextObject context;
-        TopLevelASBIEPObject developerBIE;
+        TopLevelASBIEPObject reuseTopLevelASBIEP, topLevelASBIEP;
         String current_release = "10.8.8";
         ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -317,36 +327,30 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer_asccp = coreComponentAPI.createRandomASCCP(developer_acc, developer, developerNamespace, "Published");
             ASCCObject ascc = coreComponentAPI.appendASCC(developer_acc_association, developer_asccp, "Published");
             developer_asccp_for_usera = coreComponentAPI.createRandomASCCP(developer_acc_association, developer, developerNamespace, "Published");
-            developerBIE = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(context), developer_asccp, developer, "WIP");
 
+            reuseTopLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                    Collections.singletonList(context), developer_asccp, developer, "WIP");
+            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
+                    Collections.singletonList(context), developer_asccp_for_usera, developer, "WIP");
         }
+
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
-        viewEditBIEPage.openPage();
-        viewEditBIEPage.setBranch(current_release);
-        viewEditBIEPage.setDEN(developerBIE.getDen());
-        viewEditBIEPage.hitSearchButton();
-        WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
-        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        WebElement reusedASCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(reuseTopLevelASBIEP);
+        WebElement reusedASCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
         asbiePanel.setRemark("aRemark");
         editBIEPage.hitUpdateButton();
 
         viewEditBIEPage.openPage();
-        CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage = viewEditBIEPage.openCreateBIEPage().next(Collections.singletonList(context));
-        createBIEForSelectTopLevelConceptPage.createBIE(developer_asccp_for_usera.getDen(), current_release);
-        viewEditBIEPage.openPage();
-        viewEditBIEPage.setBranch(current_release);
-        viewEditBIEPage.setDEN(developer_asccp_for_usera.getDen());
-        viewEditBIEPage.hitSearchButton();
-        tr = viewEditBIEPage.getTableRecordAtIndex(1);
-        editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
-        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
+        editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelASBIEP);
+        String reusedAsccpPath = "/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm();
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode(reusedAsccpPath);
+        selectProfileBIEToReuseDialog.selectBIEToReuse(reuseTopLevelASBIEP);
+
         editBIEPage.openPage();
-        reusedASCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
+        reusedASCCPNode = editBIEPage.getNodeByPath(reusedAsccpPath);
         asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
         assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
     }

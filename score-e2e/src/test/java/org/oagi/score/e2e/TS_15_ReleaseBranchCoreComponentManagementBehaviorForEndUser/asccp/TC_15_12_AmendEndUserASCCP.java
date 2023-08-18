@@ -19,9 +19,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
@@ -194,12 +196,38 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
                 editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         accExtensionViewEditPage.setNamespace(endUserNamespace);
         accExtensionViewEditPage.hitUpdateButton();
-        accExtensionViewEditPage.moveToQA();
-        assertEquals("QA", accExtensionViewEditPage.getStateFieldValue());
-        assertEquals(endUser.getLoginId(), accExtensionViewEditPage.getOwnerFieldValue());
-        accExtensionViewEditPage.moveToProduction();
-        assertEquals("Production", accExtensionViewEditPage.getStateFieldValue());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]")).size());
+
+        String BieUEG = asccp.getPropertyTerm() + " User Extension Group";
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+        for (String ccState : Arrays.asList("ACC", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setBranch(branch);
+        viewEditCoreComponentPage.setOwner(endUser.getLoginId());
+        viewEditCoreComponentPage.setDEN(BieUEG);
+        viewEditCoreComponentPage.hitSearchButton();
+        assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"" + asccp.getPropertyTerm() + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + endUser.getLoginId() + "\")]")).size());
+
+        viewEditCoreComponentPage.openPage();
+        waitFor(Duration.ofMillis(3000L));
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        options = getDriver().findElements(By.cssSelector("mat-option"));
+        for (String ccState : Arrays.asList("BCCP", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
+        escape(getDriver());
+        viewEditCoreComponentPage.setBranch(branch);
+        viewEditCoreComponentPage.setOwner(endUser.getLoginId());
+        viewEditCoreComponentPage.setDEN(BieUEG);
+        viewEditCoreComponentPage.hitSearchButton();
+        assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner(BieUEG, endUser.getLoginId()).isDisplayed());
+
     }
 
     @Test
@@ -423,7 +451,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getDeprecatedCheckbox());
-        assertDisabled(asccpPanel.getDeprecatedCheckbox());
+        assertEnabled(asccpPanel.getDeprecatedCheckbox());
     }
 
     @Test
@@ -517,7 +545,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
         assertChecked(asccpPanel.getNillableCheckbox());
-        assertDisabled(asccpPanel.getNillableCheckbox());
+        assertEnabled(asccpPanel.getNillableCheckbox());
     }
 
     @Test
@@ -690,7 +718,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
         assertFalse(bccpPanel.getPropertyTermField().isEnabled());
-        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertEnabled(bccpPanel.getNillableCheckbox());
         assertDisabled(bccpPanel.getDeprecatedCheckbox());
         assertDisabled(bccpPanel.getValueConstraintSelectField());
         assertDisabled(bccpPanel.getNamespaceSelectField());

@@ -102,6 +102,14 @@ public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEd
     }
 
     @Override
+    public EditAgencyIDListPage openEditAgencyIDListPage(AgencyIDListObject agencyIDList) {
+        EditAgencyIDListPage editAgencyIDListPage = new EditAgencyIDListPageImpl(this, agencyIDList);
+        editAgencyIDListPage.openPage();
+        assert editAgencyIDListPage.isOpened();
+        return editAgencyIDListPage;
+    }
+
+    @Override
     public EditAgencyIDListPage openEditAgencyIDListPageByNameAndBranch(String name, String branch) {
         setBranch(branch);
         setName(name);

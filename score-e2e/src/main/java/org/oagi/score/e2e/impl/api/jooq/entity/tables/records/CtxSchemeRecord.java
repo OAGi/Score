@@ -4,6 +4,8 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record13;
@@ -12,44 +14,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme;
 
-import java.time.LocalDateTime;
-
 
 /**
  * This table represents a context scheme (a classification scheme) for a
  * context category.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implements Record13<ULong, String, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a detached CtxSchemeRecord
+     * Setter for <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary,
+     * database key.
      */
-    public CtxSchemeRecord() {
-        super(CtxScheme.CTX_SCHEME);
-    }
-
-    /**
-     * Create a detached, initialised CtxSchemeRecord
-     */
-    public CtxSchemeRecord(ULong ctxSchemeId, String guid, String schemeId, String schemeName, String description, String schemeAgencyId, String schemeVersionId, ULong ctxCategoryId, ULong codeListId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
-        super(CtxScheme.CTX_SCHEME);
-
-        setCtxSchemeId(ctxSchemeId);
-        setGuid(guid);
-        setSchemeId(schemeId);
-        setSchemeName(schemeName);
-        setDescription(description);
-        setSchemeAgencyId(schemeAgencyId);
-        setSchemeVersionId(schemeVersionId);
-        setCtxCategoryId(ctxCategoryId);
-        setCodeListId(codeListId);
-        setCreatedBy(createdBy);
-        setLastUpdatedBy(lastUpdatedBy);
-        setCreationTimestamp(creationTimestamp);
-        setLastUpdateTimestamp(lastUpdateTimestamp);
+    public void setCtxSchemeId(ULong value) {
+        set(0, value);
     }
 
     /**
@@ -61,11 +41,11 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary,
-     * database key.
+     * Setter for <code>oagi.ctx_scheme.guid</code>. A globally unique
+     * identifier (GUID).
      */
-    public void setCtxSchemeId(ULong value) {
-        set(0, value);
+    public void setGuid(String value) {
+        set(1, value);
     }
 
     /**
@@ -77,35 +57,19 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.guid</code>. A globally unique
-     * identifier (GUID).
-     */
-    public void setGuid(String value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>oagi.ctx_scheme.scheme_id</code>. External
-     * identification of the scheme.
-     */
-    public String getSchemeId() {
-        return (String) get(2);
-    }
-
-    /**
      * Setter for <code>oagi.ctx_scheme.scheme_id</code>. External
-     * identification of the scheme.
+     * identification of the scheme. 
      */
     public void setSchemeId(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
-     * the context scheme.
+     * Getter for <code>oagi.ctx_scheme.scheme_id</code>. External
+     * identification of the scheme. 
      */
-    public String getSchemeName() {
-        return (String) get(3);
+    public String getSchemeId() {
+        return (String) get(2);
     }
 
     /**
@@ -117,11 +81,11 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.description</code>. Description of the
-     * context scheme.
+     * Getter for <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
+     * the context scheme.
      */
-    public String getDescription() {
-        return (String) get(4);
+    public String getSchemeName() {
+        return (String) get(3);
     }
 
     /**
@@ -133,12 +97,11 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
-     * of the agency maintaining the scheme. This column currently does not use
-     * the AGENCY_ID_LIST table. It is just a free form text at this point.
+     * Getter for <code>oagi.ctx_scheme.description</code>. Description of the
+     * context scheme.
      */
-    public String getSchemeAgencyId() {
-        return (String) get(5);
+    public String getDescription() {
+        return (String) get(4);
     }
 
     /**
@@ -151,11 +114,12 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_version_id</code>. Version number
-     * of the context scheme.
+     * Getter for <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
+     * of the agency maintaining the scheme. This column currently does not use
+     * the AGENCY_ID_LIST table. It is just a free form text at this point.
      */
-    public String getSchemeVersionId() {
-        return (String) get(6);
+    public String getSchemeAgencyId() {
+        return (String) get(5);
     }
 
     /**
@@ -167,12 +131,11 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.ctx_category_id</code>. This the foreign
-     * key to the CTX_CATEGORY table. It identifies the context category
-     * associated with this context scheme.
+     * Getter for <code>oagi.ctx_scheme.scheme_version_id</code>. Version number
+     * of the context scheme.
      */
-    public ULong getCtxCategoryId() {
-        return (ULong) get(7);
+    public String getSchemeVersionId() {
+        return (String) get(6);
     }
 
     /**
@@ -185,12 +148,12 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.code_list_id</code>. This is the foreign
-     * key to the CODE_LIST table. It identifies the code list associated with
-     * this context scheme.
+     * Getter for <code>oagi.ctx_scheme.ctx_category_id</code>. This the foreign
+     * key to the CTX_CATEGORY table. It identifies the context category
+     * associated with this context scheme.
      */
-    public ULong getCodeListId() {
-        return (ULong) get(8);
+    public ULong getCtxCategoryId() {
+        return (ULong) get(7);
     }
 
     /**
@@ -203,11 +166,12 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created this context scheme.
+     * Getter for <code>oagi.ctx_scheme.code_list_id</code>. This is the foreign
+     * key to the CODE_LIST table. It identifies the code list associated with
+     * this context scheme.
      */
-    public ULong getCreatedBy() {
-        return (ULong) get(9);
+    public ULong getCodeListId() {
+        return (ULong) get(8);
     }
 
     /**
@@ -219,12 +183,11 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
-     * scheme.
+     * Getter for <code>oagi.ctx_scheme.created_by</code>. Foreign key to the
+     * APP_USER table. It indicates the user who created this context scheme.
      */
-    public ULong getLastUpdatedBy() {
-        return (ULong) get(10);
+    public ULong getCreatedBy() {
+        return (ULong) get(9);
     }
 
     /**
@@ -237,11 +200,12 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.creation_timestamp</code>. Timestamp
-     * when the scheme was created.
+     * Getter for <code>oagi.ctx_scheme.last_updated_by</code>. Foreign key to
+     * the APP_USER table. It identifies the user who last updated the context
+     * scheme.
      */
-    public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(11);
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(10);
     }
 
     /**
@@ -252,9 +216,21 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
         set(11, value);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Getter for <code>oagi.ctx_scheme.creation_timestamp</code>. Timestamp
+     * when the scheme was created.
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(11);
+    }
+
+    /**
+     * Setter for <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
+     * when the scheme was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(12, value);
+    }
 
     /**
      * Getter for <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
@@ -265,21 +241,17 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
     }
 
     // -------------------------------------------------------------------------
-    // Record13 type implementation
+    // Primary key information
     // -------------------------------------------------------------------------
-
-    /**
-     * Setter for <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
-     * when the scheme was last updated.
-     */
-    public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(12, value);
-    }
 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
     }
+
+    // -------------------------------------------------------------------------
+    // Record13 type implementation
+    // -------------------------------------------------------------------------
 
     @Override
     public Row13<ULong, String, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
@@ -558,10 +530,6 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
         return this;
     }
 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
     @Override
     public CtxSchemeRecord value13(LocalDateTime value) {
         setLastUpdateTimestamp(value);
@@ -584,5 +552,38 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implem
         value12(value12);
         value13(value13);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached CtxSchemeRecord
+     */
+    public CtxSchemeRecord() {
+        super(CtxScheme.CTX_SCHEME);
+    }
+
+    /**
+     * Create a detached, initialised CtxSchemeRecord
+     */
+    public CtxSchemeRecord(ULong ctxSchemeId, String guid, String schemeId, String schemeName, String description, String schemeAgencyId, String schemeVersionId, ULong ctxCategoryId, ULong codeListId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+        super(CtxScheme.CTX_SCHEME);
+
+        setCtxSchemeId(ctxSchemeId);
+        setGuid(guid);
+        setSchemeId(schemeId);
+        setSchemeName(schemeName);
+        setDescription(description);
+        setSchemeAgencyId(schemeAgencyId);
+        setSchemeVersionId(schemeVersionId);
+        setCtxCategoryId(ctxCategoryId);
+        setCodeListId(codeListId);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

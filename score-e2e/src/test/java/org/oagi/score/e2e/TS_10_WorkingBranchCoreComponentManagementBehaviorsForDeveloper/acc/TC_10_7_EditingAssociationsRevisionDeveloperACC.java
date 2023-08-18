@@ -414,6 +414,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMinField("111");
         asccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        asccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
@@ -780,6 +781,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         asccPanel.setCardinalityMaxField("11");
         asccPanel.setDefinition(null);
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        asccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
@@ -1223,6 +1225,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setCardinalityMinField("111");
         bccPanel.setDefinition("Test cardinality min must be less than or equal to cardinality max");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Cardinality Min must be less than or equals to\")]")).size());
+        bccPanel.setCardinalityMinField("0"); // revert
         accViewEditPage.hitUpdateButton();
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("11", getText(bccPanel.getCardinalityMaxField()));
@@ -1671,6 +1674,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccPanel.setCardinalityMinField("111");
         bccPanel.setCardinalityMaxField("11");
         assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(),\"Cardinality Max must be greater than\")]")).size());
+        bccPanel.setCardinalityMaxField("112"); // set the value greater than the cardinality min to activate 'Update' button.
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));

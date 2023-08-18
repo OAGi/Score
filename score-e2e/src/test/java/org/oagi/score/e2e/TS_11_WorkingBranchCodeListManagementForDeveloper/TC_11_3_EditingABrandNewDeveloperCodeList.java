@@ -63,7 +63,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
+
         /**
          * Test Assertion #11.3.1.a
          */
@@ -72,11 +73,13 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListPage.hitUpdateButton();
         String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
         assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
+
         /**
          * Test Assertion #11.3.1.b
          * Note: For developer Based Code list is not visible on the UI
          */
         assertTrue(codeList.getBasedCodeListManifestId() == null);
+
         /**
          * Test Assertion #11.3.1.c
          */
@@ -86,6 +89,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         assertEquals("true", editCodeListPage.getNamespaceSelectField().getAttribute("aria-required"));
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
         assertNotChecked(editCodeListPage.getDeprecatedSelectField());
+
         /**
          * Test Assertion #11.3.1.d
          */
@@ -94,15 +98,19 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         assertEquals("Are you sure you want to update this without definitions?",
                 editCodeListPage.getDefinitionWarningDialogMessage());
         editCodeListPage.hitUpdateAnywayButton();
+
         /**
          * Test Assertion #11.3.1.e
          */
         for (NamespaceObject namespace : namespaceForTesting) {
-            assertThrows(Exception.class, () -> {
-                editCodeListPage.setNamespace(namespace);
-            });
+            if (namespace.isStandardNamespace()) {
+                assertDoesNotThrow(() -> editCodeListPage.setNamespace(namespace));
+            } else {
+                assertThrows(Exception.class, () -> editCodeListPage.setNamespace(namespace));
+            }
         }
         escape(getDriver());
+
         /**
          * Test Assertion #11.3.1.f
          */
@@ -113,6 +121,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         editCodeListValueDialog.setDefinitionSource("test definition source");
         assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
         assertNotChecked(editCodeListValueDialog.getDeprecatedSelectField());
+
         editCodeListValueDialog.hitAddButton();
         editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode("test code");
@@ -120,7 +129,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
         String enteredValue = getText(editCodeListValueDialog.getCodeField());
         editCodeListValueDialog.hitAddButton();
         String message = enteredValue + " already exist";
-        assert message.equals(getSnackBarMessage(getDriver()));
+        assertEquals(message, getSnackBarMessage(getDriver()));
     }
 
     @Test
@@ -139,7 +148,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         assertEquals("true", editCodeListValueDialog.getCodeField().getAttribute("aria-required"));
         assertEquals("true", editCodeListValueDialog.getMeaningField().getAttribute("aria-required"));
@@ -165,7 +174,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.selectCodeListValue(codeListValue.getValue());
         assertDoesNotThrow(() -> editCodeListPage.removeCodeListValue());
     }
@@ -190,7 +199,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(codeListValueOne.getValue());
         editCodeListValueDialog.setCode("new code");
         editCodeListValueDialog.setMeaning("new meaning");
@@ -225,7 +234,7 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
         editCodeListValueDialog.setCode(codeListValueOne.getValue());
         editCodeListValueDialog.setMeaning("different meaning");

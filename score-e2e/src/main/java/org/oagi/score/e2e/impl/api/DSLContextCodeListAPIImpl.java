@@ -1,7 +1,9 @@
 package org.oagi.score.e2e.impl.api;
 
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
-import org.jooq.*;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -81,6 +83,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         codeList.setLastUpdatedBy(codeListRecord.getLastUpdatedBy().toBigInteger());
         codeList.setCreationTimestamp(codeListRecord.getCreationTimestamp());
         codeList.setLastUpdateTimestamp(codeListRecord.getLastUpdateTimestamp());
+        codeList.setReleaseId(codeListManifestRecord.getReleaseId().toBigInteger());
         return codeList;
     }
 
@@ -118,7 +121,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -198,7 +201,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -342,19 +345,6 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
     }
 
     @Override
-    public List<String> getOAGISOwnedLists(BigInteger releaseId) {
-        return dslContext.select(AGENCY_ID_LIST.NAME)
-                .from(AGENCY_ID_LIST)
-                .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
-                .join(APP_USER).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                .where(and(
-                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                        APP_USER.LOGIN_ID.eq("oagis")
-                ))
-                .fetchInto(String.class);
-    }
-
-    @Override
     public boolean checkCodeListUniqueness(CodeListObject codeList, String agencyIDList) {
         List<Result<Record>> records = dslContext.select(CODE_LIST.CODE_LIST_ID)
                 .from(CODE_LIST)
@@ -426,7 +416,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Revised");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 
@@ -580,7 +570,7 @@ public class DSLContextCodeListAPIImpl implements CodeListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(codeListRecord.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"code_list\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"code_list\"}");
         dummyLogRecord.setCreatedBy(codeListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(codeListRecord.getCreationTimestamp());
 

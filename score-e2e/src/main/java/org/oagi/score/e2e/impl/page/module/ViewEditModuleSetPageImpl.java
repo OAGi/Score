@@ -142,11 +142,11 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
             }
             WebElement node = clickOnDropDownMenu(tr);
             try {
-                click(visibilityOfElementLocated(getDriver(), DISCARD_MODULE_SET_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), DISCARD_MODULE_SET_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), DISCARD_MODULE_SET_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), DISCARD_MODULE_SET_OPTION_LOCATOR));
             }
         });
 

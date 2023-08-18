@@ -42,7 +42,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_12_1_TA_1")
     public void test_TA_1() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         ReleaseObject workingBranch;
         {
@@ -83,7 +83,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_12_1_TA_2")
     public void test_TA_2() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         ReleaseObject workingBranch;
         Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
@@ -122,7 +122,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(endUser.getAppUserId(), cl.getOwnerUserId());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getCodeListNameField());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
@@ -141,7 +141,7 @@ public class TC_12_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_12_1_TA_3")
     public void test_TA_3() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUserA;
         ReleaseObject workingBranch;
         {
