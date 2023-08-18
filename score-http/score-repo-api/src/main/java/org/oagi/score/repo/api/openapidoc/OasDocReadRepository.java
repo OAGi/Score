@@ -9,4 +9,8 @@ public interface OasDocReadRepository {
     GetOasDocListResponse getOasDocList(GetOasDocListRequest request) throws ScoreDataAccessException;
 
     GetOasOperationResponse getOasOperation(GetOasOperationRequest request) throws ScoreDataAccessException;
+
+    GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) throws ScoreDataAccessException;
+
+    GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) throws ScoreDataAccessException;
 }

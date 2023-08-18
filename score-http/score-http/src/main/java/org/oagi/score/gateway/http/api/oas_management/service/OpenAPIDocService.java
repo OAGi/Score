@@ -248,4 +248,16 @@ public class OpenAPIDocService {
         GetOasOperationResponse response = scoreRepositoryFactory.createOasDocReadRepository().getOasOperation(request);
         return response;
     }
+
+    @Transactional
+    public GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) {
+        GetOasRequestTableResponse response = scoreRepositoryFactory.createOasDocReadRepository().getOasRequestTable(request);
+        return response;
+    }
+
+    @Transactional
+    public GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) {
+        GetOasResponseTableResponse response = scoreRepositoryFactory.createOasDocReadRepository().getOasResponseTable(request);
+        return response;
+    }
 }

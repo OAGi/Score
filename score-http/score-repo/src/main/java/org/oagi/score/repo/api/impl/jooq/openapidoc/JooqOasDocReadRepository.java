@@ -212,7 +212,7 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
     public GetOasOperationResponse getOasOperation(GetOasOperationRequest request) throws ScoreDataAccessException {
         OasOperation oasOperation = null;
         BigInteger oasResourceId = request.getOasResourceId();
-        if (oasResourceId != null){
+        if (oasResourceId != null) {
             oasOperation = (OasOperation) selectForOasOperation()
                     .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(ULong.valueOf(oasResourceId)))
                     .fetchOne(mapperForOasOperation());
@@ -268,5 +268,143 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                 .from(OAS_OPERATION)
                 .join(APP_USER.as("creator")).on(OAS_OPERATION.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(OAS_OPERATION.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+    }
+
+    @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) throws ScoreDataAccessException {
+        OasRequest oasRequest = null;
+        BigInteger oasOperationId = request.getOasOperationId();
+        if (oasOperationId != null) {
+            oasRequest = (OasRequest) selectForOasRequestTable()
+                    .where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
+                    .fetchOne(mapperForOasRequestTable());
+        }
+        return new GetOasRequestTableResponse(oasRequest);
+    }
+
+    private SelectOnConditionStep selectForOasRequestTable() {
+        return dslContext().select(
+                        OAS_REQUEST.OAS_REQUEST_ID,
+                        OAS_REQUEST.OAS_OPERATION_ID,
+                        OAS_REQUEST.DESCRIPTION,
+                        OAS_REQUEST.REQUIRED,
+                        OAS_REQUEST.OAS_MESSAGE_BODY_ID,
+                        OAS_REQUEST.MAKE_ARRAY_INDICATOR,
+                        OAS_REQUEST.SUPPRESS_ROOT_INDICATOR,
+                        OAS_REQUEST.META_HEADER_TOP_LEVEL_ASBIEP_ID,
+                        OAS_REQUEST.PAGINATION_TOP_LEVEL_ASBIEP_ID,
+                        OAS_REQUEST.IS_CALLBACK,
+                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                        OAS_REQUEST.CREATION_TIMESTAMP,
+                        OAS_REQUEST.LAST_UPDATE_TIMESTAMP)
+                .from(OAS_REQUEST)
+                .join(APP_USER.as("creator")).on(OAS_REQUEST.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(OAS_REQUEST.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+    }
+
+    private RecordMapper<Record, OasRequest> mapperForOasRequestTable() {
+        return record -> {
+            OasRequest oasRequest = new OasRequest();
+            oasRequest.setOasRequestId(record.get(OAS_REQUEST.OAS_REQUEST_ID).toBigInteger());
+            oasRequest.setOasOperationId(record.get(OAS_REQUEST.OAS_OPERATION_ID).toBigInteger());
+            oasRequest.setDescription(record.get(OAS_REQUEST.DESCRIPTION));
+            oasRequest.setRequired((byte) 1 == record.get(OAS_REQUEST.REQUIRED));
+            oasRequest.setOasMessageBodyId(record.get(OAS_REQUEST.OAS_MESSAGE_BODY_ID).toBigInteger());
+            oasRequest.setMakeArrayIndicator((byte) 1 == record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR));
+            oasRequest.setSuppressRootIndicator((byte) 1 == record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR));
+            oasRequest.setMetaHeaderTopLevelAsbiepId(record.get(OAS_REQUEST.META_HEADER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            oasRequest.setPaginationTopLevelAsbiepId(record.get(OAS_REQUEST.PAGINATION_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            oasRequest.setCallback((byte) 1 == record.get(OAS_REQUEST.IS_CALLBACK));
+            oasRequest.setCreatedBy(new ScoreUser(
+                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
+            ));
+            oasRequest.setLastUpdatedBy(new ScoreUser(
+                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
+            ));
+            oasRequest.setCreationTimestamp(
+                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            oasRequest.setLastUpdateTimestamp(
+                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            return oasRequest;
+        };
+    }
+
+    @Override
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) throws ScoreDataAccessException {
+        OasResponse oasResponse = null;
+        BigInteger oasOperationId = request.getOasOperationId();
+        if (oasOperationId != null) {
+            oasResponse = (OasResponse) selectForOasResponseTable()
+                    .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(oasOperationId)))
+                    .fetchOne(mapperForOasResponseTable());
+        }
+        return new GetOasResponseTableResponse(oasResponse);
+    }
+
+    private SelectOnConditionStep selectForOasResponseTable() {
+        return dslContext().select(
+                        OAS_RESPONSE.OAS_RESPONSE_ID,
+                        OAS_RESPONSE.OAS_OPERATION_ID,
+                        OAS_RESPONSE.DESCRIPTION,
+                        OAS_RESPONSE.HTTP_STATUS_CODE,
+                        OAS_RESPONSE.OAS_MESSAGE_BODY_ID,
+                        OAS_RESPONSE.MAKE_ARRAY_INDICATOR,
+                        OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR,
+                        OAS_RESPONSE.META_HEADER_TOP_LEVEL_ASBIEP_ID,
+                        OAS_RESPONSE.PAGINATION_TOP_LEVEL_ASBIEP_ID,
+                        OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR,
+                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                        OAS_RESPONSE.CREATION_TIMESTAMP,
+                        OAS_RESPONSE.LAST_UPDATE_TIMESTAMP)
+                .from(OAS_RESPONSE)
+                .join(APP_USER.as("creator")).on(OAS_RESPONSE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(OAS_RESPONSE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+    }
+
+    private RecordMapper<Record, OasResponse> mapperForOasResponseTable() {
+        return record -> {
+            OasResponse oasResponse = new OasResponse();
+            oasResponse.setOasResponseId(record.get(OAS_RESPONSE.OAS_RESPONSE_ID).toBigInteger());
+            oasResponse.setOasOperationId(record.get(OAS_RESPONSE.OAS_OPERATION_ID).toBigInteger());
+            oasResponse.setDescription(record.get(OAS_RESPONSE.DESCRIPTION));
+            oasResponse.setHttpStatusCode(record.get(OAS_RESPONSE.HTTP_STATUS_CODE));
+            oasResponse.setOasMessageBodyId(record.get(OAS_RESPONSE.OAS_MESSAGE_BODY_ID).toBigInteger());
+            oasResponse.setMakeArrayIndicator((byte) 1 == record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR));
+            oasResponse.setSuppressRootIndicator((byte) 1 == record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR));
+            oasResponse.setMetaHeaderTopLevelAsbiepId(record.get(OAS_RESPONSE.META_HEADER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            oasResponse.setPaginationTopLevelAsbiepId(record.get(OAS_RESPONSE.PAGINATION_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            oasResponse.setIncludeConfirmIndicator((byte) 1 == record.get(OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR));
+            oasResponse.setCreatedBy(new ScoreUser(
+                    record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
+                    record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
+            ));
+            oasResponse.setLastUpdatedBy(new ScoreUser(
+                    record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
+                    record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
+            ));
+            oasResponse.setCreationTimestamp(
+                    Date.from(record.get(OAS_DOC.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            oasResponse.setLastUpdateTimestamp(
+                    Date.from(record.get(OAS_DOC.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            return oasResponse;
+        };
     }
 }
