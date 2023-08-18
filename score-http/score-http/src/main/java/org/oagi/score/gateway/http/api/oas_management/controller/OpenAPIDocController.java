@@ -388,6 +388,50 @@ public class OpenAPIDocController {
                     bieForOasDoc.setOperationId(updatedOperationId);
                 }
             }
+
+            if (bieForOasDoc.getOasOperationId() != null){
+                if (bieForOasDoc.getMessageBody().equals("Request")){
+                    GetOasRequestTableRequest getOasRequestTableRequest = new GetOasRequestTableRequest(authenticationService.asScoreUser(requester))
+                            .withOasOperationId(bieForOasDoc.getOasOperationId());
+                    GetOasRequestTableResponse oasRequestTableResponse = oasDocService.getOasRequestTable(getOasRequestTableRequest);
+                    if (oasRequestTableResponse != null && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()){
+                        String newResourceName = null;
+                        String newOperationId = null;
+                        if (bieForOasDoc.isArrayIndicator()){
+                            newResourceName = bieForOasDoc.getResourceName() + "-list";
+                            newOperationId = bieForOasDoc.getOperationId() +"List";
+                        }else{
+                            String oldResourceName = bieForOasDoc.getResourceName();
+                            newResourceName = oldResourceName.substring(0, oldResourceName.length() -5);
+                            String oldOperationId = bieForOasDoc.getOperationId();
+                            newOperationId = oldOperationId.substring(0, oldOperationId.length() -4);
+                        }
+                        bieForOasDoc.setResourceName(newResourceName);
+                        bieForOasDoc.setOperationId(newOperationId);
+                    }
+                }
+
+                if (bieForOasDoc.getMessageBody().equals("Response")){
+                    GetOasResponseTableRequest getOasResponseTableRequest = new GetOasResponseTableRequest(authenticationService.asScoreUser(requester))
+                            .withOasOperationId(bieForOasDoc.getOasOperationId());
+                    GetOasResponseTableResponse oasResponseTableResponse = oasDocService.getOasResponseTable(getOasResponseTableRequest);
+                    if (oasResponseTableResponse != null && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()){
+                        String newResourceName = null;
+                        String newOperationId = null;
+                        if (bieForOasDoc.isArrayIndicator()){
+                            newResourceName = bieForOasDoc.getResourceName() + "-list";
+                            newOperationId = bieForOasDoc.getOperationId() +"List";
+                        }else{
+                            String oldResourceName = bieForOasDoc.getResourceName();
+                            newResourceName = oldResourceName.substring(0, oldResourceName.length() -5);
+                            String oldOperationId = bieForOasDoc.getOperationId();
+                            newOperationId = oldOperationId.substring(0, oldOperationId.length() -4);
+                        }
+                        bieForOasDoc.setResourceName(newResourceName);
+                        bieForOasDoc.setOperationId(newOperationId);
+                    }
+                }
+            }
         }
 
         UpdateBieForOasDocResponse response = oasDocService.updateDetails(requester, updateBieForOasDocRequest);
