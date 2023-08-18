@@ -366,7 +366,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_RESPONSE.OAS_RESPONSE_ID,
                         OAS_RESPONSE.OAS_OPERATION_ID,
                         OAS_RESPONSE.DESCRIPTION,
-                        OAS_RESPONSE.HTTP_STATUS_CODE,
                         OAS_RESPONSE.OAS_MESSAGE_BODY_ID,
                         OAS_RESPONSE.MAKE_ARRAY_INDICATOR,
                         OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR,
@@ -390,7 +389,6 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasResponse.setOasResponseId(record.get(OAS_RESPONSE.OAS_RESPONSE_ID).toBigInteger());
             oasResponse.setOasOperationId(record.get(OAS_RESPONSE.OAS_OPERATION_ID).toBigInteger());
             oasResponse.setDescription(record.get(OAS_RESPONSE.DESCRIPTION));
-            oasResponse.setHttpStatusCode(record.get(OAS_RESPONSE.HTTP_STATUS_CODE));
             oasResponse.setOasMessageBodyId(record.get(OAS_RESPONSE.OAS_MESSAGE_BODY_ID).toBigInteger());
             oasResponse.setMakeArrayIndicator((byte) 1 == record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR));
             oasResponse.setSuppressRootIndicator((byte) 1 == record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR));

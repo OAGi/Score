@@ -20,6 +20,7 @@ import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -184,7 +185,6 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         if (getBieForOasDocResponse.getLength() > 0) {
             rootNode.setBieForOasDoc(getBieForOasDocResponse.getResults().get(0));
         }
-
         return rootNode;
     }
 

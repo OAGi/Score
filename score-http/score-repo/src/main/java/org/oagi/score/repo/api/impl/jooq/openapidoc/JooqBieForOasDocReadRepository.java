@@ -155,6 +155,10 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
                     OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))));
         }
+        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
+        if (topLevelAsbiepId != null) {
+            conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)));
+        }
         if (!conditions.isEmpty()) {
             bieListForOasDoc = select()
                     .where(conditions)
