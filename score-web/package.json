@@ -1,6 +1,6 @@
 {
   "name": "score-web",
-  "version": "3.1.0-alpha",
+  "version": "3.1.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

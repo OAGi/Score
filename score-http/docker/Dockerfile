@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 tomcat:10.1.9-jdk17-temurin
+FROM --platform=linux/amd64 tomcat:10.1.12-jdk17-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -20,6 +20,6 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
     chmod -R g=u /usr/local/tomcat/
 
 USER 1001
-COPY score-http-3.1.0-alpha.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http-3.1.0.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

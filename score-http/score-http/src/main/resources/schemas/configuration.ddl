@@ -5,5 +5,4 @@ CREATE TABLE `configuration`
     `type`             varchar(100) DEFAULT NULL COMMENT 'The type of configuration property.',
     `value`            varchar(100) DEFAULT NULL COMMENT 'The value of configuration property.',
     PRIMARY KEY (`configuration_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8 COMMENT ='The table stores configuration properties of the application.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci COMMENT='The table stores configuration properties of the application.';
