@@ -66,17 +66,17 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getBranchSelectField() {
-        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            click(getDriver(), optionField);
             escape(getDriver());
         });
     }
