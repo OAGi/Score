@@ -1,12 +1,14 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.release.EditReleasePageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -70,7 +72,6 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(codeList.getReleaseId());
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
             setBranch(release.getReleaseNumber());
-            setState(codeList.getState());
             setOwner(owner.getLoginId());
             openCodeListByName(codeList.getName());
 

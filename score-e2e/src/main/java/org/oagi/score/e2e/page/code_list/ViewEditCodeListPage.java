@@ -3,6 +3,7 @@ package org.oagi.score.e2e.page.code_list;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.openqa.selenium.WebElement;
 
 /**
