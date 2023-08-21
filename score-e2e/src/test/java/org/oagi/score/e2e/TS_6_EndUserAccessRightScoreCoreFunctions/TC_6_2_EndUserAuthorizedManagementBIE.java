@@ -3176,7 +3176,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
         bbiePanel.setRemark("test remark");
         bbiePanel.setExample("test example");
-        bbiePanel.setValueConstraint("Fixed");
+        bbiePanel.setValueConstraint("Fixed Value");
         bbiePanel.setFixedValue("test value");
         bbiePanel.setValueDomainRestriction("Primitive");
         bbiePanel.setValueDomain("token");

@@ -247,6 +247,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     public ViewEditBIEPage copyBIE(String asccpDEN, String branch) {
         setDEN(asccpDEN);
         setBranch(branch);
+        waitFor(Duration.ofMillis(2000));
         hitSearchButton();
 
         return retry(() -> {
