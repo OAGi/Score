@@ -122,62 +122,69 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .headers()
-                .defaultsDisabled()
-                .contentTypeOptions()
-                .and()
-                .frameOptions()
-                .deny()
-                .and()
-                .authorizeRequests()
-                .requestMatchers("/info/**").permitAll()
-                .requestMatchers("/messages/**").permitAll()
-                .requestMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                .and()
-                .formLogin()
-                .loginProcessingUrl("/login")
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .successHandler(authenticationSuccessHandler)
-                .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                        super.onAuthenticationFailure(request, response, exception);
-                    }
+                .headers(headersConfigurer -> {
+                    headersConfigurer.defaultsDisabled()
+                            .contentTypeOptions(contentTypeOptionsCustomizer -> {
+                            })
+                            .frameOptions(frameOptionsConfig -> {
+                                frameOptionsConfig.deny();
+                            });
                 })
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                /**
-                 * RP-Initiated Logout is implemented in
-                 * {@code org.oagi.score.gateway.http.api.account_management.controller.AccountController#oauth2Logout}
-                 * using {@code OidcClientInitiatedLogoutSuccessHandler}
-                 */
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .and()
-                .httpBasic().disable()
-                .cors()
-                .configurationSource(corsConfigurationSource())
-                .and()
-                //.csrf().csrfTokenRepository(csrfTokenRepository())
-                //.and()
-                .csrf().disable()
-                .rememberMe().rememberMeServices(rememberMeServices())
-                .and()
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login")
-                        .loginProcessingUrl("/oauth2/code/*")
-                        .successHandler(authenticationSuccessHandler)
-                        .authorizedClientService(oAuth2AuthorizedClientService)
-                        .authorizationEndpoint()
-                        .authorizationRequestRepository(authorizationRequestRepository())
-                        .authorizationRequestResolver(oAuth2AuthorizationRequestResolver())
-                );
+                .authorizeHttpRequests(requestMatcherRegistry -> {
+                    requestMatcherRegistry
+                            .requestMatchers("/info/**").permitAll()
+                            .requestMatchers("/messages/**").permitAll()
+                            .requestMatchers("/oauth2/**").permitAll()
+                            .anyRequest().authenticated();
+                })
+                .exceptionHandling(exceptionHandlingConfigurer -> {
+                    exceptionHandlingConfigurer.authenticationEntryPoint((request, response, authException) ->
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+                })
+                .formLogin(formLoginConfigurer -> {
+                    formLoginConfigurer
+                            .loginProcessingUrl("/login")
+                            .usernameParameter("username")
+                            .passwordParameter("password")
+                            .successHandler(authenticationSuccessHandler)
+                            .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
+                                @Override
+                                public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                    super.onAuthenticationFailure(request, response, exception);
+                                }
+                            });
+                })
+                .logout(logoutConfigurer -> {
+                    logoutConfigurer
+                            .logoutUrl("/logout")
+                            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                            .invalidateHttpSession(true)
+                            .clearAuthentication(true);
+                })
+                .httpBasic(httpBasicConfigurer -> {
+                    httpBasicConfigurer.disable();
+                })
+                .cors(corsConfigurer -> {
+                    corsConfigurer.configurationSource(corsConfigurationSource());
+                })
+                .csrf(csrfConfigurer -> {
+                    csrfConfigurer.disable();
+                })
+                .rememberMe(rememberMeConfigurer -> {
+                    rememberMeConfigurer.rememberMeServices(rememberMeServices());
+                })
+                .oauth2Login(oAuth2LoginConfigurer -> {
+                    oAuth2LoginConfigurer
+                            .loginPage("/login")
+                            .loginProcessingUrl("/oauth2/code/*")
+                            .successHandler(authenticationSuccessHandler)
+                            .authorizedClientService(oAuth2AuthorizedClientService)
+                            .authorizationEndpoint(authorizationEndpointConfig -> {
+                                authorizationEndpointConfig
+                                        .authorizationRequestRepository(authorizationRequestRepository())
+                                        .authorizationRequestResolver(oAuth2AuthorizationRequestResolver());
+                            });
+                });
         return http.build();
     }
 }
