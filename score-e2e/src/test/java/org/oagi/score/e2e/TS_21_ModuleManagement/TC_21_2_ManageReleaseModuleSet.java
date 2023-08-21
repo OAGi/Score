@@ -249,6 +249,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         File exportReleaseFile = null;
         try {
             exportReleaseFile = editModuleSetReleasePage.hitExportButton();
+            waitFor(Duration.ofMillis(4000));
             assertNotNull(exportReleaseFile);
             assertTrue(exportReleaseFile.getName().endsWith(".zip"));
         } finally {
