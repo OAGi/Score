@@ -23,14 +23,12 @@ import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigInteger;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -289,21 +287,9 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         viewEditCodeListPage.setBranch(existingReleaseNum);
-        viewEditCodeListPage.setName(codeListCandidate.getName());
-        viewEditCodeListPage.hitSearchButton();
-        WebElement tr = viewEditCodeListPage.getTableRecordByValue(codeListCandidate.getName());
-        WebElement td = viewEditCodeListPage.getColumnByName(tr, "codeListName");
-        WebElement tdLoginID = td.findElement(By.cssSelector("a"));
-        // TODO:
-        // 'click' does not work when the browser hides the link.
-        getDriver().get(tdLoginID.getAttribute("href"));
-        waitFor(ofMillis(500L));
-        By VERSION_FIELD_LOCATOR =
-                By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
-        By DEFINITION_FIELD_LOCATOR =
-                By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-        assertEquals("99", getText(visibilityOfElementLocated(getDriver(), VERSION_FIELD_LOCATOR)));
-        assertEquals("random code list in candidate state", getText(visibilityOfElementLocated(getDriver(), DEFINITION_FIELD_LOCATOR)));
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListCandidate);
+        assertEquals("99", getText(editCodeListPage.getVersionField()));
+        assertEquals("random code list in candidate state", getText(editCodeListPage.getDefinitionField()));
     }
 
     /**
