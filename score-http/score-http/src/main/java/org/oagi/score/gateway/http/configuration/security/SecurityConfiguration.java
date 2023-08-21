@@ -132,9 +132,7 @@ public class SecurityConfiguration {
                 })
                 .authorizeHttpRequests(requestMatcherRegistry -> {
                     requestMatcherRegistry
-                            .requestMatchers("/info/**").permitAll()
-                            .requestMatchers("/messages/**").permitAll()
-                            .requestMatchers("/oauth2/**").permitAll()
+                            .requestMatchers("/info/**", "/messages/**", "/oauth2/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .exceptionHandling(exceptionHandlingConfigurer -> {
