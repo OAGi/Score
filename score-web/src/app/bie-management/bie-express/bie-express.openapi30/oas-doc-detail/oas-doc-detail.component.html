@@ -210,7 +210,9 @@
             <ng-container matColumnDef="tagName">
               <th mat-header-cell *matHeaderCellDef> Tag Name</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.tagName }}</div>
+                <mat-form-field>
+                  <input matInput [(ngModel)]="element.tagName">
+                </mat-form-field>
               </td>
             </ng-container>
 

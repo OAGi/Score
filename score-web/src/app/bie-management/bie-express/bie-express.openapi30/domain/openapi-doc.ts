@@ -271,12 +271,12 @@ export class BieForOasDoc {
   lastUpdatedBy: ScoreUser;
   private _resourceName: string;
   private _operationId: string;
+  private _tagName: string;
   private _verb: string;
   private _arrayIndicator: boolean;
   private _suppressRootIndicator: boolean;
   private _messageBody: string;
   private $hashCode: number;
-  tagName: string;
   listeners: ChangeListener<BieForOasDoc>[] = [];
 
   constructor(obj?: BieForOasDoc) {
@@ -300,9 +300,9 @@ export class BieForOasDoc {
     this.messageBody = obj && obj.messageBody || '';
     this.resourceName = obj && obj.resourceName || '';
     this.operationId = obj && obj.operationId || '';
+    this.tagName = obj && obj.tagName || '';
     this.oasOperationId = obj && obj.oasOperationId || 0;
     this.oasResourceId = obj && obj.oasResourceId || 0;
-    this.tagName = obj && obj.tagName || '';
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
@@ -318,10 +318,10 @@ export class BieForOasDoc {
       verb: this.verb,
       arrayIndicator: this.arrayIndicator,
       suppressRootIndicator: this.suppressRootIndicator,
-      messageBody: this.messageBody
+      messageBody: this.messageBody,
+      tagName: this.tagName
     };
   }
-
   get resourceName(): string {
     return this._resourceName;
   }
@@ -336,6 +336,15 @@ export class BieForOasDoc {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
+
+  get tagName(): string {
+    return this._tagName;
+  }
+
+  set tagName(value: string) {
+    this._tagName = value;
+  }
+
   get verb(): string {
     return this._verb;
   }
@@ -372,6 +381,7 @@ export class BieForOasDoc {
       ((this.messageBody) ? hashCode4Array(this.messageBody) : 0) +
       ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
       ((this.operationId) ? hashCode4String(this.operationId) : 0) +
+      ((this.tagName) ? hashCode4String(this.tagName) : 0) +
       ((this.arrayIndicator) ? 1231 : 1237) +
       ((this.suppressRootIndicator) ? 1231 : 1237);
   }
@@ -393,6 +403,7 @@ export class AssignBieForOasDoc {
   arrayIndicator: boolean;
   suppressRootIndicator: boolean;
   messageBody: string;
+  tagName: string;
 }
 export class BieForOasDocUpdateRequest {
   oasDocId: number;

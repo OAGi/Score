@@ -202,6 +202,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     for (const bieForOasDoc of selectedBieForOasDocs) {
       this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
       this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
+      this.assignBieForOasDoc.tagName = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
       this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
       this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
