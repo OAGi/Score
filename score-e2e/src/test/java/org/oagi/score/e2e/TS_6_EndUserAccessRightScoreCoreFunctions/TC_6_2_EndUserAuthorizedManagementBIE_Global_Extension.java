@@ -60,7 +60,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         NamespaceObject useraNamespace;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
@@ -238,7 +238,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         NamespaceObject useraNamespace;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 

@@ -16,6 +16,7 @@ import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 
 import java.math.BigInteger;
@@ -99,9 +100,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
-
-    private static final By TYPE_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//textarea[@data-placeholder=\"Type Definition\"]");
 
     private static final By REUSE_BIE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Reuse BIE\")]");
@@ -531,11 +529,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public String getTypeDefinitionValue() {
-        return getTypeDefinitionField().getAttribute("ng-reflect-value");
-    }
-
-    @Override
     public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
@@ -567,11 +560,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
-    }
-
-    @Override
-    public WebElement getTypeDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), TYPE_DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
@@ -1130,7 +1118,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
-            return visibilityOfElementLocated(getDriver(), By.xpath(
+            return elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
         }
 
@@ -1143,16 +1131,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getValueDomainField() {
-            return visibilityOfElementLocated(getDriver(), By.xpath(
+            return elementToBeClickable(getDriver(), By.xpath(
                     "//span[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
         }
 
         @Override
         public void setValueDomain(String valueDomain) {
-            click(getValueDomainField());
+            click(getDriver(), getValueDomainField());
             waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
-            click(elementToBeClickable(getDriver(), By.xpath(
+            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
         }
 
@@ -1198,12 +1186,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public String getValueDomainWarningMessage(String valueDomain) {
-            click(getValueDomainField());
+            click(getDriver(), getValueDomainField());
             waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
-            String message = valueDomainElement.getAttribute("ng-reflect-message");
+            new Actions(getDriver()).moveToElement(valueDomainElement).perform(); // mouse over
+            String message = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-tooltip-component")));
             pressEscape();
             return message;
         }

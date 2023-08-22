@@ -66,17 +66,17 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getBranchSelectField() {
-        return visibilityOfElementLocated(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            click(getDriver(), optionField);
             escape(getDriver());
         });
     }
@@ -397,7 +397,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getCreateDTButton() {
-        click(getCreateComponentButton());
+        click(getDriver(), getCreateComponentButton());
         return elementToBeClickable(getDriver(),
                 By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"DT\"]"));
     }
@@ -496,19 +496,15 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void selectAllComponentTypes() {
-        click(getTypeSelectField());
-        ArrayList<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
+        click(getDriver(), getTypeSelectField());
+        List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
         boolean selected;
         for (String componentType : componentTypes) {
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//span[text()=\"" + componentType + "\"]//ancestor::mat-option"));
-            if (optionField.getAttribute("aria-selected").equals("true")) {
-                selected = true;
-            } else {
-                selected = false;
-            }
+            selected = optionField.getAttribute("aria-selected").equals("true");
             if (!selected) {
-                click(optionField);
+                click(getDriver(), optionField);
             }
         }
         escape(getDriver());
@@ -516,7 +512,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     public DTViewEditPage createDT(String den, String branch) {
         setBranch(branch);
-        click(getCreateDTButton());
+        click(getDriver(), getCreateDTButton());
         waitFor(ofMillis(2000L));
 
         DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);

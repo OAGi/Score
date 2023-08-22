@@ -17,7 +17,7 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
     private static final By MODULE_SET_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-expansion-panel//*[text()= \"Module Set\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By COPY_BUTTON_LOCATOR =
-            By.xpath("//mat-expansion-panel//span[contains(text(), \"Copy\")]//ancestor::button[1][@ng-reflect-disabled=\"false\"]");
+            By.xpath("//mat-expansion-panel//span[contains(text(), \"Copy\")]//ancestor::button[1]");
 
 
     private final BasePageImpl parent;

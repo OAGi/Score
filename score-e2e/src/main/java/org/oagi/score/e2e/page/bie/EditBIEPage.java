@@ -250,13 +250,9 @@ public interface EditBIEPage extends Page {
 
     void getExtendBIELocallyOnNode(String path);
 
-    String getTypeDefinitionValue();
-
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path);
 
     SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel);
-
-    WebElement getTypeDefinitionField();
 
     ASBIEPanel getASBIEPanel(WebElement asccpNode);
 

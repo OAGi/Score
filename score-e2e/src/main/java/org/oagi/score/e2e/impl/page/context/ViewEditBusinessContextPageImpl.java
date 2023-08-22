@@ -176,7 +176,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(2000L));
 
             BusinessContextObject businessContext =
                     getAPIFactory().getBusinessContextAPI().getBusinessContextByName(businessContextName);

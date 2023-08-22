@@ -93,15 +93,46 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
+        viewEditReleasePage.setState("Draft");
+        viewEditReleasePage.hitSearchButton();
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        if (viewEditReleasePage.getTotalNumberOfItems() > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            String oldDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            editReleasePage.backToInitialized();
+            begin = System.currentTimeMillis();
+            while (System.currentTimeMillis() - begin < timeout) {
+                viewEditReleasePage.openPage();
+                viewEditReleasePage.setReleaseNum(oldDraftRelease);
+                viewEditReleasePage.hitSearchButton();
+                tr = viewEditReleasePage.getTableRecordAtIndex(1);
+                String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+                if ("Initialized".equals(state)) {
+                    break;
+                }
+            }
+
+        }
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do {
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while (!newDraftRelease.getState().equals("Draft"));
+        timeout = Duration.ofSeconds(300L).toMillis();
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
         homePage.logout();
     }
 

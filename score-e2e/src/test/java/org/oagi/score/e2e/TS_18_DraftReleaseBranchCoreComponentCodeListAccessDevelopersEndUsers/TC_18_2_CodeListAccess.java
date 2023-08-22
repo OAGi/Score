@@ -17,7 +17,9 @@ import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_18_2_CodeListAccess extends BaseTest {
@@ -67,7 +70,27 @@ public class TC_18_2_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
-
+        viewEditReleasePage.setState("Draft");
+        viewEditReleasePage.hitSearchButton();
+        long timeout = Duration.ofSeconds(300L).toMillis();
+        long begin = System.currentTimeMillis();
+        if (viewEditReleasePage.getTotalNumberOfItems() > 0) {
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
+            String oldDraftRelease = getText(editReleasePage.getReleaseNumberField());
+            editReleasePage.backToInitialized();
+            begin = System.currentTimeMillis();
+            while (System.currentTimeMillis() - begin < timeout) {
+                viewEditReleasePage.openPage();
+                viewEditReleasePage.setReleaseNum(oldDraftRelease);
+                viewEditReleasePage.hitSearchButton();
+                tr = viewEditReleasePage.getTableRecordAtIndex(1);
+                String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+                if ("Initialized".equals(state)) {
+                    break;
+                }
+            }
+        }
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
@@ -80,9 +103,18 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         releaseAssignmentPage.hitCreateButton();
 
         ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        do{
-            newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
-        } while(!newDraftRelease.getState().equals("Draft"));
+        timeout = Duration.ofSeconds(300L).toMillis();
+        begin = System.currentTimeMillis();
+        while (System.currentTimeMillis() - begin < timeout) {
+            viewEditReleasePage.openPage();
+            viewEditReleasePage.setReleaseNum(newReleaseNum);
+            viewEditReleasePage.hitSearchButton();
+            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
+            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
+            if ("Draft".equals(state)) {
+                break;
+            }
+        }
         homePage.logout();
     }
 

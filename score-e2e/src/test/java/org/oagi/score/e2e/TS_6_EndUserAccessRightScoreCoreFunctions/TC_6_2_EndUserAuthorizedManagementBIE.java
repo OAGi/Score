@@ -1165,7 +1165,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1298,7 +1299,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
          * Note that there are two ASCCPs in two releases having different definitions
          */
-        String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
         assertEquals(asccp.getDefinition(), ASCCPDefinition);
         BCCPObject bccp = asccpBCCPMap.get(asccp);
         BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1376,7 +1378,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
          * Note that there are two ASCCPs in two releases having different definitions
          */
-        ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
         assertEquals(asccp.getDefinition(), ASCCPDefinition);
         bccp = asccpBCCPMap.get(asccp);
         bcc = bccpBCCMap.get(bccp);
@@ -1526,7 +1529,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1674,7 +1678,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1941,14 +1946,14 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-            getDriver().manage().window().maximize();
             assertEquals("WIP", useraBIEWIP.getState());
             ASCCPObject asccp = bieASCCPMap.get(useraBIEWIP);
             /**
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2198,7 +2203,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2450,7 +2456,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2713,7 +2720,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -3068,7 +3076,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                              * (maybe use dark yellow and italicized font – yellow like a warning light),
                              * the meaning is the code list is usable but unstable.
                              */
-                            assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
+                            assertEquals("This code list is usable but unstable", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
                             pressEscape();
                         }
                         if (codeList.getState().equals("Deleted")) {
@@ -3080,7 +3088,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                         }
                     } else {
                         pressEscape();
-                        click(bbiePanel.getValueDomainField());
+                        click(getDriver(), bbiePanel.getValueDomainField());
                         waitFor(ofMillis(1000L));
                         By DROPDOWN_SEARCH_FIELD_LOCATOR =
                                 By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -3176,7 +3184,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
         bbiePanel.setRemark("test remark");
         bbiePanel.setExample("test example");
-        bbiePanel.setValueConstraint("Fixed");
+        bbiePanel.setValueConstraint("Fixed Value");
         bbiePanel.setFixedValue("test value");
         bbiePanel.setValueDomainRestriction("Primitive");
         bbiePanel.setValueDomain("token");

@@ -277,4 +277,12 @@ public abstract class PageHelper {
         new Actions(driver).sendKeys(Keys.ESCAPE).perform();
     }
 
+    public static boolean isChecked(WebElement element) {
+        String klass = element.getAttribute("class");
+        return "true".equals(element.getAttribute("aria-checked")) ||
+                "true".equals(element.getAttribute("ng-reflect-checked")) ||
+                "checked".equals(element.getAttribute("ng-reflect-state")) ||
+                "true".equals(element.getAttribute("aria-checked")) ||
+                (!StringUtils.isEmpty(klass) && klass.contains("mat-checkbox-checked"));
+    }
 }

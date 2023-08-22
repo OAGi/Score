@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jooq.DSLContext;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppOauth2UserRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.Oauth2AppRecord;
+import org.oagi.score.repo.api.message.model.SendMessageRequest;
+import org.oagi.score.service.message.MessageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -21,12 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAUTH2_APP;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AppOauth2User.APP_OAUTH2_USER;
 
 @Component
@@ -36,6 +39,12 @@ public class ScoreAuthenticationSuccessHandler
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @Autowired
+    private MessageService messageService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -61,7 +70,26 @@ public class ScoreAuthenticationSuccessHandler
             objectMapper.writeValue(response.getOutputStream(), resp);
         } else if (principal instanceof OAuth2User) {
             OAuth2User oAuth2User = (OAuth2User) principal;
-            storeOAuth2UserInfoIfAbsent(authentication, oAuth2User);
+            AppOauth2UserRecord appOauth2UserRecord = storeOAuth2UserInfoIfAbsent(authentication, oAuth2User);
+            if (appOauth2UserRecord != null) {
+                StringBuilder messageBody = new StringBuilder();
+                messageBody = messageBody.append("[**A new account**](")
+                        .append("/account/pending/").append(appOauth2UserRecord.getAppOauth2UserId())
+                        .append(") (Sub: ")
+                        .append(appOauth2UserRecord.getSub())
+                        .append(") is awaiting for the approval.");
+
+                for (org.oagi.score.repo.api.user.model.ScoreUser adminUser : sessionService.getScoreAdminUsers()) {
+                    SendMessageRequest sendMessageRequest = new SendMessageRequest(
+                            sessionService.getScoreSystemUser())
+                            .withRecipient(adminUser)
+                            .withSubject("Awaiting account (Sub: " + appOauth2UserRecord.getSub() + ") approval")
+                            .withBody(messageBody.toString())
+                            .withBodyContentType(SendMessageRequest.MARKDOWN_CONTENT_TYPE);
+
+                    messageService.asyncSendMessage(sendMessageRequest);
+                }
+            }
 
             handle(request, response, authentication);
             clearAuthenticationAttributes(request);
@@ -91,7 +119,7 @@ public class ScoreAuthenticationSuccessHandler
         return targetUrl.replaceAll("/login", "/");
     }
 
-    private void storeOAuth2UserInfoIfAbsent(Authentication authentication, OAuth2User oAuth2User) {
+    private AppOauth2UserRecord storeOAuth2UserInfoIfAbsent(Authentication authentication, OAuth2User oAuth2User) {
         String sub = oAuth2User.getAttribute("sub");
         AppOauth2UserRecord appOauth2UserRecord = dslContext.selectFrom(APP_OAUTH2_USER)
                 .where(APP_OAUTH2_USER.SUB.eq(sub))
@@ -121,9 +149,14 @@ public class ScoreAuthenticationSuccessHandler
             appOauth2UserRecord.setSub(sub);
             appOauth2UserRecord.setEmail(email);
 
-            dslContext.insertInto(APP_OAUTH2_USER)
-                    .set(appOauth2UserRecord)
-                    .execute();
+            appOauth2UserRecord.setAppOauth2UserId(
+                    dslContext.insertInto(APP_OAUTH2_USER)
+                            .set(appOauth2UserRecord)
+                            .returning(APP_OAUTH2_USER.APP_OAUTH2_USER_ID)
+                            .fetchOne().getAppOauth2UserId()
+            );
+            return appOauth2UserRecord;
         }
+        return null;
     }
 }
