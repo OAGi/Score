@@ -3076,7 +3076,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                              * (maybe use dark yellow and italicized font – yellow like a warning light),
                              * the meaning is the code list is usable but unstable.
                              */
-                            assertEquals("This code list is usable but u", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
+                            assertEquals("This code list is usable but unstable", bbiePanel.getValueDomainWarningMessage(codeList.getName()));
                             pressEscape();
                         }
                         if (codeList.getState().equals("Deleted")) {
@@ -3088,7 +3088,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
                         }
                     } else {
                         pressEscape();
-                        click(bbiePanel.getValueDomainField());
+                        click(getDriver(), bbiePanel.getValueDomainField());
                         waitFor(ofMillis(1000L));
                         By DROPDOWN_SEARCH_FIELD_LOCATOR =
                                 By.xpath("//input[@aria-label=\"dropdown search\"]");
