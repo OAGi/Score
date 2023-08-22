@@ -241,6 +241,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 if (affectedRows != 1) {
                     throw new ScoreDataAccessException(new IllegalStateException());
                 }
+
                 //update oasTag
                 OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
                         .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
@@ -345,7 +346,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
 
         }
         return new UpdateBieForOasDocResponse(oasDocId, !oasResourceChangedField.isEmpty() || !oasOperationChangedField.isEmpty()
-                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty());
+                || !oasRequestChangedField.isEmpty() || !oasResponseChangedField.isEmpty() || !oasTagChangeField.isEmpty());
     }
 
     @Override
