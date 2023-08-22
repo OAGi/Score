@@ -397,7 +397,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getCreateDTButton() {
-        click(getCreateComponentButton());
+        click(getDriver(), getCreateComponentButton());
         return elementToBeClickable(getDriver(),
                 By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"DT\"]"));
     }
@@ -512,7 +512,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     public DTViewEditPage createDT(String den, String branch) {
         setBranch(branch);
-        click(getCreateDTButton());
+        click(getDriver(), getCreateDTButton());
         waitFor(ofMillis(2000L));
 
         DTCreateDialog dtCreateDialog = new DTCreateDialogImpl(this, branch);

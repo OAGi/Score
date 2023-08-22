@@ -1,14 +1,12 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.release.EditReleasePageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -229,43 +227,38 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
                 /**
                  * Check if the opposite option is checked.
                  */
-                WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox"));
-                String statusSecondOption = otherOptionField.getAttribute("ng-reflect-state");
-                if (statusSecondOption.equals("checked")) {
-                    click(otherOptionField);
+                if (optionField.getAttribute("class").contains("mat-pseudo-checkbox-checked")) {
+                    click(optionField);
                 }
-                String statusFirstOption = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state");
-
-                if (statusFirstOption.equals("checked")) {
+                optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox"));
+                if (optionField.getAttribute("class").contains("mat-pseudo-checkbox-checked")) {
                     escape(getDriver());
                 } else {
-                    WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    optionField = visibilityOfElementLocated(getDriver(),
                             By.xpath("//mat-option//span[contains(text(), \"True\")]"));
                     click(optionField);
                     escape(getDriver());
                 }
             } else {
-                WebElement otherOptionField = visibilityOfElementLocated(getDriver(),
+                WebElement optionField = visibilityOfElementLocated(getDriver(),
                         By.xpath("//mat-option//span[contains(text(), \"True\")]/preceding-sibling::mat-pseudo-checkbox"));
-                String status = otherOptionField.getAttribute("ng-reflect-state");
-                if (status.equals("checked")) {
-                    click(otherOptionField);
+                if (optionField.getAttribute("class").contains("mat-pseudo-checkbox-checked")) {
+                    click(optionField);
                 }
-                String statusFirstOption = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox")).getAttribute("ng-reflect-state");
-
-                if (statusFirstOption.equals("checked")) {
+                optionField = visibilityOfElementLocated(getDriver(),
+                        By.xpath("//mat-option//span[contains(text(), \"False\")]/preceding-sibling::mat-pseudo-checkbox"));
+                if (optionField.getAttribute("class").contains("mat-pseudo-checkbox-checked")) {
                     escape(getDriver());
                 } else {
-                    WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    optionField = visibilityOfElementLocated(getDriver(),
                             By.xpath("//mat-option//span[contains(text(), \"False\")]"));
                     click(optionField);
                     escape(getDriver());
                 }
             }
-
         });
     }
 
