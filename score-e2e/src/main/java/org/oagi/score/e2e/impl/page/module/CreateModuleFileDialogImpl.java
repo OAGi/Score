@@ -13,16 +13,20 @@ import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 public class CreateModuleFileDialogImpl implements CreateModuleFileDialog {
     private static final By MODULE_FILE_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-expansion-panel//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-panel-title[contains(text(), \"Create new module file\")]//ancestor::mat-expansion-panel" +
+                    "//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By MODULE_FILE_VERSION_FIELD_LOCATOR =
-            By.xpath("//mat-expansion-panel//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-panel-title[contains(text(), \"Create new module file\")]//ancestor::mat-expansion-panel" +
+                    "//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-expansion-panel//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//mat-panel-title[contains(text(), \"Create new module file\")]//ancestor::mat-expansion-panel" +
+                    "//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//mat-expansion-panel//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//mat-panel-title[contains(text(), \"Create new module file\")]//ancestor::mat-expansion-panel" +
+                    "//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select");
     private static final By CREATE_MODULE_FILE_BUTTON_LOCATOR =
-            By.xpath("//mat-expansion-panel//span[contains(text(), \"Create\")]//ancestor::button[1][@ng-reflect-disabled=\"false\"]");
+            By.xpath("//mat-panel-title[contains(text(), \"Create new module file\")]//ancestor::mat-expansion-panel" +
+                    "//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
     private final BasePageImpl parent;
 
