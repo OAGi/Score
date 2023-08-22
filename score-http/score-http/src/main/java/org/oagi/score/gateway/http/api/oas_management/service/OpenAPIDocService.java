@@ -29,6 +29,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.oagi.score.gateway.http.helper.ScoreGuid.randomGuid;
+
 @Service
 @Transactional(readOnly = true)
 public class OpenAPIDocService {
@@ -166,7 +168,11 @@ public class OpenAPIDocService {
                 .setTopLevelAsbiepId(request.getTopLevelAsbiepId())
                 .setTimestamp(millis)
                 .execute();
-
+        ULong oasTagId = oasDocRepository.insertOasTag()
+                .setUserId(userId)
+                .setGuid(randomGuid())
+                .setName(request.getTagName())
+                .execute();
         ULong oasResourceId = oasDocRepository.insertOasResource()
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
@@ -184,6 +190,11 @@ public class OpenAPIDocService {
                 .setDescription(request.getDescriptionForOperation())
                 .setDeprecated(request.isDeprecatedForOperation())
                 .setTimestamp(millis)
+                .execute();
+        oasDocRepository.insertOasResourceTag()
+                .setUserId(userId)
+                .setOasOperationId(oasOperationId)
+                .setOasTagId(oasTagId)
                 .execute();
         ULong oasRequestId = null;
         ULong oasResponseId = null;

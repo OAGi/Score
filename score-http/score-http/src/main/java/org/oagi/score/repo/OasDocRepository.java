@@ -998,6 +998,149 @@ public class OasDocRepository {
                 .fetchOne().value1();
     }
 
+    public class InsertOasTagArguments {
+        private ULong userId;
+        private String guid;
+        private String name;
+        private String description;
+        private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
+        public InsertOasTagArguments setUserId(BigInteger userId) {
+            return setUserId(ULong.valueOf(userId));
+        }
+        public InsertOasTagArguments setUserId(ULong userId) {
+            this.userId = userId;
+            return this;
+        }
+        public InsertOasTagArguments setGuid(String guid) {
+            return setGuid(guid);
+        }
+        public InsertOasTagArguments setName(String name) {
+            return setName(name);
+        }
+        public InsertOasTagArguments setDescription(String description) {
+            return setName(description);
+        }
+        public InsertOasTagArguments setTimestamp(long millis) {
+            return setTimestamp(new Timestamp(millis).toLocalDateTime());
+        }
+        public InsertOasTagArguments setTimestamp(Date date) {
+            return setTimestamp(new Timestamp(date.getTime()).toLocalDateTime());
+        }
+        public InsertOasTagArguments setTimestamp(LocalDateTime timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        public ULong getUserId() {
+            return userId;
+        }
+        public String getGuid() {
+            return guid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+        public ULong execute() {
+            return insertOasTag(this);
+        }
+    }
+    public InsertOasTagArguments insertOasTag() {
+        return new InsertOasTagArguments();
+    }
+    private ULong insertOasTag(InsertOasTagArguments arguments) {
+        return dslContext.insertInto(OAS_TAG)
+                .set(OAS_TAG.CREATED_BY, arguments.getUserId())
+                .set(OAS_TAG.LAST_UPDATED_BY, arguments.getUserId())
+                .set(OAS_TAG.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_TAG.NAME, arguments.getName())
+                .set(OAS_TAG.DESCRIPTION, arguments.getDescription())
+                .set(OAS_TAG.GUID, arguments.getGuid())
+                .returningResult(OAS_TAG.OAS_TAG_ID)
+                .fetchOne().value1();
+    }
+
+    public class InsertOasResourceTagArguments {
+        private ULong userId;
+        private ULong oasOperationId;
+        private ULong oasTagId;
+        private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
+        public InsertOasResourceTagArguments setUserId(BigInteger userId) {
+            return setUserId(ULong.valueOf(userId));
+        }
+        public InsertOasResourceTagArguments setUserId(ULong userId) {
+            this.userId = userId;
+            return this;
+        }
+        public InsertOasResourceTagArguments setOasOperationId(BigInteger oasOperationId) {
+            return setOasOperationId(ULong.valueOf(oasOperationId));
+        }
+        public InsertOasResourceTagArguments setOasOperationId(ULong oasOperationId) {
+            this.oasOperationId = oasOperationId;
+            return this;
+        }
+
+        public InsertOasResourceTagArguments setOasTagId(BigInteger oasTagId) {
+            return setOasTagId(ULong.valueOf(oasTagId));
+        }
+        public InsertOasResourceTagArguments setOasTagId(ULong oasTagId) {
+            this.oasTagId = oasTagId;
+            return this;
+        }
+        public InsertOasResourceTagArguments setTimestamp(long millis) {
+            return setTimestamp(new Timestamp(millis).toLocalDateTime());
+        }
+        public InsertOasResourceTagArguments setTimestamp(Date date) {
+            return setTimestamp(new Timestamp(date.getTime()).toLocalDateTime());
+        }
+        public InsertOasResourceTagArguments setTimestamp(LocalDateTime timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        public ULong getUserId() {
+            return userId;
+        }
+
+        public ULong getOasOperationId() {
+            return oasOperationId;
+        }
+
+        public ULong getOasTagId() {
+            return oasTagId;
+        }
+
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+        public ULong execute() {
+            return insertOasResourceTag(this);
+        }
+    }
+    public InsertOasResourceTagArguments insertOasResourceTag() {
+        return new InsertOasResourceTagArguments();
+    }
+    private ULong insertOasResourceTag(InsertOasResourceTagArguments arguments) {
+        return dslContext.insertInto(OAS_RESOURCE_TAG)
+                .set(OAS_RESOURCE_TAG.CREATED_BY, arguments.getUserId())
+                .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, arguments.getUserId())
+                .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, arguments.getTimestamp())
+                .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, arguments.getOasOperationId())
+                .set(OAS_RESOURCE_TAG.OAS_TAG_ID, arguments.getOasTagId())
+                .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID)
+                .fetchOne().value1();
+    }
+
     public class InsertOasRequestArguments {
         private ULong userId;
         private ULong oasOperationId;

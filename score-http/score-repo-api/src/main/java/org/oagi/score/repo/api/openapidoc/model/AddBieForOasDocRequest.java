@@ -24,6 +24,7 @@ public class AddBieForOasDocRequest extends Request {
     private boolean suppressRootIndicator;
     private boolean includeMetaHeaderIndicator;
     private boolean includePaginationIndicator;
+    private String tagName;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -42,6 +43,7 @@ public class AddBieForOasDocRequest extends Request {
     public void setOasRequest(boolean oasRequest) {
         isOasRequest = oasRequest;
     }
+
     public BigInteger getTopLevelAsbiepId() {
         return topLevelAsbiepId;
     }
@@ -162,6 +164,14 @@ public class AddBieForOasDocRequest extends Request {
         this.includePaginationIndicator = includePaginationIndicator;
     }
 
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
+
     public Collection<String> getUpdaterUsernameList() {
         return updaterUsernameList;
     }
@@ -185,6 +195,4 @@ public class AddBieForOasDocRequest extends Request {
     public void setUpdateEndDate(LocalDateTime updateEndDate) {
         this.updateEndDate = updateEndDate;
     }
-
-
 }

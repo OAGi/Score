@@ -15,6 +15,7 @@ public class AssignBieForOasDoc extends Auditable {
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
     private boolean required;
+    private String tagName;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
     private ScoreUser createdBy;
@@ -84,6 +85,14 @@ public class AssignBieForOasDoc extends Auditable {
         this.suppressRootIndicator = suppressRootIndicator;
     }
 
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
+
     @Override
     public Date getLastUpdateTimestamp() {
         return lastUpdateTimestamp;
@@ -135,6 +144,7 @@ public class AssignBieForOasDoc extends Auditable {
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
                 ", required=" + required +
+                ", tagName='" + tagName + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +

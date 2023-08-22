@@ -327,6 +327,7 @@ public class OpenAPIDocController {
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
         request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
+        request.setTagName(assignBieForOasDoc.getTagName());
         String verbOption = assignBieForOasDoc.getVerb();
         String resoureName = null;
         GetOasDocRequest oasDocRequest = new GetOasDocRequest(authenticationService.asScoreUser(requester));
