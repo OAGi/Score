@@ -395,7 +395,9 @@ public class OpenAPIDocController {
                     GetOasRequestTableRequest getOasRequestTableRequest = new GetOasRequestTableRequest(authenticationService.asScoreUser(requester))
                             .withOasOperationId(bieForOasDoc.getOasOperationId());
                     GetOasRequestTableResponse oasRequestTableResponse = oasDocService.getOasRequestTable(getOasRequestTableRequest);
-                    if (oasRequestTableResponse != null && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
+                    if (oasRequestTableResponse != null &&
+                            oasRequestTableResponse.getOasRequestTable() != null
+                                    && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
                         String newResourceName = null;
                         String newOperationId = null;
                         String oldResourceName = bieForOasDoc.getResourceName();
@@ -428,7 +430,9 @@ public class OpenAPIDocController {
                     GetOasResponseTableRequest getOasResponseTableRequest = new GetOasResponseTableRequest(authenticationService.asScoreUser(requester))
                             .withOasOperationId(bieForOasDoc.getOasOperationId());
                     GetOasResponseTableResponse oasResponseTableResponse = oasDocService.getOasResponseTable(getOasResponseTableRequest);
-                    if (oasResponseTableResponse != null && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()){
+                    if (oasResponseTableResponse != null &&
+                            oasResponseTableResponse.getOasResponseTable() != null
+                            && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()){
                         String newResourceName = null;
                         String newOperationId = null;
                         String oldResourceName = bieForOasDoc.getResourceName();
