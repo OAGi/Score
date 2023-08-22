@@ -1165,7 +1165,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1298,7 +1299,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
          * Note that there are two ASCCPs in two releases having different definitions
          */
-        String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
         assertEquals(asccp.getDefinition(), ASCCPDefinition);
         BCCPObject bccp = asccpBCCPMap.get(asccp);
         BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1376,7 +1378,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
          * Note that there are two ASCCPs in two releases having different definitions
          */
-        ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+        topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
         assertEquals(asccp.getDefinition(), ASCCPDefinition);
         bccp = asccpBCCPMap.get(asccp);
         bcc = bccpBCCMap.get(bccp);
@@ -1526,7 +1529,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1674,7 +1678,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -1941,14 +1946,14 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
-            getDriver().manage().window().maximize();
             assertEquals("WIP", useraBIEWIP.getState());
             ASCCPObject asccp = bieASCCPMap.get(useraBIEWIP);
             /**
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2198,7 +2203,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2450,7 +2456,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);
@@ -2713,7 +2720,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
              * Assert that Type Definition field in BIE has the same value as ASCCP's definition on which it is based.
              * Note that there are two ASCCPs in two releases having different definitions
              */
-            String ASCCPDefinition = editBIEPage.getTypeDefinitionValue();
+            EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+            String ASCCPDefinition = getText(topLevelASBIEPPanel.getTypeDefinitionField());
             assertEquals(asccp.getDefinition(), ASCCPDefinition);
             BCCPObject bccp = asccpBCCPMap.get(asccp);
             BCCObject bcc = bccpBCCMap.get(bccp);

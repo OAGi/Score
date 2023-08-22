@@ -100,9 +100,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
 
-    private static final By TYPE_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//textarea[@data-placeholder=\"Type Definition\"]");
-
     private static final By REUSE_BIE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Reuse BIE\")]");
 
@@ -531,11 +528,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public String getTypeDefinitionValue() {
-        return getTypeDefinitionField().getAttribute("ng-reflect-value");
-    }
-
-    @Override
     public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path) {
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
@@ -567,11 +559,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
-    }
-
-    @Override
-    public WebElement getTypeDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), TYPE_DEFINITION_FIELD_LOCATOR);
     }
 
     @Override
