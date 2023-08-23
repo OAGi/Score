@@ -168,11 +168,7 @@ public class OpenAPIDocService {
                 .setTopLevelAsbiepId(request.getTopLevelAsbiepId())
                 .setTimestamp(millis)
                 .execute();
-        ULong oasTagId = oasDocRepository.insertOasTag()
-                .setUserId(userId)
-                .setGuid(randomGuid())
-                .setName(request.getTagName())
-                .execute();
+
         ULong oasResourceId = oasDocRepository.insertOasResource()
                 .setUserId(userId)
                 .setOasDocId(request.getOasDocId())
@@ -191,11 +187,19 @@ public class OpenAPIDocService {
                 .setDeprecated(request.isDeprecatedForOperation())
                 .setTimestamp(millis)
                 .execute();
-        oasDocRepository.insertOasResourceTag()
-                .setUserId(userId)
-                .setOasOperationId(oasOperationId)
-                .setOasTagId(oasTagId)
-                .execute();
+
+        if (request.getTagName() != null){
+            ULong oasTagId = oasDocRepository.insertOasTag()
+                    .setUserId(userId)
+                    .setGuid(randomGuid())
+                    .setName(request.getTagName())
+                    .execute();
+            oasDocRepository.insertOasResourceTag()
+                    .setUserId(userId)
+                    .setOasOperationId(oasOperationId)
+                    .setOasTagId(oasTagId)
+                    .execute();
+        }
         ULong oasRequestId = null;
         ULong oasResponseId = null;
         if (request.isOasRequest()) {
