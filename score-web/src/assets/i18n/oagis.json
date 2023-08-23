@@ -90,7 +90,8 @@
     "VIEW": "List of Profiled Components, Nouns, BODs",
     "COPY": "Copy a Profiled Component, Noun, BOD",
     "UPLIFT": "Uplift a Profiled Component, Noun, BOD",
-    "GENERATE": "Generate Expression for a Profiled Component, Noun, BOD"
+    "GENERATE": "Generate Expression for a Profiled Component, Noun, BOD",
+    "OPENAPIDOC": "Create Open API DOC for a Profiled Component, Noun, BOD"
   },
   "CC_NAV": {
     "TITLE": "Manage Model Library"

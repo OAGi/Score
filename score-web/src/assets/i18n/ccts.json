@@ -95,6 +95,7 @@
     "COPY": "",
     "UPLIFT": "",
     "GENERATE": "",
+    "OPENAPIDOC":"",
     "REPORT": ""
   },
   "CC_NAV": {

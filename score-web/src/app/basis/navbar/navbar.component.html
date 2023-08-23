@@ -21,13 +21,12 @@
         <button mat-menu-item routerLink="profile_bie/uplift" title="{{'BIE_NAV.UPLIFT' | translate}}">
           Uplift BIE
         </button>
-        <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}" [matMenuTriggerFor]="bie_express_openapi30">
+        <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}">
           Express BIE
         </button>
-        <mat-menu #bie_express_openapi30="matMenu">
-          <button mat-menu-item routerLink="profile_bie/express/oas_doc">Open API Doc</button>
-        </mat-menu>
-
+        <button mat-menu-item routerLink="profile_bie/express/oas_doc" title="{{'BIE_NAV.OPENAPIDOC' | translate}}">
+          Open API Doc
+        </button>
         <button mat-menu-item routerLink="profile_bie/report" title="{{'BIE_NAV.REPORT' | translate}}">
           Reuse Report
         </button>
