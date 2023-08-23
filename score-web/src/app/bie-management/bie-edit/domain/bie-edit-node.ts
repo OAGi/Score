@@ -256,7 +256,7 @@ export class BieDetailUpdateRequest {
         version: this.topLevelAsbiepDetail.version,
         status: this.topLevelAsbiepDetail.status,
         inverseMode: this.topLevelAsbiepDetail.inverseMode,
-        bieForOasDoc: this.topLevelAsbiepDetail.bieForOasDoc
+        bieForOasDoc: this.topLevelAsbiepDetail.bieForOasDoc.json
       } : {},
       abieDetails: this.abieDetails.map(e => e.json),
       asbieDetails: this.asbieDetails.map(e => e.json),

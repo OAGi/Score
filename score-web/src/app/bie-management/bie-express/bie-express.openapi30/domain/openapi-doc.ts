@@ -310,6 +310,7 @@ export class BieForOasDoc {
 
   get json(): any {
     return {
+      oasDocId: this.oasDocId,
       topLevelAsbiepId: this.topLevelAsbiepId,
       oasResourceId: this.oasResourceId,
       oasOperationId: this.oasOperationId,
