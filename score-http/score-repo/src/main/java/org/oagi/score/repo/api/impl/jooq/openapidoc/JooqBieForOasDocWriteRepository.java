@@ -53,6 +53,44 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
         List<Field<?>> oasTagChangeField = new ArrayList<>();
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
             if (bieForOasDoc.getMessageBody().equals("Request")) {
+                //update oasTag
+                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
+                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
+                        .fetchOptional().orElse(null);
+                if (req_oasResourceTagRecord == null) {
+                    if (bieForOasDoc.getTagName() != null) {
+                        ULong oasTagId = dslContext().insertInto(OAS_TAG)
+                                .set(OAS_TAG.GUID, randomGuid())
+                                .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
+                                .set(OAS_TAG.CREATED_BY, ULong.valueOf(requesterUserId))
+                                .set(OAS_TAG.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                                .set(OAS_TAG.CREATION_TIMESTAMP, timestamp)
+                                .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
+                                .returningResult(OAS_TAG.OAS_TAG_ID)
+                                .fetchOne().value1();
+                        dslContext().insertInto(OAS_RESOURCE_TAG)
+                                .set(OAS_RESOURCE_TAG.CREATED_BY, ULong.valueOf(requesterUserId))
+                                .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
+                                .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, timestamp)
+                                .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
+                                .set(OAS_RESOURCE_TAG.OAS_TAG_ID, oasTagId)
+                                .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, ULong.valueOf(bieForOasDoc.getOasOperationId()))
+                                .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID).fetchOne().value1();
+                    }
+                } else {
+                    ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
+                    OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
+                            .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+                    if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
+                        oasTagChangeField.add(OAS_TAG.NAME);
+                        oasTagRecord.setName(bieForOasDoc.getTagName());
+                        int affectedRows = oasTagRecord.update(oasTagChangeField);
+                        if (affectedRows != 1) {
+                            throw new ScoreDataAccessException(new IllegalStateException());
+                        }
+                    }
+                }
+
                 //update oas_resource
                 OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE.as("req_oas_resource")).where(and(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
                         OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)))).fetchOptional().orElse(null);
@@ -93,54 +131,6 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 if (affectedRows != 1) {
                     throw new ScoreDataAccessException(new IllegalStateException());
                 }
-
-                //update oasTag
-                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
-                if (res_oasResourceTagRecord != null){
-                    dslContext().delete(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
-                            .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_TAG.as("res_oas_tag")).where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(
-                            res_oasResourceTagRecord.getOasTagId())).execute();
-                }
-                if (req_oasResourceTagRecord == null) {
-                    if (bieForOasDoc.getTagName() != null) {
-                        ULong oasTagId = dslContext().insertInto(OAS_TAG)
-                                .set(OAS_TAG.GUID, randomGuid())
-                                .set(OAS_TAG.NAME, bieForOasDoc.getTagName())
-                                .set(OAS_TAG.CREATED_BY, ULong.valueOf(requesterUserId))
-                                .set(OAS_TAG.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
-                                .set(OAS_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .returningResult(OAS_TAG.OAS_TAG_ID)
-                                .fetchOne().value1();
-                        dslContext().insertInto(OAS_RESOURCE_TAG)
-                                .set(OAS_RESOURCE_TAG.CREATED_BY, ULong.valueOf(requesterUserId))
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATED_BY, ULong.valueOf(requesterUserId))
-                                .set(OAS_RESOURCE_TAG.CREATION_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.LAST_UPDATE_TIMESTAMP, timestamp)
-                                .set(OAS_RESOURCE_TAG.OAS_TAG_ID, oasTagId)
-                                .set(OAS_RESOURCE_TAG.OAS_OPERATION_ID, ULong.valueOf(bieForOasDoc.getOasOperationId()))
-                                .returningResult(OAS_RESOURCE_TAG.OAS_TAG_ID).fetchOne().value1();
-                    }
-                } else {
-                    ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
-                    OasTagRecord oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
-                            .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
-                    if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
-                        oasTagChangeField.add(OAS_TAG.NAME);
-                        oasTagRecord.setName(bieForOasDoc.getTagName());
-                        affectedRows = oasTagRecord.update(oasTagChangeField);
-                        if (affectedRows != 1) {
-                            throw new ScoreDataAccessException(new IllegalStateException());
-                        }
-                    }
-                }
-
                 //update arrayIndicator and SuppressRootIndicator
                 ULong oasRequestId = null;
                 ULong oasResponseId = null;
@@ -243,18 +233,9 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 }
 
                 //update oasTag
-                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
-                        .fetchOptional().orElse(null);
                 OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
                         .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
                         .fetchOptional().orElse(null);
-                if (req_oasResourceTagRecord != null){
-                    dslContext().delete(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
-                            .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
-                    dslContext().delete(OAS_TAG.as("req_oas_tag")).where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(
-                            req_oasResourceTagRecord.getOasTagId())).execute();
-                }
                 if (res_oasResourceTagRecord == null) {
                     if (bieForOasDoc.getTagName() != null) {
                         ULong oasTagId = dslContext().insertInto(OAS_TAG)
