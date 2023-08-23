@@ -244,7 +244,7 @@ public class DtWriteRepository {
                     BDT_PRI_RESTRI.IS_DEFAULT)
                     .select(dslContext.select(inline(dtManifestId),
                             CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID,
-                            CDT_AWD_PRI.IS_DEFAULT)
+                            CDT_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT)
                             .from(CDT_AWD_PRI)
                             .join(CDT_AWD_PRI_XPS_TYPE_MAP).on(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI.CDT_AWD_PRI_ID))
                             .join(DT_MANIFEST).on(CDT_AWD_PRI.CDT_ID.eq(DT_MANIFEST.DT_ID))
@@ -275,7 +275,7 @@ public class DtWriteRepository {
                     BDT_SC_PRI_RESTRI.IS_DEFAULT)
                     .select(dslContext.select(inline(dtScManifestId),
                             CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID,
-                            CDT_SC_AWD_PRI.IS_DEFAULT)
+                            CDT_SC_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT)
                             .from(CDT_SC_AWD_PRI)
                             .join(CDT_SC_AWD_PRI_XPS_TYPE_MAP).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID))
                             .join(DT_SC_MANIFEST).on(CDT_SC_AWD_PRI.CDT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
