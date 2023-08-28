@@ -47,7 +47,7 @@ public class TC_27_1_AboutPageContainsFollowingInformation extends BaseTest {
         String regEx = "[\\d+\\.].*";
         assertTrue(getText(versionList.getItemByName("score-web")).matches("score-web : " + regEx));
         assertTrue(getText(versionList.getItemByName("score-http")).matches("score-http : " + regEx));
-        assertTrue(getText(versionList.getItemByName("MySQL")).matches("MySQL : " + regEx));
+        assertTrue(getText(versionList.getItemByName("MariaDB")).matches("MariaDB : " + regEx));
         assertTrue(getText(versionList.getItemByName("Redis")).matches("Redis : " + regEx));
     }
 

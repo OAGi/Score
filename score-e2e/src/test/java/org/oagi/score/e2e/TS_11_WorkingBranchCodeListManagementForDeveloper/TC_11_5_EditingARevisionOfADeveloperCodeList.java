@@ -14,6 +14,7 @@ import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.TimeoutException;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
-import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
+import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
@@ -32,7 +34,6 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -44,8 +45,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -57,27 +58,27 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
 
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
             codeList.setDeprecated(true);
             getAPIFactory().getCodeListAPI().updateCodeList(codeList);
             codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             boolean previousDeprecatedStatus = codeList.isDeprecated();
             if (previousDeprecatedStatus == true) {
-                assertDisabled(editCodeListPage.getDeprecatedSelectField());
+                assertEnabled(editCodeListPage.getDeprecatedSelectField());
             } else {
                 assertEnabled(editCodeListPage.getDeprecatedSelectField());
             }
@@ -103,8 +104,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     public void test_TA_2() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, ArrayList<CodeListValueObject>> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, List<CodeListValueObject>> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -114,7 +115,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-            ArrayList<CodeListValueObject> values = new ArrayList<>();
+            List<CodeListValueObject> values = new ArrayList<>();
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
             values.add(codeListValue);
@@ -122,36 +123,37 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             codeListValue.setDeprecated(true);
             getAPIFactory().getCodeListValueAPI().updateCodeListValue(codeListValue);
             values.add(codeListValue);
-            codeListCodeListValueMap.put(codeList, values);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), values);
             codeListForTesting.add(codeList);
 
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-           ArrayList<CodeListValueObject> values = codeListCodeListValueMap.get(codeList);
-           for(CodeListValueObject value: values){
-               editCodeListPage.selectCodeListValue(value.getValue());
-               assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
-               EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
-               editCodeListValueDialog.setMeaning("new meaning for value");
-               editCodeListValueDialog.setDefinition("new definition for value");
-               editCodeListValueDialog.setDefinitionSource("new definition source for value");
-               boolean previousDeprecatedStatusForValue = value.isDeprecated();
-               if (previousDeprecatedStatusForValue == true){
-                   assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-               }else{
-                   assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
-               }
-               editCodeListValueDialog.hitSaveButton();
-           }
+            List<CodeListValueObject> values = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
+            for (CodeListValueObject value : values) {
+                editCodeListPage.selectCodeListValue(value.getValue());
+                assertThrows(Exception.class, () -> {
+                    editCodeListPage.removeCodeListValue();
+                });
+                EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
+                editCodeListValueDialog.setMeaning("new meaning for value");
+                editCodeListValueDialog.setDefinition("new definition for value");
+                editCodeListValueDialog.setDefinitionSource("new definition source for value");
+                boolean previousDeprecatedStatusForValue = value.isDeprecated();
+                if (previousDeprecatedStatusForValue == true) {
+                    assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                } else {
+                    assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
+                }
+                editCodeListValueDialog.hitSaveButton();
+            }
         }
-
     }
 
     @Test
@@ -159,8 +161,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     public void test_TA_3() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -172,13 +174,13 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
@@ -195,13 +197,14 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             editCodeListValueDialog.hitSaveButton();
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_4")
     public void test_TA_4() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -213,18 +216,18 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
-            CodeListValueObject value = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
             editCodeListValueDialog.setCode(value.getValue());
             editCodeListValueDialog.setMeaning(value.getMeaning());
@@ -234,13 +237,14 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assert message.equals(getSnackBarMessage(getDriver()));
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_5")
     public void test_TA_5() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -252,13 +256,13 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
@@ -272,13 +276,14 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertDoesNotThrow(() -> editCodeListPage.removeCodeListValue());
         }
     }
+
     @Test
     @DisplayName("TC_11_5_TA_6")
     public void test_TA_6() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -290,13 +295,13 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertTrue(Integer.valueOf(getText(editCodeListPage.getRevisionField())) > 1);
@@ -311,14 +316,16 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             editCodeListValueDialog.hitAddButton();
             editCodeListPage.hitUpdateButton();
             editCodeListPage.hitCancelButton();
-            CodeListValueObject oldValue = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject oldValue = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             assertEquals("Published", getText(editCodeListPage.getStateField()));
             assertEquals("1", getText(editCodeListPage.getRevisionField()));
             assertEquals(codeList.getVersionId(), getText(editCodeListPage.getVersionField()));
             assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
             assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
             assertDoesNotThrow(() -> editCodeListPage.valueExists(oldValue.getValue()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.valueExists(newCodeValue);});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.valueExists(newCodeValue);
+            });
 
         }
     }

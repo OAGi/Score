@@ -94,7 +94,15 @@ public class JooqBieWriteRepository
         topLevelAsbiepRecord.setVersion(request.getVersion());
         topLevelAsbiepRecord.setOwnerUserId(userId);
         topLevelAsbiepRecord.setLastUpdatedBy(userId);
-        topLevelAsbiepRecord.setLastUpdateTimestamp(LocalDateTime.now());
+        LocalDateTime timestamp = LocalDateTime.now();
+        topLevelAsbiepRecord.setLastUpdateTimestamp(timestamp);
+
+        if (request.getSourceTopLevelAsbiepId() != null) {
+            topLevelAsbiepRecord.setSourceTopLevelAsbiepId(ULong.valueOf(request.getSourceTopLevelAsbiepId()));
+            topLevelAsbiepRecord.setSourceAction(request.getSourceAction());
+            LocalDateTime sourceTimestamp = (request.getSourceTimestamp() != null) ? request.getSourceTimestamp() : timestamp;
+            topLevelAsbiepRecord.setSourceTimestamp(sourceTimestamp);
+        }
 
         topLevelAsbiepRecord.setTopLevelAsbiepId(
                 dslContext().insertInto(TOP_LEVEL_ASBIEP)

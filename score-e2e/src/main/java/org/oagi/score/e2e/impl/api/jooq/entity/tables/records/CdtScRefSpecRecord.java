@@ -177,5 +177,6 @@ public class CdtScRefSpecRecord extends UpdatableRecordImpl<CdtScRefSpecRecord> 
         setCdtScRefSpecId(cdtScRefSpecId);
         setCdtScId(cdtScId);
         setRefSpecId(refSpecId);
+        resetChangedOnNotNull();
     }
 }

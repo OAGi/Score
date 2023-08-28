@@ -23,50 +23,43 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
-
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
-
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
-
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
-
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
-
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
-
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select");
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
         super(parent);
@@ -84,7 +77,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         assert "Express BIE".equals(getText(getTitle()));
     }
 
-    private String getCheckedAttribute(WebElement element){
+    private String getCheckedAttribute(WebElement element) {
         return element.findElement(By.xpath("label/span[1]/input")).getAttribute("aria-checked");
     }
 
@@ -97,14 +90,30 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP) {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelASBIEP.getReleaseId());
         setBranch(release.getReleaseNumber());
+        setState(topLevelASBIEP.getState());
         setDEN(topLevelASBIEP.getDen());
         hitSearchButton();
 
         retry(() -> {
             WebElement tr = getTableRecordByValue(topLevelASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
+            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+            click(getDriver(), ele);
+        });
+    }
+
+    @Override
+    public void selectBIEForExpression(String releaseNum, String topLevelASBIEPDEN) {
+        setBranch(releaseNum);
+        setDEN(topLevelASBIEPDEN);
+        hitSearchButton();
+
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(topLevelASBIEPDEN);
+            WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
         });
+
     }
 
     @Override
@@ -123,6 +132,37 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
+    public void setState(String state) {
+        retry(() -> {
+            click(getStateSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
+            click(optionField);
+            escape(getDriver());
+        });
+    }
+
+    @Override
+    public WebElement getStateSelectField() {
+        return visibilityOfElementLocated(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        click(getOwnerSelectField());
+        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
+        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+        click(searchedSelectField);
+        escape(getDriver());
+    }
+
+    @Override
+    public WebElement getOwnerSelectField() {
+        return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+    }
+
+    @Override
     public WebElement getOpenAPIFormatSelectField() {
         return visibilityOfElementLocated(getDriver(), OPEN_API_FORMAT_SELECT_FIELD_LOCATOR);
     }
@@ -136,6 +176,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void setDEN(String den) {
         sendKeys(getDENField(), den);
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
@@ -146,25 +187,57 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         click(getSearchButton());
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
     @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
+
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
     }
 
     @Override
+    public void setItemsPerPage(int items) {
+        WebElement itemsPerPageField = elementToBeClickable(getDriver(),
+                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+        click(itemsPerPageField);
+        waitFor(Duration.ofMillis(500L));
+        WebElement itemField = elementToBeClickable(getDriver(),
+                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+        click(itemField);
+        waitFor(Duration.ofMillis(500L));
+    }
+
+    @Override
+    public int getTotalNumberOfItems() {
+        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
+                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
+        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    }
+
+    @Override
     public File hitGenerateButton(ExpressionFormat format) {
-        return hitGenerateButton(format, false);
+        return hitGenerateButton(format, null, false);
+    }
+
+    @Override
+    public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher) {
+        return hitGenerateButton(format, expectedFilenameMatcher, false);
     }
 
     @Override
     public File hitGenerateButton(ExpressionFormat format, boolean compressed) {
+        return hitGenerateButton(format, null, compressed);
+    }
+
+    @Override
+    public File hitGenerateButton(ExpressionFormat format, Function<String, Boolean> expectedFilenameMatcher, boolean compressed) {
         click(getGenerateButton());
         try {
-            return waitForDownloadFile(Duration.ofMillis(30000), getValidator(format, compressed));
+            return waitForDownloadFile(ofMillis(60000L), expectedFilenameMatcher, getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -275,9 +348,18 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         };
     }
 
-    private File waitForDownloadFile(Duration duration, Function<File, Boolean> validator) throws IOException, InterruptedException {
+    private File waitForDownloadFile(Duration duration,
+                                     Function<String, Boolean> expectedFilenameMatcher,
+                                     Function<File, Boolean> validator) throws IOException, InterruptedException {
         String userHome = System.getProperty("user.home");
         Path path = Paths.get(new File(userHome, "Downloads").toURI());
+        if (expectedFilenameMatcher != null) {
+            Optional<Path> matchedFile = Files.list(path)
+                    .filter(child -> expectedFilenameMatcher.apply(child.toFile().getName())).findFirst();
+            if (matchedFile.isPresent()) {
+                return matchedFile.get().toFile();
+            }
+        }
 
         WatchService watchService = FileSystems.getDefault().newWatchService();
         path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
@@ -290,6 +372,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             if (key != null && key.isValid()) {
                 for (WatchEvent<?> event : key.pollEvents()) {
                     downloadedFile = new File(path.toFile(), event.context().toString());
+                    if (expectedFilenameMatcher != null && !expectedFilenameMatcher.apply(downloadedFile.getName())) {
+                        break;
+                    }
                     if (validator.apply(downloadedFile)) {
                         return downloadedFile;
                     }
@@ -324,6 +409,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleIncludeCCTSDefinitionTag() {
         click(getIncludeCCTSDefinitionTagCheckbox().findElement(By.tagName("label")));
     }
+
     @Override
     public WebElement getIncludeCCTSDefinitionTagCheckbox() {
         return getCheckboxByName("Include CCTS_Definition Tag");
@@ -353,6 +439,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleIncludeWHOColumns() {
         click(getIncludeWHOColumnsCheckbox().findElement(By.tagName("label")));
     }
+
     @Override
     public WebElement getIncludeWHOColumnsCheckbox() {
         return getCheckboxByName("Include WHO Columns");
@@ -362,6 +449,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void toggleBasedCCMetaData() {
         click(getBasedCCMetaDataCheckbox());
     }
+
     @Override
     public WebElement getBasedCCMetaDataCheckbox() {
         return getCheckboxByName("Based CC Meta Data");
@@ -396,56 +484,6 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public JSONSchemaExpressionOptions selectJSONSchemaExpression() {
         click(getJSONSchemaExpressionRadioButton());
         return new JSONSchemaExpressionOptionsImpl();
-    }
-
-    private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
-        @Override
-        public WebElement getMakeAsAnArrayCheckbox() {
-            return getCheckboxByName("Make as an array");
-        }
-
-        @Override
-        public void toggleMakeAsAnArray() {
-            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
-        }
-
-        @Override
-        public WebElement getIncludeMetaHeaderCheckbox() {
-            return getCheckboxByName("Include Meta Header");
-        }
-
-        @Override
-        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
-            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
-                click(getIncludeMetaHeaderCheckbox());
-            }else{
-                click(getIncludeMetaHeaderCheckbox());
-                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
-                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-                assert includeMetaHeaderProfileBIEDialog.isOpened();
-                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
-            }
-        }
-
-        @Override
-        public WebElement getIncludePaginationResponseCheckbox() {
-            return getCheckboxByName("Include Pagination Response");
-        }
-
-        @Override
-        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
-            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
-            if (checked.equals("true")){
-                click(getIncludePaginationResponseCheckbox());
-            }else{
-                click(getIncludePaginationResponseCheckbox());
-                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-                assert includePaginationResponseProfileBIEDialog.isOpened();
-                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
-            }
-        }
     }
 
     @Override
@@ -489,9 +527,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public void selectMultipleBIEsForExpression(ReleaseObject release, ArrayList<TopLevelASBIEPObject> biesForSelection) {
+    public void selectMultipleBIEsForExpression(ReleaseObject release, List<TopLevelASBIEPObject> biesForSelection) {
         setBranch(release.getReleaseNumber());
-        for (TopLevelASBIEPObject bie: biesForSelection){
+        for (TopLevelASBIEPObject bie : biesForSelection) {
             retry(() -> {
                 WebElement tr = getTableRecordByValue(bie.getDen());
                 WebElement td = getColumnByName(tr, "select");
@@ -511,15 +549,27 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     @Override
-    public int getNumberOfBIEsInIndexBox() {
-        WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
-        String paginatorRangeLabel = getText(paginatorRangeLabelElement);
-        return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
+    public void toggleIncludeBusinessContextInFilename() {
+        click(getIncludeBusinessContextInFilenameCheckbox());
     }
 
     @Override
-    public int getNumberfBIEsInTable() {
+    public WebElement getIncludeBusinessContextInFilenameCheckbox() {
+        return getCheckboxByName("Include a business context in the filename");
+    }
+
+    @Override
+    public void toggleIncludeVersionInFilename() {
+        click(getIncludeVersionInFilenameCheckbox());
+    }
+
+    @Override
+    public WebElement getIncludeVersionInFilenameCheckbox() {
+        return getCheckboxByName("Include a version in the filename");
+    }
+
+    @Override
+    public int getNumberOfBIEsInTable() {
         List<WebElement> rows = getDriver().findElements(By.xpath("//td//span/ancestor::tr"));
         int numberOfBIEs = rows.size();
         return numberOfBIEs;
@@ -529,6 +579,69 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public OpenAPIExpressionOptions selectOpenAPIExpression() {
         click(getOpenAPIExpressionRadioButton());
         return new OpenAPIExpressionOptionsImpl();
+    }
+
+    @Override
+    public void selectJSONOpenAPIFormat() {
+        retry(() -> {
+            click(getOpenAPIFormatSelectField());
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
+            click(optionField);
+        });
+    }
+
+    private class JSONSchemaExpressionOptionsImpl implements JSONSchemaExpressionOptions {
+        @Override
+        public WebElement getMakeAsAnArrayCheckbox() {
+            return getCheckboxByName("Make as an array");
+        }
+
+        @Override
+        public void toggleMakeAsAnArray() {
+            click(getMakeAsAnArrayCheckbox().findElement(By.tagName("label")));
+            waitFor(ofMillis(500L));
+        }
+
+        @Override
+        public WebElement getIncludeMetaHeaderCheckbox() {
+            return getCheckboxByName("Include Meta Header");
+        }
+
+        @Override
+        public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
+            String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
+            if (checked.equals("true")) {
+                click(getIncludeMetaHeaderCheckbox());
+            } else {
+                click(getIncludeMetaHeaderCheckbox());
+                IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
+                        new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includeMetaHeaderProfileBIEDialog.isOpened();
+                waitFor(ofMillis(1000L));
+                includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
+            }
+        }
+
+        @Override
+        public WebElement getIncludePaginationResponseCheckbox() {
+            return getCheckboxByName("Include Pagination Response");
+        }
+
+        @Override
+        public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
+            String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
+            if (checked.equals("true")) {
+                click(getIncludePaginationResponseCheckbox());
+            } else {
+                click(getIncludePaginationResponseCheckbox());
+                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includePaginationResponseProfileBIEDialog.isOpened();
+                waitFor(ofMillis(1000L));
+                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            }
+        }
     }
 
     private class OpenAPIExpressionOptionsImpl implements OpenAPIExpressionOptions {
@@ -595,9 +708,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
+            if (checked.equals("true")) {
                 click(getIncludeMetaHeaderCheckbox());
-            }else{
+            } else {
                 click(getIncludeMetaHeaderCheckbox());
                 IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
                         new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
@@ -614,15 +727,15 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludePaginationResponse(TopLevelASBIEPObject paginationResponseASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludePaginationResponseCheckbox());
-           if (checked.equals("true")){
-               click(getIncludePaginationResponseCheckbox());
-           }else{
-               click(getIncludePaginationResponseCheckbox());
-               IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
-                       new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
-               assert includePaginationResponseProfileBIEDialog.isOpened();
-               includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
-           }
+            if (checked.equals("true")) {
+                click(getIncludePaginationResponseCheckbox());
+            } else {
+                click(getIncludePaginationResponseCheckbox());
+                IncludePaginationResponseProfileBIEDialogImpl includePaginationResponseProfileBIEDialog =
+                        new IncludePaginationResponseProfileBIEDialogImpl(ExpressBIEPageImpl.this);
+                assert includePaginationResponseProfileBIEDialog.isOpened();
+                includePaginationResponseProfileBIEDialog.selectPaginationResponseProfile(paginationResponseASBIEP, context);
+            }
         }
     }
 
@@ -646,9 +759,9 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         @Override
         public void toggleIncludeMetaHeader(TopLevelASBIEPObject metaHeaderASBIEP, BusinessContextObject context) {
             String checked = getCheckedAttribute(getIncludeMetaHeaderCheckbox());
-            if (checked.equals("true")){
+            if (checked.equals("true")) {
                 click(getIncludeMetaHeaderCheckbox());
-            }else{
+            } else {
                 click(getIncludeMetaHeaderCheckbox());
                 IncludeMetaHeaderProfileBIEDialogImpl includeMetaHeaderProfileBIEDialog =
                         new IncludeMetaHeaderProfileBIEDialogImpl(ExpressBIEPageImpl.this);
@@ -656,15 +769,5 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
                 includeMetaHeaderProfileBIEDialog.selectMetaHeaderProfile(metaHeaderASBIEP, context);
             }
         }
-    }
-
-    @Override
-    public void selectJSONOpenAPIFormat() {
-        retry(() -> {
-            click(getOpenAPIFormatSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option/span[contains(text(), \"JSON\")]"));
-            click(optionField);
-        });
     }
 }

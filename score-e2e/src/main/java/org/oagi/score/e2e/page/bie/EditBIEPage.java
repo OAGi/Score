@@ -1,12 +1,12 @@
 package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.obj.BusinessContextObject;
+import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.Page;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.WebElement;
-
 
 import java.util.List;
 
@@ -50,6 +50,22 @@ public interface EditBIEPage extends Page {
     WebElement clickOnDropDownMenuByPath(String path);
 
     /**
+     * Click the drop-down menu to open the context menu on the node.
+     *
+     * @param path the path of the node
+     * @param dataLevel the level of the node
+     * @return node UI element
+     */
+    WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel);
+
+    /**
+     * Return the Top-level ASBIEP.
+     *
+     * @return the Top-level ASBIEP
+     */
+    TopLevelASBIEPObject getTopLevelASBIEP();
+
+    /**
      * Return the panel for 'Top-Level ASBIEP' node.
      *
      * @return 'Top-Level ASBIEP' node panel
@@ -70,6 +86,15 @@ public interface EditBIEPage extends Page {
      * @return the UI element of the tree node
      */
     WebElement getNodeByPath(String path);
+
+    /**
+     * Return the UI element of the tree node by the node path.
+     *
+     * @param path the node path
+     * @param retry the number of retry
+     * @return the UI element of the tree node
+     */
+    WebElement getNodeByPath(String path, int retry);
 
     /**
      * Return {@code true} if the node is deprecated, otherwise {@code false}.
@@ -170,6 +195,10 @@ public interface EditBIEPage extends Page {
      */
     void moveToProduction();
 
+    void enableChildren(String path);
+
+    void setChildrenMaxCardinalityToOne(String path);
+
     /**
      * Make the local user extension on the 'Extension' node.
      *
@@ -187,6 +216,22 @@ public interface EditBIEPage extends Page {
     ACCExtensionViewEditPage extendBIEGloballyOnNode(String path);
 
     /**
+     * Retain Reused BIE information on the node
+     *
+     * @param path the path of the Reused BIE node.
+     * @return the EditBIEPage
+     */
+    void RetainReusedBIEOnNode(String path);
+
+    /**
+     * Create a top level BIE for the selected ASBIE node
+     *
+     * @param path the path of the ASBIE node
+     * @return the ViewEditBIEPage
+     */
+    void MakeBIEReusableOnNode(String path);
+
+    /**
      * Return the attention message in the warning dialog.
      * This happens when the user attempts to make the user extension,
      * but another user is working on that extension.
@@ -198,16 +243,22 @@ public interface EditBIEPage extends Page {
     /**
      * Continue to extend the 'Extension' BIE after it gets the attention message.
      *
-     * @see #getAttentionDialogMessage()
      * @return the local/global user extension page
+     * @see #getAttentionDialogMessage()
      */
     ACCExtensionViewEditPage continueToExtendBIEOnNode();
 
     void getExtendBIELocallyOnNode(String path);
 
-    String getTypeDefinitionValue();
-
     SelectProfileBIEToReuseDialog reuseBIEOnNode(String path);
+
+    SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel);
+
+    ASBIEPanel getASBIEPanel(WebElement asccpNode);
+
+    BBIEPanel getBBIEPanel(WebElement bccpNode);
+
+    BBIESCPanel getBBIESCPanel(WebElement bdtScNode);
 
     /**
      * An interface of the panel for 'Top-Level ASBIEP' node.
@@ -361,11 +412,27 @@ public interface EditBIEPage extends Page {
          */
         WebElement getTypeDefinitionField();
 
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
+
     }
 
-    WebElement getTypeDefinitionField();
-
-    ASBIEPanel getASBIEPanel(WebElement asccpNode);
+    /**
+     * Return the Reused ASBIE Panel
+     *
+     * @param asccpNode ASCCP node
+     * @return the Reused ASBIE Panel
+     */
+    ReusedASBIEPanel getReusedASBIEPanel(WebElement asccpNode);
 
     interface ASBIEPanel {
 
@@ -456,9 +523,85 @@ public interface EditBIEPage extends Page {
         WebElement getShowBusinessTermsButton();
 
         WebElement getAssignBusinessTermButton(boolean enabled);
+
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
     }
 
-    BBIEPanel getBBIEPanel(WebElement bccpNode);
+    interface ReusedASBIEPanel {
+
+        /**
+         * Return the UI element of the 'Release' field.
+         *
+         * @return the UI element of the 'Release' field
+         */
+        WebElement getReleaseField();
+
+        /**
+         * Return the UI element of the 'State' field.
+         *
+         * @return the UI element of the 'State field
+         */
+        WebElement getStateField();
+
+        /**
+         * Return the UI element of the 'Owner' field.
+         *
+         * @return the UI element of the 'Owner' field
+         */
+        WebElement getOwnerField();
+
+        /**
+         * Return the UI element of the 'Business Context' field.
+         *
+         * @return the UI element of the 'Business Context' field
+         */
+        WebElement getBusinessContextField();
+
+        /**
+         * Return the UI element of the 'Legacy Business Term' field.
+         *
+         * @return the UI element of the 'Legacy Business Term' field
+         */
+        WebElement getLegacyBusinessTermField();
+
+        /**
+         * Return the UI element of the 'Remark' field.
+         *
+         * @return the UI element of the 'Remark' field
+         */
+        WebElement getRemarkField();
+
+        /**
+         * Return the UI element of the 'Version' field.
+         *
+         * @return the UI element of the 'Version' field
+         */
+        WebElement getVersionField();
+
+        /**
+         * Return the UI element of the 'Status' field.
+         *
+         * @return the UI element of the 'Status' field
+         */
+        WebElement getStatusField();
+
+        /**
+         * Return the UI element of the 'Context Definition' field.
+         *
+         * @return the UI element of the 'Context Definition' field
+         */
+        WebElement getContextDefinitionField();
+    }
 
     interface BBIEPanel {
 
@@ -532,7 +675,6 @@ public interface EditBIEPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param value "None", "Fixed Value", "Default Value"
          * @return
          */
@@ -598,9 +740,19 @@ public interface EditBIEPage extends Page {
         String getResetDialogMessage();
 
         String getValueDomainWarningMessage(String valueDomain);
-    }
 
-    BBIESCPanel getBBIESCPanel(WebElement bdtScNode);
+        /**
+         * Return the UI element of the 'Reset detail' button.
+         *
+         * @return the UI element of the 'Reset detail' button
+         */
+        WebElement getResetDetailButton();
+
+        /**
+         * Reset detail
+         */
+        void resetDetail();
+    }
 
     interface BBIESCPanel {
 
@@ -661,7 +813,6 @@ public interface EditBIEPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param value "None", "Fixed Value", "Default Value"
          * @return
          */

@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record10;
-import org.jooq.Row10;
+import org.jooq.Record13;
+import org.jooq.Row13;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
@@ -21,7 +21,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
  * be retrieved all at once speeding up the profile BOD transactions.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> {
+public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -195,6 +195,58 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         return (Byte) get(9);
     }
 
+    /**
+     * Setter for <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
+     * A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has
+     * linked to this record.
+     */
+    public void setSourceTopLevelAsbiepId(ULong value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
+     * A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has
+     * linked to this record.
+     */
+    public ULong getSourceTopLevelAsbiepId() {
+        return (ULong) get(10);
+    }
+
+    /**
+     * Setter for <code>oagi.top_level_asbiep.source_action</code>. An action
+     * that had used to create a reference from the source (e.g., 'Copy' or
+     * 'Uplift'.)
+     */
+    public void setSourceAction(String value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.source_action</code>. An action
+     * that had used to create a reference from the source (e.g., 'Copy' or
+     * 'Uplift'.)
+     */
+    public String getSourceAction() {
+        return (String) get(11);
+    }
+
+    /**
+     * Setter for <code>oagi.top_level_asbiep.source_timestamp</code>. A
+     * timestamp when a source reference had been made.
+     */
+    public void setSourceTimestamp(LocalDateTime value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.source_timestamp</code>. A
+     * timestamp when a source reference had been made.
+     */
+    public LocalDateTime getSourceTimestamp() {
+        return (LocalDateTime) get(12);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -205,17 +257,17 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     // -------------------------------------------------------------------------
-    // Record10 type implementation
+    // Record13 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 
     @Override
-    public Row10<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte> valuesRow() {
-        return (Row10) super.valuesRow();
+    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> valuesRow() {
+        return (Row13) super.valuesRow();
     }
 
     @Override
@@ -269,6 +321,21 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
+    public Field<ULong> field11() {
+        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID;
+    }
+
+    @Override
+    public Field<String> field12() {
+        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_ACTION;
+    }
+
+    @Override
+    public Field<LocalDateTime> field13() {
+        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP;
+    }
+
+    @Override
     public ULong component1() {
         return getTopLevelAsbiepId();
     }
@@ -319,6 +386,21 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
+    public ULong component11() {
+        return getSourceTopLevelAsbiepId();
+    }
+
+    @Override
+    public String component12() {
+        return getSourceAction();
+    }
+
+    @Override
+    public LocalDateTime component13() {
+        return getSourceTimestamp();
+    }
+
+    @Override
     public ULong value1() {
         return getTopLevelAsbiepId();
     }
@@ -366,6 +448,21 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     @Override
     public Byte value10() {
         return getInverseMode();
+    }
+
+    @Override
+    public ULong value11() {
+        return getSourceTopLevelAsbiepId();
+    }
+
+    @Override
+    public String value12() {
+        return getSourceAction();
+    }
+
+    @Override
+    public LocalDateTime value13() {
+        return getSourceTimestamp();
     }
 
     @Override
@@ -429,7 +526,25 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     @Override
-    public TopLevelAsbiepRecord values(ULong value1, ULong value2, ULong value3, LocalDateTime value4, ULong value5, ULong value6, String value7, String value8, String value9, Byte value10) {
+    public TopLevelAsbiepRecord value11(ULong value) {
+        setSourceTopLevelAsbiepId(value);
+        return this;
+    }
+
+    @Override
+    public TopLevelAsbiepRecord value12(String value) {
+        setSourceAction(value);
+        return this;
+    }
+
+    @Override
+    public TopLevelAsbiepRecord value13(LocalDateTime value) {
+        setSourceTimestamp(value);
+        return this;
+    }
+
+    @Override
+    public TopLevelAsbiepRecord values(ULong value1, ULong value2, ULong value3, LocalDateTime value4, ULong value5, ULong value6, String value7, String value8, String value9, Byte value10, ULong value11, String value12, LocalDateTime value13) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -440,6 +555,9 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         value8(value8);
         value9(value9);
         value10(value10);
+        value11(value11);
+        value12(value12);
+        value13(value13);
         return this;
     }
 
@@ -457,7 +575,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     /**
      * Create a detached, initialised TopLevelAsbiepRecord
      */
-    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state, Byte inverseMode) {
+    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state, Byte inverseMode, ULong sourceTopLevelAsbiepId, String sourceAction, LocalDateTime sourceTimestamp) {
         super(TopLevelAsbiep.TOP_LEVEL_ASBIEP);
 
         setTopLevelAsbiepId(topLevelAsbiepId);
@@ -470,5 +588,9 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         setStatus(status);
         setState(state);
         setInverseMode(inverseMode);
+        setSourceTopLevelAsbiepId(sourceTopLevelAsbiepId);
+        setSourceAction(sourceAction);
+        setSourceTimestamp(sourceTimestamp);
+        resetChangedOnNotNull();
     }
 }

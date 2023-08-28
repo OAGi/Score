@@ -1,22 +1,17 @@
 package org.oagi.score.e2e.impl.page.bie;
 
-import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.bie.IncludePaginationResponseProfileBIEDialog;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
 
 public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePaginationResponseProfileBIEDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -98,7 +93,8 @@ public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePag
         retry(() -> {
             WebElement tr = getTableRecordByValue(paginationResponseASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+            click(getDriver(), ele);
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());

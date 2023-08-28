@@ -231,5 +231,6 @@ public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPri
         setCdtScAwdPriId(cdtScAwdPriId);
         setXbtId(xbtId);
         setIsDefault(isDefault);
+        resetChangedOnNotNull();
     }
 }

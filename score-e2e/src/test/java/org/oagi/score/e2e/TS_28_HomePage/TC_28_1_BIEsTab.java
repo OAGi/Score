@@ -25,65 +25,12 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
-    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
-        this.randomAccounts.add(appUser);
+    private static int extractNumberFromText(String text) {
+        return Integer.valueOf(text.replaceAll("\\D", ""));
     }
 
-    private class UserTopLevelASBIEPContainer {
-        static List<String> SAMPLED_ASCCP_DEN_LIST = Arrays.asList(
-                "Coordinate Reference. Sequenced Identifiers",
-                "Account Identifiers. Named Identifiers",
-                "Customer Item Identification. Item Identification",
-                "Change Product Availability. Change Product Availability",
-                "Collaboration Message. Collaboration Message",
-                "Production Data. Production Data");
-        private AppUserObject appUser;
-        private int yieldPointer = 0;
-        int numberOfWIPBIEs;
-        int numberOfQABIEs;
-        int numberOfProductionBIEs;
-
-        private List<String> recentBIEs = new ArrayList<>();
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
-            this(appUser, release, nextInt(2, 5), nextInt(2, 5), nextInt(2, 5));
-        }
-
-        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,
-                                           int numberOfWIPBIEs, int numberOfQABIEs, int numberOfProductionBIEs) {
-            this.appUser = appUser;
-            this.numberOfWIPBIEs = numberOfWIPBIEs;
-            this.numberOfQABIEs = numberOfQABIEs;
-            this.numberOfProductionBIEs = numberOfProductionBIEs;
-
-            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
-
-            for (int i = 0; i < numberOfWIPBIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "WIP");
-            }
-            for (int i = 0; i < numberOfQABIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "QA");
-            }
-            for (int i = 0; i < numberOfProductionBIEs; ++i) {
-                String randomASCCP = nextRandomASCCP();
-                recentBIEs.add(randomASCCP);
-                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
-                        release, "Production");
-            }
-        }
-
-        String nextRandomASCCP() {
-            if (this.yieldPointer == SAMPLED_ASCCP_DEN_LIST.size()) {
-                this.yieldPointer = 0;
-            }
-            return SAMPLED_ASCCP_DEN_LIST.get(this.yieldPointer++);
-        }
+    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
+        this.randomAccounts.add(appUser);
     }
 
     @Test
@@ -120,10 +67,6 @@ public class TC_28_1_BIEsTab extends BaseTest {
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext), asccp, creator, state);
     }
 
-    private static int extractNumberFromText(String text) {
-        return Integer.valueOf(text.replaceAll("\\D", ""));
-    }
-
     @Test
     @DisplayName("TC_28_1_2")
     public void developer_can_click_on_state_to_view_bies_of_that_state_in_total_bies_by_state_panel() {
@@ -135,6 +78,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.TotalBIEsByStatesPanel totalBIEsByStatesPanel = homePage.openTotalBIEsByStatesPanel();
@@ -148,6 +92,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForQA = totalBIEsByStatesPanel.clickStateProgressBar("QA");
         viewEditBIEPageForQA.setOwner(developer.getLoginId());
         viewEditBIEPageForQA.hitSearchButton();
@@ -157,6 +102,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForProduction = totalBIEsByStatesPanel.clickStateProgressBar("Production");
         viewEditBIEPageForProduction.setOwner(developer.getLoginId());
         viewEditBIEPageForProduction.hitSearchButton();
@@ -177,6 +123,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.MyBIEsByStatesPanel myBIEsByStatesPanel = homePage.openMyBIEsByStatesPanel();
@@ -204,31 +151,28 @@ public class TC_28_1_BIEsTab extends BaseTest {
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        click(homePage.getBIEsTab());
         homePage.setBranch(release.getReleaseNumber());
 
         HomePage.MyBIEsByStatesPanel myBIEsByStatesPanel = homePage.openMyBIEsByStatesPanel();
 
         ViewEditBIEPage viewEditBIEPageForWIP = myBIEsByStatesPanel.clickStateProgressBar("WIP");
-        viewEditBIEPageForWIP.setOwner(developer.getLoginId());
-        viewEditBIEPageForWIP.hitSearchButton();
 
         assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForQA = myBIEsByStatesPanel.clickStateProgressBar("QA");
-        viewEditBIEPageForQA.setOwner(developer.getLoginId());
-        viewEditBIEPageForQA.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getScoreLogo()); // to go to the home page again.
+        click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForProduction = myBIEsByStatesPanel.clickStateProgressBar("Production");
-        viewEditBIEPageForProduction.setOwner(developer.getLoginId());
-        viewEditBIEPageForProduction.hitSearchButton();
 
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
@@ -259,45 +203,11 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
         developer.setPassword("oagis");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-
         HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
-        homePage.setBranch("10.8.3");
-        for (UserTopLevelASBIEPContainer container : containersFor10_8_3.values()) {
-            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
-            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
-            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
-            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
-            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
-            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
-
-            assertTrue(container.numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
-            assertTrue(container.numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
-            assertTrue(container.numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
-            assertTrue(container.numberOfWIPBIEs +
-                    container.numberOfQABIEs +
-                    container.numberOfProductionBIEs <=
-                    Integer.valueOf(getText(td_Total)));
-        }
-
-        homePage.setBranch("10.8.4");
-        for (UserTopLevelASBIEPContainer container : containersFor10_8_4.values()) {
-            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
-            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
-            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
-            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
-            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
-
-            assertTrue(container.numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
-            assertTrue(container.numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
-            assertTrue(container.numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
-            assertTrue(container.numberOfWIPBIEs +
-                    container.numberOfQABIEs +
-                    container.numberOfProductionBIEs <=
-                    Integer.valueOf(getText(td_Total)));
-        }
-
+        biesByUsersAndStatesPanel.setItemsPerPage(20);
         homePage.setBranch("All");
         for (AppUserObject appUser : developers) {
+            biesByUsersAndStatesPanel.setUsername(appUser.getLoginId());
             WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(appUser.getLoginId());
             WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
             WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
@@ -316,6 +226,48 @@ public class TC_28_1_BIEsTab extends BaseTest {
                     containersFor10_8_4.get(appUser.getLoginId()).numberOfWIPBIEs +
                     containersFor10_8_4.get(appUser.getLoginId()).numberOfQABIEs +
                     containersFor10_8_4.get(appUser.getLoginId()).numberOfProductionBIEs <= Integer.valueOf(getText(td_Total)));
+
+            biesByUsersAndStatesPanel.setUsername(appUser.getLoginId()); // toggle the username
+        }
+
+        homePage.setBranch("10.8.3");
+        for (UserTopLevelASBIEPContainer container : containersFor10_8_3.values()) {
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
+            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
+            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
+            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+
+            assertTrue(container.numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
+            assertTrue(container.numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
+            assertTrue(container.numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
+            assertTrue(container.numberOfWIPBIEs +
+                    container.numberOfQABIEs +
+                    container.numberOfProductionBIEs <=
+                    Integer.valueOf(getText(td_Total)));
+
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId()); // toggle the username
+        }
+
+        homePage.setBranch("10.8.4");
+        for (UserTopLevelASBIEPContainer container : containersFor10_8_4.values()) {
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
+            WebElement td_WIP = biesByUsersAndStatesPanel.getColumnByName(tr, "WIP");
+            WebElement td_QA = biesByUsersAndStatesPanel.getColumnByName(tr, "QA");
+            WebElement td_Production = biesByUsersAndStatesPanel.getColumnByName(tr, "Production");
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+
+            assertTrue(container.numberOfWIPBIEs <= Integer.valueOf(getText(td_WIP)));
+            assertTrue(container.numberOfQABIEs <= Integer.valueOf(getText(td_QA)));
+            assertTrue(container.numberOfProductionBIEs <= Integer.valueOf(getText(td_Production)));
+            assertTrue(container.numberOfWIPBIEs +
+                    container.numberOfQABIEs +
+                    container.numberOfProductionBIEs <=
+                    Integer.valueOf(getText(td_Total)));
+
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId()); // toggle the username
         }
     }
 
@@ -368,8 +320,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_28_1_7")
-    public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page() {
+    @DisplayName("TC_28_1_7 (WIP)")
+    public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_WIP() {
         List<AppUserObject> developers = new ArrayList<>();
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -389,13 +341,12 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
         developer.setPassword("oagis");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-
         HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
         homePage.setBranch(releaseNumber);
+
         for (AppUserObject devUser : developers) {
             UserTopLevelASBIEPContainer container = containersFor10_8_4.get(devUser.getLoginId());
-            click(homePage.getScoreLogo()); // to go to the home page again.
-
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
             WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
             WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
             assertTrue(container.numberOfWIPBIEs +
@@ -410,6 +361,45 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertEquals(0, viewEditBIEPageByUserAndWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_28_1_7 (QA)")
+    public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_QA() {
+        List<AppUserObject> developers = new ArrayList<>();
+        for (int i = 0; i < 3; ++i) {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            developers.add(developer);
+        }
+
+        String releaseNumber = "10.8.4";
+
+        Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
+        for (AppUserObject developer : developers) {
+            containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+            ));
+        }
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
+        developer.setPassword("oagis");
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
+        homePage.setBranch(releaseNumber);
+
+        for (AppUserObject devUser : developers) {
+            UserTopLevelASBIEPContainer container = containersFor10_8_4.get(devUser.getLoginId());
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+            assertTrue(container.numberOfWIPBIEs +
+                    container.numberOfQABIEs +
+                    container.numberOfProductionBIEs <=
+                    Integer.valueOf(getText(td_Total)));
+
             ViewEditBIEPage viewEditBIEPageByUserAndQA = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "QA");
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
@@ -417,6 +407,45 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_28_1_7 (Production)")
+    public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_Production() {
+        List<AppUserObject> developers = new ArrayList<>();
+        for (int i = 0; i < 3; ++i) {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            developers.add(developer);
+        }
+
+        String releaseNumber = "10.8.4";
+
+        Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
+        for (AppUserObject developer : developers) {
+            containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+            ));
+        }
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
+        developer.setPassword("oagis");
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
+        homePage.setBranch(releaseNumber);
+
+        for (AppUserObject devUser : developers) {
+            UserTopLevelASBIEPContainer container = containersFor10_8_4.get(devUser.getLoginId());
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+            assertTrue(container.numberOfWIPBIEs +
+                    container.numberOfQABIEs +
+                    container.numberOfProductionBIEs <=
+                    Integer.valueOf(getText(td_Total)));
+
             ViewEditBIEPage viewEditBIEPageByUserAndProduction = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "Production");
             assertEquals(0, viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
@@ -424,6 +453,45 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_28_1_7 (Total)")
+    public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_Total() {
+        List<AppUserObject> developers = new ArrayList<>();
+        for (int i = 0; i < 3; ++i) {
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            developers.add(developer);
+        }
+
+        String releaseNumber = "10.8.4";
+
+        Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
+        for (AppUserObject developer : developers) {
+            containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+            ));
+        }
+
+        AppUserObject developer = getAPIFactory().getAppUserAPI().getAppUserByLoginID("oagis");
+        developer.setPassword("oagis");
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        HomePage.BIEsByUsersAndStatesPanel biesByUsersAndStatesPanel = homePage.openBIEsByUsersAndStatesPanel();
+        homePage.setBranch(releaseNumber);
+
+        for (AppUserObject devUser : developers) {
+            UserTopLevelASBIEPContainer container = containersFor10_8_4.get(devUser.getLoginId());
+            biesByUsersAndStatesPanel.setUsername(container.appUser.getLoginId());
+            WebElement tr = biesByUsersAndStatesPanel.getTableRecordByValue(container.appUser.getLoginId());
+            WebElement td_Total = biesByUsersAndStatesPanel.getColumnByName(tr, "total");
+            assertTrue(container.numberOfWIPBIEs +
+                    container.numberOfQABIEs +
+                    container.numberOfProductionBIEs <=
+                    Integer.valueOf(getText(td_Total)));
+
             ViewEditBIEPage viewEditBIEPageByUserAndTotal = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "total");
             // The total number of randomly-generated BIEs could be more than the default size of items, 10.
@@ -432,6 +500,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
             assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
             assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("QA"));
             assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("Production"));
+
+            click(homePage.getScoreLogo()); // to go to the home page again.
+            click(homePage.getBIEsTab());
         }
     }
 
@@ -509,6 +580,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
                 // to go to homepage
                 click(homePage.getScoreLogo());
+                click(homePage.getBIEsTab());
             }
 
             homePage.logout();
@@ -523,6 +595,62 @@ public class TC_28_1_BIEsTab extends BaseTest {
         this.randomAccounts.forEach(randomAccount -> {
             getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
         });
+    }
+
+    private class UserTopLevelASBIEPContainer {
+        static List<String> SAMPLED_ASCCP_DEN_LIST = Arrays.asList(
+                "Coordinate Reference. Sequenced Identifiers",
+                "Account Identifiers. Named Identifiers",
+                "Customer Item Identification. Item Identification",
+                "Change Product Availability. Change Product Availability",
+                "Collaboration Message. Collaboration Message",
+                "Production Data. Production Data");
+        int numberOfWIPBIEs;
+        int numberOfQABIEs;
+        int numberOfProductionBIEs;
+        private AppUserObject appUser;
+        private int yieldPointer = 0;
+        private List<String> recentBIEs = new ArrayList<>();
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
+            this(appUser, release, nextInt(2, 5), nextInt(2, 5), nextInt(2, 5));
+        }
+
+        public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,
+                                           int numberOfWIPBIEs, int numberOfQABIEs, int numberOfProductionBIEs) {
+            this.appUser = appUser;
+            this.numberOfWIPBIEs = numberOfWIPBIEs;
+            this.numberOfQABIEs = numberOfQABIEs;
+            this.numberOfProductionBIEs = numberOfProductionBIEs;
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(this.appUser);
+
+            for (int i = 0; i < numberOfWIPBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "WIP");
+            }
+            for (int i = 0; i < numberOfQABIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "QA");
+            }
+            for (int i = 0; i < numberOfProductionBIEs; ++i) {
+                String randomASCCP = nextRandomASCCP();
+                recentBIEs.add(randomASCCP);
+                createTopLevelASBIEPByDEN(this.appUser, context, randomASCCP,
+                        release, "Production");
+            }
+        }
+
+        String nextRandomASCCP() {
+            if (this.yieldPointer == SAMPLED_ASCCP_DEN_LIST.size()) {
+                this.yieldPointer = 0;
+            }
+            return SAMPLED_ASCCP_DEN_LIST.get(this.yieldPointer++);
+        }
     }
 
 }

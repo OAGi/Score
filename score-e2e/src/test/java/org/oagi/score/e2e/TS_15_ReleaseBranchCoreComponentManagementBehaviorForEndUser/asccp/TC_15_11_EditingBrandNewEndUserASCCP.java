@@ -16,6 +16,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -259,7 +260,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
         assertFalse(bccpPanel.getGUIDField().isEnabled());
         assertFalse(bccpPanel.getDENField().isEnabled());
         assertDisabled(bccpPanel.getPropertyTermField());
-        assertDisabled(bccpPanel.getNillableCheckbox());
+        assertEnabled(bccpPanel.getNillableCheckbox());
         assertDisabled(bccpPanel.getDeprecatedCheckbox());
         assertDisabled(bccpPanel.getValueConstraintSelectField());
         assertDisabled(bccpPanel.getNamespaceSelectField());
@@ -411,6 +412,8 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
         viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
+            viewEditCoreComponentPage.setBranch(branch);
+            waitFor(Duration.ofMillis(1500));
             viewEditCoreComponentPage.setDEN(den);
             viewEditCoreComponentPage.hitSearchButton();
 

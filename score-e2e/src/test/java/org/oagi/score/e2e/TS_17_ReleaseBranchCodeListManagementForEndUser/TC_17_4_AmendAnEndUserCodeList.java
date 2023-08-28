@@ -28,7 +28,8 @@ import java.util.Map;
 
 import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -51,7 +52,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -81,23 +82,23 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             CodeListValueObject value = codeListValueMap.get(cl);
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
             assertTrue(getText(editCodeListPage.getCodeListNameField()).equals(cl.getName()));
             assertTrue(getText(editCodeListPage.getDefinitionField()).equals(cl.getDefinition()));
             assertTrue(getText(editCodeListPage.getDefinitionSourceField()).equals(cl.getDefinitionSource()));
             assertTrue(getText(editCodeListPage.getListIDField()).equals(cl.getListId()));
             assertTrue(getText(editCodeListPage.getRemarkField()).equals(cl.getRemark()));
             boolean deprecated;
-            if (editCodeListPage.getDeprecatedSelectField().isSelected()){
+            if (editCodeListPage.getDeprecatedSelectField().isSelected()) {
                 deprecated = true;
-            }else {
+            } else {
                 deprecated = false;
             }
             assertEquals(cl.isDeprecated(), deprecated);
@@ -108,9 +109,9 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertTrue(getText(editCodeListValueDialog.getDefinitionField()).equals(value.getDefinition()));
             assertTrue(getText(editCodeListValueDialog.getDefinitionSourceField()).equals(value.getDefinitionSource()));
 
-            if (editCodeListValueDialog.getDeprecatedSelectField().isSelected()){
+            if (editCodeListValueDialog.getDeprecatedSelectField().isSelected()) {
                 deprecated = true;
-            }else {
+            } else {
                 deprecated = false;
             }
             assertEquals(value.isDeprecated(), deprecated);
@@ -123,7 +124,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_2() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -146,13 +147,14 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.hitAmendButton();});
-
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.hitAmendButton();
+            });
         }
     }
 
@@ -161,7 +163,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_3() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -193,19 +195,19 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
             /**
              * Test Assertion #17.4.3.a
              */
-            if (cl.isDeprecated()){
+            if (cl.isDeprecated()) {
                 assertDisabled(editCodeListPage.getDeprecatedSelectField());
-            }else{
+            } else {
                 assertEnabled(editCodeListPage.getDeprecatedSelectField());
                 editCodeListPage.toggleDeprecated();
             }
@@ -215,7 +217,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertDisabled(editCodeListPage.getNamespaceSelectField());
             assertDisabled(editCodeListPage.getListIDField());
             assertDisabled(editCodeListPage.getAgencyIDListField());
-            String versionAfterAmendment = cl.getVersionId()+"_New";
+            String versionAfterAmendment = cl.getVersionId() + "_New";
             assertTrue(getText(editCodeListPage.getVersionField()).equals(versionAfterAmendment));
             assertEnabled(editCodeListPage.getVersionField());
             editCodeListPage.setVersion("something new");
@@ -231,12 +233,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+
     @Test
     @DisplayName("TC_17_4_TA_4")
     public void test_TA_4() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -268,26 +271,28 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             waitFor(ofSeconds(1L));
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = codeListValueMap.get(cl);
             editCodeListPage.selectCodeListValue(value.getValue());
-            assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
+            assertThrows(Exception.class, () -> {
+                editCodeListPage.removeCodeListValue();
+            });
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");
             editCodeListValueDialog.setDefinitionSource("new definition source for value");
             boolean previousDeprecatedStatusForValue = value.isDeprecated();
-            if (previousDeprecatedStatusForValue == true){
+            if (previousDeprecatedStatusForValue == true) {
                 assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-            }else{
+            } else {
                 assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
                 editCodeListValueDialog.toggleDeprecated();
             }
@@ -295,12 +300,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+
     @Test
     @DisplayName("TC_17_4_TA_5")
     public void test_TA_5() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         List<CodeListValueObject> values = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -325,25 +331,27 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = values.get(0);
             editCodeListPage.selectCodeListValue(value.getValue());
-            assertThrows(Exception.class, () -> {editCodeListPage.removeCodeListValue();});
+            assertThrows(Exception.class, () -> {
+                editCodeListPage.removeCodeListValue();
+            });
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");
             editCodeListValueDialog.setDefinitionSource("new definition source for value");
             boolean previousDeprecatedStatusForValue = value.isDeprecated();
-            if (previousDeprecatedStatusForValue == true){
+            if (previousDeprecatedStatusForValue == true) {
                 assertDisabled(editCodeListValueDialog.getDeprecatedSelectField());
-            }else{
+            } else {
                 assertEnabled(editCodeListValueDialog.getDeprecatedSelectField());
                 editCodeListValueDialog.toggleDeprecated();
             }
@@ -357,7 +365,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_6() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -378,13 +386,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
             String newValueCode = "new value code";
             editCodeListValueDialog.setCode(newValueCode);
@@ -398,12 +406,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListPage.hitUpdateButton();
         }
     }
+
     @Test
     @DisplayName("TC_17_4_TA_7")
     public void test_TA_7() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -424,13 +433,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.addCodeListValue();
             String newValueCode = "new value code";
             editCodeListValueDialog.setCode(newValueCode);
@@ -446,7 +455,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     public void test_TA_8() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<CodeListObject, CodeListValueObject> codeListValueMap = new HashMap<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -469,13 +478,13 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
 
-        for (CodeListObject cl : codeListForTesting){
+        for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
-            assertEquals(previousRevisionNumber+1,Integer.parseInt(getText(editCodeListPage.getRevisionField())));
+            assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
             editCodeListPage.setDefinition("new definition");
             editCodeListPage.setDefinitionSource("new definition source");
             editCodeListPage.setVersion("new version");
@@ -494,7 +503,9 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertEquals(cl.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
             CodeListValueObject oldValue = codeListValueMap.get(cl);
             assertDoesNotThrow(() -> editCodeListPage.valueExists(oldValue.getValue()));
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.valueExists(newValueCode);});
+            assertThrows(TimeoutException.class, () -> {
+                editCodeListPage.valueExists(newValueCode);
+            });
         }
     }
 
@@ -505,7 +516,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
         AppUserObject developer;
         ReleaseObject branch;
         NamespaceObject namespace;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -539,7 +550,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             int previousRevisionNumber = Integer.parseInt(getText(editCodeListPage.getRevisionField()));
             editCodeListPage.hitAmendButton();
             assertTrue(getText(editCodeListPage.getStateField()).equals("WIP"));
@@ -550,7 +561,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             editCodeListValueDialog.setMeaning("new value meaning");
             editCodeListValueDialog.hitAddButton();
             editCodeListPage.hitUpdateButton();
-            if (cl.getDefinition() == null){
+            if (cl.getDefinition() == null) {
                 editCodeListPage.hitUpdateAnywayButton();
             }
             /**
@@ -590,11 +601,11 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
                 List<JsonNode> values = rootNode.findValues("enum");
                 JsonNode value = values.get(0);
                 ArrayList<String> jsonValues = new ArrayList<>();
-                for (int i=0; i<value.size(); i++){
+                for (int i = 0; i < value.size(); i++) {
                     jsonValues.add(value.get(i).asText());
                 }
                 List<CodeListValueObject> codeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(cl.getCodeListManifestId());
-                for (CodeListValueObject codeListalue : codeListValues){
+                for (CodeListValueObject codeListalue : codeListValues) {
                     assertTrue(jsonValues.contains(codeListalue.getValue()));
                 }
             } catch (IOException e) {

@@ -70,7 +70,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
      * The column <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
      * business context.
      */
-    public final TableField<BizCtxRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "Short, descriptive name of the business context.");
+    public final TableField<BizCtxRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Short, descriptive name of the business context.");
 
     /**
      * The column <code>oagi.biz_ctx.created_by</code>. Foreign key to the

@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -71,7 +74,9 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUserA, branch.getReleaseNumber());
         ReleaseObject anotherBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
         homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        assertThrows(NoSuchElementException.class, () -> {viewEditCodeListPage.searchCodeListByNameAndBranch(codeList.getName(), anotherBranch.getReleaseNumber());});
+        assertThrows(NoSuchElementException.class, () -> {
+            viewEditCodeListPage.searchCodeListByNameAndBranch(codeList.getName(), anotherBranch.getReleaseNumber());
+        });
     }
 
     @Test
@@ -150,6 +155,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         editCodeListPage.removeCodeListValue();
         editCodeListPage.hitUpdateButton();
     }
+
     @Test
     @DisplayName("TC_17_2_TA_4")
     public void test_TA_4() {
@@ -175,6 +181,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
         assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
     }
+
     @Test
     @DisplayName("TC_17_2_TA_5")
     public void test_TA_5() {
@@ -199,18 +206,21 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branch.getReleaseNumber());
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListPublished);
         AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeListPublished.getOwnerUserId());
         assertTrue(codeListPublished.getState().equals("Published"));
         assertTrue(owner.isDeveloper());
-        assertDoesNotThrow(() -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+        assertDoesNotThrow(() -> {
+            editCodeListPage.hitDeriveCodeListBasedOnThisButton();
+        });
     }
+
     @Test
     @DisplayName("TC_17_2_TA_6")
     public void test_TA_6() {
         AppUserObject endUserA;
         ReleaseObject branch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
@@ -239,15 +249,17 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListProduction, endUserB);
             codeListForTesting.add(codeListProduction);
         }
+
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
-        for (CodeListObject cl: codeListForTesting){
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        for (CodeListObject cl : codeListForTesting) {
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl, true);
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
             assertFalse(owner.isDeveloper());
             assertThrows(TimeoutException.class, () -> editCodeListPage.getDeriveCodeListBasedOnThisButton());
         }
     }
+
     @Test
     @DisplayName("TC_17_2_TA_7")
     public void test_TA_7() {
@@ -277,8 +289,10 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeListPublished.getName(), branchTwo.getReleaseNumber());
-        assertDoesNotThrow(() -> {editCodeListPage.hitDeriveCodeListBasedOnThisButton();});
+        EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeListPublished);
+        assertDoesNotThrow(() -> {
+            editCodeListPage.hitDeriveCodeListBasedOnThisButton();
+        });
     }
 
     @AfterEach

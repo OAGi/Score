@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_34_6_DeletingAgencyIDList extends BaseTest {

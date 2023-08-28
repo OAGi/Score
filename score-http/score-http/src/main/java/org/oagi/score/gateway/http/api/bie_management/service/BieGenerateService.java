@@ -245,6 +245,9 @@ public class BieGenerateService {
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);
                 break;
+            case "AVRO":
+                generateExpression = applicationContext.getBean(BieAvroGenerateExpression.class);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown expression option: " + expressionOption);
         }

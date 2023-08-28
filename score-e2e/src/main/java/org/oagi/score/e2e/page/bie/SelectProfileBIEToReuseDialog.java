@@ -29,6 +29,8 @@ public interface SelectProfileBIEToReuseDialog extends Dialog {
 
     void selectBIEToReuse(TopLevelASBIEPObject bie);
 
+    void selectBIEToReuse(String topLevelBIEPropertyName);
+
     WebElement getTableRecordByValue(String value);
 
     WebElement getColumnByName(WebElement tableRecord, String columnName);

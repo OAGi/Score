@@ -215,6 +215,8 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         assertDisabled(asccpPanel.getReusableCheckbox());
         asccpViewEditPage.hitReviseButton();
 
+        asccpViewEditPage.openPage();
+        asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
         assertEquals("2", getText(asccpPanel.getRevisionField()));
         assertNotChecked(asccpPanel.getReusableCheckbox());

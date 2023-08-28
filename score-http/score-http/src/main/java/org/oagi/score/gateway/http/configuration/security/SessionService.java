@@ -7,6 +7,9 @@ import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 import org.oagi.score.repo.api.user.model.GetScoreUserRequest;
+import org.oagi.score.repo.api.user.model.GetScoreUsersRequest;
+import org.oagi.score.repo.api.user.model.ScoreRole;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_OAUTH2_USER;
@@ -154,6 +158,12 @@ public class SessionService {
 
     public org.oagi.score.repo.api.user.model.ScoreUser getScoreSystemUser() {
         return getScoreUserByUserId(SYSTEM_USER_ID);
+    }
+
+    public List<org.oagi.score.repo.api.user.model.ScoreUser> getScoreAdminUsers() {
+        ScoreUserReadRepository repo = scoreRepositoryFactory.createScoreUserReadRepository();
+        return repo.getScoreUsers(new GetScoreUsersRequest()
+                .withRole(ScoreRole.ADMINISTRATOR)).getUsers();
     }
 
     public org.oagi.score.repo.api.user.model.ScoreUser asScoreUser(AuthenticatedPrincipal user) {

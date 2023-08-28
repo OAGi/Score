@@ -761,5 +761,6 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setPrevCodeListValueId(prevCodeListValueId);
         setNextCodeListValueId(nextCodeListValueId);
+        resetChangedOnNotNull();
     }
 }

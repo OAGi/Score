@@ -21,7 +21,7 @@ public class HelpMenuImpl extends DelegateBasePageImpl implements HelpMenu {
             By.xpath("//button[contains(text(), \"About\")]");
 
     private final By USER_GUIDE_SUB_MENU_LOCATOR =
-            By.xpath("//button/a[contains(text(), \"User Guide\")]");
+            By.xpath("//button[contains(text(), \"User Guide\")]");
 
     public HelpMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

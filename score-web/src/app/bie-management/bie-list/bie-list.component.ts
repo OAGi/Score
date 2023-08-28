@@ -15,11 +15,13 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {
+  TransferOwnershipDialogComponent
+} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -34,7 +36,7 @@ export class BieListComponent implements OnInit {
   title = 'BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner',
+    'select', 'state', 'branch', 'den', 'owner',
     'transferOwnership', 'businessContexts', 'version',
     'status', 'bizTerm', 'remark', 'lastUpdateTimestamp', 'more'
   ];
@@ -95,23 +97,7 @@ export class BieListComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-      if (this.releases.length > 0) {
-        if (this.request.release.releaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
-        } else {
-          const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
-          if (savedReleaseId) {
-            this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-            if (!this.request.release) {
-              this.request.release = this.releases[0];
-              saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
-            }
-          } else {
-            this.request.release = this.releases[0];
-          }
-        }
-      }
-
+      this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
       this.loadBieList(true);
     });
   }
@@ -163,6 +149,14 @@ export class BieListComponent implements OnInit {
       case 'endDate':
         this.request.updatedDate.end = null;
         break;
+    }
+  }
+
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    if (selectAllValue) {
+      this.request.releases = this.releases;
+    } else {
+      this.request.releases = [];
     }
   }
 

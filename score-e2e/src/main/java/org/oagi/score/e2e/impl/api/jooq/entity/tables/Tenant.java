@@ -58,7 +58,7 @@ public class Tenant extends TableImpl<TenantRecord> {
     /**
      * The column <code>oagi.tenant.name</code>. The name of the tenant.
      */
-    public final TableField<TenantRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100), this, "The name of the tenant.");
+    public final TableField<TenantRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of the tenant.");
 
     private Tenant(Name alias, Table<TenantRecord> aliased) {
         this(alias, aliased, null);

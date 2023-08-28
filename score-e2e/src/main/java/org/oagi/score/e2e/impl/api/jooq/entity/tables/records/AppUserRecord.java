@@ -369,5 +369,6 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
         setIsDeveloper(isDeveloper);
         setIsAdmin(isAdmin);
         setIsEnabled(isEnabled);
+        resetChangedOnNotNull();
     }
 }

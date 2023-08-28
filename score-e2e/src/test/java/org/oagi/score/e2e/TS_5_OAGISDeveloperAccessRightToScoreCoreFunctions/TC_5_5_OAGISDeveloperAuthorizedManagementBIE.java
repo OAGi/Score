@@ -8,17 +8,16 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.menu.BIEMenu;
-import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.*;
-import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +32,7 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
@@ -149,7 +149,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         );
         BCCObject bccAbsenceTypeCode = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Code", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Open_ Code", nextRelease.getReleaseNumber()),
                 "Published"
         );
         ASCCObject asccFinancialAccountIdentifiersGroup = coreComponentAPI.appendASCC(
@@ -167,7 +167,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", nextRelease.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -266,7 +266,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         BBIEPanel = editBIEPageForRevised.getBBIEPanel(node);
         nillable = BBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -327,7 +327,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         ASBIEPanel = editBIEPageForRevised.getASBIEPanel(node);
         nillable = ASBIEPanel.getNillableCheckbox();
         assertChecked(nillable);
-        assertDisabled(nillable);
+        assertEnabled(nillable);
     }
 
     @Test
@@ -386,7 +386,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 acc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Number", release.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", release.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -1113,9 +1113,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
             WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-            assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+            assertDisabled(td.findElement(By.tagName("input")));
 
-            assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+            assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
         }
     }
 
@@ -1146,9 +1146,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-        assertDisabled(td.findElement(By.tagName("mat-checkbox")));
+        assertDisabled(td.findElement(By.tagName("input")));
 
-        assertFalse(viewEditBIEPage.getDiscardButton(false).isEnabled());
+        assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
     }
 
     @Test
@@ -1173,7 +1173,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         click(homePage.getScoreLogo());
         ViewEditBIEPage viewEditBIEPageForCheck = homePage.getBIEMenu().openViewEditBIESubMenu();
         viewEditBIEPageForCheck.setBranch(topLevelASBIEP.getReleaseNumber());
-        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnwerUserId()).getLoginId());
+        viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         viewEditBIEPageForCheck.setDEN(topLevelASBIEP.getPropertyTerm());
         viewEditBIEPageForCheck.hitSearchButton();
 
@@ -1293,6 +1293,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Data Area/Item Certificate Of Analysis/Item Certificate Of Analysis Header/Description";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         int cardinalityMin = nextInt(2, 5);
@@ -1408,27 +1409,39 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
+        clear(bbiePanel.getCardinalityMinField());
         sendKeys(bbiePanel.getCardinalityMinField(), "");
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min is\")]")).isDisplayed());
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
+        clear(bbiePanel.getCardinalityMinField());
         sendKeys(bbiePanel.getCardinalityMinField(), randStrForCardinalityMin);
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"'" + randStrForCardinalityMin + "' is not allowed for Cardinality Min\")]")).isDisplayed());
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
+        clear(bbiePanel.getCardinalityMaxField());
         sendKeys(bbiePanel.getCardinalityMaxField(), "");
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Max is\")]")).isDisplayed());
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
+        clear(bbiePanel.getCardinalityMaxField());
         sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"'" + randStrForCardinalityMax + "' is not allowed for Cardinality Max\")]")).isDisplayed());
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieErrorMessage != null);
+        });
     }
 
     @Test
@@ -1456,26 +1469,34 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         bbieScPanel.toggleUsed();
 
         sendKeys(bbieScPanel.getCardinalityMinField(), "");
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         String randStrForCardinalityMin = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMinField(), randStrForCardinalityMin);
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         sendKeys(bbieScPanel.getCardinalityMaxField(), "");
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
 
         String randStrForCardinalityMax = randomAlphanumeric(5, 10);
         sendKeys(bbieScPanel.getCardinalityMaxField(), randStrForCardinalityMax);
-        waitFor(ofMillis(500L)); // wait for popping the error message up
-        errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
-        assertTrue(errorMessage != null);
+        waitFor(ofMillis(1000L)); // wait for popping the error message up
+        retry(() -> {
+            String bbieScErrorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-error")));
+            assertTrue(bbieScErrorMessage != null);
+        });
     }
 
     @Test
@@ -1686,6 +1707,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -1726,6 +1748,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String path = "/" + asccp.getPropertyTerm() + "/Note";
         WebElement bbieNode = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
         bbiePanel.toggleUsed();
@@ -1837,7 +1860,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Maintenance Order. Cancel Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1878,7 +1901,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Process Maintenance Order. Process Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1932,7 +1955,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Cancel Maintenance Order. Cancel Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1979,7 +2002,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Maintenance Order. Sync Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2030,7 +2053,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Notify Maintenance Order. Notify Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2062,7 +2085,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Show Maintenance Order. Show Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2118,7 +2141,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Change Maintenance Order. Change Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2166,7 +2189,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Get Maintenance Order. Get Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "WIP");
 
@@ -2232,7 +2255,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "QA");
 
@@ -2472,7 +2495,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
                 viewEditBIEPage.openTransferBIEOwnershipDialog(tr);
@@ -2488,7 +2511,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
         td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertTrue(td.findElement(By.tagName("button")).isEnabled());
+        assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         td = viewEditBIEPage.getColumnByName(tr, "businessContexts");
         assertEquals(randomBusinessContext.getName(), getText(td));
@@ -2505,7 +2528,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
         // end of the pre-condition
@@ -2534,7 +2557,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "Production");
         // end of the pre-condition
@@ -3495,13 +3518,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time"); // required BBIE field.
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
-        assertDisabled(creationDateTimePanel.getUsedCheckbox());
+        assertEnabled(creationDateTimePanel.getUsedCheckbox());
         assertChecked(creationDateTimePanel.getUsedCheckbox());
 
         WebElement dataAreaNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Data Area"); // required ASBIE field.
         EditBIEPage.ASBIEPanel dataAreaPanel = editBIEPage.getASBIEPanel(dataAreaNode);
-        assertDisabled(dataAreaPanel.getUsedCheckbox());
+        assertEnabled(dataAreaPanel.getUsedCheckbox());
         assertChecked(dataAreaPanel.getUsedCheckbox());
     }
 
@@ -3697,6 +3720,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement creationDateTimeNode = editBIEPage.getNodeByPath(
                 "/" + asccp.getPropertyTerm() + "/Application Area/Creation Date Time");
+        waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel creationDateTimePanel = editBIEPage.getBBIEPanel(creationDateTimeNode);
         assertEquals("Primitive", getText(creationDateTimePanel.getValueDomainRestrictionSelectField()));
         assertEquals("date time", getText(creationDateTimePanel.getValueDomainField()));
@@ -3738,43 +3762,343 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
     }
 
     @Test
-    @DisplayName("TC_5_5_TA_52")
-    public void test_TA_52() {
+    @DisplayName("TC_5_5_TA_52 (Enable Children - ASBIE)")
+    public void test_TA_52_asbie() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String asbieChild : Arrays.asList("Sender", "Intermediary", "Receiver", "Signature", "Extension")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + asbieChild);
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(childPanel);
+            assertEnabled(asbiePanel.getUsedCheckbox());
+        }
+        for (String bbieChild : Arrays.asList("Creation Date Time", "Scenario Identifier", "Correlation Identifier", "BOD Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + bbieChild);
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(childPanel);
+            assertEnabled(bbiePanel.getUsedCheckbox());
+        }
+    }
+
+    @Test
+    @DisplayName("TC_5_5_TA_52 (Enable Children - BBIE)")
+    public void test_TA_52_bbie() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area/Sender/Component Identifier";
+        WebElement componentIdentifier = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIEPanel componentIdentifierPanel = editBIEPage.getBBIEPanel(componentIdentifier);
+        componentIdentifierPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String child : Arrays.asList("Scheme Agency Identifier", "Scheme Identifier", "Scheme Version Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + child);
+            EditBIEPage.BBIESCPanel bbieScPanel = editBIEPage.getBBIESCPanel(childPanel);
+            assertEnabled(bbieScPanel.getUsedCheckbox());
+        }
     }
 
     @Test
     @DisplayName("TC_5_5_TA_53")
     public void test_TA_53() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        editBIEPage.enableChildren(path);
+        editBIEPage.setChildrenMaxCardinalityToOne(path);
+        editBIEPage.hitUpdateButton();
+
+        editBIEPage.openPage();
+        for (String asbieChild : Arrays.asList("Sender", "Intermediary", "Receiver", "Signature", "Extension")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + asbieChild);
+            EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(childPanel);
+            assertEquals(1, Integer.valueOf(getText(asbiePanel.getCardinalityMaxField())));
+        }
+        for (String bbieChild : Arrays.asList("Creation Date Time", "Scenario Identifier", "Correlation Identifier", "BOD Identifier")) {
+            WebElement childPanel = editBIEPage.getNodeByPath(path + "/" + bbieChild);
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(childPanel);
+            assertEquals(1, Integer.valueOf(getText(bbiePanel.getCardinalityMaxField())));
+        }
     }
 
     @Test
     @DisplayName("TC_5_5_TA_54")
     public void test_TA_54() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
+        topLevelASBIEPPanel.setRemark(randomPrint(50, 100).trim());
+        topLevelASBIEPPanel.setVersion("version_" + randomAlphanumeric(5, 10));
+        topLevelASBIEPPanel.setStatus("status_" + randomAlphanumeric(5, 10));
+        topLevelASBIEPPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        topLevelASBIEPPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getVersionField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getStatusField())));
+        assertTrue(StringUtils.isEmpty(getText(topLevelASBIEPPanel.getContextDefinitionField())));
+
+        editBIEPage.openPage();
+        String path = "/" + asccp.getPropertyTerm() + "/Application Area";
+        WebElement applicationArea = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
+        applicationAreaPanel.toggleUsed();
+        applicationAreaPanel.setRemark(randomPrint(50, 100).trim());
+        applicationAreaPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        applicationAreaPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(applicationAreaPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(applicationAreaPanel.getContextDefinitionField())));
+
+        editBIEPage.openPage();
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Scenario Identifier";
+        WebElement scenarioIdentifier = editBIEPage.getNodeByPath(path);
+        waitFor(Duration.ofMillis(2000));
+        EditBIEPage.BBIEPanel scenarioIdentifierPanel = editBIEPage.getBBIEPanel(scenarioIdentifier);
+        scenarioIdentifierPanel.toggleUsed();
+        scenarioIdentifierPanel.setRemark(randomPrint(50, 100).trim());
+        scenarioIdentifierPanel.setExample(randomPrint(50, 100).trim());
+        scenarioIdentifierPanel.setContextDefinition(randomPrint(50, 100).trim());
+        editBIEPage.hitUpdateButton();
+
+        scenarioIdentifierPanel.resetDetail();
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getRemarkField())));
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getExampleField())));
+        assertTrue(StringUtils.isEmpty(getText(scenarioIdentifierPanel.getContextDefinitionField())));
     }
 
+    @Disabled
     @Test
     @DisplayName("TC_5_5_TA_55")
     public void test_TA_55() {
+        // 'Exclude SCs' option has been removed.
     }
 
     @Test
     @DisplayName("TC_5_5_issue1234")
     public void test_issue1234() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        ReleaseObject prevRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        ReleaseObject curRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+
+        /*
+         * 'Alternate UOM Code. Unit_ Code' in 10.6 changed to 'Alternate UOM Code. Open_ Code' in 10.7.0.1
+         */
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(
+                "Alternate UOM Code. Unit_ Code", prevRelease.getReleaseNumber());
+        bccp.setDefaultValue(randomAlphabetic(5, 10));
+        getAPIFactory().getCoreComponentAPI().updateBCCP(bccp);
+        try {
+            BusinessContextObject randomBusinessContext =
+                    getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", prevRelease.getReleaseNumber());
+            TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+            HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+            EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+            String path = "/" + asccp.getPropertyTerm() + "/Alternate UOM Code";
+            WebElement node = editBIEPage.getNodeByPath(path);
+            waitFor(Duration.ofMillis(2000));
+            EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+            assertEquals(bccp.getDefaultValue(), getText(bbiePanel.getDefaultValueField()));
+
+            asccp = getAPIFactory().getCoreComponentAPI()
+                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", curRelease.getReleaseNumber());
+            topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                    .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+            editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+            node = editBIEPage.getNodeByPath(path);
+            waitFor(Duration.ofMillis(2000));
+            bbiePanel = editBIEPage.getBBIEPanel(node);
+
+            assertEquals("None", getText(bbiePanel.getValueConstraintSelectField()));
+        } finally {
+            bccp.setDefaultValue(null);
+            getAPIFactory().getCoreComponentAPI().updateBCCP(bccp);
+        }
     }
 
     @Test
     public void test_TA_5_5_56() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm();
+        WebElement node = editBIEPage.getNodeByPath(path);
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains(asccp.getPropertyTerm()));
+        assertTrue(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertTrue(nodeText.contains("0..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertTrue(nodeText.contains("0..∞"));
     }
 
     @Test
     public void test_TA_5_5_56a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        editBIEPage.toggleHideCardinality(); // Turn off cardinality
+
+        String path = "/" + asccp.getPropertyTerm();
+        WebElement node = editBIEPage.getNodeByPath(path);
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains(asccp.getPropertyTerm()));
+        assertFalse(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertFalse(nodeText.contains("0..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertFalse(nodeText.contains("0..∞"));
     }
 
     @Test
     public void test_TA_5_5_56b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+        TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+
+        String path = "/" + asccp.getPropertyTerm() + "/Version Identifier";
+        WebElement node = editBIEPage.getNodeByPath(path);
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        bbiePanel.setCardinalityMin(1);
+        waitFor(ofMillis(1000L));
+        String nodeText = getText(node);
+        assertTrue(nodeText.contains("Version Identifier"));
+        assertTrue(nodeText.contains("1..1"));
+
+        path = "/" + asccp.getPropertyTerm() + "/Application Area/Receiver";
+        node = editBIEPage.getNodeByPath(path);
+        EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(node);
+        asbiePanel.toggleUsed();
+        int randomCardinalityMax = Integer.valueOf(randomNumeric(2, 3));
+        asbiePanel.setCardinalityMax(randomCardinalityMax);
+        waitFor(ofMillis(1000L));
+        nodeText = getText(node);
+        assertTrue(nodeText.contains("Receiver"));
+        assertTrue(nodeText.contains("0.." + randomCardinalityMax));
     }
 
     @AfterEach

@@ -1,5 +1,7 @@
 package org.oagi.score.e2e;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import static java.time.Duration.ofMillis;
@@ -49,6 +51,16 @@ public class AssertionHelper {
 
     public static void assertDisabled(WebElement element) {
         waitFor(ofMillis(500L));
+        if ("mat-checkbox".equals(element.getTagName())) {
+            try {
+                WebElement inputCheckbox = element.findElement(By.tagName("input"));
+                assertNotNull(inputCheckbox.getAttribute("disabled"));
+            } catch (NoSuchElementException e) {
+                assertEquals("true", element.getAttribute("ng-reflect-disabled"));
+            }
+            return;
+        }
+
         try {
             assertEquals("true", element.getAttribute("ng-reflect-disabled"));
         } catch (Error | Exception rerun) {

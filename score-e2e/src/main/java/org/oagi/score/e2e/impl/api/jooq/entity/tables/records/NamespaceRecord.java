@@ -467,5 +467,6 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implem
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

@@ -22,8 +22,10 @@ public class DatabaseStartupConfiguration {
     @Bean
     public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource) {
         DatabaseStartupValidator validator = new DatabaseStartupValidator();
+        validator.setInterval(2); // 2s
+        validator.setTimeout(300); // 5m
         validator.setDataSource(dataSource);
-        validator.setValidationQuery(DatabaseDriver.MYSQL.getValidationQuery());
+        validator.setValidationQuery(DatabaseDriver.MARIADB.getValidationQuery());
         return validator;
     }
 

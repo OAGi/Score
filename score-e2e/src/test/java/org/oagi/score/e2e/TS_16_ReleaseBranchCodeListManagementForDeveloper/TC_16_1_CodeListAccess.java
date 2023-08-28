@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class TC_16_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_16_1_TA_1")
     public void test_TA_1() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject branch;
         {
@@ -105,55 +106,55 @@ public class TC_16_1_CodeListAccess extends BaseTest {
         for (CodeListObject cl : codeListForTesting) {
             assertNotEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
-            if (owner.isDeveloper()){
-                if (cl.getState().equals("Published")){
-                    assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
-                }else{
-                    assertThrows(NoSuchElementException.class, () ->{viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
+            if (owner.isDeveloper()) {
+                if (cl.getState().equals("Published")) {
+                    assertDoesNotThrow(() -> {
+                        viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                    });
+                } else {
+                    assertThrows(NoSuchElementException.class, () -> {
+                        viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                    });
                 }
-            }else{
-                assertDoesNotThrow(() -> {viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());});
+            } else {
+                assertDoesNotThrow(() -> {
+                    viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+                });
             }
         }
     }
+
     @Test
     @DisplayName("TC_16_1_TA_2")
     public void test_TA_2() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        AppUserObject developerA;
-        ReleaseObject branch;
-        {
-            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerA);
+        AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developerA);
+        AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developerB);
 
-            AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerB);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            /**
-             * Create Published developer Code List for a particular release branch
-             */
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
-                    createRandomCodeList(developerB, namespace, branch, "Published");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerB);
-            codeListForTesting.add(codeListPublished);
-        }
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        /**
+         * Create Published developer Code List for a particular release branch
+         */
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
+                createRandomCodeList(developerB, namespace, branch, "Published");
+        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerB);
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        for (CodeListObject cl : codeListForTesting) {
-            assertNotEquals(developerA.getAppUserId(), cl.getOwnerUserId());
-            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
-            assertTrue(owner.isDeveloper());
-            assertTrue(cl.getState().equals("Published"));
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
-        }
+        assertNotEquals(developerA.getAppUserId(), codeListPublished.getOwnerUserId());
+        AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeListPublished.getOwnerUserId());
+        assertTrue(owner.isDeveloper());
+        assertTrue(codeListPublished.getState().equals("Published"));
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.openCodeListViewEditPage(codeListPublished);
     }
+
     @Test
     @DisplayName("TC_16_1_TA_3")
     public void test_TA_3() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListValuesMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListValuesMap = new HashMap<>();
         AppUserObject developerA;
         ReleaseObject branch;
         {
@@ -173,38 +174,41 @@ public class TC_16_1_CodeListAccess extends BaseTest {
                     createRandomCodeList(endUser, euNamespace, branch, "WIP");
             CodeListValueObject value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, endUser);
             codeListForTesting.add(codeListWIP);
-            codeListValuesMap.put(codeListWIP, value);
+            codeListValuesMap.put(codeListWIP.getCodeListManifestId(), value);
 
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, euNamespace, branch, "Draft");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, endUser);
             codeListForTesting.add(codeListDraft);
-            codeListValuesMap.put(codeListDraft, value);
+            codeListValuesMap.put(codeListDraft.getCodeListManifestId(), value);
 
             CodeListObject codeListProduction = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, euNamespace, branch, "Production");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListProduction, endUser);
             codeListForTesting.add(codeListProduction);
-            codeListValuesMap.put(codeListProduction, value);
+            codeListValuesMap.put(codeListProduction.getCodeListManifestId(), value);
         }
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        for (CodeListObject cl : codeListForTesting) {
-            assertNotEquals(developerA.getAppUserId(), cl.getOwnerUserId());
-            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(cl.getOwnerUserId());
+        ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        for (CodeListObject codeList : codeListForTesting) {
+            assertNotEquals(developerA.getAppUserId(), codeList.getOwnerUserId());
+            AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
             assertFalse(owner.isDeveloper());
-            ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(cl.getName(), branch.getReleaseNumber());
+
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList, true);
             assertDisabled(editCodeListPage.getCodeListNameField());
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             assertDisabled(editCodeListPage.getVersionField());
-            assertThrows(TimeoutException.class, () -> {editCodeListPage.getAddCodeListValueButton();});
-            CodeListValueObject value = codeListValuesMap.get(cl);
+            assertThrows(TimeoutException.class, () -> editCodeListPage.getAddCodeListValueButton());
+            CodeListValueObject value = codeListValuesMap.get(codeList.getCodeListManifestId());
             assertDoesNotThrow(() -> editCodeListPage.getTableRecordByValue(value.getValue()));
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
             addCommentDialog.setComment("test comment");
             escape(getDriver());
+
+            viewEditCodeListPage.openPage();
         }
     }
 

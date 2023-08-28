@@ -74,45 +74,45 @@ public class DtSc extends TableImpl<DtScRecord> {
      * The column <code>oagi.dt_sc.object_class_term</code>. Object class term
      * of the SC.
      */
-    public final TableField<DtScRecord, String> OBJECT_CLASS_TERM = createField(DSL.name("object_class_term"), SQLDataType.VARCHAR(60), this, "Object class term of the SC.");
+    public final TableField<DtScRecord, String> OBJECT_CLASS_TERM = createField(DSL.name("object_class_term"), SQLDataType.VARCHAR(60).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Object class term of the SC.");
 
     /**
      * The column <code>oagi.dt_sc.property_term</code>. Property term of the
      * SC.
      */
-    public final TableField<DtScRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), SQLDataType.VARCHAR(60), this, "Property term of the SC.");
+    public final TableField<DtScRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), SQLDataType.VARCHAR(60).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Property term of the SC.");
 
     /**
      * The column <code>oagi.dt_sc.representation_term</code>. Representation of
      * the supplementary component.
      */
-    public final TableField<DtScRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(20), this, "Representation of the supplementary component.");
+    public final TableField<DtScRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Representation of the supplementary component.");
 
     /**
      * The column <code>oagi.dt_sc.definition</code>. Description of the
      * supplementary component.
      */
-    public final TableField<DtScRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB, this, "Description of the supplementary component.");
+    public final TableField<DtScRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the supplementary component.");
 
     /**
      * The column <code>oagi.dt_sc.definition_source</code>. This is typically a
      * URL identifying the source of the DEFINITION column.
      */
-    public final TableField<DtScRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(200), this, "This is typically a URL identifying the source of the DEFINITION column.");
+    public final TableField<DtScRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
      * The column <code>oagi.dt_sc.owner_dt_id</code>. Foreigned key to the DT
      * table indicating the data type, to which this supplementary component
      * belongs.
      */
-    public final TableField<DtScRecord, ULong> OWNER_DT_ID = createField(DSL.name("owner_dt_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreigned key to the DT table indicating the data type, to which this supplementary component belongs.");
+    public final TableField<DtScRecord, ULong> OWNER_DT_ID = createField(DSL.name("owner_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreigned key to the DT table indicating the data type, to which this supplementary component belongs.");
 
     /**
      * The column <code>oagi.dt_sc.cardinality_min</code>. The minimum
      * occurrence constraint associated with the supplementary component. The
      * valid values zero or one.
      */
-    public final TableField<DtScRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.");
+    public final TableField<DtScRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.");
 
     /**
      * The column <code>oagi.dt_sc.cardinality_max</code>. The maximum
@@ -120,41 +120,41 @@ public class DtSc extends TableImpl<DtScRecord> {
      * valid values are zero or one. Zero is used when the SC is restricted from
      * an instantiation in the data type.
      */
-    public final TableField<DtScRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER, this, "The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.");
+    public final TableField<DtScRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.");
 
     /**
      * The column <code>oagi.dt_sc.based_dt_sc_id</code>. Foreign key to the
      * DT_SC table itself. This column is used when the SC is derived from the
      * based DT.
      */
-    public final TableField<DtScRecord, ULong> BASED_DT_SC_ID = createField(DSL.name("based_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "Foreign key to the DT_SC table itself. This column is used when the SC is derived from the based DT.");
+    public final TableField<DtScRecord, ULong> BASED_DT_SC_ID = createField(DSL.name("based_dt_sc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the DT_SC table itself. This column is used when the SC is derived from the based DT.");
 
     /**
      * The column <code>oagi.dt_sc.default_value</code>. This column specifies
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
      */
-    public final TableField<DtScRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB, this, "This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.");
+    public final TableField<DtScRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
      * The column <code>oagi.dt_sc.fixed_value</code>. This column captures the
      * fixed value constraint. Default and fixed value constraints cannot be
      * used at the same time.
      */
-    public final TableField<DtScRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB, this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
+    public final TableField<DtScRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
      * The column <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
-    public final TableField<DtScRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "Indicates whether this is deprecated and should not be reused (i.e., no new reference to this record should be created).");
+    public final TableField<DtScRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether this is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
      * The column <code>oagi.dt_sc.replacement_dt_sc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
-    public final TableField<DtScRecord, ULong> REPLACEMENT_DT_SC_ID = createField(DSL.name("replacement_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "This refers to a replacement if the record is deprecated.");
+    public final TableField<DtScRecord, ULong> REPLACEMENT_DT_SC_ID = createField(DSL.name("replacement_dt_sc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
      * The column <code>oagi.dt_sc.created_by</code>. Foreign key to the
@@ -182,25 +182,25 @@ public class DtSc extends TableImpl<DtScRecord> {
      * The column <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
      * code list was created.
      */
-    public final TableField<DtScRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
+    public final TableField<DtScRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was created.");
 
     /**
      * The column <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
      * the code list was last updated.
      */
-    public final TableField<DtScRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP(6)", SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
+    public final TableField<DtScRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the code list was last updated.");
 
     /**
      * The column <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
-    public final TableField<DtScRecord, ULong> PREV_DT_SC_ID = createField(DSL.name("prev_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the previous history record.");
+    public final TableField<DtScRecord, ULong> PREV_DT_SC_ID = createField(DSL.name("prev_dt_sc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
      * The column <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
-    public final TableField<DtScRecord, ULong> NEXT_DT_SC_ID = createField(DSL.name("next_dt_sc_id"), SQLDataType.BIGINTUNSIGNED, this, "A self-foreign key to indicate the next history record.");
+    public final TableField<DtScRecord, ULong> NEXT_DT_SC_ID = createField(DSL.name("next_dt_sc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private DtSc(Name alias, Table<DtScRecord> aliased) {
         this(alias, aliased, null);

@@ -44,7 +44,7 @@ public class AgencyIdListReadRepository {
                         BCCP_MANIFEST.RELEASE_ID.eq(AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
                 ))
                 .join(AGENCY_ID_LIST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
+                        states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetch();
 

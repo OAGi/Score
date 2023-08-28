@@ -396,5 +396,6 @@ public class ModuleAgencyIdListManifestRecord extends UpdatableRecordImpl<Module
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

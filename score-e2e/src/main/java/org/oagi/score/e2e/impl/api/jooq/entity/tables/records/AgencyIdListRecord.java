@@ -971,5 +971,6 @@ public class AgencyIdListRecord extends UpdatableRecordImpl<AgencyIdListRecord> 
         setOwnerUserId(ownerUserId);
         setPrevAgencyIdListId(prevAgencyIdListId);
         setNextAgencyIdListId(nextAgencyIdListId);
+        resetChangedOnNotNull();
     }
 }

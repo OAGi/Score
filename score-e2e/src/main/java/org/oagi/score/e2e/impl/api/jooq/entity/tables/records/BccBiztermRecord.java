@@ -346,5 +346,6 @@ public class BccBiztermRecord extends UpdatableRecordImpl<BccBiztermRecord> impl
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

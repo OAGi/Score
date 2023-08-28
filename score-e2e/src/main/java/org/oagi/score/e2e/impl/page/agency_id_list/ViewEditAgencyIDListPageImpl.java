@@ -1,17 +1,11 @@
 package org.oagi.score.e2e.impl.page.agency_id_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
-import org.oagi.score.e2e.impl.page.bie.ViewEditBIEPageImpl;
-import org.oagi.score.e2e.impl.page.code_list.EditCodeListPageImpl;
-import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
-import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -24,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEditAgencyIDListPage {
 
@@ -35,13 +28,13 @@ public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEd
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -106,6 +99,14 @@ public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEd
     @Override
     public WebElement getNewAgencyIDListButton() {
         return elementToBeClickable(getDriver(), NEW_AGENCY_ID_LIST_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public EditAgencyIDListPage openEditAgencyIDListPage(AgencyIDListObject agencyIDList) {
+        EditAgencyIDListPage editAgencyIDListPage = new EditAgencyIDListPageImpl(this, agencyIDList);
+        editAgencyIDListPage.openPage();
+        assert editAgencyIDListPage.isOpened();
+        return editAgencyIDListPage;
     }
 
     @Override

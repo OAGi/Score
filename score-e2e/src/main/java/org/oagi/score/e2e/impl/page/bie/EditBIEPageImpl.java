@@ -6,6 +6,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.business_term.AssignBusinessTermBTPageImpl;
 import org.oagi.score.e2e.impl.page.business_term.BusinessTermAssignmentPageImpl;
 import org.oagi.score.e2e.impl.page.core_component.ACCExtensionViewEditPageImpl;
+import org.oagi.score.e2e.obj.ACCObject;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -15,12 +16,14 @@ import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -33,11 +36,23 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
 
+    private static final By ENABLE_CHILDREN_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Enable Children\")]");
+
+    private static final By SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Set Children Max Cardinality to 1\")]");
+
     private static final By ABIE_LOCAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Locally\")]");
 
     private static final By ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Create ABIE Extension Globally\")]");
+
+    private static final By RETAINED_REUSED_BIE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Retain Reused BIE\")]");
+
+    private static final By MAKE_BIE_REUSABLE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Make BIE reusable\")]");
 
     private static final By SETTINGS_ICON_LOCATOR =
             By.xpath("//mat-icon[text() = \"settings\"]");
@@ -85,9 +100,6 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
-
-    private static final By TYPE_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//textarea[@data-placeholder=\"Type Definition\"]");
 
     private static final By REUSE_BIE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Reuse BIE\")]");
@@ -140,24 +152,74 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     @Override
     public WebElement clickOnDropDownMenuByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        String nodeName = nodes[nodes.length - 1];
-        WebElement node = getNodeByName(nodeName);
-        click(node);
-        new Actions(getDriver()).sendKeys("O").perform();
-        try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
-                return node;
+        return clickOnDropDownMenuByPathAndLevel(path, -1);
+    }
+
+    @Override
+    public WebElement clickOnDropDownMenuByPathAndLevel(String path, int dataLevel) {
+        return retry(() -> {
+            goToNode(path);
+            String[] nodes = path.split("/");
+            String nodeName = nodes[nodes.length - 1];
+            WebElement node = getNodeByNameAndDataLevel(nodeName, dataLevel);
+            click(getDriver(), node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            try {
+                if (visibilityOfElementLocated(getDriver(),
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    return node;
+                }
+            } catch (WebDriverException ignore) {
             }
-        } catch (WebDriverException ignore) {
-        }
-        WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
-        click(contextMenuIcon);
-        assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
-        return node;
+            WebElement contextMenuIcon = getContextMenuIconByNodeName(nodeName);
+            click(contextMenuIcon);
+            assert visibilityOfElementLocated(getDriver(),
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+            return node;
+        });
+    }
+
+    @Override
+    public TopLevelASBIEPObject getTopLevelASBIEP() {
+        return asbiep;
+    }
+
+    @Override
+    public void RetainReusedBIEOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(elementToBeClickable(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), RETAINED_REUSED_BIE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Retain\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(1000L));
+        });
+    }
+
+    @Override
+    public void MakeBIEReusableOnNode(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+            try {
+                click(elementToBeClickable(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), MAKE_BIE_REUSABLE_OPTION_LOCATOR));
+            }
+
+            click(elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-dialog-container//span[contains(text(), \"Make\")]//ancestor::button[1]")));
+            invisibilityOfLoadingContainerElement(getDriver());
+            waitFor(ofMillis(2000L));
+        });
     }
 
     @Override
@@ -165,17 +227,56 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_GLOBAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(1000L));
 
-            ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            String currentUrl = retry(() -> {
+                waitFor(ofMillis(1000L));
+                String url = getDriver().getCurrentUrl();
+                if (url.contains("core_component")) {
+                    return url;
+                }
+                throw new WebDriverException();
+            });
+            BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+            ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+            ACCExtensionViewEditPage ACCExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
             assert ACCExtensionViewEditPage.isOpened();
             return ACCExtensionViewEditPage;
+        });
+    }
+
+    @Override
+    public void enableChildren(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+
+            try {
+                click(elementToBeClickable(getDriver(), ENABLE_CHILDREN_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), ENABLE_CHILDREN_OPTION_LOCATOR));
+            }
+        });
+    }
+
+    @Override
+    public void setChildrenMaxCardinalityToOne(String path) {
+        retry(() -> {
+            WebElement node = clickOnDropDownMenuByPath(path);
+
+            try {
+                click(elementToBeClickable(getDriver(), SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR));
+            } catch (TimeoutException e) {
+                click(node);
+                new Actions(getDriver()).sendKeys("O").perform();
+                click(elementToBeClickable(getDriver(), SET_CHILDREN_MAX_CARDINALITY_TO_ONE_OPTION_LOCATOR));
+            }
         });
     }
 
@@ -184,15 +285,24 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
-            waitFor(ofMillis(1000L));
 
-            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+            String currentUrl = retry(() -> {
+                waitFor(ofMillis(1000L));
+                String url = getDriver().getCurrentUrl();
+                if (url.contains("core_component")) {
+                    return url;
+                }
+                throw new WebDriverException();
+            });
+            BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+            ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+            ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
             assert accExtensionViewEditPage.isOpened();
             return accExtensionViewEditPage;
         });
@@ -203,11 +313,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         retry(() -> {
             WebElement node = clickOnDropDownMenuByPath(path);
             try {
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             } catch (TimeoutException e) {
                 click(node);
                 new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
+                click(elementToBeClickable(getDriver(), ABIE_LOCAL_EXTENSION_OPTION_LOCATOR));
             }
         });
     }
@@ -215,16 +325,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     @Override
     public ACCExtensionViewEditPage continueToExtendBIEOnNode() {
         click(elementToBeClickable(getDriver(), YES_BUTTON_IN_DIALOG_LOCATOR));
-        waitFor(ofMillis(500L));
-        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this);
+        waitFor(ofMillis(1000L));
+
         switchToNextTab(getDriver());
+        String currentUrl = getDriver().getCurrentUrl();
+        BigInteger accManifestId = new BigInteger(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByManifestId(accManifestId);
+        ACCExtensionViewEditPage accExtensionViewEditPage = new ACCExtensionViewEditPageImpl(this, acc);
         assert accExtensionViewEditPage.isOpened();
         return accExtensionViewEditPage;
     }
 
     @Override
     public WebElement getSearchInputTextField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -233,12 +347,22 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement goToNode(String path) {
-        click(getSearchInputTextField());
-        WebElement node = sendKeys(visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR), path);
-        node.sendKeys(Keys.ENTER);
-        click(node);
-        clear(getSearchInputTextField());
-        return node;
+        return goToNode(path, 0);
+    }
+
+    private WebElement goToNode(String path, int retry) {
+        return retry(() -> {
+            WebElement searchInput = getSearchInputTextField();
+            click(getDriver(), searchInput);
+            WebElement node = sendKeys(searchInput, path);
+            for (int i = 0; i < (retry + 1); ++i) {
+                node.sendKeys(Keys.ENTER);
+                waitFor(ofMillis(500L));
+            }
+            click(getDriver(), node);
+            clear(searchInput);
+            return node;
+        });
     }
 
     public TopLevelASBIEPPanel getTopLevelASBIEPPanel() {
@@ -260,16 +384,35 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     private WebElement getNodeByName(String nodeName) {
-        By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+        return getNodeByNameAndDataLevel(nodeName, -1);
+    }
+
+    private WebElement getNodeByNameAndDataLevel(String nodeName, int dataLevel) {
+        String xpathExpr = "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]";
+        if (dataLevel >= 0) {
+            xpathExpr += "[@data-level=\"" + dataLevel + "\"]";
+        }
+        By nodeLocator = By.xpath(xpathExpr);
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
     @Override
     public WebElement getNodeByPath(String path) {
-        goToNode(path);
-        String[] nodes = path.split("/");
-        return getNodeByName(nodes[nodes.length - 1]);
+        return getNodeByPath(path, 0);
+    }
+
+    @Override
+    public WebElement getNodeByPath(String path, int retry) {
+        return retry(() -> {
+            goToNode(path, retry);
+            String[] nodes = path.split("/");
+            int dataLevel = nodes.length - 2;
+            if (dataLevel > 0) {
+                return getNodeByNameAndDataLevel(nodes[nodes.length - 1], dataLevel);
+            } else {
+                return getNodeByName(nodes[nodes.length - 1]);
+            }
+        });
     }
 
     @Override
@@ -386,47 +529,37 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     @Override
-    public String getTypeDefinitionValue() {
-        return getTypeDefinitionField().getAttribute("ng-reflect-value");
-    }
-
-    @Override
     public SelectProfileBIEToReuseDialog reuseBIEOnNode(String path) {
-        /*return retry(() -> {
-            WebElement node = clickOnDropDownMenuByPath(path);
-            try {
-                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
-            } catch (TimeoutException e) {
-                click(node);
-                new Actions(getDriver()).sendKeys("O").perform();
-                click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
-            }
-            waitFor(ofMillis(1000L));
-
-            SelectProfileBIEToReusePage selectProfileBIEToReuse = new SelectProfileBIEToReusePageImpl(this);
-            assert selectProfileBIEToReuse.isOpened();
-            return selectProfileBIEToReuse;
-        });*/
-
         WebElement node = clickOnDropDownMenuByPath(path);
         try {
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         } catch (TimeoutException e) {
-            click(node);
+            click(getDriver(), node);
             new Actions(getDriver()).sendKeys("O").perform();
-            click(visibilityOfElementLocated(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
         }
         waitFor(ofMillis(1000L));
 
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
-
     }
 
     @Override
-    public WebElement getTypeDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), TYPE_DEFINITION_FIELD_LOCATOR);
+    public SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel) {
+        WebElement node = clickOnDropDownMenuByPathAndLevel(path, dataLevel);
+        try {
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(getDriver(), node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(getDriver(), elementToBeClickable(getDriver(), REUSE_BIE_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
+        assert selectProfileBIEToReuse.isOpened();
+        return selectProfileBIEToReuse;
     }
 
     @Override
@@ -436,7 +569,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(asccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new ASBIEPanelImpl();
         });
     }
@@ -448,7 +581,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIEPanelImpl();
         });
     }
@@ -460,7 +593,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(1000L));
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
-            assert nodeText.contains(panelTitle);
+            assert nodeText.contains(panelTitle.trim());
             return new BBIESCPanelImpl();
         });
     }
@@ -478,6 +611,11 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private WebElement getTextAreaFieldByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
                 "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
+    }
+
+    private WebElement getIconButtonByName(String iconName) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//mat-icon[contains(text(), \"" + iconName + "\")]//ancestor::button"));
     }
 
     private class TopLevelASBIEPPanelImpl implements TopLevelASBIEPPanel {
@@ -600,6 +738,81 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getTypeDefinitionField() {
             return getTextAreaFieldByName("Type Definition");
+        }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
+        }
+    }
+
+    @Override
+    public ReusedASBIEPanel getReusedASBIEPanel(WebElement asccpNode) {
+        return retry(() -> {
+            click(asccpNode);
+            waitFor(ofMillis(500L));
+            return new ReusedASBIEPanelImpl("//div[contains(@class, \"detail-reused\")][1]");
+        });
+    }
+
+    private class ReusedASBIEPanelImpl implements ReusedASBIEPanel {
+
+        private final String baseXPath;
+
+        public ReusedASBIEPanelImpl(String baseXPath) {
+            this.baseXPath = baseXPath;
+        }
+
+        @Override
+        public WebElement getReleaseField() {
+            return getInputFieldByName("Release");
+        }
+
+        @Override
+        public WebElement getStateField() {
+            return getInputFieldByName("State");
+        }
+
+        @Override
+        public WebElement getOwnerField() {
+            return getInputFieldByName("Owner");
+        }
+
+        @Override
+        public WebElement getBusinessContextField() {
+            return getInputFieldByName("Business Context");
+        }
+
+        @Override
+        public WebElement getLegacyBusinessTermField() {
+            return getInputFieldByName("Legacy Business Term");
+        }
+
+        @Override
+        public WebElement getRemarkField() {
+            return getInputFieldByName("Remark");
+        }
+
+        @Override
+        public WebElement getVersionField() {
+            return getInputFieldByName("Version");
+        }
+
+        @Override
+        public WebElement getStatusField() {
+            return getInputFieldByName("Status");
+        }
+
+        @Override
+        public WebElement getContextDefinitionField() {
+            return getTextAreaFieldByName("Context Definition");
         }
     }
 
@@ -729,6 +942,18 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             } else {
                 return visibilityOfElementLocated(getDriver(), ASSIGN_BUSINESS_TERM_LOCATOR);
             }
+        }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
         }
     }
 
@@ -893,7 +1118,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
-            return visibilityOfElementLocated(getDriver(), By.xpath(
+            return elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
         }
 
@@ -906,15 +1131,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public WebElement getValueDomainField() {
-            return visibilityOfElementLocated(getDriver(), By.xpath(
+            return elementToBeClickable(getDriver(), By.xpath(
                     "//span[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
         }
 
         @Override
         public void setValueDomain(String valueDomain) {
-            click(getValueDomainField());
+            click(getDriver(), getValueDomainField());
+            waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
-            click(elementToBeClickable(getDriver(), By.xpath(
+            click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
         }
 
@@ -960,14 +1186,34 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public String getValueDomainWarningMessage(String valueDomain) {
-            click(getValueDomainField());
+            click(getDriver(), getValueDomainField());
             waitFor(ofMillis(1000L));
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), valueDomain);
             WebElement valueDomainElement = findElement(getDriver(), By.xpath(
                     "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]/span/div"));
-            String message = valueDomainElement.getAttribute("ng-reflect-message");
+            new Actions(getDriver()).moveToElement(valueDomainElement).perform(); // mouse over
+            String message = getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-tooltip-component")));
+            pressEscape();
             return message;
         }
+
+        @Override
+        public WebElement getResetDetailButton() {
+            return getIconButtonByName("refresh");
+        }
+
+        @Override
+        public void resetDetail() {
+            click(getResetDetailButton());
+            click(getDialogButtonByName(getDriver(), "Reset"));
+            assert "Reset".equals(getSnackBarMessage(getDriver()));
+        }
+    }
+
+    private void pressEscape() {
+        waitFor(Duration.ofMillis(500));
+        Actions action = new Actions(getDriver());
+        action.sendKeys(Keys.ESCAPE).build().perform();
     }
 
     private class BBIESCPanelImpl implements BBIESCPanel {

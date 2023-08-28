@@ -346,5 +346,6 @@ public class AsccBiztermRecord extends UpdatableRecordImpl<AsccBiztermRecord> im
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

@@ -121,6 +121,10 @@ public interface HomePage extends Page {
 
     UEsByUsersAndStatesPanel openUEsByUsersAndStatesPanel();
 
+    MyUEsByStatesPanel openMyUEsByStatesPanel();
+
+    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
+
     interface TotalBIEsByStatesPanel {
         WebElement getStateProgressBarByState(String state);
 
@@ -180,6 +184,13 @@ public interface HomePage extends Page {
          * @return the UI element of the column
          */
         WebElement getColumnByName(WebElement tableRecord, String columnName);
+
+        /**
+         * Set the size of items to the 'Items per page' select field.
+         *
+         * @param items the size of items; 5, 10, 20
+         */
+        void setItemsPerPage(int items);
 
         /**
          * Open the 'View/Edit BIE' page by clicking the cell in the table based on the username and the column name.
@@ -293,6 +304,13 @@ public interface HomePage extends Page {
         WebElement getColumnByName(WebElement tableRecord, String columnName);
 
         /**
+         * Set the size of items to the 'Items per page' select field.
+         *
+         * @param items the size of items; 5, 10, 20
+         */
+        void setItemsPerPage(int items);
+
+        /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the username and the column name.
          *
          * @param user       the username
@@ -311,13 +329,12 @@ public interface HomePage extends Page {
 
     }
 
-    MyUEsByStatesPanel openMyUEsByStatesPanel();
-
     interface MyUnusedUEsInBIEsPanel {
 
-        /**Return the table record in the table based on the user extension name and association DEN
+        /**
+         * Return the table record in the table based on the user extension name and association DEN
          *
-         * @param ueName  user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the table record UI element
          */
@@ -326,14 +343,12 @@ public interface HomePage extends Page {
         /**
          * Open the 'View/Edit Core Component' page by clicking the cell in the table based on the user extension and association DEN
          *
-         * @param ueName user extension name
+         * @param ueName   user extension name
          * @param assocDEN Association DEN
          * @return the 'View/Edit Core Component' page object
          */
         ViewEditCoreComponentPage openViewEditCCPageByUEAndDEN(String ueName, String assocDEN);
 
     }
-
-    MyUnusedUEsInBIEsPanel openMyUnusedUEsInBIEsPanel();
 
 }

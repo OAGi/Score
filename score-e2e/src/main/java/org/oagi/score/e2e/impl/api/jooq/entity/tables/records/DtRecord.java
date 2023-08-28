@@ -496,5 +496,6 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
         setReplacementDtId(replacementDtId);
         setPrevDtId(prevDtId);
         setNextDtId(nextDtId);
+        resetChangedOnNotNull();
     }
 }

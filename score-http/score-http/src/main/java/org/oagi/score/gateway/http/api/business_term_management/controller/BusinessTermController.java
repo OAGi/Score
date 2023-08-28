@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +46,7 @@ public class BusinessTermController {
     @Autowired
     private BusinessTermService businessTermService;
 
-    private static String TYPE = "text/csv";
+    private static String DEFAULT_ALLOWED_CONTENT_TYPE = "text/csv";
 
     @RequestMapping(value = "/business_terms", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -226,15 +221,19 @@ public class BusinessTermController {
     public ResponseEntity uploadFile(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestParam("file") MultipartFile file) throws IOException {
-        if (TYPE.equals(file.getContentType())) {
+        if (DEFAULT_ALLOWED_CONTENT_TYPE.equals(file.getContentType())) {
             CreateBulkBusinessTermRequest request = new CreateBulkBusinessTermRequest(authenticationService.asScoreUser(requester));
             request.setInputStream(file.getInputStream());
             CreateBulkBusinessTermResponse response = businessTermService.createBusinessTermsFromFile(request);
-            if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
-                logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
-                return ResponseEntity.noContent().build();
+            if (response.hasErrors()) {
+                throw new ScoreDataAccessException("Fail to parse CSV file: " + String.join(" and ", response.getFormatCheckExceptions()));
             } else {
-                return ResponseEntity.status(200).build();
+                if (response.getBusinessTermIds() != null && !response.getBusinessTermIds().isEmpty()) {
+                    logger.debug("Uploaded the file successfully: " + file.getOriginalFilename() + " with created record IDs " + response.getBusinessTermIds());
+                    return ResponseEntity.noContent().build();
+                } else {
+                    return ResponseEntity.status(200).build();
+                }
             }
         } else {
             return ResponseEntity.status(415).body("Unsupported content type: " + file.getContentType());

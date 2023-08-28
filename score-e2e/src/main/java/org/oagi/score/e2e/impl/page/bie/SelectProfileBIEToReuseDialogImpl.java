@@ -77,6 +77,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         click(searchedSelectField);
         escape(getDriver());
     }
+
     @Override
     public WebElement getUpdaterSelectField() {
         return visibilityOfElementLocated(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
@@ -113,6 +114,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
     }
+
     @Override
     public WebElement getSearchButton() {
         return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
@@ -134,6 +136,18 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());
     }
+
+    @Override
+    public void selectBIEToReuse(String topLevelBIEPropertyName) {
+        retry(() -> {
+            WebElement tr = getTableRecordByValue(topLevelBIEPropertyName);
+            WebElement td = getColumnByName(tr, "select");
+            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        });
+        click(getSelectButton());
+        invisibilityOfLoadingContainerElement(getDriver());
+    }
+
     @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));

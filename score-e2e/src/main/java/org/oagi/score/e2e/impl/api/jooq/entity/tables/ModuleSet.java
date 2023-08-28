@@ -74,7 +74,7 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
      * The column <code>oagi.module_set.description</code>. Description or
      * explanation about the module set or use of the module set.
      */
-    public final TableField<ModuleSetRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "Description or explanation about the module set or use of the module set.");
+    public final TableField<ModuleSetRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description or explanation about the module set or use of the module set.");
 
     /**
      * The column <code>oagi.module_set.created_by</code>. Foreign key to the

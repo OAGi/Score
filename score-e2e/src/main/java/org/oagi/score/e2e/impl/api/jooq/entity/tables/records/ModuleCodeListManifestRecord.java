@@ -394,5 +394,6 @@ public class ModuleCodeListManifestRecord extends UpdatableRecordImpl<ModuleCode
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);
         setLastUpdateTimestamp(lastUpdateTimestamp);
+        resetChangedOnNotNull();
     }
 }

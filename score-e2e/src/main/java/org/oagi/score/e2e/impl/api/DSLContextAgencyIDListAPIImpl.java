@@ -1,23 +1,25 @@
 package org.oagi.score.e2e.impl.api;
 
-import org.jooq.*;
+import org.apache.commons.lang3.StringUtils;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.AgencyIDListAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.*;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.LogRecord;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
@@ -66,7 +68,7 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(agencyIDList.getGuid());
-        dummyLogRecord.setSnapshot(JSON.valueOf("{\"component\": \"agencyIdList\"}"));
+        dummyLogRecord.setSnapshot("{\"component\": \"agencyIdList\"}");
         dummyLogRecord.setCreatedBy(agencyIdListRecord.getCreatedBy());
         dummyLogRecord.setCreationTimestamp(agencyIdListRecord.getCreationTimestamp());
 
@@ -130,7 +132,10 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
     }
 
     @Override
-    public AgencyIDListObject getAgencyIDListByNameAndBranch(String name, String branch) {
+    public List<AgencyIDListObject> getAgencyIDListsByRelease(ReleaseObject release) {
+        if (release == null) {
+            return Collections.emptyList();
+        }
         List<Field<?>> fields = new ArrayList();
         fields.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
         fields.add(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID);
@@ -140,10 +145,38 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
                 .from(AGENCY_ID_LIST_MANIFEST)
                 .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(and(
-                        AGENCY_ID_LIST.NAME.eq(name),
-                        RELEASE.RELEASE_NUM.eq(branch)
-                ))
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId())))
+                .fetch(record -> agencyIDListListMapper(record));
+    }
+
+    @Override
+    public AgencyIDListObject getAgencyIDListByNameAndBranch(String name, String branch) {
+        return getAgencyIDListByNameAndBranchAndState(name, branch, null);
+    }
+
+    @Override
+    public AgencyIDListObject getAgencyIDListByNameAndBranchAndState(String name, String branch, String state) {
+        List<Condition> conditions = new ArrayList<>();
+        if (!StringUtils.isEmpty(name)) {
+            conditions.add(AGENCY_ID_LIST.NAME.eq(name));
+        }
+        if (!StringUtils.isEmpty(branch)) {
+            conditions.add(RELEASE.RELEASE_NUM.eq(branch));
+        }
+        if (!StringUtils.isEmpty(state)) {
+            conditions.add(AGENCY_ID_LIST.STATE.eq(state));
+        }
+
+        List<Field<?>> fields = new ArrayList();
+        fields.add(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID);
+        fields.add(AGENCY_ID_LIST_MANIFEST.RELEASE_ID);
+        fields.addAll(Arrays.asList(AGENCY_ID_LIST.fields()));
+        return dslContext.select(fields)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .where(and(conditions))
                 .fetchOne(record -> agencyIDListListMapper(record));
     }
 

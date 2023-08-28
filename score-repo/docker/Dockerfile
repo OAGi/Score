@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 mysql:5.7.42
+FROM --platform=linux/amd64 mariadb:11.0.3
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -7,8 +7,8 @@ ENV MYSQL_USER=oagi
 ENV MYSQL_PASSWORD=oagi
 ENV MYSQL_ROOT_PASSWORD=oagi
 
-RUN yum -y update
-RUN yum -y upgrade
+RUN apt-get -y update
+RUN apt-get -y upgrade
 
 VOLUME /var/lib/mysql
 
@@ -17,4 +17,4 @@ ADD oagis.sql /docker-entrypoint-initdb.d/oagis.sql
 USER mysql
 EXPOSE 3306
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["mysqld"]
+CMD ["mariadbd", "--plugin-load-add=type_mysql_json"]

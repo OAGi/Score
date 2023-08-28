@@ -7,6 +7,7 @@ package org.oagi.score.e2e.impl.api.jooq.entity;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue;
@@ -21,6 +22,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc;
@@ -30,6 +32,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccBizterm;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
@@ -58,6 +61,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
@@ -81,6 +85,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2AppScope;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.RefSpec;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
@@ -128,6 +133,11 @@ public class Tables {
      * The table <code>oagi.acc_manifest</code>.
      */
     public static final AccManifest ACC_MANIFEST = AccManifest.ACC_MANIFEST;
+
+    /**
+     * The table <code>oagi.acc_manifest_tag</code>.
+     */
+    public static final AccManifestTag ACC_MANIFEST_TAG = AccManifestTag.ACC_MANIFEST_TAG;
 
     /**
      * The AGENCY_ID_LIST table stores information about agency identification
@@ -208,6 +218,11 @@ public class Tables {
     public static final AsccpManifest ASCCP_MANIFEST = AsccpManifest.ASCCP_MANIFEST;
 
     /**
+     * The table <code>oagi.asccp_manifest_tag</code>.
+     */
+    public static final AsccpManifestTag ASCCP_MANIFEST_TAG = AsccpManifestTag.ASCCP_MANIFEST_TAG;
+
+    /**
      * A BBIE represents a relationship/association between an ABIE and a BBIEP.
      * It is a contextualization of a BCC. The BBIE table also stores some
      * information about the specific constraints related to the BDT associated
@@ -265,6 +280,11 @@ public class Tables {
      * The table <code>oagi.bccp_manifest</code>.
      */
     public static final BccpManifest BCCP_MANIFEST = BccpManifest.BCCP_MANIFEST;
+
+    /**
+     * The table <code>oagi.bccp_manifest_tag</code>.
+     */
+    public static final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
 
     /**
      * This table captures the allowed primitives for a BDT. The allowed
@@ -445,7 +465,7 @@ public class Tables {
     public static final Comment COMMENT = Comment.COMMENT;
 
     /**
-     * The table stores configuration properties of the application. 
+     * The table stores configuration properties of the application.
      */
     public static final Configuration CONFIGURATION = Configuration.CONFIGURATION;
 
@@ -477,6 +497,11 @@ public class Tables {
      * The table <code>oagi.dt_manifest</code>.
      */
     public static final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
+
+    /**
+     * The table <code>oagi.dt_manifest_tag</code>.
+     */
+    public static final DtManifestTag DT_MANIFEST_TAG = DtManifestTag.DT_MANIFEST_TAG;
 
     /**
      * This table represents the supplementary component (SC) of a DT. Revision
@@ -601,6 +626,11 @@ public class Tables {
      * The table <code>oagi.seq_key</code>.
      */
     public static final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
+
+    /**
+     * The table <code>oagi.tag</code>.
+     */
+    public static final Tag TAG = Tag.TAG;
 
     /**
      * This table about the user tenant role.

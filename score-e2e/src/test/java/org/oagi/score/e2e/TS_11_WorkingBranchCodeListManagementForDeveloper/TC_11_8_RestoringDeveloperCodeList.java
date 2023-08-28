@@ -12,6 +12,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,6 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -39,8 +39,8 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -50,33 +50,37 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
+
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertEquals(developerA.getLoginId(), getText(editCodeListPage.getOwnerField()));
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             editCodeListPage.hitDeleteButton();
-            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            codeList.setState("Deleted");
+
+            viewEditCodeListPage.openPage();
+            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Deleted", getText(editCodeListPage.getStateField()));
             editCodeListPage.hitRestoreButton();
-            CodeListValueObject value = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             assertDoesNotThrow(() -> editCodeListPageNew.valueExists(value.getValue()));
         }
-
     }
+
     @Test
     @DisplayName("TC_11_8_TA_2")
     public void test_TA_2() {
         AppUserObject developerA;
         AppUserObject developerB;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -89,29 +93,31 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
+
         for (CodeListObject codeList : codeListForTesting) {
             HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertEquals(developerB.getLoginId(), getText(editCodeListPage.getOwnerField()));
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             editCodeListPage.hitDeleteButton();
+            codeList.setState("Deleted");
+
             homePage.logout();
             homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
             viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPageNew = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             assertEquals("Deleted", getText(editCodeListPage.getStateField()));
             assertNotEquals(developerA.getLoginId(), getText(editCodeListPage.getOwnerField()));
             editCodeListPage.hitRestoreButton();
             assertEquals(developerA.getLoginId(), getText(editCodeListPage.getOwnerField()));
-            CodeListValueObject value = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             assertDoesNotThrow(() -> editCodeListPageNew.valueExists(value.getValue()));
         }
-
     }
 
     @AfterEach

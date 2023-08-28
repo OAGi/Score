@@ -8,7 +8,6 @@ import org.oagi.score.e2e.page.context.EditBusinessContextPage;
 import org.oagi.score.e2e.page.context.ViewEditBusinessContextPage;
 import org.openqa.selenium.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -177,7 +176,7 @@ public class ViewEditBusinessContextPageImpl extends BasePageImpl implements Vie
             }
             WebElement tdName = td.findElement(By.tagName("a"));
             click(tdName);
-            waitFor(ofMillis(500L));
+            waitFor(ofMillis(2000L));
 
             BusinessContextObject businessContext =
                     getAPIFactory().getBusinessContextAPI().getBusinessContextByName(businessContextName);

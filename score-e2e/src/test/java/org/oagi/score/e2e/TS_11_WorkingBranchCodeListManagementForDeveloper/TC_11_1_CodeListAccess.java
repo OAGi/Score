@@ -1,10 +1,16 @@
 package org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.CodeListObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -40,7 +46,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_1_and_TA_14")
     public void test_TA_1_and_TA_14() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         {
@@ -81,7 +87,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_2")
     public void test_TA_2() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject workingBranch;
         {
@@ -114,7 +120,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertEquals(Boolean.valueOf("true"), developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             if (cl.getState().equals("WIP")) {
                 /**
                  * The developer can view and edit the details (including code values) of a CL that is in the WIP state and owned by him.
@@ -136,7 +142,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_3")
     public void test_TA_3() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         {
@@ -164,7 +170,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
              * The developer CAN view but CANNOT edit the details of a CL that is in WIP state and owned by another developer.
              */
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
         }
@@ -173,7 +179,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_4")
     public void test_TA_4() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         {
@@ -213,7 +219,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertTrue(acceptedStates.contains(cl.getState()));
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -225,7 +231,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_5")
     public void test_TA_5() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         {
@@ -254,7 +260,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertEquals("Published", cl.getState());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -267,7 +273,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_6")
     public void test_TA_6() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         AppUserObject endUser;
@@ -317,7 +323,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_7")
     public void test_TA_7() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
         ReleaseObject workingBranch;
@@ -349,7 +355,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertEquals("Deleted", cl.getState());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -361,7 +367,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_8")
     public void test_TA_8() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
         ReleaseObject workingBranch;
@@ -402,7 +408,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertTrue(developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -414,7 +420,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_9")
     public void test_TA_9() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         AppUserObject developerA;
         ReleaseObject workingBranch;
@@ -456,7 +462,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertTrue(developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
             EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPageByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
+                    openCodeListViewEditPage(cl);
             assertDisabled(editCodeListPage.getDefinitionField());
             assertDisabled(editCodeListPage.getDefinitionSourceField());
             AddCommentDialog addCommentDialog = editCodeListPage.hitAddCommentButton();
@@ -468,7 +474,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_10")
     public void test_TA_10() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         {
@@ -535,7 +541,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_11")
     public void test_TA_11() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject workingBranch;
         {
@@ -593,7 +599,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_12")
     public void test_TA_12() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
         ReleaseObject workingBranch;
         {
@@ -627,13 +633,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             if (previousState.equals("")) {
                 String currentState = cl.getState();
                 previousState = cl.getState();
-                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.setState(currentState);
                 viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             } else {
-                viewEditCodeListPage.toggleState(previousState);
+                viewEditCodeListPage.setState(previousState);
                 String currentState = cl.getState();
                 previousState = cl.getState();
-                viewEditCodeListPage.toggleState(currentState);
+                viewEditCodeListPage.setState(currentState);
                 viewEditCodeListPage.searchCodeListByNameAndBranch(cl.getName(), workingBranch.getReleaseNumber());
             }
         }
@@ -642,16 +648,17 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_13")
     public void test_TA_13() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        AppUserObject developerB;
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        AppUserObject developerA, developerB;
         ReleaseObject workingBranch;
         {
+            developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developerA);
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            thisAccountWillBeDeletedAfterTests(developerA);
             NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
@@ -674,6 +681,8 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.setOwner(developerA.getLoginId());
+        viewEditCodeListPage.setItemsPerPage(50);
         for (CodeListObject cl : codeListForTesting) {
             viewEditCodeListPage.searchCodeListByUpdatedDateAndBranch(cl, workingBranch.getReleaseNumber());
         }
@@ -682,7 +691,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_15")
     public void test_TA_15() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         ReleaseObject workingBranch;
         {
@@ -722,7 +731,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     @Test
     @DisplayName("TC_11_1_TA_16")
     public void test_TA_16() {
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         Map<CodeListObject, ReleaseObject> codeListRelease = new HashMap<>();
         {

@@ -10,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class AgencyIdListRepository implements ScoreRepository<AgencyIdList> {
@@ -37,9 +36,16 @@ public class AgencyIdListRepository implements ScoreRepository<AgencyIdList> {
     }
 
     @Override
-    public List<AgencyIdList> findAllByReleaseId(BigInteger releaseId) {
+    public List<AgencyIdList> findAllByReleaseIds(Collection<BigInteger> releaseIds) {
+        if (releaseIds == null || releaseIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getSelectOnConditionStep()
-                .where(Tables.AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .where(
+                        (releaseIds.size() == 1) ?
+                                Tables.AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseIds.iterator().next())) :
+                                Tables.AGENCY_ID_LIST_MANIFEST.RELEASE_ID.in(releaseIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                )
                 .fetchInto(AgencyIdList.class);
     }
 

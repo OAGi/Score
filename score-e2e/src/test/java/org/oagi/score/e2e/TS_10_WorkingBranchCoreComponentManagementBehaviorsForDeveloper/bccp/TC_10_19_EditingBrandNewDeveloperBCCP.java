@@ -118,7 +118,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
 
         String denText = getText(bccpPanel.getDENField());
-        assertEquals("Test Object " + randomPropertyTerm + ". Code", denText);
+        assertEquals("Test Object " + randomPropertyTerm + ". System Environment_ Code", denText);
     }
 
     @Test
@@ -293,7 +293,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         bccpCreateDialog.create("Temperature_ Open_ Measure. Type");
         viewEditCoreComponentPage.openPage();
 
-        String den = "Property Term. Measure";
+        String den = "Property Term. Temperature_ Open_ Measure";
         {
             viewEditCoreComponentPage.setDEN(den);
             viewEditCoreComponentPage.hitSearchButton();

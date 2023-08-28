@@ -188,5 +188,6 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
         setUsageRuleId(usageRuleId);
         setName(name);
         setConditionType(conditionType);
+        resetChangedOnNotNull();
     }
 }

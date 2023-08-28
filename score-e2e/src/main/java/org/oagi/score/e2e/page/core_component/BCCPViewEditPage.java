@@ -243,6 +243,13 @@ public interface BCCPViewEditPage extends Page {
      */
     BCCPanelContainer getBCCPanelContainer(WebElement bccNode);
 
+    /**
+     * Return the History page of the current component in a new tab.
+     *
+     * @return the History page.
+     */
+    HistoryPage showHistory();
+
     AddCommentDialog openCommentsDialog(String path);
 
     WebElement getDefinitionSourceField();
@@ -787,7 +794,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getPropertyTermField();
 
         /**
-         *
          * @param propertyTerm
          */
         void setPropertyTerm(String propertyTerm);
@@ -819,7 +825,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getValueConstraintSelectField();
 
         /**
-         *
          * @param valueConstraint
          */
         void setValueConstraint(String valueConstraint);
@@ -832,7 +837,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getFixedValueField();
 
         /**
-         *
          * @param fixedValue
          */
         void setFixedValue(String fixedValue);
@@ -845,7 +849,6 @@ public interface BCCPViewEditPage extends Page {
         WebElement getDefaultValueField();
 
         /**
-         *
          * @param defaultValue
          */
         void setDefaultValue(String defaultValue);

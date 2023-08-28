@@ -1,6 +1,9 @@
 package org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
@@ -9,12 +12,14 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -24,7 +29,6 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
     @BeforeEach
     public void init() {
         super.init();
-
     }
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
@@ -36,8 +40,8 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
     public void test_TA_1() {
         AppUserObject developerA;
         ReleaseObject workingBranch;
-        ArrayList<CodeListObject> codeListForTesting = new ArrayList<>();
-        Map<CodeListObject, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
+        List<CodeListObject> codeListForTesting = new ArrayList<>();
+        Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
@@ -49,18 +53,18 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
 
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
             codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
-            codeListCodeListValueMap.put(codeList, codeListValue);
+            codeListCodeListValueMap.put(codeList.getCodeListManifestId(), codeListValue);
             codeListForTesting.add(codeList);
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
-        for(CodeListObject codeList : codeListForTesting){
+        for (CodeListObject codeList : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPageByNameAndBranch(codeList.getName(), workingBranch.getReleaseNumber());
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
             editCodeListPage.hitRevise();
             assertEquals("Working", getText(editCodeListPage.getReleaseField()));
             assertEquals("2", getText(editCodeListPage.getRevisionField()));
@@ -71,7 +75,7 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
             assertEquals(codeList.getDefinition(), getText(editCodeListPage.getDefinitionField()));
             assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
             assertEquals(codeList.getVersionId() + "_New", getText(editCodeListPage.getVersionField()));
-            CodeListValueObject value = codeListCodeListValueMap.get(codeList);
+            CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
         }
 

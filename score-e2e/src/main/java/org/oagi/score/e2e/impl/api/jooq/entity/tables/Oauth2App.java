@@ -63,27 +63,27 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     /**
      * The column <code>oagi.oauth2_app.issuer_uri</code>.
      */
-    public final TableField<Oauth2AppRecord, String> ISSUER_URI = createField(DSL.name("issuer_uri"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> ISSUER_URI = createField(DSL.name("issuer_uri"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.authorization_uri</code>.
      */
-    public final TableField<Oauth2AppRecord, String> AUTHORIZATION_URI = createField(DSL.name("authorization_uri"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> AUTHORIZATION_URI = createField(DSL.name("authorization_uri"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.token_uri</code>.
      */
-    public final TableField<Oauth2AppRecord, String> TOKEN_URI = createField(DSL.name("token_uri"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> TOKEN_URI = createField(DSL.name("token_uri"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.user_info_uri</code>.
      */
-    public final TableField<Oauth2AppRecord, String> USER_INFO_URI = createField(DSL.name("user_info_uri"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> USER_INFO_URI = createField(DSL.name("user_info_uri"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.jwk_set_uri</code>.
      */
-    public final TableField<Oauth2AppRecord, String> JWK_SET_URI = createField(DSL.name("jwk_set_uri"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> JWK_SET_URI = createField(DSL.name("jwk_set_uri"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.redirect_uri</code>.
@@ -93,7 +93,7 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     /**
      * The column <code>oagi.oauth2_app.end_session_endpoint</code>.
      */
-    public final TableField<Oauth2AppRecord, String> END_SESSION_ENDPOINT = createField(DSL.name("end_session_endpoint"), SQLDataType.VARCHAR(200), this, "");
+    public final TableField<Oauth2AppRecord, String> END_SESSION_ENDPOINT = createField(DSL.name("end_session_endpoint"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.client_id</code>.
@@ -118,32 +118,32 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     /**
      * The column <code>oagi.oauth2_app.prompt</code>.
      */
-    public final TableField<Oauth2AppRecord, String> PROMPT = createField(DSL.name("prompt"), SQLDataType.VARCHAR(20), this, "");
+    public final TableField<Oauth2AppRecord, String> PROMPT = createField(DSL.name("prompt"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.display_provider_name</code>.
      */
-    public final TableField<Oauth2AppRecord, String> DISPLAY_PROVIDER_NAME = createField(DSL.name("display_provider_name"), SQLDataType.VARCHAR(100), this, "");
+    public final TableField<Oauth2AppRecord, String> DISPLAY_PROVIDER_NAME = createField(DSL.name("display_provider_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.background_color</code>.
      */
-    public final TableField<Oauth2AppRecord, String> BACKGROUND_COLOR = createField(DSL.name("background_color"), SQLDataType.VARCHAR(50), this, "");
+    public final TableField<Oauth2AppRecord, String> BACKGROUND_COLOR = createField(DSL.name("background_color"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.font_color</code>.
      */
-    public final TableField<Oauth2AppRecord, String> FONT_COLOR = createField(DSL.name("font_color"), SQLDataType.VARCHAR(50), this, "");
+    public final TableField<Oauth2AppRecord, String> FONT_COLOR = createField(DSL.name("font_color"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.display_order</code>.
      */
-    public final TableField<Oauth2AppRecord, Integer> DISPLAY_ORDER = createField(DSL.name("display_order"), SQLDataType.INTEGER.defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "");
+    public final TableField<Oauth2AppRecord, Integer> DISPLAY_ORDER = createField(DSL.name("display_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>oagi.oauth2_app.is_disabled</code>.
      */
-    public final TableField<Oauth2AppRecord, Byte> IS_DISABLED = createField(DSL.name("is_disabled"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "");
+    public final TableField<Oauth2AppRecord, Byte> IS_DISABLED = createField(DSL.name("is_disabled"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     private Oauth2App(Name alias, Table<Oauth2AppRecord> aliased) {
         this(alias, aliased, null);

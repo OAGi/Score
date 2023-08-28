@@ -1,12 +1,10 @@
 package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.AgencyIDListValueAPI;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListValueRecord;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
@@ -24,7 +22,6 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
-import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.AGENCY_ID_LIST_MANIFEST;
 
 public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI {
 

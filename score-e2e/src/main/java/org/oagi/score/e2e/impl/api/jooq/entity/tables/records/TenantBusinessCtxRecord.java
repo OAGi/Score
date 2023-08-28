@@ -181,5 +181,6 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
         setTenantBusinessCtxId(tenantBusinessCtxId);
         setTenantId(tenantId);
         setBizCtxId(bizCtxId);
+        resetChangedOnNotNull();
     }
 }

@@ -329,5 +329,6 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> im
         setLogId(logId);
         setPrevXbtManifestId(prevXbtManifestId);
         setNextXbtManifestId(nextXbtManifestId);
+        resetChangedOnNotNull();
     }
 }
