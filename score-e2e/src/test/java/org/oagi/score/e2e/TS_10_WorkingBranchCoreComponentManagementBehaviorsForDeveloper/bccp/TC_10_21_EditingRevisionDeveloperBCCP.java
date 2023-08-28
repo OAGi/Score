@@ -10,6 +10,7 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.core_component.BCCPChangeBDTDialog;
 import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
@@ -425,8 +426,32 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
     @Test
     @Disabled
     public void test_TA_10_21_2() {
-    }
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
 
+        String branch = "Working";
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        // Code. Type
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("fea2278fc93f48b98cf5bb3e32c004e8", release.getReleaseNumber());
+        BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        BCCPViewEditPage bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        bccpViewEditPage.hitReviseButton();
+
+        // reload the page
+        viewEditCoreComponentPage.openPage();
+        bccpViewEditPage =
+                viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
+        BCCPChangeBDTDialog bccpChangeBDTDialog = bccpViewEditPage.openChangeBDTDialog();
+        assertTrue(bccpChangeBDTDialog.isOpened());
+    }
     @Test
     public void test_TA_10_21_3() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
