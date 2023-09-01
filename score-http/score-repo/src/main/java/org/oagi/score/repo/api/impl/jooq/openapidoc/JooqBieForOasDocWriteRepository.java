@@ -348,10 +348,18 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 //delete oas_request
                 OasRequestRecord oasRequestRecord = dslContext().selectFrom(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
+                        .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
+                        .fetchOptional().orElse(null);
                 if (oasRequestRecord != null) {
                     dslContext().delete(OAS_REQUEST).where(OAS_REQUEST.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                     dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasRequestRecord.getOasMessageBodyId())).execute();
                     if (oasOperationRecord != null) {
+                        if (req_oasResourceTagRecord != null){
+                            ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
+                            dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                            dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+                        }
                         dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                         dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
                     }
@@ -362,10 +370,18 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 //delete oas_response
                 OasResponseRecord oasResponseRecord = dslContext().selectFrom(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
                 OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).fetchOptional().orElse(null);
+                OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
+                        .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
+                        .fetchOptional().orElse(null);
                 if (oasResponseRecord != null) {
                     dslContext().delete(OAS_RESPONSE).where(OAS_RESPONSE.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                     dslContext().delete(OAS_MESSAGE_BODY).where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.eq(oasResponseRecord.getOasMessageBodyId())).execute();
                     if (oasOperationRecord != null) {
+                        if (res_oasResourceTagRecord != null){
+                            ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
+                            dslContext().delete(OAS_RESOURCE_TAG).where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
+                            dslContext().delete(OAS_TAG).where(OAS_TAG.OAS_TAG_ID.eq(oasTagId)).execute();
+                        }
                         dslContext().delete(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId()))).execute();
                         dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasOperationRecord.getOasResourceId())).execute();
                     }
