@@ -3,10 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 import org.jooq.impl.QOM;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
-import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocListRequest;
-import org.oagi.score.gateway.http.api.oas_management.data.BieForOasDocUpdateRequest;
-import org.oagi.score.gateway.http.api.oas_management.data.SetOperationIdWithVerb;
-import org.oagi.score.gateway.http.api.oas_management.data.UpdateOperationIdWhenVerbChanged;
+import org.oagi.score.gateway.http.api.oas_management.data.*;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -15,6 +12,7 @@ import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListReque
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -321,6 +319,37 @@ public class OpenAPIDocController {
     public ResponseEntity addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
+        //Retrieve all current assigned bie list for this given oasDocId
+        ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(assignBieForOasDoc.getOasDocId());
+        GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
+        getBieForOasDocRequest.setOasDocId(assignBieForOasDoc.getOasDocId());
+        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
+        if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
+            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
+                BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
+                    ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
+                    if (!reusedBIERecord.getReusedOperations().containsKey(selectedTopLevelAsbiepId)){
+                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
+                    } else{
+                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
+                    }
+
+                    if (!reusedBIERecord.getReusedResourcePath().containsKey(selectedTopLevelAsbiepId)){
+                        reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
+                    } else{
+                        reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
+                    }
+                    reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
+                }
+
+                else{
+                    ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
+
+                }
+            }
+        }
+
         AddBieForOasDocRequest request = new AddBieForOasDocRequest(authenticationService.asScoreUser(requester));
         request.setOasRequest(assignBieForOasDoc.isOasRequest());
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
@@ -364,6 +393,67 @@ public class OpenAPIDocController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    private class ReusedBIEViolationCheck{
+
+        private BigInteger oasDocId;
+        private HashMap<BigInteger, ReusedBIERecord> reusedBIEMap;
+
+        public ReusedBIEViolationCheck(BigInteger oasDocId){
+            this.oasDocId = oasDocId;
+        }
+
+        public HashMap<BigInteger, ReusedBIERecord> getReusedBIEMap() {
+            return reusedBIEMap;
+        }
+
+        public void setReusedBIEMap(HashMap<BigInteger, ReusedBIERecord> reusedBIEMap) {
+            this.reusedBIEMap = reusedBIEMap;
+        }
+
+        public BigInteger getOasDocId() {
+            return oasDocId;
+        }
+
+        public void setOasDocId(BigInteger oasDocId) {
+            this.oasDocId = oasDocId;
+        }
+    }
+
+    private class ReusedBIERecord {
+        private BigInteger topLevelAsbiepId;
+        private HashMap<String, String> reusedOperations;
+        private HashMap<String, String> reusedResourcePath;
+
+        public ReusedBIERecord(BigInteger topLevelAsbiepId){
+            this.topLevelAsbiepId =  topLevelAsbiepId;
+        }
+
+        public BigInteger getTopLevelAsbiepId() {
+            return topLevelAsbiepId;
+        }
+
+        public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+            this.topLevelAsbiepId = topLevelAsbiepId;
+        }
+
+        public HashMap<String, String> getReusedOperations() {
+            return reusedOperations;
+        }
+
+        public void setReusedOperations(HashMap<String, String> reusedOperations) {
+            this.reusedOperations = reusedOperations;
+        }
+
+        public HashMap<String, String> getReusedResourcePath() {
+            return reusedResourcePath;
+        }
+
+        public void setReusedResourcePath(HashMap<String, String> reusedResourcePath) {
+            this.reusedResourcePath = reusedResourcePath;
+        }
+    }
+
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/bie_list/detail", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateBieForOasDoc(
