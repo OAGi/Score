@@ -329,23 +329,24 @@ public class OpenAPIDocController {
                 BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
                 if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
                     ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
-                    if (!reusedBIERecord.getReusedOperations().containsKey(selectedTopLevelAsbiepId)){
-                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
-                    } else{
-                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
-                    }
-
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(selectedTopLevelAsbiepId)){
-                        reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
-                    } else{
-                        reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
-                    }
+                    reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
+                    reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
                     reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
                 }
-
                 else{
                     ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
+                    String verb = bieForOasDoc.getVerb();
+                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)){
+                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
+                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())){
+                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
+                    }
 
+                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)){
+                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
+                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())){
+                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
+                    }
                 }
             }
         }
@@ -378,6 +379,10 @@ public class OpenAPIDocController {
         }
         request.setPath(resoureName);
         request.setVerb(verbOption);
+
+        // Check reusedBIE across multiple operations
+        // use the table in issue #1519 for violation check
+
         SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, assignBieForOasDoc.getPropertyTerm(),
                 isArray);
         String operationId = setOperationIdWithVerb.verbToOperationId();
