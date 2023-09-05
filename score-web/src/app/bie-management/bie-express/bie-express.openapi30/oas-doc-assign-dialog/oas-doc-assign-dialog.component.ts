@@ -200,6 +200,15 @@ export class OasDocAssignDialogComponent implements OnInit {
   addBieForOasDoc() {
     const selectedBieForOasDocs = this.selection.selected;
     for (const bieForOasDoc of selectedBieForOasDocs) {
+      this.openAPIService.checkBIEreusedAcrossMultipleOperations(bieForOasDoc).subscribe(
+        resp => {
+          this.doAddBieForOasDoc(bieForOasDoc);
+        }, _ => {
+        });
+    }
+  }
+
+  doAddBieForOasDoc(bieForOasDoc: BieForOasDoc) {
       this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
       this.assignBieForOasDoc.propertyTerm = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.tagName = bieForOasDoc.propertyTerm;
@@ -223,7 +232,6 @@ export class OasDocAssignDialogComponent implements OnInit {
           }
         });
       });
-    }
   }
 
   onNoClick(): void {
