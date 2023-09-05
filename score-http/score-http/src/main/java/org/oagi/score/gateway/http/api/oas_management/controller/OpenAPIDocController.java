@@ -231,7 +231,6 @@ public class OpenAPIDocController {
     }
 
     public static class DeleteBieForOasDocRequestData {
-
         private BigInteger oasDocId;
         private List<BieForOasDoc> bieForOasDocList = Collections.emptyList();
 
@@ -319,38 +318,6 @@ public class OpenAPIDocController {
     public ResponseEntity addBieForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody AssignBieForOasDoc assignBieForOasDoc) {
-        //Retrieve all current assigned bie list for this given oasDocId
-        ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(assignBieForOasDoc.getOasDocId());
-        GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
-        getBieForOasDocRequest.setOasDocId(assignBieForOasDoc.getOasDocId());
-        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
-        if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
-            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
-                BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
-                    ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
-                    reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
-                    reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
-                    reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
-                }
-                else{
-                    ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
-                    String verb = bieForOasDoc.getVerb();
-                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)){
-                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
-                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())){
-                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
-                    }
-
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)){
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())){
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    }
-                }
-            }
-        }
-
         AddBieForOasDocRequest request = new AddBieForOasDocRequest(authenticationService.asScoreUser(requester));
         request.setOasRequest(assignBieForOasDoc.isOasRequest());
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
@@ -379,23 +346,6 @@ public class OpenAPIDocController {
         }
         request.setPath(resoureName);
         request.setVerb(verbOption);
-
-        // Check reusedBIE across multiple operations
-        // use the table in issue #1519 for violation check
-        ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(assignBieForOasDoc.getTopLevelAsbiepId());
-        if (reusedBIERecord != null){
-            String existingMessageBody = reusedBIERecord.getReusedOperations().get(verbOption);
-            if (StringUtils.hasLength(existingMessageBody)){
-                if (assignBieForOasDoc.isOasRequest() == true){
-                    if (verbOption.equals("GET")){
-                        return ResponseEntity.status(415).body("requestBody is not allowed for: " + verbOption);
-                    }
-                }
-
-            }
-
-        }
-
         SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, assignBieForOasDoc.getPropertyTerm(),
                 isArray);
         String operationId = setOperationIdWithVerb.verbToOperationId();
@@ -412,6 +362,60 @@ public class OpenAPIDocController {
         }
     }
 
+    @RequestMapping(value = "/oas_doc/check_bie_reused_across_operations", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity checkBIEReusedAcrossOperations(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody BieForOasDoc selectedBieForOasDoc) {
+        //Retrieve all current assigned bie list for this given oasDocId
+        ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(selectedBieForOasDoc.getOasDocId());
+        GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
+        getBieForOasDocRequest.setOasDocId(selectedBieForOasDoc.getOasDocId());
+        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
+        if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
+            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
+                BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
+                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
+                    ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
+                    reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), bieForOasDoc.getMessageBody());
+                    reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
+                    reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
+                }
+                else{
+                    ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
+                    String verb = bieForOasDoc.getVerb();
+                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)){
+                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
+                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())){
+                        reusedBIERecord.getReusedOperations().put(verb, bieForOasDoc.getMessageBody());
+                    }
+
+                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)){
+                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
+                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())){
+                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
+                    }
+                }
+            }
+        }
+
+        // Check reusedBIE across multiple operations
+        // use the table in issue #1519 for violation check
+        ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedBieForOasDoc.getTopLevelAsbiepId());
+        if (reusedBIERecord != null){
+            String selectedVerb = selectedBieForOasDoc.getVerb();
+            String existingMessageBody = reusedBIERecord.getReusedOperations().get(selectedVerb);
+            if (StringUtils.hasLength(existingMessageBody)){
+                if (selectedBieForOasDoc.getMessageBody().equals("Request")){
+                    if (selectedVerb.equals("GET")){
+                        return ResponseEntity.status(415).body("requestBody is not allowed for: " + selectedVerb);
+                    }
+                }
+            }
+
+        }
+        return ResponseEntity.noContent().build();
+    }
     private class ReusedBIEViolationCheck{
 
         private BigInteger oasDocId;
