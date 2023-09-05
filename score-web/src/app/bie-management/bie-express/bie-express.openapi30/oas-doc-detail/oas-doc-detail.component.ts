@@ -331,7 +331,7 @@ export class OasDocDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = {};
+    dialogConfig.data = this.dataSource.data;
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
     dialogConfig.data.isEditable = this.isEditable();

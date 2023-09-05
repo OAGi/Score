@@ -205,7 +205,6 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.assignBieForOasDoc.tagName = bieForOasDoc.propertyTerm;
       this.assignBieForOasDoc.topLevelAsbiepId = bieForOasDoc.topLevelAsbiepId;
       this.assignBieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
-      this.assignBieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
       if (this.assignBieForOasDoc.messageBody === 'Request') {
         this.assignBieForOasDoc.oasRequest = true;
       } else if (this.assignBieForOasDoc.messageBody === 'Response') {
@@ -214,18 +213,17 @@ export class OasDocAssignDialogComponent implements OnInit {
       this.assignBieForOasDoc.oasDocId = this.oasDoc.oasDocId;
       this.assignBieForOasDoc.arrayIndicator = bieForOasDoc.arrayIndicator;
       this.assignBieForOasDoc.suppressRootIndicator = bieForOasDoc.suppressRootIndicator;
+      this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
+        this.snackBar.open('Added', '', {
+          duration: 3000,
+        });
+        this.dialogRef.close({
+          result: {
+            status: 'OK'
+          }
+        });
+      });
     }
-    this.openAPIService.assignBieForOasDoc(this.assignBieForOasDoc).subscribe(resp => {
-      this.snackBar.open('Added', '', {
-        duration: 3000,
-      });
-      this.dialogRef.close({
-        result: {
-          status: 'OK'
-        }
-      });
-    });
-
   }
 
   onNoClick(): void {
