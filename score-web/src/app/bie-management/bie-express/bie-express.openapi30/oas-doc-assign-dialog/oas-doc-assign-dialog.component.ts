@@ -200,7 +200,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   addBieForOasDoc() {
     const selectedBieForOasDocs = this.selection.selected;
     for (const bieForOasDoc of selectedBieForOasDocs) {
-      this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc).subscribe(
+      this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).subscribe(
         resp => {
           this.doAddBieForOasDoc(bieForOasDoc);
         }, _ => {
