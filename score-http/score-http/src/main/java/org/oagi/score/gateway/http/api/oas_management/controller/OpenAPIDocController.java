@@ -382,6 +382,19 @@ public class OpenAPIDocController {
 
         // Check reusedBIE across multiple operations
         // use the table in issue #1519 for violation check
+        ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(assignBieForOasDoc.getTopLevelAsbiepId());
+        if (reusedBIERecord != null){
+            String existingMessageBody = reusedBIERecord.getReusedOperations().get(verbOption);
+            if (StringUtils.hasLength(existingMessageBody)){
+                if (assignBieForOasDoc.isOasRequest() == true){
+                    if (verbOption.equals("GET")){
+                        return ResponseEntity.status(415).body("requestBody is not allowed for: " + verbOption);
+                    }
+                }
+
+            }
+
+        }
 
         SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, assignBieForOasDoc.getPropertyTerm(),
                 isArray);
@@ -402,7 +415,7 @@ public class OpenAPIDocController {
     private class ReusedBIEViolationCheck{
 
         private BigInteger oasDocId;
-        private HashMap<BigInteger, ReusedBIERecord> reusedBIEMap;
+        private HashMap<BigInteger, ReusedBIERecord> reusedBIEMap = new HashMap<>();
 
         public ReusedBIEViolationCheck(BigInteger oasDocId){
             this.oasDocId = oasDocId;
@@ -427,8 +440,8 @@ public class OpenAPIDocController {
 
     private class ReusedBIERecord {
         private BigInteger topLevelAsbiepId;
-        private HashMap<String, String> reusedOperations;
-        private HashMap<String, String> reusedResourcePath;
+        private HashMap<String, String> reusedOperations = new HashMap<>();
+        private HashMap<String, String> reusedResourcePath = new HashMap<>();
 
         public ReusedBIERecord(BigInteger topLevelAsbiepId){
             this.topLevelAsbiepId =  topLevelAsbiepId;
