@@ -118,14 +118,8 @@ export class OpenAPIService {
       title: oasDoc.title
     });
   }
-  checkBIEreusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc): Observable<any>{
-    return this.http.post('/api/oas_doc/check_bie_reused_across_operations',{
-      oasDocId: bieForOasDoc.oasDocId,
-      verb: bieForOasDoc.verb,
-      topLevelAsbiepId: bieForOasDoc.topLevelAsbiepId,
-      messageBody: bieForOasDoc.messageBody,
-      resourceName: bieForOasDoc.resourceName
-    });
+  checkBIEReusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc): Observable<any>{
+    return this.http.post('/api/oas_doc/check_bie_reused_across_operations', bieForOasDoc.json);
   }
 
   getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
