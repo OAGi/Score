@@ -362,15 +362,16 @@ public class OpenAPIDocController {
         }
     }
 
-    @RequestMapping(value = "/oas_doc/check_bie_reused_across_operations", method = RequestMethod.POST,
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/check_bie_reused_across_operations", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity checkBIEReusedAcrossOperations(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @RequestBody BieForOasDoc selectedBieForOasDoc) {
+            @RequestBody BieForOasDoc selectedBieForOasDoc,
+            @PathVariable("id") BigInteger oasDocId) {
         //Retrieve all current assigned bie list for this given oasDocId
-        ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(selectedBieForOasDoc.getOasDocId());
+        ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
-        getBieForOasDocRequest.setOasDocId(selectedBieForOasDoc.getOasDocId());
+        getBieForOasDocRequest.setOasDocId(oasDocId);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
