@@ -364,12 +364,14 @@ public class OpenAPIDocController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/check_bie_reused_across_operations", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity checkBIEReusedAcrossOperations(
+    public ReusedBIEViolationCheckResponse checkBIEReusedAcrossOperations(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody BieForOasDoc selectedBieForOasDoc,
             @PathVariable("id") BigInteger oasDocId) {
         //Retrieve all current assigned bie list for this given oasDocId
         ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
+        ReusedBIEViolationCheckResponse response = new ReusedBIEViolationCheckResponse();
+        List<String> errorMessages = new ArrayList<>();
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
         getBieForOasDocRequest.setOasDocId(oasDocId);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
@@ -409,13 +411,14 @@ public class OpenAPIDocController {
             if (StringUtils.hasLength(existingMessageBody)){
                 if (selectedBieForOasDoc.getMessageBody().equals("Request")){
                     if (selectedVerb.equals("GET")){
-                        return ResponseEntity.status(415).body("requestBody is not allowed for: " + selectedVerb);
+                        errorMessages.add( "requestBody rarely used for GET operation.");
                     }
                 }
             }
 
         }
-        return ResponseEntity.noContent().build();
+        response.setErrorMessages(errorMessages);
+        return response;
     }
     private class ReusedBIEViolationCheck{
 
