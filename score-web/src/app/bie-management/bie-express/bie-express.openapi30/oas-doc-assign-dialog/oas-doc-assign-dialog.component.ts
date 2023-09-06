@@ -204,7 +204,13 @@ export class OasDocAssignDialogComponent implements OnInit {
       bieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
       this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).subscribe(
         resp => {
-          this.doAddBieForOasDoc(bieForOasDoc);
+          if (resp.errorMessages && resp.errorMessages.length > 0) {
+            this.snackBar.open(resp.errorMessages[0], '', {
+              duration: 5000,
+            });
+          } else {
+            this.doAddBieForOasDoc(bieForOasDoc);
+          }
         }, _ => {
         });
     }

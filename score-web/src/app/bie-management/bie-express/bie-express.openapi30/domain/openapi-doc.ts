@@ -435,3 +435,6 @@ export class BieForOasDocDeleteRequest {
     };
   }
 }
+export class ReusedBIEViolationCheck {
+  errorMessages: string[];
+}

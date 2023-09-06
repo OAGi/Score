@@ -6,7 +6,7 @@ import {
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
-  OasDocListRequest
+  OasDocListRequest, ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
@@ -118,8 +118,8 @@ export class OpenAPIService {
       title: oasDoc.title
     });
   }
-  checkBIEReusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc, oasDoc: OasDoc): Observable<any>{
-    return this.http.post('/api/oas_doc/' + oasDoc.oasDocId + '/check_bie_reused_across_operations', bieForOasDoc.json);
+  checkBIEReusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc, oasDoc: OasDoc): Observable<ReusedBIEViolationCheck>{
+    return this.http.post<ReusedBIEViolationCheck>('/api/oas_doc/' + oasDoc.oasDocId + '/check_bie_reused_across_operations', bieForOasDoc.json);
   }
 
   getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
