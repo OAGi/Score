@@ -73,9 +73,8 @@ public class OpenAPIGenerateService {
         // need to pass the params
         List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps);
-        OpenAPIGenerateExpressionOption option = new OpenAPIGenerateExpressionOption();
         for (String paramsKey: params.keySet()) {
-            option = params.get(paramsKey);
+            OpenAPIGenerateExpressionOption option = params.get(paramsKey);
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }

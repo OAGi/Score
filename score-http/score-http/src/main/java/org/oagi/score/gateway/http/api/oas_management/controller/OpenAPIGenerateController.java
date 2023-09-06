@@ -49,7 +49,7 @@ public class OpenAPIGenerateController {
                 String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName();
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
                 BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (topLevelAsbiepIds != null && !topLevelAsbiepIds.contains(topLevelAsbiepId)){
+                if (topLevelAsbiepIds != null){
                     topLevelAsbiepIds.add(topLevelAsbiepId);
                 }
                 openAPIGenerateExpressionOption.setTopLevelAsbiepId(topLevelAsbiepId);
