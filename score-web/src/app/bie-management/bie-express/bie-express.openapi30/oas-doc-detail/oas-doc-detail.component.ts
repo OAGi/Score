@@ -457,7 +457,7 @@ export class OasDocDetailComponent implements OnInit {
     const nodes = this.getChanged();
     request.oasDocId = this.oasDoc.oasDocId;
     request.bieForOasDocList = nodes;
-    console.log(nodes);
+
     this.loading = true;
     this.isUpdating = true;
     this.openAPIService.updateDetails(request).pipe(finalize(() => {
@@ -465,6 +465,16 @@ export class OasDocDetailComponent implements OnInit {
       this.loading = false;
     })).subscribe(_ => {
       this.loadBieListForOasDoc(true);
+      this.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate(this.oasDoc).subscribe(
+        resp => {
+          if (resp.errorMessages && resp.errorMessages.length > 0) {
+            this.snackBar.open(resp.errorMessages[0], '', {
+              duration: 5000,
+            });
+          } else {
+          }
+        }, _ => {
+        });
     });
     if (callbackFn === undefined) {
       this.snackBar.open('Updated', '', {
