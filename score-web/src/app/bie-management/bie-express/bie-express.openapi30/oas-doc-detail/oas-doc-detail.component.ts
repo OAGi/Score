@@ -166,10 +166,8 @@ export class OasDocDetailComponent implements OnInit {
       (oasDoc1.oasDocId === undefined || !oasDoc1.oasDocId) ||
       (oasDoc1.title === undefined || oasDoc1.title === '') ||
       (oasDoc1.openAPIVersion === undefined || oasDoc1.openAPIVersion === '') ||
-      (oasDoc1.version === undefined || oasDoc1.version === '') ||
-      (oasDoc1.licenseName === undefined || oasDoc1.licenseName === '');
+      (oasDoc1.version === undefined || oasDoc1.version === '');
   }
-
   back() {
     this.location.back();
   }
