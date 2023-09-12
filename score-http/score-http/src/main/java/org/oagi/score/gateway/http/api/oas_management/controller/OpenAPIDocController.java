@@ -418,7 +418,7 @@ public class OpenAPIDocController {
                 }
             } else{
                 Set<String> existingMessageBodySet = reusedBIERecord.getReusedOperations().get(selectedVerb);
-                if (existingMessageBodySet.size() > 0){
+                if (existingMessageBodySet != null && existingMessageBodySet.size() > 0){
                     if (selectedBieForOasDoc.getMessageBody().equals("Response")){
                         if (existingMessageBodySet.contains("Response")){
                             errorMessages.add("There is an existing responseBody for the operation " + selectedVerb
