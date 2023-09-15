@@ -177,16 +177,16 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             Map<String, Object> securitySchemes = null;
             if (root == null) {
                 root = new LinkedHashMap<>();
-                root.put("openapi", OPEN_API_VERSION);
+                root.put("openapi", option.getOasDoc().getOpenAPIVersion());
                 root.put("info", ImmutableMap.<String, Object>builder()
-                        .put("title", "")
-                        .put("description", "")
+                        .put("title", option.getOasDoc().getTitle())
+                        .put("description", option.getOasDoc().getDescription())
                         .put("contact", ImmutableMap.<String, Object>builder()
-                                .put("name", "")
-                                .put("url", "")
-                                .put("email", "example@example.org")
+                                .put("name", option.getOasDoc().getContactName())
+                                .put("url", option.getOasDoc().getContactUrl())
+                                .put("email", option.getOasDoc().getContactEmail())
                                 .build())
-                        .put("version", "")
+                        .put("version", option.getOasDoc().getVersion())
                         .put("x-oagis-release", release.getReleaseNum())
                         .put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()))
                         .put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "")
