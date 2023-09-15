@@ -26,3 +26,7 @@
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }
+
+.highlight{
+  background: #42A948;
+}
