@@ -17,7 +17,7 @@ public class SetOperationIdWithVerb {
         String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
         switch (this.verb) {
             case "GET":
-                this.operationId = biePropertyTermCamelCase + "_get" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = biePropertyTermCamelCase + "_query" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "POST":
@@ -25,7 +25,7 @@ public class SetOperationIdWithVerb {
                         biePropertyTermWithoutSpace);
                 break;
             case "PUT":
-                this.operationId = biePropertyTermCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = biePropertyTermCamelCase + "_replace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "PATCH":
