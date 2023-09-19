@@ -240,13 +240,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String prefix = "";
                 // Issue #1302
                 if (isDifferent) {
-                    prefix = "get-";
+                    prefix = "query";
                 }
-                if (isFriendly()) {
-                    schemaName = prefix + bieName;
-                } else {
-                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
-                }
+
+                schemaName = prefix + bieName;
+
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30GetTemplate(true);
                 }
@@ -268,7 +266,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                         .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
                                                 .put("type", "string")
                                                 .build() : ImmutableMap.<String, Object>builder()
-                                                .put("$ref", "#/components/schemas/integer")
+                                                .put("$ref", "#/components/schemas/" + schemaName)
                                                 .build())
                                         .build()
                         ))
@@ -313,13 +311,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String prefix = "";
                 // Issue #1302
                 if (isDifferent) {
-                    prefix = "post-";
+                    prefix = "create";
                 }
-                if (isFriendly()) {
-                    schemaName = prefix + bieName;
-                } else {
-                    schemaName = prefix + bieName + "-" + typeAbie.getGuid();
-                }
+
+                schemaName = prefix + bieName;
+
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
                 }
