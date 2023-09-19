@@ -10,6 +10,7 @@ import java.util.Collection;
 public class AddBieForOasDocRequest extends Request {
     private boolean isOasRequest;
     private BigInteger topLevelAsbiepId;
+    private String businessContext;
     private BigInteger oasDocId;
     private String operationId;
     private String path;
@@ -50,6 +51,14 @@ public class AddBieForOasDocRequest extends Request {
 
     public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
         this.topLevelAsbiepId = topLevelAsbiepId;
+    }
+
+    public String getBusinessContext() {
+        return businessContext;
+    }
+
+    public void setBusinessContext(String businessContext) {
+        this.businessContext = businessContext;
     }
 
     public BigInteger getOasDocId() {

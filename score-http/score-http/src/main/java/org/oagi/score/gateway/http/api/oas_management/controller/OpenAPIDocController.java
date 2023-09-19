@@ -335,18 +335,34 @@ public class OpenAPIDocController {
             oasDocVersion = oasDocResponse.getOasDoc().getVersion();
         }
         String bieForOasDocPropertyTermWithDash = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "-");
+        //get BusinessContext for the assigned BieForOasDoc
+        GetBusinessContextListRequest getBusinessContextListRequest =
+                new GetBusinessContextListRequest(authenticationService.asScoreUser(requester))
+                        .withTopLevelAsbiepIdList(Arrays.asList(assignBieForOasDoc.getTopLevelAsbiepId()))
+                        .withName(request.getBusinessContext());
+
+        getBusinessContextListRequest.setPageIndex(-1);
+        getBusinessContextListRequest.setPageSize(-1);
+
+        GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+        assignBieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
+        //
+
+        String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).getName();
+
         boolean isArray = request.isMakeArrayIndicator();
         if (oasDocVersion != null) {
-            resoureName = "/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+            resoureName = "/" + businessContextName +"/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
                     bieForOasDocPropertyTermWithDash.toLowerCase());
 
         } else {
-            resoureName = "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+            resoureName = "/"  + businessContextName +"/"  + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
                     bieForOasDocPropertyTermWithDash.toLowerCase());
         }
         request.setPath(resoureName);
         request.setVerb(verbOption);
-        SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, assignBieForOasDoc.getPropertyTerm(),
+        SetOperationIdWithVerb setOperationIdWithVerb = new SetOperationIdWithVerb(verbOption, businessContextName, assignBieForOasDoc.getPropertyTerm(),
                 isArray);
         String operationId = setOperationIdWithVerb.verbToOperationId();
         request.setOperationId(operationId);

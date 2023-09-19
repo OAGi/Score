@@ -1,17 +1,24 @@
 package org.oagi.score.repo.api.openapidoc.model;
 
+import com.fasterxml.jackson.databind.util.AccessPattern;
 import org.oagi.score.repo.api.base.Auditable;
+import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.businesscontext.model.BusinessContext;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 public class AssignBieForOasDoc extends Auditable {
     private boolean oasRequest;
     private BigInteger topLevelAsbiepId;
     private BigInteger oasDocId;
     private String propertyTerm;
+    private List<BusinessContext> businessContexts;
+    private String access;
     private String verb;
+    private BieState state;
     private boolean arrayIndicator;
     private boolean suppressRootIndicator;
     private boolean required;
@@ -53,12 +60,36 @@ public class AssignBieForOasDoc extends Auditable {
         this.propertyTerm = propertyTerm;
     }
 
+    public List<BusinessContext> getBusinessContexts() {
+        return businessContexts;
+    }
+
+    public void setBusinessContexts(List<BusinessContext> businessContexts) {
+        this.businessContexts = businessContexts;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
+    }
+
     public String getVerb() {
         return verb;
     }
 
     public void setVerb(String verb) {
         this.verb = verb;
+    }
+
+    public BieState getState() {
+        return state;
+    }
+
+    public void setState(BieState state) {
+        this.state = state;
     }
 
     public boolean isRequired() {
@@ -140,7 +171,10 @@ public class AssignBieForOasDoc extends Auditable {
                 ", topLevelAsbiepId=" + topLevelAsbiepId +
                 ", oasDocId=" + oasDocId +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", businessContexts=" + businessContexts +
+                ", access='" + access + '\'' +
                 ", verb='" + verb + '\'' +
+                ", state=" + state +
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
                 ", required=" + required +
