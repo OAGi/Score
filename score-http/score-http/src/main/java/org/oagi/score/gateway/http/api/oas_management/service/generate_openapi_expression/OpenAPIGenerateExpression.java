@@ -180,11 +180,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 root.put("openapi", option.getOasDoc().getOpenAPIVersion());
                 root.put("info", ImmutableMap.<String, Object>builder()
                         .put("title", option.getOasDoc().getTitle())
-                        .put("description", option.getOasDoc().getDescription())
+                        .put("description", StringUtils.hasLength(option.getOasDoc().getDescription()) ? option.getOasDoc().getDescription() : "")
                         .put("contact", ImmutableMap.<String, Object>builder()
-                                .put("name", option.getOasDoc().getContactName())
-                                .put("url", option.getOasDoc().getContactUrl())
-                                .put("email", option.getOasDoc().getContactEmail())
+                                .put("name", StringUtils.hasLength(option.getOasDoc().getContactName()) ? option.getOasDoc().getContactName() : "")
+                                .put("url", StringUtils.hasLength(option.getOasDoc().getContactUrl()) ? option.getOasDoc().getContactUrl(): "")
+                                .put("email", StringUtils.hasLength(option.getOasDoc().getContactEmail()) ? option.getOasDoc().getContactEmail(): "")
                                 .build())
                         .put("version", option.getOasDoc().getVersion())
                         .put("x-oagis-release", release.getReleaseNum())
@@ -237,12 +237,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
             if (option.isOpenAPI30GetTemplate()) {
                 String schemaName;
-                String prefix = "";
+                String prefix = "query";
                 // Issue #1302
-                if (isDifferent) {
-                    prefix = "query";
-                }
-
                 schemaName = prefix + bieName;
 
                 if (schemaName.equals(bieName)) {
@@ -263,10 +259,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                         .put("in", "" + ((isArray) ? "query" : "path"))
                                         .put("description", "")
                                         .put("required", ((isArray) ? false : true))
-                                        .put("schema", (isFriendly()) ? ImmutableMap.<String, Object>builder()
+                                        .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
                                                 .put("type", "string")
+                                                .put("format", "date-time")
                                                 .build() : ImmutableMap.<String, Object>builder()
-                                                .put("$ref", "#/components/schemas/" + schemaName)
+                                                .put("type", "string")
                                                 .build())
                                         .build()
                         ))
@@ -308,13 +305,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
             if (option.isOpenAPI30PostTemplate()) {
                 String schemaName;
-                String prefix = "";
+                String responseSchemaName;
+                String prefix = "create";
                 // Issue #1302
-                if (isDifferent) {
-                    prefix = "create";
-                }
-
                 schemaName = prefix + bieName;
+                responseSchemaName = "query" + bieName;
 
                 if (schemaName.equals(bieName)) {
                     option.setSuppressRootPropertyForOpenAPI30PostTemplate(true);
@@ -343,6 +338,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                         .put("description", "")
                                         .put("content", ImmutableMap.<String, Object>builder()
                                                 .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
+                                                                .build())
                                                         .build())
                                                 .build())
                                         .build())

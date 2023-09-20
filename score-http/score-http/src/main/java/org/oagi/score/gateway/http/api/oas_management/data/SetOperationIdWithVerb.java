@@ -15,39 +15,39 @@ public class SetOperationIdWithVerb {
         this.isArray = isArray;
     }
     public String verbToOperationId() {
-        String biePropertyTermCamelCase = camelCase(this.biePropertyTerm);
+        String businessContextCamelCase = camelCase(this.businessContext);
         String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
         switch (this.verb) {
             case "GET":
-                this.operationId = this.businessContext + "_query" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_query" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "POST":
-                this.operationId = this.businessContext + "_create" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_create" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "PUT":
-                this.operationId = this.businessContext + "_replace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId =businessContextCamelCase + "_replace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "PATCH":
-                this.operationId = this.businessContext + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_update" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "DELETE":
-                this.operationId = this.businessContext + "_delete" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_delete" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "OPTIONS":
-                this.operationId = this.businessContext + "_options" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_options" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "HEAD":
-                this.operationId = this.businessContext + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "TRACE":
-                this.operationId = this.businessContext + "_trace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_trace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             default:
