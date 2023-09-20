@@ -4,6 +4,7 @@ import lombok.Data;
 import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -22,37 +23,28 @@ public class OpenAPIGenerateExpressionOption {
     private String verb;
     private String openAPIExpressionFormat;
     private boolean openAPICodeGenerationFriendly;
-    private boolean openAPI30GetTemplate;
-    private boolean arrayForJsonExpressionForOpenAPI30GetTemplate;
-    private boolean suppressRootPropertyForOpenAPI30GetTemplate;
-    private boolean includeMetaHeaderForJsonForOpenAPI30GetTemplate;
-    private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate;
-    private boolean includePaginationResponseForJsonForOpenAPI30GetTemplate;
-    private BigInteger paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate;
-    private boolean openAPI30PostTemplate;
-    private boolean arrayForJsonExpressionForOpenAPI30PostTemplate;
-    private boolean suppressRootPropertyForOpenAPI30PostTemplate;
-    private boolean includeMetaHeaderForJsonForOpenAPI30PostTemplate;
-    private BigInteger metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate;
-    public boolean isGetTemplateAndPostTemplateOptionDifferent() {
-        if (isOpenAPI30GetTemplate() != isOpenAPI30PostTemplate()) {
+    private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
+    public boolean isTwoTemplateOptionDifferent(String verb1, String verb2) {
+
+        if (openAPI30TemplateMap.containsKey(verb1) != openAPI30TemplateMap.containsKey(verb2)) {
             return false;
         }
-        if (isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
+        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2).isIncludePaginationResponse()) {
             return true;
         }
-        if (isArrayForJsonExpressionForOpenAPI30GetTemplate() !=
-                isArrayForJsonExpressionForOpenAPI30PostTemplate()) {
+        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
+                openAPI30TemplateMap.get(verb1).isArrayForJsonExpression() != openAPI30TemplateMap.get(verb2).isArrayForJsonExpression()) {
             return true;
         }
-        if (isSuppressRootPropertyForOpenAPI30GetTemplate() !=
-                isSuppressRootPropertyForOpenAPI30PostTemplate()) {
+        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
+                openAPI30TemplateMap.get(verb1).isSuppressRootProperty() != openAPI30TemplateMap.get(verb2).isSuppressRootProperty()) {
             return true;
         }
-        if (isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate() !=
-                isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
+        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
+                openAPI30TemplateMap.get(verb1).isIncludeMetaHeader() != openAPI30TemplateMap.get(verb2).isIncludeMetaHeader()) {
             return true;
         }
         return false;
     }
 }
+

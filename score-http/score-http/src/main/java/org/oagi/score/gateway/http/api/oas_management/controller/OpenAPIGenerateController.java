@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
+import org.oagi.score.gateway.http.api.oas_management.data.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
 import org.oagi.score.repo.api.openapidoc.model.*;
@@ -62,14 +63,22 @@ public class OpenAPIGenerateController {
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 switch (verbOption) {
                     case "GET":
-                        openAPIGenerateExpressionOption.setOpenAPI30GetTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30GetTemplate(bieForOasDoc.isArrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30GetTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        OpenAPITemplateForVerbOption openAPI30GetTemplate = new OpenAPITemplateForVerbOption("GET");
+                        openAPI30GetTemplate.setArrayForJsonExpression(bieForOasDoc.isArrayIndicator());
+                        openAPI30GetTemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
+                        openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put("GET", openAPI30GetTemplate);
                         break;
                     case "POST":
-                        openAPIGenerateExpressionOption.setOpenAPI30PostTemplate(true);
-                        openAPIGenerateExpressionOption.setArrayForJsonExpressionForOpenAPI30PostTemplate(bieForOasDoc.isArrayIndicator());
-                        openAPIGenerateExpressionOption.setSuppressRootPropertyForOpenAPI30PostTemplate(bieForOasDoc.isSuppressRootIndicator());
+                        OpenAPITemplateForVerbOption openAPI30PostTemplate = new OpenAPITemplateForVerbOption("POST");
+                        openAPI30PostTemplate.setArrayForJsonExpression(bieForOasDoc.isArrayIndicator());
+                        openAPI30PostTemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
+                        openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put("POST", openAPI30PostTemplate);
+                        break;
+                    case "PATCH":
+                        OpenAPITemplateForVerbOption openAPI30PatchTemplate = new OpenAPITemplateForVerbOption("PATCH");
+                        openAPI30PatchTemplate.setArrayForJsonExpression(bieForOasDoc.isArrayIndicator());
+                        openAPI30PatchTemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
+                        openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put("PATCH", openAPI30PatchTemplate);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
