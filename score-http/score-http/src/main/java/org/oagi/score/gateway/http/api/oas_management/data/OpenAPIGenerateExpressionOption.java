@@ -26,22 +26,25 @@ public class OpenAPIGenerateExpressionOption {
     private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
     public boolean isTwoTemplateOptionDifferent(String verb1, String verb2) {
 
-        if (openAPI30TemplateMap.containsKey(verb1) != openAPI30TemplateMap.containsKey(verb2)) {
+        String templateKey1 = verb1 +"-" + this.resourceName;
+        String templateKey2 = verb2 +"-" + this.resourceName;
+
+        if (openAPI30TemplateMap.containsKey(templateKey1) != openAPI30TemplateMap.containsKey(templateKey2)) {
             return false;
         }
-        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2).isIncludePaginationResponse()) {
+        if (openAPI30TemplateMap.get(templateKey1) != null && openAPI30TemplateMap.get(templateKey1).isIncludePaginationResponse()) {
             return true;
         }
-        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
-                openAPI30TemplateMap.get(verb1).isArrayForJsonExpression() != openAPI30TemplateMap.get(verb2).isArrayForJsonExpression()) {
+        if (openAPI30TemplateMap.get(templateKey1) != null && openAPI30TemplateMap.get(templateKey2) != null &&
+                openAPI30TemplateMap.get(templateKey1).isArrayForJsonExpression() != openAPI30TemplateMap.get(templateKey2).isArrayForJsonExpression()) {
             return true;
         }
-        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
-                openAPI30TemplateMap.get(verb1).isSuppressRootProperty() != openAPI30TemplateMap.get(verb2).isSuppressRootProperty()) {
+        if (openAPI30TemplateMap.get(templateKey1) != null && openAPI30TemplateMap.get(templateKey2) != null &&
+                openAPI30TemplateMap.get(templateKey1).isSuppressRootProperty() != openAPI30TemplateMap.get(templateKey2).isSuppressRootProperty()) {
             return true;
         }
-        if (openAPI30TemplateMap.get(verb1) != null && openAPI30TemplateMap.get(verb2) != null &&
-                openAPI30TemplateMap.get(verb1).isIncludeMetaHeader() != openAPI30TemplateMap.get(verb2).isIncludeMetaHeader()) {
+        if (openAPI30TemplateMap.get(templateKey1) != null && openAPI30TemplateMap.get(templateKey2) != null &&
+                openAPI30TemplateMap.get(templateKey1).isIncludeMetaHeader() != openAPI30TemplateMap.get(templateKey2).isIncludeMetaHeader()) {
             return true;
         }
         return false;

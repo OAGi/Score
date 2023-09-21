@@ -234,7 +234,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             path.put("description", "");
 
             boolean isDifferentForGetAndPost = option.isTwoTemplateOptionDifferent("GET", "POST");
-            if (option.getOpenAPI30TemplateMap().containsKey("GET")) {
+            boolean isDifferentForGetAndPatch = option.isTwoTemplateOptionDifferent("GET", "PATCH");
+            String getTemplateKey = "GET-" + option.getResourceName();
+            String postTemplateKey = "POST-" + option.getResourceName();
+            String patchTemplateKey = "PATCH-" + option.getResourceName();
+            if (option.getOpenAPI30TemplateMap().containsKey(getTemplateKey)) {
                 String schemaName;
                 String prefix = "query";
                 // Issue #1302
@@ -244,9 +248,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
                 if (schemaName.equals(bieName)) {
-                    option.getOpenAPI30TemplateMap().get("GET").setSuppressRootProperty(true);
+                    option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
                 }
-                boolean isArray = option.getOpenAPI30TemplateMap().get("GET").isArrayForJsonExpression();
+                boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
                 path.put("get", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -305,7 +309,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
             }
 
-            if (option.getOpenAPI30TemplateMap().containsKey("POST")) {
+            if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
                 String schemaName;
                 String responseSchemaName;
                 String prefix = "create";
@@ -317,9 +321,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
                 if (schemaName.equals(bieName)) {
-                    option.getOpenAPI30TemplateMap().get("POST").setSuppressRootProperty(true);
+                    option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
                 }
-                boolean isArray = option.getOpenAPI30TemplateMap().get("POST").isArrayForJsonExpression();
+                boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
                 path.put("post", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -369,17 +373,20 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
             }
 
-            if (option.getOpenAPI30TemplateMap().containsKey("PATCH")) {
+            if (option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)) {
                 String schemaName;
                 String responseSchemaName;
                 String prefix = "update";
+                if (isDifferentForGetAndPatch){
+                    prefix = "create";
+                }
                 schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
                 responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
                 if (schemaName.equals(bieName)) {
-                    option.getOpenAPI30TemplateMap().get("PATCH").setSuppressRootProperty(true);
+                    option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
                 }
-                boolean isArray = option.getOpenAPI30TemplateMap().get("PATCH").isArrayForJsonExpression();
+                boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
                 path.put("patch", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -473,24 +480,25 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         /*
          * Issue #587
          */
-        if (option.getOpenAPI30TemplateMap().get("GET") != null &&
-            option.getOpenAPI30TemplateMap().get("GET").isIncludeMetaHeader()) {
+        String getTemplateKey = "GET-" + option.getResourceName();
+        if (option.getOpenAPI30TemplateMap().get(getTemplateKey) != null &&
+            option.getOpenAPI30TemplateMap().get(getTemplateKey).isIncludeMetaHeader()) {
             TopLevelAsbiep metaHeaderTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get("GET").getMetaHeaderTopLevelAsbiepId());
+                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get(getTemplateKey).getMetaHeaderTopLevelAsbiepId());
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
-        if (option.getOpenAPI30TemplateMap().get("GET") != null &&
-                option.getOpenAPI30TemplateMap().get("GET").isIncludePaginationResponse()) {
+        if (option.getOpenAPI30TemplateMap().get(getTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(getTemplateKey).isIncludePaginationResponse()) {
             TopLevelAsbiep paginationResponseTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get("GET").getPaginationResponseTopLevelAsbiepId());
+                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get(getTemplateKey).getPaginationResponseTopLevelAsbiepId());
             fillProperties(parent, schemas, paginationResponseTopLevelAsbiep, generationContext);
         }
 
         fillProperties(parent, schemas, asbiep, abie, generationContext);
 
         // Issue #1317
-        if (option.getOpenAPI30TemplateMap().get("GET") != null &&
-                option.getOpenAPI30TemplateMap().get("GET").isSuppressRootProperty()) {
+        if (option.getOpenAPI30TemplateMap().get(getTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(getTemplateKey).isSuppressRootProperty()) {
             suppressRootProperty(parent);
         }
     }
@@ -502,18 +510,19 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         /*
          * Issue #587
          */
-        if (option.getOpenAPI30TemplateMap().get("POST") != null &&
-                option.getOpenAPI30TemplateMap().get("POST").isIncludeMetaHeader()) {
+        String postTemplateKey = "POST-" + option.getResourceName();
+        if (option.getOpenAPI30TemplateMap().get(postTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(postTemplateKey).isIncludeMetaHeader()) {
             TopLevelAsbiep metaHeaderTopLevelAsbiep =
-                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get("POST").getMetaHeaderTopLevelAsbiepId());
+                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get(postTemplateKey).getMetaHeaderTopLevelAsbiepId());
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
         }
 
         fillProperties(parent, schemas, asbiep, abie, generationContext);
 
         // Issue #1317
-        if (option.getOpenAPI30TemplateMap().get("POST") != null &&
-                option.getOpenAPI30TemplateMap().get("POST").isSuppressRootProperty()) {
+        if (option.getOpenAPI30TemplateMap().get(postTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(postTemplateKey).isSuppressRootProperty()) {
             suppressRootProperty(parent);
         }
     }
