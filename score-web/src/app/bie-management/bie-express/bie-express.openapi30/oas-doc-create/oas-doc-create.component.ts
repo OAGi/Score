@@ -40,8 +40,7 @@ export class OasDocCreateComponent implements OnInit {
     return (this.disabled) ||
       (this.oasDoc.title === undefined || this.oasDoc.title === '') ||
       (this.oasDoc.openAPIVersion === undefined || this.oasDoc.openAPIVersion === '') ||
-      (this.oasDoc.version === undefined || this.oasDoc.version === '') ||
-      (this.oasDoc.licenseName === undefined || this.oasDoc.licenseName === '');
+      (this.oasDoc.version === undefined || this.oasDoc.version === '');
   }
 
   back() {
