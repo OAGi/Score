@@ -228,8 +228,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
+            String pathKey = option.getVerb() + "-" + pathName;
             paths.put(pathName, path);
-
             path.put("summary", "");
             path.put("description", "");
 
