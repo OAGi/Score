@@ -126,7 +126,7 @@ public class Helper {
     }
 
     private static String _camelCase(String term) {
-        return Arrays.stream(term.split(" ")).filter(e -> StringUtils.hasLength(e))
+        return Arrays.stream(term.split("-")).filter(e -> StringUtils.hasLength(e))
                 .map(e -> {
                     if (e.length() > 1) {
                         return Character.toUpperCase(e.charAt(0)) + e.substring(1).toLowerCase();
