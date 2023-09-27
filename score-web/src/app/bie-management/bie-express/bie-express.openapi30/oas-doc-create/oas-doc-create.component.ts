@@ -8,6 +8,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
+import {AbstractControl, Form, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {UnboundedPipe} from '../../../../common/utility';
 
 @Component({
   selector: 'score-oas-doc-create',
@@ -19,7 +21,10 @@ export class OasDocCreateComponent implements OnInit {
   subtitle = 'Open API Doc Metadata';
   oasDoc: OasDoc;
   disabled: boolean;
-
+  urlReg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
+  emailReg = '[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}';
+  contactUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
   constructor(private bizCtxService: BusinessContextService,
               private openAPIService: OpenAPIService,
               private accountService: AccountListService,
@@ -93,6 +98,4 @@ export class OasDocCreateComponent implements OnInit {
       return callbackFn && callbackFn();
     });
   }
-
-
 }

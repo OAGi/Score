@@ -13,6 +13,7 @@ public class GetOasDocListRequest extends PaginationRequest<OasDoc> {
     private String openAPIVersion;
     private String version;
     private String licenseName;
+    private String description;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
@@ -59,6 +60,14 @@ public class GetOasDocListRequest extends PaginationRequest<OasDoc> {
 
     public void setLicenseName(String licenseName) {
         this.licenseName = licenseName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Collection<String> getUpdaterUsernameList() {

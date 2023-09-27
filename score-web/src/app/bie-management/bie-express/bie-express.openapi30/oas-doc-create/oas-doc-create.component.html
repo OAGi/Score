@@ -7,14 +7,13 @@
   </mat-card>
   <mat-card class="mb-2">
     <mat-card-content class="mat-card-container">
-
       <mat-form-field>
         <mat-label>Title</mat-label>
         <input matInput required [(ngModel)]="oasDoc.title" maxlength="65536"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Open API Version</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.openAPIVersion"  maxlength="20"/>
+        <input matInput required [(ngModel)]="oasDoc.openAPIVersion" value="3.0.3" maxlength="20"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Doc Version</mat-label>
@@ -31,11 +30,18 @@
 
       <mat-form-field>
         <mat-label>Contact Url</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactUrl" maxlength="255"/>
+        <input matInput [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="255"/>
+        <mat-error *ngIf="contactUrl.hasError('pattern')">
+              > Please enter a valid URL
+        </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Email</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="65536"/>
+        <input type="email" matInput [(ngModel)]="oasDoc.contactEmail"  [formControl]="contactEmail"
+               maxlength="65536"/>
+        <mat-error *ngIf="contactEmail.hasError('pattern')">
+          > Please enter a valid email address
+        </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>License Name</mat-label>
