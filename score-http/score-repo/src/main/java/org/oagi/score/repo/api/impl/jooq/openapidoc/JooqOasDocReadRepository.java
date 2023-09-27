@@ -134,6 +134,9 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
         if (StringUtils.hasLength(request.getLicenseName())) {
             conditions.addAll(contains(request.getLicenseName(), OAS_DOC.LICENSE_NAME));
         }
+        if (StringUtils.hasLength(request.getDescription())) {
+            conditions.addAll(contains(request.getDescription(), OAS_DOC.DESCRIPTION));
+        }
         if (!request.getUpdaterUsernameList().isEmpty()) {
             conditions.add(APP_USER.as("updater").LOGIN_ID.in(
                     new HashSet<>(request.getUpdaterUsernameList()).stream()
