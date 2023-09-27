@@ -21,7 +21,10 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>Terms Of Service</mat-label>
-        <input matInput [(ngModel)]="oasDoc.termsOfService" maxlength="255"/>
+        <input matInput [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="255"/>
+        <mat-error *ngIf="termServiceUrl.hasError('pattern')">
+          > Please enter a valid URL for Terms of Service
+        </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Name</mat-label>
@@ -49,7 +52,10 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>License Url</mat-label>
-        <input matInput [(ngModel)]="oasDoc.licenseUrl" maxlength="255"/>
+        <input matInput [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="255"/>
+        <mat-error *ngIf="licenseUrl.hasError('pattern')">
+          > Please enter a valid URL
+        </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Description</mat-label>

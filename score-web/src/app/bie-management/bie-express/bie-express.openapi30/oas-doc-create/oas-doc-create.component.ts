@@ -25,6 +25,8 @@ export class OasDocCreateComponent implements OnInit {
   emailReg = '[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}';
   contactUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
   contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
+  licenseUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  termServiceUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
   constructor(private bizCtxService: BusinessContextService,
               private openAPIService: OpenAPIService,
               private accountService: AccountListService,
