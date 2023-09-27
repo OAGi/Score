@@ -172,7 +172,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
             Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
 
-            Map<String, Object> paths;
+            Map<String, List<Object>> paths = new LinkedHashMap<String, List<Object>>();
             Map<String, Object> schemas = new LinkedHashMap<>();
             Map<String, Object> securitySchemes = null;
             if (root == null) {
@@ -213,7 +213,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         .build()
                 );
             } else {
-                paths = (Map<String, Object>) root.get("paths");
+                paths = (Map<String, List<Object>>) root.get("paths");
                 schemas = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("schemas");
                 securitySchemes = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("securitySchemes");
 
@@ -228,8 +228,17 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
-            String pathKey = option.getVerb() + "-" + pathName;
-            paths.put(pathName, path);
+            if (paths.isEmpty()){
+                List<Object> pathList = new ArrayList<>();
+                pathList.add(path);
+                paths.put(pathName, pathList);
+            } else if (!paths.containsKey(pathName)){
+                List<Object> pathList = new ArrayList<>();
+                pathList.add(path);
+                paths.put(pathName, pathList);
+            } else{
+                paths.get(pathName).add(path);
+            }
             path.put("summary", "");
             path.put("description", "");
 
