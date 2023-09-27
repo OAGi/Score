@@ -72,6 +72,7 @@ public class OpenAPIDocController {
         request.setTitle(title);
         request.setLicenseName(licenseName);
         request.setVersion(version);
+        request.setDescription(description);
 
         request.setUpdaterUsernameList(!StringUtils.hasLength(updaterUsernameList) ? Collections.emptyList() :
                 Arrays.asList(updaterUsernameList.split(",")).stream().map(e -> e.trim())
