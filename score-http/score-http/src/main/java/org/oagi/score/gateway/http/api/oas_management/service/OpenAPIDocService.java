@@ -78,7 +78,7 @@ public class OpenAPIDocService {
     }
 
     @Transactional
-    public DeleteOasDocResponse DeleteOasDoc(DeleteOasDocRequest request) {
+    public DeleteOasDocResponse deleteOasDoc(DeleteOasDocRequest request) {
         DeleteOasDocResponse response = scoreRepositoryFactory.createOasDocWriteRepository().deleteOasDoc(request);
         return response;
     }

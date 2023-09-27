@@ -1,8 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
-import org.jooq.impl.QOM;
-import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.business_term_management.controller.BusinessTermController;
 import org.oagi.score.gateway.http.api.oas_management.data.*;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -10,16 +9,16 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermRequest;
+import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
-import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
-import org.redisson.transaction.operation.set.SetOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
 
@@ -353,11 +351,11 @@ public class OpenAPIDocController {
 
         boolean isArray = request.isMakeArrayIndicator();
         if (oasDocVersion != null) {
-            resoureName = "/" + businessContextName +"/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+            resoureName = "/" + businessContextName + "/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
                     bieForOasDocPropertyTermWithDash.toLowerCase());
 
         } else {
-            resoureName = "/"  + businessContextName +"/"  + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
+            resoureName = "/" + businessContextName + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
                     bieForOasDocPropertyTermWithDash.toLowerCase());
         }
         request.setPath(resoureName);
@@ -391,32 +389,31 @@ public class OpenAPIDocController {
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
         getBieForOasDocRequest.setOasDocId(oasDocId);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
-        if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
-            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
+        if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
+            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
+                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)) {
                     ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
                     Set<String> messageBodySet = new HashSet<String>();
                     messageBodySet.add(bieForOasDoc.getMessageBody());
                     reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
                     reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
                     reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
-                }
-                else{
+                } else {
                     ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
                     String verb = bieForOasDoc.getVerb();
-                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)){
+                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)) {
                         Set<String> messageBodySet = new HashSet<String>();
                         messageBodySet.add(bieForOasDoc.getMessageBody());
                         reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())){
+                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())) {
                         Set<String> messageBodySet = reusedBIERecord.getReusedOperations().get(verb);
                         messageBodySet.add(bieForOasDoc.getMessageBody());
                     }
 
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)){
+                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)) {
                         reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())){
+                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())) {
                         reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
                     }
                 }
@@ -426,19 +423,19 @@ public class OpenAPIDocController {
         // Check reusedBIE across multiple operations
         // use the table in issue #1519 for violation check
         ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedBieForOasDoc.getTopLevelAsbiepId());
-        if (reusedBIERecord != null){
+        if (reusedBIERecord != null) {
             String selectedVerb = selectedBieForOasDoc.getVerb();
-            if (selectedVerb.equals("GET")){
-                if (selectedBieForOasDoc.getMessageBody().equals("Request")){
-                    errorMessages.add( "requestBody rarely used for GET operation.");
+            if (selectedVerb.equals("GET")) {
+                if (selectedBieForOasDoc.getMessageBody().equals("Request")) {
+                    errorMessages.add("requestBody rarely used for GET operation.");
                 }
-            } else{
+            } else {
                 Set<String> existingMessageBodySet = reusedBIERecord.getReusedOperations().get(selectedVerb);
-                if (existingMessageBodySet != null && existingMessageBodySet.size() > 0){
-                    if (selectedBieForOasDoc.getMessageBody().equals("Response")){
-                        if (existingMessageBodySet.contains("Response")){
+                if (existingMessageBodySet != null && existingMessageBodySet.size() > 0) {
+                    if (selectedBieForOasDoc.getMessageBody().equals("Response")) {
+                        if (existingMessageBodySet.contains("Response")) {
                             errorMessages.add("There is an existing responseBody for the operation " + selectedVerb
-                            + " for the same BIE.");
+                                    + " for the same BIE.");
                         }
                     }
 
@@ -461,32 +458,31 @@ public class OpenAPIDocController {
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
         getBieForOasDocRequest.setOasDocId(oasDocId);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
-        if (bieForOasDocList != null && bieForOasDocList.getResults() != null){
-            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()){
+        if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
+            for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)){
+                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)) {
                     ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
                     Set<String> messageBodySet = new HashSet<String>();
                     messageBodySet.add(bieForOasDoc.getMessageBody());
                     reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
                     reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
                     reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
-                }
-                else{
+                } else {
                     ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
                     String verb = bieForOasDoc.getVerb();
-                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)){
+                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)) {
                         Set<String> messageBodySet = new HashSet<String>();
                         messageBodySet.add(bieForOasDoc.getMessageBody());
                         reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())){
+                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())) {
                         Set<String> messageBodySet = reusedBIERecord.getReusedOperations().get(verb);
                         messageBodySet.add(bieForOasDoc.getMessageBody());
                     }
 
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)){
+                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)) {
                         reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())){
+                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())) {
                         reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
                     }
                 }
@@ -495,12 +491,13 @@ public class OpenAPIDocController {
         response.setErrorMessages(errorMessages);
         return response;
     }
-    private class ReusedBIEViolationCheck{
+
+    private class ReusedBIEViolationCheck {
 
         private BigInteger oasDocId;
         private HashMap<BigInteger, ReusedBIERecord> reusedBIEMap = new HashMap<>();
 
-        public ReusedBIEViolationCheck(BigInteger oasDocId){
+        public ReusedBIEViolationCheck(BigInteger oasDocId) {
             this.oasDocId = oasDocId;
         }
 
@@ -526,8 +523,8 @@ public class OpenAPIDocController {
         private HashMap<String, Set<String>> reusedOperations = new HashMap<>();
         private HashMap<String, String> reusedResourcePath = new HashMap<>();
 
-        public ReusedBIERecord(BigInteger topLevelAsbiepId){
-            this.topLevelAsbiepId =  topLevelAsbiepId;
+        public ReusedBIERecord(BigInteger topLevelAsbiepId) {
+            this.topLevelAsbiepId = topLevelAsbiepId;
         }
 
         public BigInteger getTopLevelAsbiepId() {
@@ -567,12 +564,12 @@ public class OpenAPIDocController {
 
         updateBieForOasDocRequest.setBieForOasDocList(request.getBieForOasDocList());
 
-        for (BieForOasDoc bieForOasDoc : updateBieForOasDocRequest.getBieForOasDocList()){
-            if (bieForOasDoc.getOasResourceId() != null){
+        for (BieForOasDoc bieForOasDoc : updateBieForOasDocRequest.getBieForOasDocList()) {
+            if (bieForOasDoc.getOasResourceId() != null) {
                 GetOasOperationRequest getOasOperationRequest = new GetOasOperationRequest(authenticationService.asScoreUser(requester))
                         .withOasResourceId(bieForOasDoc.getOasResourceId());
-                GetOasOperationResponse  oasOperationResponse = oasDocService.getOasOperation(getOasOperationRequest);
-                if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())){
+                GetOasOperationResponse oasOperationResponse = oasDocService.getOasOperation(getOasOperationRequest);
+                if (!bieForOasDoc.getVerb().equals(oasOperationResponse.getOasOperation().getVerb())) {
 
                     UpdateOperationIdWhenVerbChanged updateOperationIdWhenVerbChanged = new UpdateOperationIdWhenVerbChanged(
                             bieForOasDoc.getVerb(), bieForOasDoc.getOperationId(), bieForOasDoc.isArrayIndicator());
@@ -581,14 +578,14 @@ public class OpenAPIDocController {
                 }
             }
 
-            if (bieForOasDoc.getOasOperationId() != null){
-                if (bieForOasDoc.getMessageBody().equals("Request")){
+            if (bieForOasDoc.getOasOperationId() != null) {
+                if (bieForOasDoc.getMessageBody().equals("Request")) {
                     GetOasRequestTableRequest getOasRequestTableRequest = new GetOasRequestTableRequest(authenticationService.asScoreUser(requester))
                             .withOasOperationId(bieForOasDoc.getOasOperationId());
                     GetOasRequestTableResponse oasRequestTableResponse = oasDocService.getOasRequestTable(getOasRequestTableRequest);
                     if (oasRequestTableResponse != null &&
                             oasRequestTableResponse.getOasRequestTable() != null
-                                    && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
+                            && bieForOasDoc.isArrayIndicator() != oasRequestTableResponse.getOasRequestTable().isMakeArrayIndicator()) {
                         String newResourceName = null;
                         String newOperationId = null;
                         String oldResourceName = bieForOasDoc.getResourceName();
@@ -617,39 +614,38 @@ public class OpenAPIDocController {
                     }
                 }
 
-                if (bieForOasDoc.getMessageBody().equals("Response")){
+                if (bieForOasDoc.getMessageBody().equals("Response")) {
                     GetOasResponseTableRequest getOasResponseTableRequest = new GetOasResponseTableRequest(authenticationService.asScoreUser(requester))
                             .withOasOperationId(bieForOasDoc.getOasOperationId());
                     GetOasResponseTableResponse oasResponseTableResponse = oasDocService.getOasResponseTable(getOasResponseTableRequest);
                     if (oasResponseTableResponse != null &&
                             oasResponseTableResponse.getOasResponseTable() != null
-                            && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()){
+                            && bieForOasDoc.isArrayIndicator() != oasResponseTableResponse.getOasResponseTable().isMakeArrayIndicator()) {
                         String newResourceName = null;
                         String newOperationId = null;
                         String oldResourceName = bieForOasDoc.getResourceName();
                         String oldOperationId = bieForOasDoc.getOperationId();
-                        if (bieForOasDoc.isArrayIndicator()){
-                            if (!oldResourceName.endsWith("-list")){
+                        if (bieForOasDoc.isArrayIndicator()) {
+                            if (!oldResourceName.endsWith("-list")) {
                                 newResourceName = oldResourceName + "-list";
                             }
-                            if (!oldOperationId.endsWith("List")){
+                            if (!oldOperationId.endsWith("List")) {
                                 newOperationId = oldOperationId + "List";
                             }
-                        }
-                       else{
-                            if (oldResourceName.endsWith("-list")){
-                                newResourceName = oldResourceName.substring(0, oldResourceName.length() -5);
+                        } else {
+                            if (oldResourceName.endsWith("-list")) {
+                                newResourceName = oldResourceName.substring(0, oldResourceName.length() - 5);
                             }
-                            if (oldOperationId.endsWith("List")){
-                                newOperationId = oldOperationId.substring(0, oldOperationId.length() -4);
+                            if (oldOperationId.endsWith("List")) {
+                                newOperationId = oldOperationId.substring(0, oldOperationId.length() - 4);
                             }
                         }
-                       if(newResourceName != null){
-                           bieForOasDoc.setResourceName(newResourceName);
-                       }
-                       if(newOperationId != null){
-                           bieForOasDoc.setOperationId(newOperationId);
-                       }
+                        if (newResourceName != null) {
+                            bieForOasDoc.setResourceName(newResourceName);
+                        }
+                        if (newOperationId != null) {
+                            bieForOasDoc.setOperationId(newOperationId);
+                        }
                     }
                 }
             }
@@ -715,7 +711,7 @@ public class OpenAPIDocController {
         DeleteOasDocRequest request = new DeleteOasDocRequest(authenticationService.asScoreUser(requester))
                 .withOasDocIdList(Arrays.asList(oasDocId));
 
-        DeleteOasDocResponse response = oasDocService.DeleteOasDoc(request);
+        DeleteOasDocResponse response = oasDocService.deleteOasDoc(request);
 
         if (response.contains(oasDocId)) {
             return ResponseEntity.noContent().build();
@@ -724,5 +720,34 @@ public class OpenAPIDocController {
         }
     }
 
+    public static class DeleteOasDocRequestData {
+        private List<BigInteger> oasDocIdList = Collections.emptyList();
 
+        public List<BigInteger> getOasDocIdList() {
+            return oasDocIdList;
+        }
+
+        public void setOasDocIdList(List<BigInteger> oasDocIdList) {
+            this.oasDocIdList = oasDocIdList;
+        }
+    }
+
+    @RequestMapping(value = "/oas_doc/delete", method = RequestMethod.POST)
+    public ResponseEntity deletes(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody DeleteOasDocRequestData requestData) {
+        DeleteOasDocRequest request =
+                new DeleteOasDocRequest(authenticationService.asScoreUser(requester))
+                        .withOasDocIdList(requestData.getOasDocIdList());
+        DeleteOasDocResponse response =
+                oasDocService.deleteOasDoc(request);
+
+        if (response.containsAll(requestData.getOasDocIdList())) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
+
+
