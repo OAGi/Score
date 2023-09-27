@@ -58,16 +58,16 @@
     "TITLE": "Express BIE"
   },
   "BIE_EXPRESS_OPENAPI30": {
-    "TITLE": "OpenAPI Doc"
+    "TITLE": "OpenAPI Document"
   },
   "OAS_DOC_CREATE":{
-    "TITLE": "Create OpenAPI Doc"
+    "TITLE": "Create OpenAPI Document"
   },
   "OAS_DOC_ASSIGN":{
-    "TITLE": "Add BIE for OpenAPI Doc"
+    "TITLE": "Add BIE for OpenAPI Document"
   },
   "OAS_DOC_BIE_LIST":{
-    "TITLE": "Bie List for Open API Doc"
+    "TITLE": "BIE List for OpenAPI Document"
   },
   "BIE_COPY": {
     "TITLE": "Copy BIE"

@@ -37,7 +37,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
   styleUrls: ['./oas-doc-detail.component.css']
 })
 export class OasDocDetailComponent implements OnInit {
-  title = 'Edit Open API Document';
+  title = 'Edit OpenAPI Document';
   oasDocs: simpleOasDoc[];
   oasDoc: OasDoc;
   workingRelease = WorkingRelease;
@@ -79,7 +79,7 @@ export class OasDocDetailComponent implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.packageOption = 'ALL';
-    // Default Open API expression format is 'YAML'.
+    // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
     this.oasDoc = new OasDoc();
 
@@ -273,7 +273,7 @@ export class OasDocDetailComponent implements OnInit {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
     dialogConfig.data.content = [
-      'Another Open API Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'
+      'Another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'
     ];
 
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {

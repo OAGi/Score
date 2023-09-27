@@ -27,7 +27,7 @@ import {BieExpressOption} from '../domain/generate-expression';
   styleUrls: ['./bie-express.openapi30.component.css']
 })
 export class BieExpressOpenapi30Component implements OnInit {
-  title = 'Express BIE in Open API 3.0 Expression';
+  title = 'Express BIE in OpenAPI 3.0 Expression';
 
   displayedColumns: string[] = [
     'select', 'state', 'den', 'owner', 'version', 'status', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody', 'resourceName', 'operationId',
@@ -73,7 +73,7 @@ export class BieExpressOpenapi30Component implements OnInit {
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
     this.option.packageOption = 'ALL';
-    // Default Open API expression format is 'YAML'.
+    // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
     // Init BIE table
     this.request = new BieListRequest(this.route.snapshot.queryParamMap, new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));

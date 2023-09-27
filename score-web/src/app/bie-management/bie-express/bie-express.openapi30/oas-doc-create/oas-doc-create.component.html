@@ -9,57 +9,63 @@
     <mat-card-content class="mat-card-container">
       <mat-form-field>
         <mat-label>Title</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.title" maxlength="65536"/>
+        <input matInput required placeholder="The title of the API" [(ngModel)]="oasDoc.title" maxlength="65536"/>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>Open API Version</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.openAPIVersion" value="3.0.3" maxlength="20"/>
+        <mat-label>OpenAPI Version</mat-label>
+        <input matInput required placeholder="The version number of the OpenAPI Specification that the OpenAPI document uses (e.g., 3.0.3)"
+               [(ngModel)]="oasDoc.openAPIVersion" value="3.0.3" maxlength="20"/>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>Doc Version</mat-label>
-        <input matInput required [(ngModel)]="oasDoc.version" maxlength="20"/>
+        <mat-label>Document Version</mat-label>
+        <input matInput required placeholder="The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version)"
+               [(ngModel)]="oasDoc.version" maxlength="20"/>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>Terms Of Service</mat-label>
-        <input matInput [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="255"/>
+        <mat-label>Terms of Service</mat-label>
+        <input matInput placeholder="A URL to the Terms of Service for the API"
+               [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="255"/>
         <mat-error *ngIf="termServiceUrl.hasError('pattern')">
-          > Please enter a valid URL for Terms of Service
+          The terms of service must be a valid URL
         </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Name</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactName" maxlength="65536"/>
+        <input matInput placeholder="The identifying name of the contact person/organization"
+               [(ngModel)]="oasDoc.contactName" maxlength="65536"/>
       </mat-form-field>
-
       <mat-form-field>
-        <mat-label>Contact Url</mat-label>
-        <input matInput [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="255"/>
+        <mat-label>Contact URL</mat-label>
+        <input matInput placeholder="The URL pointing to the contact information"
+               [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="255"/>
         <mat-error *ngIf="contactUrl.hasError('pattern')">
-              > Please enter a valid URL
+          The contact URL must be be a valid URL
         </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Contact Email</mat-label>
-        <input type="email" matInput [(ngModel)]="oasDoc.contactEmail"  [formControl]="contactEmail"
-               maxlength="65536"/>
+        <input type="email" matInput placeholder="The email address of the contact person/organization"
+               [(ngModel)]="oasDoc.contactEmail"  [formControl]="contactEmail" maxlength="65536"/>
         <mat-error *ngIf="contactEmail.hasError('pattern')">
-          > Please enter a valid email address
+          The contact email must be in the form of an email address
         </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>License Name</mat-label>
-        <input matInput  [(ngModel)]="oasDoc.licenseName" maxlength="100"/>
+        <input matInput placeholder="The license name used for the API (e.g., Apache 2.0)"
+               [(ngModel)]="oasDoc.licenseName" maxlength="100"/>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>License Url</mat-label>
-        <input matInput [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="255"/>
+        <mat-label>License URL</mat-label>
+        <input matInput placeholder="A URL to the license used for the API (e.g., http://www.apache.org/licenses/LICENSE-2.0)"
+               [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="255"/>
         <mat-error *ngIf="licenseUrl.hasError('pattern')">
-          > Please enter a valid URL
+          The license URL must be be a valid URL
         </mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Description</mat-label>
-        <textarea rows="6" cols="30" matInput [(ngModel)]="oasDoc.description"></textarea>
+        <textarea rows="6" cols="30" matInput placeholder="A description of the API" [(ngModel)]="oasDoc.description"></textarea>
       </mat-form-field>
     </mat-card-content>
   </mat-card>

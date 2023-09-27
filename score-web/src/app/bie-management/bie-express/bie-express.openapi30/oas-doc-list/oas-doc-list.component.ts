@@ -25,7 +25,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class OasDocListComponent implements OnInit {
 
-  title = 'Open API Doc';
+  title = 'OpenAPI Document';
   displayedColumns: string[] = [
     'select', 'title', 'openAPIVersion', 'description', 'version', 'licenseName',
     'lastUpdateTimestamp'

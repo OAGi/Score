@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {OasDoc} from '../domain/openapi-doc';
+import {BieForOasDoc, OasDoc} from '../domain/openapi-doc';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../../authentication/auth.service';
@@ -10,6 +10,7 @@ import {OpenAPIService} from '../domain/openapi.service';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {AbstractControl, Form, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {UnboundedPipe} from '../../../../common/utility';
+import {ScoreUser} from "../../../../authentication/domain/auth";
 
 @Component({
   selector: 'score-oas-doc-create',
@@ -17,8 +18,8 @@ import {UnboundedPipe} from '../../../../common/utility';
   styleUrls: ['./oas-doc-create.component.css']
 })
 export class OasDocCreateComponent implements OnInit {
-  title = 'Create Open API Doc';
-  subtitle = 'Open API Doc Metadata';
+  title = 'Create OpenAPI Document';
+  subtitle = 'OpenAPI Document Metadata';
   oasDoc: OasDoc;
   disabled: boolean;
   urlReg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
@@ -57,7 +58,7 @@ export class OasDocCreateComponent implements OnInit {
   openDialogOasDocCreate() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
-    dialogConfig.data.content = ['Another Open API Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'];
+    dialogConfig.data.content = ['Another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'];
   }
 
   doCreate() {
