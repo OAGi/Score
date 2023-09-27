@@ -42,6 +42,7 @@ export class OasDocCreateComponent implements OnInit {
   ngOnInit(): void {
     this.disabled = false;
     this.oasDoc = new OasDoc();
+    this.oasDoc.openAPIVersion = '3.0.3'; // default value of the OpenAPI document
   }
 
   isDisabled(oasDoc: OasDoc) {
