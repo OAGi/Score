@@ -27,7 +27,7 @@ export class OasDocListComponent implements OnInit {
 
   title = 'OpenAPI Document';
   displayedColumns: string[] = [
-    'select', 'title', 'openAPIVersion', 'description', 'version', 'licenseName',
+    'select', 'title', 'openAPIVersion', 'version', 'licenseName', 'description',
     'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<OasDoc>();

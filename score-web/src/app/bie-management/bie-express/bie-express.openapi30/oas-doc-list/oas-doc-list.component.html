@@ -146,13 +146,6 @@
               </a>
           </ng-container>
 
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef> Description</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="word-break-all">{{ element.description }}</span>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef>Document Version</th>
             <td mat-cell *matCellDef="let element">
@@ -164,6 +157,13 @@
             <th mat-header-cell *matHeaderCellDef> License Name</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.licenseName }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef> Description</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="word-break-all">{{ element.description }}</span>
             </td>
           </ng-container>
 
