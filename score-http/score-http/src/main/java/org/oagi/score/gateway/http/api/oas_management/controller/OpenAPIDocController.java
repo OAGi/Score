@@ -348,7 +348,7 @@ public class OpenAPIDocController {
         assignBieForOasDoc.setBusinessContexts(getBusinessContextListResponse.getResults());
         //
 
-        String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).getName();
+        String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).getName().toLowerCase();
 
         boolean isArray = request.isMakeArrayIndicator();
         if (oasDocVersion != null) {

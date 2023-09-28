@@ -255,20 +255,15 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
-            if (paths.isEmpty()){
+            if (paths.isEmpty() || !paths.containsKey(pathName)){
                 List<Object> pathList = new ArrayList<>();
                 pathList.add(path);
                 paths.put(pathName, pathList);
-            } else if (!paths.containsKey(pathName)){
-                List<Object> pathList = new ArrayList<>();
-                pathList.add(path);
-                paths.put(pathName, pathList);
-            } else{
+            }  else{
                 paths.get(pathName).add(path);
             }
             path.put("summary", "");
             path.put("description", "");
-
             boolean isDifferentForGetAndPost = option.isTwoTemplateOptionDifferent("GET", "POST");
             boolean isDifferentForGetAndPatch = option.isTwoTemplateOptionDifferent("GET", "PATCH");
             String getTemplateKey = "GET-" + option.getResourceName();
@@ -281,9 +276,13 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 if (isDifferentForGetAndPost){
                     prefix = "query";
                 }
-                schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                if (isFriendly()) {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                } else {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                }
 
-                if (schemaName.equals(bieName)) {
+                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                     option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
@@ -354,10 +353,15 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 if (isDifferentForGetAndPost){
                     prefix = "create";
                 }
-                schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                if (isFriendly()) {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                } else {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                }
+
                 responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
-                if (schemaName.equals(bieName)) {
+                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                     option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
@@ -417,10 +421,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 if (isDifferentForGetAndPatch){
                     prefix = "create";
                 }
-                schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                if (isFriendly()) {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                } else {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                }
                 responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
-                if (schemaName.equals(bieName)) {
+                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                     option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();

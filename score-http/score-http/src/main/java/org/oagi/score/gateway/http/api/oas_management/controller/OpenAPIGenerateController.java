@@ -60,6 +60,7 @@ public class OpenAPIGenerateController {
                 openAPIGenerateExpressionOption.setResourceName(bieForOasDoc.getResourceName());
                 openAPIGenerateExpressionOption.setOperationId(bieForOasDoc.getOperationId());
                 openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
+                openAPIGenerateExpressionOption.setOpenAPICodeGenerationFriendly(true);
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 String templateKey = "";
                 switch (verbOption) {
