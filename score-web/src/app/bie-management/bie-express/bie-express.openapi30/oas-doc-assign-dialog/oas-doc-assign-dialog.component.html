@@ -203,13 +203,16 @@
           <ng-container matColumnDef="verb">
             <th mat-header-cell *matHeaderCellDef> Verb</th>
             <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true" [formControl]="selectedVerb" (click)="$event.stopPropagation()">
                 <mat-option value="GET">GET</mat-option>
                 <mat-option value="PUT">PUT</mat-option>
                 <mat-option value="POST">POST</mat-option>
                 <mat-option value="DELETE">DELETE</mat-option>
                 <mat-option value="PATCH">PATCH</mat-option>
               </mat-select>
+              <mat-error *ngIf="selectedVerb.hasError('required')">
+                The verb must be selected
+              </mat-error>
             </td>
           </ng-container>
 
@@ -230,10 +233,15 @@
           <ng-container matColumnDef="messageBody">
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
             <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" (click)="$event.stopPropagation()">
+              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]"  required="true"
+                          [formControl]="selectedMessageBody"
+                          (click)="$event.stopPropagation()">
                 <mat-option value="Request">Request</mat-option>
                 <mat-option value="Response">Response</mat-option>
               </mat-select>
+              <mat-error *ngIf="selectedMessageBody.hasError('required')">
+                The messageBody must be selected
+              </mat-error>
             </td>
           </ng-container>
           <ng-container matColumnDef="lastUpdateTimestamp">
@@ -258,7 +266,8 @@
   </mat-card>
 
   <div class="actions mt-4">
-    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary" [disabled]="selection.isEmpty()">
+    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary" [disabled]="selection.isEmpty() || selectedVerb.hasError('required') ||
+                                     selectedMessageBody.hasError('required')">
       <mat-icon>add</mat-icon>
       Add
     </button>

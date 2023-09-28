@@ -2,7 +2,7 @@ import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {SimpleRelease} from '../../../../release-management/domain/release';
-import {FormControl} from '@angular/forms';
+import {FormControl, Validators} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {ReleaseService} from '../../../../release-management/domain/release.service';
@@ -39,6 +39,8 @@ export class OasDocAssignDialogComponent implements OnInit {
   businessContextSelection = {};
   verbSelection = {};
   messageBodySelection = {};
+  selectedVerb = new FormControl('', [Validators.required]);
+  selectedMessageBody = new FormControl('', [Validators.required]);
   loading = false;
   oasDoc: OasDoc;
   loginIdList: string[] = [];
