@@ -78,7 +78,7 @@ public class OasExample extends TableImpl<OasExampleRecord> {
      * cannot easily be included in JSON or YAML documents. The value field and
      * externalValue field are mutually exclusive.
      */
-    public final TableField<OasExampleRecord, String> REF = createField(DSL.name("ref"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL that points to the literal example. This provides the capability to reference examples that cannot easily be included in JSON or YAML documents. The value field and externalValue field are mutually exclusive.");
+    public final TableField<OasExampleRecord, String> REF = createField(DSL.name("ref"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A URL that points to the literal example. This provides the capability to reference examples that cannot easily be included in JSON or YAML documents. The value field and externalValue field are mutually exclusive.");
 
     /**
      * The column <code>oagi.oas_example.value</code>. Embedded literal example.

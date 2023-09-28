@@ -63,7 +63,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      * The column <code>oagi.oas_external_doc.url</code>. REQUIRED. The URL for
      * the target documentation. Value MUST be in the format of a URL.
      */
-    public final TableField<OasExternalDocRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(250).nullable(false), this, "REQUIRED. The URL for the target documentation. Value MUST be in the format of a URL.");
+    public final TableField<OasExternalDocRecord, String> URL = createField(DSL.name("url"), SQLDataType.CLOB.nullable(false), this, "REQUIRED. The URL for the target documentation. Value MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_external_doc.description</code>. A short
