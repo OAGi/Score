@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.builder.Builder;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
@@ -178,24 +179,45 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             if (root == null) {
                 root = new LinkedHashMap<>();
                 root.put("openapi", option.getOasDoc().getOpenAPIVersion());
-                root.put("info", ImmutableMap.<String, Object>builder()
-                        .put("title", option.getOasDoc().getTitle())
-                        .put("description", StringUtils.hasLength(option.getOasDoc().getDescription()) ? option.getOasDoc().getDescription() : "")
-                        .put("termsOfService", StringUtils.hasLength(option.getOasDoc().getTermsOfService()) ? option.getOasDoc().getTermsOfService() : "")
-                        .put("contact", ImmutableMap.<String, Object>builder()
-                                .put("name", StringUtils.hasLength(option.getOasDoc().getContactName()) ? option.getOasDoc().getContactName() : "")
-                                .put("url", StringUtils.hasLength(option.getOasDoc().getContactUrl()) ? option.getOasDoc().getContactUrl(): "")
-                                .put("email", StringUtils.hasLength(option.getOasDoc().getContactEmail()) ? option.getOasDoc().getContactEmail(): "")
-                                .build())
-                        .put("license", ImmutableMap.<String, Object>builder()
-                                .put("name", StringUtils.hasLength(option.getOasDoc().getLicenseName()) ? option.getOasDoc().getLicenseName() : "")
-                                .put("url", StringUtils.hasLength(option.getOasDoc().getLicenseUrl()) ? option.getOasDoc().getLicenseUrl(): "")
-                                .build())
-                        .put("version", option.getOasDoc().getVersion())
+                ImmutableMap.Builder infoBuilder = ImmutableMap.<String, Object>builder()
+                        .put("title", option.getOasDoc().getTitle());
+                if (StringUtils.hasLength(option.getOasDoc().getDescription())) {
+                    infoBuilder = infoBuilder.put("description", option.getOasDoc().getDescription());
+                }
+                if (StringUtils.hasLength(option.getOasDoc().getTermsOfService())) {
+                    infoBuilder = infoBuilder.put("termsOfService", option.getOasDoc().getTermsOfService());
+                }
+                if (StringUtils.hasLength(option.getOasDoc().getContactName()) ||
+                        StringUtils.hasLength(option.getOasDoc().getContactUrl()) ||
+                        StringUtils.hasLength(option.getOasDoc().getContactEmail())) {
+                    ImmutableMap.Builder contactBuilder = ImmutableMap.<String, Object>builder();
+                    if (StringUtils.hasLength(option.getOasDoc().getContactName())) {
+                        contactBuilder = contactBuilder.put("name", option.getOasDoc().getContactName());
+                    }
+                    if (StringUtils.hasLength(option.getOasDoc().getContactUrl())) {
+                        contactBuilder = contactBuilder.put("url", option.getOasDoc().getContactUrl());
+                    }
+                    if (StringUtils.hasLength(option.getOasDoc().getContactEmail())) {
+                        contactBuilder = contactBuilder.put("email", option.getOasDoc().getContactEmail());
+                    }
+                    infoBuilder = infoBuilder.put("contact", contactBuilder.build());
+                }
+                if (StringUtils.hasLength(option.getOasDoc().getLicenseName()) ||
+                        StringUtils.hasLength(option.getOasDoc().getLicenseUrl())) {
+                    ImmutableMap.Builder licenseBuilder = ImmutableMap.<String, Object>builder();
+                    if (StringUtils.hasLength(option.getOasDoc().getLicenseName())) {
+                        licenseBuilder = licenseBuilder.put("name", option.getOasDoc().getLicenseName());
+                    }
+                    if (StringUtils.hasLength(option.getOasDoc().getLicenseUrl())) {
+                        licenseBuilder = licenseBuilder.put("url", option.getOasDoc().getLicenseUrl());
+                    }
+                    infoBuilder = infoBuilder.put("license", licenseBuilder.build());
+                }
+                infoBuilder = infoBuilder.put("version", option.getOasDoc().getVersion())
                         .put("x-oagis-release", release.getReleaseNum())
                         .put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()))
-                        .put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "")
-                        .build());
+                        .put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "");
+                root.put("info", infoBuilder.build());
 
                 paths = new LinkedHashMap();
                 securitySchemes = ImmutableMap.<String, Object>builder()
