@@ -265,6 +265,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
+                boolean isId = pathName.contains("{id}");
                 path.put("get", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -276,9 +277,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         .put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
                                         .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
-                                        .put("in", "" + ((isArray) ? "query" : "path"))
+                                        .put("in", "" + ((isId) ? "path" : "query"))
                                         .put("description", "")
-                                        .put("required", ((isArray) ? false : true))
+                                        .put("required", ((isId) ? true : false))
                                         .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
                                                 .put("type", "string")
                                                 .put("format", "date-time")
