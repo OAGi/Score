@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.builder.Builder;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
@@ -118,7 +117,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 .filter(e -> e.getBizCtxId().equals(bizCtxId))
                 .findAny().orElse(null);
         String delimiter = "-";
-        if (bizCtx != null){
+        if (bizCtx != null) {
             String bizCtxName = bizCtx.getName();
             // RESTful Web API Design V2 document
             // [R85] For URI path segments, consisting of more than a single word, a hyphen character "-"
@@ -255,11 +254,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
-            if (paths.isEmpty() || !paths.containsKey(pathName)){
+            if (paths.isEmpty() || !paths.containsKey(pathName)) {
                 List<Object> pathList = new ArrayList<>();
                 pathList.add(path);
                 paths.put(pathName, pathList);
-            }  else{
+            } else {
                 paths.get(pathName).add(path);
             }
             path.put("summary", "");
@@ -273,7 +272,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName;
                 String prefix = "query";
                 // Issue #1302
-                if (isDifferentForGetAndPost){
+                if (isDifferentForGetAndPost) {
                     prefix = "query";
                 }
                 if (isFriendly()) {
@@ -350,7 +349,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String responseSchemaName;
                 String prefix = "create";
                 // Issue #1302
-                if (isDifferentForGetAndPost){
+                if (isDifferentForGetAndPost) {
                     prefix = "create";
                 }
                 if (isFriendly()) {
@@ -418,7 +417,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 String schemaName;
                 String responseSchemaName;
                 String prefix = "update";
-                if (isDifferentForGetAndPatch){
+                if (isDifferentForGetAndPatch) {
                     prefix = "create";
                 }
                 if (isFriendly()) {
@@ -432,6 +431,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
+                boolean isId = pathName.contains("{id}");
                 path.put("patch", ImmutableMap.<String, Object>builder()
                         .put("summary", "")
                         .put("description", "")
@@ -443,9 +443,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         .put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
                                         .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
-                                        .put("in", "" + ((isArray) ? "query" : "path"))
+                                        .put("in", "" + ((isId) ? "path" : "query"))
                                         .put("description", "")
-                                        .put("required", ((isArray) ? false : true))
+                                        .put("required", ((isId) ? true : false))
                                         .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
                                                 .put("type", "string")
                                                 .put("format", "date-time")
@@ -527,7 +527,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
          */
         String getTemplateKey = "GET-" + option.getResourceName();
         if (option.getOpenAPI30TemplateMap().get(getTemplateKey) != null &&
-            option.getOpenAPI30TemplateMap().get(getTemplateKey).isIncludeMetaHeader()) {
+                option.getOpenAPI30TemplateMap().get(getTemplateKey).isIncludeMetaHeader()) {
             TopLevelAsbiep metaHeaderTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get(getTemplateKey).getMetaHeaderTopLevelAsbiepId());
             fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
