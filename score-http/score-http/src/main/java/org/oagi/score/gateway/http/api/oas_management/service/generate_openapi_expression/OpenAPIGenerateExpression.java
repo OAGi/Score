@@ -258,11 +258,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 List<Object> pathList = new ArrayList<>();
                 pathList.add(path);
                 paths.put(pathName, pathList);
+                path.put("summary", "");
+                path.put("description", "");
             } else {
                 paths.get(pathName).add(path);
             }
-            path.put("summary", "");
-            path.put("description", "");
             boolean isDifferentForGetAndPost = option.isTwoTemplateOptionDifferent("GET", "POST");
             boolean isDifferentForGetAndPatch = option.isTwoTemplateOptionDifferent("GET", "PATCH");
             String getTemplateKey = "GET-" + option.getResourceName();
