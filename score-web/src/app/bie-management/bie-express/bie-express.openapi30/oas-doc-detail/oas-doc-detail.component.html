@@ -19,14 +19,17 @@
         <div class="row">
           <div class="col-2">
             <mat-form-field>
-              <mat-label>Title</mat-label>
-              <input matInput required [(ngModel)]="oasDoc.title" maxlength="255"/>
+              <mat-label>OpenAPI Version</mat-label>
+              <mat-select required [(value)]="oasDoc.openAPIVersion">
+                <mat-option [value]="'3.0.3'">3.0.3</mat-option>
+              </mat-select>
             </mat-form-field>
           </div>
+          
           <div class="col-2">
             <mat-form-field>
-              <mat-label>OpenAPI Version</mat-label>
-              <input matInput required [(ngModel)]="oasDoc.openAPIVersion" maxlength="255">
+              <mat-label>Title</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.title" maxlength="255"/>
             </mat-form-field>
           </div>
 

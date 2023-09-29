@@ -8,13 +8,15 @@
   <mat-card class="mb-2">
     <mat-card-content class="mat-card-container">
       <mat-form-field>
-        <mat-label>Title</mat-label>
-        <input matInput required placeholder="The title of the API" [(ngModel)]="oasDoc.title" maxlength="65536"/>
+        <mat-label>OpenAPI Version</mat-label>
+        <mat-select required placeholder="'The version number of the OpenAPI Specification that the OpenAPI document uses (e.g., 3.0.3)'"
+                    [(value)]="oasDoc.openAPIVersion">
+          <mat-option [value]="'3.0.3'">3.0.3</mat-option>
+        </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>OpenAPI Version</mat-label>
-        <input matInput required placeholder="The version number of the OpenAPI Specification that the OpenAPI document uses (e.g., 3.0.3)"
-               [(ngModel)]="oasDoc.openAPIVersion" maxlength="20"/>
+        <mat-label>Title</mat-label>
+        <input matInput required placeholder="The title of the API" [(ngModel)]="oasDoc.title" maxlength="65536"/>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Document Version</mat-label>
