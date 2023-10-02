@@ -710,14 +710,30 @@ public class OpenAPIDocController {
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger oasDocId) throws ScoreDataAccessException {
 
-        DeleteOasDocRequest request = new DeleteOasDocRequest(authenticationService.asScoreUser(requester))
-                .withOasDocIdList(Arrays.asList(oasDocId));
+        GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
 
-        DeleteOasDocResponse response = oasDocService.deleteOasDoc(request);
+        AppUser appUser = sessionService.getAppUserByUsername(requester);
 
-        if (response.contains(oasDocId)) {
-            return ResponseEntity.noContent().build();
-        } else {
+        getBieForOasDocRequest.setOasDocId(oasDocId);
+
+        GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
+
+        DeleteBieForOasDocRequest deleteBieForOasDocRequest = new DeleteBieForOasDocRequest(authenticationService.asScoreUser(requester))
+                .withBieForOasDocList(bieForOasDocList.getResults());
+        deleteBieForOasDocRequest.setOasDocId(oasDocId);
+        DeleteBieForOasDocResponse deleteBieForOasDocResponse = oasDocService.deleteBieForOasDoc(deleteBieForOasDocRequest);
+
+        if (deleteBieForOasDocResponse.containsAll(bieForOasDocList.getResults())) {
+            DeleteOasDocRequest deleteOasDocRequest = new DeleteOasDocRequest(authenticationService.asScoreUser(requester))
+                    .withOasDocIdList(Arrays.asList(oasDocId));
+            DeleteOasDocResponse response = oasDocService.deleteOasDoc(deleteOasDocRequest);
+
+            if (response.contains(oasDocId)) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        }else{
             return ResponseEntity.badRequest().build();
         }
     }

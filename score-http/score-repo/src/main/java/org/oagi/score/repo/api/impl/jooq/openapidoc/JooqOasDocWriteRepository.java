@@ -4,6 +4,8 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.businessterm.model.BieToAssign;
+import org.oagi.score.repo.api.businessterm.model.DeleteAssignedBusinessTermResponse;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasDocRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -19,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_DOC;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.ScoreGuidUtils.randomGuid;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -147,6 +149,24 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
         List<BigInteger> oasDocIdList = request.getOasDocIdList();
         if (oasDocIdList == null || oasDocIdList.isEmpty()) {
             return new DeleteOasDocResponse(Collections.emptyList());
+        }
+
+        List<ULong> oasResourceIds = dslContext().select(OAS_RESOURCE.OAS_RESOURCE_ID)
+                .from(OAS_RESOURCE)
+                .where(
+                        oasDocIdList.size() == 1 ?
+                                OAS_RESOURCE.OAS_DOC_ID.eq(ULong.valueOf(oasDocIdList.get(0))) :
+                                OAS_RESOURCE.OAS_DOC_ID.in(oasDocIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                ).fetchInto(ULong.class);
+
+        if (!oasResourceIds.isEmpty()){
+            dslContext().delete(OAS_RESOURCE)
+                    .where(
+                            oasResourceIds.size() == 1 ?
+                                    OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasResourceIds.get(0)) :
+                                    OAS_RESOURCE.OAS_RESOURCE_ID.in(oasResourceIds)
+                    ).execute();
+
         }
         try {
             dslContext().delete(OAS_DOC)
