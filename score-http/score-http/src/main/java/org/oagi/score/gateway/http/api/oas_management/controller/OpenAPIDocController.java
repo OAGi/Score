@@ -349,6 +349,7 @@ public class OpenAPIDocController {
         //
 
         String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).getName().toLowerCase();
+        businessContextName = businessContextName.replace(' ', '-');
 
         boolean isArray = request.isMakeArrayIndicator();
         if (oasDocVersion != null) {

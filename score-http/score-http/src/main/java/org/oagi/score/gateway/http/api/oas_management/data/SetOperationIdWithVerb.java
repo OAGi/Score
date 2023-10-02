@@ -15,7 +15,8 @@ public class SetOperationIdWithVerb {
         this.isArray = isArray;
     }
     public String verbToOperationId() {
-        String businessContextCamelCase = camelCase(this.businessContext);
+        String businessContextWithoutHyphen = this.businessContext.replace('-', ' ');
+        String businessContextCamelCase = camelCase(businessContextWithoutHyphen);
         String biePropertyTermWithoutSpace = this.biePropertyTerm.replaceAll("\\s", "");
         switch (this.verb) {
             case "GET":
