@@ -172,7 +172,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
             Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
 
-            Map<String, List<Object>> paths = new LinkedHashMap<String, List<Object>>();
+            Map<String, Object> paths = new LinkedHashMap<>();
             Map<String, Object> schemas = new LinkedHashMap<>();
             Map<String, Object> securitySchemes = null;
             if (root == null) {
@@ -239,7 +239,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         .build()
                 );
             } else {
-                paths = (Map<String, List<Object>>) root.get("paths");
+                paths = (Map<String, Object>) root.get("paths");
                 schemas = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("schemas");
                 securitySchemes = (Map<String, Object>) ((Map<String, Object>) root.get("components")).get("securitySchemes");
 
@@ -249,19 +249,19 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 Map<String, Object> scopes = (Map<String, Object>) authorizationCode.get("scopes");
                 scopes.putAll(getAuthorizationCodeScopes(topLevelAsbiep));
             }
-
+            Map<String, Object> pathMap = new LinkedHashMap<>();
             Map<String, Object> path = new LinkedHashMap();
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
             if (paths.isEmpty() || !paths.containsKey(pathName)) {
-                List<Object> pathList = new ArrayList<>();
-                pathList.add(path);
-                paths.put(pathName, pathList);
-                path.put("summary", "");
-                path.put("description", "");
+                paths.put(pathName, pathMap);
+                pathMap.put("summary", "");
+                pathMap.put("description", "");
+                pathMap.put(option.getVerb().toLowerCase(), path);
             } else {
-                paths.get(pathName).add(path);
+                Map<String, Object> existingPathMap = (Map<String, Object>)paths.get(pathName);
+                existingPathMap.put(option.getVerb().toLowerCase(), path);
             }
             boolean isDifferentForGetAndPost = option.isTwoTemplateOptionDifferent("GET", "POST");
             boolean isDifferentForGetAndPatch = option.isTwoTemplateOptionDifferent("GET", "PATCH");
@@ -286,15 +286,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
                 boolean isId = pathName.contains("{id}");
-                path.put("get", ImmutableMap.<String, Object>builder()
-                        .put("summary", "")
-                        .put("description", "")
-                        .put("security", Arrays.asList(ImmutableMap.builder()
+                path.put("summary", "");
+                path.put("description", "");
+                path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Read"))
-                                .build()))
-                        .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                        .put("operationId", option.getOperationId())
-                        .put("parameters", Arrays.asList(
+                                .build()));
+                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                path.put("operationId", option.getOperationId());
+                path.put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
                                         .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
                                         .put("in", "" + ((isId) ? "path" : "query"))
@@ -307,8 +306,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                 .put("type", "string")
                                                 .build())
                                         .build()
-                        ))
-                        .put("responses", ImmutableMap.<String, Object>builder()
+
+                        ));
+                path.put("responses", ImmutableMap.<String, Object>builder()
                                 .put("200", ImmutableMap.<String, Object>builder()
                                         .put("description", "")
                                         .put("content", ImmutableMap.<String, Object>builder()
@@ -319,8 +319,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                         .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .build());
+                                .build());
 
                 if (!isFriendly() && !schemas.containsKey("integer")) {
                     schemas.put("integer", ImmutableMap.<String, Object>builder()
@@ -364,15 +363,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
-                path.put("post", ImmutableMap.<String, Object>builder()
-                        .put("summary", "")
-                        .put("description", "")
-                        .put("security", Arrays.asList(ImmutableMap.builder()
+                path.put("summary", "");
+                path.put("description", "");
+                path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Write"))
-                                .build()))
-                        .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                        .put("operationId", option.getOperationId())
-                        .put("requestBody", ImmutableMap.<String, Object>builder()
+                                .build()));
+                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                path.put("operationId", option.getOperationId());
+                path.put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
@@ -381,8 +379,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                         .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .put("responses", ImmutableMap.<String, Object>builder()
+                                .build());
+                path.put("responses", ImmutableMap.<String, Object>builder()
                                 .put("200", ImmutableMap.<String, Object>builder()
                                         .put("description", "")
                                         .put("content", ImmutableMap.<String, Object>builder()
@@ -393,9 +391,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                         .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .build());
-
+                                .build());
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                     fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
@@ -432,15 +428,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
                 boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
                 boolean isId = pathName.contains("{id}");
-                path.put("patch", ImmutableMap.<String, Object>builder()
-                        .put("summary", "")
-                        .put("description", "")
-                        .put("security", Arrays.asList(ImmutableMap.builder()
+                path.put("summary", "");
+                path.put("description", "");
+                path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Write"))
-                                .build()))
-                        .put("tags", Arrays.asList(basedAsccp.getPropertyTerm()))
-                        .put("operationId", option.getOperationId())
-                        .put("parameters", Arrays.asList(
+                                .build()));
+                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                path.put("operationId", option.getOperationId());
+                path.put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
                                         .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
                                         .put("in", "" + ((isId) ? "path" : "query"))
@@ -453,8 +448,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                 .put("type", "string")
                                                 .build())
                                         .build()
-                        ))
-                        .put("requestBody", ImmutableMap.<String, Object>builder()
+                        ));
+                path.put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
@@ -463,8 +458,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                         .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .put("responses", ImmutableMap.<String, Object>builder()
+                                .build());
+                path.put("responses", ImmutableMap.<String, Object>builder()
                                 .put("200", ImmutableMap.<String, Object>builder()
                                         .put("description", "")
                                         .put("content", ImmutableMap.<String, Object>builder()
@@ -475,8 +470,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                         .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .build());
+                                .build());
 
                 if (!schemas.containsKey(schemaName)) {
                     Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
