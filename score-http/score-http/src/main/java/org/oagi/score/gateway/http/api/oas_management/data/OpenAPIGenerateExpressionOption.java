@@ -14,6 +14,7 @@ public class OpenAPIGenerateExpressionOption {
     private BigInteger topLevelAsbiepId;
     private String resourceName;
     private String operationId;
+    private String tagName;
     private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;
