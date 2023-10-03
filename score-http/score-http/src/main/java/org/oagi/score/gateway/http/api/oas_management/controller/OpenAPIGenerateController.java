@@ -50,11 +50,18 @@ public class OpenAPIGenerateController {
         if (bieListForOasDoc != null) {
             for (BieForOasDoc bieForOasDoc : bieListForOasDoc) {
                 String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName();
+                GetAssignedOasTagRequest getAssignedOasTagRequest = new GetAssignedOasTagRequest(authenticationService.asScoreUser(user));
+                getAssignedOasTagRequest.setOasOperationId(bieForOasDoc.getOasOperationId());
+                getAssignedOasTagRequest.setMessageBodyType(bieForOasDoc.getMessageBody());
+                GetAssignedOasTagResponse getAssignedOasTagResponse = oasDocService.getAssignedOasTag(getAssignedOasTagRequest);
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
                 openAPIGenerateExpressionOption.setOasDoc(getOasDocResponse.getOasDoc());
                 BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
                 if (topLevelAsbiepIds != null){
                     topLevelAsbiepIds.add(topLevelAsbiepId);
+                }
+                if (getAssignedOasTagResponse != null){
+                    openAPIGenerateExpressionOption.setTagName(getAssignedOasTagResponse.getOasTag().getName());
                 }
                 openAPIGenerateExpressionOption.setTopLevelAsbiepId(topLevelAsbiepId);
                 openAPIGenerateExpressionOption.setResourceName(bieForOasDoc.getResourceName());

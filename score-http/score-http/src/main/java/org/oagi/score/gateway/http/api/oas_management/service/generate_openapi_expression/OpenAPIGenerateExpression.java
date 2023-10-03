@@ -291,7 +291,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Read"))
                                 .build()));
-                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                if (option.getTagName() != null){
+                    path.put("tags", Arrays.asList(option.getTagName()));
+                }
                 path.put("operationId", option.getOperationId());
                 path.put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()
@@ -368,7 +370,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Write"))
                                 .build()));
-                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                if (option.getTagName() != null){
+                    path.put("tags", Arrays.asList(option.getTagName()));
+                }
                 path.put("operationId", option.getOperationId());
                 path.put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
@@ -433,7 +437,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 path.put("security", Arrays.asList(ImmutableMap.builder()
                                 .put("OAuth2", Arrays.asList(bieName + "Write"))
                                 .build()));
-                path.put("tags", Arrays.asList(basedAsccp.getPropertyTerm()));
+                if (option.getTagName() != null){
+                    path.put("tags", Arrays.asList(option.getTagName()));
+                }
                 path.put("operationId", option.getOperationId());
                 path.put("parameters", Arrays.asList(
                                 ImmutableMap.<String, Object>builder()

@@ -7,7 +7,10 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
+import org.oagi.score.repo.api.businessterm.model.AssignedBusinessTerm;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResourceTagRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasTagRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
@@ -21,6 +24,7 @@ import java.util.*;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.utils.ScoreGuidUtils.randomGuid;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -229,5 +233,49 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 length
         );
     }
+    @Override
+    public GetAssignedOasTagResponse getAssignedOasTag(GetAssignedOasTagRequest request) throws ScoreDataAccessException {
+        OasTagRecord oasTagRecord = null;
+        if (request.getMessageBodyType().equals("Request")) {
+            //Get oasTag
+            OasResourceTagRecord req_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("req_oas_resource_tag"))
+                    .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
+                    .fetchOptional().orElse(null);
+            if (req_oasResourceTagRecord == null) {
+                return null;
+            } else {
+                ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
+                oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
+                        .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+            }
+        } else if (request.getMessageBodyType().equals("Response")){
+            //Get oasTag
+            OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
+                    .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
+                    .fetchOptional().orElse(null);
+            if (res_oasResourceTagRecord == null) {
+                return null;
+            } else {
+                ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
+                oasTagRecord = dslContext().selectFrom(OAS_TAG.as("res_oas_tag"))
+                        .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
+            }
 
+        }else throw new ScoreDataAccessException("Wrong MessageBody Type: " + request.getMessageBodyType());
+
+        GetAssignedOasTagResponse response;
+        if (oasTagRecord != null){
+            OasTag oasTag = new OasTag(
+                    oasTagRecord.getOasTagId().toBigInteger(),
+                    oasTagRecord.getGuid(),
+                    oasTagRecord.getName(),
+                    oasTagRecord.getDescription(),
+                    null,
+                    null);
+            response = new GetAssignedOasTagResponse(oasTag);
+        }else{
+            return null;
+        }
+        return response;
+    }
 }

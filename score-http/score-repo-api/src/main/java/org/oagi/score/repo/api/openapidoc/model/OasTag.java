@@ -17,6 +17,14 @@ public class OasTag extends Auditable {
     private ScoreUser lastUpdatedBy;
     public OasTag() {
     }
+    public OasTag(BigInteger oasTagId, String guid, String name, String description, Date lastUpdateTimestamp, Date creationTimestamp) {
+        this.oasTagId = oasTagId;
+        this.guid = guid;
+        this.name = name;
+        this.description = description;
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+        this.creationTimestamp = creationTimestamp;
+    }
 
     public BigInteger getOasTagId() {
         return oasTagId;
@@ -89,6 +97,7 @@ public class OasTag extends Auditable {
     public void setLastUpdatedBy(ScoreUser lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
+
     @Override
     public String toString() {
         return "OasTag{" +
