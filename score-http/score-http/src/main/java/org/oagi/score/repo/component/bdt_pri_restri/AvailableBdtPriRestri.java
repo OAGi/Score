@@ -11,5 +11,7 @@ public class AvailableBdtPriRestri {
     private boolean isDefault;
     private BigInteger xbtId;
     private String xbtName;
+    private BigInteger codeListManifestId;
+    private BigInteger agencyIdListManifestId;
 
 }

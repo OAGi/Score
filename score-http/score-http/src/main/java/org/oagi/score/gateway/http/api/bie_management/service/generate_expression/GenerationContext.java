@@ -937,24 +937,7 @@ public class GenerationContext implements InitializingBean {
         if (bbie == null) {
             return null;
         }
-        AgencyIdList agencyIdList = findAgencyIdList(bbie.getAgencyIdListManifestId());
-        if (agencyIdList != null) {
-            return agencyIdList;
-        }
-
-        BdtPriRestri bdtPriRestri =
-                findBdtPriRestri(bbie.getBdtPriRestriId());
-        if (bdtPriRestri != null) {
-            agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListManifestId());
-        }
-
-        if (agencyIdList == null) {
-            bdtPriRestri = findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
-            if (bdtPriRestri != null) {
-                agencyIdList = findAgencyIdList(bdtPriRestri.getAgencyIdListManifestId());
-            }
-        }
-        return agencyIdList;
+        return findAgencyIdList(bbie.getAgencyIdListManifestId());
     }
 
     public AgencyIdList getAgencyIdList(BBIESC bbieSc) {

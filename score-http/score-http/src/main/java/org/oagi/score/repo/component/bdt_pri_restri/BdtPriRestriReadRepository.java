@@ -38,8 +38,18 @@ public class BdtPriRestriReadRepository {
                 isDefault = "time".equalsIgnoreCase(xbtName);
             }
             availableBdtPriRestri.setDefault(isDefault);
-            availableBdtPriRestri.setXbtId(e.get(XBT.XBT_ID).toBigInteger());
-            availableBdtPriRestri.setXbtName(xbtName);
+            if (e.get(XBT.XBT_ID) != null) {
+                availableBdtPriRestri.setXbtId(e.get(XBT.XBT_ID).toBigInteger());
+            }
+            if (xbtName != null) {
+                availableBdtPriRestri.setXbtName(xbtName);
+            }
+            if (e.get(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID) != null) {
+                availableBdtPriRestri.setCodeListManifestId(e.get(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID).toBigInteger());
+            }
+            if (e.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID) != null) {
+                availableBdtPriRestri.setAgencyIdListManifestId(e.get(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger());
+            }
             return availableBdtPriRestri;
         };
     }
@@ -47,11 +57,9 @@ public class BdtPriRestriReadRepository {
     public List<AvailableBdtPriRestri> availableBdtPriRestriListByBccManifestId(BigInteger bccManifestId) {
         return dslContext.select(
                 BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID, DT.DATA_TYPE_TERM,
-                BDT_PRI_RESTRI.IS_DEFAULT, XBT.XBT_ID, XBT.NAME)
+                BDT_PRI_RESTRI.IS_DEFAULT, XBT.XBT_ID, XBT.NAME,
+                BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID, BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(BDT_PRI_RESTRI)
-                .join(CDT_AWD_PRI_XPS_TYPE_MAP)
-                .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
-                .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .join(DT_MANIFEST)
                 .on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
                 .join(BCCP_MANIFEST)
@@ -60,29 +68,31 @@ public class BdtPriRestriReadRepository {
                 .on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(BCC_MANIFEST)
                 .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP)
+                .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
+                .leftJoin(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
                 .fetchStream().map(mapper())
-                .sorted(Comparator.comparing(AvailableBdtPriRestri::getXbtName))
                 .collect(Collectors.toList());
     }
 
     public List<AvailableBdtPriRestri> availableBdtPriRestriListByBccpManifestId(BigInteger bccpManifestId) {
         return dslContext.select(
                 BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID, DT.DATA_TYPE_TERM,
-                BDT_PRI_RESTRI.IS_DEFAULT, XBT.XBT_ID, XBT.NAME)
+                BDT_PRI_RESTRI.IS_DEFAULT, XBT.XBT_ID, XBT.NAME,
+                BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID, BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(BDT_PRI_RESTRI)
-                .join(CDT_AWD_PRI_XPS_TYPE_MAP)
-                .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
-                .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .join(DT_MANIFEST)
                 .on(BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
                 .join(DT)
                 .on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(BCCP_MANIFEST)
                 .on(DT_MANIFEST.DT_MANIFEST_ID.eq(BCCP_MANIFEST.BDT_MANIFEST_ID))
+                .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP)
+                .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
+                .leftJoin(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchStream().map(mapper())
-                .sorted(Comparator.comparing(AvailableBdtPriRestri::getXbtName))
                 .collect(Collectors.toList());
     }
 
