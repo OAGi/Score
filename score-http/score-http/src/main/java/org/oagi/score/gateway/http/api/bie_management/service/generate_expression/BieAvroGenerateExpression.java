@@ -439,7 +439,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
             if (option.isBieDefinition() && StringUtils.hasLength(getDocumentation())) {
                 properties.put("doc", getDocumentation());
             }
-            if (isRecord && !getChildren().isEmpty()) {
+            if (isRecord) {
                 properties.put("fields", getChildren().stream()
                         .map(e -> e.toProperties()).collect(Collectors.toList()));
             }
