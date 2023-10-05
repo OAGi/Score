@@ -33,10 +33,28 @@ class Helper {
     }
 
     static CodeList getCodeList(GenerationContext generationContext, BBIE bbie, DT bdt) {
-        if (bbie == null) {
-            return null;
+        CodeList codeList = null;
+
+        if (bbie.getCodeListManifestId() != null) {
+            codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
         }
-        return generationContext.findCodeList(bbie.getCodeListManifestId());
+
+        if (codeList == null) {
+            BdtPriRestri bdtPriRestri =
+                    generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+            if (bdtPriRestri != null && bdtPriRestri.getCodeListManifestId() != null) {
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListManifestId());
+            }
+        }
+
+        if (codeList == null) {
+            BdtPriRestri bdtPriRestri =
+                    generationContext.findBdtPriRestriByBbieAndDefaultIsTrue(bbie);
+            if (bdtPriRestri != null && bdtPriRestri.getCodeListManifestId() != null) {
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListManifestId());
+            }
+        }
+        return codeList;
     }
 
     static Xbt getXbt(GenerationContext generationContext,
