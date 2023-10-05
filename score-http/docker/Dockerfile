@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 tomcat:10.1.12-jdk21-openjdk
+FROM --platform=linux/amd64 tomcat:10.1.13-jdk21-openjdk
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -13,7 +13,7 @@ ENV REDIS_PORT 6379
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-COPY mariadb-java-client-3.1.4.jar /usr/local/tomcat/lib/mariadb-java-client-3.1.4.jar
+COPY mariadb-java-client-3.2.0.jar /usr/local/tomcat/lib/mariadb-java-client-3.2.0.jar
 
 RUN rm -rf /usr/local/tomcat/webapps/* && \
     chgrp -R 0 /usr/local/tomcat/ && \
@@ -21,6 +21,6 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
 
 USER 1001
 COPY web.xml /usr/local/tomcat/conf/web.xml
-COPY score-http-3.1.0.war /usr/local/tomcat/webapps/ROOT.war
+COPY score-http-3.1.1.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

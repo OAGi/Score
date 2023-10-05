@@ -1974,6 +1974,8 @@ have to be its owner. To do that:
    5. *Definition*. Specify the description of the BCCP. *Definition* is
       optional but a warning is given if none is specified.
 
+   6. *BDT*. The associated BDT can be changed.
+
 5. Click the "Update" button at the top right to save changes.
 
 Cancel a BCCP revision
