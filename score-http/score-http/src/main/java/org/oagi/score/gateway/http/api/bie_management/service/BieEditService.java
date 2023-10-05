@@ -1105,9 +1105,20 @@ public class BieEditService implements InitializingBean {
                     throw new IllegalArgumentException();
                 }
 
-                bbieRecord.setBdtPriRestriId(ULong.valueOf(bdtPriRestriList.get(0).getBdtPriRestriId()));
-                bbieRecord.setCodeListManifestId(null);
-                bbieRecord.setAgencyIdListManifestId(null);
+                AvailableBdtPriRestri defaultBdtPriRestri = bdtPriRestriList.get(0);
+                if (defaultBdtPriRestri.getCodeListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(ULong.valueOf(defaultBdtPriRestri.getCodeListManifestId()));
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (defaultBdtPriRestri.getAgencyIdListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(ULong.valueOf(defaultBdtPriRestri.getAgencyIdListManifestId()));
+                } else {
+                    bbieRecord.setBdtPriRestriId(ULong.valueOf(defaultBdtPriRestri.getBdtPriRestriId()));
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(null);
+                }
                 bbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                 bbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
 
@@ -1161,9 +1172,21 @@ public class BieEditService implements InitializingBean {
                     throw new IllegalArgumentException();
                 }
 
-                bbieScRecord.setDtScPriRestriId(ULong.valueOf(bdtScPriRestriList.get(0).getBdtScPriRestriId()));
-                bbieScRecord.setCodeListManifestId(null);
-                bbieScRecord.setAgencyIdListManifestId(null);
+                AvailableBdtScPriRestri defaultBdtScPriRestri = bdtScPriRestriList.get(0);
+                if (defaultBdtScPriRestri.getCodeListManifestId() != null) {
+                    bbieScRecord.setDtScPriRestriId(null);
+                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultBdtScPriRestri.getCodeListManifestId()));
+                    bbieScRecord.setAgencyIdListManifestId(null);
+                } else if (defaultBdtScPriRestri.getAgencyIdListManifestId() != null) {
+                    bbieScRecord.setDtScPriRestriId(null);
+                    bbieScRecord.setCodeListManifestId(null);
+                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultBdtScPriRestri.getAgencyIdListManifestId()));
+                } else {
+                    bbieScRecord.setDtScPriRestriId(ULong.valueOf(defaultBdtScPriRestri.getBdtScPriRestriId()));
+                    bbieScRecord.setCodeListManifestId(null);
+                    bbieScRecord.setAgencyIdListManifestId(null);
+                }
+
                 bbieScRecord.setDefaultValue(null);
                 bbieScRecord.setFixedValue(null);
                 bbieScRecord.setExample(null);

@@ -144,6 +144,8 @@ export class BdtPriRestri {
   default: boolean;
   xbtId: number;
   xbtName: string;
+  codeListManifestId: number;
+  agencyIdListManifestId: number;
 }
 
 export class BdtScPriRestri {
@@ -151,6 +153,8 @@ export class BdtScPriRestri {
   default: boolean;
   xbtId: number;
   xbtName: string;
+  codeListManifestId: number;
+  agencyIdListManifestId: number;
 }
 
 export class CodeList {
