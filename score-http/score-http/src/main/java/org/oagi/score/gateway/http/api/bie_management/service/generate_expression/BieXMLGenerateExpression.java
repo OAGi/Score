@@ -976,10 +976,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             parent.addContent(eNode);
 
             List<BBIESC> bbieScList = generationContext.queryBBIESCs(bbie);
-            CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
-
+            CodeList codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
             if (codeList == null) {
-                AgencyIdList agencyIdList = generationContext.getAgencyIdList(bbie);
+                AgencyIdList agencyIdList = generationContext.findAgencyIdList(bbie.getAgencyIdListManifestId());
                 if (agencyIdList != null) {
                     if (option.isBieGuid()) {
                         eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuid.randomGuid());
@@ -1026,7 +1025,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             }
         } else {
             List<BBIESC> bbieScList = generationContext.queryBBIESCs(bbie);
-            CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
+            CodeList codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
             if (codeList == null) {
                 AgencyIdList agencyIdList = generationContext.getAgencyIdList(bbie);
                 if (agencyIdList != null) {

@@ -693,12 +693,12 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
     private String getReference(Map<String, Object> definitions, BBIE bbie, DT bdt,
                                 GenerationContext generationContext) {
-        CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
+        CodeList codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
         String ref;
         if (codeList != null) {
             ref = fillDefinitions(definitions, bbie, codeList);
         } else {
-            AgencyIdList agencyIdList = generationContext.getAgencyIdList(bbie);
+            AgencyIdList agencyIdList = generationContext.findAgencyIdList(bbie.getAgencyIdListManifestId());
             if (agencyIdList != null) {
                 ref = fillDefinitions(definitions, agencyIdList);
             } else {
