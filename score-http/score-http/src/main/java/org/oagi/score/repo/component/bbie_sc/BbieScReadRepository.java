@@ -5,6 +5,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
+import org.oagi.score.data.BdtPriRestri;
+import org.oagi.score.data.BdtScPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieScRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScRecord;
@@ -75,13 +77,32 @@ public class BbieScReadRepository {
             bbieSc.setCardinalityMax(dtScRecord.getCardinalityMax());
             bbieSc.setDefaultValue(dtScRecord.getDefaultValue());
             bbieSc.setFixedValue(dtScRecord.getFixedValue());
-            bbieSc.setBdtScPriRestriId(getDefaultDtScPriRestriIdByDtScId(dtScManifestId));
+            BdtScPriRestri defaultBdtScPriRestri = getDefaultBdtScPriRestriByBdtScManifestId(dtScManifestId);
+            if (defaultBdtScPriRestri.getCodeListManifestId() != null) {
+                bbieSc.setCodeListManifestId(defaultBdtScPriRestri.getCodeListManifestId());
+            } else if (defaultBdtScPriRestri.getAgencyIdListManifestId() != null) {
+                bbieSc.setAgencyIdListManifestId(defaultBdtScPriRestri.getAgencyIdListManifestId());
+            } else {
+                BigInteger defaultBdtScPriRestriId = getDefaultDtScPriRestriIdByDtScManifestId(dtScManifestId);
+                bbieSc.setBdtScPriRestriId(defaultBdtScPriRestriId);
+            }
         }
 
         return bbieScNode;
     }
 
-    public BigInteger getDefaultDtScPriRestriIdByDtScId(BigInteger dtScManifestId) {
+    public BdtScPriRestri getDefaultBdtScPriRestriByBdtScManifestId(BigInteger dtScManifestId) {
+        ULong bdtScManifestId = ULong.valueOf(dtScManifestId);
+        return dslContext.select(BDT_SC_PRI_RESTRI.fields())
+                .from(BDT_SC_PRI_RESTRI)
+                .where(and(
+                        BDT_SC_PRI_RESTRI.BDT_SC_MANIFEST_ID.eq(bdtScManifestId),
+                        BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)
+                ))
+                .fetchOptionalInto(BdtScPriRestri.class).orElse(null);
+    }
+
+    public BigInteger getDefaultDtScPriRestriIdByDtScManifestId(BigInteger dtScManifestId) {
         ULong bdtScManifestId = ULong.valueOf(dtScManifestId);
         String bdtScRepresentationTerm = dslContext.select(DT_SC.REPRESENTATION_TERM)
                 .from(DT_SC)

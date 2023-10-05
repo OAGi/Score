@@ -5,6 +5,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
+import org.oagi.score.data.BdtPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.component.bcc.BccReadRepository;
@@ -91,15 +92,23 @@ public class BbieReadRepository {
                 bbie.setFixedValue(bccpRecord.getFixedValue());
             }
             bbie.setNillable(bccpRecord.getIsNillable() == 1);
-            BigInteger defaultBdtPriRestriId = getDefaultBdtPriRestriIdByBdtId(
+            BdtPriRestri defaultBdtPriRestri = getDefaultBdtPriRestriByBdtManifestId(
                     bccpManifestRecord.getBdtManifestId().toBigInteger());
-            bbie.setBdtPriRestriId(defaultBdtPriRestriId);
+            if (defaultBdtPriRestri.getCodeListManifestId() != null) {
+                bbie.setCodeListManifestId(defaultBdtPriRestri.getCodeListManifestId());
+            } else if (defaultBdtPriRestri.getAgencyIdListManifestId() != null) {
+                bbie.setAgencyIdListManifestId(defaultBdtPriRestri.getAgencyIdListManifestId());
+            } else {
+                BigInteger defaultBdtPriRestriId = getDefaultBdtPriRestriIdByBdtManifestId(
+                        bccpManifestRecord.getBdtManifestId().toBigInteger());
+                bbie.setBdtPriRestriId(defaultBdtPriRestriId);
+            }
         }
 
         return bbieNode;
     }
 
-    public BigInteger getDefaultBdtPriRestriIdByBdtId(BigInteger bdtManifestId) {
+    public BigInteger getDefaultBdtPriRestriIdByBdtManifestId(BigInteger bdtManifestId) {
         ULong dtManifestId = ULong.valueOf(bdtManifestId);
         String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
                 .from(DT)
@@ -131,6 +140,17 @@ public class BbieReadRepository {
                 .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID));
         return step.where(conds)
                 .fetchOptionalInto(BigInteger.class).orElse(BigInteger.ZERO);
+    }
+
+    public BdtPriRestri getDefaultBdtPriRestriByBdtManifestId(BigInteger bdtManifestId) {
+        ULong dtManifestId = ULong.valueOf(bdtManifestId);
+        return dslContext.select(BDT_PRI_RESTRI.fields())
+                .from(BDT_PRI_RESTRI)
+                .where(and(
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifestId),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)
+                ))
+                .fetchOptionalInto(BdtPriRestri.class).orElse(null);
     }
 
     public BbieNode.Bbie getBbie(BigInteger topLevelAsbiepId, String hashPath) {
