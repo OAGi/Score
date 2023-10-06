@@ -19,6 +19,7 @@ import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.corecomponent.model.CcType;
+import org.oagi.score.repo.api.module.ModuleSetReleaseReadRepository;
 import org.oagi.score.repo.api.module.ModuleSetReleaseWriteRepository;
 import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
@@ -282,13 +283,17 @@ public class ModuleSetReleaseService implements InitializingBean {
         GetAssignedCCListRequest request = new GetAssignedCCListRequest(user);
         request.setModuleSetReleaseId(moduleSetReleaseId);
         request.setModuleId(moduleId);
-        List<AssignableNode> accList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedACCByModuleSetReleaseId(request);
-        List<AssignableNode> asccpList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedASCCPByModuleSetReleaseId(request);
-        List<AssignableNode> bccpList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedBCCPByModuleSetReleaseId(request);
-        List<AssignableNode> dtList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedDTByModuleSetReleaseId(request);
-        List<AssignableNode> codeListList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedCodeListByModuleSetReleaseId(request);
-        List<AssignableNode> agencyIdListList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedAgencyIdListByModuleSetReleaseId(request);
-        List<AssignableNode> xbtList = scoreRepositoryFactory.createModuleSetReleaseReadRepository().getAssignedXBTByModuleSetReleaseId(request);
+
+        ModuleSetReleaseReadRepository moduleSetReleaseReadRepository = scoreRepositoryFactory.createModuleSetReleaseReadRepository();
+
+        List<AssignableNode> accList = moduleSetReleaseReadRepository.getAssignedACCByModuleSetReleaseId(request);
+        List<AssignableNode> asccpList = moduleSetReleaseReadRepository.getAssignedASCCPByModuleSetReleaseId(request);
+        List<AssignableNode> bccpList = moduleSetReleaseReadRepository.getAssignedBCCPByModuleSetReleaseId(request);
+        List<AssignableNode> dtList = moduleSetReleaseReadRepository.getAssignedDTByModuleSetReleaseId(request);
+        List<AssignableNode> codeListList = moduleSetReleaseReadRepository.getAssignedCodeListByModuleSetReleaseId(request);
+        List<AssignableNode> agencyIdListList = moduleSetReleaseReadRepository.getAssignedAgencyIdListByModuleSetReleaseId(request);
+        List<AssignableNode> xbtList = moduleSetReleaseReadRepository.getAssignedXBTByModuleSetReleaseId(request);
+
         assignComponents.setAssignedAccManifestMap(accList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));
         assignComponents.setAssignedAsccpManifestMap(asccpList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));
         assignComponents.setAssignedBccpManifestMap(bccpList.stream().collect(Collectors.toMap(AssignableNode::getManifestId, Function.identity())));

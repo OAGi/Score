@@ -7,7 +7,6 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
-import org.oagi.score.repo.component.asccp.PurgeAsccpRepositoryResponse;
 import org.oagi.score.repo.component.bcc.BccWriteRepository;
 import org.oagi.score.repo.component.bcc.UpdateBccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -395,6 +394,20 @@ public class BccpWriteRepository {
         bccpManifestRecord.setBdtManifestId(bdtManifestId);
         bccpManifestRecord.setLogId(logRecord.getLogId());
         bccpManifestRecord.update(BCCP_MANIFEST.BDT_MANIFEST_ID, BCCP_MANIFEST.LOG_ID);
+
+        // update the DEN of BCCs associated with this BCCP.
+        for (Record2<ULong, String> bccRecord : dslContext.select(BCC.BCC_ID, ACC.OBJECT_CLASS_TERM)
+                .from(BCC)
+                .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+                .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .fetch()) {
+            dslContext.update(BCC)
+                    .set(BCC.DEN, bccRecord.get(ACC.OBJECT_CLASS_TERM) + ". " + den)
+                    .where(BCC.BCC_ID.eq(bccRecord.get(BCC.BCC_ID)))
+                    .execute();
+        }
 
         return new UpdateBccpBdtRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), bccpRecord.getDen());
     }
