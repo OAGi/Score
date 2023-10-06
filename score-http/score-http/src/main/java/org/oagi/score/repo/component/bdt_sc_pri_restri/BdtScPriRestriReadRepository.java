@@ -58,6 +58,7 @@ public class BdtScPriRestriReadRepository {
         return dslContext.select(
                 BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID,
                 BDT_SC_PRI_RESTRI.IS_DEFAULT,
+                DT_SC.REPRESENTATION_TERM,
                 XBT.XBT_ID, XBT.NAME,
                 BDT_SC_PRI_RESTRI.CODE_LIST_MANIFEST_ID, BDT_SC_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(BDT_SC_PRI_RESTRI)
