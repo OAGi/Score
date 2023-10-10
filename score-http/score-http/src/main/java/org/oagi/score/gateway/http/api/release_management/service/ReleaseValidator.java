@@ -384,6 +384,29 @@ public class ReleaseValidator {
                 response.addMessageForBccp(bccpManifestRecord.getBccpManifestId().toBigInteger(),
                         Error, "Namespace is required.", NAMESPACE);
             }
+
+            DtManifestRecord dtManifestRecord = dtManifestRecordMap.get(bccpManifestRecord.getBdtManifestId());
+            DtRecord dtRecord = dtRecordMap.get(dtManifestRecord.getDtId());
+            CcState dtState = CcState.valueOf(dtRecord.getState());
+            if (dtState != CcState.Published) {
+                if (assignedDtComponentManifestIds.contains(dtManifestRecord.getDtManifestId().toBigInteger())) {
+                    if (dtState != CcState.Candidate) {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Error, "'" + dtRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                BCCP_BDT);
+                    }
+                } else {
+                    if (dtManifestRecord.getPrevDtManifestId() == null) {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Error, "'" + dtRecord.getDen() + "' is needed in the release assignment due to '" + bccpRecord.getDen() + "'.",
+                                BCCP_BDT);
+                    } else {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Warning, "'" + dtRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                BCCP_BDT);
+                    }
+                }
+            }
         }
     }
 
