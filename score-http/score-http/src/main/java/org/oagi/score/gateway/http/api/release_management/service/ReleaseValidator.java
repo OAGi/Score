@@ -343,31 +343,32 @@ public class ReleaseValidator {
                         Error, "Namespace is required.", NAMESPACE);
             }
 
-            // check ACCs whose `roleOfAcc` is this acc.
-            accManifestRecords.stream().filter(e -> e.getAccManifestId().equals(asccpManifestRecord.getRoleOfAccManifestId()))
-                    .forEach(accManifestRecord -> {
-                        AccRecord accRecord = accRecordMap.get(accManifestRecord.getAccId());
-                        CcState accState = CcState.valueOf(accRecord.getState());
-                        if (accState != CcState.Published) {
-                            if (assignedAccComponentManifestIds.contains(accManifestRecord.getAccManifestId().toBigInteger())) {
-                                if (accState != CcState.Candidate) {
-                                    response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                            Error, "'" + accRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
-                                            ASCCP_RoleOfAcc);
-                                }
-                            } else {
-                                if (accManifestRecord.getPrevAccManifestId() == null) {
-                                    response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                            Error, "'" + accRecord.getDen() + "' is needed in the release assignment due to '" + asccpRecord.getDen() + "'.",
-                                            ASCCP_RoleOfAcc);
-                                } else {
-                                    response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                            Warning, "'" + accRecord.getDen() + "' has been revised but not included in the release assignment.",
-                                            ASCCP_RoleOfAcc);
-                                }
-                            }
-                        }
-                    });
+            // Check ASCCP.ROLE_OF_ACC
+            AccManifestRecord accManifestRecord = accManifestRecordMap.get(asccpManifestRecord.getRoleOfAccManifestId());
+            if (accManifestRecord == null) {
+                continue;
+            }
+            AccRecord accRecord = accRecordMap.get(accManifestRecord.getAccId());
+            CcState accState = CcState.valueOf(accRecord.getState());
+            if (accState != CcState.Published) {
+                if (assignedAccComponentManifestIds.contains(accManifestRecord.getAccManifestId().toBigInteger())) {
+                    if (accState != CcState.Candidate) {
+                        response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
+                                Error, "'" + accRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                ASCCP_RoleOfAcc);
+                    }
+                } else {
+                    if (accManifestRecord.getPrevAccManifestId() == null) {
+                        response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
+                                Error, "'" + accRecord.getDen() + "' is needed in the release assignment due to '" + asccpRecord.getDen() + "'.",
+                                ASCCP_RoleOfAcc);
+                    } else {
+                        response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
+                                Warning, "'" + accRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                ASCCP_RoleOfAcc);
+                    }
+                }
+            }
         }
     }
 
@@ -383,6 +384,33 @@ public class ReleaseValidator {
             if (bccpRecord.getNamespaceId() == null) {
                 response.addMessageForBccp(bccpManifestRecord.getBccpManifestId().toBigInteger(),
                         Error, "Namespace is required.", NAMESPACE);
+            }
+
+            // Check BCCP.BDT
+            DtManifestRecord dtManifestRecord = dtManifestRecordMap.get(bccpManifestRecord.getBdtManifestId());
+            if (dtManifestRecord == null) {
+                continue;
+            }
+            DtRecord dtRecord = dtRecordMap.get(dtManifestRecord.getDtId());
+            CcState dtState = CcState.valueOf(dtRecord.getState());
+            if (dtState != CcState.Published) {
+                if (assignedDtComponentManifestIds.contains(dtManifestRecord.getDtManifestId().toBigInteger())) {
+                    if (dtState != CcState.Candidate) {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Error, "'" + dtRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                BCCP_BDT);
+                    }
+                } else {
+                    if (dtManifestRecord.getPrevDtManifestId() == null) {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Error, "'" + dtRecord.getDen() + "' is needed in the release assignment due to '" + bccpRecord.getDen() + "'.",
+                                BCCP_BDT);
+                    } else {
+                        response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
+                                Warning, "'" + dtRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                BCCP_BDT);
+                    }
+                }
             }
         }
     }

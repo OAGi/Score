@@ -79,7 +79,8 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
                     } catch (ScoreDataAccessException e) {
                         throw e;
                     } catch (InvocationTargetException e) {
-                        throw new ScoreDataAccessException(e.getCause());
+                        Throwable cause = e.getCause();
+                        throw new ScoreDataAccessException(cause.getMessage(), e);
                     } catch (Throwable e) {
                         throw new ScoreDataAccessException(e);
                     }
