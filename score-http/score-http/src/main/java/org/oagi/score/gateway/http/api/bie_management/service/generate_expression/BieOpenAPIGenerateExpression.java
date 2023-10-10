@@ -1023,12 +1023,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
 
     private String getReference(Map<String, Object> schemas, BBIE bbie, DT bdt,
                                 GenerationContext generationContext) {
-        CodeList codeList = Helper.getCodeList(generationContext, bbie, bdt);
+        CodeList codeList = generationContext.findCodeList(bbie.getCodeListManifestId());
         String ref;
         if (codeList != null) {
             ref = fillSchemas(schemas, bbie, codeList);
         } else {
-            AgencyIdList agencyIdList = generationContext.getAgencyIdList(bbie);
+            AgencyIdList agencyIdList = generationContext.findAgencyIdList(bbie.getAgencyIdListManifestId());
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {

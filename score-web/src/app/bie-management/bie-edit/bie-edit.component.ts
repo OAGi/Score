@@ -1583,12 +1583,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
-      } else {
+      } else { // valueDomainType === 'Primitive'
         this.service.getBbiepBdtPriRestriList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
           if (bbiepNodeDetail.bbie.bdtPriRestriId === null) {
             bbiepNodeDetail.bbie.bdtPriRestriId = list.find(e => e.default).bdtPriRestriId;
           }
-          valueDomains = list.map(e => new ValueDomain(e.bdtPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtPriRestriId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }
@@ -1612,7 +1612,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           if (this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId === null) {
             this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId = list.find(e => e.default).bdtScPriRestriId;
           }
-          valueDomains = list.map(e => new ValueDomain(e.bdtScPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtScPriRestriId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }

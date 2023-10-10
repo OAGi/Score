@@ -12,6 +12,8 @@ import java.util.List;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.user.model.ScoreUser.SYSTEM_USER_ID;
+import static org.oagi.score.repo.api.user.model.ScoreUser.SYSTEM_USER_LOGIN_ID;
 
 @Component
 public class FixDatabaseRecordInitializer implements InitializingBean {
@@ -23,7 +25,31 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        upsertSystemUser();
         issue1476();
+    }
+
+    private void upsertSystemUser() {
+        boolean sysadmExists = dslContext.selectCount()
+                .from(APP_USER)
+                .where(APP_USER.LOGIN_ID.eq(SYSTEM_USER_LOGIN_ID))
+                .fetchOptionalInto(Integer.class).orElse(0) > 0;
+        if (!sysadmExists) {
+            dslContext.insertInto(APP_USER)
+                    .set(APP_USER.APP_USER_ID, ULong.valueOf(SYSTEM_USER_ID))
+                    .set(APP_USER.LOGIN_ID, SYSTEM_USER_LOGIN_ID)
+                    .set(APP_USER.NAME, "System")
+                    .set(APP_USER.ORGANIZATION, "System")
+                    .set(APP_USER.IS_DEVELOPER, (byte) 1)
+                    .set(APP_USER.IS_ADMIN, (byte) 1)
+                    .set(APP_USER.IS_ENABLED, (byte) 1)
+                    .execute();
+        }
+
+        dslContext.update(APP_USER)
+                .set(APP_USER.APP_USER_ID, ULong.valueOf(SYSTEM_USER_ID))
+                .where(APP_USER.LOGIN_ID.eq(SYSTEM_USER_LOGIN_ID))
+                .execute();
     }
 
     private void issue1476() {

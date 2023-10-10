@@ -149,7 +149,20 @@ public class BbieWriteRepository {
                     throw new IllegalArgumentException();
                 }
 
-                bbieRecord.setBdtPriRestriId(ULong.valueOf(bdtPriRestriList.get(0).getBdtPriRestriId()));
+                AvailableBdtPriRestri defaultBdtPriRestri = bdtPriRestriList.get(0);
+                if (defaultBdtPriRestri.getCodeListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(ULong.valueOf(defaultBdtPriRestri.getCodeListManifestId()));
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (defaultBdtPriRestri.getAgencyIdListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(ULong.valueOf(defaultBdtPriRestri.getAgencyIdListManifestId()));
+                } else {
+                    bbieRecord.setBdtPriRestriId(ULong.valueOf(defaultBdtPriRestri.getBdtPriRestriId()));
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(null);
+                }
             } else {
                 if (bbie.getBdtPriRestriId() != null) {
                     bbieRecord.setBdtPriRestriId(ULong.valueOf(bbie.getBdtPriRestriId()));

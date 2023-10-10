@@ -1,16 +1,12 @@
 package org.oagi.score.repo.component.bccp;
 
 import com.google.gson.JsonObject;
-import org.jooq.DSLContext;
-import org.jooq.Record2;
-import org.jooq.UpdateSetFirstStep;
-import org.jooq.UpdateSetMoreStep;
+import org.jooq.*;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
-import org.oagi.score.repo.component.asccp.PurgeAsccpRepositoryResponse;
 import org.oagi.score.repo.component.bcc.BccWriteRepository;
 import org.oagi.score.repo.component.bcc.UpdateBccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -250,9 +246,20 @@ public class BccpWriteRepository {
         boolean propertyTermChanged = false;
         if (compare(bccpRecord.getPropertyTerm(), request.getPropertyTerm()) != 0) {
             propertyTermChanged = true;
+
+            Record3<ULong, String, String> result = dslContext.select(DT.DT_ID, DT.QUALIFIER, DT.DATA_TYPE_TERM)
+                    .from(DT)
+                    .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
+                    .where(DT_MANIFEST.DT_MANIFEST_ID.eq(bccpManifestRecord.getBdtManifestId()))
+                    .fetchOne();
+
+            String qualifier = result.get(DT.QUALIFIER);
+            String dataTypeTerm = result.get(DT.DATA_TYPE_TERM);
+            String den = request.getPropertyTerm() + ". " + (((qualifier != null) ? (qualifier + "_ ") : "") + dataTypeTerm);
+
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(BCCP.PROPERTY_TERM, request.getPropertyTerm())
-                    .set(BCCP.DEN, request.getPropertyTerm() + ". " + bccpRecord.getRepresentationTerm());
+                    .set(BCCP.DEN, den);
         }
         if (!StringUtils.hasLength(request.getDefaultValue()) && !StringUtils.hasLength(request.getFixedValue())) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
@@ -357,7 +364,7 @@ public class BccpWriteRepository {
 
         // update bccp record.
         ULong bdtManifestId = ULong.valueOf(request.getBdtManifestId());
-        Record2<ULong, String> result = dslContext.select(DT.DT_ID, DT.DATA_TYPE_TERM)
+        Record3<ULong, String, String> result = dslContext.select(DT.DT_ID, DT.QUALIFIER, DT.DATA_TYPE_TERM)
                 .from(DT)
                 .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(bdtManifestId))
@@ -365,7 +372,11 @@ public class BccpWriteRepository {
 
         bccpRecord.setBdtId(result.get(DT.DT_ID));
         bccpRecord.setRepresentationTerm(result.get(DT.DATA_TYPE_TERM));
-        bccpRecord.setDen(bccpRecord.getPropertyTerm() + ". " + bccpRecord.getRepresentationTerm());
+
+        String qualifier = result.get(DT.QUALIFIER);
+        String dataTypeTerm = result.get(DT.DATA_TYPE_TERM);
+        String den = bccpRecord.getPropertyTerm() + ". " + (((qualifier != null) ? (qualifier + "_ ") : "") + dataTypeTerm);
+        bccpRecord.setDen(den);
         bccpRecord.setLastUpdatedBy(userId);
         bccpRecord.setLastUpdateTimestamp(timestamp);
         bccpRecord.update(BCCP.BDT_ID,
@@ -383,6 +394,20 @@ public class BccpWriteRepository {
         bccpManifestRecord.setBdtManifestId(bdtManifestId);
         bccpManifestRecord.setLogId(logRecord.getLogId());
         bccpManifestRecord.update(BCCP_MANIFEST.BDT_MANIFEST_ID, BCCP_MANIFEST.LOG_ID);
+
+        // update the DEN of BCCs associated with this BCCP.
+        for (Record2<ULong, String> bccRecord : dslContext.select(BCC.BCC_ID, ACC.OBJECT_CLASS_TERM)
+                .from(BCC)
+                .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+                .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                .fetch()) {
+            dslContext.update(BCC)
+                    .set(BCC.DEN, bccRecord.get(ACC.OBJECT_CLASS_TERM) + ". " + den)
+                    .where(BCC.BCC_ID.eq(bccRecord.get(BCC.BCC_ID)))
+                    .execute();
+        }
 
         return new UpdateBccpBdtRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), bccpRecord.getDen());
     }
