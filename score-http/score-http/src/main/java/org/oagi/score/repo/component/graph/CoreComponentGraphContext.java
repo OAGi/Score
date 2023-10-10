@@ -45,6 +45,7 @@ public class CoreComponentGraphContext implements GraphContext {
     private Map<ULong, List<AsccpManifest>> asccpManifestMapByRoleOfAccManifestId;
     private Map<ULong, List<ShortTag>> asccpManifestTagMap;
     private Map<ULong, BccpManifest> bccpManifestMap;
+    private Map<ULong, List<BccpManifest>> bccpManifestMapByBdtManifestId;
     private Map<ULong, List<ShortTag>> bccpManifestTagMap;
     private Map<ULong, List<AsccManifest>> asccManifestMap;
     private Map<ULong, List<BccManifest>> bccManifestMap;
@@ -228,10 +229,10 @@ public class CoreComponentGraphContext implements GraphContext {
                 .where(ASCCP_MANIFEST.RELEASE_ID.eq(this.releaseId))
                 .fetchGroups(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ShortTag.class);
 
-        bccpManifestMap =
+        List<BccpManifest> bccpManifestList =
                 dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BDT_MANIFEST_ID,
-                        BCCP.PROPERTY_TERM, BCCP.REPRESENTATION_TERM, BCCP.STATE, BCCP.GUID, BCCP.IS_DEPRECATED,
-                        BCCP_MANIFEST.RELEASE_ID, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
+                                BCCP.PROPERTY_TERM, BCCP.REPRESENTATION_TERM, BCCP.STATE, BCCP.GUID, BCCP.IS_DEPRECATED,
+                                BCCP_MANIFEST.RELEASE_ID, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
                         .from(BCCP_MANIFEST)
                         .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                         .where(BCCP_MANIFEST.RELEASE_ID.eq(this.releaseId))
@@ -245,8 +246,11 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(BCCP.IS_DEPRECATED),
                                 record.get(BCCP_MANIFEST.RELEASE_ID),
                                 record.get(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
-                        )).stream()
-                        .collect(Collectors.toMap(BccpManifest::getBccpManifestId, Function.identity()));
+                        ));
+        bccpManifestMap = bccpManifestList.stream()
+                .collect(Collectors.toMap(BccpManifest::getBccpManifestId, Function.identity()));
+        bccpManifestMapByBdtManifestId = bccpManifestList.stream()
+                .collect(groupingBy(BccpManifest::getBdtManifestId));
 
         bccpManifestTagMap = dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
@@ -459,6 +463,17 @@ public class CoreComponentGraphContext implements GraphContext {
                 graph.addNode(_node);
             });
             graph.addEdges(node, bccpUsages);
+        }
+
+        else if (node.getType() == Node.NodeType.DT) {
+            List<Node> dtUsages = bccpManifestMapByBdtManifestId.getOrDefault(
+                    node.getManifestId(), Collections.emptyList())
+                    .stream().map(e -> toNode(e)).collect(Collectors.toList());
+
+            dtUsages.forEach(_node -> {
+                graph.addNode(_node);
+            });
+            graph.addEdges(node, dtUsages);
         }
 
         response.setGraph(graph);

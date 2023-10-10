@@ -58,6 +58,7 @@ import {Tag, ShortTag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 import {FormControl} from "@angular/forms";
+import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 
 
 @Component({
@@ -939,6 +940,26 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         this.tags = tags;
       });
     });
+  }
+
+  visibleFindUsages(node: CcFlatNode): boolean {
+    if (!node) {
+      return false;
+    }
+    return node.type.toUpperCase() === 'DT';
+  }
+
+  findUsages(node: CcFlatNode) {
+    const dialogRef = this.dialog.open(FindUsagesDialogComponent, {
+      data: {
+        type: node.type,
+        manifestId: node.manifestId
+      },
+      width: '600px',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(_ => {});
   }
 
   openComments(type: string, node?: CcFlatNode) {
