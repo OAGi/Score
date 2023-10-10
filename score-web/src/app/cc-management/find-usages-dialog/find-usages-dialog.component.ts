@@ -20,9 +20,12 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
     return node;
   }
 
-  toBccpNode(bccpNode: CcGraphNode, parent: CcFlatNode) {
-    const bdtNode = next(this._ccGraph, bccpNode);
+  toBccpNode(bccpNode: CcGraphNode, parent: CcFlatNode, bdtNode?: CcGraphNode) {
+    if (!bdtNode) {
+      bdtNode = next(this._ccGraph, bccpNode);
+    }
     const node = new BccpFlatNode(bccpNode, bdtNode);
+    node.expandable = false;
     node.deprecated = bccpNode.deprecated || bdtNode.deprecated;
     node.state = bccpNode.state;
     node.level = parent.level + 1;
@@ -47,14 +50,6 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
     }
 
     const children = [];
-
-    if (node instanceof DtFlatNode) {
-      targets.forEach(target => {
-        children.push(this.toDtScNode(nodes[target], node));
-      });
-      return children;
-    }
-
     targets.forEach(target => {
       if (target.startsWith('ACC-')) {
         children.push(this.toAccNode(nodes[target], node));
@@ -71,12 +66,17 @@ class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNodeDatab
           children.push(asccpNode);
         }
       } else if (target.startsWith('BCCP-')) {
-        children.push(this.toBccpNode(nodes[target], node));
+        if (node instanceof DtFlatNode) {
+          children.push(this.toBccpNode(nodes[target], node, nodes[getKey(node)]));
+        } else {
+          children.push(this.toBccpNode(nodes[target], node));
+        }
       } else if (target.startsWith('DT-')) {
-        const bdtScEdges = edges[target];
-        if (bdtScEdges) {
-          bdtScEdges.targets.map(e => nodes[e]).filter(e => e.cardinalityMax > 0).forEach(e => {
-            children.push(this.toDtScNode(e, node));
+        const bccpEdges = edges[target];
+        console.log(bccpEdges);
+        if (bccpEdges) {
+          bccpEdges.targets.map(e => nodes[e]).forEach(e => {
+            children.push(this.toBccpNode(e, node));
           });
         }
       }

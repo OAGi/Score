@@ -74,6 +74,13 @@ public class GraphService {
                 ccGraphContext = new CoreComponentGraphContext(dslContext, bccpManifestRecord.getReleaseId().toBigInteger());
                 node = ccGraphContext.toNode(bccpManifestRecord);
                 break;
+            case "DT":
+                DtManifestRecord dtManifestRecord = dslContext.selectFrom(DT_MANIFEST)
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(request.getManifestId())))
+                        .fetchOne();
+                ccGraphContext = new CoreComponentGraphContext(dslContext, dtManifestRecord.getReleaseId().toBigInteger());
+                node = ccGraphContext.toNode(dtManifestRecord);
+                break;
             default:
                 throw new UnsupportedOperationException();
         }

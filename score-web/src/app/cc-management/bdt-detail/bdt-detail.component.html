@@ -338,6 +338,10 @@
                     <button mat-menu-item (click)="openComments(contextMenuItem.type, contextMenuItem)">
                       <span class="context-menu-item">Comments</span>
                     </button>
+                    <button mat-menu-item (click)="findUsages(contextMenuItem)"
+                            [disabled]="!visibleFindUsages(contextMenuItem)">
+                      <span class="context-menu-item">Where Used</span>
+                    </button>
                     <button mat-menu-item [matMenuTriggerFor]="editTagsSubMenu">Tags</button>
                   </mat-menu>
 
