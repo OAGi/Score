@@ -92,6 +92,20 @@ public class OpenAPIGenerateController {
                         templateKey = "PATCH-" + bieForOasDoc.getResourceName();
                         openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put(templateKey, openAPI30PatchTemplate);
                         break;
+                    case "PUT":
+                        OpenAPITemplateForVerbOption openAPI30PutTemplate = new OpenAPITemplateForVerbOption("PUT");
+                        openAPI30PutTemplate.setArrayForJsonExpression(bieForOasDoc.isArrayIndicator());
+                        openAPI30PutTemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
+                        templateKey = "PUT-" + bieForOasDoc.getResourceName();
+                        openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put(templateKey, openAPI30PutTemplate);
+                        break;
+                    case "DELETE":
+                        OpenAPITemplateForVerbOption openAPI30DeleteTemplate = new OpenAPITemplateForVerbOption("DELETE");
+                        openAPI30DeleteTemplate.setArrayForJsonExpression(bieForOasDoc.isArrayIndicator());
+                        openAPI30DeleteTemplate.setSuppressRootProperty(bieForOasDoc.isSuppressRootIndicator());
+                        templateKey = "DELETE-" + bieForOasDoc.getResourceName();
+                        openAPIGenerateExpressionOption.getOpenAPI30TemplateMap().put(templateKey, openAPI30DeleteTemplate);
+                        break;
                     default:
                         throw new IllegalArgumentException("Unknown verb option: " + verbOption);
                 }
