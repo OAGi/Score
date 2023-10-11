@@ -1,28 +1,29 @@
-import {AfterViewChecked, Component, ElementRef, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {OAuth2AppInfo} from '../../authentication/domain/auth';
 import {Observable} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {AboutService} from '../about/domain/about.service';
+import {SignInPageInfo} from '../about/domain/about';
 
 @Component({
   selector: 'score-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements AfterViewChecked {
+export class LoginComponent {
 
   credentials = {username: '', password: ''};
   next = '';
   err = undefined;
 
-  paddingTop = '10%';
-  observer;
-  @ViewChild('authForm', {static: false, read: ElementRef}) authForm: ElementRef;
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
+  signInPageInfo: Observable<SignInPageInfo>;
 
   constructor(public auth: AuthService,
+              private aboutService: AboutService,
               private snackBar: MatSnackBar,
               private http: HttpClient,
               private route: ActivatedRoute,
@@ -38,6 +39,7 @@ export class LoginComponent implements AfterViewChecked {
     });
 
     this.oauth2AppInfos = this.auth.getOAuth2AppInfos();
+    this.signInPageInfo = this.aboutService.getSignInPageInfo();
   }
 
   login() {
@@ -79,17 +81,6 @@ export class LoginComponent implements AfterViewChecked {
 
   onClose() {
     this.err = undefined;
-  }
-
-  onResize(event?) {
-    const maxHeight = window.innerHeight - ((!!this.authForm) ? this.authForm.nativeElement.offsetHeight : 0);
-    this.paddingTop = Math.max(maxHeight, 30) / 2 + 'px';
-  }
-
-  ngAfterViewChecked(): void {
-    setTimeout(() => {
-      this.onResize();
-    }, 0);
   }
 
   get roles(): string[] {

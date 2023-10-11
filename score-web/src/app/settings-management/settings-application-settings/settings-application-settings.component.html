@@ -60,6 +60,21 @@
                   </button>
                 </div>
               </div>
+              <div class="mt-4">
+                <div class="subhead">
+                  <h4 class="subhead-heading">Sign-in Page Statement</h4>
+                </div>
+                <textarea class="width-max"
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="6"
+                          [(ngModel)]="signInPageInfo.statement"></textarea>
+                <div class="actions">
+                  <button mat-raised-button color="primary"
+                          (click)="updateSignInPageInfoConfiguration()">
+                    Update
+                  </button>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
         </mat-card>

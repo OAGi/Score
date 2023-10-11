@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.SQLDataType.CLOB;
+import static org.jooq.impl.SQLDataType.VARCHAR;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreUser.SYSTEM_USER_ID;
 import static org.oagi.score.repo.api.user.model.ScoreUser.SYSTEM_USER_LOGIN_ID;
@@ -27,6 +29,7 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         upsertSystemUser();
         issue1476();
+        increaseLengthOfValueColumnInConfigurationTable(); // this is a temporal execution.
     }
 
     private void upsertSystemUser() {
@@ -91,6 +94,12 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
                 .set(ASCCP_MANIFEST_TAG.TAG_ID, verbTagId)
                 .where(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID.in(confirmAsccpManifestIdList))
                 .execute();
+    }
+
+    private void increaseLengthOfValueColumnInConfigurationTable() {
+        if ("varchar".equals(CONFIGURATION.VALUE.getDataType().getTypeName().toLowerCase())) {
+            dslContext.execute("ALTER TABLE `configuration` MODIFY `value` TEXT DEFAULT NULL COMMENT '" + CONFIGURATION.VALUE.getComment() + "'");
+        }
     }
 
 }
