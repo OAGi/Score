@@ -25,10 +25,8 @@ export class SettingsApplicationSettingsService {
     return this.http.post('/api/application/' + type + '/' + (value ? 'enable' : 'disable'), {});
   }
 
-  updateConfiguration(key: string, value: string): Observable<any> {
-    return this.http.post('/api/application/' + key, {
-      value
-    });
+  getConfiguration(key: string): Observable<any> {
+    return this.http.get<any>('/api/application/' + key);
   }
 
 }

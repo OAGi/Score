@@ -1,7 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {ProductInfo, SignInPageInfo} from './about';
+import {ProductInfo, WebPageInfo} from './about';
 
 @Injectable()
 export class AboutService {
@@ -14,7 +14,16 @@ export class AboutService {
     return this.http.get<ProductInfo[]>('api/info/products');
   }
 
-  getSignInPageInfo(): Observable<SignInPageInfo> {
-    return this.http.get<SignInPageInfo>('api/info/pages/signin');
+  getWebPageInfo(): Observable<WebPageInfo> {
+    return this.http.get<WebPageInfo>('api/info/webpage');
   }
+
+  updateWebPageInfo(webPageInfo: WebPageInfo): Observable<any> {
+    return this.http.post('/api/info/webpage', {
+      brand: webPageInfo.brand,
+      favicon: webPageInfo.favicon,
+      signInStatement: webPageInfo.signInStatement
+    });
+  }
+
 }

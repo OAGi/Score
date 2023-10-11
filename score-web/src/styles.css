@@ -143,6 +143,15 @@ b {
   font-weight: normal;
 }
 
+.subsubhead {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.subsubhead-heading {
+  font-weight: normal;
+}
+
 div.context-section {
   padding: 0;
 }

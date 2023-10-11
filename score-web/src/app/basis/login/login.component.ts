@@ -6,7 +6,7 @@ import {OAuth2AppInfo} from '../../authentication/domain/auth';
 import {Observable} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AboutService} from '../about/domain/about.service';
-import {SignInPageInfo} from '../about/domain/about';
+import {WebPageInfo} from '../about/domain/about';
 
 @Component({
   selector: 'score-login',
@@ -20,7 +20,7 @@ export class LoginComponent {
   err = undefined;
 
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
-  signInPageInfo: Observable<SignInPageInfo>;
+  webPageInfo: Observable<WebPageInfo>;
 
   constructor(public auth: AuthService,
               private aboutService: AboutService,
@@ -39,7 +39,7 @@ export class LoginComponent {
     });
 
     this.oauth2AppInfos = this.auth.getOAuth2AppInfos();
-    this.signInPageInfo = this.aboutService.getSignInPageInfo();
+    this.webPageInfo = this.aboutService.getWebPageInfo();
   }
 
   login() {
