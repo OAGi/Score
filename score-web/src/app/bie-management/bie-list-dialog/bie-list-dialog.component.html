@@ -1,6 +1,6 @@
 <mat-card style="box-shadow: none; padding: 0;">
   <mat-card-header>
-    <mat-card-title>Reuses of "{{data.den}}"</mat-card-title>
+    <mat-card-title>BIEs reused '{{ data.den }}'</mat-card-title>
   </mat-card-header>
 </mat-card>
 
@@ -21,17 +21,17 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="reusingPropertyTerm">
-        <th mat-header-cell *matHeaderCellDef > Property Term</th>
+      <ng-container matColumnDef="reusingDen">
+        <th mat-header-cell *matHeaderCellDef > DEN</th>
         <td mat-cell *matCellDef="let element">
           <div class="den word-break-all">
             <span *ngIf="isAccessibleLeft(element)">
-              <a href="{{getRouteLink(element)}}" target="_blank">
-                {{ element.reusingPropertyTerm }}
+              <a href="{{ getRouteLink(element) }}" target="_blank">
+                {{ element.reusingDen }}
               </a>
             </span>
             <span *ngIf="!isAccessibleLeft(element)">
-              {{ element.reusingPropertyTerm }}
+              {{ element.reusingDen }}
             </span>
           </div>
           <div class="bie-guid">{{ element.reusingGuid }}</div>
@@ -59,8 +59,15 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="reusingRemark">
+        <th mat-header-cell *matHeaderCellDef> Remark</th>
+        <td mat-cell *matCellDef="let element">
+          <div>{{ element.reusingRemark }}</div>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="arrow">
-        <th mat-header-cell *matHeaderCellDef > </th>
+        <th mat-header-cell *matHeaderCellDef> </th>
         <td mat-cell *matCellDef="let element">
           <fa-icon [icon]="faRecycle"></fa-icon>
         </td>
@@ -73,17 +80,17 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="reusedPropertyTerm">
+      <ng-container matColumnDef="reusedDen">
         <th mat-header-cell *matHeaderCellDef > Reused</th>
         <td mat-cell *matCellDef="let element">
           <div class="den word-break-all">
             <span *ngIf="isAccessibleRight(element)">
               <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
-                {{ element.reusedPropertyTerm }}
+                {{ element.reusedDen }}
               </a>
             </span>
             <span *ngIf="!isAccessibleRight(element)">
-              {{ element.reusedPropertyTerm }}
+              {{ element.reusedDen }}
             </span>
           </div>
           <div class="bie-guid">{{ element.reusedGuid }}</div>

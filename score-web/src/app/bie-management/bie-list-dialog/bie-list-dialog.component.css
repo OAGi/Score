@@ -57,7 +57,11 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-reusedVersion, .mat-column-reusedStatus, .mat-column-reusingVersion, .mat-column-reusingStatus {
-  width: 5%;
+  width: 8%;
+}
+
+.mat-column-reusedRemark, .mat-column-reusingRemark {
+  width: 18%;
 }
 
 .mat-column-reusedState, .mat-column-reusedOwner, .mat-column-reusingState, .mat-column-reusingOwner {

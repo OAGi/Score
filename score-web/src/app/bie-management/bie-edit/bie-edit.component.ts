@@ -41,7 +41,7 @@ import {
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {BusinessTermService} from '../../business-term-management/domain/business-term.service';
 import {AuthService} from '../../authentication/auth.service';
@@ -54,6 +54,7 @@ import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
 import {MultiActionsSnackBarComponent} from "../../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
+import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 
 
 @Component({
@@ -679,6 +680,24 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         });
       });
     });
+  }
+
+  findReuses(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const reusedNode = node as AsbiepFlatNode;
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {
+      topLevelAsbiepId: reusedNode.topLevelAsbiepId,
+      releaseNum: this.rootNode.releaseNum,
+      den: reusedNode.asccpNode.propertyTerm + '. ' + reusedNode.accNode.objectClassTerm,
+      excludeTopLevelAsbiepIdList: [this.rootNode.topLevelAsbiepId]
+    };
+    const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
 
   removeReusedBIE(node: BieFlatNode) {

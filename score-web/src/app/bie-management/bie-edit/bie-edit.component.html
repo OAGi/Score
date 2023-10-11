@@ -220,6 +220,10 @@
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
                     <mat-divider *ngIf="canRemoveReusedBIE(contextMenuItem)"></mat-divider>
+                    <button mat-menu-item (click)="findReuses(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Find Reuses</span>
+                    </button>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
                             *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
                       <span class="context-menu-item">Remove Reused BIE</span>

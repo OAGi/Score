@@ -9,7 +9,7 @@ export class BieReportService {
   }
 
   getBieReuseReport(topLevelAsbiepId?: number): Observable<ReuseReport[]> {
-    if (topLevelAsbiepId != undefined) {
+    if (topLevelAsbiepId !== undefined) {
       return this.http.get<ReuseReport[]>('/api/profile_bie/reuse_report/' + topLevelAsbiepId);
     } else {
       return this.http.get<ReuseReport[]>('/api/profile_bie/reuse_report');
