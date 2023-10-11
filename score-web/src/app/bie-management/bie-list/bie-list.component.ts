@@ -296,7 +296,7 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  openBieListDialog(bie: BieList) {
+  openFindReuseBieListDialog(bie: BieList) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
