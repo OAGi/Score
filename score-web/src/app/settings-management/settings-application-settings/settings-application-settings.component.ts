@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AboutService} from '../../basis/about/domain/about.service';
-import {SignInPageInfo} from '../../basis/about/domain/about';
+import {WebPageInfo} from '../../basis/about/domain/about';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -14,15 +14,15 @@ import {SignInPageInfo} from '../../basis/about/domain/about';
 export class SettingsApplicationSettingsComponent implements OnInit {
 
   title = 'Application settings';
-  signInPageInfo: SignInPageInfo;
+  webPageInfo: WebPageInfo;
 
   constructor(private auth: AuthService,
               private aboutService: AboutService,
               private settingsService: SettingsApplicationSettingsService,
               private confirmDialogService: ConfirmDialogService,
               private snackBar: MatSnackBar) {
-    aboutService.getSignInPageInfo().subscribe(resp => {
-      this.signInPageInfo = resp;
+    aboutService.getWebPageInfo().subscribe(resp => {
+      this.webPageInfo = resp;
     });
   }
 
@@ -134,8 +134,22 @@ export class SettingsApplicationSettingsComponent implements OnInit {
       });
   }
 
-  updateSignInPageInfoConfiguration() {
-    this.settingsService.updateConfiguration(this.signInPageInfo.paramKey, this.signInPageInfo.statement).subscribe(_ => {
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateWebPageInfo();
+    }
+  }
+
+  updateWebPageInfo() {
+    this.aboutService.updateWebPageInfo(this.webPageInfo).subscribe(_ => {
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

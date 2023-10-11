@@ -17,83 +17,87 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApplicationConfigurationService {
 
-	@Autowired
-	private ConfigurationRepository configRepo;
+    @Autowired
+    private ConfigurationRepository configRepo;
 
-	@Autowired
-	private SessionService sessionService;
+    @Autowired
+    private SessionService sessionService;
 
-	@Autowired
-	private ScoreRepositoryFactory scoreRepositoryFactory;
+    @Autowired
+    private ScoreRepositoryFactory scoreRepositoryFactory;
 
-	private static final String TENANT_CONFIG_PARAM_NAME = "score.tenant.enabled";
+    private static final String TENANT_CONFIG_PARAM_NAME = "score.tenant.enabled";
 
-	private static final String BUSINESS_TERM_CONFIG_PARAM_NAME = "score.business-term.enabled";
+    private static final String BUSINESS_TERM_CONFIG_PARAM_NAME = "score.business-term.enabled";
 
-	private static final String BIE_INVERSE_MODE_CONFIG_PARAM_NAME = "score.bie.inverse-mode";
+    private static final String BIE_INVERSE_MODE_CONFIG_PARAM_NAME = "score.bie.inverse-mode";
 
-	public static final String SIGN_IN_PAGE_STATEMENT_CONFIG_PARAM_NAME = "score.pages.signin.statement";
+    public static final String NAVBAR_BRAND_CONFIG_PARAM_NAME = "score.pages.navbar.brand";
 
-	public String getConfigurationValueByName(String paramConfigName) {
-		return configRepo.getConfigurationValueByName(paramConfigName);
-	}
+    public static final String FAVICON_LINK_CONFIG_PARAM_NAME = "score.pages.favicon.link";
 
-	public boolean isTenantEnabled() {
-		return getBooleanProperty(TENANT_CONFIG_PARAM_NAME);
-	}
+    public static final String SIGN_IN_PAGE_STATEMENT_CONFIG_PARAM_NAME = "score.pages.signin.statement";
 
-	public boolean isBusinessTermEnabled() {
-		return getBooleanProperty(BUSINESS_TERM_CONFIG_PARAM_NAME);
-	}
+    public String getConfigurationValueByName(String paramConfigName) {
+        return configRepo.getConfigurationValueByName(paramConfigName);
+    }
 
-	public boolean isBieInverseModeEnabled() {
-		return getBooleanProperty(BIE_INVERSE_MODE_CONFIG_PARAM_NAME);
-	}
+    public boolean isTenantEnabled() {
+        return getBooleanProperty(TENANT_CONFIG_PARAM_NAME);
+    }
 
-	public boolean getBooleanProperty(String key) {
-		return getBooleanProperty(key, false);
-	}
+    public boolean isBusinessTermEnabled() {
+        return getBooleanProperty(BUSINESS_TERM_CONFIG_PARAM_NAME);
+    }
 
-	public boolean getBooleanProperty(String key, boolean defaultValue) {
-		Boolean value = Boolean.valueOf(getProperty(key));
-		return (value != null) ? value : defaultValue;
-	}
+    public boolean isBieInverseModeEnabled() {
+        return getBooleanProperty(BIE_INVERSE_MODE_CONFIG_PARAM_NAME);
+    }
 
-	public String getProperty(String key) {
-		return configRepo.getConfigurationValueByName(key);
-	}
+    public boolean getBooleanProperty(String key) {
+        return getBooleanProperty(key, false);
+    }
 
-	public void changeApplicationConfiguration(AuthenticatedPrincipal user,
-											   ApplicationConfigurationChangeRequest request) {
-		ScoreUser scoreUser = sessionService.asScoreUser(user);
-		if (!scoreUser.hasRole(ScoreRole.ADMINISTRATOR)) {
-			throw new AccessControlException(scoreUser);
-		}
+    public boolean getBooleanProperty(String key, boolean defaultValue) {
+        Boolean value = Boolean.valueOf(getProperty(key));
+        return (value != null) ? value : defaultValue;
+    }
 
-		Boolean tenantEnabled = request.getTenantEnabled();
-		if (tenantEnabled != null) {
-			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.upsertBooleanConfiguration(scoreUser, TENANT_CONFIG_PARAM_NAME, tenantEnabled);
-		}
+    public String getProperty(String key) {
+        return configRepo.getConfigurationValueByName(key);
+    }
 
-		Boolean businessTermEnabled = request.getBusinessTermEnabled();
-		if (businessTermEnabled != null) {
-			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.upsertBooleanConfiguration(scoreUser, BUSINESS_TERM_CONFIG_PARAM_NAME, businessTermEnabled);
-		}
+    public void changeApplicationConfiguration(AuthenticatedPrincipal user,
+                                               ApplicationConfigurationChangeRequest request) {
+        ScoreUser scoreUser = sessionService.asScoreUser(user);
+        if (!scoreUser.hasRole(ScoreRole.ADMINISTRATOR)) {
+            throw new AccessControlException(scoreUser);
+        }
 
-		Boolean bieInverseModeEnabled = request.getBieInverseModeEnabled();
-		if (bieInverseModeEnabled != null) {
-			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
-		}
+        Boolean tenantEnabled = request.getTenantEnabled();
+        if (tenantEnabled != null) {
+            scoreRepositoryFactory.createConfigurationWriteRepository()
+                    .upsertBooleanConfiguration(scoreUser, TENANT_CONFIG_PARAM_NAME, tenantEnabled);
+        }
 
-		String key = request.getKey();
-		if (StringUtils.hasLength(key)) {
-			scoreRepositoryFactory.createConfigurationWriteRepository()
-					.upsertConfiguration(scoreUser, key, request.getValue());
-		}
+        Boolean businessTermEnabled = request.getBusinessTermEnabled();
+        if (businessTermEnabled != null) {
+            scoreRepositoryFactory.createConfigurationWriteRepository()
+                    .upsertBooleanConfiguration(scoreUser, BUSINESS_TERM_CONFIG_PARAM_NAME, businessTermEnabled);
+        }
 
-	}
+        Boolean bieInverseModeEnabled = request.getBieInverseModeEnabled();
+        if (bieInverseModeEnabled != null) {
+            scoreRepositoryFactory.createConfigurationWriteRepository()
+                    .upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
+        }
+
+        String key = request.getKey();
+        if (StringUtils.hasLength(key)) {
+            scoreRepositoryFactory.createConfigurationWriteRepository()
+                    .upsertConfiguration(scoreUser, key, request.getValue());
+        }
+
+    }
 
 }

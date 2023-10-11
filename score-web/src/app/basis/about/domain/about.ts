@@ -3,7 +3,8 @@ export class ProductInfo {
   productVersion: string;
 }
 
-export class SignInPageInfo {
-  paramKey: string;
-  statement: string;
+export class WebPageInfo {
+  brand: string;
+  favicon: string;
+  signInStatement: string;
 }

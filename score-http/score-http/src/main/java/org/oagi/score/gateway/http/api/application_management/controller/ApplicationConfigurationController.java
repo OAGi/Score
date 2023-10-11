@@ -6,22 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ApplicationConfigurationController {
 
     @Autowired
     private ApplicationConfigurationService service;
-
-    @RequestMapping(value = "/application/{key}", method = RequestMethod.POST)
-    public ResponseEntity updateConfiguration(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                              @PathVariable("key") String key,
-                                              @RequestBody ApplicationConfigurationChangeRequest request) {
-        request.setKey(key);
-        service.changeApplicationConfiguration(user, request);
-        return ResponseEntity.noContent().build();
-    }
 
     @RequestMapping(value = "/application/{type}/enable", method = RequestMethod.POST)
     public ResponseEntity tenantEnable(@AuthenticationPrincipal AuthenticatedPrincipal user,

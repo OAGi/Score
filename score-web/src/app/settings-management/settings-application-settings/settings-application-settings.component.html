@@ -62,15 +62,41 @@
               </div>
               <div class="mt-4">
                 <div class="subhead">
-                  <h4 class="subhead-heading">Sign-in Page Statement</h4>
+                  <h4 class="subhead-heading">Web Page Settings</h4>
                 </div>
-                <textarea class="width-max"
-                          cdkTextareaAutosize
-                          [cdkAutosizeMinRows]="6"
-                          [(ngModel)]="signInPageInfo.statement"></textarea>
+                <div class="webpage-setting">
+                  <div class="subsubhead">
+                    <h5 class="subsubhead-heading">Brand Logo (Supported format: SVG, Recommended size: 160x26)</h5>
+                  </div>
+                  <textarea class="width-max"
+                            cdkTextareaAutosize
+                            [cdkAutosizeMinRows]="6"
+                            [cdkAutosizeMaxRows]="20"
+                            [(ngModel)]="webPageInfo.brand"></textarea>
+                </div>
+                <div class="webpage-setting">
+                  <div class="subsubhead">
+                    <h5 class="subsubhead-heading">Favicon Link</h5>
+                  </div>
+                  <textarea class="width-max"
+                            cdkTextareaAutosize
+                            [cdkAutosizeMinRows]="3"
+                            [cdkAutosizeMaxRows]="6"
+                            [(ngModel)]="webPageInfo.favicon"></textarea>
+                </div>
+                <div class="webpage-setting">
+                  <div class="subsubhead">
+                    <h5 class="subsubhead-heading">Sign-in Page Statement (formatted in Markdown)</h5>
+                  </div>
+                  <textarea class="width-max"
+                            cdkTextareaAutosize
+                            [cdkAutosizeMinRows]="6"
+                            [cdkAutosizeMaxRows]="20"
+                            [(ngModel)]="webPageInfo.signInStatement"></textarea>
+                </div>
                 <div class="actions">
                   <button mat-raised-button color="primary"
-                          (click)="updateSignInPageInfoConfiguration()">
+                          (click)="updateWebPageInfo()">
                     Update
                   </button>
                 </div>
@@ -78,14 +104,6 @@
             </mat-card-content>
           </mat-card>
         </mat-card>
-
-        <div class="row action-group m-0">
-          <div class="col-12 actions-wrap">
-            <div class="actions">
-
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

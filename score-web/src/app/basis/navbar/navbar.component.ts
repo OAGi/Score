@@ -9,6 +9,11 @@ import {tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
+import {
+  SettingsApplicationSettingsService
+} from '../../settings-management/settings-application-settings/domain/settings-application-settings.service';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {AboutService} from '../about/domain/about.service';
 
 @Component({
   selector: 'score-navbar',
@@ -19,8 +24,12 @@ export class NavbarComponent implements OnInit {
 
   private _notiCount: number = -1;
   public notiMatIcon: string = 'notifications_none';
+  public brand: SafeHtml;
 
   constructor(private auth: AuthService,
+              private aboutService: AboutService,
+              private configService: SettingsApplicationSettingsService,
+              private sanitizer: DomSanitizer,
               private router: Router,
               private message: MessageService,
               private stompService: RxStompService,
@@ -30,6 +39,15 @@ export class NavbarComponent implements OnInit {
     const browserLang = translate.getBrowserLang();
     translate.use(browserLang.match(/ccts|oagis/) ? browserLang : 'ccts');
     translate.onLangChange.subscribe((event: LangChangeEvent) => {
+    });
+
+    aboutService.getWebPageInfo().subscribe(webPageInfo => {
+      if (!!webPageInfo.brand) {
+        this.brand = sanitizer.bypassSecurityTrustHtml(webPageInfo.brand);
+      }
+      if (!!webPageInfo.favicon) {
+        (document.querySelector('#appIcon') as HTMLLinkElement).href = webPageInfo.favicon;
+      }
     });
   }
 

@@ -51,10 +51,10 @@
     </form>
   </div>
 
-  <div class="row mt-2 justify-content-center" *ngIf="(signInPageInfo | async) as signInPageInfo; else emptyBlock">
+  <div class="row mt-2 justify-content-center" *ngIf="(webPageInfo | async) as webPageInfo; else emptyBlock">
     <div class="col-12">
       <div class="statement-container">
-        <markdown [data]="signInPageInfo.statement"></markdown>
+        <markdown [data]="webPageInfo.signInStatement"></markdown>
       </div>
     </div>
   </div>
