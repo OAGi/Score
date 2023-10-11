@@ -1,4 +1,9 @@
 export class ProductInfo {
-  productName: String;
-  productVersion: String;
+  productName: string;
+  productVersion: string;
+}
+
+export class SignInPageInfo {
+  paramKey: string;
+  statement: string;
 }

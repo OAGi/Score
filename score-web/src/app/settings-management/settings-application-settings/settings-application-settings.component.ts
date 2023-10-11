@@ -3,6 +3,8 @@ import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {AboutService} from '../../basis/about/domain/about.service';
+import {SignInPageInfo} from '../../basis/about/domain/about';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -12,11 +14,16 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 export class SettingsApplicationSettingsComponent implements OnInit {
 
   title = 'Application settings';
+  signInPageInfo: SignInPageInfo;
 
   constructor(private auth: AuthService,
+              private aboutService: AboutService,
               private settingsService: SettingsApplicationSettingsService,
               private confirmDialogService: ConfirmDialogService,
               private snackBar: MatSnackBar) {
+    aboutService.getSignInPageInfo().subscribe(resp => {
+      this.signInPageInfo = resp;
+    });
   }
 
   ngOnInit() {
@@ -125,6 +132,14 @@ export class SettingsApplicationSettingsComponent implements OnInit {
           });
         }
       });
+  }
+
+  updateSignInPageInfoConfiguration() {
+    this.settingsService.updateConfiguration(this.signInPageInfo.paramKey, this.signInPageInfo.statement).subscribe(_ => {
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+    });
   }
 
 }

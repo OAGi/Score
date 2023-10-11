@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.application_management.service;
 import org.oagi.score.gateway.http.api.application_management.data.ApplicationConfigurationChangeRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.security.AccessControlException;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
@@ -31,6 +32,8 @@ public class ApplicationConfigurationService {
 
 	private static final String BIE_INVERSE_MODE_CONFIG_PARAM_NAME = "score.bie.inverse-mode";
 
+	public static final String SIGN_IN_PAGE_STATEMENT_CONFIG_PARAM_NAME = "score.pages.signin.statement";
+
 	public String getConfigurationValueByName(String paramConfigName) {
 		return configRepo.getConfigurationValueByName(paramConfigName);
 	}
@@ -52,8 +55,12 @@ public class ApplicationConfigurationService {
 	}
 
 	public boolean getBooleanProperty(String key, boolean defaultValue) {
-		Boolean value = Boolean.valueOf(configRepo.getConfigurationValueByName(key));
+		Boolean value = Boolean.valueOf(getProperty(key));
 		return (value != null) ? value : defaultValue;
+	}
+
+	public String getProperty(String key) {
+		return configRepo.getConfigurationValueByName(key);
 	}
 
 	public void changeApplicationConfiguration(AuthenticatedPrincipal user,
@@ -80,6 +87,13 @@ public class ApplicationConfigurationService {
 			scoreRepositoryFactory.createConfigurationWriteRepository()
 					.upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
 		}
+
+		String key = request.getKey();
+		if (StringUtils.hasLength(key)) {
+			scoreRepositoryFactory.createConfigurationWriteRepository()
+					.upsertConfiguration(scoreUser, key, request.getValue());
+		}
+
 	}
 
 }

@@ -39,4 +39,27 @@ public class JooqConfigurationWriteRepository
                     .execute();
         }
     }
+
+    @Override
+    public void upsertConfiguration(ScoreUser user, String configurationName, String value) {
+        ConfigurationRecord configurationRecord = dslContext().selectFrom(CONFIGURATION)
+                .where(and(
+                        CONFIGURATION.NAME.eq(configurationName),
+                        CONFIGURATION.TYPE.eq("String")
+                ))
+                .fetchOptional().orElse(null);
+
+        if (configurationRecord == null) {
+            dslContext().insertInto(CONFIGURATION)
+                    .set(CONFIGURATION.NAME, configurationName)
+                    .set(CONFIGURATION.VALUE, value)
+                    .set(CONFIGURATION.TYPE, "String")
+                    .execute();
+        } else {
+            dslContext().update(CONFIGURATION)
+                    .set(CONFIGURATION.VALUE, value)
+                    .where(CONFIGURATION.CONFIGURATION_ID.eq(configurationRecord.getConfigurationId()))
+                    .execute();
+        }
+    }
 }
