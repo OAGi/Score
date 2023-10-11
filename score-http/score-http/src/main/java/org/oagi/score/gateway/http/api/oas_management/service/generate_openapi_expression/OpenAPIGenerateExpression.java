@@ -566,6 +566,70 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
             }
 
+            if (option.getOpenAPI30TemplateMap().containsKey(deleteTemplateKey)) {
+                String schemaName;
+                String responseSchemaName;
+                String prefix = "delete";
+                if (isFriendly()) {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                } else {
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                }
+
+                responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+
+                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                    option.getOpenAPI30TemplateMap().get(deleteTemplateKey).setSuppressRootProperty(true);
+                }
+                boolean isArray = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isArrayForJsonExpression();
+                path.put("summary", "");
+                path.put("description", "");
+                path.put("security", Arrays.asList(ImmutableMap.builder()
+                        .put("OAuth2", Arrays.asList(bieName + "Write"))
+                        .build()));
+                if (option.getTagName() != null){
+                    path.put("tags", Arrays.asList(option.getTagName()));
+                }
+                path.put("operationId", option.getOperationId());
+                path.put("requestBody", ImmutableMap.<String, Object>builder()
+                        .put("description", "")
+                        .put("content", ImmutableMap.<String, Object>builder()
+                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                .build())
+                                        .build())
+                                .build())
+                        .build());
+                path.put("responses", ImmutableMap.<String, Object>builder()
+                        .put("200", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build());
+                if (!schemas.containsKey(schemaName)) {
+                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                    fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                    schemas.put(schemaName, properties);
+                }
+
+                // Issue #1483
+                if (isArray && !schemas.containsKey(schemaName + "List")) {
+                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                            .put("type", "array")
+                            .put("items", ImmutableMap.<String, Object>builder()
+                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .build())
+                            .build());
+                }
+            }
+
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
@@ -687,6 +751,30 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         // Issue #1317
         if (option.getOpenAPI30TemplateMap().get(putTemplateKey) != null &&
                 option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty()) {
+            suppressRootProperty(parent);
+        }
+    }
+
+    private void fillPropertiesForDeleteTemplate(Map<String, Object> parent,
+                                               Map<String, Object> schemas,
+                                               ASBIEP asbiep, ABIE abie,
+                                               GenerationContext generationContext) {
+        /*
+         * Issue #587
+         */
+        String deleteTemplateKey = "DELETE-" + option.getResourceName();
+        if (option.getOpenAPI30TemplateMap().get(deleteTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isIncludeMetaHeader()) {
+            TopLevelAsbiep metaHeaderTopLevelAsbiep =
+                    topLevelAsbiepRepository.findById(option.getOpenAPI30TemplateMap().get(deleteTemplateKey).getMetaHeaderTopLevelAsbiepId());
+            fillProperties(parent, schemas, metaHeaderTopLevelAsbiep, generationContext);
+        }
+
+        fillProperties(parent, schemas, asbiep, abie, generationContext);
+
+        // Issue #1317
+        if (option.getOpenAPI30TemplateMap().get(deleteTemplateKey) != null &&
+                option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isSuppressRootProperty()) {
             suppressRootProperty(parent);
         }
     }
