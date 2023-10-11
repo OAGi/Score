@@ -591,16 +591,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(option.getTagName()));
                 }
                 path.put("operationId", option.getOperationId());
-                path.put("requestBody", ImmutableMap.<String, Object>builder()
-                        .put("description", "")
-                        .put("content", ImmutableMap.<String, Object>builder()
-                                .put("application/json", ImmutableMap.<String, Object>builder()
-                                        .put("schema", ImmutableMap.<String, Object>builder()
-                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
-                                                .build())
-                                        .build())
-                                .build())
-                        .build());
                 path.put("responses", ImmutableMap.<String, Object>builder()
                         .put("200", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
