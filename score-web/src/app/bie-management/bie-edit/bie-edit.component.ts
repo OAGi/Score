@@ -696,8 +696,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     dialogConfig.data = {
       topLevelAsbiepId: reusedNode.topLevelAsbiepId,
       releaseNum: this.rootNode.releaseNum,
-      den: reusedNode.asccpNode.propertyTerm + '. ' + reusedNode.accNode.objectClassTerm,
-      excludeTopLevelAsbiepIdList: [this.rootNode.topLevelAsbiepId]
+      den: reusedNode.asccpNode.propertyTerm + '. ' + reusedNode.accNode.objectClassTerm
     };
     const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
