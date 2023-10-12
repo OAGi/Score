@@ -5,6 +5,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AboutService} from '../../basis/about/domain/about.service';
 import {WebPageInfo} from '../../basis/about/domain/about';
+import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -14,9 +15,10 @@ import {WebPageInfo} from '../../basis/about/domain/about';
 export class SettingsApplicationSettingsComponent implements OnInit {
 
   title = 'Application settings';
-  webPageInfo: WebPageInfo;
+  webPageInfo: WebPageInfo = new WebPageInfo();
 
   constructor(private auth: AuthService,
+              private sanitizer: DomSanitizer,
               private aboutService: AboutService,
               private settingsService: SettingsApplicationSettingsService,
               private confirmDialogService: ConfirmDialogService,
@@ -27,6 +29,14 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  safetHtml(str: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(str);
+  }
+
+  safeResourceUrl(href: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(href);
   }
 
   get isTenantEnabled(): boolean {

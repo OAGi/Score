@@ -65,40 +65,77 @@
                   <h4 class="subhead-heading">Web Page Settings</h4>
                 </div>
                 <div class="webpage-setting">
-                  <div class="subsubhead">
-                    <h5 class="subsubhead-heading">Brand Logo (Supported format: SVG, Recommended size: 160x26)</h5>
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Brand Logo (Supported format: SVG, Recommended size: 160x26)</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="6"
+                                [cdkAutosizeMaxRows]="20"
+                                [(ngModel)]="webPageInfo.brand"></textarea>
+                    </div>
+                    <div class="col-4">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Preview</h5>
+                      </div>
+                      <div class="brand-preview-container">
+                        <div class="brand-preview" [innerHTML]="safetHtml(webPageInfo.brand)">
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <textarea class="width-max"
-                            cdkTextareaAutosize
-                            [cdkAutosizeMinRows]="6"
-                            [cdkAutosizeMaxRows]="20"
-                            [(ngModel)]="webPageInfo.brand"></textarea>
                 </div>
                 <div class="webpage-setting">
-                  <div class="subsubhead">
-                    <h5 class="subsubhead-heading">Favicon Link</h5>
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Favicon Link (URL)</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="3"
+                                [cdkAutosizeMaxRows]="6"
+                                [(ngModel)]="webPageInfo.favicon"></textarea>
+                    </div>
+                    <div class="col-4">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Preview</h5>
+                      </div>
+                      <div class="favicon-preview-container">
+                        <img class="favicon-preview" *ngIf="webPageInfo.favicon" [src]="webPageInfo.favicon">
+                      </div>
+                    </div>
                   </div>
-                  <textarea class="width-max"
-                            cdkTextareaAutosize
-                            [cdkAutosizeMinRows]="3"
-                            [cdkAutosizeMaxRows]="6"
-                            [(ngModel)]="webPageInfo.favicon"></textarea>
                 </div>
                 <div class="webpage-setting">
-                  <div class="subsubhead">
-                    <h5 class="subsubhead-heading">Sign-in Page Statement (formatted in Markdown)</h5>
+                  <div class="row">
+                    <div class="col-8">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Sign-in Page Statement (formatted in Markdown)</h5>
+                      </div>
+                      <textarea class="width-max"
+                                cdkTextareaAutosize
+                                [cdkAutosizeMinRows]="6"
+                                [cdkAutosizeMaxRows]="20"
+                                [(ngModel)]="webPageInfo.signInStatement"></textarea>
+                    </div>
+                    <div class="col-4">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Preview</h5>
+                      </div>
+                      <div class="statement-container">
+                        <markdown [data]="webPageInfo.signInStatement"></markdown>
+                      </div>
+                    </div>
                   </div>
-                  <textarea class="width-max"
-                            cdkTextareaAutosize
-                            [cdkAutosizeMinRows]="6"
-                            [cdkAutosizeMaxRows]="20"
-                            [(ngModel)]="webPageInfo.signInStatement"></textarea>
-                </div>
-                <div class="actions">
-                  <button mat-raised-button color="primary"
-                          (click)="updateWebPageInfo()">
-                    Update
-                  </button>
+                  <div class="actions">
+                    <button mat-raised-button color="primary"
+                            (click)="updateWebPageInfo()">
+                      Update
+                    </button>
+                  </div>
                 </div>
               </div>
             </mat-card-content>
