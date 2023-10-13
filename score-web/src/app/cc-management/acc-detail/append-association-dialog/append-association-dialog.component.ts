@@ -9,7 +9,7 @@ import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {CcNodeService} from '../../domain/core-component-node.service';
 import {FormControl} from '@angular/forms';
@@ -54,6 +54,8 @@ export class AppendAssociationDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -148,9 +150,11 @@ export class AppendAssociationDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

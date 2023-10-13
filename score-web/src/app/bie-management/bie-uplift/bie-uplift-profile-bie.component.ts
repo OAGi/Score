@@ -10,7 +10,7 @@ import {BusinessContextService} from '../../context-management/business-context/
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -57,6 +57,8 @@ export class BieUpliftProfileBieComponent implements OnInit {
     return [];
   }
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -150,9 +152,11 @@ export class BieUpliftProfileBieComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

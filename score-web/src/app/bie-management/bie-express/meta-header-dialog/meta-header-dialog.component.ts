@@ -6,7 +6,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SimpleRelease} from '../../../release-management/domain/release';
 import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -40,6 +40,8 @@ export class MetaHeaderDialogComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -101,9 +103,11 @@ export class MetaHeaderDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }
