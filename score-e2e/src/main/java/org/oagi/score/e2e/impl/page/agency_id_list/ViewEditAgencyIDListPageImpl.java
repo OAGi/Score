@@ -138,6 +138,8 @@ public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEd
             AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().getAgencyIDListByManifestId(agencyIdListManifestId);
             EditAgencyIDListPage editAgencyIDListPage = new EditAgencyIDListPageImpl(this, agencyIDList);
             assert editAgencyIDListPage.isOpened();
+
+            waitFor(ofMillis(1000L)); // delay for loading agency ID list data
             return editAgencyIDListPage;
         });
     }

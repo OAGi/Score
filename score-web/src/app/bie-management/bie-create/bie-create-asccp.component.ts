@@ -16,7 +16,7 @@ import {CcList, CcListRequest} from '../../cc-management/cc-list/domain/cc-list'
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest, PageResponse} from '../../basis/basis';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -69,6 +69,8 @@ export class BieCreateAsccpComponent implements OnInit {
 
   workingRelease = WorkingRelease;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -179,9 +181,11 @@ export class BieCreateAsccpComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

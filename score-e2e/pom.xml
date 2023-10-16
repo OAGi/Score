@@ -6,24 +6,24 @@
 
     <groupId>org.oagi.score.e2e</groupId>
     <artifactId>score-e2e</artifactId>
-    <version>3.0.2</version>
+    <version>3.1.1</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.version>4.11.0</selenium.version>
-        <junit.version>5.9.2</junit.version>
-        <junit.platform.version>1.9.2</junit.platform.version>
+        <selenium.version>4.14.0</selenium.version>
+        <junit.version>5.10.0</junit.version>
+        <junit.platform.version>1.10.0</junit.platform.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
-        <log4j.version>2.19.0</log4j.version>
+        <log4j.version>2.20.0</log4j.version>
         <commons.lang3.version>3.13.0</commons.lang3.version>
         <commons.math3.version>3.6.1</commons.math3.version>
-        <lombok.version>1.18.28</lombok.version>
-        <mariadb-client.version>3.1.4</mariadb-client.version>
+        <lombok.version>1.18.30</lombok.version>
+        <mariadb-client.version>3.2.0</mariadb-client.version>
         <hikariCP.version>5.0.1</hikariCP.version>
-        <jOOQ.version>3.18.6</jOOQ.version>
+        <jOOQ.version>3.18.7</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
     </properties>
 

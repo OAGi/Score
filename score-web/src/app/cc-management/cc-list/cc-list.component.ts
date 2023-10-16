@@ -15,7 +15,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {
   TransferOwnershipDialogComponent
@@ -89,6 +89,8 @@ export class CcListComponent implements OnInit {
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: CcList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -264,9 +266,11 @@ export class CcListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

@@ -361,7 +361,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public void searchCodeListByUpdatedDateAndBranch(CodeListObject codeList, String releaseNumber) {
         setBranch(releaseNumber);
-        sendKeys(getUpdatedDateField(), codeList.getLastUpdateTimestamp().toString());
+        sendKeys(getUpdatedDateField(), codeList.getLastUpdateTimestamp());
         retry(() -> {
             hitSearchButton();
 
