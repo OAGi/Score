@@ -56,6 +56,7 @@ public class OpenAPIGenerateController {
                 GetAssignedOasTagResponse getAssignedOasTagResponse = oasDocService.getAssignedOasTag(getAssignedOasTagRequest);
                 OpenAPIGenerateExpressionOption openAPIGenerateExpressionOption = new OpenAPIGenerateExpressionOption();
                 openAPIGenerateExpressionOption.setOasDoc(getOasDocResponse.getOasDoc());
+                openAPIGenerateExpressionOption.setMessageBodyType(bieForOasDoc.getMessageBody());
                 BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
                 if (topLevelAsbiepIds != null){
                     topLevelAsbiepIds.add(topLevelAsbiepId);

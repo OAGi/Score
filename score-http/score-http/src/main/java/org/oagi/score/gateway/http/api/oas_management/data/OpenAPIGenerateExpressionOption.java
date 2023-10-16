@@ -22,6 +22,7 @@ public class OpenAPIGenerateExpressionOption {
     private BigInteger metaHeaderTopLevelAsbiepId;
     private BigInteger paginationResponseTopLevelAsbiepId;
     private String verb;
+    private String messageBodyType;
     private String openAPIExpressionFormat;
     private boolean openAPICodeGenerationFriendly;
     private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
