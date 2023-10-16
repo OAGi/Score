@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record21;
-import org.jooq.Row21;
+import org.jooq.Record20;
+import org.jooq.Row20;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp;
@@ -19,7 +19,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp;
  * An ASCCP specifies a role (or property) an ACC may play under another ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Record21<ULong, String, String, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> {
+public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Record20<ULong, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -138,22 +138,6 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     /**
-     * Setter for <code>oagi.asccp.den</code>. The dictionary entry name of the
-     * ASCCP.
-     */
-    public void setDen(String value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>oagi.asccp.den</code>. The dictionary entry name of the
-     * ASCCP.
-     */
-    public String getDen() {
-        return (String) get(7);
-    }
-
-    /**
      * Setter for <code>oagi.asccp.created_by</code>. Foreign key to the
      * APP_USER table referring to the user who creates the entity. 
      * 
@@ -162,7 +146,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * its current record.
      */
     public void setCreatedBy(ULong value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
@@ -174,7 +158,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * its current record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(8);
+        return (ULong) get(7);
     }
 
     /**
@@ -186,7 +170,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * rollback the ownership. 
      */
     public void setOwnerUserId(ULong value) {
-        set(9, value);
+        set(8, value);
     }
 
     /**
@@ -198,7 +182,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * rollback the ownership. 
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(9);
+        return (ULong) get(8);
     }
 
     /**
@@ -209,7 +193,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(10, value);
+        set(9, value);
     }
 
     /**
@@ -220,7 +204,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(10);
+        return (ULong) get(9);
     }
 
     /**
@@ -230,7 +214,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(11, value);
+        set(10, value);
     }
 
     /**
@@ -240,7 +224,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(10);
     }
 
     /**
@@ -252,7 +236,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * revision has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(12, value);
+        set(11, value);
     }
 
     /**
@@ -264,7 +248,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * revision has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(11);
     }
 
     /**
@@ -276,7 +260,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * records of when the state was changed.
      */
     public void setState(String value) {
-        set(13, value);
+        set(12, value);
     }
 
     /**
@@ -288,7 +272,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * records of when the state was changed.
      */
     public String getState() {
-        return (String) get(13);
+        return (String) get(12);
     }
 
     /**
@@ -299,7 +283,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * level.
      */
     public void setNamespaceId(ULong value) {
-        set(14, value);
+        set(13, value);
     }
 
     /**
@@ -310,7 +294,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * level.
      */
     public ULong getNamespaceId() {
-        return (ULong) get(14);
+        return (ULong) get(13);
     }
 
     /**
@@ -319,7 +303,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * to the XML schema local element declaration.
      */
     public void setReusableIndicator(Byte value) {
-        set(15, value);
+        set(14, value);
     }
 
     /**
@@ -328,7 +312,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * to the XML schema local element declaration.
      */
     public Byte getReusableIndicator() {
-        return (Byte) get(15);
+        return (Byte) get(14);
     }
 
     /**
@@ -337,7 +321,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(16, value);
+        set(15, value);
     }
 
     /**
@@ -346,7 +330,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(16);
+        return (Byte) get(15);
     }
 
     /**
@@ -354,7 +338,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * replacement if the record is deprecated.
      */
     public void setReplacementAsccpId(ULong value) {
-        set(17, value);
+        set(16, value);
     }
 
     /**
@@ -362,7 +346,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * replacement if the record is deprecated.
      */
     public ULong getReplacementAsccpId() {
-        return (ULong) get(17);
+        return (ULong) get(16);
     }
 
     /**
@@ -372,7 +356,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * the value is default to false for simplification.
      */
     public void setIsNillable(Byte value) {
-        set(18, value);
+        set(17, value);
     }
 
     /**
@@ -382,7 +366,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * the value is default to false for simplification.
      */
     public Byte getIsNillable() {
-        return (Byte) get(18);
+        return (Byte) get(17);
     }
 
     /**
@@ -390,7 +374,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * indicate the previous history record.
      */
     public void setPrevAsccpId(ULong value) {
-        set(19, value);
+        set(18, value);
     }
 
     /**
@@ -398,7 +382,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * indicate the previous history record.
      */
     public ULong getPrevAsccpId() {
-        return (ULong) get(19);
+        return (ULong) get(18);
     }
 
     /**
@@ -406,7 +390,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * indicate the next history record.
      */
     public void setNextAsccpId(ULong value) {
-        set(20, value);
+        set(19, value);
     }
 
     /**
@@ -414,7 +398,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
      * indicate the next history record.
      */
     public ULong getNextAsccpId() {
-        return (ULong) get(20);
+        return (ULong) get(19);
     }
 
     // -------------------------------------------------------------------------
@@ -427,17 +411,17 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     // -------------------------------------------------------------------------
-    // Record21 type implementation
+    // Record20 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row21<ULong, String, String, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
-        return (Row21) super.fieldsRow();
+    public Row20<ULong, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
+        return (Row20) super.fieldsRow();
     }
 
     @Override
-    public Row21<ULong, String, String, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> valuesRow() {
-        return (Row21) super.valuesRow();
+    public Row20<ULong, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> valuesRow() {
+        return (Row20) super.valuesRow();
     }
 
     @Override
@@ -476,72 +460,67 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     @Override
-    public Field<String> field8() {
-        return Asccp.ASCCP.DEN;
-    }
-
-    @Override
-    public Field<ULong> field9() {
+    public Field<ULong> field8() {
         return Asccp.ASCCP.CREATED_BY;
     }
 
     @Override
-    public Field<ULong> field10() {
+    public Field<ULong> field9() {
         return Asccp.ASCCP.OWNER_USER_ID;
     }
 
     @Override
-    public Field<ULong> field11() {
+    public Field<ULong> field10() {
         return Asccp.ASCCP.LAST_UPDATED_BY;
     }
 
     @Override
-    public Field<LocalDateTime> field12() {
+    public Field<LocalDateTime> field11() {
         return Asccp.ASCCP.CREATION_TIMESTAMP;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
+    public Field<LocalDateTime> field12() {
         return Asccp.ASCCP.LAST_UPDATE_TIMESTAMP;
     }
 
     @Override
-    public Field<String> field14() {
+    public Field<String> field13() {
         return Asccp.ASCCP.STATE;
     }
 
     @Override
-    public Field<ULong> field15() {
+    public Field<ULong> field14() {
         return Asccp.ASCCP.NAMESPACE_ID;
     }
 
     @Override
-    public Field<Byte> field16() {
+    public Field<Byte> field15() {
         return Asccp.ASCCP.REUSABLE_INDICATOR;
     }
 
     @Override
-    public Field<Byte> field17() {
+    public Field<Byte> field16() {
         return Asccp.ASCCP.IS_DEPRECATED;
     }
 
     @Override
-    public Field<ULong> field18() {
+    public Field<ULong> field17() {
         return Asccp.ASCCP.REPLACEMENT_ASCCP_ID;
     }
 
     @Override
-    public Field<Byte> field19() {
+    public Field<Byte> field18() {
         return Asccp.ASCCP.IS_NILLABLE;
     }
 
     @Override
-    public Field<ULong> field20() {
+    public Field<ULong> field19() {
         return Asccp.ASCCP.PREV_ASCCP_ID;
     }
 
     @Override
-    public Field<ULong> field21() {
+    public Field<ULong> field20() {
         return Asccp.ASCCP.NEXT_ASCCP_ID;
     }
 
@@ -581,72 +560,67 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     @Override
-    public String component8() {
-        return getDen();
-    }
-
-    @Override
-    public ULong component9() {
+    public ULong component8() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong component10() {
+    public ULong component9() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong component11() {
+    public ULong component10() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime component12() {
+    public LocalDateTime component11() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime component13() {
+    public LocalDateTime component12() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String component14() {
+    public String component13() {
         return getState();
     }
 
     @Override
-    public ULong component15() {
+    public ULong component14() {
         return getNamespaceId();
     }
 
     @Override
-    public Byte component16() {
+    public Byte component15() {
         return getReusableIndicator();
     }
 
     @Override
-    public Byte component17() {
+    public Byte component16() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong component18() {
+    public ULong component17() {
         return getReplacementAsccpId();
     }
 
     @Override
-    public Byte component19() {
+    public Byte component18() {
         return getIsNillable();
     }
 
     @Override
-    public ULong component20() {
+    public ULong component19() {
         return getPrevAsccpId();
     }
 
     @Override
-    public ULong component21() {
+    public ULong component20() {
         return getNextAsccpId();
     }
 
@@ -686,72 +660,67 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     @Override
-    public String value8() {
-        return getDen();
-    }
-
-    @Override
-    public ULong value9() {
+    public ULong value8() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong value10() {
+    public ULong value9() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong value11() {
+    public ULong value10() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime value12() {
+    public LocalDateTime value11() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime value13() {
+    public LocalDateTime value12() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String value14() {
+    public String value13() {
         return getState();
     }
 
     @Override
-    public ULong value15() {
+    public ULong value14() {
         return getNamespaceId();
     }
 
     @Override
-    public Byte value16() {
+    public Byte value15() {
         return getReusableIndicator();
     }
 
     @Override
-    public Byte value17() {
+    public Byte value16() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong value18() {
+    public ULong value17() {
         return getReplacementAsccpId();
     }
 
     @Override
-    public Byte value19() {
+    public Byte value18() {
         return getIsNillable();
     }
 
     @Override
-    public ULong value20() {
+    public ULong value19() {
         return getPrevAsccpId();
     }
 
     @Override
-    public ULong value21() {
+    public ULong value20() {
         return getNextAsccpId();
     }
 
@@ -798,91 +767,85 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     }
 
     @Override
-    public AsccpRecord value8(String value) {
-        setDen(value);
-        return this;
-    }
-
-    @Override
-    public AsccpRecord value9(ULong value) {
+    public AsccpRecord value8(ULong value) {
         setCreatedBy(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value10(ULong value) {
+    public AsccpRecord value9(ULong value) {
         setOwnerUserId(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value11(ULong value) {
+    public AsccpRecord value10(ULong value) {
         setLastUpdatedBy(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value12(LocalDateTime value) {
+    public AsccpRecord value11(LocalDateTime value) {
         setCreationTimestamp(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value13(LocalDateTime value) {
+    public AsccpRecord value12(LocalDateTime value) {
         setLastUpdateTimestamp(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value14(String value) {
+    public AsccpRecord value13(String value) {
         setState(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value15(ULong value) {
+    public AsccpRecord value14(ULong value) {
         setNamespaceId(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value16(Byte value) {
+    public AsccpRecord value15(Byte value) {
         setReusableIndicator(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value17(Byte value) {
+    public AsccpRecord value16(Byte value) {
         setIsDeprecated(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value18(ULong value) {
+    public AsccpRecord value17(ULong value) {
         setReplacementAsccpId(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value19(Byte value) {
+    public AsccpRecord value18(Byte value) {
         setIsNillable(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value20(ULong value) {
+    public AsccpRecord value19(ULong value) {
         setPrevAsccpId(value);
         return this;
     }
 
     @Override
-    public AsccpRecord value21(ULong value) {
+    public AsccpRecord value20(ULong value) {
         setNextAsccpId(value);
         return this;
     }
 
     @Override
-    public AsccpRecord values(ULong value1, String value2, String value3, String value4, String value5, String value6, ULong value7, String value8, ULong value9, ULong value10, ULong value11, LocalDateTime value12, LocalDateTime value13, String value14, ULong value15, Byte value16, Byte value17, ULong value18, Byte value19, ULong value20, ULong value21) {
+    public AsccpRecord values(ULong value1, String value2, String value3, String value4, String value5, String value6, ULong value7, ULong value8, ULong value9, ULong value10, LocalDateTime value11, LocalDateTime value12, String value13, ULong value14, Byte value15, Byte value16, ULong value17, Byte value18, ULong value19, ULong value20) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -903,7 +866,6 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
         value18(value18);
         value19(value19);
         value20(value20);
-        value21(value21);
         return this;
     }
 
@@ -921,7 +883,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
     /**
      * Create a detached, initialised AsccpRecord
      */
-    public AsccpRecord(ULong asccpId, String guid, String type, String propertyTerm, String definition, String definitionSource, ULong roleOfAccId, String den, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong namespaceId, Byte reusableIndicator, Byte isDeprecated, ULong replacementAsccpId, Byte isNillable, ULong prevAsccpId, ULong nextAsccpId) {
+    public AsccpRecord(ULong asccpId, String guid, String type, String propertyTerm, String definition, String definitionSource, ULong roleOfAccId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong namespaceId, Byte reusableIndicator, Byte isDeprecated, ULong replacementAsccpId, Byte isNillable, ULong prevAsccpId, ULong nextAsccpId) {
         super(Asccp.ASCCP);
 
         setAsccpId(asccpId);
@@ -931,7 +893,6 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> implements Rec
         setDefinition(definition);
         setDefinitionSource(definitionSource);
         setRoleOfAccId(roleOfAccId);
-        setDen(den);
         setCreatedBy(createdBy);
         setOwnerUserId(ownerUserId);
         setLastUpdatedBy(lastUpdatedBy);
