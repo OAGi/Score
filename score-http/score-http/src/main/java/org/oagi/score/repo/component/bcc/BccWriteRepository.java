@@ -275,12 +275,12 @@ public class BccWriteRepository {
         bccManifestRecord.setReleaseId(ULong.valueOf(request.getReleaseId()));
         bccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
         bccManifestRecord.setToBccpManifestId(bccpManifestRecord.getBccpManifestId());
+        bccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + bccpManifestRecord.getDen());
         bccManifestRecord.setBccManifestId(
                 dslContext.insertInto(BCC_MANIFEST)
                         .set(bccManifestRecord)
                         .returning(BCC_MANIFEST.BCC_MANIFEST_ID).fetchOne().getBccManifestId()
         );
-        bccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + bccpManifestRecord.getDen());
 
         seqKeyHandler(request.getUser(), bccManifestRecord).moveTo(request.getPos());
 
@@ -627,12 +627,12 @@ public class BccWriteRepository {
         targetBccManifestRecord.setBccManifestId(null);
         targetBccManifestRecord.setFromAccManifestId(ULong.valueOf(request.getAccManifestId()));
         targetBccManifestRecord.setBccId(bccId);
+        targetBccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + bccpDen);
         targetBccManifestRecord.setSeqKeyId(null);
         targetBccManifestRecord.setPrevBccManifestId(null);
         targetBccManifestRecord.setNextBccManifestId(null);
         targetBccManifestRecord.setBccManifestId(
                 dslContext.insertInto(BCC_MANIFEST).set(targetBccManifestRecord).returning().fetchOne().getBccManifestId());
-        targetBccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + bccpDen);
 
         seqKeyHandler(request.getUser(), targetBccManifestRecord).moveTo(MoveTo.LAST);
 

@@ -294,19 +294,19 @@ public class AsccWriteRepository {
                         .returning(ASCC.ASCC_ID).fetchOne().getAsccId()
         );
 
-        AsccManifestRecord asccManifest = new AsccManifestRecord();
-        asccManifest.setAsccId(ascc.getAsccId());
-        asccManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
-        asccManifest.setFromAccManifestId(accManifestRecord.getAccManifestId());
-        asccManifest.setToAsccpManifestId(asccpManifestRecord.getAsccpManifestId());
-        asccManifest.setAsccManifestId(
+        AsccManifestRecord asccManifestRecord = new AsccManifestRecord();
+        asccManifestRecord.setAsccId(ascc.getAsccId());
+        asccManifestRecord.setReleaseId(ULong.valueOf(request.getReleaseId()));
+        asccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
+        asccManifestRecord.setToAsccpManifestId(asccpManifestRecord.getAsccpManifestId());
+        asccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + asccpManifestRecord.getDen());
+        asccManifestRecord.setAsccManifestId(
                 dslContext.insertInto(ASCC_MANIFEST)
-                        .set(asccManifest)
+                        .set(asccManifestRecord)
                         .returning(ASCC_MANIFEST.ASCC_MANIFEST_ID).fetchOne().getAsccManifestId()
         );
-        asccManifest.setDen(accRecord.getObjectClassTerm() + ". " + asccpManifestRecord.getDen());
 
-        seqKeyHandler(request.getUser(), asccManifest).moveTo(request.getPos());
+        seqKeyHandler(request.getUser(), asccManifestRecord).moveTo(request.getPos());
 
         if (request.getLogAction() != null) {
             upsertLogIntoAccAndAssociationsByAction(
@@ -323,7 +323,7 @@ public class AsccWriteRepository {
         }
 
 
-        return new CreateAsccRepositoryResponse(asccManifest.getAsccManifestId().toBigInteger());
+        return new CreateAsccRepositoryResponse(asccManifestRecord.getAsccManifestId().toBigInteger());
     }
 
     private void upsertLogIntoAccAndAssociations(AccRecord accRecord,
@@ -626,12 +626,12 @@ public class AsccWriteRepository {
         targetAsccManifestRecord.setAsccManifestId(null);
         targetAsccManifestRecord.setFromAccManifestId(ULong.valueOf(request.getAccManifestId()));
         targetAsccManifestRecord.setAsccId(asccId);
+        targetAsccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + asccpDen);
         targetAsccManifestRecord.setSeqKeyId(null);
         targetAsccManifestRecord.setPrevAsccManifestId(null);
         targetAsccManifestRecord.setNextAsccManifestId(null);
         targetAsccManifestRecord.setAsccManifestId(
                 dslContext.insertInto(ASCC_MANIFEST).set(targetAsccManifestRecord).returning().fetchOne().getAsccManifestId());
-        targetAsccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + asccpDen);
 
         seqKeyHandler(request.getUser(), targetAsccManifestRecord).moveTo(MoveTo.LAST);
 
