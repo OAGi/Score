@@ -146,7 +146,7 @@ public class ExternalController {
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
 
-        return ccService.getCcList(request);
+        return ccService.getCcListWithLastUpdatedAndSince(request);
     }
 
     /*

@@ -48,6 +48,9 @@ public class CcList {
     private boolean newComponent;
     private List<ShortTag> tagList = Collections.emptyList();
 
+    private String sinceReleaseNum;
+    private String lastChangedReleaseNum;
+
     public CcList() {
     }
 
