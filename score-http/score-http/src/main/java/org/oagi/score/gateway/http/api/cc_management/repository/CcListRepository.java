@@ -33,6 +33,7 @@ import static org.apache.commons.lang3.StringUtils.stripToNull;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BCC_MANIFEST;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.oagi.score.service.common.data.OagisComponentType.*;
 
@@ -238,7 +239,7 @@ public class CcListRepository {
             conditions.add(ACC_MANIFEST.ACC_MANIFEST_ID.notIn(request.getExcludes()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ACC.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ACC_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), ACC.DEFINITION));
@@ -322,7 +323,7 @@ public class CcListRepository {
                 ACC_MANIFEST.ACC_MANIFEST_ID.as("manifest_id"),
                 ACC.ACC_ID.as("id"),
                 ACC.GUID,
-                ACC.DEN,
+                ACC_MANIFEST.DEN,
                 ACC.DEFINITION,
                 ACC.DEFINITION_SOURCE,
                 ACC.OBJECT_CLASS_TERM.as("term"),
@@ -344,8 +345,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(ACC.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(ACC.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(ACC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ACC_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -379,7 +380,7 @@ public class CcListRepository {
 
         List<Condition> conditions = new ArrayList();
         conditions.add(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
-        conditions.add(ASCC.DEN.notContains("User Extension Group"));
+        conditions.add(ASCC_MANIFEST.DEN.notContains("User Extension Group"));
 
         if (request.getDeprecated() != null) {
             conditions.add(ASCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
@@ -401,7 +402,7 @@ public class CcListRepository {
             conditions.add(ASCC_MANIFEST.ASCC_MANIFEST_ID.notIn(request.getExcludes()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ASCC.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ASCC_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), ASCC.DEFINITION));
@@ -422,7 +423,7 @@ public class CcListRepository {
                 ASCC_MANIFEST.ASCC_MANIFEST_ID.as("manifest_id"),
                 ASCC.ASCC_ID.as("id"),
                 ASCC.GUID,
-                ASCC.DEN,
+                ASCC_MANIFEST.DEN,
                 ASCC.DEFINITION,
                 ASCC.DEFINITION_SOURCE,
                 val((String) null).as("term"),
@@ -444,8 +445,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(ASCC.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(ASCC.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(ASCC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ASCC_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -481,7 +482,7 @@ public class CcListRepository {
 
         List<Condition> conditions = new ArrayList();
         conditions.add(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
-        conditions.add(BCC.DEN.notContains("User Extension Group"));
+        conditions.add(BCC_MANIFEST.DEN.notContains("User Extension Group"));
 
         if (request.getDeprecated() != null) {
             conditions.add(BCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
@@ -503,7 +504,7 @@ public class CcListRepository {
             conditions.add(BCC_MANIFEST.BCC_MANIFEST_ID.notIn(request.getExcludes()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), BCC.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), BCC_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), BCC.DEFINITION));
@@ -524,7 +525,7 @@ public class CcListRepository {
                 BCC_MANIFEST.BCC_MANIFEST_ID.as("manifest_id"),
                 BCC.BCC_ID.as("id"),
                 BCC.GUID,
-                BCC.DEN,
+                BCC_MANIFEST.DEN,
                 BCC.DEFINITION,
                 BCC.DEFINITION_SOURCE,
                 val((String) null).as("term"),
@@ -546,8 +547,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(BCC.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(BCC.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(BCC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(BCC_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -583,7 +584,7 @@ public class CcListRepository {
 
         List<Condition> conditions = new ArrayList();
         conditions.add(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
-        conditions.add(ASCCP.DEN.notContains("User Extension Group"));
+        conditions.add(ASCCP_MANIFEST.DEN.notContains("User Extension Group"));
 
         if (request.getDeprecated() != null) {
             conditions.add(ASCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
@@ -605,7 +606,7 @@ public class CcListRepository {
             conditions.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.notIn(request.getExcludes()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ASCCP.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), ASCCP_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), ASCCP.DEFINITION));
@@ -638,7 +639,7 @@ public class CcListRepository {
                 ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifest_id"),
                 ASCCP.ASCCP_ID.as("id"),
                 ASCCP.GUID,
-                ASCCP.DEN,
+                ASCCP_MANIFEST.DEN,
                 ASCCP.DEFINITION,
                 ASCCP.DEFINITION_SOURCE,
                 ASCCP.PROPERTY_TERM.as("term"),
@@ -660,8 +661,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(ASCCP.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(ASCCP.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(ASCCP_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(ASCCP_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -699,7 +700,7 @@ public class CcListRepository {
 
         List<Condition> conditions = new ArrayList();
         conditions.add(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
-        conditions.add(BCCP.DEN.notContains("User Extension Group"));
+        conditions.add(BCCP_MANIFEST.DEN.notContains("User Extension Group"));
         if (request.getDeprecated() != null) {
             conditions.add(BCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
@@ -720,7 +721,7 @@ public class CcListRepository {
             conditions.add(BCCP_MANIFEST.BCCP_MANIFEST_ID.notIn(request.getExcludes()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), BCCP.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), BCCP_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), BCCP.DEFINITION));
@@ -747,7 +748,7 @@ public class CcListRepository {
                 BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifest_id"),
                 BCCP.BCCP_ID.as("id"),
                 BCCP.GUID,
-                BCCP.DEN,
+                BCCP_MANIFEST.DEN,
                 BCCP.DEFINITION,
                 BCCP.DEFINITION_SOURCE,
                 BCCP.PROPERTY_TERM.as("term"),
@@ -769,8 +770,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(BCCP.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(BCCP.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(BCCP_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(BCCP_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -847,7 +848,7 @@ public class CcListRepository {
             conditions.add(DT.NAMESPACE_ID.in(request.getNamespaces()));
         }
         if (StringUtils.hasLength(request.getDen())) {
-            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), DT.DEN));
+            conditions.addAll(ContainsFilterBuilder.contains(request.getDen(), DT_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getDefinition())) {
             conditions.addAll(ContainsFilterBuilder.contains(request.getDefinition(), DT.DEFINITION));
@@ -871,7 +872,7 @@ public class CcListRepository {
                 DT_MANIFEST.DT_MANIFEST_ID.as("manifest_id"),
                 DT.DT_ID.as("id"),
                 DT.GUID,
-                DT.DEN,
+                DT_MANIFEST.DEN,
                 DT.DEFINITION,
                 DT.DEFINITION_SOURCE,
                 DT.DATA_TYPE_TERM.as("term"),
@@ -896,8 +897,8 @@ public class CcListRepository {
         ));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
-                    val(1).minus(levenshtein(lower(DT.DEN), val(request.getDen().toLowerCase()))
-                                    .div(greatest(length(DT.DEN), length(request.getDen()))))
+                    val(1).minus(levenshtein(lower(DT_MANIFEST.DEN), val(request.getDen().toLowerCase()))
+                                    .div(greatest(length(DT_MANIFEST.DEN), length(request.getDen()))))
                             .as("score")
             );
         }
@@ -967,7 +968,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewAccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> accChangesMap = new HashMap<>();
-        dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN,
+        dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
@@ -983,7 +984,7 @@ public class CcListRepository {
                         ccChange = accChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ACC", manifestId.toBigInteger(),
-                                record.get(ACC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(ACC_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         accChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1002,7 +1003,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedAccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> accChangesMap = new HashMap<>();
-        dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN,
+        dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(ACC_MANIFEST)
                 .join(ACC_MANIFEST.as("prev_manifest")).on(
@@ -1021,7 +1022,7 @@ public class CcListRepository {
                         ccChange = accChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ACC", manifestId.toBigInteger(),
-                                record.get(ACC.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(ACC_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         accChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1040,7 +1041,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewAsccpList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> asccpChangesMap = new HashMap<>();
-        dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN,
+        dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(ASCCP_MANIFEST)
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
@@ -1056,7 +1057,7 @@ public class CcListRepository {
                         ccChange = asccpChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ASCCP", manifestId.toBigInteger(),
-                                record.get(ASCCP.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(ASCCP_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         asccpChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1075,7 +1076,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedAsccpList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> asccpChangesMap = new HashMap<>();
-        dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN,
+        dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(ASCCP_MANIFEST)
                 .join(ASCCP_MANIFEST.as("prev_manifest")).on(
@@ -1094,7 +1095,7 @@ public class CcListRepository {
                         ccChange = asccpChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ASCCP", manifestId.toBigInteger(),
-                                record.get(ASCCP.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(ASCCP_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         asccpChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1113,7 +1114,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewBccpList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> bccpChangesMap = new HashMap<>();
-        dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN,
+        dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(BCCP_MANIFEST)
                 .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
@@ -1129,7 +1130,7 @@ public class CcListRepository {
                         ccChange = bccpChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("BCCP", manifestId.toBigInteger(),
-                                record.get(BCCP.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(BCCP_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         bccpChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1148,7 +1149,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedBccpList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> bccpChangesMap = new HashMap<>();
-        dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN,
+        dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(BCCP_MANIFEST)
                 .join(BCCP_MANIFEST.as("prev_manifest")).on(
@@ -1167,7 +1168,7 @@ public class CcListRepository {
                         ccChange = bccpChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("BCCP", manifestId.toBigInteger(),
-                                record.get(BCCP.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(BCCP_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         bccpChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1186,7 +1187,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewAsccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> asccChangesMap = new HashMap<>();
-        dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC.DEN)
+        dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC_MANIFEST.DEN)
                 .from(ASCC_MANIFEST)
                 .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
                 .where(and(
@@ -1199,7 +1200,7 @@ public class CcListRepository {
                         ccChange = asccChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ASCC", manifestId.toBigInteger(),
-                                record.get(ASCC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(ASCC_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         asccChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1208,7 +1209,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedAsccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> asccChangesMap = new HashMap<>();
-        dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC.DEN)
+        dslContext.select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC_MANIFEST.DEN)
                 .from(ASCC_MANIFEST)
                 .join(ASCC_MANIFEST.as("prev_manifest")).on(
                         and(
@@ -1224,7 +1225,7 @@ public class CcListRepository {
                         ccChange = asccChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("ASCC", manifestId.toBigInteger(),
-                                record.get(ASCC.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(ASCC_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         asccChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1233,7 +1234,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewBccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> bccChangesMap = new HashMap<>();
-        dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC.DEN)
+        dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.DEN)
                 .from(BCC_MANIFEST)
                 .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
                 .where(and(
@@ -1246,7 +1247,7 @@ public class CcListRepository {
                         ccChange = bccChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("BCC", manifestId.toBigInteger(),
-                                record.get(BCC.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(BCC_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         bccChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1255,7 +1256,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedBccList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> bccChangesMap = new HashMap<>();
-        dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC.DEN)
+        dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.DEN)
                 .from(BCC_MANIFEST)
                 .join(BCC_MANIFEST.as("prev_manifest")).on(
                         and(
@@ -1271,7 +1272,7 @@ public class CcListRepository {
                         ccChange = bccChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("BCC", manifestId.toBigInteger(),
-                                record.get(BCC.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(BCC_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         bccChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1280,7 +1281,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getNewDtList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> dtChangesMap = new HashMap<>();
-        dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT.DEN,
+        dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(DT_MANIFEST)
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
@@ -1296,7 +1297,7 @@ public class CcListRepository {
                         ccChange = dtChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("DT", manifestId.toBigInteger(),
-                                record.get(DT.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(DT_MANIFEST.DEN), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
                         dtChangesMap.put(manifestId, ccChange);
                     }
 
@@ -1315,7 +1316,7 @@ public class CcListRepository {
 
     private Collection<CcChangesResponse.CcChange> getChangedDtList(ScoreUser requester, ULong releaseId) {
         Map<ULong, CcChangesResponse.CcChange> dtChangesMap = new HashMap<>();
-        dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT.DEN,
+        dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN,
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(DT_MANIFEST)
                 .join(DT_MANIFEST.as("prev_manifest")).on(
@@ -1334,7 +1335,7 @@ public class CcListRepository {
                         ccChange = dtChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("DT", manifestId.toBigInteger(),
-                                record.get(DT.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(DT_MANIFEST.DEN), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
                         dtChangesMap.put(manifestId, ccChange);
                     }
 

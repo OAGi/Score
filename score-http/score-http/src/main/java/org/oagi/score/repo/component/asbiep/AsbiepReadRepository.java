@@ -44,7 +44,11 @@ public class AsbiepReadRepository {
         asccp.setAsccpManifestId(asccpManifestId);
         asccp.setGuid(asccpRecord.getGuid());
         asccp.setPropertyTerm(asccpRecord.getPropertyTerm());
-        asccp.setDen(asccpRecord.getDen());
+        String den = dslContext.select(ASCCP_MANIFEST.DEN)
+                .from(ASCCP_MANIFEST)
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
+                .fetchOneInto(String.class);
+        asccp.setDen(den);
         asccp.setDefinition(asccpRecord.getDefinition());
         asccp.setState(CcState.valueOf(asccpRecord.getState()));
         asccp.setNillable(asccpRecord.getIsNillable() == 1);

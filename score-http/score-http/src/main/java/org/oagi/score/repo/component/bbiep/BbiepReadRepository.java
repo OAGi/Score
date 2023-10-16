@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BBIEP;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
 public class BbiepReadRepository {
@@ -49,7 +49,11 @@ public class BbiepReadRepository {
         bccp.setBccpManifestId(bccpManifestId);
         bccp.setGuid(bccpRecord.getGuid());
         bccp.setPropertyTerm(bccpRecord.getPropertyTerm());
-        bccp.setDen(bccpRecord.getDen());
+        String den = dslContext.select(BCCP_MANIFEST.DEN)
+                .from(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOneInto(String.class);
+        bccp.setDen(den);
         bccp.setDefinition(bccpRecord.getDefinition());
         bccp.setState(CcState.valueOf(bccpRecord.getState()));
         bccp.setNillable(bccpRecord.getIsNillable() == 1);
@@ -61,7 +65,12 @@ public class BbiepReadRepository {
         BbiepNode.Bdt bdt = bbiepNode.getBdt();
         bdt.setGuid(bdtRecord.getGuid());
         bdt.setDataTypeTerm(bdtRecord.getDataTypeTerm());
-        bdt.setDen(bdtRecord.getDen());
+        String bdtDen = dslContext.select(DT_MANIFEST.DEN)
+                .from(DT_MANIFEST)
+                .join(BCCP_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(BCCP_MANIFEST.BDT_MANIFEST_ID))
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOneInto(String.class);
+        bdt.setDen(bdtDen);
         bdt.setDefinition(bdtRecord.getDefinition());
         bdt.setState(CcState.valueOf(bdtRecord.getState()));
 

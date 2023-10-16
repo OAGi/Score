@@ -256,17 +256,17 @@ public class ReleaseValidator {
                             if (assignedAccComponentManifestIds.contains(basedAccManifestRecord.getAccManifestId().toBigInteger())) {
                                 if (basedAccstate != CcState.Candidate) {
                                     response.addMessageForAcc(basedAccManifestRecord.getAccManifestId().toBigInteger(),
-                                            Error, "'" + basedAcc.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                            Error, "'" + basedAccManifestRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
                                             ACC_BasedACC);
                                 }
                             } else {
                                 if (basedAccManifestRecord.getPrevAccManifestId() == null) {
                                     response.addMessageForAcc(basedAccManifestRecord.getAccManifestId().toBigInteger(),
-                                            Error, "'" + basedAcc.getDen() + "' is needed in the release assignment due to '" + accRecord.getDen() + "'.",
+                                            Error, "'" + basedAccManifestRecord.getDen() + "' is needed in the release assignment due to '" + accManifestRecord.getDen() + "'.",
                                             ACC_BasedACC);
                                 } else {
                                     response.addMessageForAcc(basedAccManifestRecord.getAccManifestId().toBigInteger(),
-                                            Warning, "'" + basedAcc.getDen() + "' has been revised but not included in the release assignment.",
+                                            Warning, "'" + basedAccManifestRecord.getDen() + "' has been revised but not included in the release assignment.",
                                             ACC_BasedACC);
                                 }
                             }
@@ -283,17 +283,17 @@ public class ReleaseValidator {
                             if (assignedAsccpComponentManifestIds.contains(asccpManifestRecord.getAsccpManifestId().toBigInteger())) {
                                 if (asccpState != CcState.Candidate) {
                                     response.addMessageForAsccp(asccpManifestRecord.getAsccpManifestId().toBigInteger(),
-                                            Error, "'" + asccpRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                            Error, "'" + asccpManifestRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
                                             ACC_Association);
                                 }
                             } else {
                                 if (asccpManifestRecord.getPrevAsccpManifestId() == null) {
                                     response.addMessageForAsccp(asccpManifestRecord.getAsccpManifestId().toBigInteger(),
-                                            Error, "'" + asccpRecord.getDen() + "' is needed in the release assignment due to '" + accRecord.getDen() + "'.",
+                                            Error, "'" + asccpManifestRecord.getDen() + "' is needed in the release assignment due to '" + accManifestRecord.getDen() + "'.",
                                             ACC_Association);
                                 } else {
                                     response.addMessageForAsccp(asccpManifestRecord.getAsccpManifestId().toBigInteger(),
-                                            Warning, "'" + asccpRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                            Warning, "'" + asccpManifestRecord.getDen() + "' has been revised but not included in the release assignment.",
                                             ACC_Association);
                                 }
                             }
@@ -310,17 +310,17 @@ public class ReleaseValidator {
                             if (assignedBccpComponentManifestIds.contains(bccpManifestRecord.getBccpManifestId().toBigInteger())) {
                                 if (bccpState != CcState.Candidate) {
                                     response.addMessageForBccp(bccpManifestRecord.getBccpManifestId().toBigInteger(),
-                                            Error, "'" + bccpRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                            Error, "'" + bccpManifestRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
                                             ACC_Association);
                                 }
                             } else {
                                 if (bccpManifestRecord.getPrevBccpManifestId() == null) {
                                     response.addMessageForBccp(bccpManifestRecord.getBccpManifestId().toBigInteger(),
-                                            Error, "'" + bccpRecord.getDen() + "' is needed in the release assignment due to '" + accRecord.getDen() + "'.",
+                                            Error, "'" + bccpManifestRecord.getDen() + "' is needed in the release assignment due to '" + accManifestRecord.getDen() + "'.",
                                             ACC_Association);
                                 } else {
                                     response.addMessageForBccp(bccpManifestRecord.getBccpManifestId().toBigInteger(),
-                                            Warning, "'" + bccpRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                            Warning, "'" + bccpManifestRecord.getDen() + "' has been revised but not included in the release assignment.",
                                             ACC_Association);
                                 }
                             }
@@ -354,17 +354,17 @@ public class ReleaseValidator {
                 if (assignedAccComponentManifestIds.contains(accManifestRecord.getAccManifestId().toBigInteger())) {
                     if (accState != CcState.Candidate) {
                         response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                Error, "'" + accRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                Error, "'" + accManifestRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
                                 ASCCP_RoleOfAcc);
                     }
                 } else {
                     if (accManifestRecord.getPrevAccManifestId() == null) {
                         response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                Error, "'" + accRecord.getDen() + "' is needed in the release assignment due to '" + asccpRecord.getDen() + "'.",
+                                Error, "'" + accManifestRecord.getDen() + "' is needed in the release assignment due to '" + asccpManifestRecord.getDen() + "'.",
                                 ASCCP_RoleOfAcc);
                     } else {
                         response.addMessageForAcc(accManifestRecord.getAccManifestId().toBigInteger(),
-                                Warning, "'" + accRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                Warning, "'" + accManifestRecord.getDen() + "' has been revised but not included in the release assignment.",
                                 ASCCP_RoleOfAcc);
                     }
                 }
@@ -397,17 +397,17 @@ public class ReleaseValidator {
                 if (assignedDtComponentManifestIds.contains(dtManifestRecord.getDtManifestId().toBigInteger())) {
                     if (dtState != CcState.Candidate) {
                         response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
-                                Error, "'" + dtRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
+                                Error, "'" + dtManifestRecord.getDen() + "' should be in '" + CcState.Candidate + "'.",
                                 BCCP_BDT);
                     }
                 } else {
                     if (dtManifestRecord.getPrevDtManifestId() == null) {
                         response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
-                                Error, "'" + dtRecord.getDen() + "' is needed in the release assignment due to '" + bccpRecord.getDen() + "'.",
+                                Error, "'" + dtManifestRecord.getDen() + "' is needed in the release assignment due to '" + bccpManifestRecord.getDen() + "'.",
                                 BCCP_BDT);
                     } else {
                         response.addMessageForDt(dtManifestRecord.getDtManifestId().toBigInteger(),
-                                Warning, "'" + dtRecord.getDen() + "' has been revised but not included in the release assignment.",
+                                Warning, "'" + dtManifestRecord.getDen() + "' has been revised but not included in the release assignment.",
                                 BCCP_BDT);
                     }
                 }

@@ -35,7 +35,7 @@ public class BCCRepository implements ScoreRepository<BCC> {
                 Tables.BCC.ENTITY_TYPE,
                 Tables.BCC.FROM_ACC_ID,
                 Tables.BCC.TO_BCCP_ID,
-                Tables.BCC.DEN,
+                Tables.BCC_MANIFEST.DEN,
                 Tables.BCC.DEFINITION,
                 Tables.BCC.DEFINITION_SOURCE,
                 Tables.BCC.DEFAULT_VALUE,

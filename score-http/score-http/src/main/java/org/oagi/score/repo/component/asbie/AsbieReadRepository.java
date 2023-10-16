@@ -60,7 +60,11 @@ public class AsbieReadRepository {
         ascc.setGuid(asccRecord.getGuid());
         ascc.setCardinalityMin(asccRecord.getCardinalityMin());
         ascc.setCardinalityMax(asccRecord.getCardinalityMax());
-        ascc.setDen(asccRecord.getDen());
+        String den = dslContext.select(ASCC_MANIFEST.DEN)
+                .from(ASCC_MANIFEST)
+                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
+                .fetchOneInto(String.class);
+        ascc.setDen(den);
         ascc.setDefinition(asccRecord.getDefinition());
         ascc.setState(CcState.valueOf(asccRecord.getState()));
 

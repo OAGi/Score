@@ -72,7 +72,6 @@ public class AccWriteRepository {
         AccRecord acc = new AccRecord();
         acc.setGuid(ScoreGuid.randomGuid());
         acc.setObjectClassTerm(request.getInitialObjectClassTerm());
-        acc.setDen(acc.getObjectClassTerm() + ". Details");
         acc.setOagisComponentType(request.getInitialComponentType().getValue());
         acc.setType(request.getInitialType().name());
         acc.setDefinition(request.getInitialDefinition());
@@ -103,6 +102,7 @@ public class AccWriteRepository {
         if (basedAccManifest != null) {
             accManifest.setBasedAccManifestId(basedAccManifest.getAccManifestId());
         }
+        accManifest.setDen(acc.getObjectClassTerm() + ". Details");
 
         LogRecord logRecord =
                 logRepository.insertAccLog(
@@ -397,10 +397,16 @@ public class AccWriteRepository {
         UpdateSetFirstStep<AccRecord> firstStep = dslContext.update(ACC);
         UpdateSetMoreStep<AccRecord> moreStep = null;
         if (compare(accRecord.getObjectClassTerm(), request.getObjectClassTerm()) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(ACC.OBJECT_CLASS_TERM, request.getObjectClassTerm())
-                    .set(ACC.DEN, request.getObjectClassTerm() + ". Details");
             denNeedsToUpdate = true;
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(ACC.OBJECT_CLASS_TERM, request.getObjectClassTerm());
+
+            String den = request.getObjectClassTerm() + ". Details";
+            accManifestRecord.setDen(den);
+            dslContext.update(ACC_MANIFEST)
+                    .set(ACC_MANIFEST.DEN, den)
+                    .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
+                    .execute();
         }
         if (compare(accRecord.getDefinition(), request.getDefinition()) != 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
@@ -448,36 +454,26 @@ public class AccWriteRepository {
                     .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                     .fetch()) {
 
-                AsccRecord asccRecord = dslContext.selectFrom(ASCC)
-                        .where(ASCC.ASCC_ID.eq(asccManifestRecord.getAsccId()))
-                        .fetchOne();
-
-                String asccpDen = dslContext.select(ASCCP.DEN)
-                        .from(ASCCP)
-                        .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                String asccpDen = dslContext.select(ASCCP_MANIFEST.DEN)
+                        .from(ASCCP_MANIFEST)
                         .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccManifestRecord.getToAsccpManifestId()))
                         .fetchOneInto(String.class);
 
-                asccRecord.setDen(accRecord.getObjectClassTerm() + ". " + asccpDen);
-                asccRecord.update(ASCC.DEN);
+                asccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + asccpDen);
+                asccManifestRecord.update(ASCC_MANIFEST.DEN);
             }
 
             for (BccManifestRecord bccManifestRecord : dslContext.selectFrom(BCC_MANIFEST)
                     .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                     .fetch()) {
 
-                BccRecord bccRecord = dslContext.selectFrom(BCC)
-                        .where(BCC.BCC_ID.eq(bccManifestRecord.getBccId()))
-                        .fetchOne();
-
-                String bccpDen = dslContext.select(BCCP.DEN)
-                        .from(BCCP)
-                        .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+                String bccpDen = dslContext.select(BCCP_MANIFEST.DEN)
+                        .from(BCCP_MANIFEST)
                         .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccManifestRecord.getToBccpManifestId()))
                         .fetchOneInto(String.class);
 
-                bccRecord.setDen(accRecord.getObjectClassTerm() + ". " + bccpDen);
-                bccRecord.update(BCC.DEN);
+                bccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + bccpDen);
+                bccManifestRecord.update(BCC_MANIFEST.DEN);
             }
 
             for (AsccpManifestRecord asccpManifestRecord : dslContext.selectFrom(ASCCP_MANIFEST)
@@ -488,22 +484,20 @@ public class AccWriteRepository {
                         .where(ASCCP.ASCCP_ID.eq(asccpManifestRecord.getAsccpId()))
                         .fetchOne();
 
-                asccpRecord.setDen(asccpRecord.getPropertyTerm() + ". " + accRecord.getObjectClassTerm());
-                asccpRecord.update(ASCCP.DEN);
+                asccpManifestRecord.setDen(asccpRecord.getPropertyTerm() + ". " + accRecord.getObjectClassTerm());
+                asccpManifestRecord.update(ASCCP_MANIFEST.DEN);
 
                 for (AsccManifestRecord asccManifestRecord : dslContext.selectFrom(ASCC_MANIFEST)
                         .where(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                         .fetch()) {
 
-                    AsccRecord asccRecord = dslContext.selectFrom(ASCC)
-                            .where(ASCC.ASCC_ID.eq(asccManifestRecord.getAsccId()))
-                            .fetchOne();
-
                     String objectClassTerm = dslContext.select(ACC.OBJECT_CLASS_TERM)
-                            .from(ACC).where(ACC.ACC_ID.eq(asccRecord.getFromAccId()))
+                            .from(ACC)
+                            .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                            .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(asccManifestRecord.getFromAccManifestId()))
                             .fetchOneInto(String.class);
-                    asccRecord.setDen(objectClassTerm + ". " + asccpRecord.getDen());
-                    asccRecord.update(ASCC.DEN);
+                    asccManifestRecord.setDen(objectClassTerm + ". " + asccpManifestRecord.getDen());
+                    asccManifestRecord.update(ASCC_MANIFEST.DEN);
                 }
             }
         }
@@ -598,9 +592,8 @@ public class AccWriteRepository {
                 .map(BccManifestRecord::getToBccpManifestId).collect(Collectors.toList());
 
         while (basedAccManifestRecord != null) {
-            List<String> conflictAsccpList = dslContext.select(ASCCP.DEN)
-                    .from(ASCCP)
-                    .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+            List<String> conflictAsccpList = dslContext.select(ASCCP_MANIFEST.DEN)
+                    .from(ASCCP_MANIFEST)
                     .join(ASCC_MANIFEST).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID))
                     .where(
                             and(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
@@ -615,9 +608,8 @@ public class AccWriteRepository {
                 }
             }
 
-            List<String> conflictBccpList = dslContext.select(BCCP.DEN)
-                    .from(BCCP)
-                    .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+            List<String> conflictBccpList = dslContext.select(BCCP_MANIFEST.DEN)
+                    .from(BCCP_MANIFEST)
                     .join(BCC_MANIFEST).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCC_MANIFEST.TO_BCCP_MANIFEST_ID))
                     .where(
                             and(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(basedAccManifestRecord.getAccManifestId()),
@@ -670,7 +662,7 @@ public class AccWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (accRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + accRecord.getDen() + "' namespace required.");
+            throw new IllegalArgumentException("'" + accManifestRecord.getDen() + "' namespace required.");
         }
 
         // update acc state.
@@ -850,7 +842,7 @@ public class AccWriteRepository {
                 .where(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!asccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCPs first before purging the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCPs first before purging the ACC '" + accManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
             } else {
@@ -862,7 +854,7 @@ public class AccWriteRepository {
                 .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
                 .fetch();
         if (!basedAccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the ACC '" + accRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the ACC '" + accManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAccRepositoryResponse(accManifestRecord.getAccManifestId().toBigInteger(), e);
             } else {
@@ -1496,11 +1488,11 @@ public class AccWriteRepository {
             accManifestRecord.setBasedAccManifestId(null);
             accRecord.setBasedAccId(null);
         }
+        accManifestRecord.setDen(accRecord.getObjectClassTerm() + ". Details");
         accManifestRecord.setLogId(cursorLog.getLogId());
-        accManifestRecord.update(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC_MANIFEST.LOG_ID);
+        accManifestRecord.update(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC_MANIFEST.DEN, ACC_MANIFEST.LOG_ID);
 
         accRecord.setObjectClassTerm(serializer.getSnapshotString(snapshot.get("objectClassTerm")));
-        accRecord.setDen(accRecord.getObjectClassTerm() + ". Details");
         accRecord.setDefinition(serializer.getSnapshotString(snapshot.get("definition")));
         accRecord.setDefinitionSource(serializer.getSnapshotString(snapshot.get("definitionSource")));
         accRecord.setOagisComponentType(OagisComponentType.valueOf(

@@ -69,12 +69,17 @@ public class BDTSimpleContent extends AbstractBDTSimple {
     }
 
     @Override
+    public DtManifestRecord getBaseDataTypeManifest() {
+        return baseDtManifestRecord;
+    }
+
+    @Override
     public DtRecord getBaseDataType() {
         return baseDataType;
     }
 
     public String getName() {
-        return ModelUtils.getTypeName(dataType);
+        return ModelUtils.getTypeName(dtManifestRecord, dataType);
     }
 
     public String getGuid() {
@@ -82,7 +87,12 @@ public class BDTSimpleContent extends AbstractBDTSimple {
     }
 
     public String getBaseDTName() {
-        return ModelUtils.getTypeName(baseDataType);
+        return ModelUtils.getTypeName(baseDtManifestRecord, baseDataType);
+    }
+
+    @Override
+    public DtManifestRecord getDataTypeManifest() {
+        return dtManifestRecord;
     }
 
     public ULong getNamespaceId() {

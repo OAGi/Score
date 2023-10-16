@@ -29,7 +29,7 @@ public class DTRepository implements ScoreRepository<DT> {
                 Tables.DT.SIX_DIGIT_ID,
                 Tables.DT_MANIFEST.BASED_DT_MANIFEST_ID,
                 Tables.DT.BASED_DT_ID,
-                Tables.DT.DEN,
+                Tables.DT_MANIFEST.DEN,
                 Tables.DT.DEFINITION,
                 Tables.DT.DEFINITION_SOURCE,
                 Tables.DT.CONTENT_COMPONENT_DEFINITION,

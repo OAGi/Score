@@ -1639,7 +1639,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ULong, String, String, LocalDateTime, String,
                 String, UInteger, UInteger>>> map =
                 dslContext.select(
-                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN, RELEASE.RELEASE_NUM,
+                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                         ACC.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ACC.STATE,
                         LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                         .from(ACC_MANIFEST)
@@ -1679,7 +1679,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // ASCCPs
         map = dslContext.select(
-                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN, RELEASE.RELEASE_NUM,
+                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ASCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ASCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ASCCP_MANIFEST)
@@ -1719,7 +1719,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // BCCPs
         map = dslContext.select(
-                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN, RELEASE.RELEASE_NUM,
+                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 BCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, BCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(BCCP_MANIFEST)
@@ -1839,7 +1839,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // DTs
         map = dslContext.select(
-                        DT_MANIFEST.DT_MANIFEST_ID, DT.DEN, RELEASE.RELEASE_NUM,
+                        DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                         DT.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, DT.STATE,
                         LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(DT_MANIFEST)

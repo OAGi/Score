@@ -35,7 +35,7 @@ public class ASCCRepository implements ScoreRepository<ASCC> {
                 Tables.ASCC.SEQ_KEY,
                 Tables.ASCC.FROM_ACC_ID,
                 Tables.ASCC.TO_ASCCP_ID,
-                Tables.ASCC.DEN,
+                Tables.ASCC_MANIFEST.DEN,
                 Tables.ASCC.DEFINITION,
                 Tables.ASCC.DEFINITION_SOURCE,
                 Tables.ASCC.CREATED_BY,

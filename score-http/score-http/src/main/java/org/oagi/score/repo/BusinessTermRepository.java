@@ -46,7 +46,7 @@ public class BusinessTermRepository {
             conditions.add(ASBIE.ASBIE_ID.eq(ULong.valueOf(request.getBieId())));
         }
         if (StringUtils.hasLength(request.getBieDen())) {
-            conditions.add(ASCC.DEN.contains(request.getBieDen()));
+            conditions.add(ASCC_MANIFEST.DEN.contains(request.getBieDen()));
         }
         if (request.isPrimary()) {
             conditions.add(ASBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) 1));
@@ -67,7 +67,7 @@ public class BusinessTermRepository {
                         ASBIE_BIZTERM.ASBIE_ID.as("bieId"),
                         ASBIE_BIZTERM.PRIMARY_INDICATOR.as("primary"),
                         ASBIE_BIZTERM.TYPE_CODE.as("typeCode"),
-                        ASCC.DEN.as("den"),
+                        ASCC_MANIFEST.DEN.as("den"),
                         BUSINESS_TERM.BUSINESS_TERM_ID,
                         BUSINESS_TERM.BUSINESS_TERM_,
                         BUSINESS_TERM.EXTERNAL_REF_URI.as("externalReferenceUri"),
@@ -107,7 +107,7 @@ public class BusinessTermRepository {
         }
         if (StringUtils.hasLength(request.getBieDen())) {
             if (StringUtils.hasLength(request.getBieDen())) {
-                conditions.add(BCC.DEN.contains(request.getBieDen()));
+                conditions.add(BCC_MANIFEST.DEN.contains(request.getBieDen()));
             }
         }
         if (request.isPrimary()) {
@@ -129,7 +129,7 @@ public class BusinessTermRepository {
                         BBIE_BIZTERM.BBIE_ID.as("bieId"),
                         BBIE_BIZTERM.PRIMARY_INDICATOR.as("primary"),
                         BBIE_BIZTERM.TYPE_CODE.as("typeCode"),
-                        BCC.DEN.as("den"),
+                        BCC_MANIFEST.DEN.as("den"),
                         BUSINESS_TERM.BUSINESS_TERM_ID,
                         BUSINESS_TERM.BUSINESS_TERM_,
                         BUSINESS_TERM.EXTERNAL_REF_URI.as("externalReferenceUri"),

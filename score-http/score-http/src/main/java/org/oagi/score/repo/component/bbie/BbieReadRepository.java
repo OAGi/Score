@@ -63,7 +63,11 @@ public class BbieReadRepository {
         bcc.setGuid(bccRecord.getGuid());
         bcc.setCardinalityMin(bccRecord.getCardinalityMin());
         bcc.setCardinalityMax(bccRecord.getCardinalityMax());
-        bcc.setDen(bccRecord.getDen());
+        String den = dslContext.select(BCC_MANIFEST.DEN)
+                .from(BCC_MANIFEST)
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
+                .fetchOneInto(String.class);
+        bcc.setDen(den);
         bcc.setDefinition(bccRecord.getDefinition());
         bcc.setState(CcState.valueOf(bccRecord.getState()));
         if (bccRecord.getDefaultValue() != null || bccRecord.getFixedValue() != null) {

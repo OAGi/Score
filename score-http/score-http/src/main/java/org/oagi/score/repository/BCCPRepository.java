@@ -33,7 +33,7 @@ public class BCCPRepository implements ScoreRepository<BCCP> {
                 Tables.BCCP.FIXED_VALUE,
                 Tables.BCCP_MANIFEST.BDT_MANIFEST_ID,
                 Tables.BCCP.BDT_ID,
-                Tables.BCCP.DEN,
+                Tables.BCCP_MANIFEST.DEN,
                 Tables.BCCP.DEFINITION,
                 Tables.BCCP.DEFINITION_SOURCE,
                 Tables.BCCP.NAMESPACE_ID,

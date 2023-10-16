@@ -28,7 +28,7 @@ public class ASCCPRepository implements ScoreRepository<ASCCP> {
                 Tables.ASCCP.ASCCP_ID,
                 Tables.ASCCP.GUID,
                 Tables.ASCCP.PROPERTY_TERM,
-                Tables.ASCCP.DEN,
+                Tables.ASCCP_MANIFEST.DEN,
                 Tables.ASCCP.DEFINITION,
                 Tables.ASCCP.DEFINITION_SOURCE,
                 Tables.ASCCP.ROLE_OF_ACC_ID,

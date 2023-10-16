@@ -72,7 +72,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
      * The column <code>oagi.configuration.value</code>. The value of
      * configuration property.
      */
-    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The value of configuration property.");
+    public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The value of configuration property.");
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased) {
         this(alias, aliased, null);

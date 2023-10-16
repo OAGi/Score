@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function20;
+import org.jooq.Function19;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row20;
+import org.jooq.Row19;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -103,14 +103,6 @@ public class Ascc extends TableImpl<AsccRecord> {
      * element of the FROM_ACC_ID. 
      */
     public final TableField<AsccRecord, ULong> TO_ASCCP_ID = createField(DSL.name("to_asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "TO_ASCCP_ID is a foreign key to an ASCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. ");
-
-    /**
-     * The column <code>oagi.ascc.den</code>. DEN (dictionary entry name) of the
-     * ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of
-     * the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " +
-     * OBJECT_CLASS_TERM + ". " + DEN. 
-     */
-    public final TableField<AsccRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "DEN (dictionary entry name) of the ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + \"_ \" + OBJECT_CLASS_TERM + \". \" + DEN. ");
 
     /**
      * The column <code>oagi.ascc.definition</code>. This is a documentation or
@@ -404,18 +396,18 @@ public class Ascc extends TableImpl<AsccRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row20 type methods
+    // Row19 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
-        return (Row20) super.fieldsRow();
+    public Row19<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function20<? super ULong, ? super String, ? super Integer, ? super Integer, ? super Integer, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function19<? super ULong, ? super String, ? super Integer, ? super Integer, ? super Integer, ? super ULong, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -423,7 +415,7 @@ public class Ascc extends TableImpl<AsccRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function20<? super ULong, ? super String, ? super Integer, ? super Integer, ? super Integer, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function19<? super ULong, ? super String, ? super Integer, ? super Integer, ? super Integer, ? super ULong, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
