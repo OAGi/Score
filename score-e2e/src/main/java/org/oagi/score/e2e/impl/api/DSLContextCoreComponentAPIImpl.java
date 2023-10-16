@@ -40,6 +40,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ACC_MANIFEST.ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.RELEASE_ID);
+        fields.add(ACC_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ACC.fields()));
         return dslContext.select(fields)
                 .from(ACC_MANIFEST)
@@ -100,6 +101,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.RELEASE_ID);
+        fields.add(ASCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ASCCP.fields()));
         return dslContext.select(fields)
                 .from(ASCCP_MANIFEST)
@@ -243,6 +245,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -1644,6 +1647,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
