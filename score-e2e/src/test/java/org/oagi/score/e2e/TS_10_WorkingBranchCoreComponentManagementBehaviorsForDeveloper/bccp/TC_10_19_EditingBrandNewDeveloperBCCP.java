@@ -15,6 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
@@ -296,6 +296,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         String den = "Property Term. Temperature_ Open_ Measure";
         {
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
@@ -307,6 +308,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
             transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
 
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             tr = viewEditCoreComponentPage.getTableRecordByValue(den);
@@ -320,6 +322,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
