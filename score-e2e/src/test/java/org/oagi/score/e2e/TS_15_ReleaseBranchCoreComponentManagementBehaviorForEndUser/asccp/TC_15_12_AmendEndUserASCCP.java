@@ -214,7 +214,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"" + asccp.getPropertyTerm() + "\")]//ancestor::tr//td[8]//*[contains(text(), \"" + endUser.getLoginId() + "\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
+        invisibilityOfLoadingContainerElement(getDriver());
         click(viewEditCoreComponentPage.getTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         for (String ccState : Arrays.asList("BCCP", "CDT", "BDT")) {
