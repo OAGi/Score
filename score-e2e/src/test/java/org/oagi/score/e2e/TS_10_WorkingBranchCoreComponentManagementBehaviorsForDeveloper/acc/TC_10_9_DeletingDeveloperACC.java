@@ -16,13 +16,13 @@ import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.oagi.score.e2e.impl.PageHelper.getText;
-import static org.oagi.score.e2e.impl.PageHelper.switchToMainTab;
+import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_10_9_DeletingDeveloperACC extends BaseTest {
@@ -209,6 +209,7 @@ public class TC_10_9_DeletingDeveloperACC extends BaseTest {
             ascc.setCardinalityMax(1);
             coreComponentAPI.updateASCC(ascc);
         }
+        waitFor(Duration.ofMillis(5000L));
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         WebElement accNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//*[@ng-reflect-message=\"Deleted\" or contains(@class,'text-line-through')]")).size());
