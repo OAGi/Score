@@ -1300,11 +1300,16 @@ public class AccWriteRepository {
             newAsccManifestRecord.setAsccId(asccManifestRecord.getAsccId());
             newAsccManifestRecord.setReleaseId(accManifestRecord.getReleaseId());
             newAsccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
-            AsccpManifestRecord toAsccpManifest = dslContext.selectFrom(ASCCP_MANIFEST)
+            ULong toAsccpManifestId = dslContext.select(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID)
+                    .from(ASCCP_MANIFEST)
                     .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccManifestRecord.getToAsccpManifestId()))
-                    .fetchOne();
-            newAsccManifestRecord.setToAsccpManifestId(toAsccpManifest.getAsccpManifestId());
-            newAsccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + toAsccpManifest.getDen());
+                    .fetchOneInto(ULong.class);
+            newAsccManifestRecord.setToAsccpManifestId(toAsccpManifestId);
+            String toAsccpDen = dslContext.select(ASCCP_MANIFEST.DEN)
+                    .from(ASCCP_MANIFEST)
+                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(toAsccpManifestId))
+                    .fetchOneInto(String.class);
+            newAsccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + toAsccpDen);
             newAsccManifestRecord.setPrevAsccManifestId(asccManifestRecord.getAsccManifestId());
             dslContext.insertInto(ASCC_MANIFEST).set(newAsccManifestRecord).execute();
         }
@@ -1330,16 +1335,21 @@ public class AccWriteRepository {
             }
         }
 
-        for (BccManifestRecord bccManifestRecord: nullNextPrevBccManifestRecords) {
+        for (BccManifestRecord bccManifestRecord : nullNextPrevBccManifestRecords) {
             BccManifestRecord newBccManifestRecord = new BccManifestRecord();
             newBccManifestRecord.setBccId(bccManifestRecord.getBccId());
             newBccManifestRecord.setReleaseId(accManifestRecord.getReleaseId());
             newBccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
-            BccpManifestRecord toBccpManifest = dslContext.selectFrom(BCCP_MANIFEST)
+            ULong toBccpManifestId = dslContext.select(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)
+                    .from(BCCP_MANIFEST)
                     .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccManifestRecord.getToBccpManifestId()))
-                    .fetchOne();
-            newBccManifestRecord.setToBccpManifestId(toBccpManifest.getBccpManifestId());
-            newBccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + toBccpManifest.getDen());
+                    .fetchOneInto(ULong.class);
+            newBccManifestRecord.setToBccpManifestId(toBccpManifestId);
+            String toBccpDen = dslContext.select(BCCP_MANIFEST.DEN)
+                    .from(BCCP_MANIFEST)
+                    .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(toBccpManifestId))
+                    .fetchOneInto(String.class);
+            newBccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + toBccpDen);
             newBccManifestRecord.setPrevBccManifestId(bccManifestRecord.getBccManifestId());
             dslContext.insertInto(BCC_MANIFEST).set(newBccManifestRecord).execute();
         }
