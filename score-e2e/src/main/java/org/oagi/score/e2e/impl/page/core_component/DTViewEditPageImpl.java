@@ -698,8 +698,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
         });
-        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
         assert "Deleted".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
