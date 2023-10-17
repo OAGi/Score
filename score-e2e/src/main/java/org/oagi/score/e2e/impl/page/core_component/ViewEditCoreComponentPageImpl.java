@@ -79,6 +79,8 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             click(getDriver(), optionField);
             escape(getDriver());
         });
+
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
