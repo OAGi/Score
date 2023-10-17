@@ -273,7 +273,8 @@ public class AsccpWriteRepository {
             asccpManifestRecord.setDen(den);
             dslContext.update(ASCCP_MANIFEST)
                     .set(ASCCP_MANIFEST.DEN, den)
-                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()));
+                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
+                    .execute();
         }
         if (compare(asccpRecord.getDefinition(), request.getDefinition()) != 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)

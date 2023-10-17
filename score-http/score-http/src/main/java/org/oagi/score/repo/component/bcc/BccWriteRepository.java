@@ -365,8 +365,7 @@ public class BccWriteRepository {
         UpdateSetMoreStep<BccRecord> moreStep = null;
 
         String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(BCCP_MANIFEST.DEN)
-                .from(BCCP)
-                .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+                .from(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccManifestRecord.getToBccpManifestId()))
                 .fetchOneInto(String.class);
         boolean denChanged = compare(bccManifestRecord.getDen(), den) != 0;

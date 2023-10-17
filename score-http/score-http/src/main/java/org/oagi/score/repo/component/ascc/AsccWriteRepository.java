@@ -383,8 +383,7 @@ public class AsccWriteRepository {
         UpdateSetMoreStep<AsccRecord> moreStep = null;
 
         String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(ASCCP_MANIFEST.DEN)
-                .from(ASCCP)
-                .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                .from(ASCCP_MANIFEST)
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccManifestRecord.getToAsccpManifestId()))
                 .fetchOneInto(String.class);
         boolean denChanged = compare(asccManifestRecord.getDen(), den) != 0;
