@@ -84,7 +84,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
      * OpenAPI document is being served. Variable substitutions will be made
      * when a variable is named in {brackets}.
      */
-    public final TableField<OasServerRecord, String> URL = createField(DSL.name("url"), SQLDataType.CLOB.nullable(false), this, "REQUIRED. A URL to the target host. This URL supports Server Variables and MAY be relative, to indicate that the host location is relative to the location where the OpenAPI document is being served. Variable substitutions will be made when a variable is named in {brackets}.");
+    public final TableField<OasServerRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(250).nullable(false), this, "REQUIRED. A URL to the target host. This URL supports Server Variables and MAY be relative, to indicate that the host location is relative to the location where the OpenAPI document is being served. Variable substitutions will be made when a variable is named in {brackets}.");
 
     /**
      * The column <code>oagi.oas_server.variables</code>. A map between a

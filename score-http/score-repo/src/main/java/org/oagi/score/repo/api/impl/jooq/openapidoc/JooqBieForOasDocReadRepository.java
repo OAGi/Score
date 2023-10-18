@@ -45,7 +45,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
-                        ASCCP.DEN,
+                        ASCCP_MANIFEST.DEN,
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
                         APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                         APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
@@ -105,7 +105,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
             bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
             bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
-            bieForOasDoc.setDen(record.get(ASCCP.DEN));
+            bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
             if (record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")) != null) {
                 bieForOasDoc.setMessageBody("Request");

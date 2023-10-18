@@ -88,7 +88,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.terms_of_service</code>. A URL to the Terms
      * of Service for the API. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> TERMS_OF_SERVICE = createField(DSL.name("terms_of_service"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A URL to the Terms of Service for the API. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> TERMS_OF_SERVICE = createField(DSL.name("terms_of_service"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL to the Terms of Service for the API. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.version</code>. REQUIRED. The version of
@@ -107,7 +107,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.contact_url</code>. The URL pointing to the
      * contact information. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> CONTACT_URL = createField(DSL.name("contact_url"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The URL pointing to the contact information. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> CONTACT_URL = createField(DSL.name("contact_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The URL pointing to the contact information. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.contact_email</code>. The email address of
@@ -126,7 +126,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * The column <code>oagi.oas_doc.license_url</code>. A URL to the license
      * used for the API. MUST be in the format of a URL.
      */
-    public final TableField<OasDocRecord, String> LICENSE_URL = createField(DSL.name("license_url"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A URL to the license used for the API. MUST be in the format of a URL.");
+    public final TableField<OasDocRecord, String> LICENSE_URL = createField(DSL.name("license_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A URL to the license used for the API. MUST be in the format of a URL.");
 
     /**
      * The column <code>oagi.oas_doc.owner_user_id</code>. The user who owns the
