@@ -6,6 +6,7 @@ import {ScoreUser} from '../../../../authentication/domain/auth';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
 import {BbieScDetail, ChangeListener} from '../../../domain/bie-flat-tree';
+import {BieToAssign} from '../../../../business-term-management/domain/business-term';
 
 export class OasDocListRequest {
   filters: {
@@ -337,7 +338,6 @@ export class BieForOasDoc {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
-
   get tagName(): string {
     return this._tagName;
   }
@@ -437,4 +437,30 @@ export class BieForOasDocDeleteRequest {
 }
 export class ReusedBIEViolationCheck {
   errorMessages: string[];
+}
+
+export class OasTag{
+  oasTagId: number;
+  guid: string;
+  name: string;
+  lastUpdateTimestamp: Date;
+  createdBy: ScoreUser;
+  lastUpdatedBy: ScoreUser;
+  used: boolean;
+}
+
+export class AssignedOasTag {
+  assignedOasTagId: number;
+  bieId: number;
+  oasTagId: number;
+  guid: string;
+  name: string;
+  lastUpdateTimestamp: Date;
+  createdBy: ScoreUser;
+  lastUpdatedBy: ScoreUser;
+}
+
+export class PostAssignOasTag {
+  biesToAssign: number[];
+  oasTagId: number;
 }
