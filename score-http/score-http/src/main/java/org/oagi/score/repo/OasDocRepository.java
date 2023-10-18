@@ -97,7 +97,7 @@ public class OasDocRepository {
                     TOP_LEVEL_ASBIEP.VERSION,
                     TOP_LEVEL_ASBIEP.STATUS,
                     ABIE.GUID,
-                    ASCCP.DEN,
+                    ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
@@ -120,7 +120,7 @@ public class OasDocRepository {
 
         public SelectBieForOasDocListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
@@ -271,9 +271,9 @@ public class OasDocRepository {
 
                     case "den":
                         if ("asc".equals(direction)) {
-                            sortField = ASCCP.DEN.asc();
+                            sortField = ASCCP_MANIFEST.DEN.asc();
                         } else if ("desc".equals(direction)) {
-                            sortField = ASCCP.DEN.desc();
+                            sortField = ASCCP_MANIFEST.DEN.desc();
                         }
                         break;
 
@@ -421,7 +421,7 @@ public class OasDocRepository {
                     ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
                     ASCCP.ASCCP_ID,
                     ASCCP.GUID,
-                    ASCCP.DEN,
+                    ASCCP_MANIFEST.DEN,
                     APP_USER.as("owner").LOGIN_ID.as("owner"),
                     APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                     APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
@@ -464,7 +464,7 @@ public class OasDocRepository {
 
         public GetBieListForOasDocArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
@@ -615,9 +615,9 @@ public class OasDocRepository {
 
                     case "den":
                         if ("asc".equals(direction)) {
-                            sortField = ASCCP.DEN.asc();
+                            sortField = ASCCP_MANIFEST.DEN.asc();
                         } else if ("desc".equals(direction)) {
-                            sortField = ASCCP.DEN.desc();
+                            sortField = ASCCP_MANIFEST.DEN.desc();
                         }
                         break;
 
