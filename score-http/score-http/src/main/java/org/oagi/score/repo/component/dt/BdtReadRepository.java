@@ -44,7 +44,11 @@ public class BdtReadRepository {
         bdtNode.setDataTypeTerm(dtRecord.getDataTypeTerm());
         bdtNode.setQualifier(dtRecord.getQualifier_());
         bdtNode.setDefinition(dtRecord.getDefinition());
-        bdtNode.setDen(dtRecord.getDen());
+        String den = dslContext.select(DT_MANIFEST.DEN)
+                .from(DT_MANIFEST)
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(dtManifestId)))
+                .fetchOneInto(String.class);
+        bdtNode.setDen(den);
         bdtNode.setBdtManifestId(dtManifestId);
 
         return bdtNode;

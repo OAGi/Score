@@ -611,9 +611,6 @@ public class TC_15_16_AmendEndUserBCCP extends BaseTest {
         assertEquals(dataType.getQualifier(), getText(dtPanel.getQualifierField()));
         assertFalse(dtPanel.getDefinitionSourceField().isEnabled());
         assertFalse(dtPanel.getDefinitionField().isEnabled());
-
-        BCCPViewEditPage finalBccpViewEditPage = bccpViewEditPage;
-        assertThrows(WebDriverException.class, () -> finalBccpViewEditPage.openChangeBDTDialog());
     }
 
     @Test

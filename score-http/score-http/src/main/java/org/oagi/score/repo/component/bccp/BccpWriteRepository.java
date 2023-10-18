@@ -63,8 +63,6 @@ public class BccpWriteRepository {
         bccp.setGuid(ScoreGuid.randomGuid());
         bccp.setPropertyTerm(request.getInitialPropertyTerm());
         bccp.setRepresentationTerm(bdt.getDataTypeTerm());
-        String den = bccp.getPropertyTerm() + ". " + bdt.getDen().replaceAll(". Type", "");
-        bccp.setDen(den);
         bccp.setBdtId(bdt.getDtId());
         bccp.setState(CcState.WIP.name());
         bccp.setIsDeprecated((byte) 0);
@@ -86,6 +84,8 @@ public class BccpWriteRepository {
         bccpManifest.setBccpId(bccp.getBccpId());
         bccpManifest.setBdtManifestId(bdtManifest.getDtManifestId());
         bccpManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
+        String den = bccp.getPropertyTerm() + ". " + bdtManifest.getDen().replaceAll(". Type", "");
+        bccpManifest.setDen(den);
         bccpManifest = dslContext.insertInto(BCCP_MANIFEST)
                 .set(bccpManifest)
                 .returning(BCCP_MANIFEST.BCCP_MANIFEST_ID).fetchOne();
@@ -246,6 +246,8 @@ public class BccpWriteRepository {
         boolean propertyTermChanged = false;
         if (compare(bccpRecord.getPropertyTerm(), request.getPropertyTerm()) != 0) {
             propertyTermChanged = true;
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(BCCP.PROPERTY_TERM, request.getPropertyTerm());
 
             Record3<ULong, String, String> result = dslContext.select(DT.DT_ID, DT.QUALIFIER, DT.DATA_TYPE_TERM)
                     .from(DT)
@@ -256,10 +258,11 @@ public class BccpWriteRepository {
             String qualifier = result.get(DT.QUALIFIER);
             String dataTypeTerm = result.get(DT.DATA_TYPE_TERM);
             String den = request.getPropertyTerm() + ". " + (((qualifier != null) ? (qualifier + "_ ") : "") + dataTypeTerm);
-
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(BCCP.PROPERTY_TERM, request.getPropertyTerm())
-                    .set(BCCP.DEN, den);
+            bccpManifestRecord.setDen(den);
+            dslContext.update(BCCP_MANIFEST)
+                    .set(BCCP_MANIFEST.DEN, den)
+                    .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
+                    .execute();
         }
         if (!StringUtils.hasLength(request.getDefaultValue()) && !StringUtils.hasLength(request.getFixedValue())) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
@@ -372,16 +375,17 @@ public class BccpWriteRepository {
 
         bccpRecord.setBdtId(result.get(DT.DT_ID));
         bccpRecord.setRepresentationTerm(result.get(DT.DATA_TYPE_TERM));
+        bccpRecord.setLastUpdatedBy(userId);
+        bccpRecord.setLastUpdateTimestamp(timestamp);
+        bccpRecord.update(BCCP.BDT_ID,
+                BCCP.REPRESENTATION_TERM,
+                BCCP.LAST_UPDATED_BY, BCCP.LAST_UPDATE_TIMESTAMP);
 
         String qualifier = result.get(DT.QUALIFIER);
         String dataTypeTerm = result.get(DT.DATA_TYPE_TERM);
         String den = bccpRecord.getPropertyTerm() + ". " + (((qualifier != null) ? (qualifier + "_ ") : "") + dataTypeTerm);
-        bccpRecord.setDen(den);
-        bccpRecord.setLastUpdatedBy(userId);
-        bccpRecord.setLastUpdateTimestamp(timestamp);
-        bccpRecord.update(BCCP.BDT_ID,
-                BCCP.REPRESENTATION_TERM, BCCP.DEN,
-                BCCP.LAST_UPDATED_BY, BCCP.LAST_UPDATE_TIMESTAMP);
+        bccpManifestRecord.setDen(den);
+        bccpManifestRecord.update(BCCP_MANIFEST.DEN);
 
         // creates new log for updated record.
         LogRecord logRecord =
@@ -396,20 +400,19 @@ public class BccpWriteRepository {
         bccpManifestRecord.update(BCCP_MANIFEST.BDT_MANIFEST_ID, BCCP_MANIFEST.LOG_ID);
 
         // update the DEN of BCCs associated with this BCCP.
-        for (Record2<ULong, String> bccRecord : dslContext.select(BCC.BCC_ID, ACC.OBJECT_CLASS_TERM)
-                .from(BCC)
-                .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+        for (Record2<ULong, String> bccRecord : dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, ACC.OBJECT_CLASS_TERM)
+                .from(BCC_MANIFEST)
                 .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .fetch()) {
-            dslContext.update(BCC)
-                    .set(BCC.DEN, bccRecord.get(ACC.OBJECT_CLASS_TERM) + ". " + den)
-                    .where(BCC.BCC_ID.eq(bccRecord.get(BCC.BCC_ID)))
+            dslContext.update(BCC_MANIFEST)
+                    .set(BCC_MANIFEST.DEN, bccRecord.get(ACC.OBJECT_CLASS_TERM) + ". " + den)
+                    .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccRecord.get(BCC_MANIFEST.BCC_MANIFEST_ID)))
                     .execute();
         }
 
-        return new UpdateBccpBdtRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), bccpRecord.getDen());
+        return new UpdateBccpBdtRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), bccpManifestRecord.getDen());
     }
 
     public UpdateBccpStateRepositoryResponse updateBccpState(UpdateBccpStateRepositoryRequest request) {
@@ -445,7 +448,7 @@ public class BccpWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (bccpRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + bccpRecord.getDen() + "' dose not have NamespaceId.");
+            throw new IllegalArgumentException("'" + bccpManifestRecord.getDen() + "' dose not have NamespaceId.");
         }
 
         // update bccp state.
@@ -545,7 +548,7 @@ public class BccpWriteRepository {
                 .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccpManifestRecord.getBccpManifestId()))
                 .fetch();
         if (!bccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccpManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeBccpRepositoryResponse(bccpManifestRecord.getBccpManifestId().toBigInteger(), e);
             } else {
@@ -733,13 +736,13 @@ public class BccpWriteRepository {
         }
 
         bccpManifestRecord.setBdtManifestId(bdtManifestRecord.getDtManifestId());
+        bccpManifestRecord.setDen(bccpRecord.getPropertyTerm() + ". " + bccpRecord.getRepresentationTerm());
         bccpManifestRecord.setLogId(cursorLog.getLogId());
-        bccpManifestRecord.update(BCCP_MANIFEST.BDT_MANIFEST_ID, BCCP_MANIFEST.LOG_ID);
+        bccpManifestRecord.update(BCCP_MANIFEST.BDT_MANIFEST_ID, BCCP_MANIFEST.DEN, BCCP_MANIFEST.LOG_ID);
 
         bccpRecord.setBdtId(bdtManifestRecord.getDtId());
         bccpRecord.setPropertyTerm(serializer.getSnapshotString(snapshot.get("propertyTerm")));
         bccpRecord.setRepresentationTerm(serializer.getSnapshotString(snapshot.get("representationTerm")));
-        bccpRecord.setDen(bccpRecord.getPropertyTerm() + ". " + bccpRecord.getRepresentationTerm());
         bccpRecord.setDefinition(serializer.getSnapshotString(snapshot.get("definition")));
         bccpRecord.setDefinitionSource(serializer.getSnapshotString(snapshot.get("definitionSource")));
         bccpRecord.setNamespaceId(serializer.getSnapshotId(snapshot.get("namespaceId")));

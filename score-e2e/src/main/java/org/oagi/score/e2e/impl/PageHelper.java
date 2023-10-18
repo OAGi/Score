@@ -114,7 +114,7 @@ public abstract class PageHelper {
     }
 
     public static void invisibilityOfLoadingContainerElement(WebDriver driver) {
-        invisibilityOfLoadingContainerElement(defaultWait(driver));
+        invisibilityOfLoadingContainerElement(wait(driver, Duration.ofSeconds(10L), ofMillis(100L)));
     }
 
     public static void invisibilityOfLoadingContainerElement(Wait<WebDriver> wait) {

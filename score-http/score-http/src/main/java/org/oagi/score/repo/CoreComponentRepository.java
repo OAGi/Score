@@ -234,7 +234,7 @@ public class CoreComponentRepository {
                         ACC.STATE,
                         ACC.OWNER_USER_ID,
                         APP_USER.LOGIN_ID.as("ownerUsername"),
-                        ACC.DEN)
+                        ACC_MANIFEST.DEN)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -246,7 +246,7 @@ public class CoreComponentRepository {
                                 ASCCP.STATE,
                                 ASCCP.OWNER_USER_ID,
                                 APP_USER.LOGIN_ID.as("ownerUsername"),
-                                ASCCP.DEN)
+                                ASCCP_MANIFEST.DEN)
                         .from(ASCCP_MANIFEST)
                         .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                         .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -258,7 +258,7 @@ public class CoreComponentRepository {
                                 BCCP.STATE,
                                 BCCP.OWNER_USER_ID,
                                 APP_USER.LOGIN_ID.as("ownerUsername"),
-                                BCCP.DEN)
+                                BCCP_MANIFEST.DEN)
                         .from(BCCP_MANIFEST)
                         .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                         .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
@@ -270,7 +270,7 @@ public class CoreComponentRepository {
                                 DT.STATE,
                                 DT.OWNER_USER_ID,
                                 APP_USER.LOGIN_ID.as("ownerUsername"),
-                                DT.DEN)
+                                DT_MANIFEST.DEN)
                         .from(DT_MANIFEST)
                         .join(DT).on(and(DT_MANIFEST.DT_ID.eq(DT.DT_ID), DT_MANIFEST.BASED_DT_MANIFEST_ID.isNotNull()))
                         .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))

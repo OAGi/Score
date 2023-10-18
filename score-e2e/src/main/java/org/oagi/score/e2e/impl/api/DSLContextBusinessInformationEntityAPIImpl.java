@@ -38,7 +38,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
         fields.add(ASBIEP.BASED_ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ASCCP_ID);
         fields.add(ASCCP.PROPERTY_TERM);
-        fields.add(ASCCP.DEN);
+        fields.add(ASCCP_MANIFEST.DEN);
         fields.add(RELEASE.RELEASE_NUM);
         return dslContext.select(fields)
                 .from(TOP_LEVEL_ASBIEP)
@@ -58,7 +58,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
         fields.add(ASBIEP.BASED_ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ASCCP_ID);
         fields.add(ASCCP.PROPERTY_TERM);
-        fields.add(ASCCP.DEN);
+        fields.add(ASCCP_MANIFEST.DEN);
         fields.add(RELEASE.RELEASE_NUM);
         return dslContext.select(fields)
                 .from(TOP_LEVEL_ASBIEP)
@@ -68,7 +68,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                 .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         ASCCP_MANIFEST.RELEASE_ID.eq(releaseId),
-                        ASCCP.DEN.eq(den)))
+                        ASCCP_MANIFEST.DEN.eq(den)))
                 .fetchOne(record -> topLevelASBIEPMapper(record));
     }
 
@@ -94,7 +94,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
         topLevelASBIEPObject.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
         topLevelASBIEPObject.setOwnerUserId(record.get(TOP_LEVEL_ASBIEP.OWNER_USER_ID).toBigInteger());
         topLevelASBIEPObject.setLastUpdateTimestamp(record.get(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP));
-        topLevelASBIEPObject.setDen(record.get(ASCCP.DEN));
+        topLevelASBIEPObject.setDen(record.get(ASCCP_MANIFEST.DEN));
         topLevelASBIEPObject.setReleaseNumber(record.get(RELEASE.RELEASE_NUM));
         return topLevelASBIEPObject;
     }

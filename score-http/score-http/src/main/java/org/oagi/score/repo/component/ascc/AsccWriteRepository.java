@@ -56,7 +56,8 @@ public class AsccWriteRepository {
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
 
-    private void ensureNoConflictInForward(ULong fromAccManifestId, AsccpRecord asccpRecord,
+    private void ensureNoConflictInForward(ULong fromAccManifestId,
+                                           AsccpManifestRecord asccpManifestRecord, AsccpRecord asccpRecord,
                                            List<String> denPathList) {
         if (fromAccManifestId == null) {
             return;
@@ -65,7 +66,7 @@ public class AsccWriteRepository {
         // Issue #1463
         // Find conflicts under 'Group' ACCs.
         {
-            List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+            List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                     .from(ASCC_MANIFEST)
                     .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                     .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
@@ -100,8 +101,8 @@ public class AsccWriteRepository {
                         ))
                         .fetchOneInto(Integer.class);
                 if (cnt > 0) {
-                    denPathList.add(groupAccRecord.get(ACC.DEN));
-                    throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has ASCCP [" + asccpRecord.getDen() + "]");
+                    denPathList.add(groupAccRecord.get(ACC_MANIFEST.DEN));
+                    throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has ASCCP [" + asccpManifestRecord.getDen() + "]");
                 }
             }
         }
@@ -116,10 +117,10 @@ public class AsccWriteRepository {
                 ))
                 .fetchOneInto(Integer.class);
         if (cnt > 0) {
-            throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has ASCCP [" + asccpRecord.getDen() + "]");
+            throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has ASCCP [" + asccpManifestRecord.getDen() + "]");
         }
 
-        Record2<ULong, String> basedAccRecord = dslContext.select(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC.DEN)
+        Record2<ULong, String> basedAccRecord = dslContext.select(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                 .from(ACC_MANIFEST)
                 .join(ACC_MANIFEST.as("base")).on(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("base").ACC_MANIFEST_ID))
                 .join(ACC).on(ACC_MANIFEST.as("base").ACC_ID.eq(ACC.ACC_ID))
@@ -128,14 +129,15 @@ public class AsccWriteRepository {
 
         if (basedAccRecord != null) {
             List<String> childDenPathList = new ArrayList<>(denPathList);
-            childDenPathList.add(basedAccRecord.get(ACC.DEN));
-            ensureNoConflictInForward(basedAccRecord.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID), asccpRecord, childDenPathList);
+            childDenPathList.add(basedAccRecord.get(ACC_MANIFEST.DEN));
+            ensureNoConflictInForward(basedAccRecord.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID), asccpManifestRecord, asccpRecord, childDenPathList);
         }
     }
 
-    private void ensureNoConflictInBackward(ULong fromAccManifestId, AsccpRecord asccpRecord,
+    private void ensureNoConflictInBackward(ULong fromAccManifestId,
+                                            AsccpManifestRecord asccpManifestRecord, AsccpRecord asccpRecord,
                                             List<String> denPathList) {
-        List<Record2<ULong, String>> childAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+        List<Record2<ULong, String>> childAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(fromAccManifestId))
@@ -147,12 +149,12 @@ public class AsccWriteRepository {
         for (Record2<ULong, String> childAccRecord : childAccRecords) {
             ULong childAccManifestId = childAccRecord.get(ACC_MANIFEST.ACC_MANIFEST_ID);
             List<String> childDenPathList = new ArrayList<>(denPathList);
-            childDenPathList.add(childAccRecord.get(ACC.DEN));
+            childDenPathList.add(childAccRecord.get(ACC_MANIFEST.DEN));
 
             // Issue #1463
             // Find conflicts under 'Group' ACCs.
             {
-                List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+                List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                         .from(Tables.ASCC_MANIFEST)
                         .join(ASCCP_MANIFEST).on(Tables.ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                         .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
@@ -187,8 +189,8 @@ public class AsccWriteRepository {
                             ))
                             .fetchOneInto(Integer.class);
                     if (cnt > 0) {
-                        childDenPathList.add(groupAccRecord.get(ACC.DEN));
-                        throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has ASCCP [" + asccpRecord.getDen() + "]");
+                        childDenPathList.add(groupAccRecord.get(ACC_MANIFEST.DEN));
+                        throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has ASCCP [" + asccpManifestRecord.getDen() + "]");
                     }
                 }
             }
@@ -202,10 +204,10 @@ public class AsccWriteRepository {
                     ))
                     .fetchOneInto(Integer.class);
             if (cnt > 0) {
-                throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has ASCCP [" + asccpRecord.getDen() + "]");
+                throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has ASCCP [" + asccpManifestRecord.getDen() + "]");
             }
 
-            ensureNoConflictInBackward(childAccManifestId, asccpRecord, childDenPathList);
+            ensureNoConflictInBackward(childAccManifestId, asccpManifestRecord, asccpRecord, childDenPathList);
         }
     }
 
@@ -243,10 +245,10 @@ public class AsccWriteRepository {
 
         // Issue #1192
         List<String> denPathList = new ArrayList<>();
-        denPathList.add(accRecord.getDen());
+        denPathList.add(accManifestRecord.getDen());
 
-        ensureNoConflictInForward(accManifestRecord.getAccManifestId(), asccpRecord, denPathList);
-        ensureNoConflictInBackward(accManifestRecord.getAccManifestId(), asccpRecord, denPathList);
+        ensureNoConflictInForward(accManifestRecord.getAccManifestId(), asccpManifestRecord, asccpRecord, denPathList);
+        ensureNoConflictInBackward(accManifestRecord.getAccManifestId(), asccpManifestRecord, asccpRecord, denPathList);
 
         if (dslContext.selectCount()
                 .from(ASCCP_MANIFEST)
@@ -274,7 +276,6 @@ public class AsccWriteRepository {
 
         AsccRecord ascc = new AsccRecord();
         ascc.setGuid(ScoreGuid.randomGuid());
-        ascc.setDen(accRecord.getObjectClassTerm() + ". " + asccpRecord.getDen());
         ascc.setCardinalityMin(request.getCardinalityMin());
         ascc.setCardinalityMax(request.getCardinalityMax());
         ascc.setSeqKey(0); // @deprecated
@@ -293,18 +294,19 @@ public class AsccWriteRepository {
                         .returning(ASCC.ASCC_ID).fetchOne().getAsccId()
         );
 
-        AsccManifestRecord asccManifest = new AsccManifestRecord();
-        asccManifest.setAsccId(ascc.getAsccId());
-        asccManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
-        asccManifest.setFromAccManifestId(accManifestRecord.getAccManifestId());
-        asccManifest.setToAsccpManifestId(asccpManifestRecord.getAsccpManifestId());
-        asccManifest.setAsccManifestId(
+        AsccManifestRecord asccManifestRecord = new AsccManifestRecord();
+        asccManifestRecord.setAsccId(ascc.getAsccId());
+        asccManifestRecord.setReleaseId(ULong.valueOf(request.getReleaseId()));
+        asccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
+        asccManifestRecord.setToAsccpManifestId(asccpManifestRecord.getAsccpManifestId());
+        asccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + asccpManifestRecord.getDen());
+        asccManifestRecord.setAsccManifestId(
                 dslContext.insertInto(ASCC_MANIFEST)
-                        .set(asccManifest)
+                        .set(asccManifestRecord)
                         .returning(ASCC_MANIFEST.ASCC_MANIFEST_ID).fetchOne().getAsccManifestId()
         );
 
-        seqKeyHandler(request.getUser(), asccManifest).moveTo(request.getPos());
+        seqKeyHandler(request.getUser(), asccManifestRecord).moveTo(request.getPos());
 
         if (request.getLogAction() != null) {
             upsertLogIntoAccAndAssociationsByAction(
@@ -321,7 +323,7 @@ public class AsccWriteRepository {
         }
 
 
-        return new CreateAsccRepositoryResponse(asccManifest.getAsccManifestId().toBigInteger());
+        return new CreateAsccRepositoryResponse(asccManifestRecord.getAsccManifestId().toBigInteger());
     }
 
     private void upsertLogIntoAccAndAssociations(AccRecord accRecord,
@@ -380,15 +382,12 @@ public class AsccWriteRepository {
         UpdateSetFirstStep<AsccRecord> firstStep = dslContext.update(ASCC);
         UpdateSetMoreStep<AsccRecord> moreStep = null;
 
-        String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(ASCCP.DEN)
-                .from(ASCCP)
-                .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+        String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(ASCCP_MANIFEST.DEN)
+                .from(ASCCP_MANIFEST)
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccManifestRecord.getToAsccpManifestId()))
                 .fetchOneInto(String.class);
-        if (compare(asccRecord.getDen(), den) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(ASCC.DEN, den);
-        }
+        boolean denChanged = compare(asccManifestRecord.getDen(), den) != 0;
+
         if (compare(asccRecord.getDefinition(), request.getDefinition()) != 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(ASCC.DEFINITION, request.getDefinition());
@@ -410,7 +409,14 @@ public class AsccWriteRepository {
                     .set(ASCC.CARDINALITY_MAX, request.getCardinalityMax());
         }
 
-        if (moreStep != null) {
+        if (moreStep != null || denChanged) {
+            if (denChanged) {
+                dslContext.update(ASCC_MANIFEST)
+                        .set(ASCC_MANIFEST.DEN, den)
+                        .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asccManifestRecord.getAsccManifestId()))
+                        .execute();
+            }
+
             moreStep.set(ASCC.LAST_UPDATED_BY, userId)
                     .set(ASCC.LAST_UPDATE_TIMESTAMP, timestamp)
                     .where(ASCC.ASCC_ID.eq(asccRecord.getAsccId()))
@@ -530,9 +536,8 @@ public class AsccWriteRepository {
 
         AsccRecord targetAsccRecord = dslContext.selectFrom(ASCC).where(ASCC.ASCC_ID.eq(targetAsccManifestRecord.getAsccId())).fetchOne();
 
-        String asccpDen = dslContext.select(ASCCP.DEN)
+        String asccpDen = dslContext.select(ASCCP_MANIFEST.DEN)
                 .from(ASCCP_MANIFEST)
-                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(targetAsccManifestRecord.getToAsccpManifestId()))
                 .fetchOneInto(String.class);
 
@@ -615,12 +620,12 @@ public class AsccWriteRepository {
         targetAsccRecord.setFromAccId(targetAccRecord.getAccId());
         targetAsccRecord.setPrevAsccId(null);
         targetAsccRecord.setNextAsccId(null);
-        targetAsccRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + asccpDen);
         ULong asccId = dslContext.insertInto(ASCC).set(targetAsccRecord).returning().fetchOne().getAsccId();
 
         targetAsccManifestRecord.setAsccManifestId(null);
         targetAsccManifestRecord.setFromAccManifestId(ULong.valueOf(request.getAccManifestId()));
         targetAsccManifestRecord.setAsccId(asccId);
+        targetAsccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + asccpDen);
         targetAsccManifestRecord.setSeqKeyId(null);
         targetAsccManifestRecord.setPrevAsccManifestId(null);
         targetAsccManifestRecord.setNextAsccManifestId(null);

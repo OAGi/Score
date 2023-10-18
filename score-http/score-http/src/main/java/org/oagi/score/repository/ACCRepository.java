@@ -29,7 +29,7 @@ public class ACCRepository implements ScoreRepository<ACC> {
                 Tables.ACC.ACC_ID,
                 Tables.ACC.GUID,
                 Tables.ACC.OBJECT_CLASS_TERM,
-                Tables.ACC.DEN,
+                Tables.ACC_MANIFEST.DEN,
                 Tables.ACC.DEFINITION,
                 Tables.ACC.DEFINITION_SOURCE,
                 Tables.ACC.BASED_ACC_ID,

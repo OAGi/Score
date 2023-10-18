@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function22;
+import org.jooq.Function21;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row22;
+import org.jooq.Row21;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -87,13 +87,6 @@ public class Acc extends TableImpl<AccRecord> {
      * is expanded to "Identifier".
      */
     public final TableField<AccRecord, String> OBJECT_CLASS_TERM = createField(DSL.name("object_class_term"), SQLDataType.VARCHAR(100).nullable(false), this, "Object class name of the ACC concept. For OAGIS, this is generally name of a type with the \"Type\" truncated from the end. Per CCS the name is space separated. \"ID\" is expanded to \"Identifier\".");
-
-    /**
-     * The column <code>oagi.acc.den</code>. DEN (dictionary entry name) of the
-     * ACC. It can be derived as OBJECT_CLASS_QUALIFIER + "_ " +
-     * OBJECT_CLASS_TERM + ". Details".
-     */
-    public final TableField<AccRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "DEN (dictionary entry name) of the ACC. It can be derived as OBJECT_CLASS_QUALIFIER + \"_ \" + OBJECT_CLASS_TERM + \". Details\".");
 
     /**
      * The column <code>oagi.acc.definition</code>. This is a documentation or
@@ -423,18 +416,18 @@ public class Acc extends TableImpl<AccRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row22 type methods
+    // Row21 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row22<ULong, String, String, String, String, String, String, ULong, String, Integer, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
-        return (Row22) super.fieldsRow();
+    public Row21<ULong, String, String, String, String, String, ULong, String, Integer, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
+        return (Row21) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function21<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -442,7 +435,7 @@ public class Acc extends TableImpl<AccRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function21<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

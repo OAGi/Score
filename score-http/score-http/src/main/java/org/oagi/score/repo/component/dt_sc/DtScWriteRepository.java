@@ -600,7 +600,7 @@ public class DtScWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (dtRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + dtRecord.getDen() + "' dose not have NamespaceId.");
+            throw new IllegalArgumentException("'" + dtManifestRecord.getDen() + "' dose not have NamespaceId.");
         }
 
         // update dt state.

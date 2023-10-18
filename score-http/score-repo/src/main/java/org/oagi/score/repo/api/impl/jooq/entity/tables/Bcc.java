@@ -114,14 +114,6 @@ public class Bcc extends TableImpl<BccRecord> {
     public final TableField<BccRecord, Integer> ENTITY_TYPE = createField(DSL.name("entity_type"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. ");
 
     /**
-     * The column <code>oagi.bcc.den</code>. DEN (dictionary entry name) of the
-     * BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of
-     * the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + "_ " +
-     * OBJECT_CLASS_TERM + ". " + DEN. 
-     */
-    public final TableField<BccRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + \"_ \" + OBJECT_CLASS_TERM + \". \" + DEN. ");
-
-    /**
      * The column <code>oagi.bcc.definition</code>. This is a documentation or
      * description of the BCC. Since BCC is business context independent, this
      * is a business context independent description of the BCC. Since there are

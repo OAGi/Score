@@ -10,11 +10,16 @@ import org.oagi.score.repository.provider.DataProvider;
 
 public abstract class ASCCP implements Component {
 
+    private AsccpManifestRecord asccpManifest;
     private AsccpRecord asccp;
+    private AccManifestRecord rolfOfAccManifest;
     private AccRecord roleOfAcc;
 
-    ASCCP(AsccpRecord asccp, AccRecord roleOfAcc) {
+    ASCCP(AsccpManifestRecord asccpManifest, AsccpRecord asccp,
+          AccManifestRecord rolfOfAccManifest, AccRecord roleOfAcc) {
+        this.asccpManifest = asccpManifest;
         this.asccp = asccp;
+        this.rolfOfAccManifest = rolfOfAccManifest;
         this.roleOfAcc = roleOfAcc;
     }
 
@@ -33,9 +38,9 @@ public abstract class ASCCP implements Component {
             case 5:
             case 6:
             case 7:
-                return new ASCCPComplexType(asccp, roleOfAcc);
+                return new ASCCPComplexType(asccpManifest, asccp, roleOfAccManifest, roleOfAcc);
             case 4:
-                return new ASCCPGroup(asccp, roleOfAcc);
+                return new ASCCPGroup(asccpManifest, asccp, roleOfAccManifest, roleOfAcc);
             default:
                 throw new IllegalStateException();
         }
@@ -46,7 +51,7 @@ public abstract class ASCCP implements Component {
     }
 
     public String getTypeName() {
-        String den = asccp.getDen();
+        String den = asccpManifest.getDen();
         String propertyTerm = asccp.getPropertyTerm();
 
         return Utility.toCamelCase(den.substring((propertyTerm + ". ").length())) + "Type";

@@ -16,6 +16,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -293,6 +294,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, release, namespace, "WIP");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        waitFor(Duration.ofMillis(4000L));
         appendASCCPDialog.setDEN(asccp_endUser.getDen());
         appendASCCPDialog.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-dialog-content//a[contains(text(),\"" + asccp_endUser.getPropertyTerm() + "\")]//ancestor::tr/td[1]//label/span[1]")).size());
@@ -1761,6 +1763,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         {
             viewEditCoreComponentPage.setDEN(acc.getDen());
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
@@ -1772,6 +1775,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
 
             viewEditCoreComponentPage.setDEN(acc.getDen());
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());
@@ -1795,6 +1799,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
             viewEditCoreComponentPage.setDEN(acc.getDen());
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(acc.getDen());

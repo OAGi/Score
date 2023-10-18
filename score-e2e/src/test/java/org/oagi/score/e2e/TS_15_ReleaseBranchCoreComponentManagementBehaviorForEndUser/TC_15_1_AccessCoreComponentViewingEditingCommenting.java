@@ -85,7 +85,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(1500));
+            invisibilityOfLoadingContainerElement(getDriver());
             viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();

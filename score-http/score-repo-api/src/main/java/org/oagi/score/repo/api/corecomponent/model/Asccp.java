@@ -16,8 +16,6 @@ public class Asccp extends Auditable implements CoreComponent, Serializable {
 
     private String propertyTerm;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -74,14 +72,6 @@ public class Asccp extends Auditable implements CoreComponent, Serializable {
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

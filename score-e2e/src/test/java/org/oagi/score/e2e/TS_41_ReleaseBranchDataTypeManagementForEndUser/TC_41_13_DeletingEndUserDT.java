@@ -104,7 +104,7 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
             DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             dtViewEditPage.hitDeleteButton();
 
-            for (DTObject derivedDT : derivedBDTs){
+            for (DTObject derivedDT : derivedBDTs) {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
                 viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
                 WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());
@@ -116,7 +116,7 @@ public class TC_41_13_DeletingEndUserDT extends BaseTest {
             viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(dt.getDen(), branch.getReleaseNumber());
             dtViewEditPage.hitRestoreButton();
 
-            for (DTObject derivedDT : derivedBDTs){
+            for (DTObject derivedDT : derivedBDTs) {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
                 viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(derivedDT.getDen(), branch.getReleaseNumber());
                 WebElement node = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen());

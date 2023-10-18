@@ -10,12 +10,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function10;
+import org.jooq.Function11;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row10;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -81,6 +81,14 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
      * The column <code>oagi.bcc_manifest.to_bccp_manifest_id</code>.
      */
     public final TableField<BccManifestRecord, ULong> TO_BCCP_MANIFEST_ID = createField(DSL.name("to_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+
+    /**
+     * The column <code>oagi.bcc_manifest.den</code>. DEN (dictionary entry
+     * name) of the BCC. This column can be derived from QUALIFIER and
+     * OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as
+     * QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". " + DEN.
+     */
+    public final TableField<BccManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + \"_ \" + OBJECT_CLASS_TERM + \". \" + DEN.");
 
     /**
      * The column <code>oagi.bcc_manifest.conflict</code>. This indicates that
@@ -289,18 +297,18 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row10 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<ULong, ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row11<ULong, ULong, ULong, ULong, ULong, ULong, String, Byte, ULong, ULong, ULong> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function11<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -308,7 +316,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
