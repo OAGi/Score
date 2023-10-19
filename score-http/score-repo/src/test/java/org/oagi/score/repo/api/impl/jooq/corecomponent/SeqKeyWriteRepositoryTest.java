@@ -67,7 +67,6 @@ public class SeqKeyWriteRepositoryTest
                 ))
                 .fetchOneInto(ULong.class));
         bccRecord.setEntityType(EntityType.Element.getValue());
-        bccRecord.setDen("All Extension. " + propertyTerm + ". " + representationTerm);
         bccRecord.setIsDeprecated((byte) 0);
         bccRecord.setIsNillable((byte) 0);
         bccRecord.setOwnerUserId(ULong.valueOf(requester.getUserId()));
@@ -93,6 +92,7 @@ public class SeqKeyWriteRepositoryTest
                 .fetchOneInto(ULong.class));
         bccManifestRecord.setReleaseId(ULong.valueOf(releaseId));
         bccManifestRecord.setBccId(ULong.valueOf(bccId));
+        bccManifestRecord.setDen("All Extension. " + propertyTerm + ". " + representationTerm);
 
         return dslContext().insertInto(BCC_MANIFEST)
                 .set(bccManifestRecord)
