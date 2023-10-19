@@ -275,11 +275,12 @@ public class BieForOasDoc extends Auditable {
                 ", state=" + state +
                 ", access='" + access + '\'' +
                 ", verb='" + verb + '\'' +
+                ", messageBody='" + messageBody + '\'' +
                 ", arrayIndicator=" + arrayIndicator +
                 ", suppressRootIndicator=" + suppressRootIndicator +
                 ", resourceName='" + resourceName + '\'' +
                 ", operationId='" + operationId + '\'' +
-                ", tagName='" + tagName + '\'' +
+                ", tagName=" + tagName +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +
