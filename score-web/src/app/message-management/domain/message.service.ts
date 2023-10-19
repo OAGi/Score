@@ -49,12 +49,12 @@ export class MessageService {
     return this.http.get<PageResponse<MessageList>>('/api/message_list', {params: params});
   }
 
-  delete(...messageIds): Observable<any> {
-    if (messageIds.length === 1) {
-      return this.http.delete('/api/message/' + messageIds[0]);
+  delete(...messageIdList): Observable<any> {
+    if (messageIdList.length === 1) {
+      return this.http.delete('/api/message/' + messageIdList[0]);
     } else {
       return this.http.post<any>('/api/message/delete', {
-        messageIds: messageIds
+        messageIdList
       });
     }
   }
