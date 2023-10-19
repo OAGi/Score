@@ -117,7 +117,7 @@ public class CcNodeControllerTest {
                         .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                         .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                         .where(and(
-                                DT.DEN.eq("Action_ Code. Type"),
+                                DT_MANIFEST.DEN.eq("Action_ Code. Type"),
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId))
                         ))
                         .fetchOneInto(BigInteger.class)
@@ -217,7 +217,7 @@ public class CcNodeControllerTest {
                         .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                         .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                         .where(and(
-                                DT.DEN.eq("Action_ Code. Type"),
+                                DT_MANIFEST.DEN.eq("Action_ Code. Type"),
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId))
                         ))
                         .fetchOneInto(BigInteger.class)
