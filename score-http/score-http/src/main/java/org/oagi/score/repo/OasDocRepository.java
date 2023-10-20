@@ -99,6 +99,7 @@ public class OasDocRepository {
                     ABIE.GUID,
                     ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
+                    ASBIEP.REMARK,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                     APP_USER.LOGIN_ID.as("owner"),

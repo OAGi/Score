@@ -17,6 +17,7 @@ public class BieForOasDoc extends Auditable {
     private BigInteger oasOperationId;
     private String den;
     private String propertyTerm;
+    private String remark;
     private String guid;
     private List<BusinessContext> businessContexts;
     private BigInteger ownerUserId;
@@ -86,6 +87,13 @@ public class BieForOasDoc extends Auditable {
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
+    }
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getGuid() {
@@ -266,6 +274,7 @@ public class BieForOasDoc extends Auditable {
                 ", oasOperationId=" + oasOperationId +
                 ", den='" + den + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", remark='" + remark + '\'' +
                 ", guid='" + guid + '\'' +
                 ", businessContexts=" + businessContexts +
                 ", ownerUserId=" + ownerUserId +
@@ -280,7 +289,7 @@ public class BieForOasDoc extends Auditable {
                 ", suppressRootIndicator=" + suppressRootIndicator +
                 ", resourceName='" + resourceName + '\'' +
                 ", operationId='" + operationId + '\'' +
-                ", tagName=" + tagName +
+                ", tagName='" + tagName + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", creationTimestamp=" + creationTimestamp +
                 ", createdBy=" + createdBy +
