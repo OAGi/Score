@@ -1,0 +1,27 @@
+.mat-column-state {
+  width: 100px;
+  font-size: 13px;
+}
+.mat-column-den {
+  width: 250px;
+  font-size: 13px;
+}
+.mat-column-owner {
+  width: 100px;
+}
+
+.mat-column-version {
+  width: 100px;
+}
+
+.mat-column-remark {
+  width: 500px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.highlight{
+  background: #42A948;
+}

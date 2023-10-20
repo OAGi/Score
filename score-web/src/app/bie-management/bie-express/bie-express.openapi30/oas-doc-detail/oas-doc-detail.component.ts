@@ -47,7 +47,7 @@ export class OasDocDetailComponent implements OnInit {
   bizCtxSearch: string;
   disabled: boolean;
   displayedColumns: string[] = [
-    'select', 'den', 'owner', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
+    'select', 'den', 'remark', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();
