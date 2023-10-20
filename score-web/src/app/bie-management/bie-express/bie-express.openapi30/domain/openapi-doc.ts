@@ -257,6 +257,7 @@ export class BieForOasDoc {
   oasOperationId: number;
   den: string;
   propertyTerm: string;
+  remark: string;
   guid: string;
   bizCtxId: number;
   bizCtxName: string;
@@ -285,6 +286,7 @@ export class BieForOasDoc {
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
     this.den = obj && obj.den || '';
     this.propertyTerm = obj && obj.propertyTerm || '';
+    this.remark = obj && obj.remark || '';
     this.guid = obj && obj.guid || '';
     this.bizCtxId = obj && obj.bizCtxId || 0;
     this.bizCtxName = obj && obj.bizCtxName || '';

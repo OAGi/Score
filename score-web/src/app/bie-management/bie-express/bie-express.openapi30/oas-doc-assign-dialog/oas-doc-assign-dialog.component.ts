@@ -31,7 +31,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'version', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
+    'select', 'state', 'den', 'owner', 'version', 'verb', 'messageBody', 'remark',
     'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieForOasDoc>();

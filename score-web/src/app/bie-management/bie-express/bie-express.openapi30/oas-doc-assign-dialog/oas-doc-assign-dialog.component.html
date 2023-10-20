@@ -216,20 +216,6 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="arrayIndicator">
-            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="suppressRootIndicator">
-            <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="messageBody">
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
             <td mat-cell *matCellDef="let element">
@@ -242,6 +228,13 @@
               <mat-error *ngIf="selectedMessageBody.hasError('required')">
                 The messageBody must be selected
               </mat-error>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.remark }}</div>
             </td>
           </ng-container>
           <ng-container matColumnDef="lastUpdateTimestamp">
