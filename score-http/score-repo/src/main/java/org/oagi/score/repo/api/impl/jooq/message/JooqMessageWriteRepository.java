@@ -1,6 +1,8 @@
 package org.oagi.score.repo.api.impl.jooq.message;
 
 import org.jooq.DSLContext;
+import org.jooq.Record2;
+import org.jooq.Result;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
@@ -14,7 +16,9 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.MESSAGE;
 
@@ -56,17 +60,25 @@ public class JooqMessageWriteRepository
             throw new IllegalArgumentException();
         }
 
-        ULong recipientId = dslContext().select(MESSAGE.RECIPIENT_ID)
-                .from(MESSAGE)
-                .where(MESSAGE.MESSAGE_ID.eq(ULong.valueOf(request.getMessageId())))
-                .fetchOptionalInto(ULong.class).orElse(null);
+        if (request.getMessageIdList() == null || request.getMessageIdList().isEmpty()) {
+            return;
+        }
 
-        if (!recipientId.equals(ULong.valueOf(requester.getUserId()))) {
+        List<ULong> messageIdList = request.getMessageIdList().stream()
+                .map(e -> ULong.valueOf(e)).collect(Collectors.toList());
+
+        Result<Record2<ULong, ULong>> result = dslContext().select(MESSAGE.MESSAGE_ID, MESSAGE.RECIPIENT_ID)
+                .from(MESSAGE)
+                .where(MESSAGE.MESSAGE_ID.in(messageIdList))
+                .fetch();
+
+        if (result.stream().map(e -> e.get(MESSAGE.RECIPIENT_ID).longValue())
+                .filter(e -> e != requester.getUserId().longValue()).count() > 0) {
             throw new ScoreDataAccessException("You do not have a permission to access this message.");
         }
 
         dslContext().deleteFrom(MESSAGE)
-                .where(MESSAGE.MESSAGE_ID.eq(ULong.valueOf(request.getMessageId())))
+                .where(MESSAGE.MESSAGE_ID.in(messageIdList))
                 .execute();
     }
 

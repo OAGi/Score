@@ -85,7 +85,7 @@ export class NavbarComponent implements OnInit {
     if (userToken) {
       this.stompService.watch('/topic/message/' + userToken.username).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
-        if (!!data.messageId) {
+        if (!!data.messageId || !!data.messageIdList) {
           this.reloadNotiCount();
         }
       });
