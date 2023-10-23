@@ -350,27 +350,26 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
-                                   Xbt xbt, FacetRestrictionsAware facetRestri) {
-        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
-        String name = "type_" + guid;
+                                   Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
+        if (!definitions.containsKey(componentName)) {
+            Map<String, Object> content = toProperties(xbt);
+            if (facetRestri.getFacetMinLength() != null) {
+                content.put("minLength", facetRestri.getFacetMinLength().longValue());
+            }
+            if (facetRestri.getFacetMaxLength() != null) {
+                content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
+            }
+            if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+                // Override 'pattern' and 'format' properties
+                content.remove("pattern");
+                content.remove("format");
+                content.put("pattern", facetRestri.getFacetPattern());
+            }
 
-        Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getFacetMinLength() != null) {
-            content.put("minLength", facetRestri.getFacetMinLength().longValue());
-        }
-        if (facetRestri.getFacetMaxLength() != null) {
-            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
-            // Override 'pattern' and 'format' properties
-            content.remove("pattern");
-            content.remove("format");
-            content.put("pattern", facetRestri.getFacetPattern());
+            definitions.put(componentName, content);
         }
 
-        definitions.put(name, content);
-
-        return "#/definitions/" + name;
+        return "#/definitions/" + componentName;
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -714,7 +713,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 }
 
                 if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
-                    ref = fillDefinitions(definitions, xbt, bbie);
+                    ref = fillDefinitions(definitions, xbt, bbie, "type_" + bbie.getGuid());
+                } else if (bdt.getFacetMinLength() != null || bdt.getFacetMaxLength() != null || StringUtils.hasLength(bdt.getFacetPattern())) {
+                    ref = fillDefinitions(definitions, xbt, bdt, "type_" + bdt.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }
@@ -792,7 +793,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 }
 
                 if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
-                    ref = fillDefinitions(definitions, xbt, bbieSc);
+                    ref = fillDefinitions(definitions, xbt, bbieSc, "type_" + bbieSc.getGuid());
+                } else if (dtSc.getFacetMinLength() != null || dtSc.getFacetMaxLength() != null || StringUtils.hasLength(dtSc.getFacetPattern())) {
+                    ref = fillDefinitions(definitions, xbt, dtSc, "type_" + dtSc.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }

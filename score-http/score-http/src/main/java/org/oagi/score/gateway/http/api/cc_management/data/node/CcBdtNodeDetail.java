@@ -19,6 +19,9 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private String representationTerm;
     private String sixDigitId;
     private String qualifier;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private BigInteger basedBdtId;
     private BigInteger basedBdtManifestId;
     private String basedBdtDen;

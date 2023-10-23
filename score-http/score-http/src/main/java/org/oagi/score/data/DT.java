@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DT implements CoreComponent {
+public class DT implements CoreComponent, FacetRestrictionsAware {
 
     private BigInteger dtManifestId = BigInteger.ZERO;
     private BigInteger dtId = BigInteger.ZERO;
@@ -18,6 +18,9 @@ public class DT implements CoreComponent {
     private String dataTypeTerm;
     private String representationTerm;
     private String qualifier;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private String sixDigitId;
     private BigInteger basedDtManifestId = BigInteger.ZERO;
     private BigInteger basedDtId = BigInteger.ZERO;

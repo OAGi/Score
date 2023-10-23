@@ -72,6 +72,18 @@ WHERE `bcc_manifest`.`from_acc_manifest_id` = `acc_manifest`.`acc_manifest_id`
 
 ALTER TABLE `bcc` DROP COLUMN `den`;
 
+-- Issue #1554
+-- Add `facet_min_length`, `facet_max_length`, and `facet_pattern` to `dt` and `dt_sc` tables.
+ALTER TABLE `dt`
+    ADD COLUMN `facet_min_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `based_dt_id`,
+    ADD COLUMN `facet_max_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
+    ADD COLUMN `facet_pattern`    text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`;
+
+ALTER TABLE `dt_sc`
+    ADD COLUMN `facet_min_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `fixed_value`,
+    ADD COLUMN `facet_max_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
+    ADD COLUMN `facet_pattern`    text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`;
+
 -- Issue #1492
 -- Add tables for OpenAPI documents
 SET FOREIGN_KEY_CHECKS = 0;

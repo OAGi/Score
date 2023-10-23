@@ -24,7 +24,7 @@ import {
   Base,
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail,
+  CcBccpNodeDetail, CcBdtPriRestri,
   CcBdtScNodeDetail,
   CcId,
   CcNodeDetail,
@@ -1199,6 +1199,16 @@ export class ExtensionDetailComponent implements OnInit {
           }, err => {
           });
       });
+  }
+
+  isStringTypePrimitive(dtPrimitives: CcBdtPriRestri[]): boolean {
+    const primitives = dtPrimitives.map(e => e.primitiveName).filter(e => !!e);
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
+      if (primitives.includes(typeName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   openCoreComponent(node: CcFlatNode) {

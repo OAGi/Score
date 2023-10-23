@@ -14,6 +14,9 @@ public class UpdateDtPropertiesRepositoryRequest extends RepositoryRequest {
     private final BigInteger dtManifestId;
 
     private String qualifier;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private String sixDigitId;
     private String contentComponentDefinition;
     private String definition;
@@ -46,6 +49,32 @@ public class UpdateDtPropertiesRepositoryRequest extends RepositoryRequest {
     public void setQualifier(String qualifier) {
         if (StringUtils.hasLength(qualifier)) {
             this.qualifier = qualifier;
+        }
+    }
+
+    public BigInteger getFacetMinLength() {
+        return facetMinLength;
+    }
+
+    public void setFacetMinLength(BigInteger facetMinLength) {
+        this.facetMinLength = facetMinLength;
+    }
+
+    public BigInteger getFacetMaxLength() {
+        return facetMaxLength;
+    }
+
+    public void setFacetMaxLength(BigInteger facetMaxLength) {
+        this.facetMaxLength = facetMaxLength;
+    }
+
+    public String getFacetPattern() {
+        return facetPattern;
+    }
+
+    public void setFacetPattern(String facetPattern) {
+        if (StringUtils.hasLength(facetPattern)) {
+            this.facetPattern = facetPattern;
         }
     }
 

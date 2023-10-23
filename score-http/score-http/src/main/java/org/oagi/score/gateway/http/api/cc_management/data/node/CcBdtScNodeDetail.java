@@ -25,6 +25,9 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private String definitionSource;
     private String defaultValue;
     private String fixedValue;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
 
     private String objectClassTerm;
     private String propertyTerm;

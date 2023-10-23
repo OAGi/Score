@@ -7,19 +7,14 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function22;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row22;
 import org.jooq.Schema;
-import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -142,6 +137,24 @@ public class DtSc extends TableImpl<DtScRecord> {
      * used at the same time.
      */
     public final TableField<DtScRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
+
+    /**
+     * The column <code>oagi.dt_sc.facet_min_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public final TableField<DtScRecord, ULong> FACET_MIN_LENGTH = createField(DSL.name("facet_min_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
+
+    /**
+     * The column <code>oagi.dt_sc.facet_max_length</code>. Defines the minimum
+     * number of units of length.
+     */
+    public final TableField<DtScRecord, ULong> FACET_MAX_LENGTH = createField(DSL.name("facet_max_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
+
+    /**
+     * The column <code>oagi.dt_sc.facet_pattern</code>. Defines a constraint on
+     * the lexical space of a datatype to literals in a specific pattern.
+     */
+    public final TableField<DtScRecord, String> FACET_PATTERN = createField(DSL.name("facet_pattern"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Defines a constraint on the lexical space of a datatype to literals in a specific pattern.");
 
     /**
      * The column <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
@@ -393,29 +406,5 @@ public class DtSc extends TableImpl<DtScRecord> {
     @Override
     public DtSc rename(Table<?> name) {
         return new DtSc(name.getQualifiedName(), null);
-    }
-
-    // -------------------------------------------------------------------------
-    // Row22 type methods
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
-        return (Row22) super.fieldsRow();
-    }
-
-    /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
-     */
-    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super Integer, ? super Integer, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
-    }
-
-    /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
-     */
-    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super Integer, ? super Integer, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
     }
 }

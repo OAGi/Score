@@ -271,6 +271,29 @@ public class DtScWriteRepository {
                     .set(DT_SC.FIXED_VALUE, request.getFixedValue())
                     .setNull(DT_SC.DEFAULT_VALUE);
         }
+        if (request.getFacetMinLength() == null || request.getFacetMinLength().longValue() <= 0L) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MIN_LENGTH);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MIN_LENGTH, ULong.valueOf(request.getFacetMinLength()));
+        }
+        if (request.getFacetMaxLength() == null || request.getFacetMaxLength().longValue() <= 0L) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MAX_LENGTH);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MAX_LENGTH, ULong.valueOf(request.getFacetMaxLength()));
+        }
+        if (compare(dtScRecord.getFacetPattern(), request.getFacetPattern()) != 0) {
+            if (StringUtils.hasLength(request.getFacetPattern())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_PATTERN, request.getFacetPattern());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_PATTERN);
+            }
+        }
 
         if (moreStep != null) {
             moreStep.set(DT_SC.LAST_UPDATED_BY, userId)
