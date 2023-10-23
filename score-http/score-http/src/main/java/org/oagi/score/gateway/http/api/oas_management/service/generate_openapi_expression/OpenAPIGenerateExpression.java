@@ -351,7 +351,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                     .put("$ref", "#/components/schemas/" + schemaName + "ListEntry")
                                     .build())
                             .build());
+
+                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName + "ListEntry", properties);
+                    }
                 }
+
             }
 
             if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
@@ -426,6 +433,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                     .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
+
+                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName + "ListEntry", properties);
+                    }
                 }
             }
 
@@ -501,6 +514,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                     .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
+
+                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName + "ListEntry", properties);
+                    }
                 }
             }
 
@@ -589,6 +608,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                     .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
+
+                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName + "ListEntry", properties);
+                    }
                 }
             }
 
@@ -650,6 +675,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                     .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
+
+                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName + "ListEntry", properties);
+                    }
                 }
             }
 
