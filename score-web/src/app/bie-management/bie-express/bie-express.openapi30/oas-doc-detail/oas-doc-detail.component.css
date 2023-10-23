@@ -1,0 +1,32 @@
+.mat-column-den {
+  width: 250px;
+  font-size: 13px;
+}
+
+.mat-column-verb {
+  width: 80px;
+}
+
+.mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
+  width: 100px;
+}
+
+.mat-column-messageBody {
+  width: 140px;
+}
+
+.mat-column-tagName {
+  width: 10%;
+}
+
+.mat-column-tagName .tagName:not(:last-child)::after {
+  content: ', ';
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.highlight{
+  background: #42A948;
+}

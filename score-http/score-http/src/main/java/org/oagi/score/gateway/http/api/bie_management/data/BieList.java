@@ -21,7 +21,6 @@ public class BieList {
     private String owner;
     private BigInteger ownerUserId;
     private AccessPrivilege access;
-
     private String version;
     private String status;
     private String bizTerm;

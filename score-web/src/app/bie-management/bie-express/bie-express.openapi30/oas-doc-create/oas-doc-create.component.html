@@ -1,0 +1,92 @@
+<div class="context-section">
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header>
+      <mat-card-title>{{ "OAS_DOC_CREATE.TITLE" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>OpenAPI Version</mat-label>
+          <mat-select required placeholder="'The version number of the OpenAPI Specification that the OpenAPI document uses (e.g., 3.0.3)'"
+                      [(value)]="oasDoc.openAPIVersion">
+            <mat-option [value]="'3.0.3'">3.0.3</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Title</mat-label>
+          <input matInput required placeholder="The title of the API" [(ngModel)]="oasDoc.title" maxlength="65536"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Document Version</mat-label>
+          <input matInput required placeholder="The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version)"
+                 [(ngModel)]="oasDoc.version" maxlength="20"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Terms of Service</mat-label>
+          <input matInput placeholder="A URL to the Terms of Service for the API"
+                 [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="65535"/>
+          <mat-error *ngIf="termServiceUrl.hasError('pattern')">
+            The terms of service must be a valid URL
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contact Name</mat-label>
+          <input matInput placeholder="The identifying name of the contact person/organization"
+                 [(ngModel)]="oasDoc.contactName" maxlength="65535"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contact URL</mat-label>
+          <input matInput placeholder="The URL pointing to the contact information"
+                 [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="65535"/>
+          <mat-error *ngIf="contactUrl.hasError('pattern')">
+            The contact URL must be be a valid URL
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contact Email</mat-label>
+          <input type="email" matInput placeholder="The email address of the contact person/organization"
+                 [(ngModel)]="oasDoc.contactEmail"  [formControl]="contactEmail" maxlength="65535"/>
+          <mat-error *ngIf="contactEmail.hasError('pattern')">
+            The contact email must be in the form of an email address
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>License Name</mat-label>
+          <input matInput placeholder="The license name used for the API (e.g., Apache 2.0)"
+                 [(ngModel)]="oasDoc.licenseName" maxlength="100"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>License URL</mat-label>
+          <input matInput placeholder="A URL to the license used for the API (e.g., http://www.apache.org/licenses/LICENSE-2.0)"
+                 [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="65535"/>
+          <mat-error *ngIf="licenseUrl.hasError('pattern')">
+            The license URL must be be a valid URL
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea rows="6" cols="30" matInput placeholder="A description of the API" [(ngModel)]="oasDoc.description"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="createWithoutCheck()"
+                [disabled]="isDisabled(oasDoc)">
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

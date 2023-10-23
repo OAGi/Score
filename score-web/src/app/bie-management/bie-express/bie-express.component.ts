@@ -83,7 +83,7 @@ export class BieExpressComponent implements OnInit {
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
     this.option.packageOption = 'ALL';
-    // Default Open API expression format is 'YAML'.
+    // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
     // Default ODF expression format is 'ODS'.
     this.option.odfExpressionFormat = 'ODS';
