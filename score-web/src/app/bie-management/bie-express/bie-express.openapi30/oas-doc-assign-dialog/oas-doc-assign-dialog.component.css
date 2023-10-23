@@ -6,7 +6,7 @@
   font-size: 13px;
 }
 .mat-column-den {
-  width: 250px;
+  width: 300px;
   font-size: 13px;
 }
 .mat-column-owner {
@@ -18,7 +18,11 @@
 }
 
 .mat-column-remark {
-  width: 500px;
+  width: 300px;
+}
+
+.mat-column-verb, .mat-column-messageBody {
+  width: 200px;
 }
 
 .mat-column-arrayIndicator{

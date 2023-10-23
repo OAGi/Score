@@ -348,7 +348,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .put("$ref", "#/components/schemas/" + schemaName + "ListEntry")
                                     .build())
                             .build());
                 }
@@ -423,7 +423,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
                 }
@@ -498,7 +498,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
                 }
@@ -586,7 +586,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
                 }
@@ -647,7 +647,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
                             .put("type", "array")
                             .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName)
+                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
                                     .build())
                             .build());
                 }
