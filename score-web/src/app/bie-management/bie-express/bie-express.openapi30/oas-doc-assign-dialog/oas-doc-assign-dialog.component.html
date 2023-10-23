@@ -5,7 +5,7 @@
     </mat-toolbar>
   </div>
 
-  <mat-card class="pt-3">
+  <mat-dialog-content class="pt-2 pb-2 mat-card-container">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
@@ -145,7 +145,6 @@
       </mat-card-actions>
     </mat-card>
 
-    <mat-card-content class="mat-card-container">
       <div class="loading-container" *ngIf="loading">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
@@ -246,9 +245,7 @@
           (page)="onPageChange($event)"
           showFirstLastButtons></mat-paginator>
       </div>
-    </mat-card-content>
-  </mat-card>
-
+  </mat-dialog-content>
   <div class="actions mt-4">
     <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary" [disabled]="selection.isEmpty() || selectedVerb.hasError('required') ||
                                      selectedMessageBody.hasError('required')">

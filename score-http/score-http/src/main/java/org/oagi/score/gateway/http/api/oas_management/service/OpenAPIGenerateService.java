@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpres
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -73,13 +74,25 @@ public class OpenAPIGenerateService {
         // need to pass the params
         List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps);
+        String filename = "";
         for (String paramsKey: params.keySet()) {
             OpenAPIGenerateExpressionOption option = params.get(paramsKey);
+            if (!StringUtils.hasLength(filename)){
+                long millis = System.currentTimeMillis();
+                if (StringUtils.hasLength(option.getOasDoc().getTitle())){
+                    if (StringUtils.hasLength(option.getOasDoc().getVersion())){
+                        filename = option.getOasDoc().getTitle() +"-" + option.getOasDoc().getVersion() +"-" + millis;
+                    }else{
+                        filename = option.getOasDoc().getTitle() +"-" + millis;
+                    }
+                } else{
+                    filename = ScoreGuid.randomGuid();
+                }
+            }
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }
 
-        String filename = ScoreGuid.randomGuid();
         File schemaExpressionFile;
         try {
             schemaExpressionFile = generateExpression.asFile(filename);

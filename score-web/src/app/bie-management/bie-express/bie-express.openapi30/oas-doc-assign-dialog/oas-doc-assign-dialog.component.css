@@ -1,3 +1,6 @@
+.mat-dialog-content {
+  max-height: max-content;
+}
 .mat-column-state {
   width: 100px;
   font-size: 13px;

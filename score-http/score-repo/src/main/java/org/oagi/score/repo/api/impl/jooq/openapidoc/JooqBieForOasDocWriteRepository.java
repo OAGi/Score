@@ -112,24 +112,24 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 //update oas_operation
                 OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("req_oas_operation")).where(and(OAS_OPERATION.as("req_oas_operation").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
                         OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
-                if (oasOperationRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
-                }
-                if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
-                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").OPERATION_ID);
-                    oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
-                }
-                if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())) {
-                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").VERB);
-                    oasOperationRecord.setVerb(bieForOasDoc.getVerb());
-                }
-                oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATED_BY);
-                oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
-                oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATE_TIMESTAMP);
-                oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                int affectedRows = oasOperationRecord.update(oasOperationChangedField);
-                if (affectedRows != 1) {
-                    throw new ScoreDataAccessException(new IllegalStateException());
+                if (oasOperationRecord != null){
+                    if (!StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())){
+                        oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").OPERATION_ID);
+                        oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
+                    }
+
+                    if (!StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())){
+                        oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").VERB);
+                        oasOperationRecord.setVerb(bieForOasDoc.getVerb());
+                    }
+                    oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
+                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATED_BY);
+                    oasOperationChangedField.add(OAS_OPERATION.as("req_oas_operation").LAST_UPDATE_TIMESTAMP);
+                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
+                    int affectedRows = oasOperationRecord.update(oasOperationChangedField);
+                    if (affectedRows != 1) {
+                        throw new ScoreDataAccessException(new IllegalStateException());
+                    }
                 }
                 //update arrayIndicator and SuppressRootIndicator
                 ULong oasRequestId = null;
@@ -179,7 +179,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     oasRequestRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
                     oasRequestChangedField.add(OAS_REQUEST.LAST_UPDATE_TIMESTAMP);
                     oasRequestRecord.setLastUpdateTimestamp(timestamp);
-                    affectedRows = oasRequestRecord.update(oasRequestChangedField);
+                    int affectedRows = oasRequestRecord.update(oasRequestChangedField);
                     if (affectedRows != 1) {
                         throw new ScoreDataAccessException(new IllegalStateException());
                     }
@@ -209,29 +209,25 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                 //update oas_operation
                 OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION.as("res_oas_operation")).where(and(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.eq(ULong.valueOf(bieForOasDoc.getOasResourceId())),
                         OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))).fetchOptional().orElse(null);
-                if (oasOperationRecord == null) {
-                    throw new ScoreDataAccessException(new IllegalArgumentException());
-                }
-                if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())) {
-                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").VERB);
-                    oasOperationRecord.setVerb(bieForOasDoc.getVerb());
+                if (oasOperationRecord != null){
+                    if (!StringUtils.equals(bieForOasDoc.getVerb(), oasOperationRecord.getVerb())){
+                        oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").VERB);
+                        oasOperationRecord.setVerb(bieForOasDoc.getVerb());
+                    }
 
+                    if (!StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())){
+                        oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").OPERATION_ID);
+                        oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
+                    }
+                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATED_BY);
+                    oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
+                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATE_TIMESTAMP);
+                    oasResourceRecord.setLastUpdateTimestamp(timestamp);
+                    int affectedRows = oasOperationRecord.update(oasOperationChangedField);
+                    if (affectedRows != 1) {
+                        throw new ScoreDataAccessException(new IllegalStateException());
+                    }
                 }
-
-                if (oasOperationRecord != null && !StringUtils.equals(bieForOasDoc.getOperationId(), oasOperationRecord.getOperationId())) {
-                    oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").OPERATION_ID);
-                    oasOperationRecord.setOperationId(bieForOasDoc.getOperationId());
-                }
-
-                oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATED_BY);
-                oasOperationRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
-                oasOperationChangedField.add(OAS_OPERATION.as("res_oas_operation").LAST_UPDATE_TIMESTAMP);
-                oasResourceRecord.setLastUpdateTimestamp(timestamp);
-                int affectedRows = oasOperationRecord.update(oasOperationChangedField);
-                if (affectedRows != 1) {
-                    throw new ScoreDataAccessException(new IllegalStateException());
-                }
-
                 //update oasTag
                 OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
                         .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(bieForOasDoc.getOasOperationId())))
@@ -263,7 +259,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     if (oasTagRecord != null && !StringUtils.equals(oasTagRecord.getName(), bieForOasDoc.getTagName())) {
                         oasTagChangeField.add(OAS_TAG.NAME);
                         oasTagRecord.setName(bieForOasDoc.getTagName());
-                        affectedRows = oasTagRecord.update(oasTagChangeField);
+                        int affectedRows = oasTagRecord.update(oasTagChangeField);
                         if (affectedRows != 1) {
                             throw new ScoreDataAccessException(new IllegalStateException());
                         }
@@ -317,7 +313,7 @@ public class JooqBieForOasDocWriteRepository extends JooqScoreRepository impleme
                     oasResponseRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
                     oasResponseChangedField.add(OAS_RESPONSE.LAST_UPDATE_TIMESTAMP);
                     oasResponseRecord.setLastUpdateTimestamp(timestamp);
-                    affectedRows = oasResponseRecord.update(oasResponseChangedField);
+                    int affectedRows = oasResponseRecord.update(oasResponseChangedField);
                     if (affectedRows != 1) {
                         throw new ScoreDataAccessException(new IllegalStateException());
                     }

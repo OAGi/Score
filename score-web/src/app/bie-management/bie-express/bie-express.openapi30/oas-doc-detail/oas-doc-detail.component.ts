@@ -333,6 +333,11 @@ export class OasDocDetailComponent implements OnInit {
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
     dialogConfig.data.isEditable = this.isEditable();
+    dialogConfig.width = '100%';
+    dialogConfig.maxWidth = '100%';
+    dialogConfig.height = '100%';
+    dialogConfig.maxHeight = '100%';
+    dialogConfig.autoFocus = false;
 
     const isAddAction: boolean = (bieForOasDoc === undefined);
 
