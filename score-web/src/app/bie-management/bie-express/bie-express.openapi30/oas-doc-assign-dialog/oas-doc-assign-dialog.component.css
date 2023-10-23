@@ -18,6 +18,10 @@
   width: 500px;
 }
 
+.mat-column-arrayIndicator{
+  width: 100px;
+}
+
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }
