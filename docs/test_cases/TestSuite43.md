@@ -1,6 +1,6 @@
 # Test Suite 43
 
-**OpenAPI Document Managmeent**
+**OpenAPI Document Management**
 
 ## Test Case 43.1
 **Define OpenAPI Document Definition**
@@ -8,22 +8,22 @@
 ### Test Assertion:
 
 #### Test Assertion #43.1.1
-The "View/Edit Business Term" menu under BIE menu should open the page titled with "Business Term". 
+The "OpenAPI Document" menu under BIE menu should open the page titled with "OpenAPI Document". 
 
 #### Test Assertion #43.1.2
-The end user can create a Business Term with only required fields including both Business Term and External Reference URI field. 
+The end user can create an OpenAPI Document with only required fields including Open API version, Title, and Document Version fields. 
 
 #### Test Assertion #43.1.3
-The end user cannot create a Business Term if any required field is not provided. 
+The end user cannot create an OpenAPI Document if any required field is not provided. 
 
 #### Test Assertion #43.1.4
-The end user can search for a Business Term based only on its term. 
+The end user can search for an OpenAPI Document based only on its term. 
 
 #### Test Assertion #43.1.5
-The end user can search for a Business Term based on the external reference URI.
+The end user can search for an OpenAPI Document based on the external reference URI.
 
 #### Test Assertion #43.1.6
-The end user can open a Business Term on the "Business Term" page to update its details in "Edit Business Term" page. 
+The end user can open an OpenAPI Document on the "Business Term" page to update its details in "Edit Business Term" page. 
 
 #### Test Assertion #43.1.7
 The end user cannot change Definition field in "Edit Business Term" page. 
@@ -76,16 +76,16 @@ The end user can discard a Business Term in View/Edit Business Term page if it i
 ### Test Assertion:
 
 #### Test Assertion #43.2.1
-The "Business Term Assignment" menu should open the page titled with "Business Term Assignment". 
+The "Add BIE For OpenAPI Document" menu should open the page titled with "Add BIE For OpenAPI Document". 
 
 #### Test Assertion #43.2.2
-On Business Term Assignment page, the end user can view all the business terms with assignments. 
+On Add BIE For OpenAPI Document page, the end user can view BIEs available to be assigned. This can be duplicate of previously assigned, but only if assigned to a separate Verb and Body Type combination. 
 
 #### Test Assertion #43.2.3
-On Business Term Assignment page, the end user can view the ASBIEs, BBIEs and Top-Level BIEs available for Business Term assignments. 
+On Add BIE For OpenAPI Document page, the end user can search BIEs by Branch, State, Owner, Updater, DEN, Business Context, Updated Start Date, and Updated End Date. 
 
 #### Test Assertion #43.2.4
-On Business Term Assignment page, the end user can search business term assignments by BIE type and den, business term, URI and type code. 
+On Business Term Assignment page, . 
 
 #### Test Assertion #43.2.5
 On Business Term Assignment page, the end user can filter only preferred business terms.  
