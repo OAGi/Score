@@ -1,6 +1,10 @@
 .mat-column-den {
-  width: 250px;
+  width: 150px;
   font-size: 13px;
+}
+
+.mat-column-remark{
+  width: 250px;
 }
 
 .mat-column-verb {
@@ -8,11 +12,17 @@
 }
 
 .mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
-  width: 100px;
+  width: 50px;
 }
 
 .mat-column-messageBody {
-  width: 140px;
+  width: 100px;
+}
+.mat-column-resourceName{
+  width: 250px;
+}
+.mat-column-operationId{
+  width: 250px;
 }
 
 .mat-column-tagName {
