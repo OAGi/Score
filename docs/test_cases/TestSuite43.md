@@ -23,19 +23,19 @@ The end user can search for an OpenAPI Document based only on its term.
 The end user can search for an OpenAPI Document based on the external reference URI.
 
 #### Test Assertion #43.1.6
-The end user can open an OpenAPI Document on the "Business Term" page to update its details in "Edit Business Term" page. 
+The end user can open an OpenAPI Document on the "OpenAPI Document " page to update its details in "Edit OpenAPI Document " page. 
 
 #### Test Assertion #43.1.7
-The end user cannot change Definition field in "Edit Business Term" page. 
+The end user cannot change Definition field in "Edit OpenAPI Document " page. 
 
 #### Test Assertion #43.1.8
-The end user cannot save a Business Term with an already existing term and URI in "Edit Business Term" page.
+The end user cannot save an OpenAPI Document with an already existing term and URI in "Edit OpenAPI Document " page.
 
 #### Test Assertion #43.1.9
-The end user cannot discard a Business Term in View/Edit Business Term page if it is used in assignments. 
+The end user cannot discard an OpenAPI Document in View/Edit OpenAPI Document  page if it is used in assignments. 
 
 #### Test Assertion #43.1.10
-The end user can discard a Business Term in View/Edit Business Term page if it is not in any assignments. 
+The end user can discard an OpenAPI Document in View/Edit OpenAPI Document  page if it is not in any assignments. 
 
 
 ### Test Step Pre-condition:
@@ -46,25 +46,25 @@ The end user can discard a Business Term in View/Edit Business Term page if it i
 
 1. An end user logins.
 2. He visits the Home page and clicks on the BIE tab.
-3. He clicks the "View/Edit Business Term" from the dropdown list.
-4. Verify that the title in the new page is "Business Term" (Assertion [#1](#test-assertion-4311)). 
-5. He clicks on the "New Business Term" button from the right above on the "Business Term" page. 
-6. He provides the required inputs for Business Term, then "Create" button will be enabled. 
+3. He clicks the "View/Edit OpenAPI Document " from the dropdown list.
+4. Verify that the title in the new page is "OpenAPI Document " (Assertion [#1](#test-assertion-4311)). 
+5. He clicks on the "New OpenAPI Document " button from the right above on the "OpenAPI Document " page. 
+6. He provides the required inputs for OpenAPI Document , then "Create" button will be enabled. 
 7. He clicks on the "Create" button. Repeat the steps 5-7 a few times to create several business terms.
-8. Verify that those business terms are listed in the "Business Term" page (Assertion [#2](#test-assertion-4312)). 
-9. Repeat the step 5-6, but don't provide the required input for Business Term or External Reference URI on step 6. 
+8. Verify that those business terms are listed in the "OpenAPI Document " page (Assertion [#2](#test-assertion-4312)). 
+9. Repeat the step 5-6, but don't provide the required input for OpenAPI Document  or External Reference URI on step 6. 
 10. Verify that "Create" button is still disabled. (Assertion [#3](#test-assertion-4313)). 
-11. The end user will go back to "Business Term" page.
+11. The end user will go back to "OpenAPI Document " page.
 12. He will search the newly created business terms by putting some common word in the "Term" field and hits Search button. 
 13. Verify that only business terms containing the search word are listed in the table (Assertion [#4](#test-assertion-4314)). 
 14. He will search the newly created business terms by putting the external reference URI field and hits Search button.
 15. Verify that only business terms containing the search URI are listed in the table (Assertion [#5](#test-assertion-4315))
-16. He clicks on any newly created business term in the table and the "Edit Business Term" page will open. He can modify any fields except "Definition", and the Update button will be enabled after modification. He clicks on the Update button and the page will go back to Business Term page. 
+16. He clicks on any newly created business term in the table and the "Edit OpenAPI Document " page will open. He can modify any fields except "Definition", and the Update button will be enabled after modification. He clicks on the Update button and the page will go back to OpenAPI Document  page. 
 17. Verify that the updated business term can be filtered based on the updated field information by searching on the new information. (Assertion [#6](#test-assertion-4316))
-18. He clicks on any newly created business term in "Business Term" page and the "Edit Business Term" page will open. Verify that the "Definition" field is not editable. (Assertion [#7](#test-assertion-4317)).
-19. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
-20. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button on "Create Business Term" page, he will get a pop-up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#8](#test-assertion-4318)).
-21. The end user goes back to the home page and clicks on the "View/Edit Business Term" from the BIE dropdown list. 
+18. He clicks on any newly created business term in "OpenAPI Document " page and the "Edit OpenAPI Document " page will open. Verify that the "Definition" field is not editable. (Assertion [#7](#test-assertion-4317)).
+19. The end user goes back to the home page and clicks on the "View/Edit OpenAPI Document " from the BIE dropdown list. 
+20. He will create a new business term with the same information twice. Verify that the second time, when he clicks on the Create button on "Create OpenAPI Document " page, he will get a pop-up error message: Invalid parameters, another business term with the same business term and external reference URI already exists! (Assertion [#8](#test-assertion-4318)).
+21. The end user goes back to the home page and clicks on the "View/Edit OpenAPI Document " from the BIE dropdown list. 
 22. He selects a business term which has been assigned to some BIEs. He clicks on the Discard button. Verify that he will get an error message: Discard's forbidden! The business term is used. (Assertion [#9](#test-assertion-4319)).
 23. He selects a business term without any assignments. He clicks on the Discard button and he will get a confirmation dialog which reminds that the business term will be permanently removed. He confirms by clicking on the Discard button on the confirmation dialog. Verify that the businss term is discarded from the table. (Assertion [#10](#test-assertion-43110)).
 
@@ -85,25 +85,25 @@ On Add BIE For OpenAPI Document page, the end user can view BIEs available to be
 On Add BIE For OpenAPI Document page, the end user can search BIEs by Branch, State, Owner, Updater, DEN, Business Context, Updated Start Date, and Updated End Date. 
 
 #### Test Assertion #43.2.4
-On Business Term Assignment page, . 
+On OpenAPI Document  Assignment page, . 
 
 #### Test Assertion #43.2.5
-On Business Term Assignment page, the end user can filter only preferred business terms.  
+On OpenAPI Document  Assignment page, the end user can filter only preferred business terms.  
 
 #### Test Assertion #43.2.6
-On Business Term Assignment page, the end user can select a BIE in the table and view all the business term assignments for that BIE. 
+On OpenAPI Document  Assignment page, the end user can select a BIE in the table and view all the business term assignments for that BIE. 
 
 #### Test Assertion #43.2.7
-On Assign Business Term page, the end user can select any BIE to view all the Business Terms available for assignments. 
+On Assign OpenAPI Document  page, the end user can select any BIE to view all the OpenAPI Document s available for assignments. 
 
 #### Test Assertion #43.2.8
-On Assign Business Term page, the end user can filter business terms that are already assigned to the same core component. 
+On Assign OpenAPI Document  page, the end user can filter business terms that are already assigned to the same core component. 
 
 #### Test Assertion #43.2.9
 
-On the Select Business Term step/page of the business term assignment, the application shall allow or disallow duplicate  business term and type code (or no type code) assignment based on the conditions below.  
+On the Select OpenAPI Document  step/page of the business term assignment, the application shall allow or disallow duplicate  business term and type code (or no type code) assignment based on the conditions below.  
 
-Business Term     | Type Code     | Dis/Allow 
+OpenAPI Document      | Type Code     | Dis/Allow 
 Same              |  Same         | Disallow
 Same              |  Diff         | Allow
 Diff              |  Same         | Allow  
@@ -123,36 +123,36 @@ For each BIE, there can only be one preferred business term assignment.
 
 1. An end user logins.
 2. He visits the Home page and clicks on the BIE tab.
-3. He clicks on the "Business Term Assignment" from the dropdown list.
-4. Verify that the title in the open page is "Business Term Assignment". (Assertion [#1] (#test-assertion-4321))
+3. He clicks on the "OpenAPI Document  Assignment" from the dropdown list.
+4. Verify that the title in the open page is "OpenAPI Document  Assignment". (Assertion [#1] (#test-assertion-4321))
 5. Verify that three business terms in the table. (Assertion [#2] (#test-assertion-4322)).
-6. He clicks on the "Assign Business Term" button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#3] (#test-assertion-4323)).
-7. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
+6. He clicks on the "Assign OpenAPI Document " button and verify that all BIEs created in the preconditions are available for assignments. (Assertion [#3] (#test-assertion-4323)).
+7. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
 8. Verify that he can search the business term assignments based on BIE DEN, business term, extenal reference URI or type code. (Assertion [#4](#test-assertion-4324)).
 9. Verify that he can filter out the preferred business term assignments by checking Preferred Only checkbox. (Assertion [#5](#test-assertion-4325)).
 10. He selects any BIE in the "Businss Term Assignment" page, then clicks on the "Search by Selected BIE", verify that only business terms for the selected BIE are listed. (Assertion [#6](#test-assertion-4326)).
-11. He clicks on the "Assign Business Term" button. Then select any BIE in the new table and click "Next". Verify that he can see all the busines terms available for assignment. (Assertion [#7](#test-assertion-4327)).
-12. On the same "Assign Business Term" page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then hits "Search" button. 
+11. He clicks on the "Assign OpenAPI Document " button. Then select any BIE in the new table and click "Next". Verify that he can see all the busines terms available for assignment. (Assertion [#7](#test-assertion-4327)).
+12. On the same "Assign OpenAPI Document " page, the end user can filter out all the business term already assigned to the same core component by checking the "Filter by same CC" checkbox. then hits "Search" button. 
 13. Verify the search results match the business term asssignments in preconditions(Assertion [#8](#test-assertion-4328)).
-14. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-15. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4329)).
-16. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-17. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table,the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term but using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
-18. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-19. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using the same type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
-20. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-21. He clicks on the "Assign Business Term" button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
-22. The end user goes back to "Business Term Assignment" from the BIE dropdown list. 
-23. He will select any BIE from the "Business Term Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-43210)).
-24. Repeat step 23, if no true value in the column titled with "Preferred Business Term". Click any BIE to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally hits "Update" button. 
-25. Repeat step 23, verify that only one True value in the column titled with "Preferred Business Term". (Assertion [#10](#test-assertion-43210)).
-26. Repeat step 23, click any BIE with the false value in the column titled with "Preferred Business Term" to open the "Edit Business Term Assignment" page, then click the checkbox: Preferred Business Term. Finally hits "Update: button. Verify that a warning dialog will pop up with the message: Overwrite previous preferred business term?The preferred business term already exists for selected BIE and type code. Are you sure you want to do the update and overwrite the previous preferred business term assignment? (Assertion [#10](#test-assertion-43210)).
+14. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
+15. He clicks on the "Assign OpenAPI Document " button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term and using the same type code. Verify that the second time he clicks on the "Create" button, an error message will pop up: Invalid parameters, Another business term assignment for the same BIE and type code already exists!. (Assertion [#9](#test-assertion-4329)).
+16. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
+17. He clicks on the "Assign OpenAPI Document " button. Then select any BIE in the table and click "Next". He will select any business term in the new table,the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with the same business term but using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
+18. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
+19. He clicks on the "Assign OpenAPI Document " button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using the same type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
+20. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
+21. He clicks on the "Assign OpenAPI Document " button. Then select any BIE in the table and click "Next". He will select any business term in the new table, the "Create" button will be enabled. He can put a type code and hits "Create" to add the assignment. Then repeat the whole process for the same BIE with a different business term and using a different type code. Verify that the second time he clicks on the "Create" button, the assignment is created. (Assertion [#9](#test-assertion-4329)).
+22. The end user goes back to "OpenAPI Document  Assignment" from the BIE dropdown list. 
+23. He will select any BIE from the "OpenAPI Document  Assignment" page. Then clicks on the "Search by Selected BIE" buton on the right above. On the new page, verify that at most one True value in the column titled with "Preferred OpenAPI Document ". (Assertion [#10](#test-assertion-43210)).
+24. Repeat step 23, if no true value in the column titled with "Preferred OpenAPI Document ". Click any BIE to open the "Edit OpenAPI Document  Assignment" page, then click the checkbox: Preferred OpenAPI Document . Finally hits "Update" button. 
+25. Repeat step 23, verify that only one True value in the column titled with "Preferred OpenAPI Document ". (Assertion [#10](#test-assertion-43210)).
+26. Repeat step 23, click any BIE with the false value in the column titled with "Preferred OpenAPI Document " to open the "Edit OpenAPI Document  Assignment" page, then click the checkbox: Preferred OpenAPI Document . Finally hits "Update: button. Verify that a warning dialog will pop up with the message: Overwrite previous preferred business term?The preferred business term already exists for selected BIE and type code. Are you sure you want to do the update and overwrite the previous preferred business term assignment? (Assertion [#10](#test-assertion-43210)).
 
 ## Test Case 43.3
 
-**Business Term from BIE detail page**
+**BIE Usage Detail page**
 
-Pre-condition: N/A
+Pre-condition: A BIE is assigned to the Open API Document.
 
 ### Test Assertion:
 
@@ -161,11 +161,11 @@ The end user can see all business terms assigned to a descendant BIE node.
 
 #### Test Assertion #43.3.2
 
-Hovering over the "Show Business Terms" button in the detail pane of a descendant BIE node shows up to five business term assigned to that node. 
+Hovering over the "Show OpenAPI Document s" button in the detail pane of a descendant BIE node shows up to five business term assigned to that node. 
 
 #### Test Assertion #43.3.3
 
-The end user can assign business terms to a descendant BIE node in the BIE detail page by clicking the "Assign Business Term" button in BIE detail pane. 
+The end user can assign business terms to a descendant BIE node in the BIE detail page by clicking the "Assign OpenAPI Document " button in BIE detail pane. 
 
 
 ### Test Step Pre-condition:
@@ -179,59 +179,13 @@ The end user can assign business terms to a descendant BIE node in the BIE detai
 3. He clicks on the "View/Edit BIE" from the dropdown list.
 4. He clicks on any BIE from the table. The BIE detail page will open.
 5. He expands the root level in the left sidenav tree and clicks on any used node in the second level, the detail for that node will display on the right.
-6. He will click on "Show Business Terms" button to view all the business terms that already assigned to that node.
+6. He will click on "Show OpenAPI Document s" button to view all the business terms that already assigned to that node.
 7. Verify that the list of business terms in the new window is indeed assigned to the selected node (Assertion [#1](#test-assertion-4331)).
 8. He closes the new window and goes back to previous window.
-9. He will hover over "Show Business Terms" button without clicking. A hint bar will display to show the number of business terms assigned to the node. Verify the number is the same as in the previosu step. (Assertion [#2](#test-assertion-4332)).
-10. He will click on the "Assign Business Term" button right next to the "Show Business Terms" button on the same page.
+9. He will hover over "Show OpenAPI Document s" button without clicking. A hint bar will display to show the number of business terms assigned to the node. Verify the number is the same as in the previosu step. (Assertion [#2](#test-assertion-4332)).
+10. He will click on the "Assign OpenAPI Document " button right next to the "Show OpenAPI Document s" button on the same page.
 11. He will select any availabe business term in the new window,  set the Type Code, and click on "Create" button.
 12. He will close the new window and go back to previous window. 
-13. He will hover over "Show Business Terms" button without clicking again. Verify the number in the hint bar is increased by one. (Assertion [#3](#test-asssertion-4333)).
+13. He will hover over "Show OpenAPI Document s" button without clicking again. Verify the number in the hint bar is increased by one. (Assertion [#3](#test-asssertion-4333)).
 
 
-## Test Case 43.4
-
-**Load Business Terms from an External Source**
-
-Pre-condition: N/A
-
-### Test Assertion:
-
-#### Test Assertion #43.4.1
-The end user can download a template for the external csv file to be uploaded from "Business Term" page. 
-
-#### Test Assertion #43.4.2
-
-The end user can upload and attach the csv file with the correct format as specified in the template from "Business Term" page. 
-
-#### Test Assertion #43.4.3
-
-No new business term will be created if the uploaded csv file does not obey the format as specified in the template such as missing columns, missing header row, extra columns and invalid data format. 
-
-#### Test Assertion #43.4.4
-
-For bulk upload through "Upload Business Terms", if the business term is uploaded with new externalReferenceUri, a new business term will be created. 
-
-#### Test Assertion #43.4.5
-
-For bulk upload through "Upload Business Terms", if the business term is uploaded with an existent externalReferenceUri, the previous business term with the same URI will be updated with the new information. 
-
-
-### Test Step Pre-condition:
-N/A
-
-### Test Steps:
-
-1. An end user logins.
-2. He visits the Home page and clicks on the BIE tab.
-3. He clicks on the "View/Edit Business Term" from the dropdown list.
-4. He clicks on the "Upload Business Terms" button. 
-5. On the "Upload Business Terms" page, he will click on "Download template" on the right corner. Verify that a csv file named "businessTermTemplateWithExample.csv" is downloaded and saved into local drive. (Assertion [#1](#test-assertion-4341)).
-6. On the same page, he will click on the attach button. An window will open for the end user to select the updated csv files with all the business term information for upload. He will select that file to upload. 
-7. Verify that all the business terms in the uploaded csv file are listed in the table after uploaded. (Assertion [#2](#test-assertion-4343)).
-8. Verify that a warning message will pop up if the csv file does not follow the format as specified in the template. (Assertion [#3](#test-assertion-4343)).
-9. The end user will fix the format errors in the csv file and re-upload. 
-10. Verify that a new business term is created in the table if the external reference uri is new in the uploaded csv file. (Assertion [#4](#test-assertion-4344)).
-11. Verify that an existent business term is updated with the new information if the external reference uri is the same as the exitent one in the uploaded csv file. 
-(Assertion [#5](#test-assertion-4345)).
-12. Re-upload the same csv file for a second time. Verify that no more changes in all business terms. 
