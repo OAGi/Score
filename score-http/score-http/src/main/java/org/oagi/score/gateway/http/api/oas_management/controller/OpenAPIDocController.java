@@ -322,7 +322,8 @@ public class OpenAPIDocController {
         request.setTopLevelAsbiepId(assignBieForOasDoc.getTopLevelAsbiepId());
         request.setOasDocId(assignBieForOasDoc.getOasDocId());
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
-        request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
+        //issue#1492 Comments by Scott without displaying, default Suppress Root = true when Adding BIE
+        request.setSuppressRootIndicator(true);
         request.setTagName(assignBieForOasDoc.getTagName());
         String verbOption = assignBieForOasDoc.getVerb();
         String resoureName = null;
@@ -367,7 +368,8 @@ public class OpenAPIDocController {
         String operationId = setOperationIdWithVerb.verbToOperationId();
         request.setOperationId(operationId);
         request.setMakeArrayIndicator(assignBieForOasDoc.isArrayIndicator());
-        request.setSuppressRootIndicator(assignBieForOasDoc.isSuppressRootIndicator());
+        //issue#1492 Comments by Scott without displaying, default Suppress Root = true when Adding BIE
+        request.setSuppressRootIndicator(true);
         request.setRequiredForRequestBody(assignBieForOasDoc.isRequired());
         request.setDeprecatedForOperation(false);
         AddBieForOasDocResponse response = oasDocService.addBieForOasDoc(requester, request);
