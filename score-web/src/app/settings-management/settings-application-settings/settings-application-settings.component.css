@@ -21,3 +21,11 @@
   display: inline-block;
   margin-top: 2px;
 }
+
+.actions .info {
+  font-size: 13px;
+}
+
+.actions .info mat-icon {
+  transform: scale(0.8);
+}
