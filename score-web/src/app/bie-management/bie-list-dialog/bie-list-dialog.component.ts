@@ -4,9 +4,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
-import {base64Encode} from '../../common/utility';
 import {ReuseReport} from '../bie-report/domain/bie-report';
 import {BieReportService} from '../bie-report/domain/bie-report.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-list-dialog',
@@ -23,6 +23,7 @@ export class BieListDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<BieListDialogComponent>,
               private service: BieReportService,
               private auth: AuthService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.displayedColumns = [
       'releaseNum',

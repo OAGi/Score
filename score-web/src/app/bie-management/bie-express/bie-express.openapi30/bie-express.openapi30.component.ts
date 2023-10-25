@@ -20,6 +20,7 @@ import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {BieExpressOption} from '../domain/generate-expression';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-express.openapi30',
@@ -27,6 +28,7 @@ import {BieExpressOption} from '../domain/generate-expression';
   styleUrls: ['./bie-express.openapi30.component.css']
 })
 export class BieExpressOpenapi30Component implements OnInit {
+
   title = 'Express BIE in OpenAPI 3.0 Expression';
 
   displayedColumns: string[] = [
@@ -65,7 +67,8 @@ export class BieExpressOpenapi30Component implements OnInit {
               private dialog: MatDialog,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService
   ) {
   }
 
@@ -88,8 +91,11 @@ export class BieExpressOpenapi30Component implements OnInit {
       this.paginator.pageIndex = 0;
       this.loadBieList();
     });
-    forkJoin([this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()]).subscribe(([loginIds, releases]) => {
+
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([loginIds, releases]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);

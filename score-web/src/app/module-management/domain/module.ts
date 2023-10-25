@@ -116,8 +116,8 @@ export class ModuleSet {
 }
 
 export class ModuleSetMetadata {
-  numberOfDirectories: number = 0;
-  numberOfFiles: number = 0;
+  numberOfDirectories = 0;
+  numberOfFiles = 0;
 }
 
 export class ModuleSetModuleListRequest {

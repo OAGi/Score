@@ -14,7 +14,7 @@ import {ReleaseCreateComponent} from './release-create/release-create.component'
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
   ReleaseWhatsChangedDialogComponent
-} from "./release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component";
+} from './release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component';
 
 const routes: Routes = [
   {

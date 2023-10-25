@@ -3,6 +3,9 @@ package org.oagi.score.gateway.http.api.application_management.data;
 import lombok.Data;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 public class ApplicationConfigurationChangeRequest {
 
@@ -13,12 +16,13 @@ public class ApplicationConfigurationChangeRequest {
     private Boolean bieInverseModeEnabled;
 
     // General
-    private String key;
-    private String value;
+    private Map<String, String> keyValueMap = new HashMap<>();
 
     public ApplicationConfigurationChangeRequest withKeyAndValue(String key, String value) {
-        this.setKey(StringUtils.hasLength(key) ? key : null);
-        this.setValue(StringUtils.hasLength(value) ? value : null);
+        if (!StringUtils.hasLength(key)) {
+            return this;
+        }
+        keyValueMap.put(key, StringUtils.hasLength(value) ? value : null);
         return this;
     }
 

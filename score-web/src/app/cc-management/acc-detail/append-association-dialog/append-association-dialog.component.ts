@@ -17,6 +17,7 @@ import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../../domain/core-component-node';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-append-association-dialog',
@@ -64,6 +65,7 @@ export class AppendAssociationDialogComponent implements OnInit {
               private accountService: AccountListService,
               private service: CcNodeService,
               private confirmDialogService: ConfirmDialogService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.action = data.action;
     if (this.data.isGlobal) {

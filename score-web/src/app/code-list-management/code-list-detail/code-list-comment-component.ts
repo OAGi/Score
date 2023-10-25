@@ -2,9 +2,7 @@ import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {CodeList} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {
-  Comment
-} from '../../cc-management/domain/core-component-node';
+import {Comment} from '../../cc-management/domain/core-component-node';
 
 @Injectable()
 export class CodeListCommentControl {

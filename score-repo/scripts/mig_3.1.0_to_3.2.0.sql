@@ -72,6 +72,42 @@ WHERE `bcc_manifest`.`from_acc_manifest_id` = `acc_manifest`.`acc_manifest_id`
 
 ALTER TABLE `bcc` DROP COLUMN `den`;
 
+-- Issue #1558
+-- Initialize color sets
+INSERT INTO `configuration` (`name`, `type`, `value`)
+VALUES ('score.pages.colors.cc-state.WIP.background', 'String', '#d32f2f'),
+       ('score.pages.colors.cc-state.WIP.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.QA.background', 'String', '#b961e1'),
+       ('score.pages.colors.cc-state.QA.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Draft.background', 'String', '#b961e1'),
+       ('score.pages.colors.cc-state.Draft.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Candidate.background', 'String', '#303f9f'),
+       ('score.pages.colors.cc-state.Candidate.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Production.background', 'String', '#303f9f'),
+       ('score.pages.colors.cc-state.Production.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.ReleaseDraft.background', 'String', '#c55a11'),
+       ('score.pages.colors.cc-state.ReleaseDraft.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Published.background', 'String', '#388e3c'),
+       ('score.pages.colors.cc-state.Published.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Deleted.background', 'String', '#616161'),
+       ('score.pages.colors.cc-state.Deleted.font', 'String', '#ffffff'),
+       ('score.pages.colors.cc-state.Deprecated.background', 'String', '#455a64'),
+       ('score.pages.colors.cc-state.Deprecated.font', 'String', '#ffffff'),
+       ('score.pages.colors.release-state.Processing.background', 'String', '#bfdadc'),
+       ('score.pages.colors.release-state.Processing.font', 'String', '#000000'),
+       ('score.pages.colors.release-state.Initialized.background', 'String', '#d32f2f'),
+       ('score.pages.colors.release-state.Initialized.font', 'String', '#ffffff'),
+       ('score.pages.colors.release-state.Draft.background', 'String', '#7b1fa2'),
+       ('score.pages.colors.release-state.Draft.font', 'String', '#ffffff'),
+       ('score.pages.colors.release-state.Published.background', 'String', '#388e3c'),
+       ('score.pages.colors.release-state.Published.font', 'String', '#ffffff'),
+       ('score.pages.colors.user-role.Admin.background', 'String', '#ffe4e1'),
+       ('score.pages.colors.user-role.Admin.font', 'String', '#212121'),
+       ('score.pages.colors.user-role.Developer.background', 'String', '#fafad2'),
+       ('score.pages.colors.user-role.Developer.font', 'String', '#212121'),
+       ('score.pages.colors.user-role.End-User.background', 'String', '#f5f5f5'),
+       ('score.pages.colors.user-role.End-User.font', 'String', '#212121');
+
 -- Issue #1492
 -- Add tables for OpenAPI documents
 SET FOREIGN_KEY_CHECKS = 0;

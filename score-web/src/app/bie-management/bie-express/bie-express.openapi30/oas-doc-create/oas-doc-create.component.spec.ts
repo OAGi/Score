@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OasDocCreateComponent } from './oas-doc-create.component';
+import {OasDocCreateComponent} from './oas-doc-create.component';
 
 describe('OasDocCreateComponent', () => {
   let component: OasDocCreateComponent;

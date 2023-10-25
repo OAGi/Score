@@ -19,7 +19,6 @@ import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/dom
 import {CcDtNodeDetail, OagisComponentType, XbtForList} from '../../domain/core-component-node';
 import {base64Encode} from '../../../common/utility';
 import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
-import {SummaryBieInfo} from "../../../bie-management/bie-list/domain/bie-list";
 
 @Injectable()
 export class CcListService {
@@ -263,28 +262,28 @@ export class CcListService {
 
   createPrimitiveRestriction(releaseId: number, dtManifestId: number, type: string, primitiveXbtMapList: any[]): Observable<CcDtNodeDetail> {
     return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
-      releaseId: releaseId,
-      dtManifestId: dtManifestId,
+      releaseId,
+      dtManifestId,
       restrictionType: type,
-      primitiveXbtMapList: primitiveXbtMapList,
+      primitiveXbtMapList,
     });
   }
 
   createCodeListRestriction(releaseId: number, dtManifestId: number, type: string, codeListManifestId: number): Observable<CcDtNodeDetail> {
     return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
-      releaseId: releaseId,
-      dtManifestId: dtManifestId,
+      releaseId,
+      dtManifestId,
       restrictionType: type,
-      codeListManifestId: codeListManifestId,
+      codeListManifestId,
     });
   }
 
   createAgencyIdListRestriction(releaseId: number, dtManifestId: number, type: string, agencyIdListManifestId: number): Observable<CcDtNodeDetail> {
     return this.http.post<any>('/api/core_component/dt/' + dtManifestId + '/restriction/add', {
-      releaseId: releaseId,
-      dtManifestId: dtManifestId,
+      releaseId,
+      dtManifestId,
       restrictionType: type,
-      agencyIdListManifestId: agencyIdListManifestId,
+      agencyIdListManifestId,
     });
   }
 

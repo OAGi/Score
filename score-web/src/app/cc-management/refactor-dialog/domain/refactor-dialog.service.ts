@@ -16,10 +16,10 @@ export class RefactorDialogService {
 
   refactor(type: string, targetManifestId: number, destinationManifestId: number): Observable<any> {
     return this.http.post('/api/core_component/' + type + '/refactor', {
-      type: type,
-      targetManifestId: targetManifestId,
-      destinationManifestId: destinationManifestId
-    })
+      type,
+      targetManifestId,
+      destinationManifestId
+    });
   }
 
   validateRefactoring(type: string, targetManifestId: number, destinationManifestId: number): Observable<any> {

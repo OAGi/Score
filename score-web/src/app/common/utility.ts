@@ -138,7 +138,7 @@ export function loadBranch(userToken: UserToken, type: string): number | undefin
   let value;
   try {
     value = JSON.parse(atob(localStorage.getItem(key)));
-    return value['releaseId'];
+    return value.releaseId;
   } catch (ignore) {
     return undefined;
   }
@@ -149,7 +149,7 @@ export function saveBranch(userToken: UserToken, type: string, releaseId: number
     return;
   }
   const key = 'X-Score-Branch-Selection[' + userToken.username + ', ' + type + ']';
-  localStorage.setItem(key, btoa(JSON.stringify({'releaseId': releaseId})));
+  localStorage.setItem(key, btoa(JSON.stringify({releaseId: releaseId})));
 }
 
 export function truncate(str: string, len: number): string {
@@ -228,23 +228,23 @@ export class DateAgoPipe implements PipeTransform {
 
   transform(value: number[], args?: any): any {
     const intervals = {
-      'year': 31536000,
-      'month': 2592000,
-      'week': 604800,
-      'day': 86400,
-      'hour': 3600,
-      'minute': 60,
-      'second': 1
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+      second: 1
     };
     if (value && value.length === 7) {
       const now = new Date();
       let seconds = 0;
-      seconds += (now.getFullYear() - value[0]) * intervals['year'];
-      seconds += (now.getMonth() + 1 - value[1]) * intervals['month'];
-      seconds += (now.getDate() - value[2]) * intervals['day'];
-      seconds += (now.getHours() - value[3]) * intervals['hour'];
-      seconds += (now.getMinutes() - value[4]) * intervals['minute'];
-      seconds += (now.getSeconds() - value[5]) * intervals['second'];
+      seconds += (now.getFullYear() - value[0]) * intervals.year;
+      seconds += (now.getMonth() + 1 - value[1]) * intervals.month;
+      seconds += (now.getDate() - value[2]) * intervals.day;
+      seconds += (now.getHours() - value[3]) * intervals.hour;
+      seconds += (now.getMinutes() - value[4]) * intervals.minute;
+      seconds += (now.getSeconds() - value[5]) * intervals.second;
       if (seconds < 29) {
         return 'Just now';
       }

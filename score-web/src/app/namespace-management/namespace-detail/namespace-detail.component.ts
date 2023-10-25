@@ -5,7 +5,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {hashCode} from '../../common/utility';
-import {Namespace, NamespaceList} from '../domain/namespace';
+import {Namespace} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';

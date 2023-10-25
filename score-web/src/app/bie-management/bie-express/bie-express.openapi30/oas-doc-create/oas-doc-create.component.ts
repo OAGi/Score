@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BieForOasDoc, OasDoc} from '../domain/openapi-doc';
+import {OasDoc} from '../domain/openapi-doc';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../../authentication/auth.service';
@@ -8,9 +8,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {AbstractControl, Form, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
-import {UnboundedPipe} from '../../../../common/utility';
-import {ScoreUser} from "../../../../authentication/domain/auth";
+import {FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'score-oas-doc-create',

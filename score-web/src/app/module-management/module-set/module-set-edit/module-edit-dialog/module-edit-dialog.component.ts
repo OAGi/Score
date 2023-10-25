@@ -3,13 +3,13 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {hashCode, initFilter, sha256} from '../../../../common/utility';
+import {initFilter, sha256} from '../../../../common/utility';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
 import {ModuleElement} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
-import {FormControl} from "@angular/forms";
-import {ReplaySubject} from "rxjs";
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
 
 @Component({
   selector: 'score-module-edit-dialog',
@@ -34,15 +34,15 @@ export class ModuleEditDialogComponent implements OnInit {
               private snackBar: MatSnackBar,
               private namespaceService: NamespaceService,
               private confirmDialogService: ConfirmDialogService,
-              @Inject(MAT_DIALOG_DATA) public element: ModuleElement,) {
+              @Inject(MAT_DIALOG_DATA) public element: ModuleElement, ) {
   }
 
   ngOnInit() {
     this.title = this.element.name.toString();
     this.$hashCode = sha256(JSON.stringify({
-      'name': this.element.name,
-      'versionNum': this.element.versionNum,
-      'namespaceId': (!!this.element.namespaceId) ? this.element.namespaceId : undefined
+      name: this.element.name,
+      versionNum: this.element.versionNum,
+      namespaceId: (!!this.element.namespaceId) ? this.element.namespaceId : undefined
     }));
 
     this.namespaceService.getSimpleNamespaces().subscribe(resp => {
@@ -77,9 +77,9 @@ export class ModuleEditDialogComponent implements OnInit {
 
   changed() {
     return this.$hashCode !== sha256(JSON.stringify({
-      'name': this.element.name,
-      'versionNum': this.element.versionNum,
-      'namespaceId': (!!this.element.namespaceId) ? this.element.namespaceId : undefined,
+      name: this.element.name,
+      versionNum: this.element.versionNum,
+      namespaceId: (!!this.element.namespaceId) ? this.element.namespaceId : undefined,
     }));
   }
 
@@ -100,7 +100,7 @@ export class ModuleEditDialogComponent implements OnInit {
               }))
               .subscribe(_ => {
                 this.dialogRef.close('Discarded');
-              })
+              });
           }
         });
     } else {
@@ -119,7 +119,7 @@ export class ModuleEditDialogComponent implements OnInit {
               }))
               .subscribe(_ => {
                 this.dialogRef.close('Discarded');
-              })
+              });
           }
         });
     }

@@ -130,8 +130,12 @@
               <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
                 <td mat-cell *matCellDef="let element">
-                  <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
-                  <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+                  <span class="cc-state {{ element.state }}"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                        'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+                  <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
                 </td>
               </ng-container>
 
@@ -202,8 +206,12 @@
               <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
                 <td mat-cell *matCellDef="let element">
-                  <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
-                  <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+                  <span class="cc-state {{ element.state }}"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                        'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+                  <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
                 </td>
               </ng-container>
 

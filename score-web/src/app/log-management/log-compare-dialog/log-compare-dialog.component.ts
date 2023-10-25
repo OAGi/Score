@@ -6,7 +6,8 @@ import {
   AsccpSnapshot,
   AssociationSnapshot,
   BccpSnapshot,
-  CcSnapshot, DtScSnapshot,
+  CcSnapshot,
+  DtScSnapshot,
   DtSnapshot,
   SnapshotPair
 } from '../domain/log';
