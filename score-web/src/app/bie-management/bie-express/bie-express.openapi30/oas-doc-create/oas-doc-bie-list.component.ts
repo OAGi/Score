@@ -21,6 +21,7 @@ import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../../comm
 import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {WebPageInfoService} from '../../../../basis/basis.service';
 
 @Component({
   selector: 'score-oas-doc-bie-list',
@@ -28,6 +29,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
   styleUrls: ['./oas-doc-bie-list.component.css']
 })
 export class OasDocBieListComponent implements OnInit {
+
   subtitle = 'Select BIEs';
   oasDoc: OasDoc;
   businessContextIdList: number[] = [];
@@ -64,19 +66,20 @@ export class OasDocBieListComponent implements OnInit {
               private auth: AuthService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
     this.oasDoc = new OasDoc();
     const oasDocId = this.route.snapshot.params.id;
 
-    forkJoin(
+    forkJoin([
       this.openAPIService.getOasDoc(oasDocId)
-    )
-      .subscribe(([simpleOasDoc]) => {
-        this.oasDoc = simpleOasDoc;
-      });
+    ]).subscribe(([simpleOasDoc]) => {
+      this.oasDoc = simpleOasDoc;
+    });
+
     // Init BIE List table
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));

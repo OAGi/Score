@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  BieForOasDoc, BieForOasDocDeleteRequest,
+  BieForOasDoc,
+  BieForOasDocDeleteRequest,
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
@@ -18,7 +19,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveBranch} from 'src/app/common/utility';
-import {v4 as uuid} from 'uuid';
 import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {WorkingRelease} from '../../../../release-management/domain/release';
@@ -30,6 +30,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {WebPageInfoService} from '../../../../basis/basis.service';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -37,6 +38,7 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
   styleUrls: ['./oas-doc-detail.component.css']
 })
 export class OasDocDetailComponent implements OnInit {
+
   title = 'Edit OpenAPI Document';
   oasDocs: simpleOasDoc[];
   oasDoc: OasDoc;
@@ -71,7 +73,8 @@ export class OasDocDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
@@ -102,8 +105,8 @@ export class OasDocDetailComponent implements OnInit {
 
     forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieListForOasDoc(oasDocId)]
-    ).subscribe(([simpleOasDoc, bieForOasDoc]) => {
+      this.openAPIService.getBieListForOasDoc(oasDocId)
+    ]).subscribe(([simpleOasDoc, bieForOasDoc]) => {
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
       this.loadBieListForOasDoc(true);
@@ -314,7 +317,6 @@ export class OasDocDetailComponent implements OnInit {
             });
             this.router.navigateByUrl('/profile_bie/express/oas_doc');
           }, err => {
-            console.log(err);
             this.snackBar.open('Discard\'s forbidden! The OpenAPI Doc is used.', '', {
               duration: 5000,
             });
@@ -330,6 +332,7 @@ export class OasDocDetailComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = this.dataSource.data;
+    dialogConfig.data.webPageInfo = this.webPageInfo;
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
     dialogConfig.data.isEditable = this.isEditable();

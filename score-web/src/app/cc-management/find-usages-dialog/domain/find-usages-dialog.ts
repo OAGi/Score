@@ -1,4 +1,4 @@
-import {CcGraph, CcGraphEdge, CcGraphNode} from '../../domain/core-component-node';
+import {CcGraphEdge, CcGraphNode} from '../../domain/core-component-node';
 
 export class FindUsagesResponse {
   rootNodeKey: string;

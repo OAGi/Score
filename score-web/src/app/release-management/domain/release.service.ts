@@ -24,7 +24,7 @@ export class ReleaseService {
     if (!!states && states.length > 0) {
       params = params.set('states', states.join(','));
     }
-    return this.http.get<SimpleRelease[]>('/api/simple_releases', {params: params});
+    return this.http.get<SimpleRelease[]>('/api/simple_releases', {params});
   }
 
   getSimpleRelease(id): Observable<SimpleRelease> {
@@ -92,7 +92,7 @@ export class ReleaseService {
     } else {
       const params = new HttpParams()
         .set('releaseIds', releaseIds.join(','));
-      return this.http.delete('/api/release', {params: params});
+      return this.http.delete('/api/release', {params});
     }
   }
 

@@ -25,7 +25,7 @@ export class StateProgressBarComponent implements OnInit {
     }
     let params = new HttpParams();
     for (const param of item.href[1]) {
-      params = params.set(param['key'], param['value']);
+      params = params.set(param.key, param.value);
     }
     return base64Encode(params.toString());
   }

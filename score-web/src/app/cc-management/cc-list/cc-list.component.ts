@@ -38,8 +38,9 @@ import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {saveAs} from 'file-saver';
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-cc-list',
@@ -99,15 +100,16 @@ export class CcListComponent implements OnInit {
               private releaseService: ReleaseService,
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
-              private auth: AuthService,
               private aboutService: AboutService,
+              private auth: AuthService,
               private tagService: TagService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   get currentUser(): string {
@@ -498,7 +500,7 @@ export class CcListComponent implements OnInit {
     dialogRef.afterClosed().pipe(finalize(() => {
       this.loading = false;
     })).subscribe(roleOfAcc => {
-      if (!roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
+      if (!roleOfAcc || !roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
         return;
       }
 

@@ -2,11 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {
   AssignBieForOasDoc,
-  BieForOasDoc, BieForOasDocDeleteRequest,
+  BieForOasDoc,
+  BieForOasDocDeleteRequest,
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
-  OasDocListRequest, ReusedBIEViolationCheck
+  OasDocListRequest,
+  ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../../basis/basis';
@@ -59,7 +61,6 @@ export class OpenAPIService {
   }
 
   updateDetails(request: BieForOasDocUpdateRequest): Observable<any> {
-    console.log(request);
     return this.http.put('/api/oas_doc/' + request.oasDocId + '/bie_list/detail', request.json);
   }
 

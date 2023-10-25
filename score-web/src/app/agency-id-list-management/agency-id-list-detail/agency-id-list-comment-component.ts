@@ -2,9 +2,7 @@ import {Injectable} from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {AgencyIdList} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
-import {
-  Comment
-} from '../../cc-management/domain/core-component-node';
+import {Comment} from '../../cc-management/domain/core-component-node';
 
 @Injectable()
 export class AgencyIdListCommentControl {

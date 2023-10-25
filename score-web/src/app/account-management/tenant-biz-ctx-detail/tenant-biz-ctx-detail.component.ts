@@ -11,7 +11,10 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {TenantListService} from '../domain/tenant-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {
+  BusinessContext,
+  BusinessContextListRequest
+} from '../../context-management/business-context/domain/business-context';
 import {PageRequest} from '../../basis/basis';
 import {initFilter} from '../../common/utility';
 

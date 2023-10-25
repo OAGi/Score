@@ -26,6 +26,7 @@ import {HttpParams} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -40,6 +41,7 @@ import {TagService} from '../../tag-management/domain/tag.service';
   ],
 })
 export class BieCreateAsccpComponent implements OnInit {
+
   title = 'Create BIE';
   subtitle = 'Select Top-Level Concept';
 
@@ -86,7 +88,8 @@ export class BieCreateAsccpComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {

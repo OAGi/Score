@@ -185,7 +185,6 @@ export class BusinessTermListComponent implements OnInit {
             this.selection.clear();
             this.loadBusinessTermList();
           }, err => {
-            console.log(err);
             this.snackBar.open('Discard\'s forbidden! The business term is used.', '', {
               duration: 5000,
             });

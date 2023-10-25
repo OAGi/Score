@@ -13,6 +13,8 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Service
 @Transactional
 public class ApplicationConfigurationService {
@@ -37,6 +39,30 @@ public class ApplicationConfigurationService {
     public static final String FAVICON_LINK_CONFIG_PARAM_NAME = "score.pages.favicon.link";
 
     public static final String SIGN_IN_PAGE_STATEMENT_CONFIG_PARAM_NAME = "score.pages.signin.statement";
+
+    public static final String COMPONENT_STATE_BACKGROUND_COLOR_CONFIG_PARAM_NAME(String state) {
+        return "score.pages.colors.cc-state." + state + ".background";
+    }
+
+    public static final String COMPONENT_STATE_FONT_COLOR_CONFIG_PARAM_NAME(String state) {
+        return "score.pages.colors.cc-state." + state + ".font";
+    }
+
+    public static final String RELEASE_STATE_BACKGROUND_COLOR_CONFIG_PARAM_NAME(String state) {
+        return "score.pages.colors.release-state." + state + ".background";
+    }
+
+    public static final String RELEASE_STATE_FONT_COLOR_CONFIG_PARAM_NAME(String state) {
+        return "score.pages.colors.release-state." + state + ".font";
+    }
+
+    public static final String USER_ROLE_BACKGROUND_COLOR_CONFIG_PARAM_NAME(String role) {
+        return "score.pages.colors.user-role." + role + ".background";
+    }
+
+    public static final String USER_ROLE_FONT_COLOR_CONFIG_PARAM_NAME(String role) {
+        return "score.pages.colors.user-role." + role + ".font";
+    }
 
     public String getConfigurationValueByName(String paramConfigName) {
         return configRepo.getConfigurationValueByName(paramConfigName);
@@ -92,12 +118,14 @@ public class ApplicationConfigurationService {
                     .upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
         }
 
-        String key = request.getKey();
-        if (StringUtils.hasLength(key)) {
-            scoreRepositoryFactory.createConfigurationWriteRepository()
-                    .upsertConfiguration(scoreUser, key, request.getValue());
+        Map<String, String> keyValueMap = request.getKeyValueMap();
+        if (keyValueMap != null && keyValueMap.size() > 0) {
+            for (String key : keyValueMap.keySet()) {
+                if (StringUtils.hasLength(key)) {
+                    scoreRepositoryFactory.createConfigurationWriteRepository()
+                            .upsertConfiguration(scoreUser, key, keyValueMap.get(key));
+                }
+            }
         }
-
     }
-
 }

@@ -50,7 +50,7 @@ import {AppendAssociationDialogComponent} from './append-association-dialog/appe
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
-import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
+import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
@@ -64,8 +64,9 @@ import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {TagService} from '../../tag-management/domain/tag.service';
-import {Tag, ShortTag} from '../../tag-management/domain/tag';
+import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-acc-detail',
@@ -73,6 +74,7 @@ import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edi
   styleUrls: ['./acc-detail.component.css']
 })
 export class AccDetailComponent implements OnInit {
+
   faFlask = faFlask;
   title: string;
   _innerHeight: number = window.innerHeight;
@@ -146,7 +148,8 @@ export class AccDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private auth: AuthService,
               private stompService: RxStompService,
-              private clipboard: Clipboard) {
+              private clipboard: Clipboard,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {

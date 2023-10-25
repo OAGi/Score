@@ -270,8 +270,8 @@ export class SnapshotPair {
 
     if (this.component.toUpperCase() === 'ACC') {
       // init index property for associations
-      let beforeAssociations = (this.before as AccSnapshot).associations;
-      let afterAssociations = (this.after as AccSnapshot).associations;
+      const beforeAssociations = (this.before as AccSnapshot).associations;
+      const afterAssociations = (this.after as AccSnapshot).associations;
 
       this.associations = [];
 
@@ -324,8 +324,8 @@ export class SnapshotPair {
 
     else if (this.component.toUpperCase() === 'DT') {
       // init index property for associations
-      let beforeAssociations = (this.before as DtSnapshot).dtScList;
-      let afterAssociations = (this.after as DtSnapshot).dtScList;
+      const beforeAssociations = (this.before as DtSnapshot).dtScList;
+      const afterAssociations = (this.after as DtSnapshot).dtScList;
 
       this.associations = [];
 

@@ -5,8 +5,9 @@ import {base64Encode} from '../../common/utility';
 import {BieReportService} from './domain/bie-report.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {ReuseReport} from './domain/bie-report';
-import {finalize} from 'rxjs/operators';
 import {saveAs} from 'file-saver';
+import {forkJoin} from 'rxjs';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-report',
@@ -36,23 +37,22 @@ export class BieReportComponent implements OnInit {
   loading = false;
 
   constructor(private service: BieReportService,
-              private auth: AuthService) {
+              private auth: AuthService,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
-    this.loadBieReportList();
-  }
-
-  loadBieReportList() {
     this.loading = true;
 
-    this.service.getBieReuseReport().pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
+    forkJoin([
+      this.service.getBieReuseReport()
+    ]).subscribe(([resp]) => {
       this.dataSource.data = resp;
-    })
+
+      this.loading = false;
+    }, error => {
+      this.loading = false;
+    });
   }
 
   isAccessibleLeft(report: ReuseReport): boolean {
@@ -64,24 +64,24 @@ export class BieReportComponent implements OnInit {
   }
 
   getRouteLink(report: ReuseReport): string {
-    return "/profile_bie/" + report.reusingTopLevelAsbiepId + "?q=" + base64Encode(report.displayPath);
+    return '/profile_bie/' + report.reusingTopLevelAsbiepId + '?q=' + base64Encode(report.displayPath);
   }
 
   convertToCsv(): string {
     return [
-      [ "Release", "State", "Guid", "PropertyTerm", "Path", "Owner", "Version", "Status",
-        "ReusedState", "ReusedGuid", "ReusedPropertyTerm", "ReusedOwner", "ReusedVersion", "ReusedStatus",],
+      [ 'Release', 'State', 'Guid', 'PropertyTerm', 'Path', 'Owner', 'Version', 'Status',
+        'ReusedState', 'ReusedGuid', 'ReusedPropertyTerm', 'ReusedOwner', 'ReusedVersion', 'ReusedStatus', ],
       ...this.dataSource.data.map(e => [
         e.releaseNum, e.reusingState, e.reusingGuid, e.reusingPropertyTerm,
         e.displayPath, e.reusingOwner, e.reusingVersion, e.reusingStatus,
 
         e.reusedState, e.reusedGuid, e.reusedPropertyTerm,
-        e.reusedOwner, e.reusedVersion, e.reusedStatus,])
-    ].map(e => e.join(",")).join("\n");
+        e.reusedOwner, e.reusedVersion, e.reusedStatus, ])
+    ].map(e => e.join(',')).join('\n');
   }
 
   download() {
-    const blob = new Blob([this.convertToCsv()], {type: "application/csv"});
-    saveAs(blob, "reuse-report.csv");
+    const blob = new Blob([this.convertToCsv()], {type: 'application/csv'});
+    saveAs(blob, 'reuse-report.csv');
   }
 }

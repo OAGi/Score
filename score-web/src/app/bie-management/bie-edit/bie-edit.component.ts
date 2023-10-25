@@ -53,8 +53,9 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {MultiActionsSnackBarComponent} from "../../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
+import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 
 @Component({
@@ -162,7 +163,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private businessTermService: BusinessTermService,
               private auth: AuthService,
               private stompService: RxStompService,
-              private clipboard: Clipboard) {
+              private clipboard: Clipboard,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {

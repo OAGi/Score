@@ -16,6 +16,7 @@ import {ModuleElement, ModuleSetRelease, Tile} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {UserToken} from '../../../authentication/domain/auth';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-module-set-assign',
@@ -56,7 +57,8 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
+              private confirmDialogService: ConfirmDialogService,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
@@ -148,7 +150,7 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     if (!element.directory) {
       this.selectedModuleElement = element;
     }
-    let tileIndex = this.tiles.indexOf(tile) + 1;
+    const tileIndex = this.tiles.indexOf(tile) + 1;
     if (this.tiles.length > tileIndex) {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
@@ -275,15 +277,15 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     }
 
     return denFiltered && typeFiltered && stateFiltered;
-  };
+  }
 
   assign() {
     if (this.leftSelection.selected.length === 0 || this.selectedModuleElement === undefined) {
       return;
     }
     const items = this.leftSelection.selected;
-    let leftItems = this.leftDataSource.data;
-    let rightItems = this.rightDataSource.data;
+    const leftItems = this.leftDataSource.data;
+    const rightItems = this.rightDataSource.data;
 
     this.isUpdating = true;
     this.moduleService.createAssign(this.moduleSetRelease, this.selectedModuleElement.moduleId, items)
@@ -315,8 +317,8 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
       return;
     }
     const items = this.rightSelection.selected;
-    let leftItems = this.leftDataSource.data;
-    let rightItems = this.rightDataSource.data;
+    const leftItems = this.leftDataSource.data;
+    const rightItems = this.rightDataSource.data;
 
     this.isUpdating = true;
     this.moduleService.discardAssign(this.moduleSetRelease, this.selectedModuleElement.moduleId, items)

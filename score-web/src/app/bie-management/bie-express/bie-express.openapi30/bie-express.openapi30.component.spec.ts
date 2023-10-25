@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { BieExpressOpenapi30Component } from './bie-express.openapi30.component';
+import {BieExpressOpenapi30Component} from './bie-express.openapi30.component';
 
 describe('BieExpressOpenapi30Component', () => {
   let component: BieExpressOpenapi30Component;

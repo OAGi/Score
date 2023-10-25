@@ -8,7 +8,6 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
 import {hashCode} from '../../common/utility';
-import {forkJoin} from 'rxjs';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
@@ -71,7 +70,6 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
       _assignedBusinessTerm.businessTermId, _assignedBusinessTerm.typeCode,
       _assignedBusinessTerm.primary)
       .subscribe(resp => {
-      console.log(resp);
       if (!resp) {
         this.openDialogAssignedBusinessTermUpdate();
         return;

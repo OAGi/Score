@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { DisabledComponent } from './disabled.component';
+import {DisabledComponent} from './disabled.component';
 
 describe('DisabledComponent', () => {
   let component: DisabledComponent;

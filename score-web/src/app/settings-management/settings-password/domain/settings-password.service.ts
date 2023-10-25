@@ -11,8 +11,8 @@ export class SettingsPasswordService {
 
   updatePassword(oldPassword: string, newPassword: string): Observable<any> {
     return this.http.post('/api/settings/password', {
-      oldPassword: oldPassword,
-      newPassword: newPassword
+      oldPassword,
+      newPassword
     });
   }
 

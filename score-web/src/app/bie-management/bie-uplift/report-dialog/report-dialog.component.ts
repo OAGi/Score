@@ -81,11 +81,11 @@ export class ReportDialogComponent implements OnInit {
     // window.open(encodeURI(csvContent));
 
     const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.style.visibility = 'hidden';
-    link.setAttribute("href", encodedUri);
+    link.setAttribute('href', encodedUri);
 
-    link.setAttribute("download", `UpliftReport-${this.data.name}-${this.data.guid}.csv`);
+    link.setAttribute('download', `UpliftReport-${this.data.name}-${this.data.guid}.csv`);
     document.body.appendChild(link); // Required for FF
     link.click();
     document.body.removeChild(link);

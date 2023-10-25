@@ -28,7 +28,7 @@ export class UserToken {
   bie: BIEProperties;
 
   constructor() {
-    this.roles = ['',];
+    this.roles = ['', ];
     this.authentication = '';
     this.username = 'unknown';
     this.enabled = false;

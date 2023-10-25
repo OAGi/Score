@@ -1,5 +1,5 @@
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {faRecycle, faCircleExclamation} from '@fortawesome/free-solid-svg-icons';
+import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {forkJoin} from 'rxjs';
@@ -36,6 +36,7 @@ import {CcGraphNode} from '../../cc-management/domain/core-component-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
 import {BieEditAbieNode} from '../bie-edit/domain/bie-edit-node';
 import {saveBooleanProperty} from '../../common/utility';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 
 export class BieUpliftSourceFlatNodeDatabase<T extends BieFlatNode> extends BieFlatNodeDatabase<T> {
@@ -70,12 +71,12 @@ export class BieUpliftComponent implements OnInit {
   faRecycle = faRecycle;
   faCircleExclamation = faCircleExclamation;
   subtitle = 'Verify BIE';
-  loading: boolean = false;
+  loading = false;
 
   @ViewChild(MatStepper, {static: true}) stepper: MatStepper;
   @ViewChild('sourceVirtualScroll', {static: true}) public sourceVirtualScroll: CdkVirtualScrollViewport;
   @ViewChild('targetVirtualScroll', {static: true}) public targetVirtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize: number = 33;
+  virtualScrollItemSize = 33;
 
   get minBufferPx(): number {
     return 10000 * this.virtualScrollItemSize;
@@ -122,7 +123,8 @@ export class BieUpliftComponent implements OnInit {
               private location: Location,
               private router: Router,
               private dialog: MatDialog,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
@@ -260,21 +262,21 @@ export class BieUpliftComponent implements OnInit {
       if (e.type.toUpperCase() === 'ASBIEP') {
         const key = (e._node as AsbiepFlatNode).asccNode.manifestId;
         if (!sourceAsbiepList.has(key)) {
-          sourceAsbiepList.set(key, [e,]);
+          sourceAsbiepList.set(key, [e, ]);
         } else {
           sourceAsbiepList.get(key).push(e);
         }
       } else if (e.type.toUpperCase() === 'BBIEP') {
         const key = (e._node as BbiepFlatNode).bccNode.manifestId;
         if (!sourceBbiepList.has(key)) {
-          sourceBbiepList.set(key, [e,]);
+          sourceBbiepList.set(key, [e, ]);
         } else {
           sourceBbiepList.get(key).push(e);
         }
       } else if (e.type.toUpperCase() === 'BBIE_SC') {
         const key = (e._node as BbieScFlatNode).bdtScNode.manifestId;
         if (!sourceBbieScList.has(key)) {
-          sourceBbieScList.set(key, [e,]);
+          sourceBbieScList.set(key, [e, ]);
         } else {
           sourceBbieScList.get(key).push(e);
         }
@@ -289,21 +291,21 @@ export class BieUpliftComponent implements OnInit {
       if (e.type.toUpperCase() === 'ASBIEP') {
         const key = (e._node as AsbiepFlatNode).asccNode.manifestId;
         if (!targetAsbiepList.has(key)) {
-          targetAsbiepList.set(key, [e,]);
+          targetAsbiepList.set(key, [e, ]);
         } else {
           targetAsbiepList.get(key).push(e);
         }
       } else if (e.type.toUpperCase() === 'BBIEP') {
         const key = (e._node as BbiepFlatNode).bccNode.manifestId;
         if (!targetBbiepList.has(key)) {
-          targetBbiepList.set(key, [e,]);
+          targetBbiepList.set(key, [e, ]);
         } else {
           targetBbiepList.get(key).push(e);
         }
       } else if (e.type.toUpperCase() === 'BBIE_SC') {
         const key = (e._node as BbieScFlatNode).bdtScNode.manifestId;
         if (!targetBbieScList.has(key)) {
-          targetBbieScList.set(key, [e,]);
+          targetBbieScList.set(key, [e, ]);
         } else {
           targetBbieScList.get(key).push(e);
         }

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { EditTagsDialogComponent } from './edit-tags-dialog.component';
+import {EditTagsDialogComponent} from './edit-tags-dialog.component';
 
 describe('EditTagsDialogComponent', () => {
   let component: EditTagsDialogComponent;

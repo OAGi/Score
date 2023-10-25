@@ -3,9 +3,9 @@ import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {AboutService} from '../../basis/about/domain/about.service';
 import {WebPageInfo} from '../../basis/about/domain/about';
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -14,21 +14,28 @@ import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser
 })
 export class SettingsApplicationSettingsComponent implements OnInit {
 
+  webPageInfo: WebPageInfo;
+
   title = 'Application settings';
-  webPageInfo: WebPageInfo = new WebPageInfo();
+  loading = false;
 
   constructor(private auth: AuthService,
               private sanitizer: DomSanitizer,
-              private aboutService: AboutService,
               private settingsService: SettingsApplicationSettingsService,
               private confirmDialogService: ConfirmDialogService,
+              private webPageInfoService: WebPageInfoService,
               private snackBar: MatSnackBar) {
-    aboutService.getWebPageInfo().subscribe(resp => {
-      this.webPageInfo = resp;
-    });
   }
 
   ngOnInit() {
+    this.loading = true;
+    this.webPageInfoService.load().subscribe(resp => {
+      this.webPageInfo = new WebPageInfo(resp);
+
+      this.loading = false;
+    }, error => {
+      this.loading = false;
+    });
   }
 
   safetHtml(str: string): SafeHtml {
@@ -159,7 +166,9 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   }
 
   updateWebPageInfo() {
-    this.aboutService.updateWebPageInfo(this.webPageInfo).subscribe(_ => {
+    this.webPageInfoService.update(this.webPageInfo).subscribe(_ => {
+      this.webPageInfoService.set(this.webPageInfo);
+
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

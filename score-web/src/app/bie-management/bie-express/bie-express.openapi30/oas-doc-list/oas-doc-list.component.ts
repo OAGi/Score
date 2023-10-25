@@ -178,7 +178,6 @@ export class OasDocListComponent implements OnInit {
             this.selection.clear();
             this.loadOasDocList();
           }, err => {
-            console.log(err);
             this.snackBar.open('Discard\'s forbidden! The oas doc is used.', '', {
               duration: 5000,
             });

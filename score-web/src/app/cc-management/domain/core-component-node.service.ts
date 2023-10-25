@@ -78,21 +78,21 @@ export class CcNodeService {
 
   update(accNode: CcAccNode): Observable<any> {
     return this.http.post('/api/core_component/acc/' + accNode.accId, {
-      'objectClassTerm': accNode.objectClassTerm,
-      'deprecated': accNode.deprecated,
-      'abstract': accNode.abstracted,
-      'definition': accNode.definition,
-      'oagisComponentType': accNode.oagisComponentType
+      objectClassTerm: accNode.objectClassTerm,
+      deprecated: accNode.deprecated,
+      abstract: accNode.abstracted,
+      definition: accNode.definition,
+      oagisComponentType: accNode.oagisComponentType
     });
   }
 
   updateAsccp(asccp: CcAsccpNodeDetail): Observable<any> {
     return this.http.post('api/core_component/asccp/' + asccp.asccp.asccpId, {
-      'definition': asccp.asccp.definition,
-      'deprecated': asccp.asccp.deprecated,
-      'den': asccp.asccp.den,
-      'reusable': asccp.asccp.reusable,
-      'propertyTerm': asccp.asccp.propertyTerm
+      definition: asccp.asccp.definition,
+      deprecated: asccp.asccp.deprecated,
+      den: asccp.asccp.den,
+      reusable: asccp.asccp.reusable,
+      propertyTerm: asccp.asccp.propertyTerm
     });
   }
 
@@ -169,19 +169,14 @@ export class CcNodeService {
   appendAssociation(releaseId: number, accManifestId: number,
                     manifestId: number, type: string, attribute: boolean,
                     pos: number): Observable<any> | undefined {
-    const body = new Map<string, number>();
-    body['releaseId'] = releaseId;
-    body['pos'] = pos;
-    if (type === 'ASCCP') {
-      body['asccpManifestId'] = manifestId;
-    } else if (type === 'BCCP') {
-      body['bccpManifestId'] = manifestId;
-      if (attribute) {
-        body['attribute'] = true;
-      }
-    } else {
-      return;
-    }
+    const body = {
+      releaseId,
+      pos,
+      asccpManifestId: (type === 'ASCCP') ? manifestId : undefined,
+      bccpManifestId: (type === 'BCCP') ? manifestId : undefined,
+      attribute: (attribute) ? true : false
+    };
+
     return this.http.post('/api/core_component/acc/' + accManifestId + '/append', body);
   }
 
@@ -211,14 +206,14 @@ export class CcNodeService {
           break;
         case 'BCCP':
           body.bccpNodeDetails.push({
-            'bccp': (detail as CcBccpNodeDetail).bccp.json,
-            'bcc': (detail as CcBccpNodeDetail).bcc ? (detail as CcBccpNodeDetail).bcc.json : null,
+            bccp: (detail as CcBccpNodeDetail).bccp.json,
+            bcc: (detail as CcBccpNodeDetail).bcc ? (detail as CcBccpNodeDetail).bcc.json : null,
           });
           break;
         case 'ASCCP':
           body.asccpNodeDetails.push({
-            'asccp': (detail as CcAsccpNodeDetail).asccp.json,
-            'ascc': (detail as CcAsccpNodeDetail).ascc ? (detail as CcAsccpNodeDetail).ascc.json : null,
+            asccp: (detail as CcAsccpNodeDetail).asccp.json,
+            ascc: (detail as CcAsccpNodeDetail).ascc ? (detail as CcAsccpNodeDetail).ascc.json : null,
           });
           break;
         case 'DT':
@@ -233,16 +228,16 @@ export class CcNodeService {
   }
 
   updateAsccpManifest(manifestId: number, accManifestId: number): Observable<any> {
-    return this.http.post('/api/core_component/asccp/' + manifestId, {'accManifestId': accManifestId});
+    return this.http.post('/api/core_component/asccp/' + manifestId, {accManifestId: accManifestId});
   }
 
   updateBccpManifest(manifestId: number, bdtManifestId: number): Observable<any> {
-    return this.http.post('/api/core_component/bccp/' + manifestId, {'bdtManifestId': bdtManifestId});
+    return this.http.post('/api/core_component/bccp/' + manifestId, {bdtManifestId: bdtManifestId});
   }
 
   updateState(type: string, manifestId: number, state: string): Observable<CcNodeUpdateResponse> {
     const url = '/api/core_component/' + type.toLowerCase() + '/' + manifestId + '/state';
-    return this.http.post<CcNodeUpdateResponse>(url, {'state': state});
+    return this.http.post<CcNodeUpdateResponse>(url, {state: state});
   }
 
   createExtensionComponent(manifestId: number): Observable<CcNodeUpdateResponse> {

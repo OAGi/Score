@@ -8,7 +8,13 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {AsccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
+import {
+  AsccpFlatNode,
+  CcFlatNode,
+  CcFlatNodeDatabase,
+  CcFlatNodeDataSource,
+  CcFlatNodeDataSourceSearcher
+} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
@@ -39,10 +45,10 @@ import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {Tag, ShortTag} from '../../tag-management/domain/tag';
+import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
-import {FormControl} from "@angular/forms";
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'score-asccp-detail',

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,9 @@ public class InfoController {
     @Autowired
     private WebPageInfoService webPageInfoService;
 
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
     @RequestMapping(value = "/info/products", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ProductInfo> getProductInfos() {
@@ -54,6 +58,7 @@ public class InfoController {
     public void updateWebPageInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                   @RequestBody WebPageInfo webPageInfo) {
         webPageInfoService.updateWebPageInfo(user, webPageInfo);
+        simpMessagingTemplate.convertAndSend("/topic/webpage/info", webPageInfo);
     }
 
     @RequestMapping(value = "/info/cc_summary",
