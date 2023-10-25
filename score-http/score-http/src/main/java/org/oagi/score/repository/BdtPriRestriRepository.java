@@ -5,14 +5,11 @@ import org.jooq.Record6;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BdtPriRestri;
-import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BDT_PRI_RESTRI;
 

@@ -10,7 +10,6 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.repo.component.acc.PurgeAccRepositoryResponse;
 import org.oagi.score.repo.component.ascc.AsccWriteRepository;
 import org.oagi.score.repo.component.ascc.UpdateAsccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;

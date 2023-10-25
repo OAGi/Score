@@ -26,7 +26,6 @@ import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.isNull;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqContextSchemeReadRepository
         extends JooqScoreRepository

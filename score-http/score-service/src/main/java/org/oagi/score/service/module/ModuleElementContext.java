@@ -1,8 +1,9 @@
 package org.oagi.score.service.module;
 
 import org.oagi.score.repo.api.module.ModuleSetReadRepository;
-import org.oagi.score.repo.api.module.model.*;
 import org.oagi.score.repo.api.module.model.Module;
+import org.oagi.score.repo.api.module.model.ModuleElement;
+import org.oagi.score.repo.api.module.model.ModuleType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

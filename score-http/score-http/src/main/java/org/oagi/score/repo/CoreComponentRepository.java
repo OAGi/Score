@@ -1,6 +1,5 @@
 package org.oagi.score.repo;
 
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcBccpNode;
@@ -17,7 +16,6 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

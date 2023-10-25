@@ -5,13 +5,11 @@ import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ASCC;
-import org.oagi.score.data.BCCP;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

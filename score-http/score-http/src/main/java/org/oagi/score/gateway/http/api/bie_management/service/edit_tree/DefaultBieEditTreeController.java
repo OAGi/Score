@@ -20,7 +20,6 @@ import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
-import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.service.common.data.AccessPrivilege;

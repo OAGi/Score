@@ -1,7 +1,6 @@
 package org.oagi.score.data;
 
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public interface FacetRestrictionsAware {

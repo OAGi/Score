@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
-import org.oagi.score.gateway.http.api.business_term_management.controller.BusinessTermController;
 import org.oagi.score.gateway.http.api.oas_management.data.*;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -9,8 +8,6 @@ import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermRequest;
-import org.oagi.score.repo.api.businessterm.model.DeleteBusinessTermResponse;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;

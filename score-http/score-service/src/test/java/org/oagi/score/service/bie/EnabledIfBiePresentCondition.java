@@ -4,7 +4,6 @@ import org.jooq.DSLContext;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.commons.util.Preconditions;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;

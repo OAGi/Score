@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.oagi.score.service.common.data.CcState;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 

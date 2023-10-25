@@ -2,8 +2,6 @@ package org.oagi.score.repo.api.impl.jooq;
 
 import org.jooq.DSLContext;
 
-import java.math.BigInteger;
-
 public abstract class JooqScoreRepository {
 
     private final DSLContext dslContext;

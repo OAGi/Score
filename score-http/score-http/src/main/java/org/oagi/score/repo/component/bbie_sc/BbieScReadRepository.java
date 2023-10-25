@@ -5,7 +5,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
-import org.oagi.score.data.BdtPriRestri;
 import org.oagi.score.data.BdtScPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieScRecord;

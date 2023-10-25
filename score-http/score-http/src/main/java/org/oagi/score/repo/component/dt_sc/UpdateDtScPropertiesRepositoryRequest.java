@@ -5,7 +5,6 @@ import org.oagi.score.gateway.http.api.cc_management.data.node.CcBdtScPriRestri;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;

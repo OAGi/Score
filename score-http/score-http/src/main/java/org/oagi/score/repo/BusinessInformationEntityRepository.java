@@ -25,7 +25,6 @@ import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.co
 import static org.oagi.score.repo.api.bie.model.BieState.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BCC_MANIFEST;
 
 @Repository
 public class BusinessInformationEntityRepository {

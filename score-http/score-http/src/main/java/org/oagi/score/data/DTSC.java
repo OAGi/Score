@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Data

@@ -3,7 +3,6 @@ package org.oagi.score.repo.component.bbie;
 import lombok.Data;
 import org.oagi.score.service.common.data.CcState;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;

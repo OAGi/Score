@@ -10,13 +10,9 @@ import org.oagi.score.repo.CoreComponentRepository;
 import org.oagi.score.repo.OasDocRepository;
 import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
-import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResourceTagRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasTagRecord;
 import org.oagi.score.repo.api.openapidoc.model.*;
-import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AppUser;
@@ -34,10 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.oagi.score.gateway.http.helper.ScoreGuid.randomGuid;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_RESOURCE_TAG;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_TAG;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
 @Service
 @Transactional(readOnly = true)

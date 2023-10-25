@@ -2,7 +2,6 @@ package org.oagi.score.repo.component.dt;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
-import org.jooq.types.UNumber;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcBdtPriRestri;
 import org.oagi.score.gateway.http.api.cc_management.data.node.PrimitiveRestriType;
 import org.oagi.score.gateway.http.configuration.security.SessionService;

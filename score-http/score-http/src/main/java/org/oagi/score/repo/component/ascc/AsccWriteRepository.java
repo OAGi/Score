@@ -37,7 +37,6 @@ import static org.oagi.score.repo.api.impl.jooq.entity.tables.Acc.ACC;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest.ACC_MANIFEST;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc.ASCC;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AsccManifest.ASCC_MANIFEST;
-import static org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest.BCC_MANIFEST;
 
 @Repository
 public class AsccWriteRepository {
