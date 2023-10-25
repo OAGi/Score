@@ -117,4 +117,14 @@ class Helper {
                     }
                 }).collect(Collectors.joining());
     }
+
+    public static boolean hasAnyValuesInFacets(FacetRestrictionsAware facetRestrictionsAware) {
+        return StringUtils.hasLength(facetRestrictionsAware.getFacetMinInclusive()) ||
+                StringUtils.hasLength(facetRestrictionsAware.getFacetMinExclusive()) ||
+                StringUtils.hasLength(facetRestrictionsAware.getFacetMaxInclusive()) ||
+                StringUtils.hasLength(facetRestrictionsAware.getFacetMaxExclusive()) ||
+                facetRestrictionsAware.getFacetMinLength() != null ||
+                facetRestrictionsAware.getFacetMaxLength() != null ||
+                StringUtils.hasLength(facetRestrictionsAware.getFacetPattern());
+    }
 }

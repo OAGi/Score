@@ -1224,6 +1224,10 @@ class BdtDetail {
   facetMinLength: number;
   facetMaxLength: number;
   facetPattern: string;
+  facetMinInclusive: string;
+  facetMinExclusive: string;
+  facetMaxInclusive: string;
+  facetMaxExclusive: string;
   namespaceId: number;
   den: string;
   definition: string;
@@ -1259,6 +1263,10 @@ class BdtDetail {
     this.facetMinLength = obj.facetMinLength;
     this.facetMaxLength = obj.facetMaxLength;
     this.facetPattern = obj.facetPattern;
+    this.facetMinInclusive = obj.facetMinInclusive;
+    this.facetMinExclusive = obj.facetMinExclusive;
+    this.facetMaxInclusive = obj.facetMaxInclusive;
+    this.facetMaxExclusive = obj.facetMaxExclusive;
     this.namespaceId = obj.namespaceId;
     this.den = obj.den;
     this.definition = obj.definition;
@@ -1540,6 +1548,10 @@ export class CcDtNodeDetail extends CcNodeDetail {
   private _facetMinLength: number;
   private _facetMaxLength: number;
   private _facetPattern: string;
+  private _facetMinInclusive: string;
+  private _facetMinExclusive: string;
+  private _facetMaxInclusive: string;
+  private _facetMaxExclusive: string;
   private _sixDigitId: string;
   private _contentComponentDefinition: string;
   commonlyUsed: boolean;
@@ -1584,6 +1596,10 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this._facetMinLength = obj.facetMinLength;
     this._facetMaxLength = obj.facetMaxLength;
     this._facetPattern = obj.facetPattern;
+    this._facetMinInclusive = obj.facetMinInclusive;
+    this._facetMinExclusive = obj.facetMinExclusive;
+    this._facetMaxInclusive = obj.facetMaxInclusive;
+    this._facetMaxExclusive = obj.facetMaxExclusive;
     this._sixDigitId = obj.sixDigitId;
     this._contentComponentDefinition = obj.contentComponentDefinition;
     this.commonlyUsed = obj.commonlyUsed;
@@ -1881,6 +1897,10 @@ export class CcDtNodeDetail extends CcNodeDetail {
       facetMinLength: this._facetMinLength,
       facetMaxLength: this._facetMaxLength,
       facetPattern: this._facetPattern,
+      facetMinInclusive: this._facetMinInclusive,
+      facetMinExclusive: this._facetMinExclusive,
+      facetMaxInclusive: this._facetMaxInclusive,
+      facetMaxExclusive: this._facetMaxExclusive,
       sixDigitId: this._sixDigitId,
       contentComponentDefinition: this.contentComponentDefinition,
       commonlyUsed: this.commonlyUsed,
@@ -1900,6 +1920,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
       this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
       this._facetMinLength, this._facetMaxLength, this._facetPattern,
+      this._facetMinInclusive, this._facetMinExclusive, this._facetMaxInclusive, this._facetMaxExclusive,
       this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
       this._namespaceId, this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtPriRestriList);
@@ -2025,6 +2046,42 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this._node.fireChangeEvent('facetPattern', value);
   }
 
+  get facetMinInclusive(): string {
+    return this._facetMinInclusive;
+  }
+
+  set facetMinInclusive(value: string) {
+    this._facetMinInclusive = value;
+    this._node.fireChangeEvent('facetMinInclusive', value);
+  }
+
+  get facetMinExclusive(): string {
+    return this._facetMinExclusive;
+  }
+
+  set facetMinExclusive(value: string) {
+    this._facetMinExclusive = value;
+    this._node.fireChangeEvent('facetMinExclusive', value);
+  }
+
+  get facetMaxInclusive(): string {
+    return this._facetMaxInclusive;
+  }
+
+  set facetMaxInclusive(value: string) {
+    this._facetMaxInclusive = value;
+    this._node.fireChangeEvent('facetMaxInclusive', value);
+  }
+
+  get facetMaxExclusive(): string {
+    return this._facetMaxExclusive;
+  }
+
+  set facetMaxExclusive(value: string) {
+    this._facetMaxExclusive = value;
+    this._node.fireChangeEvent('facetMaxExclusive', value);
+  }
+
   get sixDigitId(): string {
     return this._sixDigitId;
   }
@@ -2054,6 +2111,10 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   private _facetMinLength: number;
   private _facetMaxLength: number;
   private _facetPattern: string;
+  private _facetMinInclusive: string;
+  private _facetMinExclusive: string;
+  private _facetMaxInclusive: string;
+  private _facetMaxExclusive: string;
 
   state: string;
   owner: string;
@@ -2102,6 +2163,10 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this._facetMinLength = obj.facetMinLength;
     this._facetMaxLength = obj.facetMaxLength;
     this._facetPattern = obj.facetPattern;
+    this._facetMinInclusive = obj.facetMinInclusive;
+    this._facetMinExclusive = obj.facetMinExclusive;
+    this._facetMaxInclusive = obj.facetMaxInclusive;
+    this._facetMaxExclusive = obj.facetMaxExclusive;
     this.cardinalityMax = obj.cardinalityMax;
     this.cardinalityMin = obj.cardinalityMin;
     this.prevCardinalityMin = obj.prevCardinalityMin;
@@ -2439,6 +2504,10 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       facetMinLength: this.facetMinLength,
       facetMaxLength: this.facetMaxLength,
       facetPattern: this.facetPattern,
+      facetMinInclusive: this.facetMinInclusive,
+      facetMinExclusive: this.facetMinExclusive,
+      facetMaxInclusive: this.facetMaxInclusive,
+      facetMaxExclusive: this.facetMaxExclusive,
       cardinalityMax: this.cardinalityMax,
       cardinalityMin: this.cardinalityMin,
       definition: this.definition,
@@ -2466,6 +2535,7 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     return hashCode4Array(this.bdtScId, this.manifestId, this.guid, this.representationTerm, this.objectClassTerm, this.propertyTerm,
       this.representationTerm, this.cardinalityMin, this.cardinalityMax, this.defaultValue, this.fixedValue,
       this.facetMinLength, this.facetMaxLength, this.facetPattern,
+      this.facetMinInclusive, this.facetMinExclusive, this.facetMaxInclusive, this.facetMaxExclusive,
       this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtScPriRestriList);
   }
@@ -2570,6 +2640,42 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   set facetPattern(value: string) {
     this._facetPattern = value;
     this._node.fireChangeEvent('facetPattern', value);
+  }
+
+  get facetMinInclusive(): string {
+    return this._facetMinInclusive;
+  }
+
+  set facetMinInclusive(value: string) {
+    this._facetMinInclusive = value;
+    this._node.fireChangeEvent('facetMinInclusive', value);
+  }
+
+  get facetMinExclusive(): string {
+    return this._facetMinExclusive;
+  }
+
+  set facetMinExclusive(value: string) {
+    this._facetMinExclusive = value;
+    this._node.fireChangeEvent('facetMinExclusive', value);
+  }
+
+  get facetMaxInclusive(): string {
+    return this._facetMaxInclusive;
+  }
+
+  set facetMaxInclusive(value: string) {
+    this._facetMaxInclusive = value;
+    this._node.fireChangeEvent('facetMaxInclusive', value);
+  }
+
+  get facetMaxExclusive(): string {
+    return this._facetMaxExclusive;
+  }
+
+  set facetMaxExclusive(value: string) {
+    this._facetMaxExclusive = value;
+    this._node.fireChangeEvent('facetMaxExclusive', value);
   }
 
   get den(): string {

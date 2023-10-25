@@ -294,6 +294,34 @@ public class DtScWriteRepository {
                         .setNull(DT_SC.FACET_PATTERN);
             }
         }
+        if (request.getFacetMinInclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MIN_INCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
+        }
+        if (request.getFacetMinExclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MIN_EXCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
+        }
+        if (request.getFacetMaxInclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MAX_INCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
+        }
+        if (request.getFacetMaxExclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT_SC.FACET_MAX_EXCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT_SC.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
+        }
 
         if (moreStep != null) {
             moreStep.set(DT_SC.LAST_UPDATED_BY, userId)

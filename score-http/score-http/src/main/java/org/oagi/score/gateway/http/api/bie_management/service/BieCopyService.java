@@ -192,8 +192,15 @@ public class BieCopyService implements InitializingBean {
                 BBIE.CARDINALITY_MIN,
                 BBIE.CARDINALITY_MAX,
                 BBIE.DEFAULT_VALUE,
-                BBIE.IS_NILLABLE.as("nillable"),
                 BBIE.FIXED_VALUE,
+                BBIE.FACET_MIN_LENGTH,
+                BBIE.FACET_MAX_LENGTH,
+                BBIE.FACET_PATTERN,
+                BBIE.FACET_MIN_INCLUSIVE,
+                BBIE.FACET_MIN_EXCLUSIVE,
+                BBIE.FACET_MAX_INCLUSIVE,
+                BBIE.FACET_MAX_EXCLUSIVE,
+                BBIE.IS_NILLABLE.as("nillable"),
                 BBIE.IS_NULL.as("nill"),
                 BBIE.DEFINITION,
                 BBIE.EXAMPLE,
@@ -251,6 +258,13 @@ public class BieCopyService implements InitializingBean {
                 BBIE_SC.CARDINALITY_MAX,
                 BBIE_SC.DEFAULT_VALUE,
                 BBIE_SC.FIXED_VALUE,
+                BBIE_SC.FACET_MIN_LENGTH,
+                BBIE_SC.FACET_MAX_LENGTH,
+                BBIE_SC.FACET_PATTERN,
+                BBIE_SC.FACET_MIN_INCLUSIVE,
+                BBIE_SC.FACET_MIN_EXCLUSIVE,
+                BBIE_SC.FACET_MAX_INCLUSIVE,
+                BBIE_SC.FACET_MAX_EXCLUSIVE,
                 BBIE_SC.DEFINITION,
                 BBIE_SC.EXAMPLE,
                 BBIE_SC.REMARK,
@@ -313,6 +327,13 @@ public class BieCopyService implements InitializingBean {
         private String defaultValue;
         private boolean nillable;
         private String fixedValue;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
+        private String facetMinInclusive;
+        private String facetMinExclusive;
+        private String facetMaxInclusive;
+        private String facetMaxExclusive;
         private boolean nill;
         private String definition;
         private String example;
@@ -367,6 +388,13 @@ public class BieCopyService implements InitializingBean {
         private int cardinalityMax;
         private String defaultValue;
         private String fixedValue;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
+        private String facetMinInclusive;
+        private String facetMinExclusive;
+        private String facetMaxInclusive;
+        private String facetMaxExclusive;
         private String definition;
         private String example;
         private String remark;
@@ -663,6 +691,13 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE.AGENCY_ID_LIST_MANIFEST_ID, (bbie.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbie.getAgencyIdListManifestId()) : null)
                     .set(BBIE.DEFAULT_VALUE, bbie.getDefaultValue())
                     .set(BBIE.FIXED_VALUE, bbie.getFixedValue())
+                    .set(BBIE.FACET_MIN_LENGTH, (bbie.getFacetMinLength() != null) ? ULong.valueOf(bbie.getFacetMinLength()) : null)
+                    .set(BBIE.FACET_MAX_LENGTH, (bbie.getFacetMaxLength() != null) ? ULong.valueOf(bbie.getFacetMaxLength()) : null)
+                    .set(BBIE.FACET_PATTERN, bbie.getFacetPattern())
+                    .set(BBIE.FACET_MIN_INCLUSIVE, (bbie.getFacetMinInclusive() != null) ? bbie.getFacetMinInclusive() : null)
+                    .set(BBIE.FACET_MIN_EXCLUSIVE, (bbie.getFacetMinExclusive() != null) ? bbie.getFacetMinExclusive() : null)
+                    .set(BBIE.FACET_MAX_INCLUSIVE, (bbie.getFacetMaxInclusive() != null) ? bbie.getFacetMaxInclusive() : null)
+                    .set(BBIE.FACET_MAX_EXCLUSIVE, (bbie.getFacetMaxExclusive() != null) ? bbie.getFacetMaxExclusive() : null)
                     .set(BBIE.DEFINITION, bbie.getDefinition())
                     .set(BBIE.EXAMPLE, bbie.getExample())
                     .set(BBIE.REMARK, bbie.getRemark())
@@ -693,6 +728,13 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID, (bbieSc.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbieSc.getAgencyIdListManifestId()) : null)
                     .set(BBIE_SC.DEFAULT_VALUE, bbieSc.getDefaultValue())
                     .set(BBIE_SC.FIXED_VALUE, bbieSc.getFixedValue())
+                    .set(BBIE_SC.FACET_MIN_LENGTH, (bbieSc.getFacetMinLength() != null) ? ULong.valueOf(bbieSc.getFacetMinLength()) : null)
+                    .set(BBIE_SC.FACET_MAX_LENGTH, (bbieSc.getFacetMaxLength() != null) ? ULong.valueOf(bbieSc.getFacetMaxLength()) : null)
+                    .set(BBIE_SC.FACET_PATTERN, bbieSc.getFacetPattern())
+                    .set(BBIE_SC.FACET_MIN_INCLUSIVE, (bbieSc.getFacetMinInclusive() != null) ? bbieSc.getFacetMinInclusive() : null)
+                    .set(BBIE_SC.FACET_MIN_EXCLUSIVE, (bbieSc.getFacetMinExclusive() != null) ? bbieSc.getFacetMinExclusive() : null)
+                    .set(BBIE_SC.FACET_MAX_INCLUSIVE, (bbieSc.getFacetMaxInclusive() != null) ? bbieSc.getFacetMaxInclusive() : null)
+                    .set(BBIE_SC.FACET_MAX_EXCLUSIVE, (bbieSc.getFacetMaxExclusive() != null) ? bbieSc.getFacetMaxExclusive() : null)
                     .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())
                     .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                     .set(BBIE_SC.REMARK, bbieSc.getRemark())

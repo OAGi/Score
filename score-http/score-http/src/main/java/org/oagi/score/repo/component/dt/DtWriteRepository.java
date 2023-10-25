@@ -2,6 +2,7 @@ package org.oagi.score.repo.component.dt;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
+import org.jooq.types.UNumber;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcBdtPriRestri;
 import org.oagi.score.gateway.http.api.cc_management.data.node.PrimitiveRestriType;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -464,6 +465,34 @@ public class DtWriteRepository {
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .setNull(DT.FACET_PATTERN);
             }
+        }
+        if (request.getFacetMinInclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT.FACET_MIN_INCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
+        }
+        if (request.getFacetMinExclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT.FACET_MIN_EXCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
+        }
+        if (request.getFacetMaxInclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT.FACET_MAX_INCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
+        }
+        if (request.getFacetMaxExclusive() == null) {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .setNull(DT.FACET_MAX_EXCLUSIVE);
+        } else {
+            moreStep = ((moreStep != null) ? moreStep : firstStep)
+                    .set(DT.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
         }
         if (compare(originalDtRecord.getSixDigitId(), request.getSixDigitId()) != 0) {
             DtRecord exist = dslContext.selectFrom(DT)

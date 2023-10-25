@@ -109,6 +109,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   restrictionDataSource = new MatTableDataSource<any>();
 
   /* string facets management */
+  facetMinimumInclusive: FormControl;
+  facetMinimumExclusive: FormControl;
+  facetMaximumInclusive: FormControl;
+  facetMaximumExclusive: FormControl;
   facetMinimumLength: FormControl;
   facetMaximumLength: FormControl;
   facetPattern: FormControl;
@@ -447,9 +451,209 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   resetFacets(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    this._setMinInclusiveFormControl(node);
+    this._setMinExclusiveFormControl(node);
+    this._setMaxInclusiveFormControl(node);
+    this._setMaxExclusiveFormControl(node);
     this._setMinLengthFormControl(node);
     this._setMaxLengthFormControl(node);
     this._setPatternFormControl(node);
+  }
+
+  _setMinInclusiveFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinInclusive;
+    let bieMinExclusive;
+    let bieMaxInclusive;
+    let bieMaxExclusive;
+    if (node instanceof CcDtNodeDetail) {
+      const bdt = node as CcDtNodeDetail;
+      bieMinInclusive = bdt.facetMinInclusive;
+      bieMinExclusive = bdt.facetMinExclusive;
+      bieMaxInclusive = bdt.facetMaxInclusive;
+      bieMaxExclusive = bdt.facetMaxExclusive;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      const bdtSc = node as CcBdtScNodeDetail;
+      bieMinInclusive = bdtSc.facetMinInclusive;
+      bieMinExclusive = bdtSc.facetMinExclusive;
+      bieMaxInclusive = bdtSc.facetMaxInclusive;
+      bieMaxExclusive = bdtSc.facetMaxExclusive;
+    } else {
+      this.facetMinimumInclusive = undefined;
+      return;
+    }
+
+    this.facetMinimumInclusive = new FormControl({
+        value: bieMinInclusive,
+        disabled
+      }, [
+        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          return null;
+        }
+      ]
+    );
+    this.facetMinimumInclusive.valueChanges.subscribe(value => {
+      if (this.facetMinimumInclusive.valid) {
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMinInclusive = value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMinInclusive = value;
+        } else {
+          return;
+        }
+      }
+    });
+  }
+
+  _setMinExclusiveFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinInclusive;
+    let bieMinExclusive;
+    let bieMaxInclusive;
+    let bieMaxExclusive;
+    if (node instanceof CcDtNodeDetail) {
+      const bdt = node as CcDtNodeDetail;
+      bieMinInclusive = bdt.facetMinInclusive;
+      bieMinExclusive = bdt.facetMinExclusive;
+      bieMaxInclusive = bdt.facetMaxInclusive;
+      bieMaxExclusive = bdt.facetMaxExclusive;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      const bdtSc = node as CcBdtScNodeDetail;
+      bieMinInclusive = bdtSc.facetMinInclusive;
+      bieMinExclusive = bdtSc.facetMinExclusive;
+      bieMaxInclusive = bdtSc.facetMaxInclusive;
+      bieMaxExclusive = bdtSc.facetMaxExclusive;
+    } else {
+      this.facetMinimumExclusive = undefined;
+      return;
+    }
+
+    this.facetMinimumExclusive = new FormControl({
+        value: bieMinExclusive,
+        disabled
+      }, [
+        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          return null;
+        }
+      ]
+    );
+    this.facetMinimumExclusive.valueChanges.subscribe(value => {
+      if (this.facetMinimumExclusive.valid) {
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMinExclusive = value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMinExclusive = value;
+        } else {
+          return;
+        }
+      }
+    });
+  }
+
+  _setMaxInclusiveFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinInclusive;
+    let bieMinExclusive;
+    let bieMaxInclusive;
+    let bieMaxExclusive;
+    if (node instanceof CcDtNodeDetail) {
+      const bdt = node as CcDtNodeDetail;
+      bieMinInclusive = bdt.facetMinInclusive;
+      bieMinExclusive = bdt.facetMinExclusive;
+      bieMaxInclusive = bdt.facetMaxInclusive;
+      bieMaxExclusive = bdt.facetMaxExclusive;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      const bdtSc = node as CcBdtScNodeDetail;
+      bieMinInclusive = bdtSc.facetMinInclusive;
+      bieMinExclusive = bdtSc.facetMinExclusive;
+      bieMaxInclusive = bdtSc.facetMaxInclusive;
+      bieMaxExclusive = bdtSc.facetMaxExclusive;
+    } else {
+      this.facetMaximumInclusive = undefined;
+      return;
+    }
+
+    this.facetMaximumInclusive = new FormControl({
+        value: bieMaxInclusive,
+        disabled
+      }, [
+        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          return null;
+        }
+      ]
+    );
+    this.facetMaximumInclusive.valueChanges.subscribe(value => {
+      if (this.facetMaximumInclusive.valid) {
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMaxInclusive = value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMaxInclusive = value;
+        } else {
+          return;
+        }
+      }
+    });
+  }
+
+  _setMaxExclusiveFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinInclusive;
+    let bieMinExclusive;
+    let bieMaxInclusive;
+    let bieMaxExclusive;
+    if (node instanceof CcDtNodeDetail) {
+      const bdt = node as CcDtNodeDetail;
+      bieMinInclusive = bdt.facetMinInclusive;
+      bieMinExclusive = bdt.facetMinExclusive;
+      bieMaxInclusive = bdt.facetMaxInclusive;
+      bieMaxExclusive = bdt.facetMaxExclusive;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      const bdtSc = node as CcBdtScNodeDetail;
+      bieMinInclusive = bdtSc.facetMinInclusive;
+      bieMinExclusive = bdtSc.facetMinExclusive;
+      bieMaxInclusive = bdtSc.facetMaxInclusive;
+      bieMaxExclusive = bdtSc.facetMaxExclusive;
+    } else {
+      this.facetMaximumExclusive = undefined;
+      return;
+    }
+
+    this.facetMaximumExclusive = new FormControl({
+        value: bieMaxExclusive,
+        disabled
+      }, [
+        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          return null;
+        }
+      ]
+    );
+    this.facetMaximumExclusive.valueChanges.subscribe(value => {
+      if (this.facetMaximumExclusive.valid) {
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMaxExclusive = value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMaxExclusive = value;
+        } else {
+          return;
+        }
+      }
+    });
   }
 
   _setMinLengthFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
@@ -1119,6 +1323,16 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   isStringTypePrimitive(cdtPrimitives: CcBdtPriRestri[]): boolean {
     const primitives = cdtPrimitives.map(e => e.primitiveName).filter(e => !!e);
     for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
+      if (primitives.includes(typeName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isNumericTypePrimitive(cdtPrimitives: CcBdtPriRestri[]): boolean {
+    const primitives = cdtPrimitives.map(e => e.primitiveName).filter(e => !!e);
+    for (const typeName of ['Decimal', 'Double', 'Float', 'Integer', 'TimeDuration', 'TimePoint']) {
       if (primitives.includes(typeName)) {
         return true;
       }

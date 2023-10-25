@@ -294,12 +294,84 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
+     * Setter for <code>oagi.dt_sc.facet_min_inclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is also
+     * an allowed value.
+     */
+    public void setFacetMinInclusive(String value) {
+        set(16, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt_sc.facet_min_inclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is also
+     * an allowed value.
+     */
+    public String getFacetMinInclusive() {
+        return (String) get(16);
+    }
+
+    /**
+     * Setter for <code>oagi.dt_sc.facet_min_exclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is no
+     * allowed value.
+     */
+    public void setFacetMinExclusive(String value) {
+        set(17, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt_sc.facet_min_exclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is no
+     * allowed value.
+     */
+    public String getFacetMinExclusive() {
+        return (String) get(17);
+    }
+
+    /**
+     * Setter for <code>oagi.dt_sc.facet_max_inclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is also
+     * an allowed value.
+     */
+    public void setFacetMaxInclusive(String value) {
+        set(18, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt_sc.facet_max_inclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is also
+     * an allowed value.
+     */
+    public String getFacetMaxInclusive() {
+        return (String) get(18);
+    }
+
+    /**
+     * Setter for <code>oagi.dt_sc.facet_max_exclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is no
+     * allowed value
+     */
+    public void setFacetMaxExclusive(String value) {
+        set(19, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt_sc.facet_max_exclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is no
+     * allowed value
+     */
+    public String getFacetMaxExclusive() {
+        return (String) get(19);
+    }
+
+    /**
      * Setter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(16, value);
+        set(20, value);
     }
 
     /**
@@ -308,7 +380,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(16);
+        return (Byte) get(20);
     }
 
     /**
@@ -316,7 +388,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * replacement if the record is deprecated.
      */
     public void setReplacementDtScId(ULong value) {
-        set(17, value);
+        set(21, value);
     }
 
     /**
@@ -324,7 +396,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtScId() {
-        return (ULong) get(17);
+        return (ULong) get(21);
     }
 
     /**
@@ -332,7 +404,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It indicates the user who created the code list.
      */
     public void setCreatedBy(ULong value) {
-        set(18, value);
+        set(22, value);
     }
 
     /**
@@ -340,7 +412,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It indicates the user who created the code list.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(18);
+        return (ULong) get(22);
     }
 
     /**
@@ -352,7 +424,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
-        set(19, value);
+        set(23, value);
     }
 
     /**
@@ -364,7 +436,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * rollback the ownership.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(19);
+        return (ULong) get(23);
     }
 
     /**
@@ -372,7 +444,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It identifies the user who last updated the code list.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(20, value);
+        set(24, value);
     }
 
     /**
@@ -380,7 +452,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It identifies the user who last updated the code list.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(20);
+        return (ULong) get(24);
     }
 
     /**
@@ -388,7 +460,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * code list was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(21, value);
+        set(25, value);
     }
 
     /**
@@ -396,7 +468,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * code list was created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(21);
+        return (LocalDateTime) get(25);
     }
 
     /**
@@ -404,7 +476,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * the code list was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(22, value);
+        set(26, value);
     }
 
     /**
@@ -412,7 +484,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * the code list was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(22);
+        return (LocalDateTime) get(26);
     }
 
     /**
@@ -420,7 +492,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the previous history record.
      */
     public void setPrevDtScId(ULong value) {
-        set(23, value);
+        set(27, value);
     }
 
     /**
@@ -428,7 +500,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the previous history record.
      */
     public ULong getPrevDtScId() {
-        return (ULong) get(23);
+        return (ULong) get(27);
     }
 
     /**
@@ -436,7 +508,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the next history record.
      */
     public void setNextDtScId(ULong value) {
-        set(24, value);
+        set(28, value);
     }
 
     /**
@@ -444,7 +516,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the next history record.
      */
     public ULong getNextDtScId() {
-        return (ULong) get(24);
+        return (ULong) get(28);
     }
 
     // -------------------------------------------------------------------------
@@ -470,7 +542,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     /**
      * Create a detached, initialised DtScRecord
      */
-    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, ULong facetMinLength, ULong facetMaxLength, String facetPattern, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
+    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
         super(DtSc.DT_SC);
 
         setDtScId(dtScId);
@@ -489,6 +561,10 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
         setFacetMinLength(facetMinLength);
         setFacetMaxLength(facetMaxLength);
         setFacetPattern(facetPattern);
+        setFacetMinInclusive(facetMinInclusive);
+        setFacetMinExclusive(facetMinExclusive);
+        setFacetMaxInclusive(facetMaxInclusive);
+        setFacetMaxExclusive(facetMaxExclusive);
         setIsDeprecated(isDeprecated);
         setReplacementDtScId(replacementDtScId);
         setCreatedBy(createdBy);

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.service.common.data.CcState;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -22,6 +23,10 @@ public class CcBdtNodeDetail implements CcNodeDetail {
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
     private String facetPattern;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
     private BigInteger basedBdtId;
     private BigInteger basedBdtManifestId;
     private String basedBdtDen;

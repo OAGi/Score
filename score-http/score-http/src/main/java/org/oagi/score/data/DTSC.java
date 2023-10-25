@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Data
@@ -21,6 +22,10 @@ public class DTSC implements Serializable, FacetRestrictionsAware {
     private String fixedValue;
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
     private String facetPattern;
     private BigInteger ownerDtManifestId = BigInteger.ZERO;
     private BigInteger ownerDtId = BigInteger.ZERO;

@@ -202,17 +202,89 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
+     * Setter for <code>oagi.dt.facet_min_inclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is also
+     * an allowed value.
+     */
+    public void setFacetMinInclusive(String value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt.facet_min_inclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is also
+     * an allowed value.
+     */
+    public String getFacetMinInclusive() {
+        return (String) get(10);
+    }
+
+    /**
+     * Setter for <code>oagi.dt.facet_min_exclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is no
+     * allowed value.
+     */
+    public void setFacetMinExclusive(String value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt.facet_min_exclusive</code>. Defines the lower
+     * limit of the range of allowed values. The lower limit is no
+     * allowed value.
+     */
+    public String getFacetMinExclusive() {
+        return (String) get(11);
+    }
+
+    /**
+     * Setter for <code>oagi.dt.facet_max_inclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is also
+     * an allowed value.
+     */
+    public void setFacetMaxInclusive(String value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt.facet_max_inclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is also
+     * an allowed value.
+     */
+    public String getFacetMaxInclusive() {
+        return (String) get(12);
+    }
+
+    /**
+     * Setter for <code>oagi.dt.facet_max_exclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is no
+     * allowed value
+     */
+    public void setFacetMaxExclusive(String value) {
+        set(13, value);
+    }
+
+    /**
+     * Getter for <code>oagi.dt.facet_max_exclusive</code>. Defines the upper
+     * limit of the range of allowed values. The upper limit is no
+     * allowed value
+     */
+    public String getFacetMaxExclusive() {
+        return (String) get(13);
+    }
+
+    /**
      * Setter for <code>oagi.dt.definition</code>. Description of the data type.
      */
     public void setDefinition(String value) {
-        set(10, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>oagi.dt.definition</code>. Description of the data type.
      */
     public String getDefinition() {
-        return (String) get(10);
+        return (String) get(14);
     }
 
     /**
@@ -220,7 +292,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * URL identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
-        set(11, value);
+        set(15, value);
     }
 
     /**
@@ -228,7 +300,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * URL identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
-        return (String) get(11);
+        return (String) get(15);
     }
 
     /**
@@ -239,7 +311,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * level.
      */
     public void setNamespaceId(ULong value) {
-        set(12, value);
+        set(16, value);
     }
 
     /**
@@ -250,7 +322,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * level.
      */
     public ULong getNamespaceId() {
-        return (ULong) get(12);
+        return (ULong) get(16);
     }
 
     /**
@@ -258,7 +330,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * of the content component of the data type.
      */
     public void setContentComponentDefinition(String value) {
-        set(13, value);
+        set(17, value);
     }
 
     /**
@@ -266,7 +338,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * of the content component of the data type.
      */
     public String getContentComponentDefinition() {
-        return (String) get(13);
+        return (String) get(17);
     }
 
     /**
@@ -278,7 +350,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * records of when the state was changed.
      */
     public void setState(String value) {
-        set(14, value);
+        set(18, value);
     }
 
     /**
@@ -290,7 +362,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * records of when the state was changed.
      */
     public String getState() {
-        return (String) get(14);
+        return (String) get(18);
     }
 
     /**
@@ -298,7 +370,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * commonly used DT(s) by BCCPs.
      */
     public void setCommonlyUsed(Byte value) {
-        set(15, value);
+        set(19, value);
     }
 
     /**
@@ -306,7 +378,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * commonly used DT(s) by BCCPs.
      */
     public Byte getCommonlyUsed() {
-        return (Byte) get(15);
+        return (Byte) get(19);
     }
 
     /**
@@ -314,7 +386,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. It indicates the user who created this DT.
      */
     public void setCreatedBy(ULong value) {
-        set(16, value);
+        set(20, value);
     }
 
     /**
@@ -322,7 +394,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. It indicates the user who created this DT.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(16);
+        return (ULong) get(20);
     }
 
     /**
@@ -333,7 +405,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(17, value);
+        set(21, value);
     }
 
     /**
@@ -344,7 +416,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(17);
+        return (ULong) get(21);
     }
 
     /**
@@ -355,7 +427,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * rollback the ownership. 
      */
     public void setOwnerUserId(ULong value) {
-        set(18, value);
+        set(22, value);
     }
 
     /**
@@ -366,7 +438,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * rollback the ownership. 
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(18);
+        return (ULong) get(22);
     }
 
     /**
@@ -376,7 +448,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(19, value);
+        set(23, value);
     }
 
     /**
@@ -386,7 +458,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(19);
+        return (LocalDateTime) get(23);
     }
 
     /**
@@ -398,7 +470,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * revision has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(20, value);
+        set(24, value);
     }
 
     /**
@@ -410,7 +482,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * revision has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(20);
+        return (LocalDateTime) get(24);
     }
 
     /**
@@ -419,7 +491,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(21, value);
+        set(25, value);
     }
 
     /**
@@ -428,7 +500,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(21);
+        return (Byte) get(25);
     }
 
     /**
@@ -436,7 +508,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * replacement if the record is deprecated.
      */
     public void setReplacementDtId(ULong value) {
-        set(22, value);
+        set(26, value);
     }
 
     /**
@@ -444,7 +516,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtId() {
-        return (ULong) get(22);
+        return (ULong) get(26);
     }
 
     /**
@@ -452,7 +524,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the previous history record.
      */
     public void setPrevDtId(ULong value) {
-        set(23, value);
+        set(27, value);
     }
 
     /**
@@ -460,7 +532,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the previous history record.
      */
     public ULong getPrevDtId() {
-        return (ULong) get(23);
+        return (ULong) get(27);
     }
 
     /**
@@ -468,7 +540,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the next history record.
      */
     public void setNextDtId(ULong value) {
-        set(24, value);
+        set(28, value);
     }
 
     /**
@@ -476,7 +548,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the next history record.
      */
     public ULong getNextDtId() {
-        return (ULong) get(24);
+        return (ULong) get(28);
     }
 
     // -------------------------------------------------------------------------
@@ -502,7 +574,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     /**
      * Create a detached, initialised DtRecord
      */
-    public DtRecord(ULong dtId, String guid, String dataTypeTerm, String qualifier, String representationTerm, String sixDigitId, ULong basedDtId, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String definition, String definitionSource, ULong namespaceId, String contentComponentDefinition, String state, Byte commonlyUsed, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated, ULong replacementDtId, ULong prevDtId, ULong nextDtId) {
+    public DtRecord(ULong dtId, String guid, String dataTypeTerm, String qualifier, String representationTerm, String sixDigitId, ULong basedDtId, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, String definition, String definitionSource, ULong namespaceId, String contentComponentDefinition, String state, Byte commonlyUsed, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated, ULong replacementDtId, ULong prevDtId, ULong nextDtId) {
         super(Dt.DT);
 
         setDtId(dtId);
@@ -515,6 +587,10 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
         setFacetMinLength(facetMinLength);
         setFacetMaxLength(facetMaxLength);
         setFacetPattern(facetPattern);
+        setFacetMinInclusive(facetMinInclusive);
+        setFacetMinExclusive(facetMinExclusive);
+        setFacetMaxInclusive(facetMaxInclusive);
+        setFacetMaxExclusive(facetMaxExclusive);
         setDefinition(definition);
         setDefinitionSource(definitionSource);
         setNamespaceId(namespaceId);

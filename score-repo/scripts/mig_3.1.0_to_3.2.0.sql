@@ -84,16 +84,52 @@ WHERE `bcc_manifest`.`from_acc_manifest_id` = `acc_manifest`.`acc_manifest_id`
 ALTER TABLE `bcc` DROP COLUMN `den`;
 
 -- Issue #1554
--- Add `facet_min_length`, `facet_max_length`, and `facet_pattern` to `dt` and `dt_sc` tables.
+-- Add `facet_*` columns to `dt`, `dt_sc`, `bbie`, and `bbie_sc` tables.
 ALTER TABLE `dt`
-    ADD COLUMN `facet_min_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `based_dt_id`,
-    ADD COLUMN `facet_max_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
-    ADD COLUMN `facet_pattern`    text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`;
+    ADD COLUMN `facet_min_length`    bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `based_dt_id`,
+    ADD COLUMN `facet_max_length`    bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
+    ADD COLUMN `facet_pattern`       text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`,
+    ADD COLUMN `facet_min_inclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is also
+an allowed value.' AFTER `facet_pattern`,
+    ADD COLUMN `facet_min_exclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is no
+allowed value.' AFTER `facet_min_inclusive`,
+    ADD COLUMN `facet_max_inclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is also
+an allowed value.' AFTER `facet_min_exclusive`,
+    ADD COLUMN `facet_max_exclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is no
+allowed value' AFTER `facet_max_inclusive`;
 
 ALTER TABLE `dt_sc`
-    ADD COLUMN `facet_min_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `fixed_value`,
-    ADD COLUMN `facet_max_length` bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
-    ADD COLUMN `facet_pattern`    text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`;
+    ADD COLUMN `facet_min_length`    bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `fixed_value`,
+    ADD COLUMN `facet_max_length`    bigint(20) unsigned DEFAULT NULL COMMENT 'Defines the minimum number of units of length.' AFTER `facet_min_length`,
+    ADD COLUMN `facet_pattern`       text                DEFAULT NULL COMMENT 'Defines a constraint on the lexical space of a datatype to literals in a specific pattern.' AFTER `facet_max_length`,
+    ADD COLUMN `facet_min_inclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is also
+an allowed value.' AFTER `facet_pattern`,
+    ADD COLUMN `facet_min_exclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is no
+allowed value.' AFTER `facet_min_inclusive`,
+    ADD COLUMN `facet_max_inclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is also
+an allowed value.' AFTER `facet_min_exclusive`,
+    ADD COLUMN `facet_max_exclusive` varchar(250)        DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is no
+allowed value' AFTER `facet_max_inclusive`;
+
+ALTER TABLE `bbie`
+    ADD COLUMN `facet_min_inclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is also
+an allowed value.' AFTER `facet_pattern`,
+    ADD COLUMN `facet_min_exclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is no
+allowed value.' AFTER `facet_min_inclusive`,
+    ADD COLUMN `facet_max_inclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is also
+an allowed value.' AFTER `facet_min_exclusive`,
+    ADD COLUMN `facet_max_exclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is no
+allowed value' AFTER `facet_max_inclusive`;
+
+ALTER TABLE `bbie_sc`
+    ADD COLUMN `facet_min_inclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is also
+an allowed value.' AFTER `facet_pattern`,
+    ADD COLUMN `facet_min_exclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the lower limit of the range of allowed values. The lower limit is no
+allowed value.' AFTER `facet_min_inclusive`,
+    ADD COLUMN `facet_max_inclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is also
+an allowed value.' AFTER `facet_min_exclusive`,
+    ADD COLUMN `facet_max_exclusive` varchar(250) DEFAULT NULL COMMENT 'Defines the upper limit of the range of allowed values. The upper limit is no
+allowed value' AFTER `facet_max_inclusive`;
 
 -- Issue #1558
 -- Initialize color sets

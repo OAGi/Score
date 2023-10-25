@@ -844,6 +844,10 @@ public class CcNodeService extends EventHandler {
         request.setFacetMinLength(detail.getFacetMinLength());
         request.setFacetMaxLength(detail.getFacetMaxLength());
         request.setFacetPattern(detail.getFacetPattern());
+        request.setFacetMinInclusive(detail.getFacetMinInclusive());
+        request.setFacetMinExclusive(detail.getFacetMinExclusive());
+        request.setFacetMaxInclusive(detail.getFacetMaxInclusive());
+        request.setFacetMaxExclusive(detail.getFacetMaxExclusive());
         request.setSixDigitId(detail.getSixDigitId());
         request.setContentComponentDefinition(detail.getContentComponentDefinition());
         request.setDefinition(detail.getDefinition());
@@ -870,6 +874,10 @@ public class CcNodeService extends EventHandler {
         request.setFacetMinLength(detail.getFacetMinLength());
         request.setFacetMaxLength(detail.getFacetMaxLength());
         request.setFacetPattern(detail.getFacetPattern());
+        request.setFacetMinInclusive(detail.getFacetMinInclusive());
+        request.setFacetMinExclusive(detail.getFacetMinExclusive());
+        request.setFacetMaxInclusive(detail.getFacetMaxInclusive());
+        request.setFacetMaxExclusive(detail.getFacetMaxExclusive());
         request.setDefinition(detail.getDefinition());
         request.setCardinalityMax(detail.getCardinalityMax());
         request.setCardinalityMin(detail.getCardinalityMin());

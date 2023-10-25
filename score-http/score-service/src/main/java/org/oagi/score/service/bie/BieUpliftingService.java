@@ -1007,6 +1007,13 @@ public class BieUpliftingService {
                 targetBbie.setFixedValue(bbie.getFixedValue());
                 targetBbie.setCardinalityMin(bbie.getCardinalityMin());
                 targetBbie.setCardinalityMax(bbie.getCardinalityMax());
+                targetBbie.setFacetMinLength(bbie.getFacetMinLength());
+                targetBbie.setFacetMaxLength(bbie.getFacetMaxLength());
+                targetBbie.setFacetPattern(bbie.getFacetPattern());
+                targetBbie.setFacetMinInclusive(bbie.getFacetMinInclusive());
+                targetBbie.setFacetMinExclusive(bbie.getFacetMinExclusive());
+                targetBbie.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
+                targetBbie.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
                 targetBbie.setNillable(bbie.isNillable());
                 targetBbie.setDefinition(bbie.getDefinition());
                 targetBbie.setRemark(bbie.getRemark());
@@ -1148,6 +1155,13 @@ public class BieUpliftingService {
                 targetBbieSc.setHashPath(sha256(targetBbieSc.getPath()));
                 targetBbieSc.setDefaultValue(bbieSc.getDefaultValue());
                 targetBbieSc.setFixedValue(bbieSc.getFixedValue());
+                targetBbieSc.setFacetMinLength(bbieSc.getFacetMinLength());
+                targetBbieSc.setFacetMaxLength(bbieSc.getFacetMaxLength());
+                targetBbieSc.setFacetPattern(bbieSc.getFacetPattern());
+                targetBbieSc.setFacetMinInclusive(bbieSc.getFacetMinInclusive());
+                targetBbieSc.setFacetMinExclusive(bbieSc.getFacetMinExclusive());
+                targetBbieSc.setFacetMaxInclusive(bbieSc.getFacetMaxInclusive());
+                targetBbieSc.setFacetMaxExclusive(bbieSc.getFacetMaxExclusive());
                 targetBbieSc.setCardinalityMin(bbieSc.getCardinalityMin());
                 targetBbieSc.setCardinalityMax(bbieSc.getCardinalityMax());
                 targetBbieSc.setNillable(bbieSc.isNillable());
