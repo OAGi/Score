@@ -974,6 +974,10 @@ export class BdtDetail {
   facetMinLength: number;
   facetMaxLength: number;
   facetPattern: string;
+  facetMinInclusive: string;
+  facetMinExclusive: string;
+  facetMaxInclusive: string;
+  facetMaxExclusive: string;
   propertyTerm: string;
   representationTerm: string;
   definition: string;
@@ -1003,6 +1007,10 @@ export class BdtScDetail {
   facetMinLength: number;
   facetMaxLength: number;
   facetPattern: string;
+  facetMinInclusive: string;
+  facetMinExclusive: string;
+  facetMaxInclusive: string;
+  facetMaxExclusive: string;
   cdtPrimitives: string[];
 }
 
@@ -1365,9 +1373,13 @@ export class BbieDetail {
   seqKey: number;
   private _cardinalityMin: number;
   private _cardinalityMax: number;
-  private _minLength: number;
-  private _maxLength: number;
-  private _pattern: string;
+  private _facetMinLength: number;
+  private _facetMaxLength: number;
+  private _facetPattern: string;
+  private _facetMinInclusive: string;
+  private _facetMinExclusive: string;
+  private _facetMaxInclusive: string;
+  private _facetMaxExclusive: string;
   private _nillable: boolean;
   private _remark: string;
   private _definition: string;
@@ -1405,31 +1417,67 @@ export class BbieDetail {
     this._node.fireChangeEvent('cardinalityMax', value);
   }
 
-  get minLength(): number {
-    return this._minLength;
+  get facetMinLength(): number {
+    return this._facetMinLength;
   }
 
-  set minLength(value: number) {
-    this._minLength = value;
-    this._node.fireChangeEvent('minLength', value);
+  set facetMinLength(value: number) {
+    this._facetMinLength = value;
+    this._node.fireChangeEvent('facetMinLength', value);
   }
 
-  get maxLength(): number {
-    return this._maxLength;
+  get facetMaxLength(): number {
+    return this._facetMaxLength;
   }
 
-  set maxLength(value: number) {
-    this._maxLength = value;
-    this._node.fireChangeEvent('maxLength', value);
+  set facetMaxLength(value: number) {
+    this._facetMaxLength = value;
+    this._node.fireChangeEvent('facetMaxLength', value);
   }
 
-  get pattern(): string {
-    return this._pattern;
+  get facetPattern(): string {
+    return this._facetPattern;
   }
 
-  set pattern(value: string) {
-    this._pattern = value;
-    this._node.fireChangeEvent('pattern', value);
+  set facetPattern(value: string) {
+    this._facetPattern = value;
+    this._node.fireChangeEvent('facetPattern', value);
+  }
+
+  get facetMinInclusive(): string {
+    return this._facetMinInclusive;
+  }
+
+  set facetMinInclusive(value: string) {
+    this._facetMinInclusive = value;
+    this._node.fireChangeEvent('facetMinInclusive', value);
+  }
+
+  get facetMinExclusive(): string {
+    return this._facetMinExclusive;
+  }
+
+  set facetMinExclusive(value: string) {
+    this._facetMinExclusive = value;
+    this._node.fireChangeEvent('facetMinExclusive', value);
+  }
+
+  get facetMaxInclusive(): string {
+    return this._facetMaxInclusive;
+  }
+
+  set facetMaxInclusive(value: string) {
+    this._facetMaxInclusive = value;
+    this._node.fireChangeEvent('facetMaxInclusive', value);
+  }
+
+  get facetMaxExclusive(): string {
+    return this._facetMaxExclusive;
+  }
+
+  set facetMaxExclusive(value: string) {
+    this._facetMaxExclusive = value;
+    this._node.fireChangeEvent('facetMaxExclusive', value);
   }
 
   get nillable(): boolean {
@@ -1553,9 +1601,13 @@ export class BbieDetail {
       this.definition = obj.definition;
       this.cardinalityMin = obj.cardinalityMin;
       this.cardinalityMax = obj.cardinalityMax;
-      this.minLength = obj.minLength;
-      this.maxLength = obj.maxLength;
-      this.pattern = obj.pattern;
+      this.facetMinLength = obj.facetMinLength;
+      this.facetMaxLength = obj.facetMaxLength;
+      this.facetPattern = obj.facetPattern;
+      this.facetMinInclusive = obj.facetMinInclusive;
+      this.facetMinExclusive = obj.facetMinExclusive;
+      this.facetMaxInclusive = obj.facetMaxInclusive;
+      this.facetMaxExclusive = obj.facetMaxExclusive;
       this.definition = obj.definition;
 
       this.nillable = obj.nillable;
@@ -1585,9 +1637,13 @@ export class BbieDetail {
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.cardinalityMin) ? this.cardinalityMin : 0) +
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.minLength) ? this.minLength : 0) +
-      ((this.maxLength) ? this.maxLength : 0) +
-      ((!!this.pattern) ? hashCode4String(this.pattern) : 0) +
+      ((this.facetMinLength) ? this.facetMinLength : 0) +
+      ((this.facetMaxLength) ? this.facetMaxLength : 0) +
+      ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
+      ((!!this.facetMinInclusive) ? hashCode4String(this.facetMinInclusive) : 0) +
+      ((!!this.facetMinExclusive) ? hashCode4String(this.facetMinExclusive) : 0) +
+      ((!!this.facetMaxInclusive) ? hashCode4String(this.facetMaxInclusive) : 0) +
+      ((!!this.facetMaxExclusive) ? hashCode4String(this.facetMaxExclusive) : 0) +
       ((this.nillable) ? 1231 : 1237) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
@@ -1606,9 +1662,13 @@ export class BbieDetail {
       definition: this.definition,
       cardinalityMin: this.cardinalityMin,
       cardinalityMax: this.cardinalityMax,
-      minLength: this.minLength,
-      maxLength: this.maxLength,
-      pattern: this.pattern,
+      facetMinLength: this.facetMinLength,
+      facetMaxLength: this.facetMaxLength,
+      facetPattern: this.facetPattern,
+      facetMinInclusive: this.facetMinInclusive,
+      facetMinExclusive: this.facetMinExclusive,
+      facetMaxInclusive: this.facetMaxInclusive,
+      facetMaxExclusive: this.facetMaxExclusive,
       nillable: this.nillable,
       remark: this.remark,
       example: this.example,
@@ -1721,9 +1781,13 @@ export class BbieScDetail {
   guid: string;
   private _cardinalityMin: number;
   private _cardinalityMax: number;
-  private _minLength: number;
-  private _maxLength: number;
-  private _pattern: string;
+  private _facetMinLength: number;
+  private _facetMaxLength: number;
+  private _facetPattern: string;
+  private _facetMinInclusive: string;
+  private _facetMinExclusive: string;
+  private _facetMaxInclusive: string;
+  private _facetMaxExclusive: string;
   private _remark: string;
   private _bizTerm: string;
   private _definition: string;
@@ -1761,31 +1825,67 @@ export class BbieScDetail {
     this._node.fireChangeEvent('cardinalityMax', value);
   }
 
-  get minLength(): number {
-    return this._minLength;
+  get facetMinLength(): number {
+    return this._facetMinLength;
   }
 
-  set minLength(value: number) {
-    this._minLength = value;
-    this._node.fireChangeEvent('minLength', value);
+  set facetMinLength(value: number) {
+    this._facetMinLength = value;
+    this._node.fireChangeEvent('facetMinLength', value);
   }
 
-  get maxLength(): number {
-    return this._maxLength;
+  get facetMaxLength(): number {
+    return this._facetMaxLength;
   }
 
-  set maxLength(value: number) {
-    this._maxLength = value;
-    this._node.fireChangeEvent('maxLength', value);
+  set facetMaxLength(value: number) {
+    this._facetMaxLength = value;
+    this._node.fireChangeEvent('facetMaxLength', value);
   }
 
-  get pattern(): string {
-    return this._pattern;
+  get facetPattern(): string {
+    return this._facetPattern;
   }
 
-  set pattern(value: string) {
-    this._pattern = value;
-    this._node.fireChangeEvent('pattern', value);
+  set facetPattern(value: string) {
+    this._facetPattern = value;
+    this._node.fireChangeEvent('facetPattern', value);
+  }
+
+  get facetMinInclusive(): string {
+    return this._facetMinInclusive;
+  }
+
+  set facetMinInclusive(value: string) {
+    this._facetMinInclusive = value;
+    this._node.fireChangeEvent('facetMinInclusive', value);
+  }
+
+  get facetMinExclusive(): string {
+    return this._facetMinExclusive;
+  }
+
+  set facetMinExclusive(value: string) {
+    this._facetMinExclusive = value;
+    this._node.fireChangeEvent('facetMinExclusive', value);
+  }
+
+  get facetMaxInclusive(): string {
+    return this._facetMaxInclusive;
+  }
+
+  set facetMaxInclusive(value: string) {
+    this._facetMaxInclusive = value;
+    this._node.fireChangeEvent('facetMaxInclusive', value);
+  }
+
+  get facetMaxExclusive(): string {
+    return this._facetMaxExclusive;
+  }
+
+  set facetMaxExclusive(value: string) {
+    this._facetMaxExclusive = value;
+    this._node.fireChangeEvent('facetMaxExclusive', value);
   }
 
   get remark(): string {
@@ -1895,9 +1995,13 @@ export class BbieScDetail {
       this.guid = obj.guid;
       this.cardinalityMin = obj.cardinalityMin;
       this.cardinalityMax = obj.cardinalityMax;
-      this.minLength = obj.minLength;
-      this.maxLength = obj.maxLength;
-      this.pattern = obj.pattern;
+      this.facetMinLength = obj.facetMinLength;
+      this.facetMaxLength = obj.facetMaxLength;
+      this.facetPattern = obj.facetPattern;
+      this.facetMinInclusive = obj.facetMinInclusive;
+      this.facetMinExclusive = obj.facetMinExclusive;
+      this.facetMaxInclusive = obj.facetMaxInclusive;
+      this.facetMaxExclusive = obj.facetMaxExclusive;
 
       this.definition = obj.definition;
       this.bizTerm = obj.bizTerm;
@@ -1924,9 +2028,13 @@ export class BbieScDetail {
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.cardinalityMin) ? this.cardinalityMin : 0) +
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.minLength) ? this.minLength : 0) +
-      ((this.maxLength) ? this.maxLength : 0) +
-      ((!!this.pattern) ? hashCode4String(this.pattern) : 0) +
+      ((this.facetMinLength) ? this.facetMinLength : 0) +
+      ((this.facetMaxLength) ? this.facetMaxLength : 0) +
+      ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
+      ((!!this.facetMinInclusive) ? hashCode4String(this.facetMinInclusive) : 0) +
+      ((!!this.facetMinExclusive) ? hashCode4String(this.facetMinExclusive) : 0) +
+      ((!!this.facetMaxInclusive) ? hashCode4String(this.facetMaxInclusive) : 0) +
+      ((!!this.facetMaxExclusive) ? hashCode4String(this.facetMaxExclusive) : 0) +
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
@@ -1944,9 +2052,13 @@ export class BbieScDetail {
       definition: this.definition,
       cardinalityMin: this.cardinalityMin,
       cardinalityMax: this.cardinalityMax,
-      minLength: this.minLength,
-      maxLength: this.maxLength,
-      pattern: this.pattern,
+      facetMinLength: this.facetMinLength,
+      facetMaxLength: this.facetMaxLength,
+      facetPattern: this.facetPattern,
+      facetMinInclusive: this.facetMinInclusive,
+      facetMinExclusive: this.facetMinExclusive,
+      facetMaxInclusive: this.facetMaxInclusive,
+      facetMaxExclusive: this.facetMaxExclusive,
       bizTerm: this.bizTerm,
       remark: this.remark,
       example: this.example,

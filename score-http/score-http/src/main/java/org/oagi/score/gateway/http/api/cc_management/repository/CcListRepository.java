@@ -33,7 +33,6 @@ import static org.apache.commons.lang3.StringUtils.stripToNull;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.BCC_MANIFEST;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.oagi.score.service.common.data.OagisComponentType.*;
 

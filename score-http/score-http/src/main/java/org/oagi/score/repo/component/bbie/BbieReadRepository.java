@@ -184,12 +184,16 @@ public class BbieReadRepository {
             bbie.setCardinalityMin(bbieRecord.getCardinalityMin());
             bbie.setCardinalityMax(bbieRecord.getCardinalityMax());
             if (bbieRecord.getFacetMinLength() != null) {
-                bbie.setMinLength(bbieRecord.getFacetMinLength().intValue());
+                bbie.setFacetMinLength(bbieRecord.getFacetMinLength().toBigInteger());
             }
             if (bbieRecord.getFacetMaxLength() != null) {
-                bbie.setMaxLength(bbieRecord.getFacetMaxLength().intValue());
+                bbie.setFacetMaxLength(bbieRecord.getFacetMaxLength().toBigInteger());
             }
-            bbie.setPattern(bbieRecord.getFacetPattern());
+            bbie.setFacetPattern(bbieRecord.getFacetPattern());
+            bbie.setFacetMinInclusive(bbieRecord.getFacetMinInclusive());
+            bbie.setFacetMinExclusive(bbieRecord.getFacetMinExclusive());
+            bbie.setFacetMaxInclusive(bbieRecord.getFacetMaxInclusive());
+            bbie.setFacetMaxExclusive(bbieRecord.getFacetMaxExclusive());
             bbie.setNillable(bbieRecord.getIsNillable() == 1);
             bbie.setRemark(bbieRecord.getRemark());
             bbie.setDefinition(bbieRecord.getDefinition());

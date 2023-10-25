@@ -50,6 +50,10 @@ public class BdtReadRepository {
             bdtNode.setFacetMaxLength(dtRecord.getFacetMaxLength().toBigInteger());
         }
         bdtNode.setFacetPattern(dtRecord.getFacetPattern());
+        bdtNode.setFacetMinInclusive(dtRecord.getFacetMinInclusive());
+        bdtNode.setFacetMinExclusive(dtRecord.getFacetMinExclusive());
+        bdtNode.setFacetMaxInclusive(dtRecord.getFacetMaxInclusive());
+        bdtNode.setFacetMaxExclusive(dtRecord.getFacetMaxExclusive());
         bdtNode.setDefinition(dtRecord.getDefinition());
         String den = dslContext.select(DT_MANIFEST.DEN)
                 .from(DT_MANIFEST)

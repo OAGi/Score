@@ -21,6 +21,10 @@ public class DT implements CoreComponent, FacetRestrictionsAware {
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
     private String facetPattern;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
     private String sixDigitId;
     private BigInteger basedDtManifestId = BigInteger.ZERO;
     private BigInteger basedDtId = BigInteger.ZERO;
@@ -45,5 +49,4 @@ public class DT implements CoreComponent, FacetRestrictionsAware {
     public BigInteger getId() {
         return getDtId();
     }
-
 }

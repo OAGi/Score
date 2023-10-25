@@ -5,7 +5,6 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.agency.model.AgencyIdList;
 import org.oagi.score.repo.api.agency.model.AgencyIdListManifest;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
-import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.ValueDomainReadRepository;
 import org.oagi.score.repo.api.corecomponent.model.BdtPriRestri;
 import org.oagi.score.repo.api.corecomponent.model.BdtScPriRestri;

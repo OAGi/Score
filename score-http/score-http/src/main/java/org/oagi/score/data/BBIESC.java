@@ -19,6 +19,10 @@ public class BBIESC implements BIE, FacetRestrictionsAware {
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
     private String facetPattern;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
     private String defaultValue;
     private String fixedValue;
     private String definition;

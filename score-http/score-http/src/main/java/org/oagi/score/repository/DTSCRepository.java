@@ -1,9 +1,8 @@
 package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
-import org.jooq.Record19;
+import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
-import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.data.DTSC;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
@@ -22,10 +21,7 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectOnConditionStep<Record19<ULong, ULong, String, String, String,
-            String, String, String, String, ULong,
-            ULong, String, ULong, ULong, Integer,
-            Integer, ULong, ULong, UInteger>> getSelectJoinStep() {
+    private SelectOnConditionStep<Record> getSelectJoinStep() {
         return dslContext.select(
                 Tables.DT_SC_MANIFEST.DT_SC_MANIFEST_ID,
                 Tables.DT_SC.DT_SC_ID,
@@ -39,6 +35,10 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
                 Tables.DT_SC.FACET_MIN_LENGTH,
                 Tables.DT_SC.FACET_MAX_LENGTH,
                 Tables.DT_SC.FACET_PATTERN,
+                Tables.DT_SC.FACET_MIN_INCLUSIVE,
+                Tables.DT_SC.FACET_MIN_EXCLUSIVE,
+                Tables.DT_SC.FACET_MAX_INCLUSIVE,
+                Tables.DT_SC.FACET_MAX_EXCLUSIVE,
                 Tables.DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID,
                 Tables.DT_SC.OWNER_DT_ID,
                 Tables.DT_SC.CARDINALITY_MIN,

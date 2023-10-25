@@ -19,14 +19,13 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -353,6 +352,24 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                                    Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
         if (!definitions.containsKey(componentName)) {
             Map<String, Object> content = toProperties(xbt);
+            if (StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
+                String minimum = facetRestri.getFacetMinInclusive();
+                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
+            }
+            if (StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
+                String minimum = facetRestri.getFacetMinExclusive();
+                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
+                content.put("exclusiveMinimum", true);
+            }
+            if (StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
+                String maximum = facetRestri.getFacetMaxInclusive();
+                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
+            }
+            if (StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
+                String maximum = facetRestri.getFacetMaxExclusive();
+                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
+                content.put("exclusiveMaximum", true);
+            }
             if (facetRestri.getFacetMinLength() != null) {
                 content.put("minLength", facetRestri.getFacetMinLength().longValue());
             }
@@ -712,9 +729,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = Helper.getXbt(generationContext, bdtPriRestri);
                 }
 
-                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
+                if (hasAnyValuesInFacets(bbie)) {
                     ref = fillDefinitions(definitions, xbt, bbie, "type_" + bbie.getGuid());
-                } else if (bdt.getFacetMinLength() != null || bdt.getFacetMaxLength() != null || StringUtils.hasLength(bdt.getFacetPattern())) {
+                } else if (hasAnyValuesInFacets(bdt)) {
                     ref = fillDefinitions(definitions, xbt, bdt, "type_" + bdt.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
@@ -792,9 +809,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 }
 
-                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
+                if (hasAnyValuesInFacets(bbieSc)) {
                     ref = fillDefinitions(definitions, xbt, bbieSc, "type_" + bbieSc.getGuid());
-                } else if (dtSc.getFacetMinLength() != null || dtSc.getFacetMaxLength() != null || StringUtils.hasLength(dtSc.getFacetPattern())) {
+                } else if (hasAnyValuesInFacets(dtSc)) {
                     ref = fillDefinitions(definitions, xbt, dtSc, "type_" + dtSc.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);

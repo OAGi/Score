@@ -105,13 +105,13 @@ public class BbieWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbie.getMinLength() != null) {
-                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            if (bbie.getFacetMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getFacetMinLength()));
             } else {
                 bbieRecord.setFacetMinLength(null);
             }
-            if (bbie.getMaxLength() != null) {
-                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            if (bbie.getFacetMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
             } else {
                 bbieRecord.setFacetMaxLength(null);
             }
@@ -123,10 +123,30 @@ public class BbieWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbie.getPattern())) {
-                bbieRecord.setFacetPattern(bbie.getPattern());
+            if (StringUtils.hasLength(bbie.getFacetPattern())) {
+                bbieRecord.setFacetPattern(bbie.getFacetPattern());
             } else {
                 bbieRecord.setFacetPattern(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMinInclusive())) {
+                bbieRecord.setFacetMinInclusive(bbie.getFacetMinInclusive());
+            } else {
+                bbieRecord.setFacetMinInclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMinExclusive())) {
+                bbieRecord.setFacetMinExclusive(bbie.getFacetMinExclusive());
+            } else {
+                bbieRecord.setFacetMinExclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMaxInclusive())) {
+                bbieRecord.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
+            } else {
+                bbieRecord.setFacetMaxInclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMaxExclusive())) {
+                bbieRecord.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
+            } else {
+                bbieRecord.setFacetMaxExclusive(null);
             }
 
             bbieRecord.setExample(bbie.getExample());
@@ -219,13 +239,13 @@ public class BbieWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbie.getMinLength() != null) {
-                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            if (bbie.getFacetMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getFacetMinLength()));
             } else {
                 bbieRecord.setFacetMinLength(null);
             }
-            if (bbie.getMaxLength() != null) {
-                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            if (bbie.getFacetMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
             } else {
                 bbieRecord.setFacetMaxLength(null);
             }
@@ -237,10 +257,30 @@ public class BbieWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbie.getPattern())) {
-                bbieRecord.setFacetPattern(bbie.getPattern());
+            if (StringUtils.hasLength(bbie.getFacetPattern())) {
+                bbieRecord.setFacetPattern(bbie.getFacetPattern());
             } else {
                 bbieRecord.setFacetPattern(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMinInclusive())) {
+                bbieRecord.setFacetMinInclusive(bbie.getFacetMinInclusive());
+            } else {
+                bbieRecord.setFacetMinInclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMinExclusive())) {
+                bbieRecord.setFacetMinExclusive(bbie.getFacetMinExclusive());
+            } else {
+                bbieRecord.setFacetMinExclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMaxInclusive())) {
+                bbieRecord.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
+            } else {
+                bbieRecord.setFacetMaxInclusive(null);
+            }
+            if (StringUtils.hasLength(bbie.getFacetMaxExclusive())) {
+                bbieRecord.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
+            } else {
+                bbieRecord.setFacetMaxExclusive(null);
             }
 
             if (bbie.getExample() != null) {
@@ -275,7 +315,7 @@ public class BbieWriteRepository {
                 }
             }
 
-            if (bbieRecord.changed()){
+            if (bbieRecord.changed()) {
                 bbieRecord.setLastUpdatedBy(requesterId);
                 bbieRecord.setLastUpdateTimestamp(request.getLocalDateTime());
                 bbieRecord.update(
@@ -288,6 +328,10 @@ public class BbieWriteRepository {
                         BBIE.FACET_MIN_LENGTH,
                         BBIE.FACET_MAX_LENGTH,
                         BBIE.FACET_PATTERN,
+                        BBIE.FACET_MIN_INCLUSIVE,
+                        BBIE.FACET_MIN_EXCLUSIVE,
+                        BBIE.FACET_MAX_INCLUSIVE,
+                        BBIE.FACET_MAX_EXCLUSIVE,
                         BBIE.EXAMPLE,
                         BBIE.REMARK,
                         BBIE.DEFAULT_VALUE,

@@ -1,7 +1,7 @@
 package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
-import org.jooq.Record20;
+import org.jooq.Record;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BBIESC;
@@ -22,11 +22,7 @@ public class BBIESCRepository implements ScoreRepository<BBIESC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectJoinStep<Record20<
-            ULong, String, ULong, ULong, ULong,
-            ULong, ULong, Integer, Integer, String,
-            String, String, String, String, String,
-            Byte, ULong, ULong, String, ULong>> getSelectJoinStep() {
+    private SelectJoinStep<Record> getSelectJoinStep() {
         return dslContext.select(
                 Tables.BBIE_SC.BBIE_SC_ID,
                 Tables.BBIE_SC.GUID,
@@ -39,14 +35,18 @@ public class BBIESCRepository implements ScoreRepository<BBIESC> {
                 Tables.BBIE_SC.CARDINALITY_MAX,
                 Tables.BBIE_SC.DEFAULT_VALUE,
                 Tables.BBIE_SC.FIXED_VALUE,
+                Tables.BBIE_SC.FACET_MIN_LENGTH,
+                Tables.BBIE_SC.FACET_MAX_LENGTH,
+                Tables.BBIE_SC.FACET_PATTERN,
+                Tables.BBIE_SC.FACET_MIN_INCLUSIVE,
+                Tables.BBIE_SC.FACET_MIN_EXCLUSIVE,
+                Tables.BBIE_SC.FACET_MAX_INCLUSIVE,
+                Tables.BBIE_SC.FACET_MAX_EXCLUSIVE,
                 Tables.BBIE_SC.DEFINITION,
                 Tables.BBIE_SC.REMARK,
                 Tables.BBIE_SC.BIZ_TERM,
                 Tables.BBIE_SC.EXAMPLE,
                 Tables.BBIE_SC.IS_USED.as("used"),
-                Tables.BBIE_SC.FACET_MIN_LENGTH,
-                Tables.BBIE_SC.FACET_MAX_LENGTH,
-                Tables.BBIE_SC.FACET_PATTERN,
                 Tables.BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(Tables.BBIE_SC);
     }

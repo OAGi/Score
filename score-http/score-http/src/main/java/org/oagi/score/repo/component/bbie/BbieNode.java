@@ -44,9 +44,13 @@ public class BbieNode {
         private BigInteger seqKey;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
-        private Integer minLength;
-        private Integer maxLength;
-        private String pattern;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
+        private String facetMinInclusive;
+        private String facetMinExclusive;
+        private String facetMaxInclusive;
+        private String facetMaxExclusive;
         private Boolean nillable;
         private String remark;
         private String definition;

@@ -1,7 +1,7 @@
 package org.oagi.score.repo.component.namespace;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceListRequest;
@@ -18,7 +18,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.NAMESPACE;

@@ -24,6 +24,10 @@ public class BbieScNode {
         private BigInteger facetMinLength;
         private BigInteger facetMaxLength;
         private String facetPattern;
+        private String facetMinInclusive;
+        private String facetMinExclusive;
+        private String facetMaxInclusive;
+        private String facetMaxExclusive;
         private CcState state;
         private List<String> cdtPrimitives = Collections.emptyList();
     }
@@ -43,9 +47,13 @@ public class BbieScNode {
         private String guid;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
-        private Integer minLength;
-        private Integer maxLength;
-        private String pattern;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
+        private String facetMinInclusive;
+        private String facetMinExclusive;
+        private String facetMaxInclusive;
+        private String facetMaxExclusive;
         private String remark;
         private String bizTerm;
         private String definition;

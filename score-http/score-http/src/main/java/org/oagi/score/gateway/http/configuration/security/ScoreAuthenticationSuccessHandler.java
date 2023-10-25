@@ -23,13 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAUTH2_APP;
 import static org.oagi.score.repo.api.impl.jooq.entity.tables.AppOauth2User.APP_OAUTH2_USER;
 
 @Component

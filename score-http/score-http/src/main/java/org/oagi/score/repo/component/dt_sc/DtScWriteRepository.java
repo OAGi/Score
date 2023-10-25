@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
@@ -292,6 +293,42 @@ public class DtScWriteRepository {
             } else {
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .setNull(DT_SC.FACET_PATTERN);
+            }
+        }
+        if (compare(dtScRecord.getFacetMinInclusive(), request.getFacetMinInclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMinInclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MIN_INCLUSIVE);
+            }
+        }
+        if (compare(dtScRecord.getFacetMinExclusive(), request.getFacetMinExclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMinExclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MIN_EXCLUSIVE);
+            }
+        }
+        if (compare(dtScRecord.getFacetMaxInclusive(), request.getFacetMaxInclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMaxInclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MAX_INCLUSIVE);
+            }
+        }
+        if (compare(dtScRecord.getFacetMaxExclusive(), request.getFacetMaxExclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMaxExclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MAX_EXCLUSIVE);
             }
         }
 

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.*;
-import static org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService.COMPONENT_STATE_BACKGROUND_COLOR_CONFIG_PARAM_NAME;
 
 @Service
 @Transactional(readOnly = true)

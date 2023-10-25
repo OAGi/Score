@@ -92,13 +92,13 @@ public class BbieScWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbieSc.getMinLength() != null) {
-                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getMinLength()));
+            if (bbieSc.getFacetMinLength() != null) {
+                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getFacetMinLength()));
             } else {
                 bbieScRecord.setFacetMinLength(null);
             }
-            if (bbieSc.getMaxLength() != null) {
-                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getMaxLength()));
+            if (bbieSc.getFacetMaxLength() != null) {
+                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
             } else {
                 bbieScRecord.setFacetMaxLength(null);
             }
@@ -110,10 +110,30 @@ public class BbieScWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbieSc.getPattern())) {
-                bbieScRecord.setFacetPattern(bbieSc.getPattern());
+            if (StringUtils.hasLength(bbieSc.getFacetPattern())) {
+                bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
             } else {
                 bbieScRecord.setFacetPattern(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMinInclusive())) {
+                bbieScRecord.setFacetMinInclusive(bbieSc.getFacetMinInclusive());
+            } else {
+                bbieScRecord.setFacetMinInclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMinExclusive())) {
+                bbieScRecord.setFacetMinExclusive(bbieSc.getFacetMinExclusive());
+            } else {
+                bbieScRecord.setFacetMinExclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMaxInclusive())) {
+                bbieScRecord.setFacetMaxInclusive(bbieSc.getFacetMaxInclusive());
+            } else {
+                bbieScRecord.setFacetMaxInclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMaxExclusive())) {
+                bbieScRecord.setFacetMaxExclusive(bbieSc.getFacetMaxExclusive());
+            } else {
+                bbieScRecord.setFacetMaxExclusive(null);
             }
 
             bbieScRecord.setBizTerm(bbieSc.getBizTerm());
@@ -201,13 +221,13 @@ public class BbieScWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbieSc.getMinLength() != null) {
-                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getMinLength()));
+            if (bbieSc.getFacetMinLength() != null) {
+                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getFacetMinLength()));
             } else {
                 bbieScRecord.setFacetMinLength(null);
             }
-            if (bbieSc.getMaxLength() != null) {
-                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getMaxLength()));
+            if (bbieSc.getFacetMaxLength() != null) {
+                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
             } else {
                 bbieScRecord.setFacetMaxLength(null);
             }
@@ -219,10 +239,30 @@ public class BbieScWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbieSc.getPattern())) {
-                bbieScRecord.setFacetPattern(bbieSc.getPattern());
+            if (StringUtils.hasLength(bbieSc.getFacetPattern())) {
+                bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
             } else {
                 bbieScRecord.setFacetPattern(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMinInclusive())) {
+                bbieScRecord.setFacetMinInclusive(bbieSc.getFacetMinInclusive());
+            } else {
+                bbieScRecord.setFacetMinInclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMinExclusive())) {
+                bbieScRecord.setFacetMinExclusive(bbieSc.getFacetMinExclusive());
+            } else {
+                bbieScRecord.setFacetMinExclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMaxInclusive())) {
+                bbieScRecord.setFacetMaxInclusive(bbieSc.getFacetMaxInclusive());
+            } else {
+                bbieScRecord.setFacetMaxInclusive(null);
+            }
+            if (StringUtils.hasLength(bbieSc.getFacetMaxExclusive())) {
+                bbieScRecord.setFacetMaxExclusive(bbieSc.getFacetMaxExclusive());
+            } else {
+                bbieScRecord.setFacetMaxExclusive(null);
             }
 
             if (bbieSc.getBizTerm() != null) {
@@ -273,6 +313,10 @@ public class BbieScWriteRepository {
                         BBIE_SC.FACET_MIN_LENGTH,
                         BBIE_SC.FACET_MAX_LENGTH,
                         BBIE_SC.FACET_PATTERN,
+                        BBIE_SC.FACET_MIN_INCLUSIVE,
+                        BBIE_SC.FACET_MIN_EXCLUSIVE,
+                        BBIE_SC.FACET_MAX_INCLUSIVE,
+                        BBIE_SC.FACET_MAX_EXCLUSIVE,
                         BBIE_SC.BIZ_TERM,
                         BBIE_SC.EXAMPLE,
                         BBIE_SC.REMARK,

@@ -1,12 +1,10 @@
 package org.oagi.score.repo;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.OasDoc;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.service.common.data.AccessPrivilege;
@@ -24,11 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.*;
-import static org.jooq.impl.DSL.or;
-import static org.oagi.score.gateway.http.helper.Utility.sha256;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 import static org.oagi.score.repo.api.bie.model.BieState.*;
-import static org.oagi.score.repo.api.bie.model.BieState.Initiating;
 import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;

@@ -28,6 +28,10 @@ public class CcBdtScNodeDetail implements CcNodeDetail {
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
     private String facetPattern;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
 
     private String objectClassTerm;
     private String propertyTerm;

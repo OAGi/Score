@@ -21,6 +21,10 @@ public class DTSC implements Serializable, FacetRestrictionsAware {
     private String fixedValue;
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
+    private String facetMinInclusive;
+    private String facetMinExclusive;
+    private String facetMaxInclusive;
+    private String facetMaxExclusive;
     private String facetPattern;
     private BigInteger ownerDtManifestId = BigInteger.ZERO;
     private BigInteger ownerDtId = BigInteger.ZERO;

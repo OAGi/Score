@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.oas_management.data;
 
 import lombok.Data;
 import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.repo.api.businesscontext.model.BusinessContext;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 
