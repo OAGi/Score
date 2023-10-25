@@ -646,27 +646,26 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     }
 
     private String fillSchemas(Map<String, Object> schemas,
-                               Xbt xbt, FacetRestrictionsAware facetRestri) {
-        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
-        String name = "type_" + guid;
+                               Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
+        if (!schemas.containsKey(componentName)) {
+            Map<String, Object> content = toProperties(xbt);
+            if (facetRestri.getFacetMinLength() != null) {
+                content.put("minLength", facetRestri.getFacetMinLength().longValue());
+            }
+            if (facetRestri.getFacetMaxLength() != null) {
+                content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
+            }
+            if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
+                // Override 'pattern' and 'format' properties
+                content.remove("pattern");
+                content.remove("format");
+                content.put("pattern", facetRestri.getFacetPattern());
+            }
 
-        Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getFacetMinLength() != null) {
-            content.put("minLength", facetRestri.getFacetMinLength().longValue());
-        }
-        if (facetRestri.getFacetMaxLength() != null) {
-            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
-            // Override 'pattern' and 'format' properties
-            content.remove("pattern");
-            content.remove("format");
-            content.put("pattern", facetRestri.getFacetPattern());
+            schemas.put(componentName, content);
         }
 
-        schemas.put(name, content);
-
-        return "#/components/schemas/" + name;
+        return "#/components/schemas/" + componentName;
     }
 
     private String fillSchemas(Map<String, Object> schemas,
@@ -1032,11 +1031,12 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
+                Xbt xbt = getXbt(bbie, bdt);
                 if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
-                    Xbt xbt = getXbt(bbie, bdt);
-                    ref = fillSchemas(schemas, xbt, bbie);
+                    ref = fillSchemas(schemas, xbt, bbie, "type_" + bbie.getGuid());
+                } else if (bdt.getFacetMinLength() != null || bdt.getFacetMaxLength() != null || StringUtils.hasLength(bdt.getFacetPattern())) {
+                    ref = fillSchemas(schemas, xbt, bdt, "type_" + bdt.getGuid());
                 } else if (!isFriendly()) {
-                    Xbt xbt = getXbt(bbie, bdt);
                     ref = fillSchemas(schemas, xbt);
                 } else {
                     ref = null;
@@ -1119,7 +1119,9 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
                 if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
-                    ref = fillSchemas(schemas, xbt, bbieSc);
+                    ref = fillSchemas(schemas, xbt, bbieSc, "type_" + bbieSc.getGuid());
+                } else if (dtSc.getFacetMinLength() != null || dtSc.getFacetMaxLength() != null || StringUtils.hasLength(dtSc.getFacetPattern())) {
+                    ref = fillSchemas(schemas, xbt, dtSc, "type_" + dtSc.getGuid());
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);
                 } else {

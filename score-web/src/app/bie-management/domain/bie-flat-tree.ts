@@ -971,6 +971,9 @@ export class BdtDetail {
   guid: string;
   cardinalityMin: number;
   cardinalityMax: number;
+  facetMinLength: number;
+  facetMaxLength: number;
+  facetPattern: string;
   propertyTerm: string;
   representationTerm: string;
   definition: string;
@@ -997,6 +1000,9 @@ export class BdtScDetail {
   defaultValue: string;
   fixedValue: string;
   fixedOrDefault: string;
+  facetMinLength: number;
+  facetMaxLength: number;
+  facetPattern: string;
   cdtPrimitives: string[];
 }
 

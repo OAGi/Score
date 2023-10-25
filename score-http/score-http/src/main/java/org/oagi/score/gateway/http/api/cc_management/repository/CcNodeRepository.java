@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jooq.*;
-import org.jooq.Record;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.CcASCCPType;
@@ -15,7 +14,6 @@ import org.oagi.score.repo.component.dt.BdtReadRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
@@ -825,6 +823,9 @@ public class CcNodeRepository {
                         DT.DATA_TYPE_TERM,
                         DT.REPRESENTATION_TERM,
                         DT.QUALIFIER,
+                        DT.FACET_MIN_LENGTH,
+                        DT.FACET_MAX_LENGTH,
+                        DT.FACET_PATTERN,
                         DT.NAMESPACE_ID,
                         DT_MANIFEST.DEN,
                         DT.DEFINITION,
@@ -861,6 +862,15 @@ public class CcNodeRepository {
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchStreamInto(Integer.class).reduce(0, Integer::sum);
         bdt.setHasNoSc(cardinalityMaxOfDtScListSum == 0);
+
+        // TODO: Replace `bdt` in `bccpNodeDetail` with `bdtNodeDetail`
+        CcBdtNode bdtNode = new CcBdtNode();
+        bdtNode.setManifestId(dslContext.select(BCCP_MANIFEST.BDT_MANIFEST_ID)
+                .from(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOneInto(BigInteger.class));
+        CcBdtNodeDetail bdtNodeDetail = this.getBdtNodeDetail(user, bdtNode);
+        bdt.setBdtPriRestriList(bdtNodeDetail.getBdtPriRestriList());
 
         return bccpNodeDetail;
     }
@@ -1060,6 +1070,9 @@ public class CcNodeRepository {
                         DT_MANIFEST.as("basedManifest").DEN.as("basedBdtDen"),
                         DT.as("based").STATE.as("basedBdtState"),
                         DT.SIX_DIGIT_ID,
+                        DT.FACET_MIN_LENGTH,
+                        DT.FACET_MAX_LENGTH,
+                        DT.FACET_PATTERN,
                         DT.CONTENT_COMPONENT_DEFINITION,
                         DT.COMMONLY_USED,
                         DT.IS_DEPRECATED.as("deprecated"),
@@ -1256,6 +1269,9 @@ public class CcNodeRepository {
                         DT_SC.DEFINITION_SOURCE,
                         DT_SC.DEFAULT_VALUE,
                         DT_SC.FIXED_VALUE,
+                        DT_SC.FACET_MIN_LENGTH,
+                        DT_SC.FACET_MAX_LENGTH,
+                        DT_SC.FACET_PATTERN,
                         DT_SC.IS_DEPRECATED.as("deprecated"),
                         DT_SC_MANIFEST.REPLACEMENT_DT_SC_MANIFEST_ID,
                         DT.STATE,

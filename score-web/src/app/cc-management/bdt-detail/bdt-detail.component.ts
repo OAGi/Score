@@ -50,15 +50,17 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
+import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
-import {FormControl} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from "@angular/forms";
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
+import {ErrorStateMatcher} from "@angular/material/core";
+import {BieFlatNode} from "../../bie-management/domain/bie-flat-tree";
 
 
 @Component({
@@ -105,6 +107,13 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
+
+  /* string facets management */
+  facetMinimumLength: FormControl;
+  facetMaximumLength: FormControl;
+  facetPattern: FormControl;
+  facetPatternTest: FormControl;
+  facetPatternTestErrorStateMatcher: ErrorStateMatcher;
 
   @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
@@ -425,14 +434,192 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       if (detail instanceof CcDtNodeDetail) {
         (node.detail as CcDtNodeDetail).update(this);
         this.restrictionDataSource.data = (node.detail as CcDtNodeDetail).valueDomains;
+        this.resetFacets(node.detail as CcDtNodeDetail);
       } else {
         (node.detail as CcBdtScNodeDetail).update(this);
         this.restrictionDataSource.data = (node.detail as CcBdtScNodeDetail).valueDomains;
+        this.resetFacets(node.detail as CcBdtScNodeDetail);
       }
 
       this.selectedNode = node;
       this.cursorNode = node;
     });
+  }
+
+  resetFacets(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    this._setMinLengthFormControl(node);
+    this._setMaxLengthFormControl(node);
+    this._setPatternFormControl(node);
+  }
+
+  _setMinLengthFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinLength;
+    let bieMaxLength;
+    if (node instanceof CcDtNodeDetail) {
+      bieMinLength = (node as CcDtNodeDetail).facetMinLength;
+      bieMaxLength = (node as CcDtNodeDetail).facetMaxLength;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      bieMinLength = (node as CcBdtScNodeDetail).facetMinLength;
+      bieMaxLength = (node as CcBdtScNodeDetail).facetMaxLength;
+    } else {
+      this.facetMinimumLength = undefined;
+      return;
+    }
+
+    this.facetMinimumLength = new FormControl({
+        value: bieMinLength,
+        disabled
+      }, [
+        Validators.pattern('\\s*|\\d+'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          if (!value) {
+            return null;
+          }
+          const num = Number(value);
+          if (Number.isNaN(num)) {
+            return null;
+          }
+          if (num < 0) {
+            return {min: 'Minimum Length must be greater than or equals to 0'};
+          }
+          if (!!bieMaxLength && num > bieMaxLength) {
+            return {max: 'Minimum Length ' + num + ' must be less than or equals to ' + bieMaxLength};
+          }
+          return null;
+        }
+      ]
+    );
+    this.facetMinimumLength.valueChanges.subscribe(value => {
+      if (this.facetMinimumLength.valid) {
+        value = typeof value === 'number' ? value : Number.parseInt(value, 10);
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMinLength = Number.isNaN(value) ? undefined : value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMinLength = Number.isNaN(value) ? undefined : value;
+        } else {
+          return;
+        }
+        this._setMaxLengthFormControl(node);
+      }
+    });
+  }
+
+  _setMaxLengthFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let bieMinLength;
+    let bieMaxLength;
+    if (node instanceof CcDtNodeDetail) {
+      bieMinLength = (node as CcDtNodeDetail).facetMinLength;
+      bieMaxLength = (node as CcDtNodeDetail).facetMaxLength;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      bieMinLength = (node as CcBdtScNodeDetail).facetMinLength;
+      bieMaxLength = (node as CcBdtScNodeDetail).facetMaxLength;
+    } else {
+      this.facetMaximumLength = undefined;
+      return;
+    }
+
+    this.facetMaximumLength = new FormControl({
+        value: new UnboundedPipe().transform(bieMaxLength),
+        disabled
+      }, [
+        Validators.pattern('\\s*|\\d+'),
+        // validatorFn for minimum value
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = (!!control.value) ? control.value.toString().trim() : undefined;
+          if (!value) {
+            return null;
+          }
+          const num = Number(value);
+          if (Number.isNaN(num)) {
+            return null;
+          }
+          if (num < 0) {
+            return {min: 'Maximum Length must be greater than or equals to 0'};
+          }
+          if (!!bieMinLength && num < bieMinLength) {
+            return {min: 'Maximum Length ' + num + ' must be greater than ' + bieMinLength};
+          }
+          return null;
+        }
+      ]
+    );
+    this.facetMaximumLength.valueChanges.subscribe(value => {
+      if (this.facetMaximumLength.valid) {
+        value = typeof value === 'number' ? value : Number.parseInt(value, 10);
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetMaxLength = Number.isNaN(value) ? undefined : value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetMaxLength = Number.isNaN(value) ? undefined : value;
+        } else {
+          return;
+        }
+        this._setMinLengthFormControl(node);
+      }
+    });
+  }
+
+  _setPatternFormControl(node: CcDtNodeDetail | CcBdtScNodeDetail) {
+    const disabled = !this.isEditable();
+
+    let pattern;
+    if (node instanceof CcDtNodeDetail) {
+      pattern = (node as CcDtNodeDetail).facetPattern;
+    } else if (node instanceof CcBdtScNodeDetail) {
+      pattern = (node as CcBdtScNodeDetail).facetPattern;
+    } else {
+      this.facetPattern = undefined;
+      return;
+    }
+
+    this.facetPattern = new FormControl({
+      value: pattern,
+      disabled
+    }, [
+      (control: AbstractControl): ValidationErrors | null => {
+        const value = (!!control.value) ? control.value.toString().trim() : undefined;
+        if (!value) {
+          return null;
+        }
+
+        try {
+          const regexp = new RegExp(value);
+        } catch (e) {
+          return {pattern: 'The pattern \'' + value + '\' is invalid.'};
+        }
+
+        return null;
+      }
+    ]);
+
+    this.facetPattern.valueChanges.subscribe(value => {
+      if (this.facetPattern.valid) {
+        if (node instanceof CcDtNodeDetail) {
+          (node as CcDtNodeDetail).facetPattern = value;
+        } else if (node instanceof CcBdtScNodeDetail) {
+          (node as CcBdtScNodeDetail).facetPattern = value;
+        }
+      }
+
+      this._setPatternTestFormControl();
+    });
+
+    this._setPatternTestFormControl();
+  }
+
+  _setPatternTestFormControl() {
+    this.facetPatternTest = new FormControl({
+      value: (!!this.facetPatternTest) ? this.facetPatternTest.value : '',
+      disabled: !this.facetPattern || !this.facetPattern.value || !this.facetPattern.valid
+    }, [
+      (this.facetPattern.valid) ? Validators.pattern(this.facetPattern.value) : Validators.nullValidator
+    ]);
+    this.facetPatternTestErrorStateMatcher = new FacetPatternTestShowOnDirtyErrorStateMatcher(this.facetPattern);
   }
 
   sort(list: CcBdtPriRestri[], idColumn: string): CcBdtPriRestri[] {
@@ -929,6 +1116,16 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
+  isStringTypePrimitive(cdtPrimitives: CcBdtPriRestri[]): boolean {
+    const primitives = cdtPrimitives.map(e => e.primitiveName).filter(e => !!e);
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
+      if (primitives.includes(typeName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
       width: '90%',
@@ -1284,5 +1481,13 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     } else {
       this.asBdtDetail().qualifier = '';
     }
+  }
+}
+
+class FacetPatternTestShowOnDirtyErrorStateMatcher implements ErrorStateMatcher {
+  constructor(private biePattern: FormControl) {
+  }
+  isErrorState(control: AbstractControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return (this.biePattern.dirty || control.dirty) && control.invalid;
   }
 }

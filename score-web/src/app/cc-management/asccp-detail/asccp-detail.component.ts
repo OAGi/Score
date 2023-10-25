@@ -19,7 +19,7 @@ import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail,
+  CcBccpNodeDetail, CcBdtPriRestri,
   CcBdtScNodeDetail,
   CcNodeDetail,
   CcRevisionResponse,
@@ -764,6 +764,16 @@ export class AsccpDetailComponent implements OnInit {
           }, err => {
           });
       });
+  }
+
+  isStringTypePrimitive(dtPrimitives: CcBdtPriRestri[]): boolean {
+    const primitives = dtPrimitives.map(e => e.primitiveName).filter(e => !!e);
+    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
+      if (primitives.includes(typeName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   openCoreComponent(node: CcFlatNode) {

@@ -21,6 +21,9 @@ public class BbieScNode {
         private String definition;
         private String defaultValue;
         private String fixedValue;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private CcState state;
         private List<String> cdtPrimitives = Collections.emptyList();
     }

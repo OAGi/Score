@@ -2,6 +2,7 @@ package org.oagi.score.repo.component.dt_sc;
 
 import org.oagi.score.data.RepositoryRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.node.CcBdtScPriRestri;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.math.BigInteger;
@@ -16,6 +17,9 @@ public class UpdateDtScPropertiesRepositoryRequest extends RepositoryRequest {
     private String representationTerm;
     private String defaultValue;
     private String fixedValue;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
     private Integer cardinalityMin;
     private Integer cardinalityMax;
     private String definition;
@@ -62,6 +66,32 @@ public class UpdateDtScPropertiesRepositoryRequest extends RepositoryRequest {
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+    }
+
+    public BigInteger getFacetMinLength() {
+        return facetMinLength;
+    }
+
+    public void setFacetMinLength(BigInteger facetMinLength) {
+        this.facetMinLength = facetMinLength;
+    }
+
+    public BigInteger getFacetMaxLength() {
+        return facetMaxLength;
+    }
+
+    public void setFacetMaxLength(BigInteger facetMaxLength) {
+        this.facetMaxLength = facetMaxLength;
+    }
+
+    public String getFacetPattern() {
+        return facetPattern;
+    }
+
+    public void setFacetPattern(String facetPattern) {
+        if (StringUtils.hasLength(facetPattern)) {
+            this.facetPattern = facetPattern;
+        }
     }
 
     public String getDefinition() {

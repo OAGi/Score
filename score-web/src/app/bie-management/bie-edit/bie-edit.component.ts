@@ -1334,17 +1334,31 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
-      bieMinLength = this.asBbiepDetail(detailNode).bbie.minLength;
-      bieMaxLength = this.asBbiepDetail(detailNode).bbie.maxLength;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetMinLength) {
+        bieMinLength = bbiepDetail.bdt.facetMinLength;
+        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbiepDetail.bbie.minLength;
+        bieMaxLength = bbiepDetail.bbie.maxLength;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
-      bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetMinLength) {
+        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbieScDetail.bbieSc.minLength;
+        bieMaxLength = bbieScDetail.bbieSc.maxLength;
+      }
     } else {
       this.bieMinimumLength = undefined;
       return;
@@ -1397,17 +1411,31 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
-      bieMinLength = this.asBbiepDetail(detailNode).bbie.minLength;
-      bieMaxLength = this.asBbiepDetail(detailNode).bbie.maxLength;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetMinLength) {
+        bieMinLength = bbiepDetail.bdt.facetMinLength;
+        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbiepDetail.bbie.minLength;
+        bieMaxLength = bbiepDetail.bbie.maxLength;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
-      bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetMinLength) {
+        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbieScDetail.bbieSc.minLength;
+        bieMaxLength = bbieScDetail.bbieSc.maxLength;
+      }
     } else {
       this.bieMaximumLength = undefined;
       return;
@@ -1460,14 +1488,26 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let biePattern;
     if (this.isBbiepDetail(detailNode)) {
-      biePattern = this.asBbiepDetail(detailNode).bbie.pattern;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetPattern) {
+        biePattern = bbiepDetail.bdt.facetPattern;
+        disabled = true;
+      } else {
+        biePattern = bbiepDetail.bbie.pattern;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      biePattern = this.asBbieScDetail(detailNode).bbieSc.pattern;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetPattern) {
+        biePattern = bbieScDetail.bdtSc.facetPattern;
+        disabled = true;
+      } else {
+        biePattern = bbieScDetail.bbieSc.pattern;
+      }
     } else {
       this.biePattern = undefined;
       return;

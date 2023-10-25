@@ -61,6 +61,13 @@ public class BbieScReadRepository {
         bdtSc.setDefinition(dtScRecord.getDefinition());
         bdtSc.setDefaultValue(dtScRecord.getDefaultValue());
         bdtSc.setFixedValue(dtScRecord.getFixedValue());
+        if (dtScRecord.getFacetMinLength() != null) {
+            bdtSc.setFacetMinLength(dtScRecord.getFacetMinLength().toBigInteger());
+        }
+        if (dtScRecord.getFacetMaxLength() != null) {
+            bdtSc.setFacetMaxLength(dtScRecord.getFacetMaxLength().toBigInteger());
+        }
+        bdtSc.setFacetPattern(dtScRecord.getFacetPattern());
         bdtSc.setCdtPrimitives(cdtPrimitives);
         bdtSc.setState(CcState.valueOf(
                 dslContext.select(DT.STATE)
