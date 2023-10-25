@@ -352,28 +352,42 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                                    Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
         if (!definitions.containsKey(componentName)) {
             Map<String, Object> content = toProperties(xbt);
-            if (StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
+
+            String type;
+            if (content.containsKey("type")) {
+                type = (String) content.get("type");
+            } else {
+                type = "string";
+                content.put("type", type);
+            }
+
+            boolean isTypeString = "string".equals(type);
+            boolean isTypeNumeric = "integer".equals(type) || "number".equals(type);
+
+            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
                 String minimum = facetRestri.getFacetMinInclusive();
                 content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
+                content.put("exclusiveMinimum", false);
             }
-            if (StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
+            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
                 String minimum = facetRestri.getFacetMinExclusive();
                 content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
                 content.put("exclusiveMinimum", true);
             }
-            if (StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
+            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
                 String maximum = facetRestri.getFacetMaxInclusive();
                 content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
+                content.put("exclusiveMaximum", false);
             }
-            if (StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
+            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
                 String maximum = facetRestri.getFacetMaxExclusive();
                 content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
                 content.put("exclusiveMaximum", true);
             }
-            if (facetRestri.getFacetMinLength() != null) {
+            if (isTypeString && facetRestri.getFacetMinLength() != null) {
                 content.put("minLength", facetRestri.getFacetMinLength().longValue());
             }
-            if (facetRestri.getFacetMaxLength() != null) {
+            if (isTypeString && facetRestri.getFacetMaxLength() != null) {
                 content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
             }
             if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
