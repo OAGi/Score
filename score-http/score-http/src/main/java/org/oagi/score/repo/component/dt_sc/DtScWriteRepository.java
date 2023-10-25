@@ -295,33 +295,41 @@ public class DtScWriteRepository {
                         .setNull(DT_SC.FACET_PATTERN);
             }
         }
-        if (request.getFacetMinInclusive() == null) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MIN_INCLUSIVE);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
+        if (compare(dtScRecord.getFacetMinInclusive(), request.getFacetMinInclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMinInclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MIN_INCLUSIVE);
+            }
         }
-        if (request.getFacetMinExclusive() == null) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MIN_EXCLUSIVE);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
+        if (compare(dtScRecord.getFacetMinExclusive(), request.getFacetMinExclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMinExclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MIN_EXCLUSIVE);
+            }
         }
-        if (request.getFacetMaxInclusive() == null) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MAX_INCLUSIVE);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
+        if (compare(dtScRecord.getFacetMaxInclusive(), request.getFacetMaxInclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMaxInclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MAX_INCLUSIVE);
+            }
         }
-        if (request.getFacetMaxExclusive() == null) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MAX_EXCLUSIVE);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
+        if (compare(dtScRecord.getFacetMaxExclusive(), request.getFacetMaxExclusive()) != 0) {
+            if (StringUtils.hasLength(request.getFacetMaxExclusive())) {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .set(DT_SC.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
+            } else {
+                moreStep = ((moreStep != null) ? moreStep : firstStep)
+                        .setNull(DT_SC.FACET_MAX_EXCLUSIVE);
+            }
         }
 
         if (moreStep != null) {
