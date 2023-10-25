@@ -16,6 +16,7 @@ import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-pagination-response-dialog',
@@ -39,6 +40,7 @@ export class PaginationResponseDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  release: SimpleRelease;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -52,7 +54,9 @@ export class PaginationResponseDialogComponent implements OnInit {
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
-    @Inject(MAT_DIALOG_DATA) public release: SimpleRelease) {
+    public webPageInfo: WebPageInfoService,
+    @Inject(MAT_DIALOG_DATA) public data: any) {
+    this.release = data.release;
   }
 
   ngOnInit() {
@@ -60,7 +64,7 @@ export class PaginationResponseDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.den = 'Pagination Response. Pagination Response';
     this.request.access = 'CanView';
-    this.request.releases = [this.release,];
+    this.request.releases = [this.release, ];
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

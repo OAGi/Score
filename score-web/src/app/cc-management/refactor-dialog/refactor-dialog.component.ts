@@ -9,6 +9,7 @@ import {CcList, CcListRequest} from '../cc-list/domain/cc-list';
 import {ExtensionDetailComponent} from '../extension-detail/extension-detail.component';
 import {RefactorDialogService} from './domain/refactor-dialog.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -49,6 +50,7 @@ export class RefactorDialogComponent implements OnInit {
               private accountService: AccountListService,
               private router: Router,
               private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }

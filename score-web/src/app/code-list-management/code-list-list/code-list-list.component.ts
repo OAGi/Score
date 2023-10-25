@@ -27,8 +27,9 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-code-list-list',
@@ -90,7 +91,8 @@ export class CodeListListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {

@@ -15,11 +15,13 @@ import {
   AssignableNode,
   ReleaseDetail,
   ReleaseValidationRequest,
-  ReleaseValidationResponse, ValidationMessage
+  ReleaseValidationResponse,
+  ValidationMessage
 } from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {Namespace} from '../../namespace-management/domain/namespace';
 import {filter, hashCode} from '../../common/utility';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-release-list',
@@ -58,7 +60,8 @@ export class ReleaseAssignComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private auth: AuthService,
-              private confirmDialogService: ConfirmDialogService) {
+              private confirmDialogService: ConfirmDialogService,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {

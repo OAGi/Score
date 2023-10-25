@@ -19,6 +19,7 @@ import {finalize} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {WebPageInfoService} from '../../../../basis/basis.service';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -68,6 +69,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
+    public webPageInfo: WebPageInfoService,
     public dialogRef: MatDialogRef<OasDocAssignDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {

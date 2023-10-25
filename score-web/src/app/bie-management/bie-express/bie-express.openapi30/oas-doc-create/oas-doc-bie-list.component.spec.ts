@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OasDocBieListComponent } from './oas-doc-bie-list.component';
+import {OasDocBieListComponent} from './oas-doc-bie-list.component';
 
 describe('OasDocBieListComponent', () => {
   let component: OasDocBieListComponent;

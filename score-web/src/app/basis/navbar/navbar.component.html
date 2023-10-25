@@ -1,6 +1,6 @@
-<mat-toolbar style="{{ 'background-color: ' + backgroundColor }}">
+<mat-toolbar [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet(userRole).background,
+                         'color': webPageInfo.getUserRoleColorSet(userRole).font}">
   <mat-toolbar-row>
-
     <a class="navbar-brand" routerLink="">
       <div [innerHTML]="brand"></div>
     </a>

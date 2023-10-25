@@ -22,7 +22,7 @@ export class TenantListService implements OnInit {
       params = params.set('name', request.name);
     }
 
-    return this.http.get<PageResponse<TenantList>>('/api/tenants', {params: params});
+    return this.http.get<PageResponse<TenantList>>('/api/tenants', {params});
   }
 
   getTenantInfo(tenantId: number): Observable<TenantInfo> {

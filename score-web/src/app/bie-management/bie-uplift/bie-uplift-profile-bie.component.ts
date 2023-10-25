@@ -19,6 +19,7 @@ import {Location} from '@angular/common';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-uplift-profile-bie',
@@ -26,6 +27,7 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./bie-uplift-profile-bie.component.css']
 })
 export class BieUpliftProfileBieComponent implements OnInit {
+
   title = 'Uplift BIE';
   subtitle = 'Select BIE';
 
@@ -70,7 +72,8 @@ export class BieUpliftProfileBieComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -168,7 +171,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-    this.request.releases = (!!this.sourceRelease) ? [this.sourceRelease,] : [];
+    this.request.releases = (!!this.sourceRelease) ? [this.sourceRelease, ] : [];
 
     this.bieListService.getBieListWithRequest(this.request).pipe(
       finalize(() => {

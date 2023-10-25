@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { BieUpliftComponent } from './bie-uplift.component';
+import {BieUpliftComponent} from './bie-uplift.component';
 
 describe('BieUpliftComponent', () => {
   let component: BieUpliftComponent;

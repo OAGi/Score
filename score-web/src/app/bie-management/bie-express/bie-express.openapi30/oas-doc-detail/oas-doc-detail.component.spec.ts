@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OasDocDetailComponent } from './oas-doc-detail.component';
+import {OasDocDetailComponent} from './oas-doc-detail.component';
 
 describe('OasDocDetailComponent', () => {
   let component: OasDocDetailComponent;

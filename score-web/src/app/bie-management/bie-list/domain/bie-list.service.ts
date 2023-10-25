@@ -6,7 +6,6 @@ import {AsbieBbieList, BieList, BieListRequest, SummaryBieInfo} from './bie-list
 import {PageResponse} from '../../../basis/basis';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieToAssign} from '../../../business-term-management/domain/business-term';
-import {CcList} from "../../../cc-management/cc-list/domain/cc-list";
 
 @Injectable()
 export class BieListService {
@@ -77,7 +76,7 @@ export class BieListService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
-    return this.http.get<PageResponse<BieList>>('/api/bie_list', {params: params});
+    return this.http.get<PageResponse<BieList>>('/api/bie_list', {params});
   }
 
   findBizCtxFromAbieId(id): Observable<BusinessContext> {
@@ -85,13 +84,13 @@ export class BieListService {
   }
 
   getBieUsageList(request: BieListRequest, topLevelAsbiepId: number): Observable<PageResponse<BieList>> {
-    let params = new HttpParams()
+    const params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
 
-    return this.http.get<PageResponse<BieList>>('/api/bie_list/' + topLevelAsbiepId + '/usage', {params: params});
+    return this.http.get<PageResponse<BieList>>('/api/bie_list/' + topLevelAsbiepId + '/usage', {params});
   }
 
   getBieListByBizCtxId(id): Observable<BieList[]> {
@@ -100,13 +99,13 @@ export class BieListService {
 
   delete(topLevelAsbiepIds: number[]): Observable<any> {
     return this.http.post<any>('/api/profile_bie_list/delete', {
-      topLevelAsbiepIds: topLevelAsbiepIds
+      topLevelAsbiepIds
     });
   }
 
   transferOwnership(topLevelAsbiepIds: number, targetLoginId: string): Observable<any> {
     return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepIds + '/transfer_ownership', {
-      topLevelAsbiepIds: topLevelAsbiepIds,
+      topLevelAsbiepIds,
       targetLoginId
     });
   }
@@ -168,7 +167,7 @@ export class BieListService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
-    return this.http.get<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie', {params: params});
+    return this.http.get<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie', {params});
   }
 
   confirmAsbieBbieListByIdAndType(biesToAssign: BieToAssign[]): Observable<PageResponse<AsbieBbieList>> {

@@ -1,5 +1,5 @@
 import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
-import {hashCode4String, loadBooleanProperty, sha256} from '../../common/utility';
+import {hashCode4String, sha256} from '../../common/utility';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
@@ -37,14 +37,14 @@ export interface BieFlatNode extends FlatNode {
 
   parents: BieFlatNode[];
 
+  showCopyLinkIcon: boolean;
+  queryPath: string;
+
   addChangeListener(listener: ChangeListener<BieFlatNode>);
   removeChangeListener(listener: ChangeListener<BieFlatNode>);
 
   fireChangeEvent(propertyName: string, val: any);
   reset();
-
-  showCopyLinkIcon: boolean;
-  queryPath: string;
 
 }
 
@@ -228,7 +228,7 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
 
   _bieId: number = undefined;
   _used: boolean = undefined;
-  _expanded: boolean = false;
+  _expanded = false;
   _expandable: boolean = undefined;
   required?: boolean;
   locked?: boolean;
@@ -2511,8 +2511,8 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
   dataChange = new BehaviorSubject<T[]>([]);
   _listeners: ChangeListener<BieFlatNodeDataSource<T>>[] = [];
 
-  _hideUnused: boolean = false;
-  _hideCardinality: boolean = false;
+  _hideUnused = false;
+  _hideCardinality = false;
 
   get data(): T[] {
     return this.dataChange.value;
@@ -3024,7 +3024,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
       const threshold = 100;
       let expandingLimit = 1000;
       let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0],] : [selectedNode,]) :
+        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0], ] : [selectedNode, ]) :
         this.searchedData;
       while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
         const item = data.shift();

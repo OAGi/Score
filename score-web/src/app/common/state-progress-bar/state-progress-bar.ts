@@ -1,5 +1,5 @@
 export interface StateProgressBarItem {
-  name: string,
+  name: string;
   value: number;
   href: any[];
   disabled: boolean;

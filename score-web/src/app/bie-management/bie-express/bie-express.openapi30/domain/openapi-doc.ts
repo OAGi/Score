@@ -1,12 +1,10 @@
 import {PageRequest} from '../../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode4Array, hashCode4String, md5} from '../../../../common/utility';
+import {base64Decode, base64Encode, hashCode4Array, hashCode4String} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
-import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
-import {BbieScDetail, ChangeListener} from '../../../domain/bie-flat-tree';
-import {BieToAssign} from '../../../../business-term-management/domain/business-term';
+import {ChangeListener} from '../../../domain/bie-flat-tree';
 
 export class OasDocListRequest {
   filters: {

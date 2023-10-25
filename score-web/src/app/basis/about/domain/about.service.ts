@@ -22,7 +22,9 @@ export class AboutService {
     return this.http.post('/api/info/webpage', {
       brand: webPageInfo.brand,
       favicon: webPageInfo.favicon,
-      signInStatement: webPageInfo.signInStatement
+      signInStatement: webPageInfo.signInStatement,
+      componentStateColorSetMap: webPageInfo.componentStateColorSetMap,
+      releaseStateColorSetMap: webPageInfo.releaseStateColorSetMap
     });
   }
 

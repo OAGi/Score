@@ -5,7 +5,7 @@ import {ModuleService} from '../../../domain/module.service';
 import {ModuleSetReleaseValidateResponse} from '../../../domain/module';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from "@angular/common/http";
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'score-module-set-release-validation-dialog',

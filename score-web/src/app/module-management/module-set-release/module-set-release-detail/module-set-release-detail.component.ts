@@ -5,7 +5,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {saveAs} from 'file-saver';
-import {interval, ReplaySubject, retry, retryWhen, Subject, takeUntil, timer} from 'rxjs';
+import {ReplaySubject} from 'rxjs';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../authentication/auth.service';
 import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
@@ -18,10 +18,7 @@ import {UserToken} from '../../../authentication/domain/auth';
 import {PageRequest} from '../../../basis/basis';
 import {
   ModuleSetReleaseValidationDialogComponent
-} from "./module-set-release-validation-dialog/module-set-release-validation-dialog.component";
-import {
-  AgencyIdListValueDialogComponent
-} from "../../../agency-id-list-management/agency-id-list-value-dialog/agency-id-list-value-dialog.component";
+} from './module-set-release-validation-dialog/module-set-release-validation-dialog.component';
 
 @Component({
   selector: 'score-module-set-detail',

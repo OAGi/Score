@@ -12,7 +12,7 @@ import {ModuleSetReleaseDetailComponent} from './module-set-release-detail/modul
 import {ModuleSetReleaseListComponent} from './module-set-release-list/module-set-release-list.component';
 import {
   ModuleSetReleaseValidationDialogComponent
-} from "./module-set-release-detail/module-set-release-validation-dialog/module-set-release-validation-dialog.component";
+} from './module-set-release-detail/module-set-release-validation-dialog/module-set-release-validation-dialog.component';
 
 const routes: Routes = [
   {

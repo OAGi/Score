@@ -17,6 +17,7 @@ import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Base, OagisComponentType, Semantics} from '../../domain/core-component-node';
 import {WorkingRelease} from '../../../release-management/domain/release';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -62,6 +63,7 @@ export class BasedAccDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }

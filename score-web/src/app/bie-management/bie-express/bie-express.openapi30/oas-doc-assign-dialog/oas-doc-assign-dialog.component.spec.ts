@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OasDocAssignDialogComponent } from './oas-doc-assign-dialog.component';
+import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog.component';
 
 describe('OasDocAssignDialogComponent', () => {
   let component: OasDocAssignDialogComponent;

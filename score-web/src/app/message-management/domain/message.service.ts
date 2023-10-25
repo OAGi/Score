@@ -46,7 +46,7 @@ export class MessageService {
       params = params.set('createEnd', '' + request.createdDate.end.getTime());
     }
 
-    return this.http.get<PageResponse<MessageList>>('/api/message_list', {params: params});
+    return this.http.get<PageResponse<MessageList>>('/api/message_list', {params});
   }
 
   delete(...messageIdList): Observable<any> {

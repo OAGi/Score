@@ -50,7 +50,7 @@ export class ModuleService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
-    return this.http.get<PaginationResponse<ModuleSet>>('/api/module_set', {params: params})
+    return this.http.get<PaginationResponse<ModuleSet>>('/api/module_set', {params})
       .pipe(map((resp: PaginationResponse<ModuleSet>) => {
         resp.results.forEach(e => {
           e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);
@@ -80,15 +80,15 @@ export class ModuleService {
   }
 
   createModule(module: ModuleElement): Observable<any> {
-    return this.http.put<any>('/api/module_set/'+ module.moduleSetId + '/module/create', module);
+    return this.http.put<any>('/api/module_set/' + module.moduleSetId + '/module/create', module);
   }
 
   copyModule(element: ModuleElement, moduleSetId: number, copySubModules: boolean, parentModuleId: number): Observable<any> {
     return this.http.post<any>('/api/module_set/' + moduleSetId + '/module/' + parentModuleId + '/copy', {
       targetModuleId: element.moduleId,
-      copySubModules: copySubModules,
-      moduleSetId: moduleSetId,
-      parentModuleId: parentModuleId
+      copySubModules,
+      moduleSetId,
+      parentModuleId
     });
 
   }
@@ -109,11 +109,12 @@ export class ModuleService {
       moduleSetReleaseDescription: moduleSetRelease.moduleSetReleaseDescription,
       releaseId: moduleSetRelease.releaseId,
       moduleSetId: moduleSetRelease.moduleSetId,
-      default: moduleSetRelease.default
+      default: moduleSetRelease.default,
+      baseModuleSetReleaseId: undefined
     };
 
     if (basedModuleSetReleaseId) {
-      params['baseModuleSetReleaseId'] = basedModuleSetReleaseId;
+      params.baseModuleSetReleaseId = basedModuleSetReleaseId;
     }
     return this.http.put<ModuleSetRelease>('/api/module_set_release', params);
   }
@@ -136,7 +137,7 @@ export class ModuleService {
   }
 
   getModules(moduleSetId: number): Observable<any> {
-    let url = '/api/module_set/' + moduleSetId + '/modules';
+    const url = '/api/module_set/' + moduleSetId + '/modules';
     return this.http.get<any>(url);
   }
 
@@ -198,7 +199,7 @@ export class ModuleService {
     if (request.isDefault) {
       params = params.set('default', request.isDefault);
     }
-    return this.http.get<PaginationResponse<ModuleSetRelease>>('/api/module_set_release_list', {params: params})
+    return this.http.get<PaginationResponse<ModuleSetRelease>>('/api/module_set_release_list', {params})
       .pipe(map((resp: PaginationResponse<ModuleSetRelease>) => {
         resp.results.forEach(e => {
           e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);

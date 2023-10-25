@@ -4,7 +4,12 @@ import {AccountListDialogComponent} from './account-list-dialog/account-list-dia
 import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
-import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanActivateUser} from '../authentication/auth.service';
+import {
+  CanActivateAdmin,
+  CanActivateDeveloper,
+  CanActivateTenantInstance,
+  CanActivateUser
+} from '../authentication/auth.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
