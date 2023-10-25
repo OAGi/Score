@@ -776,6 +776,16 @@ export class AsccpDetailComponent implements OnInit {
     return false;
   }
 
+  isNumericTypePrimitive(dtPrimitives: CcBdtPriRestri[]): boolean {
+    const primitives = dtPrimitives.map(e => e.primitiveName).filter(e => !!e);
+    for (const typeName of ['Decimal', 'Double', 'Float', 'Integer', 'TimeDuration', 'TimePoint']) {
+      if (primitives.includes(typeName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   openCoreComponent(node: CcFlatNode) {
     window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
   }
