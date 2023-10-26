@@ -52,7 +52,7 @@ public class OpenAPIGenerateController {
         GetOasDocResponse getOasDocResponse = oasDocService.getOasDoc(getOasDocRequest);
         if (bieListForOasDoc != null) {
             for (BieForOasDoc bieForOasDoc : bieListForOasDoc) {
-                String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName();
+                String paramsKey = bieForOasDoc.getVerb() + bieForOasDoc.getResourceName() + bieForOasDoc.getMessageBody();
                 GetAssignedOasTagRequest getAssignedOasTagRequest = new GetAssignedOasTagRequest(authenticationService.asScoreUser(user));
                 getAssignedOasTagRequest.setOasOperationId(bieForOasDoc.getOasOperationId());
                 getAssignedOasTagRequest.setMessageBodyType(bieForOasDoc.getMessageBody());

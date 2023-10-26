@@ -254,6 +254,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ASCCP basedAsccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
             String bieName = getBieName(topLevelAsbiep);
             String pathName = option.getResourceName();
+            String verbKey = option.getVerb().toLowerCase();
+            Map<String, Object> existingPath = new LinkedHashMap<>();
             if (paths.isEmpty() || !paths.containsKey(pathName)) {
                 paths.put(pathName, pathMap);
                 pathMap.put("summary", "");
@@ -261,7 +263,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 pathMap.put(option.getVerb().toLowerCase(), path);
             } else {
                 Map<String, Object> existingPathMap = (Map<String, Object>)paths.get(pathName);
-                existingPathMap.put(option.getVerb().toLowerCase(), path);
+                if (!existingPathMap.containsKey(verbKey)){
+                    existingPathMap.put(verbKey, path);
+                }else{
+                    existingPath =(Map<String, Object>)existingPathMap.get(verbKey);
+                }
             }
             boolean isDifferentForGetAndPost = option.isTwoTemplateOptionDifferent("GET", "POST");
             boolean isDifferentForGetAndPatch = option.isTwoTemplateOptionDifferent("GET", "PATCH");
@@ -271,126 +277,31 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             String patchTemplateKey = "PATCH-" + option.getResourceName();
             String putTemplateKey = "PUT-" + option.getResourceName();
             String deleteTemplateKey = "DELETE-" + option.getResourceName();
-            if (option.getOpenAPI30TemplateMap().containsKey(getTemplateKey)) {
-                String schemaName;
-                String prefix = "query";
-                // Issue #1302
-                if (isDifferentForGetAndPost) {
-                    prefix = "query";
-                }
-                if (isFriendly()) {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                } else {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                }
 
-                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                    option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
-                }
-                boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
-                boolean isId = pathName.contains("{id}");
-                path.put("summary", "");
-                path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                                .put("OAuth2", Arrays.asList(bieName + "Read"))
-                                .build()));
-                if (option.getTagName() != null){
-                    path.put("tags", Arrays.asList(option.getTagName()));
-                }
-                path.put("operationId", option.getOperationId());
-                path.put("parameters", Arrays.asList(
-                                ImmutableMap.<String, Object>builder()
-                                        .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
-                                        .put("in", "" + ((isId) ? "path" : "query"))
-                                        .put("description", "")
-                                        .put("required", ((isId) ? true : false))
-                                        .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
-                                                .put("type", "string")
-                                                .put("format", "date-time")
-                                                .build() : ImmutableMap.<String, Object>builder()
-                                                .put("type", "string")
-                                                .build())
-                                        .build()
-
-                        ));
-                if (option.getMessageBodyType().equals("Response")){
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build());
-                }else{
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "").build())
-                            .build());
-                }
-                if (!isFriendly() && !schemas.containsKey("integer")) {
-                    schemas.put("integer", ImmutableMap.<String, Object>builder()
-                            .put("type", "integer")
-                            .build());
-                }
-
-                if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                    fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
-                }
-                // Issue #1483
-                if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
-                            .put("type", "array")
-                            .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName + "ListEntry")
-                                    .build())
-                            .build());
-
-                    if (!schemas.containsKey(schemaName + "ListEntry")) {
-                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                        schemas.put(schemaName + "ListEntry", properties);
+            if (existingPath.size() > 0){
+                if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
+                    String schemaName;
+                    String prefix = "";
+                    if (option.getMessageBodyType().equals("Request")){
+                        prefix = "create";
+                    }else if(option.getMessageBodyType().equals("Response")){
+                        prefix = "query";
                     }
-                }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
 
-            }
-
-            if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
-                String schemaName;
-                String responseSchemaName;
-                String prefix = "create";
-                // Issue #1302
-                if (isDifferentForGetAndPost) {
-                    prefix = "create";
-                }
-                if (isFriendly()) {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                } else {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                }
-
-                responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-
-                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                    option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
-                }
-                boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
-                path.put("summary", "");
-                path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                                .put("OAuth2", Arrays.asList(bieName + "Write"))
-                                .build()));
-                if (option.getTagName() != null){
-                    path.put("tags", Arrays.asList(option.getTagName()));
-                }
-                path.put("operationId", option.getOperationId());
-                path.put("requestBody", ImmutableMap.<String, Object>builder()
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
+                    if (option.getTagName() != null && !existingPath.containsKey("tags")){
+                        existingPath.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    if (option.getMessageBodyType().equals("Request")){
+                        existingPath.put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
@@ -400,172 +311,72 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                 .build())
                                         .build())
                                 .build());
-                if (option.getMessageBodyType().equals("Response")){
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build());
-                } else{
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "").build())
-                            .build());
-                }
-                if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                    fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
-                }
-
-                // Issue #1483
-                if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
-                            .put("type", "array")
-                            .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
-                                    .build())
-                            .build());
-
-                    if (!schemas.containsKey(schemaName + "ListEntry")) {
-                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                        schemas.put(schemaName + "ListEntry", properties);
                     }
-                }
-            }
-
-            if (option.getOpenAPI30TemplateMap().containsKey(putTemplateKey)) {
-                String schemaName;
-                String responseSchemaName;
-                String prefix = "replace";
-                // Issue #1302
-                if (isDifferentForGetAndPut) {
-                    prefix = "replace";
-                }
-                if (isFriendly()) {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                } else {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                }
-
-                responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-
-                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                    option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
-                }
-                boolean isArray = option.getOpenAPI30TemplateMap().get(putTemplateKey).isArrayForJsonExpression();
-                path.put("summary", "");
-                path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (option.getTagName() != null){
-                    path.put("tags", Arrays.asList(option.getTagName()));
-                }
-                path.put("operationId", option.getOperationId());
-                path.put("requestBody", ImmutableMap.<String, Object>builder()
-                        .put("description", "")
-                        .put("content", ImmutableMap.<String, Object>builder()
-                                .put("application/json", ImmutableMap.<String, Object>builder()
-                                        .put("schema", ImmutableMap.<String, Object>builder()
-                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                    if (option.getMessageBodyType().equals("Response")){
+                        existingPath.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                                .build())
+                                                        .build())
                                                 .build())
                                         .build())
-                                .build())
-                        .build());
-                if (option.getMessageBodyType().equals("Response")){
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build());
-                }else{
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "").build())
-                            .build());
-                }
-                if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                    fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
-                }
-
-                // Issue #1483
-                if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
-                            .put("type", "array")
-                            .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
-                                    .build())
-                            .build());
-
-                    if (!schemas.containsKey(schemaName + "ListEntry")) {
-                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                        schemas.put(schemaName + "ListEntry", properties);
+                                .build());
+                    } else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
                     }
-                }
-            }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
 
-            if (option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)) {
-                String schemaName;
-                String responseSchemaName;
-                String prefix = "update";
-                if (isDifferentForGetAndPatch) {
-                    prefix = "create";
-                }
-                if (isFriendly()) {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                } else {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                }
-                responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
 
-                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                    option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
-                }
-                boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
-                boolean isId = pathName.contains("{id}");
-                path.put("summary", "");
-                path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                                .put("OAuth2", Arrays.asList(bieName + "Write"))
-                                .build()));
-                if (option.getTagName() != null){
-                    path.put("tags", Arrays.asList(option.getTagName()));
-                }
-                path.put("operationId", option.getOperationId());
-                path.put("parameters", Arrays.asList(
-                                ImmutableMap.<String, Object>builder()
-                                        .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
-                                        .put("in", "" + ((isId) ? "path" : "query"))
-                                        .put("description", "")
-                                        .put("required", ((isId) ? true : false))
-                                        .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
-                                                .put("type", "string")
-                                                .put("format", "date-time")
-                                                .build() : ImmutableMap.<String, Object>builder()
-                                                .put("type", "string")
-                                                .build())
-                                        .build()
-                        ));
-                path.put("requestBody", ImmutableMap.<String, Object>builder()
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                }//end option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)
+
+                if (option.getOpenAPI30TemplateMap().containsKey(putTemplateKey)) {
+                    String schemaName;
+                    String prefix = "";
+                    if (option.getMessageBodyType().equals("Request")){
+                        prefix = "replace";
+                    }else if(option.getMessageBodyType().equals("Response")){
+                        prefix = "query";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(putTemplateKey).isArrayForJsonExpression();
+                    if (option.getTagName() != null && !existingPath.containsKey("tags")){
+                        existingPath.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    if (option.getMessageBodyType().equals("Request")){
+                        existingPath.put("requestBody", ImmutableMap.<String, Object>builder()
                                 .put("description", "")
                                 .put("content", ImmutableMap.<String, Object>builder()
                                         .put("application/json", ImmutableMap.<String, Object>builder()
@@ -575,114 +386,545 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                                 .build())
                                         .build())
                                 .build());
-                if (option.getMessageBodyType().equals("Response")){
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
+                    }
+                    if (option.getMessageBodyType().equals("Response")){
+                        existingPath.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        existingPath.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                }//end option.getOpenAPI30TemplateMap().containsKey(putTemplateKey)
+
+                if (option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)) {
+                    String schemaName;
+                    String prefix = "";
+                    if (option.getMessageBodyType().equals("Request")){
+                        prefix = "update";
+                    }else if(option.getMessageBodyType().equals("Response")){
+                        prefix = "query";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
+                    boolean isId = pathName.contains("{id}");
+                    if (option.getTagName() != null && !existingPath.containsKey("tags")){
+                        existingPath.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    if (option.getMessageBodyType().equals("Request")){
+                        existingPath.put("requestBody", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }
+                    if (option.getMessageBodyType().equals("Response")){
+                        existingPath.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        existingPath.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                } // end option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)
+            }
+            else{//existingPath == null
+                if (option.getOpenAPI30TemplateMap().containsKey(getTemplateKey)) {
+                    String schemaName;
+                    String prefix = "query";
+                    // Issue #1302
+                    if (isDifferentForGetAndPost) {
+                        prefix = "query";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
+                    boolean isId = pathName.contains("{id}");
+                    path.put("summary", "");
+                    path.put("description", "");
+                    path.put("security", Arrays.asList(ImmutableMap.builder()
+                            .put("OAuth2", Arrays.asList(bieName + "Read"))
+                            .build()));
+                    if (option.getTagName() != null){
+                        path.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    path.put("operationId", option.getOperationId());
+                    path.put("parameters", Arrays.asList(
+                            ImmutableMap.<String, Object>builder()
+                                    .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
+                                    .put("in", "" + ((isId) ? "path" : "query"))
                                     .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
-                                                            .build())
-                                                    .build())
+                                    .put("required", ((isId) ? true : false))
+                                    .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
+                                            .put("type", "string")
+                                            .put("format", "date-time")
+                                            .build() : ImmutableMap.<String, Object>builder()
+                                            .put("type", "string")
                                             .build())
-                                    .build())
-                            .build());
-                }else{
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "").build())
-                            .build());
-                }
-                if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                    fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
-                }
+                                    .build()
 
-                // Issue #1483
-                if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
-                            .put("type", "array")
-                            .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
-                                    .build())
-                            .build());
+                    ));
+                    if (option.getMessageBodyType().equals("Response")){
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!isFriendly() && !schemas.containsKey("integer")) {
+                        schemas.put("integer", ImmutableMap.<String, Object>builder()
+                                .put("type", "integer")
+                                .build());
+                    }
 
-                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                    if (!schemas.containsKey(schemaName)) {
                         Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                         fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                        schemas.put(schemaName + "ListEntry", properties);
+                        schemas.put(schemaName, properties);
                     }
-                }
-            }
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName + "ListEntry")
+                                        .build())
+                                .build());
 
-            if (option.getOpenAPI30TemplateMap().containsKey(deleteTemplateKey)) {
-                String schemaName;
-                String responseSchemaName;
-                String prefix = "delete";
-                if (isFriendly()) {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                } else {
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                }
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
 
-                responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-
-                if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                    option.getOpenAPI30TemplateMap().get(deleteTemplateKey).setSuppressRootProperty(true);
-                }
-                boolean isArray = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isArrayForJsonExpression();
-                path.put("summary", "");
-                path.put("description", "");
-                path.put("security", Arrays.asList(ImmutableMap.builder()
-                        .put("OAuth2", Arrays.asList(bieName + "Write"))
-                        .build()));
-                if (option.getTagName() != null){
-                    path.put("tags", Arrays.asList(option.getTagName()));
-                }
-                path.put("operationId", option.getOperationId());
-                if (option.getMessageBodyType().equals("Response")){
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build());
-                }else{
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "").build())
-                            .build());
-                }
-                if (!schemas.containsKey(schemaName)) {
-                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                    fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                    schemas.put(schemaName, properties);
                 }
 
-                // Issue #1483
-                if (isArray && !schemas.containsKey(schemaName + "List")) {
-                    schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
-                            .put("type", "array")
-                            .put("items", ImmutableMap.<String, Object>builder()
-                                    .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
-                                    .build())
-                            .build());
+                if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
+                    String schemaName;
+                    String prefix = "";
+                    if (option.getMessageBodyType().equals("Request")){
+                        prefix = "create";
+                    }else if(option.getMessageBodyType().equals("Response")){
+                        prefix = "query";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
 
-                    if (!schemas.containsKey(schemaName + "ListEntry")) {
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
+                    path.put("summary", "");
+                    path.put("description", "");
+                    path.put("security", Arrays.asList(ImmutableMap.builder()
+                            .put("OAuth2", Arrays.asList(bieName + "Write"))
+                            .build()));
+                    if (option.getTagName() != null){
+                        path.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    path.put("operationId", option.getOperationId());
+                    if (option.getMessageBodyType().equals("Request")){
+                        path.put("requestBody", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }
+                    if (option.getMessageBodyType().equals("Response")){
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    } else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
                         Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                        fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                        schemas.put(schemaName + "ListEntry", properties);
+                        fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
                     }
                 }
+
+                if (option.getOpenAPI30TemplateMap().containsKey(putTemplateKey)) {
+                    String schemaName;
+                    String responseSchemaName;
+                    String prefix = "replace";
+                    // Issue #1302
+                    if (isDifferentForGetAndPut) {
+                        prefix = "replace";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+
+                    responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(putTemplateKey).isArrayForJsonExpression();
+                    path.put("summary", "");
+                    path.put("description", "");
+                    path.put("security", Arrays.asList(ImmutableMap.builder()
+                            .put("OAuth2", Arrays.asList(bieName + "Write"))
+                            .build()));
+                    if (option.getTagName() != null){
+                        path.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    path.put("operationId", option.getOperationId());
+                    if (option.getMessageBodyType().equals("Request")){
+                        path.put("requestBody", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }
+                    if (option.getMessageBodyType().equals("Response")){
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                }
+
+                if (option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)) {
+                    String schemaName;
+                    String responseSchemaName;
+                    String prefix = "update";
+                    if (isDifferentForGetAndPatch) {
+                        prefix = "create";
+                    }
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+                    responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
+                    boolean isId = pathName.contains("{id}");
+                    path.put("summary", "");
+                    path.put("description", "");
+                    path.put("security", Arrays.asList(ImmutableMap.builder()
+                            .put("OAuth2", Arrays.asList(bieName + "Write"))
+                            .build()));
+                    if (option.getTagName() != null){
+                        path.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    path.put("operationId", option.getOperationId());
+                    path.put("parameters", Arrays.asList(
+                            ImmutableMap.<String, Object>builder()
+                                    .put("name", "" + ((isArray) ? "sinceLastDateTime" : "id"))
+                                    .put("in", "" + ((isId) ? "path" : "query"))
+                                    .put("description", "")
+                                    .put("required", ((isId) ? true : false))
+                                    .put("schema", (isArray) ? ImmutableMap.<String, Object>builder()
+                                            .put("type", "string")
+                                            .put("format", "date-time")
+                                            .build() : ImmutableMap.<String, Object>builder()
+                                            .put("type", "string")
+                                            .build())
+                                    .build()
+                    ));
+                    if (option.getMessageBodyType().equals("Request")){
+                        path.put("requestBody", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + ((isArray) ? schemaName + "List" : schemaName))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }
+                    if (option.getMessageBodyType().equals("Response")){
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                }
+
+                if (option.getOpenAPI30TemplateMap().containsKey(deleteTemplateKey)) {
+                    String schemaName;
+                    String responseSchemaName;
+                    String prefix = "delete";
+                    if (isFriendly()) {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    } else {
+                        schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    }
+
+                    responseSchemaName = "query" + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+
+                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
+                        option.getOpenAPI30TemplateMap().get(deleteTemplateKey).setSuppressRootProperty(true);
+                    }
+                    boolean isArray = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isArrayForJsonExpression();
+                    path.put("summary", "");
+                    path.put("description", "");
+                    path.put("security", Arrays.asList(ImmutableMap.builder()
+                            .put("OAuth2", Arrays.asList(bieName + "Write"))
+                            .build()));
+                    if (option.getTagName() != null){
+                        path.put("tags", Arrays.asList(option.getTagName()));
+                    }
+                    path.put("operationId", option.getOperationId());
+                    if (option.getMessageBodyType().equals("Response")){
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "")
+                                        .put("content", ImmutableMap.<String, Object>builder()
+                                                .put("application/json", ImmutableMap.<String, Object>builder()
+                                                        .put("schema", ImmutableMap.<String, Object>builder()
+                                                                .put("$ref", "#/components/schemas/" + ((isArray) ? responseSchemaName + "List" : responseSchemaName))
+                                                                .build())
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build());
+                    }else{
+                        path.put("responses", ImmutableMap.<String, Object>builder()
+                                .put("200", ImmutableMap.<String, Object>builder()
+                                        .put("description", "").build())
+                                .build());
+                    }
+                    if (!schemas.containsKey(schemaName)) {
+                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                        fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                        schemas.put(schemaName, properties);
+                    }
+
+                    // Issue #1483
+                    if (isArray && !schemas.containsKey(schemaName + "List")) {
+                        schemas.put(schemaName + "List", ImmutableMap.<String, Object>builder()
+                                .put("type", "array")
+                                .put("items", ImmutableMap.<String, Object>builder()
+                                        .put("$ref", "#/components/schemas/" + schemaName +"ListEntry")
+                                        .build())
+                                .build());
+
+                        if (!schemas.containsKey(schemaName + "ListEntry")) {
+                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                            schemas.put(schemaName + "ListEntry", properties);
+                        }
+                    }
+                }
+
             }
+
 
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
