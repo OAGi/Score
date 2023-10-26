@@ -498,7 +498,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public WebElement getOpenAPIExpressionRadioButton() {
-        return getRadioButtonByName("Open API 3.0 (Template)");
+        return getRadioButtonByName("OpenAPI 3.0 (Template)");
     }
 
     @Override
