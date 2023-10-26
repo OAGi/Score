@@ -17,6 +17,7 @@ public class ASBIE implements BIE {
     private int cardinalityMin;
     private int cardinalityMax;
     private boolean nillable;
+    private boolean deprecated;
     private String remark;
     private BigInteger createdBy = BigInteger.ZERO;
     private BigInteger lastUpdatedBy = BigInteger.ZERO;

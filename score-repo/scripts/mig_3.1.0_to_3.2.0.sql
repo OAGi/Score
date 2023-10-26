@@ -167,6 +167,12 @@ VALUES ('score.pages.colors.cc-state.WIP.background', 'String', '#d32f2f'),
        ('score.pages.colors.user-role.End-User.background', 'String', '#f5f5f5'),
        ('score.pages.colors.user-role.End-User.font', 'String', '#212121');
 
+-- Issue #1298
+-- Add `is_deprecated` column to `asbie`, `bbie`, and `bbie_sc` tables.
+ALTER TABLE `asbie` ADD COLUMN `is_deprecated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indicates whether the ASBIE is deprecated.' AFTER `is_used`;
+ALTER TABLE `bbie` ADD COLUMN `is_deprecated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indicates whether the BBIE is deprecated.' AFTER `is_used`;
+ALTER TABLE `bbie_sc` ADD COLUMN `is_deprecated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indicates whether the BBIE_SC is deprecated.' AFTER `is_used`;
+
 -- Issue #1492
 -- Add tables for OpenAPI documents
 SET FOREIGN_KEY_CHECKS = 0;

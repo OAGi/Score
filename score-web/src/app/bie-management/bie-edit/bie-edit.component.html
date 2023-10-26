@@ -168,14 +168,14 @@
                                       [matTooltipDisabled]="getNodeTooltip(node) === ''">
                         </mat-checkbox>
 
-                        <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
-                          node.deprecated ? 'deprecated' : 'dummy',
-                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                          this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd']"
+                        <span [class]="['align-self-center', node.type.toLowerCase(),
+                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                              [class.deprecated]="node.deprecated"
+                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
-                        <span [class]="['pl-2']" *ngIf="!dataSource.hideCardinality">
+                        <span [class]="['pl-3']" *ngIf="!dataSource.hideCardinality">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                         </span>
 
@@ -424,7 +424,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [disabled]="!isUsable(selectedNode)"
@@ -436,7 +436,16 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsbiepDetail().asbie.deprecated"
+                                          [disabled]="!isEditable(selectedNode)">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAsbiepDetail().asbie.nillable"
@@ -448,6 +457,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -677,7 +687,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [checked]="used(selectedNode)"
@@ -689,7 +699,16 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbiepDetail().bbie.deprecated"
+                                          [disabled]="!isEditable(selectedNode)">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbiepDetail().bbie.nillable"
@@ -701,6 +720,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -879,11 +899,14 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
-                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
-                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span>{{ codeList.name }}</span>
                                       <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -904,11 +927,14 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
-                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
-                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span>{{ agency.name }}</span>
                                       <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -1100,7 +1126,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-11">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [checked]="used(selectedNode)"
@@ -1112,6 +1138,17 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbieScDetail().bbieSc.deprecated"
+                                          [disabled]="!isEditable(selectedNode)">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3"></div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -1283,11 +1320,14 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
-                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
-                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span>{{ codeList.name }}</span>
                                       <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -1308,11 +1348,14 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
-                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
-                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span>{{ agency.name }}</span>
                                       <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>

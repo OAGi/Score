@@ -50,6 +50,8 @@ public class BbieSc extends Auditable {
 
     private String example;
 
+    private boolean deprecated;
+
     private boolean used;
 
     private BigInteger ownerTopLevelAsbiepId;
@@ -252,6 +254,14 @@ public class BbieSc extends Auditable {
 
     public void setExample(String example) {
         this.example = example;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public boolean isUsed() {

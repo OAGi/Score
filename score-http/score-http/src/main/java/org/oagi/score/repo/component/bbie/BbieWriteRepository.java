@@ -84,6 +84,10 @@ public class BbieWriteRepository {
                 bbieRecord.setIsNillable((byte) (bbie.getNillable() ? 1 : 0));
             }
 
+            if (bbie.getDeprecated() != null) {
+                bbieRecord.setIsDeprecated((byte) (bbie.getDeprecated() ? 1 : 0));
+            }
+
             bbieRecord.setDefinition(bbie.getDefinition());
             BccRecord bccRecord = bccReadRepository.getBccByManifestId(bbie.getBasedBccManifestId());
             if (bccRecord == null) {
@@ -223,6 +227,10 @@ public class BbieWriteRepository {
                 bbieRecord.setIsNillable((byte) (bbie.getNillable() ? 1 : 0));
             }
 
+            if (bbie.getDeprecated() != null) {
+                bbieRecord.setIsDeprecated((byte) (bbie.getDeprecated() ? 1 : 0));
+            }
+
             if (bbie.getDefinition() != null) {
                 bbieRecord.setDefinition(emptyToNull(bbie.getDefinition()));
             }
@@ -322,6 +330,7 @@ public class BbieWriteRepository {
                         BBIE.SEQ_KEY,
                         BBIE.IS_USED,
                         BBIE.IS_NILLABLE,
+                        BBIE.IS_DEPRECATED,
                         BBIE.DEFINITION,
                         BBIE.CARDINALITY_MIN,
                         BBIE.CARDINALITY_MAX,

@@ -237,6 +237,7 @@ public class JooqBieWriteRepository
         asbieRecord.setCardinalityMax(asbie.getCardinalityMax());
         asbieRecord.setIsNillable((byte) (asbie.isNillable() ? 1 : 0));
         asbieRecord.setRemark(asbie.getRemark());
+        asbieRecord.setIsDeprecated((byte) (asbie.isDeprecated() ? 1 : 0));
         asbieRecord.setIsUsed((byte) (asbie.isUsed() ? 1 : 0));
         asbieRecord.setSeqKey(BigDecimal.ZERO);
         asbieRecord.setCreatedBy(userId);
@@ -297,6 +298,7 @@ public class JooqBieWriteRepository
         bbieRecord.setIsNull((byte) 0);
         bbieRecord.setRemark(bbie.getRemark());
         bbieRecord.setExample(bbie.getExample());
+        bbieRecord.setIsDeprecated((byte) (bbie.isDeprecated() ? 1 : 0));
         bbieRecord.setIsUsed((byte) (bbie.isUsed() ? 1 : 0));
         bbieRecord.setSeqKey(BigDecimal.ZERO);
         bbieRecord.setCreatedBy(userId);
@@ -355,6 +357,7 @@ public class JooqBieWriteRepository
         bbieScRecord.setBizTerm(bbieSc.getBizTerm());
         bbieScRecord.setRemark(bbieSc.getRemark());
         bbieScRecord.setExample(bbieSc.getExample());
+        bbieScRecord.setIsDeprecated((byte) (bbieSc.isDeprecated() ? 1 : 0));
         bbieScRecord.setIsUsed((byte) (bbieSc.isUsed() ? 1 : 0));
         bbieScRecord.setCreatedBy(userId);
         bbieScRecord.setLastUpdatedBy(userId);

@@ -47,6 +47,7 @@ public class BBIERepository implements ScoreRepository<BBIE> {
                 Tables.BBIE.DEFINITION,
                 Tables.BBIE.REMARK,
                 Tables.BBIE.EXAMPLE,
+                Tables.BBIE.IS_DEPRECATED.as("deprecated"),
                 Tables.BBIE.CREATED_BY,
                 Tables.BBIE.CREATION_TIMESTAMP,
                 Tables.BBIE.LAST_UPDATED_BY,

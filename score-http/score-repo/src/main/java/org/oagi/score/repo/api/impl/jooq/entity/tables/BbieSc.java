@@ -245,6 +245,12 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     public final TableField<BbieScRecord, Byte> IS_USED = createField(DSL.name("is_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.");
 
     /**
+     * The column <code>oagi.bbie_sc.is_deprecated</code>. Indicates whether the
+     * BBIE_SC is deprecated.
+     */
+    public final TableField<BbieScRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the BBIE_SC is deprecated.");
+
+    /**
      * The column <code>oagi.bbie_sc.created_by</code>. A foreign key referring
      * to the user who creates the BBIE_SC. The creator of the BBIE_SC is also
      * its owner by default.
