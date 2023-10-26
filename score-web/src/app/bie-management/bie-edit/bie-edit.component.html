@@ -171,6 +171,7 @@
                         <span [class]="['align-self-center', node.type.toLowerCase(),
                                         this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                               [class.deprecated]="node.deprecated"
+                              [matTooltip]="node.deprecated ? 'Deprecated' : ''"
                               [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
@@ -440,7 +441,8 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAsbiepDetail().asbie.deprecated"
-                                          [disabled]="!isEditable(selectedNode)">
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
                               Deprecated
                             </mat-checkbox>
                           </div>
@@ -703,7 +705,8 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbiepDetail().bbie.deprecated"
-                                          [disabled]="!isEditable(selectedNode)">
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
                               Deprecated
                             </mat-checkbox>
                           </div>
@@ -1142,7 +1145,8 @@
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbieScDetail().bbieSc.deprecated"
-                                          [disabled]="!isEditable(selectedNode)">
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
                               Deprecated
                             </mat-checkbox>
                           </div>

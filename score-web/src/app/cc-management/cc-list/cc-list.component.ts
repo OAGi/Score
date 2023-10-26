@@ -411,20 +411,17 @@ export class CcListComponent implements OnInit {
           return;
         }
         this.loading = true;
-        this.service.updateStateOnList(actionType, toState, this.selection.selected)
-          .pipe(
-            finalize(() => {
-              this.loading = false;
-            })
-          )
-          .subscribe(_ => {
-            this.loadCcList();
-            this.snackBar.open(notiMsg, '', {
-              duration: 3000
-            });
-            this.selection.clear();
-          }, error => {
+        this.service.updateStateOnList(actionType, toState, this.selection.selected).subscribe(_ => {
+          this.loadCcList();
+          this.snackBar.open(notiMsg, '', {
+            duration: 3000
           });
+          this.selection.clear();
+
+          this.loading = false;
+        }, error => {
+            this.loading = false;
+        });
       });
   }
 

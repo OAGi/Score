@@ -14,6 +14,7 @@ export interface BieFlatNode extends FlatNode {
   bieType: string;
   topLevelAsbiepId: number;
   deprecated: boolean;
+  ccDeprecated: boolean;
   rootNode: BieEditAbieNode;
   inverseMode: boolean;
 
@@ -87,6 +88,8 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
 
   abstract get cardinalityMin(): number;
   abstract get cardinalityMax(): number;
+
+  abstract get ccDeprecated(): boolean;
 
   get parents(): BieFlatNode[] {
     let node: BieFlatNode = this;
@@ -393,6 +396,10 @@ export class AbieFlatNode extends BieFlatNodeImpl {
   get cardinalityMax(): number {
     return 1;
   }
+
+  get ccDeprecated(): boolean {
+    return this.asccpNode.deprecated || this.accNode.deprecated;
+  }
 }
 
 export class AsbiepFlatNode extends AbieFlatNode {
@@ -501,6 +508,11 @@ export class AsbiepFlatNode extends AbieFlatNode {
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
   }
+
+  get ccDeprecated(): boolean {
+    return this.asccpNode.deprecated || this.accNode.deprecated || this.asccNode.deprecated;
+  }
+
 }
 
 export class BbiepFlatNode extends BieFlatNodeImpl {
@@ -629,6 +641,10 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
   }
+
+  get ccDeprecated(): boolean {
+    return this.bccpNode.deprecated || this.bdtNode.deprecated || this.bccNode.deprecated;
+  }
 }
 
 export class BbieScFlatNode extends BieFlatNodeImpl {
@@ -704,6 +720,10 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
 
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
+  }
+
+  get ccDeprecated(): boolean {
+    return this.bdtScNode.deprecated;
   }
 }
 
@@ -881,6 +901,10 @@ export class WrappedBieFlatNode implements BieFlatNode {
 
   get deprecated(): boolean {
     return this._node.deprecated;
+  }
+
+  get ccDeprecated(): boolean {
+    return this._node.ccDeprecated;
   }
 
   get inverseMode(): boolean {
@@ -2426,7 +2450,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
-        node.deprecated = used[0].deprecated;
+        node.deprecated = node.ccDeprecated || used[0].deprecated;
       }
     }
 
@@ -2445,7 +2469,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
-        node.deprecated = used[0].deprecated;
+        node.deprecated = node.ccDeprecated || used[0].deprecated;
       }
     }
 
@@ -2464,7 +2488,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
-        node.deprecated = used[0].deprecated;
+        node.deprecated = node.ccDeprecated || used[0].deprecated;
       }
     }
 
@@ -2602,7 +2626,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       node.isCycle = this.detectCycle(node);
     }
 
-    node.deprecated = node.asccpNode.deprecated || node.accNode.deprecated || node.asccNode.deprecated;
+    node.deprecated = node.ccDeprecated;
     node.dataSource = this.dataSource;
     return node;
   }
@@ -2632,7 +2656,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     }
     node.topLevelAsbiepId = parent.topLevelAsbiepId;
 
-    node.deprecated = node.bccpNode.deprecated || node.bdtNode.deprecated || node.bccNode.deprecated;
+    node.deprecated = node.ccDeprecated;
     node.dataSource = this.dataSource;
     return node;
   }
