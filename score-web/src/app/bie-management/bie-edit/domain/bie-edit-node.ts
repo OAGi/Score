@@ -291,7 +291,7 @@ export class UsedBie {
   ownerTopLevelAsbiepId: number;
   cardinalityMin: number;
   cardinalityMax: number;
-  deprecated: number;
+  deprecated: boolean;
 
   constructor(obj) {
     this.used = obj && obj.used;
