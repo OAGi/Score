@@ -25,7 +25,7 @@
         <junit.platform.version>1.10.0</junit.platform.version>
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
         <commons-lang.version>3.13.0</commons-lang.version>
-        <org.springframework.version>6.0.12</org.springframework.version>
+        <org.springframework.version>6.0.13</org.springframework.version>
         <gson.version>2.10.1</gson.version>
     </properties>
 
