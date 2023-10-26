@@ -460,6 +460,21 @@ public class BccpWriteRepository {
         bccpRecord.update(BCCP.STATE,
                 BCCP.LAST_UPDATED_BY, BCCP.LAST_UPDATE_TIMESTAMP, BCCP.OWNER_USER_ID);
 
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = bccpRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong bccpManifestId = bccpManifestRecord.getBccpManifestId();
+
+                dslContext.update(BBIE.join(BBIEP).on(BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID)))
+                        .set(BBIE.IS_DEPRECATED, isDeprecated)
+                        .where(BBIEP.BASED_BCCP_MANIFEST_ID.eq(bccpManifestId))
+                        .execute();
+            }
+        }
+
         // creates new log for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
                 ? LogAction.Restored : LogAction.Modified;

@@ -678,6 +678,27 @@ public class AccWriteRepository {
         updateAsccListForStateUpdatedRecord(accManifestRecord, accRecord, nextState, userId, timestamp);
         updateBccListForStateUpdatedRecord(accManifestRecord, accRecord, nextState, userId, timestamp);
 
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = accRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong accManifestId = accManifestRecord.getAccManifestId();
+
+                dslContext.update(ASBIE.join(ABIE).on(ASBIE.FROM_ABIE_ID.eq(ABIE.ABIE_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ABIE.BASED_ACC_MANIFEST_ID.eq(accManifestId))
+                        .execute();
+
+                dslContext.update(ASBIE.join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                                .join(ABIE).on(ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.ABIE_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ABIE.BASED_ACC_MANIFEST_ID.eq(accManifestId))
+                        .execute();
+            }
+        }
+
         // creates new revision for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
                 ? LogAction.Restored : LogAction.Modified;
@@ -727,6 +748,21 @@ public class AccWriteRepository {
             asccRecord.setLastUpdateTimestamp(timestamp);
             asccRecord.update(ASCC.FROM_ACC_ID, ASCC.TO_ASCCP_ID, ASCC.STATE,
                     ASCC.LAST_UPDATED_BY, ASCC.LAST_UPDATE_TIMESTAMP, ASCC.OWNER_USER_ID);
+
+            // Post-processing
+            if (nextState == CcState.Published || nextState == CcState.Production) {
+                // Issue #1298
+                // Update 'deprecated' properties in associated BIEs
+                byte isDeprecated = asccRecord.getIsDeprecated();
+                if (isDeprecated == 1) {
+                    ULong asccManifestId = asccManifestRecord.getAsccManifestId();
+
+                    dslContext.update(ASBIE)
+                            .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                            .where(ASBIE.BASED_ASCC_MANIFEST_ID.eq(asccManifestId))
+                            .execute();
+                }
+            }
         }
     }
 
@@ -764,6 +800,21 @@ public class AccWriteRepository {
             bccRecord.setLastUpdateTimestamp(timestamp);
             bccRecord.update(BCC.FROM_ACC_ID, BCC.TO_BCCP_ID, BCC.STATE,
                     BCC.LAST_UPDATED_BY, BCC.LAST_UPDATE_TIMESTAMP, BCC.OWNER_USER_ID);
+
+            // Post-processing
+            if (nextState == CcState.Published || nextState == CcState.Production) {
+                // Issue #1298
+                // Update 'deprecated' properties in associated BIEs
+                byte isDeprecated = bccRecord.getIsDeprecated();
+                if (isDeprecated == 1) {
+                    ULong bccManifestId = bccManifestRecord.getBccManifestId();
+
+                    dslContext.update(BBIE)
+                            .set(BBIE.IS_DEPRECATED, isDeprecated)
+                            .where(BBIE.BASED_BCC_MANIFEST_ID.eq(bccManifestId))
+                            .execute();
+                }
+            }
         }
     }
 

@@ -493,6 +493,27 @@ public class AsccpWriteRepository {
         asccpRecord.update(ASCCP.STATE,
                 ASCCP.LAST_UPDATED_BY, ASCCP.LAST_UPDATE_TIMESTAMP, ASCCP.OWNER_USER_ID);
 
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = asccpRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong asccpManifestId = asccpManifestRecord.getAsccpManifestId();
+
+                dslContext.update(ASBIE.join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                        .execute();
+
+                dslContext.update(ASBIE.join(ABIE).on(ASBIE.FROM_ABIE_ID.eq(ABIE.ABIE_ID))
+                                .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                        .execute();
+            }
+        }
+
         // creates new log for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
                 ? LogAction.Restored : LogAction.Modified;

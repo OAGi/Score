@@ -935,6 +935,24 @@ public class DtWriteRepository {
         dtRecord.update(DT.STATE,
                 DT.LAST_UPDATED_BY, DT.LAST_UPDATE_TIMESTAMP, DT.OWNER_USER_ID);
 
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = dtRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong dtManifestId = dtManifestRecord.getDtManifestId();
+
+                dslContext.update(BBIE_SC.join(BBIE).on(BBIE_SC.BBIE_ID.eq(BBIE.BBIE_ID))
+                                .join(BBIEP).on(BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID))
+                                .join(BCCP_MANIFEST).on(BBIEP.BASED_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
+                        .set(BBIE.IS_DEPRECATED, isDeprecated)
+                        .set(BBIE_SC.IS_DEPRECATED, isDeprecated)
+                        .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestId))
+                        .execute();
+            }
+        }
+
         // creates new log for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
                 ? LogAction.Restored : LogAction.Modified;

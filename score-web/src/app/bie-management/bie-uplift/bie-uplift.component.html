@@ -135,6 +135,7 @@
                     <span [class]="['align-self-center', node.typeClass.toLowerCase(),
                                     this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                           [class.deprecated]="node.deprecated"
+                          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
                           [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
                           [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
                     </span>
@@ -268,6 +269,7 @@
                     <span [class]="['align-self-center', node.typeClass.toLowerCase(),
                                     this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                           [class.deprecated]="node.deprecated"
+                          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
                           [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
                           [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                     </span>
