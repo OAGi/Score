@@ -1,17 +1,17 @@
 .mat-column-openAPIVersion {
-  width: 120px;
+  width: 200px;
 }
 
 .mat-column-version {
-  width: 120px;
+  width: 200px;
 }
 
 .mat-column-licenseName {
-  width: 160px;
+  width: 250px;
 }
 
-.mat-column-description {
-  width: 400px;
+.mat-column-title {
+  width: 600px;
 }
 
 .mat-column-lastUpdateTimestamp {
