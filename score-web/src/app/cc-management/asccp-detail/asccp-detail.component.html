@@ -1254,9 +1254,9 @@
                       <div class="row">
                         <div class="col-12 pb-3">
                           <mat-card>
-                            <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
+                            <mat-card-subtitle>Facets for Numeric Value Domains</mat-card-subtitle>
                             <mat-card-content>
-                              <div class="row" *ngIf="isNumericTypePrimitive(asBccpDetail().bdt.bdtPriRestriList)">
+                              <div class="row">
                                 <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Minimum Inclusive"
@@ -1286,15 +1286,25 @@
                                   </mat-form-field>
                                 </div>
                               </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for String Value Domains</mat-card-subtitle>
+                            <mat-card-content>
                               <div class="row">
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBccpDetail().bdt.bdtPriRestriList)">
+                                <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Minimum Length"
                                            [(ngModel)]="asBccpDetail().bdt.facetMinLength"
                                            [disabled]="true">
                                   </mat-form-field>
                                 </div>
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBccpDetail().bdt.bdtPriRestriList)">
+                                <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Maximum Length"
                                            [(ngModel)]="asBccpDetail().bdt.facetMaxLength"
@@ -1457,9 +1467,9 @@
                       <div class="row">
                         <div class="col-12 pb-3">
                           <mat-card>
-                            <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
+                            <mat-card-subtitle>Facets for Numeric Value Domains</mat-card-subtitle>
                             <mat-card-content>
-                              <div class="row" *ngIf="isNumericTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
+                              <div class="row">
                                 <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Minimum Inclusive"
@@ -1489,15 +1499,25 @@
                                   </mat-form-field>
                                 </div>
                               </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for String Value Domains</mat-card-subtitle>
+                            <mat-card-content>
                               <div class="row">
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
+                                <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Minimum Length"
                                            [(ngModel)]="asBdtScDetail().facetMinLength"
                                            [disabled]="true">
                                   </mat-form-field>
                                 </div>
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
+                                <div class="col-3">
                                   <mat-form-field>
                                     <input matInput placeholder="Maximum Length"
                                            [(ngModel)]="asBdtScDetail().facetMaxLength"

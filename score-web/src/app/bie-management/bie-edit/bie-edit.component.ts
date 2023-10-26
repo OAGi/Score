@@ -1014,24 +1014,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return validState.indexOf(state) > -1;
   }
 
-  isStringTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
-      if (cdtPrimitives.includes(typeName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  isNumericTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['Decimal', 'Double', 'Float', 'Integer', 'TimeDuration', 'TimePoint']) {
-      if (cdtPrimitives.includes(typeName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   goToBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
     let bieId: number;
     if (bieType === 'ASBIE') {

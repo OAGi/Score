@@ -1320,26 +1320,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
   }
 
-  isStringTypePrimitive(cdtPrimitives: CcBdtPriRestri[]): boolean {
-    const primitives = cdtPrimitives.map(e => e.primitiveName).filter(e => !!e);
-    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
-      if (primitives.includes(typeName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  isNumericTypePrimitive(cdtPrimitives: CcBdtPriRestri[]): boolean {
-    const primitives = cdtPrimitives.map(e => e.primitiveName).filter(e => !!e);
-    for (const typeName of ['Decimal', 'Double', 'Float', 'Integer', 'TimeDuration', 'TimePoint']) {
-      if (primitives.includes(typeName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
       width: '90%',

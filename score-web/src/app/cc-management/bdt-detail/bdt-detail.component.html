@@ -518,137 +518,6 @@
 
                       <div class="row">
                         <div class="col-12 pb-3">
-                          <mat-card>
-                            <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
-                            <mat-card-content>
-                              <div class="row" *ngIf="isNumericTypePrimitive(asBdtDetail().bdtPriRestriList)">
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Inclusive"
-                                           [formControl]="facetMinimumInclusive">
-                                    <mat-error
-                                      *ngIf="!facetMinimumInclusive.hasError('min') && facetMinimumInclusive.hasError('pattern')">
-                                      '{{ facetMinimumInclusive.value }}' is not allowed for Minimum Inclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumInclusive.hasError('min')">
-                                      {{ facetMinimumInclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumInclusive.hasError('max')">
-                                      {{ facetMinimumInclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Exclusive"
-                                           [formControl]="facetMinimumExclusive">
-                                    <mat-error
-                                      *ngIf="!facetMinimumExclusive.hasError('min') && facetMinimumExclusive.hasError('pattern')">
-                                      '{{ facetMinimumExclusive.value }}' is not allowed for Minimum Exclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumExclusive.hasError('min')">
-                                      {{ facetMinimumExclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumExclusive.hasError('max')">
-                                      {{ facetMinimumExclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Inclusive"
-                                           [formControl]="facetMaximumInclusive">
-                                    <mat-error
-                                      *ngIf="!facetMaximumInclusive.hasError('min') && facetMaximumInclusive.hasError('pattern')">
-                                      '{{ facetMaximumInclusive.value }}' is not allowed for Maximum Inclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumInclusive.hasError('min')">
-                                      {{ facetMaximumInclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumInclusive.hasError('max')">
-                                      {{ facetMaximumInclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Exclusive"
-                                           [formControl]="facetMaximumExclusive">
-                                    <mat-error
-                                      *ngIf="!facetMaximumExclusive.hasError('min') && facetMaximumExclusive.hasError('pattern')">
-                                      '{{ facetMaximumExclusive.value }}' is not allowed for Maximum Exclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumExclusive.hasError('min')">
-                                      {{ facetMaximumExclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumExclusive.hasError('max')">
-                                      {{ facetMaximumExclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtDetail().bdtPriRestriList)">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Length"
-                                           [formControl]="facetMinimumLength">
-                                    <mat-error
-                                      *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
-                                      '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumLength.hasError('min')">
-                                      {{ facetMinimumLength.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumLength.hasError('max')">
-                                      {{ facetMinimumLength.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtDetail().bdtPriRestriList)">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Length"
-                                           [formControl]="facetMaximumLength">
-                                    <mat-error
-                                      *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
-                                      '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumLength.hasError('min')">
-                                      {{ facetMaximumLength.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumLength.hasError('max')">
-                                      {{ facetMaximumLength.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Pattern"
-                                           [formControl]="facetPattern">
-                                    <mat-error *ngIf="facetPattern.hasError('pattern')">
-                                      {{ facetPattern.getError('pattern') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Pattern Test"
-                                           [formControl]="facetPatternTest" [errorStateMatcher]="facetPatternTestErrorStateMatcher">
-                                    <mat-error *ngIf="facetPatternTest.hasError('pattern')">
-                                      The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
-                                    </mat-error>
-                                    <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
-                                      The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
-                                    </mat-hint>
-                                  </mat-form-field>
-                                </div>
-                              </div>
-                            </mat-card-content>
-                          </mat-card>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12 pb-3">
                           <mat-expansion-panel #dtValueDomain style="margin-bottom: 8px !important;">
                             <mat-expansion-panel-header>
                               <mat-panel-title>Value Domain</mat-panel-title>
@@ -761,6 +630,147 @@
                               </mat-toolbar-row>
                             </mat-toolbar>
                           </mat-expansion-panel>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for Numeric Value Domains</mat-card-subtitle>
+                            <mat-card-content>
+                              <div class="row">
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Inclusive"
+                                           [formControl]="facetMinimumInclusive">
+                                    <mat-error
+                                      *ngIf="!facetMinimumInclusive.hasError('min') && facetMinimumInclusive.hasError('pattern')">
+                                      '{{ facetMinimumInclusive.value }}' is not allowed for Minimum Inclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumInclusive.hasError('min')">
+                                      {{ facetMinimumInclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumInclusive.hasError('max')">
+                                      {{ facetMinimumInclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Exclusive"
+                                           [formControl]="facetMinimumExclusive">
+                                    <mat-error
+                                      *ngIf="!facetMinimumExclusive.hasError('min') && facetMinimumExclusive.hasError('pattern')">
+                                      '{{ facetMinimumExclusive.value }}' is not allowed for Minimum Exclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumExclusive.hasError('min')">
+                                      {{ facetMinimumExclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumExclusive.hasError('max')">
+                                      {{ facetMinimumExclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Inclusive"
+                                           [formControl]="facetMaximumInclusive">
+                                    <mat-error
+                                      *ngIf="!facetMaximumInclusive.hasError('min') && facetMaximumInclusive.hasError('pattern')">
+                                      '{{ facetMaximumInclusive.value }}' is not allowed for Maximum Inclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumInclusive.hasError('min')">
+                                      {{ facetMaximumInclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumInclusive.hasError('max')">
+                                      {{ facetMaximumInclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Exclusive"
+                                           [formControl]="facetMaximumExclusive">
+                                    <mat-error
+                                      *ngIf="!facetMaximumExclusive.hasError('min') && facetMaximumExclusive.hasError('pattern')">
+                                      '{{ facetMaximumExclusive.value }}' is not allowed for Maximum Exclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumExclusive.hasError('min')">
+                                      {{ facetMaximumExclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumExclusive.hasError('max')">
+                                      {{ facetMaximumExclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for String Value Domains</mat-card-subtitle>
+                            <mat-card-content>
+                              <div class="row">
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Length"
+                                           [formControl]="facetMinimumLength">
+                                    <mat-error
+                                      *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
+                                      '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumLength.hasError('min')">
+                                      {{ facetMinimumLength.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumLength.hasError('max')">
+                                      {{ facetMinimumLength.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Length"
+                                           [formControl]="facetMaximumLength">
+                                    <mat-error
+                                      *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
+                                      '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumLength.hasError('min')">
+                                      {{ facetMaximumLength.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumLength.hasError('max')">
+                                      {{ facetMaximumLength.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Pattern"
+                                           [formControl]="facetPattern">
+                                    <mat-error *ngIf="facetPattern.hasError('pattern')">
+                                      {{ facetPattern.getError('pattern') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Pattern Test"
+                                           [formControl]="facetPatternTest" [errorStateMatcher]="facetPatternTestErrorStateMatcher">
+                                    <mat-error *ngIf="facetPatternTest.hasError('pattern')">
+                                      The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
+                                    </mat-error>
+                                    <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
+                                      The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
+                                    </mat-hint>
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
                         </div>
                       </div>
 
@@ -990,137 +1000,6 @@
 
                       <div class="row">
                         <div class="col-12 pb-3">
-                          <mat-card>
-                            <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
-                            <mat-card-content>
-                              <div class="row" *ngIf="isNumericTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Inclusive"
-                                           [formControl]="facetMinimumInclusive">
-                                    <mat-error
-                                      *ngIf="!facetMinimumInclusive.hasError('min') && facetMinimumInclusive.hasError('pattern')">
-                                      '{{ facetMinimumInclusive.value }}' is not allowed for Minimum Inclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumInclusive.hasError('min')">
-                                      {{ facetMinimumInclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumInclusive.hasError('max')">
-                                      {{ facetMinimumInclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Exclusive"
-                                           [formControl]="facetMinimumExclusive">
-                                    <mat-error
-                                      *ngIf="!facetMinimumExclusive.hasError('min') && facetMinimumExclusive.hasError('pattern')">
-                                      '{{ facetMinimumExclusive.value }}' is not allowed for Minimum Exclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumExclusive.hasError('min')">
-                                      {{ facetMinimumExclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumExclusive.hasError('max')">
-                                      {{ facetMinimumExclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Inclusive"
-                                           [formControl]="facetMaximumInclusive">
-                                    <mat-error
-                                      *ngIf="!facetMaximumInclusive.hasError('min') && facetMaximumInclusive.hasError('pattern')">
-                                      '{{ facetMaximumInclusive.value }}' is not allowed for Maximum Inclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumInclusive.hasError('min')">
-                                      {{ facetMaximumInclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumInclusive.hasError('max')">
-                                      {{ facetMaximumInclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Exclusive"
-                                           [formControl]="facetMaximumExclusive">
-                                    <mat-error
-                                      *ngIf="!facetMaximumExclusive.hasError('min') && facetMaximumExclusive.hasError('pattern')">
-                                      '{{ facetMaximumExclusive.value }}' is not allowed for Maximum Exclusive
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumExclusive.hasError('min')">
-                                      {{ facetMaximumExclusive.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumExclusive.hasError('max')">
-                                      {{ facetMaximumExclusive.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Minimum Length"
-                                           [formControl]="facetMinimumLength">
-                                    <mat-error
-                                      *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
-                                      '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumLength.hasError('min')">
-                                      {{ facetMinimumLength.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMinimumLength.hasError('max')">
-                                      {{ facetMinimumLength.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3" *ngIf="isStringTypePrimitive(asBdtScDetail().bdtScPriRestriList)">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Maximum Length"
-                                           [formControl]="facetMaximumLength">
-                                    <mat-error
-                                      *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
-                                      '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumLength.hasError('min')">
-                                      {{ facetMaximumLength.getError('min') }}
-                                    </mat-error>
-                                    <mat-error *ngIf="facetMaximumLength.hasError('max')">
-                                      {{ facetMaximumLength.getError('max') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Pattern"
-                                           [formControl]="facetPattern">
-                                    <mat-error *ngIf="facetPattern.hasError('pattern')">
-                                      {{ facetPattern.getError('pattern') }}
-                                    </mat-error>
-                                  </mat-form-field>
-                                </div>
-                                <div class="col-3">
-                                  <mat-form-field>
-                                    <input matInput placeholder="Pattern Test"
-                                           [formControl]="facetPatternTest" [errorStateMatcher]="facetPatternTestErrorStateMatcher">
-                                    <mat-error *ngIf="facetPatternTest.hasError('pattern')">
-                                      The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
-                                    </mat-error>
-                                    <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
-                                      The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
-                                    </mat-hint>
-                                  </mat-form-field>
-                                </div>
-                              </div>
-                            </mat-card-content>
-                          </mat-card>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-12 pb-3">
                           <mat-expansion-panel #dtScValueDomain style="margin-bottom: 8px !important;">
                             <mat-expansion-panel-header>
                               <mat-panel-title>Value Domain</mat-panel-title>
@@ -1232,6 +1111,147 @@
                               </mat-toolbar-row>
                             </mat-toolbar>
                           </mat-expansion-panel>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for Numeric Value Domains</mat-card-subtitle>
+                            <mat-card-content>
+                              <div class="row">
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Inclusive"
+                                           [formControl]="facetMinimumInclusive">
+                                    <mat-error
+                                      *ngIf="!facetMinimumInclusive.hasError('min') && facetMinimumInclusive.hasError('pattern')">
+                                      '{{ facetMinimumInclusive.value }}' is not allowed for Minimum Inclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumInclusive.hasError('min')">
+                                      {{ facetMinimumInclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumInclusive.hasError('max')">
+                                      {{ facetMinimumInclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Exclusive"
+                                           [formControl]="facetMinimumExclusive">
+                                    <mat-error
+                                      *ngIf="!facetMinimumExclusive.hasError('min') && facetMinimumExclusive.hasError('pattern')">
+                                      '{{ facetMinimumExclusive.value }}' is not allowed for Minimum Exclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumExclusive.hasError('min')">
+                                      {{ facetMinimumExclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumExclusive.hasError('max')">
+                                      {{ facetMinimumExclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Inclusive"
+                                           [formControl]="facetMaximumInclusive">
+                                    <mat-error
+                                      *ngIf="!facetMaximumInclusive.hasError('min') && facetMaximumInclusive.hasError('pattern')">
+                                      '{{ facetMaximumInclusive.value }}' is not allowed for Maximum Inclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumInclusive.hasError('min')">
+                                      {{ facetMaximumInclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumInclusive.hasError('max')">
+                                      {{ facetMaximumInclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Exclusive"
+                                           [formControl]="facetMaximumExclusive">
+                                    <mat-error
+                                      *ngIf="!facetMaximumExclusive.hasError('min') && facetMaximumExclusive.hasError('pattern')">
+                                      '{{ facetMaximumExclusive.value }}' is not allowed for Maximum Exclusive
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumExclusive.hasError('min')">
+                                      {{ facetMaximumExclusive.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumExclusive.hasError('max')">
+                                      {{ facetMaximumExclusive.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12 pb-3">
+                          <mat-card>
+                            <mat-card-subtitle>Facets for String Value Domains</mat-card-subtitle>
+                            <mat-card-content>
+                              <div class="row">
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Minimum Length"
+                                           [formControl]="facetMinimumLength">
+                                    <mat-error
+                                      *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
+                                      '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumLength.hasError('min')">
+                                      {{ facetMinimumLength.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMinimumLength.hasError('max')">
+                                      {{ facetMinimumLength.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Maximum Length"
+                                           [formControl]="facetMaximumLength">
+                                    <mat-error
+                                      *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
+                                      '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumLength.hasError('min')">
+                                      {{ facetMaximumLength.getError('min') }}
+                                    </mat-error>
+                                    <mat-error *ngIf="facetMaximumLength.hasError('max')">
+                                      {{ facetMaximumLength.getError('max') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Pattern"
+                                           [formControl]="facetPattern">
+                                    <mat-error *ngIf="facetPattern.hasError('pattern')">
+                                      {{ facetPattern.getError('pattern') }}
+                                    </mat-error>
+                                  </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                  <mat-form-field>
+                                    <input matInput placeholder="Pattern Test"
+                                           [formControl]="facetPatternTest" [errorStateMatcher]="facetPatternTestErrorStateMatcher">
+                                    <mat-error *ngIf="facetPatternTest.hasError('pattern')">
+                                      The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
+                                    </mat-error>
+                                    <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
+                                      The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
+                                    </mat-hint>
+                                  </mat-form-field>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
                         </div>
                       </div>
 
