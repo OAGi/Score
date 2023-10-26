@@ -57,6 +57,7 @@ public class BbieNode {
         private String defaultValue;
         private String fixedValue;
         private String example;
+        private Boolean deprecated;
 
         private BigInteger bdtPriRestriId;
         private BigInteger codeListManifestId;

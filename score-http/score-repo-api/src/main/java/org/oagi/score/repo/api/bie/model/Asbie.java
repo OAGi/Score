@@ -28,6 +28,8 @@ public class Asbie implements BieAssociation {
 
     private String remark;
 
+    private boolean deprecated;
+
     private boolean used;
 
     private BigInteger ownerTopLevelAsbiepId;
@@ -126,6 +128,14 @@ public class Asbie implements BieAssociation {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public boolean isUsed() {

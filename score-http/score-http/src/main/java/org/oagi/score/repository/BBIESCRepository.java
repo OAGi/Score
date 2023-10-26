@@ -46,6 +46,7 @@ public class BBIESCRepository implements ScoreRepository<BBIESC> {
                 Tables.BBIE_SC.REMARK,
                 Tables.BBIE_SC.BIZ_TERM,
                 Tables.BBIE_SC.EXAMPLE,
+                Tables.BBIE_SC.IS_DEPRECATED.as("deprecated"),
                 Tables.BBIE_SC.IS_USED.as("used"),
                 Tables.BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(Tables.BBIE_SC);

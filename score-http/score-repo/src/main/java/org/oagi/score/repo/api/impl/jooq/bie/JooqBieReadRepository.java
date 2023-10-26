@@ -159,6 +159,7 @@ public class JooqBieReadRepository
                 ASBIE.CARDINALITY_MIN,
                 ASBIE.CARDINALITY_MAX,
                 ASBIE.IS_NILLABLE,
+                ASBIE.IS_DEPRECATED,
                 ASBIE.IS_USED,
                 ASBIE.DEFINITION,
                 ASBIE.REMARK,
@@ -179,6 +180,7 @@ public class JooqBieReadRepository
             asbie.setCardinalityMin(record.get(ASBIE.CARDINALITY_MIN));
             asbie.setCardinalityMax(record.get(ASBIE.CARDINALITY_MAX));
             asbie.setNillable((byte) 1 == record.get(ASBIE.IS_NILLABLE));
+            asbie.setDeprecated((byte) 1 == record.get(ASBIE.IS_DEPRECATED));
             asbie.setUsed((byte) 1 == record.get(ASBIE.IS_USED));
             asbie.setDefinition(record.get(ASBIE.DEFINITION));
             asbie.setRemark(record.get(ASBIE.REMARK));
@@ -204,6 +206,7 @@ public class JooqBieReadRepository
                 BBIE.FIXED_VALUE,
                 BBIE.IS_NILLABLE,
                 BBIE.IS_NULL,
+                BBIE.IS_DEPRECATED,
                 BBIE.IS_USED,
                 BBIE.DEFINITION,
                 BBIE.REMARK,
@@ -233,6 +236,7 @@ public class JooqBieReadRepository
             bbie.setDefaultValue(record.get(BBIE.DEFAULT_VALUE));
             bbie.setFixedValue(record.get(BBIE.FIXED_VALUE));
             bbie.setNillable((byte) 1 == record.get(BBIE.IS_NILLABLE));
+            bbie.setDeprecated((byte) 1 == record.get(BBIE.IS_DEPRECATED));
             bbie.setUsed((byte) 1 == record.get(BBIE.IS_USED));
             bbie.setDefinition(record.get(BBIE.DEFINITION));
             bbie.setRemark(record.get(BBIE.REMARK));
@@ -316,6 +320,7 @@ public class JooqBieReadRepository
                 BBIE_SC.CARDINALITY_MAX,
                 BBIE_SC.DEFAULT_VALUE,
                 BBIE_SC.FIXED_VALUE,
+                BBIE_SC.IS_DEPRECATED,
                 BBIE_SC.IS_USED,
                 BBIE_SC.DEFINITION,
                 BBIE_SC.BIZ_TERM,
@@ -344,6 +349,7 @@ public class JooqBieReadRepository
             bbieSc.setCardinalityMax(record.get(BBIE_SC.CARDINALITY_MAX));
             bbieSc.setDefaultValue(record.get(BBIE_SC.DEFAULT_VALUE));
             bbieSc.setFixedValue(record.get(BBIE_SC.FIXED_VALUE));
+            bbieSc.setDeprecated((byte) 1 == record.get(BBIE_SC.IS_DEPRECATED));
             bbieSc.setUsed((byte) 1 == record.get(BBIE_SC.IS_USED));
             bbieSc.setDefinition(record.get(BBIE_SC.DEFINITION));
             bbieSc.setBizTerm(record.get(BBIE_SC.BIZ_TERM));

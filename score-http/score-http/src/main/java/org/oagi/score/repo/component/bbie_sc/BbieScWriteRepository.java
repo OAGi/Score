@@ -68,8 +68,12 @@ public class BbieScWriteRepository {
                     ))
                     .fetchOneInto(ULong.class));
 
-            if (bbieSc.getUsed() != null){
+            if (bbieSc.getUsed() != null) {
                 bbieScRecord.setIsUsed((byte) (bbieSc.getUsed() ? 1 : 0));
+            }
+
+            if (bbieSc.getDeprecated() != null) {
+                bbieScRecord.setIsDeprecated((byte) (bbieSc.getDeprecated() ? 1 : 0));
             }
             
             bbieScRecord.setDefinition(bbieSc.getDefinition());
@@ -205,6 +209,10 @@ public class BbieScWriteRepository {
                 bbieScRecord.setIsUsed((byte) (bbieSc.getUsed() ? 1 : 0));
             }
 
+            if (bbieSc.getDeprecated() != null) {
+                bbieScRecord.setIsDeprecated((byte) (bbieSc.getDeprecated() ? 1 : 0));
+            }
+
             if (bbieSc.getDefinition() != null) {
                 bbieScRecord.setDefinition(emptyToNull(bbieSc.getDefinition()));
             }
@@ -307,6 +315,7 @@ public class BbieScWriteRepository {
 
                 bbieScRecord.update(
                         BBIE_SC.IS_USED,
+                        BBIE_SC.IS_DEPRECATED,
                         BBIE_SC.DEFINITION,
                         BBIE_SC.CARDINALITY_MIN,
                         BBIE_SC.CARDINALITY_MAX,

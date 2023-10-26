@@ -60,6 +60,7 @@ public class BbieScNode {
         private String defaultValue;
         private String fixedValue;
         private String example;
+        private Boolean deprecated;
 
         private BigInteger bdtScPriRestriId;
         private BigInteger codeListManifestId;

@@ -1137,6 +1137,7 @@ export class AsbieDetail {
   private _cardinalityMax: number;
   private _nillable: boolean;
   private _remark: string;
+  private _deprecated: boolean;
 
   constructor(node: AsbiepFlatNode) {
     this._node = node;
@@ -1189,6 +1190,16 @@ export class AsbieDetail {
     this._node.fireChangeEvent('remark', value);
   }
 
+  get deprecated(): boolean {
+    return this._deprecated;
+  }
+
+  set deprecated(value: boolean) {
+    this._deprecated = value;
+    this._node.deprecated = value;
+    this._node.fireChangeEvent('deprecated', value);
+  }
+
   get used(): boolean {
     return this._node.used as boolean;
   }
@@ -1230,6 +1241,7 @@ export class AsbieDetail {
       this.cardinalityMax = obj.cardinalityMax;
       this.nillable = obj.nillable;
       this.remark = obj.remark;
+      this.deprecated = obj.deprecated;
       this.seqKey = 0;
     }
   }
@@ -1242,7 +1254,8 @@ export class AsbieDetail {
       ((this.cardinalityMax) ? this.cardinalityMax : 0) +
       (((this.nillable) ? 1231 : 1237)) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((this.seqKey) ? this.seqKey : 0);
+      ((this.seqKey) ? this.seqKey : 0) +
+      ((this.deprecated) ? 1231 : 1237);
   }
 
   get json(): any {
@@ -1256,6 +1269,7 @@ export class AsbieDetail {
       remark: this.remark,
       seqKey: this.seqKey,
       used: this.used,
+      deprecated: this.deprecated,
       basedAsccManifestId: this.basedAsccManifestId,
       path: this.path,
       hashPath: this.hashPath,
@@ -1387,6 +1401,7 @@ export class BbieDetail {
   private _fixedValue: string;
   fixedOrDefault: string;
   private _example: string;
+  private _deprecated: boolean;
 
   valueDomainType: string;
   private _bdtPriRestriId: number;
@@ -1534,6 +1549,16 @@ export class BbieDetail {
     this._node.fireChangeEvent('example', value);
   }
 
+  get deprecated(): boolean {
+    return this._deprecated;
+  }
+
+  set deprecated(value: boolean) {
+    this._deprecated = value;
+    this._node.deprecated = value;
+    this._node.fireChangeEvent('deprecated', value);
+  }
+
   get bdtPriRestriId(): number {
     return this._bdtPriRestriId;
   }
@@ -1609,7 +1634,7 @@ export class BbieDetail {
       this.facetMaxInclusive = obj.facetMaxInclusive;
       this.facetMaxExclusive = obj.facetMaxExclusive;
       this.definition = obj.definition;
-
+      this.deprecated = obj.deprecated;
       this.nillable = obj.nillable;
       this.remark = obj.remark;
       if (!(obj.defaultValue == null && obj.fixedValue == null)) {
@@ -1645,6 +1670,7 @@ export class BbieDetail {
       ((!!this.facetMaxInclusive) ? hashCode4String(this.facetMaxInclusive) : 0) +
       ((!!this.facetMaxExclusive) ? hashCode4String(this.facetMaxExclusive) : 0) +
       ((this.nillable) ? 1231 : 1237) +
+      ((this.deprecated) ? 1231 : 1237) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
@@ -1670,6 +1696,7 @@ export class BbieDetail {
       facetMaxInclusive: this.facetMaxInclusive,
       facetMaxExclusive: this.facetMaxExclusive,
       nillable: this.nillable,
+      deprecated: this.deprecated,
       remark: this.remark,
       example: this.example,
       defaultValue: this.defaultValue,
@@ -1795,6 +1822,7 @@ export class BbieScDetail {
   private _fixedValue: string;
   fixedOrDefault: string;
   private _example: string;
+  private _deprecated: boolean;
 
   valueDomainType: string;
   private _bdtScPriRestriId: number;
@@ -1942,6 +1970,16 @@ export class BbieScDetail {
     this._node.fireChangeEvent('example', value);
   }
 
+  get deprecated(): boolean {
+    return this._deprecated;
+  }
+
+  set deprecated(value: boolean) {
+    this._deprecated = value;
+    this._node.deprecated = value;
+    this._node.fireChangeEvent('deprecated', value);
+  }
+
   get bdtScPriRestriId(): number {
     return this._bdtScPriRestriId;
   }
@@ -2009,6 +2047,7 @@ export class BbieScDetail {
       this.defaultValue = obj.defaultValue;
       this.fixedValue = obj.fixedValue;
       this.example = obj.example;
+      this.deprecated = obj.deprecated;
       if (obj.agencyIdListManifestId) {
         this.agencyIdListManifestId = obj.agencyIdListManifestId;
         this.valueDomainType = 'Agency';
@@ -2038,6 +2077,7 @@ export class BbieScDetail {
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
+      ((this.deprecated) ? 1231 : 1237) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
       ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
       ((this.bdtScPriRestriId) ? this.bdtScPriRestriId : 0) +
@@ -2062,6 +2102,7 @@ export class BbieScDetail {
       bizTerm: this.bizTerm,
       remark: this.remark,
       example: this.example,
+      deprecated: this.deprecated,
       defaultValue: this.defaultValue,
       fixedValue: this.fixedValue,
       bdtScPriRestriId: this.bdtScPriRestriId,
@@ -2143,6 +2184,7 @@ export class BieEditAsbiepNodeDetail extends BieEditNodeDetail {
     this.asbie = new AsbieDetail(node as AsbiepFlatNode);
     this.asbiep = new AsbiepDetail(node as AsbiepFlatNode);
     this.asbie.seqKey = 0;
+    this.asbie.deprecated = node.deprecated;
     this.reset();
   }
 
@@ -2176,6 +2218,7 @@ export class BieEditBbiepNodeDetail extends BieEditNodeDetail {
     this.bbiep = new BbiepDetail(node as BbiepFlatNode);
     this.bdt = new BdtDetail(node as BbiepFlatNode);
     this.bbie.seqKey = 0;
+    this.bbie.deprecated = node.deprecated;
     this.reset();
   }
 
@@ -2208,6 +2251,7 @@ export class BieEditBbieScNodeDetail extends BieEditNodeDetail {
     this._node = node;
     this.bbieSc = new BbieScDetail(node as BbieScFlatNode);
     this.bdt = new BdtDetail(node as BbieScFlatNode);
+    this.bbieSc.deprecated = node.deprecated;
     this.reset();
   }
 
@@ -2382,6 +2426,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
+        node.deprecated = used[0].deprecated;
       }
     }
 
@@ -2400,6 +2445,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
+        node.deprecated = used[0].deprecated;
       }
     }
 
@@ -2418,6 +2464,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.used = used[0].used;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
+        node.deprecated = used[0].deprecated;
       }
     }
 
@@ -2990,7 +3037,8 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           this.service.getDetail(node.topLevelAsbiepId, 'ABIE',
             asbiepNode.accNode.manifestId, asbiepNode.abiePath),
         ]).subscribe(([asbieDetail, asbiepDetail, abieDetail]) => {
-          const stored = (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax;
+          const storedCardinalityMax = (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax;
+          const storedDeprecated = (node.detail as BieEditAsbiepNodeDetail).asbie.deprecated;
           (node.detail as BieEditAsbiepNodeDetail).ascc = (asbieDetail as unknown as BieEditAsbiepNodeDetail).ascc;
           (node.detail as BieEditAsbiepNodeDetail).asbie.update((asbieDetail as unknown as BieEditAsbiepNodeDetail).asbie);
           (node.detail as BieEditAsbiepNodeDetail).asccp = (asbiepDetail as unknown as BieEditAsbiepNodeDetail).asccp;
@@ -2999,8 +3047,11 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           (node.detail as BieEditAsbiepNodeDetail).abie.update((abieDetail as unknown as BieEditAsbiepNodeDetail).abie);
           (node.detail as BieEditAsbiepNodeDetail).reset();
           node.detail.isLoaded = true;
-          if (stored !== undefined) {
-            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = stored;
+          if (storedCardinalityMax !== undefined) {
+            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = storedCardinalityMax;
+          }
+          if (storedDeprecated) {
+            (node.detail as BieEditAsbiepNodeDetail).asbie.deprecated = storedDeprecated;
           }
 
           return callbackFn && callbackFn(node);
@@ -3016,7 +3067,8 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           this.service.getDetail(node.topLevelAsbiepId, 'DT',
             bbiepNode.bdtNode.manifestId, ''),
         ]).subscribe(([bbieDetail, bbiepDetail, bdtDetail]) => {
-          const stored = (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
+          const storedCardinalityMax = (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
+          const storedDeprecated = (node.detail as BieEditBbiepNodeDetail).bbie.deprecated;
           (node.detail as BieEditBbiepNodeDetail).bcc = (bbieDetail as unknown as BieEditBbiepNodeDetail).bcc;
           (node.detail as BieEditBbiepNodeDetail).bbie.update((bbieDetail as unknown as BieEditBbiepNodeDetail).bbie);
           (node.detail as BieEditBbiepNodeDetail).bccp = (bbiepDetail as unknown as BieEditBbiepNodeDetail).bccp;
@@ -3024,8 +3076,11 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           (node.detail as BieEditBbiepNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
           (node.detail as BieEditBbiepNodeDetail).reset();
           node.detail.isLoaded = true;
-          if (stored !== undefined) {
-            (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = stored;
+          if (storedCardinalityMax !== undefined) {
+            (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = storedCardinalityMax;
+          }
+          if (storedDeprecated) {
+            (node.detail as BieEditBbiepNodeDetail).bbie.deprecated = storedDeprecated;
           }
           return callbackFn && callbackFn(node);
         });
@@ -3038,14 +3093,18 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
           this.service.getDetail(node.topLevelAsbiepId, 'DT',
             bbieScNode.bccNode.manifestId, ''),
         ]).subscribe(([bbieScDetail, bdtDetail]) => {
-          const stored = (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
+          const storedCardinalityMax = (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
+          const storedDeprecated = (node.detail as BieEditBbieScNodeDetail).bbieSc.deprecated;
           (node.detail as BieEditBbieScNodeDetail).bdtSc = (bbieScDetail as unknown as BieEditBbieScNodeDetail).bdtSc;
           (node.detail as BieEditBbieScNodeDetail).bbieSc.update((bbieScDetail as unknown as BieEditBbieScNodeDetail).bbieSc);
           (node.detail as BieEditBbieScNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
           (node.detail as BieEditBbieScNodeDetail).reset();
           node.detail.isLoaded = true;
-          if (stored !== undefined) {
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = stored;
+          if (storedCardinalityMax !== undefined) {
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = storedCardinalityMax;
+          }
+          if (storedDeprecated) {
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.deprecated = storedDeprecated;
           }
           return callbackFn && callbackFn(node);
         });

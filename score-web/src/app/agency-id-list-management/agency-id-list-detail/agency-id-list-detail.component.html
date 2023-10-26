@@ -5,7 +5,7 @@
       <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
     </div>
     <div class="ui feed">
-      <div class="event" *ngFor="let comment of commentControl.comments" [class]="comment.isNew ? 'new-message': ''">
+      <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
         <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
           <div class="summary">
             <a>{{ comment.loginId }}</a>

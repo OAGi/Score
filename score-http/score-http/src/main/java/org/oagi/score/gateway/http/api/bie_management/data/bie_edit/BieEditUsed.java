@@ -15,5 +15,6 @@ public class BieEditUsed {
     private BigInteger ownerTopLevelAsbiepId;
     private int cardinalityMin;
     private int cardinalityMax;
+    private boolean deprecated;
 
 }

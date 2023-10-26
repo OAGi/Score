@@ -29,6 +29,7 @@ public class BBIE implements BIE, FacetRestrictionsAware {
     private boolean nillable;
     private String fixedValue;
     private boolean nill;
+    private boolean deprecated;
     private String definition;
     private String remark;
     private String example;

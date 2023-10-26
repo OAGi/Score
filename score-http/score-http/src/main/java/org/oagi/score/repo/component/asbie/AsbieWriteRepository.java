@@ -76,6 +76,10 @@ public class AsbieWriteRepository {
                 asbieRecord.setIsNillable((byte) (asbie.getNillable() ? 1 : 0));
             }
 
+            if (asbie.getDeprecated() != null) {
+                asbieRecord.setIsDeprecated((byte) (asbie.getDeprecated() ? 1 : 0));
+            }
+
             asbieRecord.setDefinition(asbie.getDefinition());
             AsccRecord asccRecord = asccReadRepository.getAsccByManifestId(asbie.getBasedAsccManifestId());
             if (asccRecord == null) {
@@ -122,6 +126,10 @@ public class AsbieWriteRepository {
                 asbieRecord.setIsNillable((byte) (asbie.getNillable() ? 1 : 0));
             }
 
+            if (asbie.getDeprecated() != null) {
+                asbieRecord.setIsDeprecated((byte) (asbie.getDeprecated() ? 1 : 0));
+            }
+
             if (asbie.getDefinition() != null) {
                 asbieRecord.setDefinition(emptyToNull(asbie.getDefinition()));
             }
@@ -149,6 +157,7 @@ public class AsbieWriteRepository {
                         ASBIE.SEQ_KEY,
                         ASBIE.IS_USED,
                         ASBIE.IS_NILLABLE,
+                        ASBIE.IS_DEPRECATED,
                         ASBIE.DEFINITION,
                         ASBIE.CARDINALITY_MIN,
                         ASBIE.CARDINALITY_MAX,

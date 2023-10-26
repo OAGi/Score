@@ -132,13 +132,14 @@
                                   *ngIf="(node.level > 0 && !node.fixed)"
                                   [checked]="node.target !== undefined"
                                   [disabled]="true"></mat-checkbox>
-                    <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
-                          this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                          this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex ? 'search-index' : 'asd']"
+                    <span [class]="['align-self-center', node.typeClass.toLowerCase(),
+                                    this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                          [class.deprecated]="node.deprecated"
+                          [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
                           [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
                     </span>
 
-                    <span [class]="['pl-2']" *ngIf="!sourceDataSource.hideCardinality">
+                    <span [class]="['pl-3']" *ngIf="!sourceDataSource.hideCardinality">
                       {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                     </span>
 
@@ -264,13 +265,14 @@
                                   [checked]="node.source !== undefined"
                                   (change)="checkMatch($event, node)"
                                   [disabled]="!canMatch(node)"></mat-checkbox>
-                    <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
-                          this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                          this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex ? 'search-index' : 'asd']"
+                    <span [class]="['align-self-center', node.typeClass.toLowerCase(),
+                                    this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                          [class.deprecated]="node.deprecated"
+                          [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
                           [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
                     </span>
 
-                    <span [class]="['pl-2']" *ngIf="!targetDataSource.hideCardinality">
+                    <span [class]="['pl-3']" *ngIf="!targetDataSource.hideCardinality">
                       {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                     </span>
 

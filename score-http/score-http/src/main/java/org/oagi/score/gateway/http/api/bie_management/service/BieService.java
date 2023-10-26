@@ -349,6 +349,19 @@ public class BieService {
         dslContext.deleteFrom(Tables.BIZ_CTX_ASSIGNMENT).where(Tables.BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
 
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();
+
+        List<ULong> topLevelAsbiepListThatHasThisAsSource = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .fetchInto(ULong.class);
+        if (!topLevelAsbiepListThatHasThisAsSource.isEmpty()) {
+            dslContext.update(TOP_LEVEL_ASBIEP)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_ACTION)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP)
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepListThatHasThisAsSource))
+                    .execute();
+        }
     }
 
     private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {

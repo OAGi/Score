@@ -48,6 +48,8 @@ public class Bbie implements BieAssociation {
 
     private String example;
 
+    private boolean deprecated;
+
     private boolean used;
 
     private BigInteger ownerTopLevelAsbiepId;
@@ -250,6 +252,14 @@ public class Bbie implements BieAssociation {
 
     public void setExample(String example) {
         this.example = example;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public boolean isUsed() {
