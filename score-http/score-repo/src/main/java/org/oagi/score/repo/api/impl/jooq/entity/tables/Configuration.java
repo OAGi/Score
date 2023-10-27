@@ -4,6 +4,8 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.jooq.Field;
@@ -120,6 +122,11 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     @Override
     public UniqueKey<ConfigurationRecord> getPrimaryKey() {
         return Keys.KEY_CONFIGURATION_PRIMARY;
+    }
+
+    @Override
+    public List<UniqueKey<ConfigurationRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_CONFIGURATION_CONFIGURATION_UK1);
     }
 
     @Override
