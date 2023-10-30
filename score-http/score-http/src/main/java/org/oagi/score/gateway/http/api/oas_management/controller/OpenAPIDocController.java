@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.oas_management.data.*;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
@@ -251,13 +252,38 @@ public class OpenAPIDocController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieForOasDoc> getBieListForOasDoc(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
-            @PathVariable("id") BigInteger oasDocId) {
+            @PathVariable("id") BigInteger oasDocId,
+            @RequestParam(name = "den", required = false) String den,
+            @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
+            @RequestParam(name = "businessContext", required = false) String businessContext,
+            @RequestParam(name = "asccpManifestId", required = false) BigInteger asccpManifestId,
+            @RequestParam(name = "access", required = false) String access,
+            @RequestParam(name = "states", required = false) String states,
+            @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
+            @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
+            @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
+            @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
+            @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
+            @RequestParam(name = "updateStart", required = false) String updateStart,
+            @RequestParam(name = "updateEnd", required = false) String updateEnd,
+            @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
+            @RequestParam(name = "releaseIds", required = false) String releaseIds,
+            @RequestParam(name = "sortActive") String sortActive,
+            @RequestParam(name = "sortDirection") String sortDirection,
+            @RequestParam(name = "pageIndex") int pageIndex,
+            @RequestParam(name = "pageSize") int pageSize
+         ) {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
 
         AppUser appUser = sessionService.getAppUserByUsername(requester);
 
         request.setOasDocId(oasDocId);
+        request.setSortActive(sortActive);
+
+        request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
+        request.setPageIndex(pageIndex);
+        request.setPageSize(pageSize);
 
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
 

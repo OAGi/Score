@@ -1,7 +1,6 @@
 package org.oagi.score.repo.api.openapidoc.model;
 
 import org.oagi.score.repo.api.base.PaginationRequest;
-import org.oagi.score.repo.api.base.Request;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
@@ -10,7 +9,6 @@ public class GetBieForOasDocRequest extends PaginationRequest<BieForOasDoc> {
     private BigInteger oasDocId;
     private String businessContext;
     private BigInteger topLevelAsbiepId;
-
     public GetBieForOasDocRequest(ScoreUser requester) {
         super(requester, BieForOasDoc.class);
         this.oasDocId = oasDocId;

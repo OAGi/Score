@@ -151,10 +151,29 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         };
     }
 
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        List<BieForOasDoc> bieListForOasDoc = new ArrayList<>();
-        List<Condition> conditions = new ArrayList<>();
+//    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+//    public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
+//        List<BieForOasDoc> bieListForOasDoc = new ArrayList<>();
+//        List<Condition> conditions = new ArrayList<>();
+//        BigInteger oasDocId = request.getOasDocId();
+//        if (oasDocId != null) {
+//            conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
+//                    OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))));
+//        }
+//        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
+//        if (topLevelAsbiepId != null) {
+//            conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)));
+//        }
+//        if (!conditions.isEmpty()) {
+//            bieListForOasDoc = select()
+//                    .where(conditions)
+//                    .fetch(mapper());
+//        }
+//
+//        return new GetBieForOasDocResponse(bieListForOasDoc, request.getPageIndex(), request.getPageSize(), bieListForOasDoc.size());
+//    }
+    private Collection<Condition> getConditions(GetBieForOasDocRequest request) {
+        List<Condition> conditions = new ArrayList();
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
             conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
@@ -164,25 +183,10 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         if (topLevelAsbiepId != null) {
             conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)));
         }
-        if (!conditions.isEmpty()) {
-            bieListForOasDoc = select()
-                    .where(conditions)
-                    .fetch(mapper());
-        }
-
-        return new GetBieForOasDocResponse(bieListForOasDoc, request.getPageIndex(), request.getPageSize(), bieListForOasDoc.size());
-    }
-    private Collection<Condition> getConditions(GetBieForOasDocListRequest request) {
-        List<Condition> conditions = new ArrayList();
-        if (request.getOasDocId() != null) {
-            conditions.add(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id").eq(
-                    ULong.valueOf(request.getOasDocId())
-            ));
-        }
         return conditions;
     }
 
-    private SortField getSortField(GetBieForOasDocListRequest request) {
+    private SortField getSortField(GetBieForOasDocRequest request) {
         if (!StringUtils.hasLength(request.getSortActive())) {
             return null;
         }
@@ -193,7 +197,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 field = ASCCP.PROPERTY_TERM;
                 break;
             case "lastupdatetimestamp":
-                field = OAS_DOC.LAST_UPDATE_TIMESTAMP;
+                field = OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP;
                 break;
 
             default:
@@ -202,10 +206,9 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
 
         return (request.getSortDirection() == ASC) ? field.asc() : field.desc();
     }
-
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public GetBieForOasDocListResponse getBieForOasDocList(GetBieForOasDocListRequest request) throws ScoreDataAccessException {
+    public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
         Collection<Condition> conditions = getConditions(request);
         SelectConditionStep conditionStep = select().where(conditions);
 
@@ -227,13 +230,14 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             }
         }
 
-        return new GetBieForOasDocListResponse(
+        return new GetBieForOasDocResponse(
                 finalStep.fetch(mapper()),
                 request.getPageIndex(),
                 request.getPageSize(),
                 length
         );
     }
+
     @Override
     public GetAssignedOasTagResponse getAssignedOasTag(GetAssignedOasTagRequest request) throws ScoreDataAccessException {
         OasTagRecord oasTagRecord = null;
