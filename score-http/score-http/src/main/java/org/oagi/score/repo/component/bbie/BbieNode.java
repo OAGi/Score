@@ -47,10 +47,6 @@ public class BbieNode {
         private BigInteger facetMinLength;
         private BigInteger facetMaxLength;
         private String facetPattern;
-        private String facetMinInclusive;
-        private String facetMinExclusive;
-        private String facetMaxInclusive;
-        private String facetMaxExclusive;
         private Boolean nillable;
         private String remark;
         private String definition;

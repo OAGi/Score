@@ -100,10 +100,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   bieCardinalityMax: FormControl;
 
   /* string facets management */
-  facetMinimumInclusive: FormControl;
-  facetMinimumExclusive: FormControl;
-  facetMaximumInclusive: FormControl;
-  facetMaximumExclusive: FormControl;
   facetMinimumLength: FormControl;
   facetMaximumLength: FormControl;
   facetPattern: FormControl;
@@ -1136,10 +1132,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       node = this.selectedNode;
     }
 
-    this._setMinInclusiveFormControl(node);
-    this._setMinExclusiveFormControl(node);
-    this._setMaxInclusiveFormControl(node);
-    this._setMaxExclusiveFormControl(node);
     this._setMinLengthFormControl(node);
     this._setMaxLengthFormControl(node);
     this._setPatternFormControl(node);
@@ -1322,294 +1314,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         }
         this._setCardinalityMinFormControl(detailNode);
-      }
-    });
-  }
-
-  _setMinInclusiveFormControl(detailNode?: BieFlatNode) {
-    if (!detailNode) {
-      detailNode = this.selectedNode;
-    } else if (detailNode !== this.selectedNode) {
-      return;
-    }
-
-    let disabled = !this.isEditable(detailNode) ||
-      !detailNode.used || !!detailNode.locked;
-
-    let bieMinInclusive;
-    let bieMinExclusive;
-    let bieMaxInclusive;
-    let bieMaxExclusive;
-    if (this.isBbiepDetail(detailNode)) {
-      const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMinInclusive) {
-        bieMinInclusive = bbiepDetail.bdt.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bdt.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bdt.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bdt.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbiepDetail.bbie.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bbie.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bbie.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bbie.facetMaxExclusive;
-      }
-    } else if (this.isBbieScDetail(detailNode)) {
-      const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMinInclusive) {
-        bieMinInclusive = bbieScDetail.bdtSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bdtSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bdtSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bdtSc.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbieScDetail.bbieSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bbieSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bbieSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bbieSc.facetMaxExclusive;
-      }
-    } else {
-      this.facetMinimumInclusive = undefined;
-      return;
-    }
-
-    this.facetMinimumInclusive = new FormControl({
-        value: bieMinInclusive,
-        disabled
-      }, [
-        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
-        // validatorFn for minimum value
-        (control: AbstractControl): ValidationErrors | null => {
-          const value = (!!control.value) ? control.value.toString().trim() : undefined;
-          return null;
-        }
-      ]
-    );
-    this.facetMinimumInclusive.valueChanges.subscribe(value => {
-      if (this.facetMinimumInclusive.valid) {
-        if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.facetMinInclusive = value;
-        } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.facetMinInclusive = value;
-        } else {
-          return;
-        }
-      }
-    });
-  }
-
-  _setMinExclusiveFormControl(detailNode?: BieFlatNode) {
-    if (!detailNode) {
-      detailNode = this.selectedNode;
-    } else if (detailNode !== this.selectedNode) {
-      return;
-    }
-
-    let disabled = !this.isEditable(detailNode) ||
-      !detailNode.used || !!detailNode.locked;
-
-    let bieMinInclusive;
-    let bieMinExclusive;
-    let bieMaxInclusive;
-    let bieMaxExclusive;
-    if (this.isBbiepDetail(detailNode)) {
-      const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMinExclusive) {
-        bieMinInclusive = bbiepDetail.bdt.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bdt.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bdt.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bdt.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbiepDetail.bbie.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bbie.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bbie.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bbie.facetMaxExclusive;
-      }
-    } else if (this.isBbieScDetail(detailNode)) {
-      const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMinExclusive) {
-        bieMinInclusive = bbieScDetail.bdtSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bdtSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bdtSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bdtSc.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbieScDetail.bbieSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bbieSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bbieSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bbieSc.facetMaxExclusive;
-      }
-    } else {
-      this.facetMinimumExclusive = undefined;
-      return;
-    }
-
-    this.facetMinimumExclusive = new FormControl({
-        value: bieMinExclusive,
-        disabled
-      }, [
-        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
-        // validatorFn for minimum value
-        (control: AbstractControl): ValidationErrors | null => {
-          const value = (!!control.value) ? control.value.toString().trim() : undefined;
-          return null;
-        }
-      ]
-    );
-    this.facetMinimumExclusive.valueChanges.subscribe(value => {
-      if (this.facetMinimumExclusive.valid) {
-        if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.facetMinExclusive = value;
-        } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.facetMinExclusive = value;
-        } else {
-          return;
-        }
-      }
-    });
-  }
-
-  _setMaxInclusiveFormControl(detailNode?: BieFlatNode) {
-    if (!detailNode) {
-      detailNode = this.selectedNode;
-    } else if (detailNode !== this.selectedNode) {
-      return;
-    }
-
-    let disabled = !this.isEditable(detailNode) ||
-      !detailNode.used || !!detailNode.locked;
-
-    let bieMinInclusive;
-    let bieMinExclusive;
-    let bieMaxInclusive;
-    let bieMaxExclusive;
-    if (this.isBbiepDetail(detailNode)) {
-      const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMaxInclusive) {
-        bieMinInclusive = bbiepDetail.bdt.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bdt.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bdt.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bdt.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbiepDetail.bbie.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bbie.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bbie.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bbie.facetMaxExclusive;
-      }
-    } else if (this.isBbieScDetail(detailNode)) {
-      const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMaxInclusive) {
-        bieMinInclusive = bbieScDetail.bdtSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bdtSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bdtSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bdtSc.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbieScDetail.bbieSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bbieSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bbieSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bbieSc.facetMaxExclusive;
-      }
-    } else {
-      this.facetMaximumInclusive = undefined;
-      return;
-    }
-
-    this.facetMaximumInclusive = new FormControl({
-        value: bieMaxInclusive,
-        disabled
-      }, [
-        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
-        // validatorFn for minimum value
-        (control: AbstractControl): ValidationErrors | null => {
-          const value = (!!control.value) ? control.value.toString().trim() : undefined;
-          return null;
-        }
-      ]
-    );
-    this.facetMaximumInclusive.valueChanges.subscribe(value => {
-      if (this.facetMaximumInclusive.valid) {
-        if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.facetMaxInclusive = value;
-        } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.facetMaxInclusive = value;
-        } else {
-          return;
-        }
-      }
-    });
-  }
-
-  _setMaxExclusiveFormControl(detailNode?: BieFlatNode) {
-    if (!detailNode) {
-      detailNode = this.selectedNode;
-    } else if (detailNode !== this.selectedNode) {
-      return;
-    }
-
-    let disabled = !this.isEditable(detailNode) ||
-      !detailNode.used || !!detailNode.locked;
-
-    let bieMinInclusive;
-    let bieMinExclusive;
-    let bieMaxInclusive;
-    let bieMaxExclusive;
-    if (this.isBbiepDetail(detailNode)) {
-      const bbiepDetail = this.asBbiepDetail(detailNode);
-      if (!!bbiepDetail.bdt.facetMaxExclusive) {
-        bieMinInclusive = bbiepDetail.bdt.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bdt.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bdt.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bdt.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbiepDetail.bbie.facetMinInclusive;
-        bieMinExclusive = bbiepDetail.bbie.facetMinExclusive;
-        bieMaxInclusive = bbiepDetail.bbie.facetMaxInclusive;
-        bieMaxExclusive = bbiepDetail.bbie.facetMaxExclusive;
-      }
-    } else if (this.isBbieScDetail(detailNode)) {
-      const bbieScDetail = this.asBbieScDetail(detailNode);
-      if (!!bbieScDetail.bdtSc.facetMaxExclusive) {
-        bieMinInclusive = bbieScDetail.bdtSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bdtSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bdtSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bdtSc.facetMaxExclusive;
-        disabled = true;
-      } else {
-        bieMinInclusive = bbieScDetail.bbieSc.facetMinInclusive;
-        bieMinExclusive = bbieScDetail.bbieSc.facetMinExclusive;
-        bieMaxInclusive = bbieScDetail.bbieSc.facetMaxInclusive;
-        bieMaxExclusive = bbieScDetail.bbieSc.facetMaxExclusive;
-      }
-    } else {
-      this.facetMaximumExclusive = undefined;
-      return;
-    }
-
-    this.facetMaximumExclusive = new FormControl({
-        value: bieMaxExclusive,
-        disabled
-      }, [
-        Validators.pattern('[-]?(([0-9]*)|(([0-9]*)\\.([0-9]*)))'),
-        // validatorFn for minimum value
-        (control: AbstractControl): ValidationErrors | null => {
-          const value = (!!control.value) ? control.value.toString().trim() : undefined;
-          return null;
-        }
-      ]
-    );
-    this.facetMaximumExclusive.valueChanges.subscribe(value => {
-      if (this.facetMaximumExclusive.valid) {
-        if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.facetMaxExclusive = value;
-        } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.facetMaxExclusive = value;
-        } else {
-          return;
-        }
       }
     });
   }
@@ -2188,10 +1892,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditBbiepNodeDetail).bbie.facetMinLength = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.facetMaxLength = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.facetPattern = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.facetMinInclusive = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.facetMinExclusive = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.facetMaxInclusive = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.facetMaxExclusive = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.fixedOrDefault = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.fixedValue = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.defaultValue = null;
@@ -2204,10 +1904,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMinLength = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMaxLength = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.facetPattern = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMinInclusive = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMinExclusive = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMaxInclusive = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMaxExclusive = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedOrDefault = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedValue = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.defaultValue = null;

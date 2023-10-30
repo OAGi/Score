@@ -272,65 +272,6 @@ public class DtScWriteRepository {
                     .set(DT_SC.FIXED_VALUE, request.getFixedValue())
                     .setNull(DT_SC.DEFAULT_VALUE);
         }
-        if (request.getFacetMinLength() == null || request.getFacetMinLength().longValue() <= 0L) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MIN_LENGTH);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MIN_LENGTH, ULong.valueOf(request.getFacetMinLength()));
-        }
-        if (request.getFacetMaxLength() == null || request.getFacetMaxLength().longValue() <= 0L) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT_SC.FACET_MAX_LENGTH);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT_SC.FACET_MAX_LENGTH, ULong.valueOf(request.getFacetMaxLength()));
-        }
-        if (compare(dtScRecord.getFacetPattern(), request.getFacetPattern()) != 0) {
-            if (StringUtils.hasLength(request.getFacetPattern())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT_SC.FACET_PATTERN, request.getFacetPattern());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT_SC.FACET_PATTERN);
-            }
-        }
-        if (compare(dtScRecord.getFacetMinInclusive(), request.getFacetMinInclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMinInclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT_SC.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT_SC.FACET_MIN_INCLUSIVE);
-            }
-        }
-        if (compare(dtScRecord.getFacetMinExclusive(), request.getFacetMinExclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMinExclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT_SC.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT_SC.FACET_MIN_EXCLUSIVE);
-            }
-        }
-        if (compare(dtScRecord.getFacetMaxInclusive(), request.getFacetMaxInclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMaxInclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT_SC.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT_SC.FACET_MAX_INCLUSIVE);
-            }
-        }
-        if (compare(dtScRecord.getFacetMaxExclusive(), request.getFacetMaxExclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMaxExclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT_SC.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT_SC.FACET_MAX_EXCLUSIVE);
-            }
-        }
 
         if (moreStep != null) {
             moreStep.set(DT_SC.LAST_UPDATED_BY, userId)

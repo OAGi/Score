@@ -190,10 +190,6 @@ public class BbieReadRepository {
                 bbie.setFacetMaxLength(bbieRecord.getFacetMaxLength().toBigInteger());
             }
             bbie.setFacetPattern(bbieRecord.getFacetPattern());
-            bbie.setFacetMinInclusive(bbieRecord.getFacetMinInclusive());
-            bbie.setFacetMinExclusive(bbieRecord.getFacetMinExclusive());
-            bbie.setFacetMaxInclusive(bbieRecord.getFacetMaxInclusive());
-            bbie.setFacetMaxExclusive(bbieRecord.getFacetMaxExclusive());
             bbie.setNillable(bbieRecord.getIsNillable() == 1);
             bbie.setRemark(bbieRecord.getRemark());
             bbie.setDefinition(bbieRecord.getDefinition());

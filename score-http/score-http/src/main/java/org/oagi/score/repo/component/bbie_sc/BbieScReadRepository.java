@@ -60,17 +60,6 @@ public class BbieScReadRepository {
         bdtSc.setDefinition(dtScRecord.getDefinition());
         bdtSc.setDefaultValue(dtScRecord.getDefaultValue());
         bdtSc.setFixedValue(dtScRecord.getFixedValue());
-        if (dtScRecord.getFacetMinLength() != null) {
-            bdtSc.setFacetMinLength(dtScRecord.getFacetMinLength().toBigInteger());
-        }
-        if (dtScRecord.getFacetMaxLength() != null) {
-            bdtSc.setFacetMaxLength(dtScRecord.getFacetMaxLength().toBigInteger());
-        }
-        bdtSc.setFacetPattern(dtScRecord.getFacetPattern());
-        bdtSc.setFacetMinInclusive(dtScRecord.getFacetMinInclusive());
-        bdtSc.setFacetMinExclusive(dtScRecord.getFacetMinExclusive());
-        bdtSc.setFacetMaxInclusive(dtScRecord.getFacetMaxInclusive());
-        bdtSc.setFacetMaxExclusive(dtScRecord.getFacetMaxExclusive());
         bdtSc.setCdtPrimitives(cdtPrimitives);
         bdtSc.setState(CcState.valueOf(
                 dslContext.select(DT.STATE)
@@ -172,10 +161,6 @@ public class BbieScReadRepository {
                 bbieSc.setFacetMaxLength(bbieScRecord.getFacetMaxLength().toBigInteger());
             }
             bbieSc.setFacetPattern(bbieScRecord.getFacetPattern());
-            bbieSc.setFacetMinInclusive(bbieScRecord.getFacetMinInclusive());
-            bbieSc.setFacetMinExclusive(bbieScRecord.getFacetMinExclusive());
-            bbieSc.setFacetMaxInclusive(bbieScRecord.getFacetMaxInclusive());
-            bbieSc.setFacetMaxExclusive(bbieScRecord.getFacetMaxExclusive());
             bbieSc.setRemark(bbieScRecord.getRemark());
             bbieSc.setBizTerm(bbieScRecord.getBizTerm());
             bbieSc.setDefinition(bbieScRecord.getDefinition());

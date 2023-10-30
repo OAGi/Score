@@ -197,10 +197,6 @@ public class BieCopyService implements InitializingBean {
                 BBIE.FACET_MIN_LENGTH,
                 BBIE.FACET_MAX_LENGTH,
                 BBIE.FACET_PATTERN,
-                BBIE.FACET_MIN_INCLUSIVE,
-                BBIE.FACET_MIN_EXCLUSIVE,
-                BBIE.FACET_MAX_INCLUSIVE,
-                BBIE.FACET_MAX_EXCLUSIVE,
                 BBIE.IS_NILLABLE.as("nillable"),
                 BBIE.IS_NULL.as("nill"),
                 BBIE.DEFINITION,
@@ -263,10 +259,6 @@ public class BieCopyService implements InitializingBean {
                 BBIE_SC.FACET_MIN_LENGTH,
                 BBIE_SC.FACET_MAX_LENGTH,
                 BBIE_SC.FACET_PATTERN,
-                BBIE_SC.FACET_MIN_INCLUSIVE,
-                BBIE_SC.FACET_MIN_EXCLUSIVE,
-                BBIE_SC.FACET_MAX_INCLUSIVE,
-                BBIE_SC.FACET_MAX_EXCLUSIVE,
                 BBIE_SC.DEFINITION,
                 BBIE_SC.EXAMPLE,
                 BBIE_SC.REMARK,
@@ -334,10 +326,6 @@ public class BieCopyService implements InitializingBean {
         private BigInteger facetMinLength;
         private BigInteger facetMaxLength;
         private String facetPattern;
-        private String facetMinInclusive;
-        private String facetMinExclusive;
-        private String facetMaxInclusive;
-        private String facetMaxExclusive;
         private boolean nill;
         private String definition;
         private String example;
@@ -396,10 +384,6 @@ public class BieCopyService implements InitializingBean {
         private BigInteger facetMinLength;
         private BigInteger facetMaxLength;
         private String facetPattern;
-        private String facetMinInclusive;
-        private String facetMinExclusive;
-        private String facetMaxInclusive;
-        private String facetMaxExclusive;
         private String definition;
         private String example;
         private String remark;
@@ -701,10 +685,6 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE.FACET_MIN_LENGTH, (bbie.getFacetMinLength() != null) ? ULong.valueOf(bbie.getFacetMinLength()) : null)
                     .set(BBIE.FACET_MAX_LENGTH, (bbie.getFacetMaxLength() != null) ? ULong.valueOf(bbie.getFacetMaxLength()) : null)
                     .set(BBIE.FACET_PATTERN, bbie.getFacetPattern())
-                    .set(BBIE.FACET_MIN_INCLUSIVE, bbie.getFacetMinInclusive())
-                    .set(BBIE.FACET_MIN_EXCLUSIVE, bbie.getFacetMinExclusive())
-                    .set(BBIE.FACET_MAX_INCLUSIVE, bbie.getFacetMaxInclusive())
-                    .set(BBIE.FACET_MAX_EXCLUSIVE, bbie.getFacetMaxExclusive())
                     .set(BBIE.DEFINITION, bbie.getDefinition())
                     .set(BBIE.EXAMPLE, bbie.getExample())
                     .set(BBIE.REMARK, bbie.getRemark())
@@ -739,10 +719,6 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.FACET_MIN_LENGTH, (bbieSc.getFacetMinLength() != null) ? ULong.valueOf(bbieSc.getFacetMinLength()) : null)
                     .set(BBIE_SC.FACET_MAX_LENGTH, (bbieSc.getFacetMaxLength() != null) ? ULong.valueOf(bbieSc.getFacetMaxLength()) : null)
                     .set(BBIE_SC.FACET_PATTERN, bbieSc.getFacetPattern())
-                    .set(BBIE_SC.FACET_MIN_INCLUSIVE, bbieSc.getFacetMinInclusive())
-                    .set(BBIE_SC.FACET_MIN_EXCLUSIVE, bbieSc.getFacetMinExclusive())
-                    .set(BBIE_SC.FACET_MAX_INCLUSIVE, bbieSc.getFacetMaxInclusive())
-                    .set(BBIE_SC.FACET_MAX_EXCLUSIVE, bbieSc.getFacetMaxExclusive())
                     .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())
                     .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                     .set(BBIE_SC.REMARK, bbieSc.getRemark())

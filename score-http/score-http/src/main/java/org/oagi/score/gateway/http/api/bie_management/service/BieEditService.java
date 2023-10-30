@@ -1109,10 +1109,6 @@ public class BieEditService implements InitializingBean {
                 bbieRecord.setFacetMinLength(null);
                 bbieRecord.setFacetMaxLength(null);
                 bbieRecord.setFacetPattern(null);
-                bbieRecord.setFacetMinInclusive(null);
-                bbieRecord.setFacetMinExclusive(null);
-                bbieRecord.setFacetMaxInclusive(null);
-                bbieRecord.setFacetMaxExclusive(null);
 
                 List<AvailableBdtPriRestri> bdtPriRestriList =
                         bdtPriRestriReadRepository.availableBdtPriRestriListByBccManifestId(bbieRecord.getBasedBccManifestId().toBigInteger());
@@ -1151,10 +1147,6 @@ public class BieEditService implements InitializingBean {
                         BBIE.FACET_MIN_LENGTH,
                         BBIE.FACET_MAX_LENGTH,
                         BBIE.FACET_PATTERN,
-                        BBIE.FACET_MIN_INCLUSIVE,
-                        BBIE.FACET_MIN_EXCLUSIVE,
-                        BBIE.FACET_MAX_INCLUSIVE,
-                        BBIE.FACET_MAX_EXCLUSIVE,
                         BBIE.IS_NULL,
                         BBIE.IS_NILLABLE,
                         BBIE.LAST_UPDATED_BY,
@@ -1217,10 +1209,6 @@ public class BieEditService implements InitializingBean {
                 bbieScRecord.setFacetMinLength(null);
                 bbieScRecord.setFacetMaxLength(null);
                 bbieScRecord.setFacetPattern(null);
-                bbieScRecord.setFacetMinInclusive(null);
-                bbieScRecord.setFacetMinExclusive(null);
-                bbieScRecord.setFacetMaxInclusive(null);
-                bbieScRecord.setFacetMaxExclusive(null);
                 bbieScRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                 bbieScRecord.setLastUpdateTimestamp(LocalDateTime.now());
 
@@ -1238,10 +1226,6 @@ public class BieEditService implements InitializingBean {
                         BBIE_SC.FACET_MIN_LENGTH,
                         BBIE_SC.FACET_MAX_LENGTH,
                         BBIE_SC.FACET_PATTERN,
-                        BBIE_SC.FACET_MIN_INCLUSIVE,
-                        BBIE_SC.FACET_MIN_EXCLUSIVE,
-                        BBIE_SC.FACET_MAX_INCLUSIVE,
-                        BBIE_SC.FACET_MAX_EXCLUSIVE,
                         BBIE_SC.LAST_UPDATED_BY,
                         BBIE_SC.LAST_UPDATE_TIMESTAMP);
                 break;

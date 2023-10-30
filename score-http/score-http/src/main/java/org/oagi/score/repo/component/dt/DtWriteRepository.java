@@ -442,65 +442,6 @@ public class DtWriteRepository {
                     .where(DT_MANIFEST.DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
                     .execute();
         }
-        if (request.getFacetMinLength() == null || request.getFacetMinLength().longValue() <= 0L) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT.FACET_MIN_LENGTH);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT.FACET_MIN_LENGTH, ULong.valueOf(request.getFacetMinLength()));
-        }
-        if (request.getFacetMaxLength() == null || request.getFacetMaxLength().longValue() <= 0L) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .setNull(DT.FACET_MAX_LENGTH);
-        } else {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(DT.FACET_MAX_LENGTH, ULong.valueOf(request.getFacetMaxLength()));
-        }
-        if (compare(originalDtRecord.getFacetPattern(), request.getFacetPattern()) != 0) {
-            if (StringUtils.hasLength(request.getFacetPattern())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.FACET_PATTERN, request.getFacetPattern());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.FACET_PATTERN);
-            }
-        }
-        if (compare(originalDtRecord.getFacetMinInclusive(), request.getFacetMinInclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMinInclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.FACET_MIN_INCLUSIVE, request.getFacetMinInclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.FACET_MIN_INCLUSIVE);
-            }
-        }
-        if (compare(originalDtRecord.getFacetMinExclusive(), request.getFacetMinExclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMinExclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.FACET_MIN_EXCLUSIVE, request.getFacetMinExclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.FACET_MIN_EXCLUSIVE);
-            }
-        }
-        if (compare(originalDtRecord.getFacetMaxInclusive(), request.getFacetMaxInclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMaxInclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.FACET_MAX_INCLUSIVE, request.getFacetMaxInclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.FACET_MAX_INCLUSIVE);
-            }
-        }
-        if (compare(originalDtRecord.getFacetMaxExclusive(), request.getFacetMaxExclusive()) != 0) {
-            if (StringUtils.hasLength(request.getFacetMaxExclusive())) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.FACET_MAX_EXCLUSIVE, request.getFacetMaxExclusive());
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.FACET_MAX_EXCLUSIVE);
-            }
-        }
         if (compare(originalDtRecord.getSixDigitId(), request.getSixDigitId()) != 0) {
             DtRecord exist = dslContext.selectFrom(DT)
                     .where(and(DT.GUID.notEqual(originalDtRecord.getGuid()),
