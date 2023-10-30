@@ -48,8 +48,13 @@ export class OpenAPIService {
     return this.http.get<OasDoc>('/api/oas_doc/' + id);
   }
 
-  getBieListForOasDoc(id): Observable<BieForOasDoc> {
-    return this.http.get<BieForOasDoc>('/api/oas_doc/' + id + '/bie_list');
+  getBieListForOasDoc(request: BieForOasDocListRequest, id): Observable<BieForOasDoc> {
+    const params = new HttpParams()
+      .set('sortActive', request.page.sortActive)
+      .set('sortDirection', request.page.sortDirection)
+      .set('pageIndex', '' + request.page.pageIndex)
+      .set('pageSize', '' + request.page.pageSize);
+    return this.http.get<BieForOasDoc>('/api/oas_doc/' + id + '/bie_list', {params});
   }
 
   getBieForOasDoc(oasDocId: number, topLevelAsbiepId: number): Observable<BieForOasDoc> {

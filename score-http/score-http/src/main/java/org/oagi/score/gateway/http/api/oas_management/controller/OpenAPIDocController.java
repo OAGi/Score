@@ -280,8 +280,9 @@ public class OpenAPIDocController {
 
         request.setOasDocId(oasDocId);
         request.setSortActive(sortActive);
-
-        request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
+        if (StringUtils.hasLength(sortDirection)){
+            request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
+        }
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
 

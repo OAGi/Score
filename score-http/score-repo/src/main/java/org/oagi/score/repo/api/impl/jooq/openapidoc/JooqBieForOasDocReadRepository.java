@@ -186,25 +186,42 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         return conditions;
     }
 
-    private SortField getSortField(GetBieForOasDocRequest request) {
+    private List<SortField<?>> getSortField(GetBieForOasDocRequest request) {
+        List<SortField<?>> sortFields = new ArrayList<>();
+
         if (!StringUtils.hasLength(request.getSortActive())) {
             return null;
         }
-
-        Field field;
+        String direction = request.getSortDirection().toString().toLowerCase();
         switch (trim(request.getSortActive()).toLowerCase()) {
             case "den":
-                field = ASCCP.PROPERTY_TERM;
+                if ("asc".equals(direction)) {
+                    sortFields.add(ASCCP.PROPERTY_TERM.asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(ASCCP.PROPERTY_TERM.desc());
+                }
                 break;
             case "lastupdatetimestamp":
-                field = OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP;
+                if ("asc".equals(direction)) {
+                    sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.desc());
+                }
                 break;
-
+            case "tagname":
+                if ("asc".equals(direction)) {
+                    sortFields.add(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name").asc());
+                    sortFields.add(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name").asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name").desc());
+                    sortFields.add(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name").desc());
+                }
+                break;
             default:
                 return null;
         }
 
-        return (request.getSortDirection() == ASC) ? field.asc() : field.desc();
+        return sortFields;
     }
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
@@ -212,10 +229,10 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         Collection<Condition> conditions = getConditions(request);
         SelectConditionStep conditionStep = select().where(conditions);
 
-        SortField sortField = getSortField(request);
+        List<SortField<?>> sortFields = getSortField(request);
         int length = dslContext().fetchCount(conditionStep);
         SelectFinalStep finalStep;
-        if (sortField == null) {
+        if (sortFields.isEmpty()) {
             if (request.isPagination()) {
                 finalStep = conditionStep.limit(request.getPageOffset(), request.getPageSize());
             } else {
@@ -223,13 +240,12 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             }
         } else {
             if (request.isPagination()) {
-                finalStep = conditionStep.orderBy(sortField)
+                finalStep = conditionStep.orderBy(sortFields)
                         .limit(request.getPageOffset(), request.getPageSize());
             } else {
-                finalStep = conditionStep.orderBy(sortField);
+                finalStep = conditionStep.orderBy(sortFields);
             }
         }
-
         return new GetBieForOasDocResponse(
                 finalStep.fetch(mapper()),
                 request.getPageIndex(),
