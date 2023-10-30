@@ -685,8 +685,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         String typeName = null;
         if (hasAnyValuesInFacets(bbie)) {
             typeName = addXbtSimpleType(xbt, bbie, "type_" + bbie.getGuid());
-        } else if (hasAnyValuesInFacets(bdt)) {
-            typeName = addXbtSimpleType(xbt, bdt, "type_" + bdt.getGuid());
         } else {
             addXbtSimpleType(xbt);
         }
@@ -718,8 +716,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         String typeName = null;
         if (hasAnyValuesInFacets(bbie)) {
             typeName = addXbtSimpleType(xbt, bbie, "type_" + bbie.getGuid());
-        } else if (hasAnyValuesInFacets(bdt)) {
-            typeName = addXbtSimpleType(xbt, bdt, "type_" + bdt.getGuid());
         } else {
             addXbtSimpleType(xbt);
         }
@@ -867,8 +863,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         String typeName = null;
         if (hasAnyValuesInFacets(bbie)) {
             typeName = addXbtSimpleType(xbt, bbie, "type_" + bbie.getGuid());
-        } else if (hasAnyValuesInFacets(bdt)) {
-            typeName = addXbtSimpleType(xbt, bdt, "type_" + bdt.getGuid());
         } else {
             addXbtSimpleType(xbt);
         }
@@ -900,26 +894,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         restrictionNode.setAttribute("base", builtinType);
         xbtNode.addContent(restrictionNode);
 
-        if (StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
-            Element minInclusiveNode = newElement("minInclusive");
-            minInclusiveNode.setAttribute("value", facetRestri.getFacetMinInclusive());
-            restrictionNode.addContent(minInclusiveNode);
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
-            Element minExclusiveNode = newElement("minExclusive");
-            minExclusiveNode.setAttribute("value", facetRestri.getFacetMinExclusive());
-            restrictionNode.addContent(minExclusiveNode);
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
-            Element maxInclusiveNode = newElement("maxInclusive");
-            maxInclusiveNode.setAttribute("value", facetRestri.getFacetMaxInclusive());
-            restrictionNode.addContent(maxInclusiveNode);
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
-            Element maxExclusiveNode = newElement("maxExclusive");
-            maxExclusiveNode.setAttribute("value", facetRestri.getFacetMaxExclusive());
-            restrictionNode.addContent(maxExclusiveNode);
-        }
         if (facetRestri.getFacetMinLength() != null) {
             Element minLengthNode = newElement("minLength");
             minLengthNode.setAttribute("value", facetRestri.getFacetMinLength().toString());
@@ -1253,8 +1227,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     String typeName = null;
                     if (hasAnyValuesInFacets(bbieSc)) {
                         typeName = addXbtSimpleType(xbt, bbieSc, "type_" + bbieSc.getGuid());
-                    } else if (hasAnyValuesInFacets(bdtSc)) {
-                        typeName = addXbtSimpleType(xbt, bdtSc, "type_" + bdtSc.getGuid());
                     } else {
                         addXbtSimpleType(xbt);
                     }
@@ -1276,8 +1248,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         String typeName = null;
         if (hasAnyValuesInFacets(bbieSc)) {
             typeName = addXbtSimpleType(xbt, bbieSc, "type_" + bbieSc.getGuid());
-        } else if (hasAnyValuesInFacets(bdtSc)) {
-            typeName = addXbtSimpleType(xbt, bdtSc, "type_" + bdtSc.getGuid());
         } else {
             addXbtSimpleType(xbt);
         }

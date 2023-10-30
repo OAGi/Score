@@ -287,10 +287,6 @@ public class JooqBieWriteRepository
             bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
         }
         bbieRecord.setFacetPattern(bbie.getFacetPattern());
-        bbieRecord.setFacetMinInclusive(bbie.getFacetMinInclusive());
-        bbieRecord.setFacetMinExclusive(bbie.getFacetMinExclusive());
-        bbieRecord.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
-        bbieRecord.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
         bbieRecord.setDefinition(bbie.getDefinition());
         bbieRecord.setCardinalityMin(bbie.getCardinalityMin());
         bbieRecord.setCardinalityMax(bbie.getCardinalityMax());
@@ -347,10 +343,6 @@ public class JooqBieWriteRepository
             bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
         }
         bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
-        bbieScRecord.setFacetMinInclusive(bbieSc.getFacetMinInclusive());
-        bbieScRecord.setFacetMinExclusive(bbieSc.getFacetMinExclusive());
-        bbieScRecord.setFacetMaxInclusive(bbieSc.getFacetMaxInclusive());
-        bbieScRecord.setFacetMaxExclusive(bbieSc.getFacetMaxExclusive());
         bbieScRecord.setDefinition(bbieSc.getDefinition());
         bbieScRecord.setCardinalityMin(bbieSc.getCardinalityMin());
         bbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());

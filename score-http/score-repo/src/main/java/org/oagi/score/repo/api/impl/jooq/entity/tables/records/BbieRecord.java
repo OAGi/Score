@@ -296,84 +296,12 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public void setFacetMinInclusive(String value) {
-        set(15, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public String getFacetMinInclusive() {
-        return (String) get(15);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public void setFacetMinExclusive(String value) {
-        set(16, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public String getFacetMinExclusive() {
-        return (String) get(16);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public void setFacetMaxInclusive(String value) {
-        set(17, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public String getFacetMaxInclusive() {
-        return (String) get(17);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public void setFacetMaxExclusive(String value) {
-        set(18, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public String getFacetMaxExclusive() {
-        return (String) get(18);
-    }
-
-    /**
      * Setter for <code>oagi.bbie.default_value</code>. This column specifies
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
      */
     public void setDefaultValue(String value) {
-        set(19, value);
+        set(15, value);
     }
 
     /**
@@ -382,7 +310,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * be used at the same time.
      */
     public String getDefaultValue() {
-        return (String) get(19);
+        return (String) get(15);
     }
 
     /**
@@ -391,7 +319,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * schema.
      */
     public void setIsNillable(Byte value) {
-        set(20, value);
+        set(16, value);
     }
 
     /**
@@ -400,7 +328,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * schema.
      */
     public Byte getIsNillable() {
-        return (Byte) get(20);
+        return (Byte) get(16);
     }
 
     /**
@@ -409,7 +337,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * used at the same time.
      */
     public void setFixedValue(String value) {
-        set(21, value);
+        set(17, value);
     }
 
     /**
@@ -418,7 +346,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * used at the same time.
      */
     public String getFixedValue() {
-        return (String) get(21);
+        return (String) get(17);
     }
 
     /**
@@ -428,7 +356,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * cannot have a value.
      */
     public void setIsNull(Byte value) {
-        set(22, value);
+        set(18, value);
     }
 
     /**
@@ -438,7 +366,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * cannot have a value.
      */
     public Byte getIsNull() {
-        return (Byte) get(22);
+        return (Byte) get(18);
     }
 
     /**
@@ -447,7 +375,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * inherited from the based BCC.
      */
     public void setDefinition(String value) {
-        set(23, value);
+        set(19, value);
     }
 
     /**
@@ -456,21 +384,21 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * inherited from the based BCC.
      */
     public String getDefinition() {
-        return (String) get(23);
+        return (String) get(19);
     }
 
     /**
      * Setter for <code>oagi.bbie.example</code>.
      */
     public void setExample(String value) {
-        set(24, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>oagi.bbie.example</code>.
      */
     public String getExample() {
-        return (String) get(24);
+        return (String) get(20);
     }
 
     /**
@@ -485,7 +413,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * "Type of BOM should be recognized in the BOM/typeCode."
      */
     public void setRemark(String value) {
-        set(25, value);
+        set(21, value);
     }
 
     /**
@@ -500,7 +428,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * "Type of BOM should be recognized in the BOM/typeCode."
      */
     public String getRemark() {
-        return (String) get(25);
+        return (String) get(21);
     }
 
     /**
@@ -510,7 +438,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * CREATED_BY.
      */
     public void setCreatedBy(ULong value) {
-        set(26, value);
+        set(22, value);
     }
 
     /**
@@ -520,7 +448,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * CREATED_BY.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(26);
+        return (ULong) get(22);
     }
 
     /**
@@ -528,7 +456,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * referring to the user who has last updated the ASBIE record. 
      */
     public void setLastUpdatedBy(ULong value) {
-        set(27, value);
+        set(23, value);
     }
 
     /**
@@ -536,7 +464,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * referring to the user who has last updated the ASBIE record. 
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(27);
+        return (ULong) get(23);
     }
 
     /**
@@ -545,7 +473,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * have the same CREATION_TIMESTAMP.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(28, value);
+        set(24, value);
     }
 
     /**
@@ -554,7 +482,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * have the same CREATION_TIMESTAMP.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(28);
+        return (LocalDateTime) get(24);
     }
 
     /**
@@ -562,7 +490,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * when the ASBIE was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(29, value);
+        set(25, value);
     }
 
     /**
@@ -570,7 +498,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * when the ASBIE was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(29);
+        return (LocalDateTime) get(25);
     }
 
     /**
@@ -582,7 +510,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
      */
     public void setSeqKey(BigDecimal value) {
-        set(30, value);
+        set(26, value);
     }
 
     /**
@@ -594,7 +522,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
      */
     public BigDecimal getSeqKey() {
-        return (BigDecimal) get(30);
+        return (BigDecimal) get(26);
     }
 
     /**
@@ -603,7 +531,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * field/component should be generated in the expression generation.
      */
     public void setIsUsed(Byte value) {
-        set(31, value);
+        set(27, value);
     }
 
     /**
@@ -612,7 +540,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * field/component should be generated in the expression generation.
      */
     public Byte getIsUsed() {
-        return (Byte) get(31);
+        return (Byte) get(27);
     }
 
     /**
@@ -620,7 +548,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * BBIE is deprecated.
      */
     public void setIsDeprecated(Byte value) {
-        set(32, value);
+        set(28, value);
     }
 
     /**
@@ -628,7 +556,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * BBIE is deprecated.
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(32);
+        return (Byte) get(28);
     }
 
     /**
@@ -636,7 +564,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(33, value);
+        set(29, value);
     }
 
     /**
@@ -644,7 +572,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(33);
+        return (ULong) get(29);
     }
 
     // -------------------------------------------------------------------------
@@ -670,7 +598,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     /**
      * Create a detached, initialised BbieRecord
      */
-    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
+    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
         super(Bbie.BBIE);
 
         setBbieId(bbieId);
@@ -688,10 +616,6 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setFacetMinLength(facetMinLength);
         setFacetMaxLength(facetMaxLength);
         setFacetPattern(facetPattern);
-        setFacetMinInclusive(facetMinInclusive);
-        setFacetMinExclusive(facetMinExclusive);
-        setFacetMaxInclusive(facetMaxInclusive);
-        setFacetMaxExclusive(facetMaxExclusive);
         setDefaultValue(defaultValue);
         setIsNillable(isNillable);
         setFixedValue(fixedValue);

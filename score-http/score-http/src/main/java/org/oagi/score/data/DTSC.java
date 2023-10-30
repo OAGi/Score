@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DTSC implements Serializable, FacetRestrictionsAware {
+public class DTSC implements Serializable {
 
     private BigInteger dtScManifestId = BigInteger.ZERO;
     private BigInteger dtScId = BigInteger.ZERO;
@@ -19,13 +19,6 @@ public class DTSC implements Serializable, FacetRestrictionsAware {
     private String definitionSource;
     private String defaultValue;
     private String fixedValue;
-    private BigInteger facetMinLength;
-    private BigInteger facetMaxLength;
-    private String facetMinInclusive;
-    private String facetMinExclusive;
-    private String facetMaxInclusive;
-    private String facetMaxExclusive;
-    private String facetPattern;
     private BigInteger ownerDtManifestId = BigInteger.ZERO;
     private BigInteger ownerDtId = BigInteger.ZERO;
     private int cardinalityMin;

@@ -31,10 +31,6 @@ public class BbieSc extends Auditable {
     private BigInteger facetMinLength;
     private BigInteger facetMaxLength;
     private String facetPattern;
-    private String facetMinInclusive;
-    private String facetMinExclusive;
-    private String facetMaxInclusive;
-    private String facetMaxExclusive;
 
     private int cardinalityMin;
 
@@ -166,38 +162,6 @@ public class BbieSc extends Auditable {
 
     public void setFacetPattern(String facetPattern) {
         this.facetPattern = facetPattern;
-    }
-
-    public String getFacetMinInclusive() {
-        return facetMinInclusive;
-    }
-
-    public void setFacetMinInclusive(String facetMinInclusive) {
-        this.facetMinInclusive = facetMinInclusive;
-    }
-
-    public String getFacetMinExclusive() {
-        return facetMinExclusive;
-    }
-
-    public void setFacetMinExclusive(String facetMinExclusive) {
-        this.facetMinExclusive = facetMinExclusive;
-    }
-
-    public String getFacetMaxInclusive() {
-        return facetMaxInclusive;
-    }
-
-    public void setFacetMaxInclusive(String facetMaxInclusive) {
-        this.facetMaxInclusive = facetMaxInclusive;
-    }
-
-    public String getFacetMaxExclusive() {
-        return facetMaxExclusive;
-    }
-
-    public void setFacetMaxExclusive(String facetMaxExclusive) {
-        this.facetMaxExclusive = facetMaxExclusive;
     }
 
     public int getCardinalityMin() {

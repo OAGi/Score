@@ -672,26 +672,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             boolean isTypeString = "string".equals(type);
             boolean isTypeNumeric = "integer".equals(type) || "number".equals(type);
 
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
-                String minimum = facetRestri.getFacetMinInclusive();
-                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
-                content.put("exclusiveMinimum", false);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
-                String minimum = facetRestri.getFacetMinExclusive();
-                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
-                content.put("exclusiveMinimum", true);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
-                String maximum = facetRestri.getFacetMaxInclusive();
-                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
-                content.put("exclusiveMaximum", false);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
-                String maximum = facetRestri.getFacetMaxExclusive();
-                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
-                content.put("exclusiveMaximum", true);
-            }
             if (isTypeString && facetRestri.getFacetMinLength() != null) {
                 content.put("minLength", facetRestri.getFacetMinLength().longValue());
             }
@@ -1091,8 +1071,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
                 Xbt xbt = getXbt(bbie, bdt);
                 if (hasAnyValuesInFacets(bbie)) {
                     ref = fillSchemas(schemas, xbt, bbie, "type_" + bbie.getGuid());
-                } else if (hasAnyValuesInFacets(bdt)) {
-                    ref = fillSchemas(schemas, xbt, bdt, "type_" + bdt.getGuid());
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);
                 } else {
@@ -1177,8 +1155,6 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             } else {
                 if (hasAnyValuesInFacets(bbieSc)) {
                     ref = fillSchemas(schemas, xbt, bbieSc, "type_" + bbieSc.getGuid());
-                } else if (hasAnyValuesInFacets(dtSc)) {
-                    ref = fillSchemas(schemas, xbt, dtSc, "type_" + dtSc.getGuid());
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);
                 } else {

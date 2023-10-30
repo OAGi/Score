@@ -364,26 +364,6 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             boolean isTypeString = "string".equals(type);
             boolean isTypeNumeric = "integer".equals(type) || "number".equals(type);
 
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinInclusive())) {
-                String minimum = facetRestri.getFacetMinInclusive();
-                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
-                content.put("exclusiveMinimum", false);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMinExclusive())) {
-                String minimum = facetRestri.getFacetMinExclusive();
-                content.put("minimum", minimum.contains(".") ? new BigDecimal(minimum) : new BigInteger(minimum));
-                content.put("exclusiveMinimum", true);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxInclusive())) {
-                String maximum = facetRestri.getFacetMaxInclusive();
-                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
-                content.put("exclusiveMaximum", false);
-            }
-            if (isTypeNumeric && StringUtils.hasLength(facetRestri.getFacetMaxExclusive())) {
-                String maximum = facetRestri.getFacetMaxExclusive();
-                content.put("maximum", maximum.contains(".") ? new BigDecimal(maximum) : new BigInteger(maximum));
-                content.put("exclusiveMaximum", true);
-            }
             if (isTypeString && facetRestri.getFacetMinLength() != null) {
                 content.put("minLength", facetRestri.getFacetMinLength().longValue());
             }
@@ -745,8 +725,6 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
                 if (hasAnyValuesInFacets(bbie)) {
                     ref = fillDefinitions(definitions, xbt, bbie, "type_" + bbie.getGuid());
-                } else if (hasAnyValuesInFacets(bdt)) {
-                    ref = fillDefinitions(definitions, xbt, bdt, "type_" + bdt.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }
@@ -825,8 +803,6 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
                 if (hasAnyValuesInFacets(bbieSc)) {
                     ref = fillDefinitions(definitions, xbt, bbieSc, "type_" + bbieSc.getGuid());
-                } else if (hasAnyValuesInFacets(dtSc)) {
-                    ref = fillDefinitions(definitions, xbt, dtSc, "type_" + dtSc.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }

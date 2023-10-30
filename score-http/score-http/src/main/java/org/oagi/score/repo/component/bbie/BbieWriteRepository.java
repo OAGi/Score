@@ -132,26 +132,6 @@ public class BbieWriteRepository {
             } else {
                 bbieRecord.setFacetPattern(null);
             }
-            if (StringUtils.hasLength(bbie.getFacetMinInclusive())) {
-                bbieRecord.setFacetMinInclusive(bbie.getFacetMinInclusive());
-            } else {
-                bbieRecord.setFacetMinInclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMinExclusive())) {
-                bbieRecord.setFacetMinExclusive(bbie.getFacetMinExclusive());
-            } else {
-                bbieRecord.setFacetMinExclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMaxInclusive())) {
-                bbieRecord.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
-            } else {
-                bbieRecord.setFacetMaxInclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMaxExclusive())) {
-                bbieRecord.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
-            } else {
-                bbieRecord.setFacetMaxExclusive(null);
-            }
 
             bbieRecord.setExample(bbie.getExample());
             bbieRecord.setRemark(bbie.getRemark());
@@ -270,26 +250,6 @@ public class BbieWriteRepository {
             } else {
                 bbieRecord.setFacetPattern(null);
             }
-            if (StringUtils.hasLength(bbie.getFacetMinInclusive())) {
-                bbieRecord.setFacetMinInclusive(bbie.getFacetMinInclusive());
-            } else {
-                bbieRecord.setFacetMinInclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMinExclusive())) {
-                bbieRecord.setFacetMinExclusive(bbie.getFacetMinExclusive());
-            } else {
-                bbieRecord.setFacetMinExclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMaxInclusive())) {
-                bbieRecord.setFacetMaxInclusive(bbie.getFacetMaxInclusive());
-            } else {
-                bbieRecord.setFacetMaxInclusive(null);
-            }
-            if (StringUtils.hasLength(bbie.getFacetMaxExclusive())) {
-                bbieRecord.setFacetMaxExclusive(bbie.getFacetMaxExclusive());
-            } else {
-                bbieRecord.setFacetMaxExclusive(null);
-            }
 
             if (bbie.getExample() != null) {
                 bbieRecord.setExample(emptyToNull(bbie.getExample()));
@@ -337,10 +297,6 @@ public class BbieWriteRepository {
                         BBIE.FACET_MIN_LENGTH,
                         BBIE.FACET_MAX_LENGTH,
                         BBIE.FACET_PATTERN,
-                        BBIE.FACET_MIN_INCLUSIVE,
-                        BBIE.FACET_MIN_EXCLUSIVE,
-                        BBIE.FACET_MAX_INCLUSIVE,
-                        BBIE.FACET_MAX_EXCLUSIVE,
                         BBIE.EXAMPLE,
                         BBIE.REMARK,
                         BBIE.DEFAULT_VALUE,

@@ -6,7 +6,10 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 import java.time.LocalDateTime;
 
+import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.Record22;
+import org.jooq.Row22;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc;
@@ -19,7 +22,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc;
  * of supplementary components is created along with it. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
+public class DtScRecord extends UpdatableRecordImpl<DtScRecord> implements Record22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -246,132 +249,12 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.facet_min_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public void setFacetMinLength(ULong value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_min_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public ULong getFacetMinLength() {
-        return (ULong) get(13);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_max_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public void setFacetMaxLength(ULong value) {
-        set(14, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_max_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public ULong getFacetMaxLength() {
-        return (ULong) get(14);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
-     */
-    public void setFacetPattern(String value) {
-        set(15, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
-     */
-    public String getFacetPattern() {
-        return (String) get(15);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public void setFacetMinInclusive(String value) {
-        set(16, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public String getFacetMinInclusive() {
-        return (String) get(16);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public void setFacetMinExclusive(String value) {
-        set(17, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public String getFacetMinExclusive() {
-        return (String) get(17);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public void setFacetMaxInclusive(String value) {
-        set(18, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public String getFacetMaxInclusive() {
-        return (String) get(18);
-    }
-
-    /**
-     * Setter for <code>oagi.dt_sc.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public void setFacetMaxExclusive(String value) {
-        set(19, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt_sc.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public String getFacetMaxExclusive() {
-        return (String) get(19);
-    }
-
-    /**
      * Setter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
      * is deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(20, value);
+        set(13, value);
     }
 
     /**
@@ -380,7 +263,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(20);
+        return (Byte) get(13);
     }
 
     /**
@@ -388,7 +271,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * replacement if the record is deprecated.
      */
     public void setReplacementDtScId(ULong value) {
-        set(21, value);
+        set(14, value);
     }
 
     /**
@@ -396,7 +279,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtScId() {
-        return (ULong) get(21);
+        return (ULong) get(14);
     }
 
     /**
@@ -404,7 +287,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It indicates the user who created the code list.
      */
     public void setCreatedBy(ULong value) {
-        set(22, value);
+        set(15, value);
     }
 
     /**
@@ -412,7 +295,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It indicates the user who created the code list.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(22);
+        return (ULong) get(15);
     }
 
     /**
@@ -424,7 +307,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
-        set(23, value);
+        set(16, value);
     }
 
     /**
@@ -436,7 +319,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * rollback the ownership.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(23);
+        return (ULong) get(16);
     }
 
     /**
@@ -444,7 +327,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It identifies the user who last updated the code list.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(24, value);
+        set(17, value);
     }
 
     /**
@@ -452,7 +335,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * APP_USER table. It identifies the user who last updated the code list.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(24);
+        return (ULong) get(17);
     }
 
     /**
@@ -460,7 +343,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * code list was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(25, value);
+        set(18, value);
     }
 
     /**
@@ -468,7 +351,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * code list was created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(25);
+        return (LocalDateTime) get(18);
     }
 
     /**
@@ -476,7 +359,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * the code list was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(26, value);
+        set(19, value);
     }
 
     /**
@@ -484,7 +367,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * the code list was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(26);
+        return (LocalDateTime) get(19);
     }
 
     /**
@@ -492,7 +375,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the previous history record.
      */
     public void setPrevDtScId(ULong value) {
-        set(27, value);
+        set(20, value);
     }
 
     /**
@@ -500,7 +383,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the previous history record.
      */
     public ULong getPrevDtScId() {
-        return (ULong) get(27);
+        return (ULong) get(20);
     }
 
     /**
@@ -508,7 +391,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the next history record.
      */
     public void setNextDtScId(ULong value) {
-        set(28, value);
+        set(21, value);
     }
 
     /**
@@ -516,7 +399,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * indicate the next history record.
      */
     public ULong getNextDtScId() {
-        return (ULong) get(28);
+        return (ULong) get(21);
     }
 
     // -------------------------------------------------------------------------
@@ -526,6 +409,509 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record22 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> fieldsRow() {
+        return (Row22) super.fieldsRow();
+    }
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, String, ULong, Integer, Integer, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, ULong, ULong> valuesRow() {
+        return (Row22) super.valuesRow();
+    }
+
+    @Override
+    public Field<ULong> field1() {
+        return DtSc.DT_SC.DT_SC_ID;
+    }
+
+    @Override
+    public Field<String> field2() {
+        return DtSc.DT_SC.GUID;
+    }
+
+    @Override
+    public Field<String> field3() {
+        return DtSc.DT_SC.OBJECT_CLASS_TERM;
+    }
+
+    @Override
+    public Field<String> field4() {
+        return DtSc.DT_SC.PROPERTY_TERM;
+    }
+
+    @Override
+    public Field<String> field5() {
+        return DtSc.DT_SC.REPRESENTATION_TERM;
+    }
+
+    @Override
+    public Field<String> field6() {
+        return DtSc.DT_SC.DEFINITION;
+    }
+
+    @Override
+    public Field<String> field7() {
+        return DtSc.DT_SC.DEFINITION_SOURCE;
+    }
+
+    @Override
+    public Field<ULong> field8() {
+        return DtSc.DT_SC.OWNER_DT_ID;
+    }
+
+    @Override
+    public Field<Integer> field9() {
+        return DtSc.DT_SC.CARDINALITY_MIN;
+    }
+
+    @Override
+    public Field<Integer> field10() {
+        return DtSc.DT_SC.CARDINALITY_MAX;
+    }
+
+    @Override
+    public Field<ULong> field11() {
+        return DtSc.DT_SC.BASED_DT_SC_ID;
+    }
+
+    @Override
+    public Field<String> field12() {
+        return DtSc.DT_SC.DEFAULT_VALUE;
+    }
+
+    @Override
+    public Field<String> field13() {
+        return DtSc.DT_SC.FIXED_VALUE;
+    }
+
+    @Override
+    public Field<Byte> field14() {
+        return DtSc.DT_SC.IS_DEPRECATED;
+    }
+
+    @Override
+    public Field<ULong> field15() {
+        return DtSc.DT_SC.REPLACEMENT_DT_SC_ID;
+    }
+
+    @Override
+    public Field<ULong> field16() {
+        return DtSc.DT_SC.CREATED_BY;
+    }
+
+    @Override
+    public Field<ULong> field17() {
+        return DtSc.DT_SC.OWNER_USER_ID;
+    }
+
+    @Override
+    public Field<ULong> field18() {
+        return DtSc.DT_SC.LAST_UPDATED_BY;
+    }
+
+    @Override
+    public Field<LocalDateTime> field19() {
+        return DtSc.DT_SC.CREATION_TIMESTAMP;
+    }
+
+    @Override
+    public Field<LocalDateTime> field20() {
+        return DtSc.DT_SC.LAST_UPDATE_TIMESTAMP;
+    }
+
+    @Override
+    public Field<ULong> field21() {
+        return DtSc.DT_SC.PREV_DT_SC_ID;
+    }
+
+    @Override
+    public Field<ULong> field22() {
+        return DtSc.DT_SC.NEXT_DT_SC_ID;
+    }
+
+    @Override
+    public ULong component1() {
+        return getDtScId();
+    }
+
+    @Override
+    public String component2() {
+        return getGuid();
+    }
+
+    @Override
+    public String component3() {
+        return getObjectClassTerm();
+    }
+
+    @Override
+    public String component4() {
+        return getPropertyTerm();
+    }
+
+    @Override
+    public String component5() {
+        return getRepresentationTerm();
+    }
+
+    @Override
+    public String component6() {
+        return getDefinition();
+    }
+
+    @Override
+    public String component7() {
+        return getDefinitionSource();
+    }
+
+    @Override
+    public ULong component8() {
+        return getOwnerDtId();
+    }
+
+    @Override
+    public Integer component9() {
+        return getCardinalityMin();
+    }
+
+    @Override
+    public Integer component10() {
+        return getCardinalityMax();
+    }
+
+    @Override
+    public ULong component11() {
+        return getBasedDtScId();
+    }
+
+    @Override
+    public String component12() {
+        return getDefaultValue();
+    }
+
+    @Override
+    public String component13() {
+        return getFixedValue();
+    }
+
+    @Override
+    public Byte component14() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong component15() {
+        return getReplacementDtScId();
+    }
+
+    @Override
+    public ULong component16() {
+        return getCreatedBy();
+    }
+
+    @Override
+    public ULong component17() {
+        return getOwnerUserId();
+    }
+
+    @Override
+    public ULong component18() {
+        return getLastUpdatedBy();
+    }
+
+    @Override
+    public LocalDateTime component19() {
+        return getCreationTimestamp();
+    }
+
+    @Override
+    public LocalDateTime component20() {
+        return getLastUpdateTimestamp();
+    }
+
+    @Override
+    public ULong component21() {
+        return getPrevDtScId();
+    }
+
+    @Override
+    public ULong component22() {
+        return getNextDtScId();
+    }
+
+    @Override
+    public ULong value1() {
+        return getDtScId();
+    }
+
+    @Override
+    public String value2() {
+        return getGuid();
+    }
+
+    @Override
+    public String value3() {
+        return getObjectClassTerm();
+    }
+
+    @Override
+    public String value4() {
+        return getPropertyTerm();
+    }
+
+    @Override
+    public String value5() {
+        return getRepresentationTerm();
+    }
+
+    @Override
+    public String value6() {
+        return getDefinition();
+    }
+
+    @Override
+    public String value7() {
+        return getDefinitionSource();
+    }
+
+    @Override
+    public ULong value8() {
+        return getOwnerDtId();
+    }
+
+    @Override
+    public Integer value9() {
+        return getCardinalityMin();
+    }
+
+    @Override
+    public Integer value10() {
+        return getCardinalityMax();
+    }
+
+    @Override
+    public ULong value11() {
+        return getBasedDtScId();
+    }
+
+    @Override
+    public String value12() {
+        return getDefaultValue();
+    }
+
+    @Override
+    public String value13() {
+        return getFixedValue();
+    }
+
+    @Override
+    public Byte value14() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong value15() {
+        return getReplacementDtScId();
+    }
+
+    @Override
+    public ULong value16() {
+        return getCreatedBy();
+    }
+
+    @Override
+    public ULong value17() {
+        return getOwnerUserId();
+    }
+
+    @Override
+    public ULong value18() {
+        return getLastUpdatedBy();
+    }
+
+    @Override
+    public LocalDateTime value19() {
+        return getCreationTimestamp();
+    }
+
+    @Override
+    public LocalDateTime value20() {
+        return getLastUpdateTimestamp();
+    }
+
+    @Override
+    public ULong value21() {
+        return getPrevDtScId();
+    }
+
+    @Override
+    public ULong value22() {
+        return getNextDtScId();
+    }
+
+    @Override
+    public DtScRecord value1(ULong value) {
+        setDtScId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value2(String value) {
+        setGuid(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value3(String value) {
+        setObjectClassTerm(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value4(String value) {
+        setPropertyTerm(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value5(String value) {
+        setRepresentationTerm(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value6(String value) {
+        setDefinition(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value7(String value) {
+        setDefinitionSource(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value8(ULong value) {
+        setOwnerDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value9(Integer value) {
+        setCardinalityMin(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value10(Integer value) {
+        setCardinalityMax(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value11(ULong value) {
+        setBasedDtScId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value12(String value) {
+        setDefaultValue(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value13(String value) {
+        setFixedValue(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value14(Byte value) {
+        setIsDeprecated(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value15(ULong value) {
+        setReplacementDtScId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value16(ULong value) {
+        setCreatedBy(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value17(ULong value) {
+        setOwnerUserId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value18(ULong value) {
+        setLastUpdatedBy(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value19(LocalDateTime value) {
+        setCreationTimestamp(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value20(LocalDateTime value) {
+        setLastUpdateTimestamp(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value21(ULong value) {
+        setPrevDtScId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord value22(ULong value) {
+        setNextDtScId(value);
+        return this;
+    }
+
+    @Override
+    public DtScRecord values(ULong value1, String value2, String value3, String value4, String value5, String value6, String value7, ULong value8, Integer value9, Integer value10, ULong value11, String value12, String value13, Byte value14, ULong value15, ULong value16, ULong value17, ULong value18, LocalDateTime value19, LocalDateTime value20, ULong value21, ULong value22) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        value4(value4);
+        value5(value5);
+        value6(value6);
+        value7(value7);
+        value8(value8);
+        value9(value9);
+        value10(value10);
+        value11(value11);
+        value12(value12);
+        value13(value13);
+        value14(value14);
+        value15(value15);
+        value16(value16);
+        value17(value17);
+        value18(value18);
+        value19(value19);
+        value20(value20);
+        value21(value21);
+        value22(value22);
+        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -542,7 +928,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     /**
      * Create a detached, initialised DtScRecord
      */
-    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
+    public DtScRecord(ULong dtScId, String guid, String objectClassTerm, String propertyTerm, String representationTerm, String definition, String definitionSource, ULong ownerDtId, Integer cardinalityMin, Integer cardinalityMax, ULong basedDtScId, String defaultValue, String fixedValue, Byte isDeprecated, ULong replacementDtScId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevDtScId, ULong nextDtScId) {
         super(DtSc.DT_SC);
 
         setDtScId(dtScId);
@@ -558,13 +944,6 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
         setBasedDtScId(basedDtScId);
         setDefaultValue(defaultValue);
         setFixedValue(fixedValue);
-        setFacetMinLength(facetMinLength);
-        setFacetMaxLength(facetMaxLength);
-        setFacetPattern(facetPattern);
-        setFacetMinInclusive(facetMinInclusive);
-        setFacetMinExclusive(facetMinExclusive);
-        setFacetMaxInclusive(facetMaxInclusive);
-        setFacetMaxExclusive(facetMaxExclusive);
         setIsDeprecated(isDeprecated);
         setReplacementDtScId(replacementDtScId);
         setCreatedBy(createdBy);

@@ -1,7 +1,7 @@
 package org.oagi.score.repository;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
+import org.jooq.Record21;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BBIESC;
@@ -22,7 +22,12 @@ public class BBIESCRepository implements ScoreRepository<BBIESC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectJoinStep<Record> getSelectJoinStep() {
+    private SelectJoinStep<Record21<
+            ULong, String, ULong, ULong, ULong,
+            ULong, ULong, Integer, Integer, String,
+            String, ULong, ULong, String, String,
+            String, String, String, Byte, Byte,
+            ULong>> getSelectJoinStep() {
         return dslContext.select(
                 Tables.BBIE_SC.BBIE_SC_ID,
                 Tables.BBIE_SC.GUID,
@@ -38,10 +43,6 @@ public class BBIESCRepository implements ScoreRepository<BBIESC> {
                 Tables.BBIE_SC.FACET_MIN_LENGTH,
                 Tables.BBIE_SC.FACET_MAX_LENGTH,
                 Tables.BBIE_SC.FACET_PATTERN,
-                Tables.BBIE_SC.FACET_MIN_INCLUSIVE,
-                Tables.BBIE_SC.FACET_MIN_EXCLUSIVE,
-                Tables.BBIE_SC.FACET_MAX_INCLUSIVE,
-                Tables.BBIE_SC.FACET_MAX_EXCLUSIVE,
                 Tables.BBIE_SC.DEFINITION,
                 Tables.BBIE_SC.REMARK,
                 Tables.BBIE_SC.BIZ_TERM,

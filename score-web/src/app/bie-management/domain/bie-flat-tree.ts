@@ -998,10 +998,6 @@ export class BdtDetail {
   facetMinLength: number;
   facetMaxLength: number;
   facetPattern: string;
-  facetMinInclusive: string;
-  facetMinExclusive: string;
-  facetMaxInclusive: string;
-  facetMaxExclusive: string;
   propertyTerm: string;
   representationTerm: string;
   definition: string;
@@ -1031,10 +1027,6 @@ export class BdtScDetail {
   facetMinLength: number;
   facetMaxLength: number;
   facetPattern: string;
-  facetMinInclusive: string;
-  facetMinExclusive: string;
-  facetMaxInclusive: string;
-  facetMaxExclusive: string;
   cdtPrimitives: string[];
 }
 
@@ -1414,10 +1406,6 @@ export class BbieDetail {
   private _facetMinLength: number;
   private _facetMaxLength: number;
   private _facetPattern: string;
-  private _facetMinInclusive: string;
-  private _facetMinExclusive: string;
-  private _facetMaxInclusive: string;
-  private _facetMaxExclusive: string;
   private _nillable: boolean;
   private _remark: string;
   private _definition: string;
@@ -1481,42 +1469,6 @@ export class BbieDetail {
   set facetPattern(value: string) {
     this._facetPattern = value;
     this._node.fireChangeEvent('facetPattern', value);
-  }
-
-  get facetMinInclusive(): string {
-    return this._facetMinInclusive;
-  }
-
-  set facetMinInclusive(value: string) {
-    this._facetMinInclusive = value;
-    this._node.fireChangeEvent('facetMinInclusive', value);
-  }
-
-  get facetMinExclusive(): string {
-    return this._facetMinExclusive;
-  }
-
-  set facetMinExclusive(value: string) {
-    this._facetMinExclusive = value;
-    this._node.fireChangeEvent('facetMinExclusive', value);
-  }
-
-  get facetMaxInclusive(): string {
-    return this._facetMaxInclusive;
-  }
-
-  set facetMaxInclusive(value: string) {
-    this._facetMaxInclusive = value;
-    this._node.fireChangeEvent('facetMaxInclusive', value);
-  }
-
-  get facetMaxExclusive(): string {
-    return this._facetMaxExclusive;
-  }
-
-  set facetMaxExclusive(value: string) {
-    this._facetMaxExclusive = value;
-    this._node.fireChangeEvent('facetMaxExclusive', value);
   }
 
   get nillable(): boolean {
@@ -1653,10 +1605,6 @@ export class BbieDetail {
       this.facetMinLength = obj.facetMinLength;
       this.facetMaxLength = obj.facetMaxLength;
       this.facetPattern = obj.facetPattern;
-      this.facetMinInclusive = obj.facetMinInclusive;
-      this.facetMinExclusive = obj.facetMinExclusive;
-      this.facetMaxInclusive = obj.facetMaxInclusive;
-      this.facetMaxExclusive = obj.facetMaxExclusive;
       this.definition = obj.definition;
       this.deprecated = obj.deprecated;
       this.nillable = obj.nillable;
@@ -1689,10 +1637,6 @@ export class BbieDetail {
       ((this.facetMinLength) ? this.facetMinLength : 0) +
       ((this.facetMaxLength) ? this.facetMaxLength : 0) +
       ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
-      ((!!this.facetMinInclusive) ? hashCode4String(this.facetMinInclusive) : 0) +
-      ((!!this.facetMinExclusive) ? hashCode4String(this.facetMinExclusive) : 0) +
-      ((!!this.facetMaxInclusive) ? hashCode4String(this.facetMaxInclusive) : 0) +
-      ((!!this.facetMaxExclusive) ? hashCode4String(this.facetMaxExclusive) : 0) +
       ((this.nillable) ? 1231 : 1237) +
       ((this.deprecated) ? 1231 : 1237) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
@@ -1715,10 +1659,6 @@ export class BbieDetail {
       facetMinLength: this.facetMinLength,
       facetMaxLength: this.facetMaxLength,
       facetPattern: this.facetPattern,
-      facetMinInclusive: this.facetMinInclusive,
-      facetMinExclusive: this.facetMinExclusive,
-      facetMaxInclusive: this.facetMaxInclusive,
-      facetMaxExclusive: this.facetMaxExclusive,
       nillable: this.nillable,
       deprecated: this.deprecated,
       remark: this.remark,
@@ -1835,10 +1775,6 @@ export class BbieScDetail {
   private _facetMinLength: number;
   private _facetMaxLength: number;
   private _facetPattern: string;
-  private _facetMinInclusive: string;
-  private _facetMinExclusive: string;
-  private _facetMaxInclusive: string;
-  private _facetMaxExclusive: string;
   private _remark: string;
   private _bizTerm: string;
   private _definition: string;
@@ -1902,42 +1838,6 @@ export class BbieScDetail {
   set facetPattern(value: string) {
     this._facetPattern = value;
     this._node.fireChangeEvent('facetPattern', value);
-  }
-
-  get facetMinInclusive(): string {
-    return this._facetMinInclusive;
-  }
-
-  set facetMinInclusive(value: string) {
-    this._facetMinInclusive = value;
-    this._node.fireChangeEvent('facetMinInclusive', value);
-  }
-
-  get facetMinExclusive(): string {
-    return this._facetMinExclusive;
-  }
-
-  set facetMinExclusive(value: string) {
-    this._facetMinExclusive = value;
-    this._node.fireChangeEvent('facetMinExclusive', value);
-  }
-
-  get facetMaxInclusive(): string {
-    return this._facetMaxInclusive;
-  }
-
-  set facetMaxInclusive(value: string) {
-    this._facetMaxInclusive = value;
-    this._node.fireChangeEvent('facetMaxInclusive', value);
-  }
-
-  get facetMaxExclusive(): string {
-    return this._facetMaxExclusive;
-  }
-
-  set facetMaxExclusive(value: string) {
-    this._facetMaxExclusive = value;
-    this._node.fireChangeEvent('facetMaxExclusive', value);
   }
 
   get remark(): string {
@@ -2060,10 +1960,6 @@ export class BbieScDetail {
       this.facetMinLength = obj.facetMinLength;
       this.facetMaxLength = obj.facetMaxLength;
       this.facetPattern = obj.facetPattern;
-      this.facetMinInclusive = obj.facetMinInclusive;
-      this.facetMinExclusive = obj.facetMinExclusive;
-      this.facetMaxInclusive = obj.facetMaxInclusive;
-      this.facetMaxExclusive = obj.facetMaxExclusive;
 
       this.definition = obj.definition;
       this.bizTerm = obj.bizTerm;
@@ -2094,10 +1990,6 @@ export class BbieScDetail {
       ((this.facetMinLength) ? this.facetMinLength : 0) +
       ((this.facetMaxLength) ? this.facetMaxLength : 0) +
       ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
-      ((!!this.facetMinInclusive) ? hashCode4String(this.facetMinInclusive) : 0) +
-      ((!!this.facetMinExclusive) ? hashCode4String(this.facetMinExclusive) : 0) +
-      ((!!this.facetMaxInclusive) ? hashCode4String(this.facetMaxInclusive) : 0) +
-      ((!!this.facetMaxExclusive) ? hashCode4String(this.facetMaxExclusive) : 0) +
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
@@ -2119,10 +2011,6 @@ export class BbieScDetail {
       facetMinLength: this.facetMinLength,
       facetMaxLength: this.facetMaxLength,
       facetPattern: this.facetPattern,
-      facetMinInclusive: this.facetMinInclusive,
-      facetMinExclusive: this.facetMinExclusive,
-      facetMaxInclusive: this.facetMaxInclusive,
-      facetMaxExclusive: this.facetMaxExclusive,
       bizTerm: this.bizTerm,
       remark: this.remark,
       example: this.example,
