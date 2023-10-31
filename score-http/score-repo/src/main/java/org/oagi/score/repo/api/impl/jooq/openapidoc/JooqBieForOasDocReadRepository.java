@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static org.jooq.impl.DSL.or;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
@@ -34,7 +34,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         super(dslContext);
     }
 
-    private SelectOnConditionStep select() {
+    private SelectOnConditionStep selectForRequest() {
         return dslContext().select(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                         TOP_LEVEL_ASBIEP.STATE,
@@ -51,24 +51,16 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
                         APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                         APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
-                        OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id"),
-                        OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id"),
-                        OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb"),
-                        OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb"),
-                        OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name"),
-                        OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name"),
-                        OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator"),
-                        OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("res_array_indicator"),
-                        OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator"),
-                        OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("res_suppress_root_indicator"),
-                        OAS_RESOURCE.as("req_oas_resource").PATH.as("req_resource_name"),
-                        OAS_RESOURCE.as("res_oas_resource").PATH.as("res_resource_name"),
-                        OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.as("req_oas_resource_id"),
-                        OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.as("res_oas_resource_id"),
-                        OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id"),
-                        OAS_OPERATION.as("res_oas_operation").OPERATION_ID.as("res_operation_id"),
-                        OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.as("req_oas_operation_id"),
-                        OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.as("res_oas_operation_id"),
+                        inline("Request").as("oas_doc_message_body_type"),
+                        OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
+                        OAS_OPERATION.as("oas_operation").VERB.as("verb"),
+                        OAS_TAG.as("oas_tag").NAME.as("tag_name"),
+                        OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator"),
+                        OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("suppress_root_indicator"),
+                        OAS_RESOURCE.as("oas_resource").PATH.as("resource_name"),
+                        OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"),
+                        OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
+                        OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
@@ -79,17 +71,62 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP)
                 .from(OAS_MESSAGE_BODY)
                 .leftJoin(OAS_REQUEST).on(OAS_REQUEST.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
-                .leftJoin(OAS_OPERATION.as("req_oas_operation")).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID))
-                .leftJoin(OAS_RESOURCE.as("req_oas_resource")).on(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.eq(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID))
-                .leftJoin(OAS_DOC.as("req_oas_doc")).on(OAS_RESOURCE.as("req_oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("req_oas_doc").OAS_DOC_ID))
-                .leftJoin(OAS_RESOURCE_TAG.as("req_oas_resource_tag")).on(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID))
-                .leftJoin(OAS_TAG.as("req_oas_tag")).on(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("req_oas_tag").OAS_TAG_ID))
+                .leftJoin(OAS_OPERATION.as("oas_operation")).on(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_RESOURCE.as("oas_resource")).on(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.eq(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID))
+                .leftJoin(OAS_DOC.as("oas_doc")).on(OAS_RESOURCE.as("oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("oas_doc").OAS_DOC_ID))
+                .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
+                .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(APP_USER.as("owner")).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
+                .join(APP_USER.as("creator")).on(OAS_MESSAGE_BODY.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(OAS_MESSAGE_BODY.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
+    }
+
+    private SelectOnConditionStep selectForResponse() {
+        return dslContext().select(
+                        TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                        TOP_LEVEL_ASBIEP.STATE,
+                        TOP_LEVEL_ASBIEP.VERSION,
+                        TOP_LEVEL_ASBIEP.RELEASE_ID,
+                        ASBIEP.ASBIEP_ID,
+                        ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                        ASCCP.ASCCP_ID,
+                        ASCCP.GUID,
+                        ASCCP_MANIFEST.DEN,
+                        ASBIEP.REMARK,
+                        APP_USER.as("owner").LOGIN_ID.as("owner"),
+                        APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
+                        APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                        APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                        APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
+                        inline("Response").as("oas_doc_message_body_type"),
+                        OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"),
+                        OAS_OPERATION.as("oas_operation").VERB.as("verb"),
+                        OAS_TAG.as("oas_tag").NAME.as("tag_name"),
+                        OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("array_indicator"),
+                        OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("suppress_root_indicator"),
+                        OAS_RESOURCE.as("oas_resource").PATH.as("resource_name"),
+                        OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"),
+                        OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id"),
+                        OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
+                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                        OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
+                        OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP)
+                .from(OAS_MESSAGE_BODY)
                 .leftJoin(OAS_RESPONSE).on(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
-                .leftJoin(OAS_OPERATION.as("res_oas_operation")).on(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID))
-                .leftJoin(OAS_RESOURCE.as("res_oas_resource")).on(OAS_OPERATION.as("res_oas_operation").OAS_RESOURCE_ID.eq(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID))
-                .leftJoin(OAS_DOC.as("res_oas_doc")).on(OAS_RESOURCE.as("res_oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("res_oas_doc").OAS_DOC_ID))
-                .leftJoin(OAS_RESOURCE_TAG.as("res_oas_resource_tag")).on(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID))
-                .leftJoin(OAS_TAG.as("res_oas_tag")).on(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("res_oas_tag").OAS_TAG_ID))
+                .leftJoin(OAS_OPERATION.as("oas_operation")).on(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_RESOURCE.as("oas_resource")).on(OAS_OPERATION.as("oas_operation").OAS_RESOURCE_ID.eq(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID))
+                .leftJoin(OAS_DOC.as("oas_doc")).on(OAS_RESOURCE.as("oas_resource").OAS_DOC_ID.eq(OAS_DOC.as("oas_doc").OAS_DOC_ID))
+                .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
+                .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
                 .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
@@ -108,29 +145,16 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
             bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
-            if (record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")) != null) {
-                bieForOasDoc.setMessageBody("Request");
-                bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("req_oas_doc").OAS_DOC_ID.as("req_oas_doc_id")).toBigInteger());
-                bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("req_oas_operation").VERB.as("req_verb")));
-                bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("req_array_indicator")) == (byte) 1);
-                bieForOasDoc.setSuppressRootIndicator(record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("req_suppress_root_indicator")) == (byte) 1);
-                bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("req_oas_resource").PATH.as("req_resource_name")));
-                bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OPERATION_ID.as("req_operation_id")));
-                bieForOasDoc.setTagName(record.get(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name")));
-                bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("req_oas_resource").OAS_RESOURCE_ID.as("req_oas_resource_id")).toBigInteger());
-                bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("req_oas_operation").OAS_OPERATION_ID.as("req_oas_operation_id")).toBigInteger());
-            } else if (record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")) != null) {
-                bieForOasDoc.setMessageBody("Response");
-                bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.as("res_oas_doc_id")).toBigInteger());
-                bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("res_oas_operation").VERB.as("res_verb")));
-                bieForOasDoc.setArrayIndicator(record.get(OAS_RESPONSE.MAKE_ARRAY_INDICATOR.as("res_array_indicator")) == (byte) 1);
-                bieForOasDoc.setSuppressRootIndicator(record.get(OAS_RESPONSE.SUPPRESS_ROOT_INDICATOR.as("res_suppress_root_indicator")) == (byte) 1);
-                bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("res_oas_resource").PATH.as("res_resource_name")));
-                bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("res_oas_operation").OPERATION_ID.as("res_operation_id")));
-                bieForOasDoc.setTagName(record.get(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name")));
-                bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("res_oas_resource").OAS_RESOURCE_ID.as("res_oas_resource_id")).toBigInteger());
-                bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("res_oas_operation").OAS_OPERATION_ID.as("res_oas_operation_id")).toBigInteger());
-            }
+            bieForOasDoc.setMessageBody(record.get(field("oas_doc_message_body_type", String.class)));
+            bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id")).toBigInteger());
+            bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("oas_operation").VERB.as("verb")));
+            bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator")) == (byte) 1);
+            bieForOasDoc.setSuppressRootIndicator(record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("suppress_root_indicator")) == (byte) 1);
+            bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name")));
+            bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id")));
+            bieForOasDoc.setTagName(record.get(OAS_TAG.as("oas_tag").NAME.as("tag_name")));
+            bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id")).toBigInteger());
+            bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id")).toBigInteger());
             bieForOasDoc.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
             bieForOasDoc.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")).toString());
             bieForOasDoc.setCreatedBy(new ScoreUser(
@@ -176,8 +200,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         List<Condition> conditions = new ArrayList();
         BigInteger oasDocId = request.getOasDocId();
         if (oasDocId != null) {
-            conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
-                    OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))));
+            conditions.add(OAS_DOC.as("oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)));
         }
         BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
         if (topLevelAsbiepId != null) {
@@ -210,11 +233,9 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 break;
             case "tagname":
                 if ("asc".equals(direction)) {
-                    sortFields.add(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name").asc());
-                    sortFields.add(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name").asc());
+                    sortFields.add(OAS_TAG.NAME.as("tag_name").asc());
                 } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_TAG.as("req_oas_tag").NAME.as("req_tag_name").desc());
-                    sortFields.add(OAS_TAG.as("res_oas_tag").NAME.as("res_tag_name").desc());
+                    sortFields.add(OAS_TAG.NAME.as("tag_name").desc());
                 }
                 break;
             default:
@@ -226,24 +247,26 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        Collection<Condition> conditions = getConditions(request);
-        SelectConditionStep conditionStep = select().where(conditions);
+        SelectOrderByStep orderByStep = selectForRequest()
+                .where(getConditions(request))
+                .unionAll(selectForResponse()
+                        .where(getConditions(request)));
 
         List<SortField<?>> sortFields = getSortField(request);
-        int length = dslContext().fetchCount(conditionStep);
+        int length = dslContext().fetchCount(orderByStep);
         SelectFinalStep finalStep;
         if (sortFields == null || sortFields.isEmpty()) {
             if (request.isPagination()) {
-                finalStep = conditionStep.limit(request.getPageOffset(), request.getPageSize());
+                finalStep = orderByStep.limit(request.getPageOffset(), request.getPageSize());
             } else {
-                finalStep = conditionStep;
+                finalStep = orderByStep;
             }
         } else {
             if (request.isPagination()) {
-                finalStep = conditionStep.orderBy(sortFields)
+                finalStep = orderByStep.orderBy(sortFields)
                         .limit(request.getPageOffset(), request.getPageSize());
             } else {
-                finalStep = conditionStep.orderBy(sortFields);
+                finalStep = orderByStep.orderBy(sortFields);
             }
         }
         return new GetBieForOasDocResponse(
