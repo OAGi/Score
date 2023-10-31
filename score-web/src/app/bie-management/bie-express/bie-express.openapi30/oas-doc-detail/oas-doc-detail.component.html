@@ -156,7 +156,8 @@
             <ng-container matColumnDef="verb">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Verb</th>
               <td mat-cell *matCellDef="let element">
-                <mat-select [(ngModel)]="element.verb">
+                <mat-select [(ngModel)]="element.verb"
+                            (ngModelChange)="onChange('verb', element)">
                   <mat-option value="GET">GET</mat-option>
                   <mat-option value="PUT">PUT</mat-option>
                   <mat-option value="POST">POST</mat-option>

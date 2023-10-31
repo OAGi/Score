@@ -41,6 +41,10 @@
   color: #767676 !important;
 }
 
+.mat-error {
+  font-size: 13px;
+}
+
 .highlight {
   background: #42A948;
 }

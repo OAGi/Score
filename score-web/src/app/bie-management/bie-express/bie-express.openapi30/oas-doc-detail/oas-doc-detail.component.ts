@@ -191,6 +191,11 @@ export class OasDocDetailComponent implements OnInit {
       this.sort.active = '';
       this.sort.direction = '';
     }
+    if (property === 'verb') {
+      if (source.verb === 'GET' && source.messageBody === 'Request') {
+        source.messageBody = 'Response';
+      }
+    }
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

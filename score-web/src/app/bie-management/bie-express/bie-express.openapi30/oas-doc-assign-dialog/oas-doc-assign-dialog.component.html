@@ -203,15 +203,17 @@
           <ng-container matColumnDef="verb">
             <th mat-header-cell *matHeaderCellDef> Verb</th>
             <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true" [formControl]="selectedVerb" (click)="$event.stopPropagation()">
+              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
+                          (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
+                          (click)="$event.stopPropagation()">
                 <mat-option value="GET">GET</mat-option>
                 <mat-option value="PUT">PUT</mat-option>
                 <mat-option value="POST">POST</mat-option>
                 <mat-option value="DELETE">DELETE</mat-option>
                 <mat-option value="PATCH">PATCH</mat-option>
               </mat-select>
-              <mat-error *ngIf="selectedVerb.hasError('required')">
-                The verb must be selected
+              <mat-error *ngIf="isSelected(element) && !verbSelection[element.topLevelAsbiepId]">
+                Verb is required.
               </mat-error>
             </td>
           </ng-container>
@@ -219,14 +221,13 @@
           <ng-container matColumnDef="messageBody">
             <th mat-header-cell *matHeaderCellDef> Message Body</th>
             <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]"  required="true"
-                          [formControl]="selectedMessageBody"
+              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
                           (click)="$event.stopPropagation()">
-                <mat-option value="Request" [disabled]="selectedVerb.value === 'GET'">Request</mat-option>
+                <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
                 <mat-option value="Response">Response</mat-option>
               </mat-select>
-              <mat-error *ngIf="selectedMessageBody.hasError('required')">
-                The messageBody must be selected
+              <mat-error *ngIf="isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]">
+                Message Body is required.
               </mat-error>
             </td>
           </ng-container>
@@ -250,8 +251,8 @@
       </div>
   </mat-dialog-content>
   <div class="actions mt-4">
-    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary" [disabled]="selection.isEmpty() || selectedVerb.hasError('required') ||
-                                     selectedMessageBody.hasError('required')">
+    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary"
+            [disabled]="selection.isEmpty() || isOptionMissing()">
       <mat-icon>add</mat-icon>
       Add
     </button>
