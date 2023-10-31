@@ -154,7 +154,7 @@
             </ng-container>
 
             <ng-container matColumnDef="verb">
-              <th mat-header-cell *matHeaderCellDef> Verb</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Verb</th>
               <td mat-cell *matCellDef="let element">
                 <mat-select [(ngModel)]="element.verb">
                   <mat-option value="GET">GET</mat-option>
@@ -191,7 +191,7 @@
             </ng-container>
 
             <ng-container matColumnDef="resourceName">
-              <th mat-header-cell *matHeaderCellDef> Resource Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Resource Name</th>
               <td mat-cell *matCellDef="let element">
                 <mat-form-field>
                   <input matInput [(ngModel)]="element.resourceName">

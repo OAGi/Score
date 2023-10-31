@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static org.jooq.impl.DSL.*;
-import static org.oagi.score.repo.api.base.SortDirection.ASC;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
@@ -175,27 +175,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         };
     }
 
-//    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-//    public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-//        List<BieForOasDoc> bieListForOasDoc = new ArrayList<>();
-//        List<Condition> conditions = new ArrayList<>();
-//        BigInteger oasDocId = request.getOasDocId();
-//        if (oasDocId != null) {
-//            conditions.add(or(OAS_DOC.as("res_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId)),
-//                    OAS_DOC.as("req_oas_doc").OAS_DOC_ID.eq(ULong.valueOf(oasDocId))));
-//        }
-//        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
-//        if (topLevelAsbiepId != null) {
-//            conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)));
-//        }
-//        if (!conditions.isEmpty()) {
-//            bieListForOasDoc = select()
-//                    .where(conditions)
-//                    .fetch(mapper());
-//        }
-//
-//        return new GetBieForOasDocResponse(bieListForOasDoc, request.getPageIndex(), request.getPageSize(), bieListForOasDoc.size());
-//    }
     private Collection<Condition> getConditions(GetBieForOasDocRequest request) {
         List<Condition> conditions = new ArrayList();
         BigInteger oasDocId = request.getOasDocId();
@@ -219,9 +198,16 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         switch (trim(request.getSortActive()).toLowerCase()) {
             case "den":
                 if ("asc".equals(direction)) {
-                    sortFields.add(ASCCP.PROPERTY_TERM.asc());
+                    sortFields.add(ASCCP_MANIFEST.DEN.asc());
                 } else if ("desc".equals(direction)) {
-                    sortFields.add(ASCCP.PROPERTY_TERM.desc());
+                    sortFields.add(ASCCP_MANIFEST.DEN.desc());
+                }
+                break;
+            case "verb":
+                if ("asc".equals(direction)) {
+                    sortFields.add(OAS_OPERATION.as("oas_operation").VERB.as("verb").asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(OAS_OPERATION.as("oas_operation").VERB.as("verb").desc());
                 }
                 break;
             case "lastupdatetimestamp":
@@ -229,6 +215,20 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.asc());
                 } else if ("desc".equals(direction)) {
                     sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.desc());
+                }
+                break;
+            case "operationid":
+                if ("asc".equals(direction)) {
+                    sortFields.add(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id").asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id").desc());
+                }
+                break;
+            case "resourcename":
+                if ("asc".equals(direction)) {
+                    sortFields.add(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name").asc());
+                } else if ("desc".equals(direction)) {
+                    sortFields.add(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name").desc());
                 }
                 break;
             case "tagname":
@@ -244,6 +244,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
 
         return sortFields;
     }
+
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
@@ -292,7 +293,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
                         .where(OAS_TAG.as("req_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
             }
-        } else if (request.getMessageBodyType().equals("Response")){
+        } else if (request.getMessageBodyType().equals("Response")) {
             //Get oasTag
             OasResourceTagRecord res_oasResourceTagRecord = dslContext().selectFrom(OAS_RESOURCE_TAG.as("res_oas_resource_tag"))
                     .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
@@ -305,10 +306,10 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
             }
 
-        }else throw new ScoreDataAccessException("Wrong MessageBody Type: " + request.getMessageBodyType());
+        } else throw new ScoreDataAccessException("Wrong MessageBody Type: " + request.getMessageBodyType());
 
         GetAssignedOasTagResponse response;
-        if (oasTagRecord != null){
+        if (oasTagRecord != null) {
             OasTag oasTag = new OasTag(
                     oasTagRecord.getOasTagId().toBigInteger(),
                     oasTagRecord.getGuid(),
@@ -317,7 +318,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     null,
                     null);
             response = new GetAssignedOasTagResponse(oasTag);
-        }else{
+        } else {
             return null;
         }
         return response;
