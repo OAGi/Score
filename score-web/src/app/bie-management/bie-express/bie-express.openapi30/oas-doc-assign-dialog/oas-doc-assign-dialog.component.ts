@@ -40,8 +40,6 @@ export class OasDocAssignDialogComponent implements OnInit {
   businessContextSelection = {};
   verbSelection = {};
   messageBodySelection = {};
-  selectedVerb = new FormControl('', [Validators.required]);
-  selectedMessageBody = new FormControl('', [Validators.required]);
   loading = false;
   oasDoc: OasDoc;
   loginIdList: string[] = [];
@@ -161,6 +159,11 @@ export class OasDocAssignDialogComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
+    if (property === 'verbSelection') {
+      if (this.verbSelection[source] === 'GET' && this.messageBodySelection[source] === 'Request') {
+        this.messageBodySelection[source] = 'Response';
+      }
+    }
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -199,6 +202,16 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   isSelected(row: BieForOasDoc) {
     return this.selection.isSelected(row);
+  }
+
+  isOptionMissing(): boolean {
+    const selectedBieForOasDocs = this.selection.selected;
+    for (const bieForOasDoc of selectedBieForOasDocs) {
+      if (!this.verbSelection[bieForOasDoc.topLevelAsbiepId] || !this.messageBodySelection[bieForOasDoc.topLevelAsbiepId]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   addBieForOasDoc() {

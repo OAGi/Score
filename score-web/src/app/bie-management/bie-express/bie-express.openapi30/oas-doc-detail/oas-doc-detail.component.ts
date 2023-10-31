@@ -103,9 +103,13 @@ export class OasDocDetailComponent implements OnInit {
       this.loadBieListForOasDoc();
     });
 
+    this.request.page = new PageRequest(
+      this.sort.active, this.sort.direction,
+      this.paginator.pageIndex, this.paginator.pageSize);
+
     forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieListForOasDoc(oasDocId)
+      this.openAPIService.getBieListForOasDoc(this.request, oasDocId)
     ]).subscribe(([simpleOasDoc, bieForOasDoc]) => {
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
@@ -186,6 +190,11 @@ export class OasDocDetailComponent implements OnInit {
     if (property === 'filters.den') {
       this.sort.active = '';
       this.sort.direction = '';
+    }
+    if (property === 'verb') {
+      if (source.verb === 'GET' && source.messageBody === 'Request') {
+        source.messageBody = 'Response';
+      }
     }
   }
 

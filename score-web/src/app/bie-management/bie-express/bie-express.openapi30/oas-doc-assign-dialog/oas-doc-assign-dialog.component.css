@@ -1,14 +1,17 @@
 .mat-dialog-content {
   max-height: max-content;
 }
+
 .mat-column-state {
   width: 100px;
   font-size: 13px;
 }
+
 .mat-column-den {
   width: 300px;
   font-size: 13px;
 }
+
 .mat-column-owner {
   width: 100px;
 }
@@ -25,7 +28,7 @@
   width: 200px;
 }
 
-.mat-column-arrayIndicator{
+.mat-column-arrayIndicator {
   width: 100px;
 }
 
@@ -33,6 +36,15 @@
   width: 160px;
 }
 
-.highlight{
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.mat-error {
+  font-size: 13px;
+}
+
+.highlight {
   background: #42A948;
 }
