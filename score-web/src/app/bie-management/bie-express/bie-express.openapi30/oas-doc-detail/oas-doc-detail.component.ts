@@ -31,6 +31,7 @@ import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assi
 import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WebPageInfoService} from '../../../../basis/basis.service';
+import {FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -48,6 +49,12 @@ export class OasDocDetailComponent implements OnInit {
   hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
+  urlReg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
+  emailReg = '[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}';
+  contactUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
+  licenseUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  termServiceUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
   displayedColumns: string[] = [
     'select', 'den', 'remark', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
     'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
