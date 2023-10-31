@@ -146,15 +146,30 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
             bieForOasDoc.setMessageBody(record.get(field("oas_doc_message_body_type", String.class)));
-            bieForOasDoc.setOasDocId(record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id")).toBigInteger());
+            ULong oasDocId = record.get(OAS_DOC.as("oas_doc").OAS_DOC_ID.as("oas_doc_id"));
+            if (oasDocId != null) {
+                bieForOasDoc.setOasDocId(oasDocId.toBigInteger());
+            }
             bieForOasDoc.setVerb(record.get(OAS_OPERATION.as("oas_operation").VERB.as("verb")));
-            bieForOasDoc.setArrayIndicator(record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator")) == (byte) 1);
-            bieForOasDoc.setSuppressRootIndicator(record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("suppress_root_indicator")) == (byte) 1);
+            Byte arrayIndicator = record.get(OAS_REQUEST.MAKE_ARRAY_INDICATOR.as("array_indicator"));
+            if (arrayIndicator != null) {
+                bieForOasDoc.setArrayIndicator(arrayIndicator == (byte) 1);
+            }
+            Byte suppressRootIndicator = record.get(OAS_REQUEST.SUPPRESS_ROOT_INDICATOR.as("suppress_root_indicator"));
+            if (suppressRootIndicator != null) {
+                bieForOasDoc.setSuppressRootIndicator(suppressRootIndicator == (byte) 1);
+            }
             bieForOasDoc.setResourceName(record.get(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name")));
             bieForOasDoc.setOperationId(record.get(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id")));
             bieForOasDoc.setTagName(record.get(OAS_TAG.as("oas_tag").NAME.as("tag_name")));
-            bieForOasDoc.setOasResourceId(record.get(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id")).toBigInteger());
-            bieForOasDoc.setOasOperationId(record.get(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id")).toBigInteger());
+            ULong oasResourceId = record.get(OAS_RESOURCE.as("oas_resource").OAS_RESOURCE_ID.as("oas_resource_id"));
+            if (oasResourceId != null) {
+                bieForOasDoc.setOasResourceId(oasResourceId.toBigInteger());
+            }
+            ULong oasOperationId = record.get(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"));
+            if (oasOperationId != null) {
+                bieForOasDoc.setOasOperationId(oasOperationId.toBigInteger());
+            }
             bieForOasDoc.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
             bieForOasDoc.setOwner(record.get(APP_USER.as("owner").LOGIN_ID.as("owner")).toString());
             bieForOasDoc.setCreatedBy(new ScoreUser(
