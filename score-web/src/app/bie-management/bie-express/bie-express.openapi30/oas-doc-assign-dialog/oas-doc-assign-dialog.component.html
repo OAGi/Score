@@ -222,7 +222,7 @@
               <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]"  required="true"
                           [formControl]="selectedMessageBody"
                           (click)="$event.stopPropagation()">
-                <mat-option value="Request">Request</mat-option>
+                <mat-option value="Request" [disabled]="selectedVerb.value === 'GET'">Request</mat-option>
                 <mat-option value="Response">Response</mat-option>
               </mat-select>
               <mat-error *ngIf="selectedMessageBody.hasError('required')">

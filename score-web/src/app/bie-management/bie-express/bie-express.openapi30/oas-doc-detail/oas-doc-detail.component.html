@@ -184,7 +184,7 @@
               <th mat-header-cell *matHeaderCellDef> Message Body</th>
               <td mat-cell *matCellDef="let element">
                 <mat-select [(ngModel)]="element.messageBody">
-                  <mat-option value="Request">Request</mat-option>
+                  <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
                   <mat-option value="Response">Response</mat-option>
                 </mat-select>
               </td>
