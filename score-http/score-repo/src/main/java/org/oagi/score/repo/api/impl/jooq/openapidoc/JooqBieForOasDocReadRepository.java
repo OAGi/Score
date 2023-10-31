@@ -232,7 +232,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         List<SortField<?>> sortFields = getSortField(request);
         int length = dslContext().fetchCount(conditionStep);
         SelectFinalStep finalStep;
-        if (sortFields.isEmpty()) {
+        if (sortFields == null || sortFields.isEmpty()) {
             if (request.isPagination()) {
                 finalStep = conditionStep.limit(request.getPageOffset(), request.getPageSize());
             } else {
