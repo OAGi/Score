@@ -19,8 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_DOC;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.OAS_RESOURCE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.ScoreGuidUtils.randomGuid;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -158,15 +157,49 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
                                 OAS_RESOURCE.OAS_DOC_ID.in(oasDocIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
                 ).fetchInto(ULong.class);
 
-        if (!oasResourceIds.isEmpty()){
+        if (!oasResourceIds.isEmpty()) {
+            List<ULong> oasOperationIds = dslContext().select(OAS_OPERATION.OAS_OPERATION_ID)
+                    .from(OAS_OPERATION)
+                    .where(
+                            oasResourceIds.size() == 1 ?
+                                    OAS_OPERATION.OAS_RESOURCE_ID.eq(oasResourceIds.get(0)) :
+                                    OAS_OPERATION.OAS_RESOURCE_ID.in(oasResourceIds)
+                    ).fetchInto(ULong.class);
+
+            if (!oasOperationIds.isEmpty()) {
+                List<ULong> oasResourceTagIds = dslContext().select(OAS_RESOURCE_TAG.OAS_TAG_ID)
+                        .from(OAS_RESOURCE_TAG)
+                        .where(
+                                oasOperationIds.size() == 1 ?
+                                        OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationIds.get(0)) :
+                                        OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIds)
+                        ).fetchInto(ULong.class);
+
+                if (!oasResourceTagIds.isEmpty()) {
+                    dslContext().deleteFrom(OAS_TAG)
+                            .where(
+                                    oasOperationIds.size() == 1 ?
+                                            OAS_TAG.OAS_TAG_ID.eq(oasResourceTagIds.get(0)) :
+                                            OAS_TAG.OAS_TAG_ID.in(oasResourceTagIds)
+                            ).execute();
+                }
+
+                dslContext().delete(OAS_OPERATION)
+                        .where(
+                                oasOperationIds.size() == 1 ?
+                                        OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationIds.get(0)) :
+                                        OAS_OPERATION.OAS_OPERATION_ID.in(oasOperationIds)
+                        ).execute();
+            }
+
             dslContext().delete(OAS_RESOURCE)
                     .where(
                             oasResourceIds.size() == 1 ?
                                     OAS_RESOURCE.OAS_RESOURCE_ID.eq(oasResourceIds.get(0)) :
                                     OAS_RESOURCE.OAS_RESOURCE_ID.in(oasResourceIds)
                     ).execute();
-
         }
+
         try {
             dslContext().delete(OAS_DOC)
                     .where(
@@ -178,6 +211,7 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
         } catch (Exception e) {
             throw new ScoreDataAccessException("It's not possible to delete the used oas doc.");
         }
+
         DeleteOasDocResponse response = new DeleteOasDocResponse(oasDocIdList);
         return response;
     }
