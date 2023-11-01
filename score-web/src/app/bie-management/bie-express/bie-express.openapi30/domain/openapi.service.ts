@@ -50,8 +50,8 @@ export class OpenAPIService {
 
   getBieListForOasDoc(request: BieForOasDocListRequest, id): Observable<BieForOasDoc> {
     const params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
+      .set('sortActives', request.page.sortActives.join(','))
+      .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
     return this.http.get<BieForOasDoc>('/api/oas_doc/' + id + '/bie_list', {params});
@@ -139,8 +139,8 @@ export class OpenAPIService {
 
   getBieForOasDocListWithRequest(request: BieForOasDocListRequest, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
     let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
+      .set('sortActives', request.page.sortActives.join(','))
+      .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
     if (request.ownerLoginIds.length > 0) {

@@ -42,6 +42,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jquery": "^3.6.1",
     "ngx-markdown": "^14.0.1",
+    "ngx-mat-multi-sort": "^0.9.1",
     "ngx-mat-select-search": "^5.0.0",
     "notiflix": "^3.2.5",
     "popper.js": "^1.16.1",

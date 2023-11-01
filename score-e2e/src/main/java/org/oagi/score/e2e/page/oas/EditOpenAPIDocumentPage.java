@@ -161,4 +161,32 @@ public interface EditOpenAPIDocumentPage extends Page {
      */
     void hitUpdateButton();
 
+    /**
+     * Return the UI element of the 'Discard' button.
+     *
+     * @return the UI element of the 'Discard' button
+     */
+    WebElement getDiscardButton();
+
+    /**
+     * Hit the 'Discard' button.
+     *
+     * @return 'OpenAPI Document' page object
+     */
+    OpenAPIDocumentPage hitDiscardButton();
+
+    /**
+     * Return the UI element of the 'Add' button.
+     *
+     * @return the UI element of the 'Add' button
+     */
+    WebElement getAddButton();
+
+    /**
+     * Open 'Add BIE for OpenAPI Document' dialog.
+     *
+     * @return 'Add BIE for OpenAPI Document' dialog
+     */
+    AddBIEForOpenAPIDocumentDialog openAddBIEForOpenAPIDocumentDialog();
+
 }

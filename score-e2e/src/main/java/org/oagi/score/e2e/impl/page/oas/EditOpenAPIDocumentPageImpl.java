@@ -3,12 +3,15 @@ package org.oagi.score.e2e.impl.page.oas;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.OpenAPIDocumentObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.oas.AddBIEForOpenAPIDocumentDialog;
 import org.oagi.score.e2e.page.oas.EditOpenAPIDocumentPage;
+import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
 
+import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpenAPIDocumentPage {
@@ -48,6 +51,12 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
 
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+
+    private static final By DISCARD_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
+
+    private static final By ADD_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
 
     private BasePage parent;
 
@@ -195,5 +204,50 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         click(getUpdateButton(true));
         waitFor(Duration.ofMillis(500));
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public WebElement getDiscardButton() {
+        return elementToBeClickable(getDriver(), DISCARD_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public OpenAPIDocumentPage hitDiscardButton() {
+        retry(() -> {
+            click(getDiscardButton());
+            waitFor(ofMillis(1000L));
+        });
+        WebElement confirmDiscardButton = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]"
+        ));
+        click(confirmDiscardButton);
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        OpenAPIDocumentPage openAPIDocumentPage;
+        if (parent instanceof OpenAPIDocumentPage) {
+            openAPIDocumentPage = (OpenAPIDocumentPage) parent;
+        } else {
+            openAPIDocumentPage = new OpenAPIDocumentPageImpl(this);
+        }
+
+        assert openAPIDocumentPage.isOpened();
+        return openAPIDocumentPage;
+    }
+
+    @Override
+    public WebElement getAddButton() {
+        return elementToBeClickable(getDriver(), ADD_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public AddBIEForOpenAPIDocumentDialog openAddBIEForOpenAPIDocumentDialog() {
+        retry(() -> {
+            click(getAddButton());
+            waitFor(ofMillis(1000L));
+        });
+
+        AddBIEForOpenAPIDocumentDialog addBIEForOpenAPIDocumentDialog = new AddBIEForOpenAPIDocumentDialogImpl(this);
+        assert addBIEForOpenAPIDocumentDialog.isOpened();
+        return addBIEForOpenAPIDocumentDialog;
     }
 }
