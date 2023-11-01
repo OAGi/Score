@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.external.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticatedPrincipal;
+
 import java.math.BigInteger;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -14,14 +16,26 @@ import org.oagi.score.export.impl.StandaloneExportContextBuilder;
 import org.oagi.score.export.impl.XMLExportSchemaModuleVisitor;
 import org.oagi.score.export.model.SchemaModule;
 import org.oagi.score.export.service.CoreComponentService;
+import org.oagi.score.gateway.http.api.bie_management.data.BieList;
+import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.module_management.data.ExportStandaloneSchemaResponse;
 import org.oagi.score.gateway.http.api.release_management.provider.ReleaseDataProvider;
 import org.oagi.score.gateway.http.helper.Zip;
+import org.oagi.score.repo.BusinessInformationEntityRepository;
+import org.oagi.score.repo.PaginationResponse;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
+import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.component.release.ReleaseRepository;
 import org.oagi.score.repository.CoreComponentRepositoryForRelease;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.PageRequest;
+import org.oagi.score.service.common.data.PageResponse;
+
 import static org.jooq.impl.DSL.*;
 
 import org.jooq.*;
+import org.jooq.types.ULong;
+
 import java.util.*;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
@@ -42,6 +56,9 @@ public class ExternalService {
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private BusinessInformationEntityRepository bieRepository;
 
 
     public String getReleases() {
@@ -128,5 +145,58 @@ public class ExternalService {
         } finally {
             FileUtils.deleteDirectory(baseDir);
         }
+    }
+
+     public PageResponse<BieList> getBieList(AuthenticatedPrincipal user, BieListRequest request) {
+        PageRequest pageRequest = request.getPageRequest();
+        
+        PaginationResponse<BieList> result = bieRepository.selectBieLists()
+                .setDen(request.getDen())
+                .setPropertyTerm(request.getPropertyTerm())
+                .setBusinessContext(request.getBusinessContext())
+                .setAsccpManifestId(request.getAsccpManifestId())
+                .setExcludePropertyTerms(request.getExcludePropertyTerms())
+                .setTopLevelAsbiepIds(request.getTopLevelAsbiepIds())
+                .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
+                .setStates(request.getStates())
+                .setReleaseIds(request.getReleaseIds())
+                .setOwnerLoginIds(request.getOwnerLoginIds())
+                .setUpdaterLoginIds(request.getUpdaterLoginIds())
+                .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
+               // .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
+                .setOwnedByDeveloper(request.getOwnedByDeveloper())
+               // .setTenantBusinessCtx(requester.isAdmin(), userTenantIds)
+                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
+                .fetchInto(BieList.class);
+
+        List<BieList> bieLists = result.getResult();
+        /*
+        bieLists.forEach(bieList -> {
+
+            GetBusinessContextListRequest getBusinessContextListRequest =
+                    new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
+                            .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))
+                            .withName(request.getBusinessContext());
+
+            getBusinessContextListRequest.setPageIndex(-1);
+            getBusinessContextListRequest.setPageSize(-1);
+
+            GetBusinessContextListResponse getBusinessContextListResponse = businessContextService
+                    .getBusinessContextList(getBusinessContextListRequest, applicationConfigurationService.isTenantEnabled());
+
+            bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
+            bieList.setAccess(
+                    AccessPrivilege.toAccessPrivilege(requester, bieList.getOwnerUserId(), bieList.getState())
+            );
+            
+        });
+*/
+        PageResponse<BieList> response = new PageResponse();
+        response.setList(bieLists);
+        response.setPage(pageRequest.getPageIndex());
+        response.setSize(pageRequest.getPageSize());
+        response.setLength(result.getPageCount());
+        return response;
     }
 }
