@@ -26,7 +26,7 @@ export class PageRequest {
   }
 
   set sortActive(val: string) {
-    this.sortActives = [val,];
+    this.sortActives = (!val) ? [] : [val,];
   }
 
   get sortDirection(): string {
@@ -34,7 +34,7 @@ export class PageRequest {
   }
 
   set sortDirection(val: string) {
-    this.sortDirections = [val,];
+    this.sortDirections = (!val) ? [] : [val,];
   }
 
 }

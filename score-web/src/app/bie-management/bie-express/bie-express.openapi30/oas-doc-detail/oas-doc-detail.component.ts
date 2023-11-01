@@ -102,7 +102,7 @@ export class OasDocDetailComponent implements OnInit {
 
     // Init BIE list table for OasDoc
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
+      new PageRequest(['tagName', 'operationId'], ['asc', 'asc'], 0, 10));
     this.request.access = 'CanView';
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

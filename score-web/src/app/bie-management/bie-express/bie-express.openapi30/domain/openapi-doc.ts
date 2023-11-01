@@ -23,13 +23,13 @@ export class OasDocListRequest {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
 
-    this.page.sortActive = params.get('sortActive');
-    if (!this.page.sortActive) {
-      this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
+    this.page.sortActives = (params.get('sortActives')) ? Array.from(params.get('sortActives').split(',')) : undefined;
+    if (!this.page.sortActives) {
+      this.page.sortActives = (defaultPageRequest) ? defaultPageRequest.sortActives : [];
     }
-    this.page.sortDirection = params.get('sortDirection');
-    if (!this.page.sortDirection) {
-      this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
+    this.page.sortDirections = (params.get('sortDirections')) ? Array.from(params.get('sortDirections').split(',')) : undefined;
+    if (!this.page.sortDirections) {
+      this.page.sortDirections = (defaultPageRequest) ? defaultPageRequest.sortDirections : [];
     }
     if (params.get('pageIndex')) {
       this.page.pageIndex = Number(params.get('pageIndex'));
@@ -57,8 +57,8 @@ export class OasDocListRequest {
 
   toParams(): HttpParams {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
+      .set('sortActives', this.page.sortActives.join(','))
+      .set('sortDirections', this.page.sortDirections.join(','))
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
@@ -150,13 +150,13 @@ export class BieForOasDocListRequest {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
 
-    this.page.sortActive = params.get('sortActive');
-    if (!this.page.sortActive) {
-      this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
+    this.page.sortActives = (params.get('sortActives')) ? Array.from(params.get('sortActives').split(',')) : undefined;
+    if (!this.page.sortActives) {
+      this.page.sortActives = (defaultPageRequest) ? defaultPageRequest.sortActives : [];
     }
-    this.page.sortDirection = params.get('sortDirection');
-    if (!this.page.sortDirection) {
-      this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
+    this.page.sortDirections = (params.get('sortDirections')) ? Array.from(params.get('sortDirections').split(',')) : undefined;
+    if (!this.page.sortDirections) {
+      this.page.sortDirections = (defaultPageRequest) ? defaultPageRequest.sortDirections : [];
     }
     if (params.get('pageIndex')) {
       this.page.pageIndex = Number(params.get('pageIndex'));
@@ -189,10 +189,11 @@ export class BieForOasDocListRequest {
       den: params.get('den') || ''
     };
   }
+
   toQuery(extras?): string {
     let params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
+      .set('sortActives', this.page.sortActives.join(','))
+      .set('sortDirections', this.page.sortDirections.join(','))
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
