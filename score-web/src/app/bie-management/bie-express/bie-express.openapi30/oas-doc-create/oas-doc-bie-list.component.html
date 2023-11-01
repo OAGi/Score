@@ -163,14 +163,14 @@
         </div>
         <div class="mat-elevation-z1">
           <table mat-table multiTemplateDataRows
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                  [dataSource]="dataSource">
 
             <!-- Checkbox Column -->
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()"
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.owner !== username"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>

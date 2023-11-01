@@ -22,6 +22,8 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WebPageInfoService} from '../../../../basis/basis.service';
+import {UserToken} from '../../../../authentication/domain/auth';
+import {BieList} from '../../../bie-list/domain/bie-list';
 
 @Component({
   selector: 'score-oas-doc-bie-list',
@@ -145,6 +147,20 @@ export class OasDocBieListComponent implements OnInit {
     });
   }
 
+  get username(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.username : undefined;
+  }
+
+  get roles(): string[] {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.roles : [];
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
   onPageChange(event: PageEvent) {
     this.loadData();
   }
@@ -215,7 +231,9 @@ export class OasDocBieListComponent implements OnInit {
   }
 
   select(row: BieForOasDoc) {
-    this.selection.select(row);
+    if (row.owner === this.username){
+      this.selection.select(row);
+    }
   }
 
   toggle(row: BieForOasDoc) {
@@ -231,6 +249,13 @@ export class OasDocBieListComponent implements OnInit {
   }
 
   create() {
+  }
+
+  isEditable(element: BieForOasDoc): boolean {
+    if (!element) {
+      return false;
+    }
+    return element.owner === this.username;
   }
 
   get isDeveloper(): boolean {
