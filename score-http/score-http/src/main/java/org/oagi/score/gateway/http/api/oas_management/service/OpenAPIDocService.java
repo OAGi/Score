@@ -88,18 +88,10 @@ public class OpenAPIDocService {
         return response;
     }
 
-    public GetBieForOasDocListResponse getBieListForOasDoc(GetBieForOasDocListRequest request) {
-        PaginationResponse<BieForOasDoc> result = oasDocRepository.selectBieForOasDocLists()
-                .setOasDocId(request.getOasDocId())
-                .setSort(request.getSortActive(), request.getSortDirection().toString())
-                .fetchInto(BieForOasDoc.class);
-
-        List<BieForOasDoc> bieForOasDocList = result.getResult();
-        GetBieForOasDocListResponse response = new GetBieForOasDocListResponse(bieForOasDocList, request.getPageIndex(), request.getPageSize(),
-                request.getPageOffset());
+    public GetBieForOasDocResponse getBieListForOasDoc(GetBieForOasDocRequest request) {
+        GetBieForOasDocResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getBieForOasDocList(request);
         return response;
     }
-
 
     public PageResponse<BieForOasDoc> selectBieForOasDoc(AuthenticatedPrincipal user, BieForOasDocListRequest request) {
         PageRequest pageRequest = request.getPageRequest();

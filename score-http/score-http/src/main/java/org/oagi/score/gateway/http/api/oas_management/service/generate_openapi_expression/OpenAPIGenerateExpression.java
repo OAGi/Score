@@ -279,6 +279,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             String deleteTemplateKey = "DELETE-" + option.getResourceName();
 
             if (existingPath.size() > 0){
+
                 if (option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)) {
                     String schemaName;
                     String prefix = "";

@@ -13,6 +13,7 @@ import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
 import {OasDocBieListComponent} from './oas-doc-create/oas-doc-bie-list.component';
 import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog/oas-doc-assign-dialog.component';
+import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 
 
 const routes: Routes = [
@@ -69,15 +70,16 @@ const routes: Routes = [
     OasDocBieListComponent,
     OasDocAssignDialogComponent
   ],
-  imports: [
-    RouterModule.forChild(routes),
-    CommonModule,
-    MaterialModule,
-    TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        CommonModule,
+        MaterialModule,
+        TranslateModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ScoreCommonModule,
+        MatMultiSortModule
+    ],
   exports: [
     OasDocCreateComponent,
     OasDocListComponent,
