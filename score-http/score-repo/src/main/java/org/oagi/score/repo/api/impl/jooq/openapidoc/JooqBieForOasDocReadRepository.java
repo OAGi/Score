@@ -254,7 +254,8 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 }
                 break;
             default:
-                return null;
+                sortFields.add(OAS_TAG.NAME.as("tag_name").asc());
+                sortFields.add(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id").asc());
         }
 
         return sortFields;
