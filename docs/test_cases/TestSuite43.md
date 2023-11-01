@@ -17,22 +17,19 @@ The end user can create an OpenAPI Document with only required fields including 
 The end user cannot create an OpenAPI Document if any required field is not provided. 
 
 #### Test Assertion #43.1.4
-The end user can search for an OpenAPI Document based only on its term. 
+The end user can search for an OpenAPI Document based only on its title. 
 
 #### Test Assertion #43.1.5
-The end user can search for an OpenAPI Document based on the external reference URI.
+The end user can search for an OpenAPI Document based on the description.
 
 #### Test Assertion #43.1.6
-The end user can open an OpenAPI Document on the "OpenAPI Document " page to update its details in "Edit OpenAPI Document " page. 
+The end user can open an OpenAPI Document on the "OpenAPI Document" page to update its details in "Edit OpenAPI Document" page. 
 
 #### Test Assertion #43.1.7
-The end user cannot change Definition field in "Edit OpenAPI Document " page. 
+The end user can change all fields in "Edit OpenAPI Document" page. 
 
 #### Test Assertion #43.1.8
-The end user cannot save an OpenAPI Document with an already existing term and URI in "Edit OpenAPI Document " page.
-
-#### Test Assertion #43.1.9
-The end user cannot discard an OpenAPI Document in View/Edit OpenAPI Document  page if it is used in assignments. 
+The end user cannot discard an OpenAPI Document in "OpenAPI Document" page if it is used in assignments. 
 
 #### Test Assertion #43.1.10
 The end user can discard an OpenAPI Document in View/Edit OpenAPI Document  page if it is not in any assignments. 

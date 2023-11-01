@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record19;
-import org.jooq.Row19;
+import org.jooq.Record20;
+import org.jooq.Row20;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie;
@@ -21,7 +21,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie;
  * ASBIEP. It is a contextualization of an ASCC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Record19<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, ULong> {
+public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Record20<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, Byte, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -362,11 +362,27 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     /**
+     * Setter for <code>oagi.asbie.is_deprecated</code>. Indicates whether the
+     * ASBIE is deprecated.
+     */
+    public void setIsDeprecated(Byte value) {
+        set(18, value);
+    }
+
+    /**
+     * Getter for <code>oagi.asbie.is_deprecated</code>. Indicates whether the
+     * ASBIE is deprecated.
+     */
+    public Byte getIsDeprecated() {
+        return (Byte) get(18);
+    }
+
+    /**
      * Setter for <code>oagi.asbie.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(18, value);
+        set(19, value);
     }
 
     /**
@@ -374,7 +390,7 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(18);
+        return (ULong) get(19);
     }
 
     // -------------------------------------------------------------------------
@@ -387,17 +403,17 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     // -------------------------------------------------------------------------
-    // Record19 type implementation
+    // Record20 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row19<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, ULong> fieldsRow() {
-        return (Row19) super.fieldsRow();
+    public Row20<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, Byte, ULong> fieldsRow() {
+        return (Row20) super.fieldsRow();
     }
 
     @Override
-    public Row19<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, ULong> valuesRow() {
-        return (Row19) super.valuesRow();
+    public Row20<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, Byte, ULong> valuesRow() {
+        return (Row20) super.valuesRow();
     }
 
     @Override
@@ -491,7 +507,12 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     @Override
-    public Field<ULong> field19() {
+    public Field<Byte> field19() {
+        return Asbie.ASBIE.IS_DEPRECATED;
+    }
+
+    @Override
+    public Field<ULong> field20() {
         return Asbie.ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID;
     }
 
@@ -586,7 +607,12 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     @Override
-    public ULong component19() {
+    public Byte component19() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong component20() {
         return getOwnerTopLevelAsbiepId();
     }
 
@@ -681,7 +707,12 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     @Override
-    public ULong value19() {
+    public Byte value19() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong value20() {
         return getOwnerTopLevelAsbiepId();
     }
 
@@ -794,13 +825,19 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     }
 
     @Override
-    public AsbieRecord value19(ULong value) {
+    public AsbieRecord value19(Byte value) {
+        setIsDeprecated(value);
+        return this;
+    }
+
+    @Override
+    public AsbieRecord value20(ULong value) {
         setOwnerTopLevelAsbiepId(value);
         return this;
     }
 
     @Override
-    public AsbieRecord values(ULong value1, String value2, ULong value3, String value4, String value5, ULong value6, ULong value7, String value8, Integer value9, Integer value10, Byte value11, String value12, ULong value13, ULong value14, LocalDateTime value15, LocalDateTime value16, BigDecimal value17, Byte value18, ULong value19) {
+    public AsbieRecord values(ULong value1, String value2, ULong value3, String value4, String value5, ULong value6, ULong value7, String value8, Integer value9, Integer value10, Byte value11, String value12, ULong value13, ULong value14, LocalDateTime value15, LocalDateTime value16, BigDecimal value17, Byte value18, Byte value19, ULong value20) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -820,6 +857,7 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
         value17(value17);
         value18(value18);
         value19(value19);
+        value20(value20);
         return this;
     }
 
@@ -837,7 +875,7 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
     /**
      * Create a detached, initialised AsbieRecord
      */
-    public AsbieRecord(ULong asbieId, String guid, ULong basedAsccManifestId, String path, String hashPath, ULong fromAbieId, ULong toAsbiepId, String definition, Integer cardinalityMin, Integer cardinalityMax, Byte isNillable, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, ULong ownerTopLevelAsbiepId) {
+    public AsbieRecord(ULong asbieId, String guid, ULong basedAsccManifestId, String path, String hashPath, ULong fromAbieId, ULong toAsbiepId, String definition, Integer cardinalityMin, Integer cardinalityMax, Byte isNillable, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
         super(Asbie.ASBIE);
 
         setAsbieId(asbieId);
@@ -858,6 +896,7 @@ public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Rec
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setSeqKey(seqKey);
         setIsUsed(isUsed);
+        setIsDeprecated(isDeprecated);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
         resetChangedOnNotNull();
     }
