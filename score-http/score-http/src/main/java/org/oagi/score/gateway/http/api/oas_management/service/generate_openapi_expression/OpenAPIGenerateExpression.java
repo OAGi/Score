@@ -1138,6 +1138,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             properties = oneOf(allOf(properties), isNillable);
         }
 
+        // Issue #1298
+        if (asbie.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
+
         if (isArray) {
             Map<String, Object> items = new LinkedHashMap();
             items.putAll(properties);
@@ -1148,7 +1153,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             if (StringUtils.hasLength(description)) {
                 properties.put("description", description);
             }
+
             properties.put("type", "array");
+
+            Boolean deprecated = (Boolean) items.remove("deprecated");
+            if (deprecated != null) {
+                properties.put("deprecated", deprecated);
+            }
+
             if (minVal > 0) {
                 properties.put("minItems", minVal);
             }
@@ -1519,14 +1531,27 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             }
         }
 
+        // Issue #1298
+        if (bbie.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
+
         if (isArray) {
-            String description = (String) properties.remove("description");
             Map<String, Object> items = new LinkedHashMap(properties);
             properties = new LinkedHashMap();
+
+            String description = (String) properties.remove("description");
             if (StringUtils.hasLength(description)) {
                 properties.put("description", description);
             }
+
             properties.put("type", "array");
+
+            Boolean deprecated = (Boolean) items.remove("deprecated");
+            if (deprecated != null) {
+                properties.put("deprecated", deprecated);
+            }
+
             if (minVal > 0) {
                 properties.put("minItems", minVal);
             }
@@ -1724,6 +1749,11 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             properties.put("$ref", ref);
         }
         properties = allOf(properties);
+
+        // Issue #1298
+        if (bbieSc.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
