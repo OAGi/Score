@@ -10,6 +10,7 @@ import java.util.List;
 
 @Data
 public class OasDocListRequest {
+
     private BigInteger oasDocId;
     private String openAPIVersion;
     private String title;
@@ -19,4 +20,5 @@ public class OasDocListRequest {
     private Date updateStartDate;
     private Date updateEndDate;
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
+
 }

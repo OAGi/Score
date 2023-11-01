@@ -188,7 +188,7 @@ public class OpenAPIDocService {
                 .setTimestamp(millis)
                 .execute();
 
-        if (request.getTagName() != null){
+        if (request.getTagName() != null) {
             ULong oasTagId = oasDocRepository.insertOasTag()
                     .setUserId(userId)
                     .setGuid(randomGuid())
@@ -277,8 +277,8 @@ public class OpenAPIDocService {
     }
 
     @Transactional
-    public GetAssignedOasTagResponse getAssignedOasTag(GetAssignedOasTagRequest request){
-        GetAssignedOasTagResponse response = scoreRepositoryFactory. createBieForOasDocReadRepository().getAssignedOasTag(request);
+    public GetAssignedOasTagResponse getAssignedOasTag(GetAssignedOasTagRequest request) {
+        GetAssignedOasTagResponse response = scoreRepositoryFactory.createBieForOasDocReadRepository().getAssignedOasTag(request);
         return response;
     }
 }

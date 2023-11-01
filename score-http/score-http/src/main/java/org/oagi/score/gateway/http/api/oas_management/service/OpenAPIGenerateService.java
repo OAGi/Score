@@ -73,17 +73,17 @@ public class OpenAPIGenerateService {
         List<TopLevelAsbiep> topLevelAsbieps = topLevelAsbiepRepository.findByIdIn(topLevelAsbiepIds);
         GenerationContext generationContext = generateExpression.generateContext(topLevelAsbieps);
         String filename = "";
-        for (String paramsKey: params.keySet()) {
+        for (String paramsKey : params.keySet()) {
             OpenAPIGenerateExpressionOption option = params.get(paramsKey);
-            if (!StringUtils.hasLength(filename)){
+            if (!StringUtils.hasLength(filename)) {
                 long millis = System.currentTimeMillis();
-                if (StringUtils.hasLength(option.getOasDoc().getTitle())){
-                    if (StringUtils.hasLength(option.getOasDoc().getVersion())){
-                        filename = option.getOasDoc().getTitle() +"-" + option.getOasDoc().getVersion() +"-" + millis;
-                    }else{
-                        filename = option.getOasDoc().getTitle() +"-" + millis;
+                if (StringUtils.hasLength(option.getOasDoc().getTitle())) {
+                    if (StringUtils.hasLength(option.getOasDoc().getVersion())) {
+                        filename = option.getOasDoc().getTitle() + "-" + option.getOasDoc().getVersion() + "-" + millis;
+                    } else {
+                        filename = option.getOasDoc().getTitle() + "-" + millis;
                     }
-                } else{
+                } else {
                     filename = ScoreGuid.randomGuid();
                 }
             }

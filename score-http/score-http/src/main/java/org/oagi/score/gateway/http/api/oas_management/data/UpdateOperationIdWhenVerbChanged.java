@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.data;
 import org.apache.commons.lang3.StringUtils;
 
 public class UpdateOperationIdWhenVerbChanged {
+
     private String verb;
     private String newOperationId;
     private String oldOperationId;
@@ -54,6 +55,7 @@ public class UpdateOperationIdWhenVerbChanged {
             default:
                 throw new IllegalArgumentException("Unknown verb option: " + this.verb);
         }
+
         return this.newOperationId;
     }
 }

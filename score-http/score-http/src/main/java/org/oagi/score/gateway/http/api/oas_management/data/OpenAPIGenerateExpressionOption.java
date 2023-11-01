@@ -27,10 +27,11 @@ public class OpenAPIGenerateExpressionOption {
     private String openAPIExpressionFormat;
     private boolean openAPICodeGenerationFriendly;
     private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
+
     public boolean isTwoTemplateOptionDifferent(String verb1, String verb2) {
 
-        String templateKey1 = verb1 +"-" + this.resourceName;
-        String templateKey2 = verb2 +"-" + this.resourceName;
+        String templateKey1 = verb1 + "-" + this.resourceName;
+        String templateKey2 = verb2 + "-" + this.resourceName;
 
         if (openAPI30TemplateMap.containsKey(templateKey1) != openAPI30TemplateMap.containsKey(templateKey2)) {
             return false;

@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.data;
 import lombok.Data;
 
 import java.math.BigInteger;
+
 @Data
 public class OpenAPITemplateForVerbOption {
     private String verbOption;

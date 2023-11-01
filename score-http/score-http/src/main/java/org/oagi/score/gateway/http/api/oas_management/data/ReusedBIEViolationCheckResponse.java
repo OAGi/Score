@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class ReusedBIEViolationCheckResponse extends Response {
+
     private List<String> errorMessages;
 
 }
