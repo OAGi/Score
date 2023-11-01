@@ -6,11 +6,13 @@ import org.oagi.score.e2e.impl.page.bie.*;
 import org.oagi.score.e2e.impl.page.business_term.ViewEditBusinessTermPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.UpliftCodeListPageImpl;
 import org.oagi.score.e2e.impl.page.code_list.ViewEditCodeListPageImpl;
+import org.oagi.score.e2e.impl.page.oas.OpenAPIDocumentPageImpl;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -35,6 +37,9 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
 
     private final By EXPRESS_BIE_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"Express BIE\")]");
+
+    private final By OPENAPI_DOCUMENT_SUB_MENU_LOCATOR =
+            By.xpath("//button[contains(text(), \"OpenAPI Document\")]");
 
     private final By REUSE_REPORT_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(text(), \"Reuse Report\")]");
@@ -145,6 +150,22 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
         ExpressBIEPage expressBIEPage = new ExpressBIEPageImpl(this);
         assert expressBIEPage.isOpened();
         return expressBIEPage;
+    }
+
+    @Override
+    public WebElement getOpenAPIDocumentSubMenu() {
+        if (!isExpanded()) {
+            expandBIEMenu();
+        }
+        return elementToBeClickable(getDriver(), OPENAPI_DOCUMENT_SUB_MENU_LOCATOR);
+    }
+
+    @Override
+    public OpenAPIDocumentPage openOpenAPIDocumentSubMenu() {
+        retry(() -> click(getOpenAPIDocumentSubMenu()));
+        OpenAPIDocumentPage openAPIDocumentPage = new OpenAPIDocumentPageImpl(this);
+        assert openAPIDocumentPage.isOpened();
+        return openAPIDocumentPage;
     }
 
     @Override
