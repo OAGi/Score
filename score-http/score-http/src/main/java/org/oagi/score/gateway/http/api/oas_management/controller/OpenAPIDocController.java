@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @RestController
 public class OpenAPIDocController {
@@ -72,13 +73,13 @@ public class OpenAPIDocController {
         request.setVersion(version);
         request.setDescription(description);
 
-        request.setUpdaterUsernameList(!StringUtils.hasLength(updaterUsernameList) ? Collections.emptyList() :
+        request.setUpdaterUsernameList(!hasLength(updaterUsernameList) ? Collections.emptyList() :
                 Arrays.asList(updaterUsernameList.split(",")).stream().map(e -> e.trim())
-                        .filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
-        if (StringUtils.hasLength(updateStart)) {
+                        .filter(e -> hasLength(e)).collect(Collectors.toList()));
+        if (hasLength(updateStart)) {
             request.setUpdateStartDate(new Timestamp(Long.valueOf(updateStart)).toLocalDateTime());
         }
-        if (StringUtils.hasLength(updateEnd)) {
+        if (hasLength(updateEnd)) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(Long.valueOf(updateEnd));
             calendar.add(Calendar.DATE, 1);
@@ -268,8 +269,8 @@ public class OpenAPIDocController {
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
             @RequestParam(name = "releaseIds", required = false) String releaseIds,
-            @RequestParam(name = "sortActive") String sortActive,
-            @RequestParam(name = "sortDirection") String sortDirection,
+            @RequestParam(name = "sortActives") String sortActives,
+            @RequestParam(name = "sortDirections") String sortDirections,
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize
          ) {
@@ -279,17 +280,16 @@ public class OpenAPIDocController {
         AppUser appUser = sessionService.getAppUserByUsername(requester);
 
         request.setOasDocId(oasDocId);
-        request.setSortActive(sortActive);
-        if (StringUtils.hasLength(sortDirection)){
-            request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
-        }
+        request.setSortActives(!hasLength(sortActives) ? Collections.emptyList() :
+                Arrays.asList(sortActives.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).collect(Collectors.toList()));
+        request.setSortDirections(!hasLength(sortDirections) ? Collections.emptyList() :
+                Arrays.asList(sortDirections.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).map(e -> SortDirection.valueOf(e.toUpperCase())).collect(Collectors.toList()));
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
 
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(request);
 
         bieForOasDocList.getResults().forEach(bieList -> {
-
             GetBusinessContextListRequest getBusinessContextListRequest =
                     new GetBusinessContextListRequest(authenticationService.asScoreUser(requester))
                             .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))

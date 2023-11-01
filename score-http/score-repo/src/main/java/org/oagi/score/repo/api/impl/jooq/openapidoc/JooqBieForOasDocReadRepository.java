@@ -4,6 +4,7 @@ import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResourceTagRecord;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.inline;
+import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
@@ -203,60 +205,43 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         return conditions;
     }
 
-    private List<SortField<?>> getSortField(GetBieForOasDocRequest request) {
+    private List<SortField<?>> getSortFields(GetBieForOasDocRequest request) {
         List<SortField<?>> sortFields = new ArrayList<>();
 
-        if (!StringUtils.hasLength(request.getSortActive())) {
-            return null;
-        }
-        String direction = request.getSortDirection().toString().toLowerCase();
-        switch (trim(request.getSortActive()).toLowerCase()) {
-            case "den":
-                if ("asc".equals(direction)) {
-                    sortFields.add(ASCCP_MANIFEST.DEN.asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(ASCCP_MANIFEST.DEN.desc());
-                }
-                break;
-            case "verb":
-                if ("asc".equals(direction)) {
-                    sortFields.add(OAS_OPERATION.as("oas_operation").VERB.as("verb").asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_OPERATION.as("oas_operation").VERB.as("verb").desc());
-                }
-                break;
-            case "lastupdatetimestamp":
-                if ("asc".equals(direction)) {
-                    sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP.desc());
-                }
-                break;
-            case "operationid":
-                if ("asc".equals(direction)) {
-                    sortFields.add(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id").asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id").desc());
-                }
-                break;
-            case "resourcename":
-                if ("asc".equals(direction)) {
-                    sortFields.add(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name").asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_RESOURCE.as("oas_resource").PATH.as("resource_name").desc());
-                }
-                break;
-            case "tagname":
-                if ("asc".equals(direction)) {
-                    sortFields.add(OAS_TAG.NAME.as("tag_name").asc());
-                } else if ("desc".equals(direction)) {
-                    sortFields.add(OAS_TAG.NAME.as("tag_name").desc());
-                }
-                break;
-            default:
-                return null;
-        }
+        for (int i = 0, len = request.getSortActives().size(); i < len; ++i) {
+            String sortActive = request.getSortActives().get(i);
+            SortDirection sortDirection = request.getSortDirections().get(i);
 
+            Field field;
+            switch (sortActive.toLowerCase()) {
+                case "den":
+                    field = ASCCP_MANIFEST.DEN;
+                    break;
+                case "verb":
+                    field = OAS_OPERATION.as("oas_operation").VERB.as("verb");
+                    break;
+                case "lastupdatetimestamp":
+                    field = OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP;
+                    break;
+                case "operationid":
+                    field = OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id");
+                    break;
+                case "resourcename":
+                    field = OAS_RESOURCE.as("oas_resource").PATH.as("resource_name");
+                    break;
+                case "tagname":
+                    field = OAS_TAG.NAME.as("tag_name");
+                    break;
+                default:
+                    continue;
+            }
+
+            if (sortDirection == ASC) {
+                sortFields.add(field.asc());
+            } else {
+                sortFields.add(field.desc());
+            }
+        }
         return sortFields;
     }
 
@@ -268,7 +253,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 .unionAll(selectForResponse()
                         .where(getConditions(request)));
 
-        List<SortField<?>> sortFields = getSortField(request);
+        List<SortField<?>> sortFields = getSortFields(request);
         int length = dslContext().fetchCount(orderByStep);
         SelectFinalStep finalStep;
         if (sortFields == null || sortFields.isEmpty()) {

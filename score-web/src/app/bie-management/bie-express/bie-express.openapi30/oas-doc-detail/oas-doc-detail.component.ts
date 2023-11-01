@@ -7,7 +7,7 @@ import {
   OasDoc,
   simpleOasDoc
 } from '../domain/openapi-doc';
-import {MatSort, SortDirection} from '@angular/material/sort';
+import {SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {OpenAPIService} from '../domain/openapi.service';
@@ -22,7 +22,6 @@ import {hashCode, saveBranch} from 'src/app/common/utility';
 import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 import {WorkingRelease} from '../../../../release-management/domain/release';
-import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
@@ -31,6 +30,7 @@ import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assi
 import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WebPageInfoService} from '../../../../basis/basis.service';
+import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -48,11 +48,20 @@ export class OasDocDetailComponent implements OnInit {
   hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
-  displayedColumns: string[] = [
-    'select', 'den', 'remark', 'verb', 'arrayIndicator', 'suppressRootIndicator', 'messageBody',
-    'resourceName', 'operationId', 'tagName', 'lastUpdateTimestamp'
+  displayedColumns = [
+    { id: 'select', name: '' },
+    { id: 'den', name: 'DEN' },
+    { id: 'remark', name: 'Remark' },
+    { id: 'verb', name: 'Verb' },
+    { id: 'arrayIndicator', name: 'Array Indicator' },
+    { id: 'suppressRootIndicator', name: 'Suppress Root Indicator' },
+    { id: 'messageBody', name: 'Message Body' },
+    { id: 'resourceName', name: 'Resource Name' },
+    { id: 'operationId', name: 'Operation ID' },
+    { id: 'tagName', name: 'Tag Name' },
+    { id: 'lastUpdateTimestamp', name: 'Last Update Timestamp' },
   ];
-  dataSource = new MatTableDataSource<BieForOasDoc>();
+  table: TableData<BieForOasDoc>;
   selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
   request: BieForOasDocListRequest;
@@ -61,7 +70,7 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private bizCtxService: BusinessContextService,
@@ -78,6 +87,9 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.table = new TableData<BieForOasDoc>(this.displayedColumns);
+    this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
+
     this.topLevelAsbiepIds = [];
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
@@ -96,15 +108,15 @@ export class OasDocDetailComponent implements OnInit {
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    this.sort.sortChange.subscribe(() => {
+    this.table.sortParams = this.request.page.sortActives;
+    this.table.sortDirs = this.request.page.sortDirections;
+    this.table.sortObservable.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadBieListForOasDoc();
     });
 
     this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
+      this.table.sortParams, this.table.sortDirs,
       this.paginator.pageIndex, this.paginator.pageSize);
 
     forkJoin([
@@ -129,7 +141,7 @@ export class OasDocDetailComponent implements OnInit {
     this.loading = true;
 
     this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
+      this.table.sortParams, this.table.sortDirs,
       this.paginator.pageIndex, this.paginator.pageSize);
 
     this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
@@ -138,13 +150,13 @@ export class OasDocDetailComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
+      this.table.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
         elm = new BieForOasDoc(elm);
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
         return elm;
       });
-      this.dataSource.data.forEach((elm: BieForOasDoc) => {
+      this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
         this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
       });
 
@@ -152,19 +164,22 @@ export class OasDocDetailComponent implements OnInit {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
-      this.dataSource.data = [];
+      this.table.dataSource.data = [];
       this.businessContextSelection = {};
     });
   }
 
   getChanged(): BieForOasDoc[] {
-    if (!this.dataSource) {
+    if (!this.table.dataSource) {
       return [];
     }
-    return this.dataSource.data.filter(e => e.isChanged);
+    return this.table.dataSource.data.filter(e => e.isChanged);
   }
 
   isChanged(): boolean {
+    if (!this.oasDoc) {
+      return false;
+    }
     return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0;
   }
 
@@ -224,17 +239,6 @@ export class OasDocDetailComponent implements OnInit {
     this.checkUniqueness(this.oasDoc, (_) => {
       this.doUpdate();
     });
-  }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-  }
-
-  clearFilter() {
-    this.bizCtxSearch = '';
-    this.applyFilter(this.bizCtxSearch);
   }
 
   get access(): string {
@@ -340,7 +344,7 @@ export class OasDocDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.dataSource.data;
+    dialogConfig.data = this.table.dataSource.data;
     dialogConfig.data.webPageInfo = this.webPageInfo;
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
@@ -367,7 +371,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   _updateDataSource(data: BieForOasDoc[]) {
-    this.dataSource.data = data;
+    this.table.dataSource.data = data;
     this.oasDoc.bieList = data;
   }
 
@@ -442,7 +446,7 @@ export class OasDocDetailComponent implements OnInit {
             });
           });
           const newData = [];
-          this.dataSource.data.forEach(row => {
+          this.table.dataSource.data.forEach(row => {
             if (!this.selection.isSelected(row)) {
               newData.push(row);
             }

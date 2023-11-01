@@ -104,23 +104,35 @@
           Add
         </button>
         <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
-                [hidden]="dataSource.data.length == 0"
+                [hidden]="table.dataSource.data.length == 0"
                 [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
                 color="warn">
           <mat-icon>delete</mat-icon>
           Remove
         </button>
         <button mat-raised-button color="primary" (click)="generate()"
-                [disabled]="isDisabled(oasDoc) || dataSource.data.length == 0">
+                [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
           Generate
         </button>
       </div>
       </mat-card-content>
     </mat-card-header>
     <mat-card-content class="mat-card-container">
+      <div class="container-fluid pb-2">
+        <div class="row">
+          <div class="col-12">
+            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
+              <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+                {{ columnName }}
+                <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+              </ng-template>
+            </mat-multi-sort-table-settings>
+          </div>
+        </div>
+      </div>
       <div class="mat-elevation-z1">
-        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
+        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef></th>
@@ -133,7 +145,7 @@
           </ng-container>
 
           <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"> DEN</th>
             <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
               <div class="den word-break-all">
                 <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
@@ -153,7 +165,7 @@
           </ng-container>
 
           <ng-container matColumnDef="verb">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Verb</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="verb"> Verb</th>
             <td mat-cell *matCellDef="let element">
               <mat-select [(ngModel)]="element.verb"
                           (ngModelChange)="onChange('verb', element)">
@@ -191,7 +203,7 @@
           </ng-container>
 
           <ng-container matColumnDef="resourceName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Resource Name</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="resourceName"> Resource Name</th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field>
                 <input matInput [(ngModel)]="element.resourceName">
@@ -200,7 +212,7 @@
           </ng-container>
 
           <ng-container matColumnDef="operationId">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Operation ID</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="operationId"> Operation ID</th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field>
                 <input matInput [(ngModel)]="element.operationId">
@@ -209,7 +221,7 @@
           </ng-container>
 
           <ng-container matColumnDef="tagName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tag Name</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="tagName"> Tag Name</th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field>
                 <input matInput [(ngModel)]="element.tagName">
@@ -218,15 +230,15 @@
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
               <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns; let entry"[ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
+          <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: table.displayedColumns; let entry" [ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
         </table>
 
         <mat-paginator
