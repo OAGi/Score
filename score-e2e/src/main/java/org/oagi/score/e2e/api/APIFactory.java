@@ -124,9 +124,32 @@ public interface APIFactory extends AutoCloseable {
      */
     BusinessInformationEntityAPI getBusinessInformationEntityAPI();
 
+    /**
+     * Return the module set API.
+     *
+     * @return the module set API.
+     */
     ModuleSetAPI getModuleSetAPI();
 
+    /**
+     * Return the module API.
+     *
+     * @return the module API.
+     */
     ModuleAPI getModuleAPI();
 
+    /**
+     * Return the module set release API.
+     *
+     * @return the module set release API.
+     */
     ModuleSetReleaseAPI getModuleSetReleaseAPI();
+
+    /**
+     * Return the OpenAPI document API.
+     *
+     * @return the OpenAPI document API.
+     */
+    OpenAPIDocumentAPI getOpenAPIDocumentAPI();
+
 }

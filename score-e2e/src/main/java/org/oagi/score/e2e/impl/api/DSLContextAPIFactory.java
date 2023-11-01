@@ -130,6 +130,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public OpenAPIDocumentAPI getOpenAPIDocumentAPI() {
+        return new DSLContextOpenAPIDocumentAPIImpl(dslContext, this);
+    }
+
+    @Override
     public void close() throws Exception {
         if (dataSource != null) {
             dataSource.close();
