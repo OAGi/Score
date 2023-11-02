@@ -50,7 +50,8 @@ public class CcListRepository {
 
         ULong defaultModuleSetReleaseId = null;
         ModuleSetReleaseRecord defaultModuleSetRelease = dslContext.selectFrom(MODULE_SET_RELEASE)
-                .where(and(MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1), MODULE_SET_RELEASE.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .where(and(MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1),
+                        MODULE_SET_RELEASE.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .fetchOne();
         if (defaultModuleSetRelease != null) {
             defaultModuleSetReleaseId = defaultModuleSetRelease.getModuleSetReleaseId();
@@ -58,24 +59,32 @@ public class CcListRepository {
 
         SelectOrderByStep select = null;
         if (request.getTypes().isAcc()) {
-            select = (select != null) ? select.union(getAccList(request, release, defaultModuleSetReleaseId)) : getAccList(request, release, defaultModuleSetReleaseId);
+            select = (select != null) ? select.union(getAccList(request, release, defaultModuleSetReleaseId))
+                    : getAccList(request, release, defaultModuleSetReleaseId);
         }
         // Component Types are only allowed by ACC.
         if (request.getTypes().isAsccp() && !hasLength(request.getComponentTypes())) {
-            select = (select != null) ? select.union(getAsccpList(request, release, defaultModuleSetReleaseId)) : getAsccpList(request, release, defaultModuleSetReleaseId);
+            select = (select != null) ? select.union(getAsccpList(request, release, defaultModuleSetReleaseId))
+                    : getAsccpList(request, release, defaultModuleSetReleaseId);
         }
         if (request.getTypes().isBccp() && !hasLength(request.getComponentTypes())) {
-            select = (select != null) ? select.union(getBccpList(request, release, defaultModuleSetReleaseId)) : getBccpList(request, release, defaultModuleSetReleaseId);
+            select = (select != null) ? select.union(getBccpList(request, release, defaultModuleSetReleaseId))
+                    : getBccpList(request, release, defaultModuleSetReleaseId);
         }
         // Tags/Namespaces are only allowed by ACC, ASCCP, BCCP, and DT.
-        if (request.getTypes().isAscc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty() && request.getNamespaces().isEmpty()) {
-            select = (select != null) ? select.union(getAsccList(request, release, defaultModuleSetReleaseId)) : getAsccList(request, release, defaultModuleSetReleaseId);
+        if (request.getTypes().isAscc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()
+                && request.getNamespaces().isEmpty()) {
+            select = (select != null) ? select.union(getAsccList(request, release, defaultModuleSetReleaseId))
+                    : getAsccList(request, release, defaultModuleSetReleaseId);
         }
-        if (request.getTypes().isBcc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty() && request.getNamespaces().isEmpty()) {
-            select = (select != null) ? select.union(getBccList(request, release, defaultModuleSetReleaseId)) : getBccList(request, release, defaultModuleSetReleaseId);
+        if (request.getTypes().isBcc() && !hasLength(request.getComponentTypes()) && request.getTags().isEmpty()
+                && request.getNamespaces().isEmpty()) {
+            select = (select != null) ? select.union(getBccList(request, release, defaultModuleSetReleaseId))
+                    : getBccList(request, release, defaultModuleSetReleaseId);
         }
         if (request.getTypes().isDt() && !hasLength(request.getComponentTypes())) {
-            select = (select != null) ? select.union(getDtList(request, release, defaultModuleSetReleaseId)) : getDtList(request, release, defaultModuleSetReleaseId);
+            select = (select != null) ? select.union(getDtList(request, release, defaultModuleSetReleaseId))
+                    : getDtList(request, release, defaultModuleSetReleaseId);
         }
 
         if (select == null) {
@@ -141,42 +150,43 @@ public class CcListRepository {
             }
         }
 
-        List<CcList> result = ((offsetStep != null) ? offsetStep.fetch() : select.fetch()).map((RecordMapper<Record, CcList>) row -> {
-            CcList ccList = new CcList();
-            ccList.setType(CcType.valueOf(row.getValue("type", String.class)));
-            ccList.setManifestId(row.getValue("manifest_id", ULong.class).toBigInteger());
-            ccList.setId(row.getValue("id", ULong.class).toBigInteger());
-            ccList.setGuid(row.getValue("guid", String.class));
-            ccList.setDen(row.getValue("den", String.class));
-            ccList.setDefinition(stripToNull(row.getValue("definition", String.class)));
-            ccList.setDefinitionSource(stripToNull(row.getValue("definition_source", String.class)));
-            ccList.setModule(row.getValue("module_path", String.class));
-            ccList.setName(row.getValue("term", String.class));
-            Integer componentType = row.getValue("oagis_component_type", Integer.class);
-            if (componentType != null) {
-                ccList.setOagisComponentType(valueOf(componentType));
-            }
-            ccList.setState(CcState.valueOf(row.getValue("state", String.class)));
-            ccList.setDeprecated(row.getValue("is_deprecated", Byte.class) == 1);
-            ccList.setLastUpdateTimestamp(Date.from(row.getValue("last_update_timestamp", LocalDateTime.class)
-                    .atZone(ZoneId.systemDefault()).toInstant()));
-            ccList.setOwner((String) row.getValue("owner"));
-            ccList.setOwnedByDeveloper(row.getValue("owned_by_developer", Byte.class) == 1);
-            ccList.setLastUpdateUser((String) row.getValue("last_update_user"));
-            ccList.setRevision(row.getValue(LOG.REVISION_NUM).toString());
-            ccList.setReleaseNum(row.getValue(RELEASE.RELEASE_NUM));
-            ULong basedManifestId = row.getValue("based_manifest_id", ULong.class);
-            if (basedManifestId != null) {
-                ccList.setBasedManifestId(basedManifestId.toBigInteger());
-                ccList.setDtType(ccList.getType() == CcType.DT ? "BDT" : "");
-            } else {
-                ccList.setDtType(ccList.getType() == CcType.DT ? "CDT" : "");
-            }
-            ccList.setSixDigitId(row.getValue("six_digit_id", String.class));
-            ccList.setDefaultValueDomain(row.getValue("default_value_domain", String.class));
-            ccList.setNewComponent(row.getValue("new_component", Byte.class) == 1);
-            return ccList;
-        });
+        List<CcList> result = ((offsetStep != null) ? offsetStep.fetch() : select.fetch())
+                .map((RecordMapper<Record, CcList>) row -> {
+                    CcList ccList = new CcList();
+                    ccList.setType(CcType.valueOf(row.getValue("type", String.class)));
+                    ccList.setManifestId(row.getValue("manifest_id", ULong.class).toBigInteger());
+                    ccList.setId(row.getValue("id", ULong.class).toBigInteger());
+                    ccList.setGuid(row.getValue("guid", String.class));
+                    ccList.setDen(row.getValue("den", String.class));
+                    ccList.setDefinition(stripToNull(row.getValue("definition", String.class)));
+                    ccList.setDefinitionSource(stripToNull(row.getValue("definition_source", String.class)));
+                    ccList.setModule(row.getValue("module_path", String.class));
+                    ccList.setName(row.getValue("term", String.class));
+                    Integer componentType = row.getValue("oagis_component_type", Integer.class);
+                    if (componentType != null) {
+                        ccList.setOagisComponentType(valueOf(componentType));
+                    }
+                    ccList.setState(CcState.valueOf(row.getValue("state", String.class)));
+                    ccList.setDeprecated(row.getValue("is_deprecated", Byte.class) == 1);
+                    ccList.setLastUpdateTimestamp(Date.from(row.getValue("last_update_timestamp", LocalDateTime.class)
+                            .atZone(ZoneId.systemDefault()).toInstant()));
+                    ccList.setOwner((String) row.getValue("owner"));
+                    ccList.setOwnedByDeveloper(row.getValue("owned_by_developer", Byte.class) == 1);
+                    ccList.setLastUpdateUser((String) row.getValue("last_update_user"));
+                    ccList.setRevision(row.getValue(LOG.REVISION_NUM).toString());
+                    ccList.setReleaseNum(row.getValue(RELEASE.RELEASE_NUM));
+                    ULong basedManifestId = row.getValue("based_manifest_id", ULong.class);
+                    if (basedManifestId != null) {
+                        ccList.setBasedManifestId(basedManifestId.toBigInteger());
+                        ccList.setDtType(ccList.getType() == CcType.DT ? "BDT" : "");
+                    } else {
+                        ccList.setDtType(ccList.getType() == CcType.DT ? "CDT" : "");
+                    }
+                    ccList.setSixDigitId(row.getValue("six_digit_id", String.class));
+                    ccList.setDefaultValueDomain(row.getValue("default_value_domain", String.class));
+                    ccList.setNewComponent(row.getValue("new_component", Byte.class) == 1);
+                    return ccList;
+                });
 
         PageResponse<CcList> response = new PageResponse();
         response.setList(result);
@@ -193,8 +203,7 @@ public class CcListRepository {
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .where(and(
                         ACC.OBJECT_CLASS_TERM.eq(objectClassTerm),
-                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))
-                ))
+                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .fetchOptionalInto(BigInteger.class).orElse(BigInteger.ZERO);
     }
 
@@ -204,8 +213,7 @@ public class CcListRepository {
                 .from(ACC_MANIFEST)
                 .where(and(
                         ACC_MANIFEST.BASED_ACC_MANIFEST_ID.in(basedManifestIds),
-                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))
-                ))
+                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .fetchInto(BigInteger.class);
     }
 
@@ -222,7 +230,8 @@ public class CcListRepository {
             conditions.add(ACC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull() : ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull()
+                    : ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ACC.STATE.in(
@@ -247,10 +256,12 @@ public class CcListRepository {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(ACC.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(ACC.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(ACC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(ACC.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             conditions.add(TAG.NAME.in(request.getTags()));
@@ -340,8 +351,7 @@ public class CcListRepository {
                 ACC_MANIFEST.BASED_ACC_MANIFEST_ID.as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
                 val((String) null).as("default_value_domain"),
-                iif(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(ACC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -353,7 +363,8 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(ACC)
                 .join(ACC_MANIFEST)
-                .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID).and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID)
+                        .and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(LOG)
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
@@ -367,7 +378,8 @@ public class CcListRepository {
                 .leftJoin(TAG)
                 .on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_ACC_MANIFEST)
-                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID),
+                        MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .where(conditions);
@@ -385,7 +397,8 @@ public class CcListRepository {
             conditions.add(ASCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull() : ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull()
+                    : ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ASCC.STATE.in(
@@ -410,10 +423,12 @@ public class CcListRepository {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(ASCC.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(ASCC.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(ASCC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(ASCC.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
         List<Field> selectFields = new ArrayList<>();
@@ -440,8 +455,7 @@ public class CcListRepository {
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
                 val((String) null).as("default_value_domain"),
-                iif(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(ASCC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -453,12 +467,12 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(ASCC)
                 .join(ASCC_MANIFEST)
-                .on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID).and(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID)
+                        .and(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(ACC_MANIFEST)
                 .on(and(
                         ASCC_MANIFEST.RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID),
-                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)
-                ))
+                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(LOG)
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
@@ -469,7 +483,8 @@ public class CcListRepository {
                 .join(appUserUpdater)
                 .on(ASCC.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
                 .leftJoin(MODULE_ACC_MANIFEST)
-                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID),
+                        MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .where(conditions);
@@ -487,7 +502,8 @@ public class CcListRepository {
             conditions.add(BCC.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull() : BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull()
+                    : BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(BCC.STATE.in(
@@ -512,10 +528,12 @@ public class CcListRepository {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(BCC.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(BCC.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(BCC.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(BCC.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
         List<Field> selectFields = new ArrayList<>();
@@ -542,8 +560,7 @@ public class CcListRepository {
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
                 val((String) null).as("default_value_domain"),
-                iif(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(BCC_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -555,12 +572,12 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(BCC)
                 .join(BCC_MANIFEST)
-                .on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID).and(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID)
+                        .and(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(ACC_MANIFEST)
                 .on(and(
                         BCC_MANIFEST.RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID),
-                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)
-                ))
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(LOG)
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
@@ -571,7 +588,8 @@ public class CcListRepository {
                 .join(appUserUpdater)
                 .on(BCC.LAST_UPDATED_BY.eq(appUserUpdater.APP_USER_ID))
                 .leftJoin(MODULE_ACC_MANIFEST)
-                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID),
+                        MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .where(conditions);
@@ -589,7 +607,8 @@ public class CcListRepository {
             conditions.add(ASCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull() : ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull()
+                    : ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(ASCCP.STATE.in(
@@ -620,16 +639,19 @@ public class CcListRepository {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(ASCCP.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(ASCCP.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(ASCCP.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(ASCCP.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
         if (request.getAsccpTypes().size() != 0) {
             conditions.add(ASCCP.TYPE.in(request.getAsccpTypes()));
         }
         if (request.getIsBIEUsable() != null && request.getIsBIEUsable()) {
-            conditions.add(ACC.OAGIS_COMPONENT_TYPE.notIn(Arrays.asList(SemanticGroup.getValue(), UserExtensionGroup.getValue())));
+            conditions.add(ACC.OAGIS_COMPONENT_TYPE
+                    .notIn(Arrays.asList(SemanticGroup.getValue(), UserExtensionGroup.getValue())));
         }
 
         List<Field> selectFields = new ArrayList<>();
@@ -656,8 +678,7 @@ public class CcListRepository {
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
                 val((String) null).as("default_value_domain"),
-                iif(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(ASCCP_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -669,7 +690,8 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(ASCCP)
                 .join(ASCCP_MANIFEST)
-                .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID).and(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID)
+                        .and(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(ACC_MANIFEST)
                 .on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID))
                 .join(ACC)
@@ -687,7 +709,8 @@ public class CcListRepository {
                 .leftJoin(TAG)
                 .on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_ASCCP_MANIFEST)
-                .on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID), MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID),
+                        MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_ASCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .where(conditions);
@@ -704,7 +727,8 @@ public class CcListRepository {
             conditions.add(BCCP.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull() : BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull()
+                    : BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(BCCP.STATE.in(
@@ -735,10 +759,12 @@ public class CcListRepository {
             conditions.add(MODULE.PATH.containsIgnoreCase(request.getModule()));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(BCCP.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(BCCP.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(BCCP.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(BCCP.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
         List<Field> selectFields = new ArrayList<>();
@@ -765,8 +791,7 @@ public class CcListRepository {
                 val((Integer) null).as("based_manifest_id"),
                 val((String) null).as("six_digit_id"),
                 val((String) null).as("default_value_domain"),
-                iif(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(BCCP_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -778,7 +803,8 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(BCCP)
                 .join(BCCP_MANIFEST)
-                .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID).and(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID)
+                        .and(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(LOG)
                 .on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
@@ -792,7 +818,8 @@ public class CcListRepository {
                 .leftJoin(TAG)
                 .on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_BCCP_MANIFEST)
-                .on(and(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID), MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID),
+                        MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_BCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
                 .where(conditions);
@@ -825,7 +852,8 @@ public class CcListRepository {
             conditions.add(DT.IS_DEPRECATED.eq((byte) (request.getDeprecated() ? 1 : 0)));
         }
         if (request.getNewComponent() != null) {
-            conditions.add(request.getNewComponent() ? DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull() : DT_MANIFEST.PREV_DT_MANIFEST_ID.isNotNull());
+            conditions.add(request.getNewComponent() ? DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull()
+                    : DT_MANIFEST.PREV_DT_MANIFEST_ID.isNotNull());
         }
         if (request.getStates() != null && !request.getStates().isEmpty()) {
             conditions.add(DT.STATE.in(
@@ -859,10 +887,12 @@ public class CcListRepository {
             conditions.add(DT.COMMONLY_USED.eq((byte) (request.getCommonlyUsed() ? 1 : 0)));
         }
         if (request.getUpdateStartDate() != null) {
-            conditions.add(DT.LAST_UPDATE_TIMESTAMP.greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+            conditions.add(DT.LAST_UPDATE_TIMESTAMP
+                    .greaterThan(new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
         }
         if (request.getUpdateEndDate() != null) {
-            conditions.add(DT.LAST_UPDATE_TIMESTAMP.lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+            conditions.add(DT.LAST_UPDATE_TIMESTAMP
+                    .lessThan(new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
         }
 
         List<Field> selectFields = new ArrayList<>();
@@ -892,8 +922,7 @@ public class CcListRepository {
                         ifnull(CODE_LIST.NAME, ""),
                         ifnull(AGENCY_ID_LIST.NAME, ""),
                         ifnull(CDT_PRI.as("pri_for_cdt").NAME, "")).as("default_value_domain"),
-                iif(DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull(), true, false).as("new_component")
-        ));
+                iif(DT_MANIFEST.PREV_DT_MANIFEST_ID.isNull(), true, false).as("new_component")));
         if (StringUtils.hasLength(request.getDen())) {
             selectFields.add(
                     val(1).minus(levenshtein(lower(DT_MANIFEST.DEN), val(request.getDen().toLowerCase()))
@@ -905,7 +934,8 @@ public class CcListRepository {
         return dslContext.select(selectFields)
                 .from(DT)
                 .join(DT_MANIFEST)
-                .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID).and(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
+                .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID)
+                        .and(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(release.getReleaseId()))))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
@@ -919,19 +949,29 @@ public class CcListRepository {
                 .leftJoin(TAG)
                 .on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .leftJoin(MODULE_DT_MANIFEST)
-                .on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID), MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
+                .on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID),
+                        MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(defaultModuleSetReleaseId)))
                 .leftJoin(MODULE)
                 .on(MODULE_DT_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
-                .leftJoin(BDT_PRI_RESTRI).on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID), BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)))
-                .leftJoin(CODE_LIST_MANIFEST).on(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .leftJoin(BDT_PRI_RESTRI)
+                .on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(BDT_PRI_RESTRI.BDT_MANIFEST_ID),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)))
+                .leftJoin(CODE_LIST_MANIFEST)
+                .on(BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                 .leftJoin(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                .leftJoin(AGENCY_ID_LIST_MANIFEST).on(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
-                .leftJoin(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP).on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
+                .leftJoin(AGENCY_ID_LIST_MANIFEST)
+                .on(BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                .leftJoin(AGENCY_ID_LIST)
+                .on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .leftJoin(CDT_AWD_PRI_XPS_TYPE_MAP)
+                .on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
                 .leftJoin(CDT_AWD_PRI).on(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI.CDT_AWD_PRI_ID))
                 .leftJoin(CDT_PRI).on(CDT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
-                .leftJoin(CDT_AWD_PRI.as("awd_pri_for_cdt")).on(and(DT.DT_ID.eq(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_ID), CDT_AWD_PRI.as("awd_pri_for_cdt").IS_DEFAULT.eq((byte) 1)))
-                .leftJoin(CDT_PRI.as("pri_for_cdt")).on(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_PRI_ID.eq(CDT_PRI.as("pri_for_cdt").CDT_PRI_ID))
+                .leftJoin(CDT_AWD_PRI.as("awd_pri_for_cdt"))
+                .on(and(DT.DT_ID.eq(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_ID),
+                        CDT_AWD_PRI.as("awd_pri_for_cdt").IS_DEFAULT.eq((byte) 1)))
+                .leftJoin(CDT_PRI.as("pri_for_cdt"))
+                .on(CDT_AWD_PRI.as("awd_pri_for_cdt").CDT_PRI_ID.eq(CDT_PRI.as("pri_for_cdt").CDT_PRI_ID))
                 .where(conditions);
     }
 
@@ -1008,8 +1048,7 @@ public class CcListRepository {
                 .join(ACC_MANIFEST.as("prev_manifest")).on(
                         and(
                                 ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev_manifest").ACC_MANIFEST_ID),
-                                ACC_MANIFEST.ACC_ID.notEqual(ACC_MANIFEST.as("prev_manifest").ACC_ID)
-                        ))
+                                ACC_MANIFEST.ACC_ID.notEqual(ACC_MANIFEST.as("prev_manifest").ACC_ID)))
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .leftJoin(ACC_MANIFEST_TAG).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST_TAG.ACC_MANIFEST_ID))
                 .leftJoin(TAG).on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
@@ -1044,7 +1083,8 @@ public class CcListRepository {
                         TAG.TAG_ID, TAG.NAME, TAG.TEXT_COLOR, TAG.BACKGROUND_COLOR)
                 .from(ASCCP_MANIFEST)
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .leftJoin(ASCCP_MANIFEST_TAG).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
+                .leftJoin(ASCCP_MANIFEST_TAG)
+                .on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
                 .leftJoin(TAG).on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .where(and(
                         ASCCP_MANIFEST.RELEASE_ID.eq(releaseId),
@@ -1080,11 +1120,12 @@ public class CcListRepository {
                 .from(ASCCP_MANIFEST)
                 .join(ASCCP_MANIFEST.as("prev_manifest")).on(
                         and(
-                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev_manifest").ASCCP_MANIFEST_ID),
-                                ASCCP_MANIFEST.ASCCP_ID.notEqual(ASCCP_MANIFEST.as("prev_manifest").ASCCP_ID)
-                        ))
+                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID
+                                        .eq(ASCCP_MANIFEST.as("prev_manifest").ASCCP_MANIFEST_ID),
+                                ASCCP_MANIFEST.ASCCP_ID.notEqual(ASCCP_MANIFEST.as("prev_manifest").ASCCP_ID)))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .leftJoin(ASCCP_MANIFEST_TAG).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
+                .leftJoin(ASCCP_MANIFEST_TAG)
+                .on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
                 .leftJoin(TAG).on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
                 .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchStream().forEach(record -> {
@@ -1153,9 +1194,9 @@ public class CcListRepository {
                 .from(BCCP_MANIFEST)
                 .join(BCCP_MANIFEST.as("prev_manifest")).on(
                         and(
-                                BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev_manifest").BCCP_MANIFEST_ID),
-                                BCCP_MANIFEST.BCCP_ID.notEqual(BCCP_MANIFEST.as("prev_manifest").BCCP_ID)
-                        ))
+                                BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID
+                                        .eq(BCCP_MANIFEST.as("prev_manifest").BCCP_MANIFEST_ID),
+                                BCCP_MANIFEST.BCCP_ID.notEqual(BCCP_MANIFEST.as("prev_manifest").BCCP_ID)))
                 .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                 .leftJoin(BCCP_MANIFEST_TAG).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID))
                 .leftJoin(TAG).on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
@@ -1212,9 +1253,9 @@ public class CcListRepository {
                 .from(ASCC_MANIFEST)
                 .join(ASCC_MANIFEST.as("prev_manifest")).on(
                         and(
-                                ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev_manifest").ASCC_MANIFEST_ID),
-                                ASCC_MANIFEST.ASCC_ID.notEqual(ASCC_MANIFEST.as("prev_manifest").ASCC_ID)
-                        ))
+                                ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID
+                                        .eq(ASCC_MANIFEST.as("prev_manifest").ASCC_MANIFEST_ID),
+                                ASCC_MANIFEST.ASCC_ID.notEqual(ASCC_MANIFEST.as("prev_manifest").ASCC_ID)))
                 .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
                 .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchStream().forEach(record -> {
@@ -1260,8 +1301,7 @@ public class CcListRepository {
                 .join(BCC_MANIFEST.as("prev_manifest")).on(
                         and(
                                 BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev_manifest").BCC_MANIFEST_ID),
-                                BCC_MANIFEST.BCC_ID.notEqual(BCC_MANIFEST.as("prev_manifest").BCC_ID)
-                        ))
+                                BCC_MANIFEST.BCC_ID.notEqual(BCC_MANIFEST.as("prev_manifest").BCC_ID)))
                 .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
                 .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchStream().forEach(record -> {
@@ -1321,8 +1361,7 @@ public class CcListRepository {
                 .join(DT_MANIFEST.as("prev_manifest")).on(
                         and(
                                 DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev_manifest").DT_MANIFEST_ID),
-                                DT_MANIFEST.DT_ID.notEqual(DT_MANIFEST.as("prev_manifest").DT_ID)
-                        ))
+                                DT_MANIFEST.DT_ID.notEqual(DT_MANIFEST.as("prev_manifest").DT_ID)))
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .leftJoin(DT_MANIFEST_TAG).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST_TAG.DT_MANIFEST_ID))
                 .leftJoin(TAG).on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
@@ -1366,7 +1405,8 @@ public class CcListRepository {
                         ccChange = codeListChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("CODE_LIST", manifestId.toBigInteger(),
-                                record.get(CODE_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(CODE_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT,
+                                new ArrayList<>());
                         codeListChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1379,9 +1419,10 @@ public class CcListRepository {
                 .from(CODE_LIST_MANIFEST)
                 .join(CODE_LIST_MANIFEST.as("prev_manifest")).on(
                         and(
-                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev_manifest").CODE_LIST_MANIFEST_ID),
-                                CODE_LIST_MANIFEST.CODE_LIST_ID.notEqual(CODE_LIST_MANIFEST.as("prev_manifest").CODE_LIST_ID)
-                        ))
+                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID
+                                        .eq(CODE_LIST_MANIFEST.as("prev_manifest").CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.CODE_LIST_ID
+                                        .notEqual(CODE_LIST_MANIFEST.as("prev_manifest").CODE_LIST_ID)))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchStream().forEach(record -> {
@@ -1413,7 +1454,8 @@ public class CcListRepository {
                         ccChange = agencyIdListChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("AGENCY_ID_LIST", manifestId.toBigInteger(),
-                                record.get(AGENCY_ID_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT, new ArrayList<>());
+                                record.get(AGENCY_ID_LIST.NAME), CcChangesResponse.CcChangeType.NEW_COMPONENT,
+                                new ArrayList<>());
                         agencyIdListChangesMap.put(manifestId, ccChange);
                     }
                 });
@@ -1426,9 +1468,10 @@ public class CcListRepository {
                 .from(AGENCY_ID_LIST_MANIFEST)
                 .join(AGENCY_ID_LIST_MANIFEST.as("prev_manifest")).on(
                         and(
-                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev_manifest").AGENCY_ID_LIST_MANIFEST_ID),
-                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.notEqual(AGENCY_ID_LIST_MANIFEST.as("prev_manifest").AGENCY_ID_LIST_ID)
-                        ))
+                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID
+                                        .eq(AGENCY_ID_LIST_MANIFEST.as("prev_manifest").AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID
+                                        .notEqual(AGENCY_ID_LIST_MANIFEST.as("prev_manifest").AGENCY_ID_LIST_ID)))
                 .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                 .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchStream().forEach(record -> {
@@ -1438,11 +1481,102 @@ public class CcListRepository {
                         ccChange = agencyIdListChangesMap.get(manifestId);
                     } else {
                         ccChange = new CcChangesResponse.CcChange("AGENCY_ID_LIST", manifestId.toBigInteger(),
-                                record.get(AGENCY_ID_LIST.NAME), CcChangesResponse.CcChangeType.REVISED, new ArrayList<>());
+                                record.get(AGENCY_ID_LIST.NAME), CcChangesResponse.CcChangeType.REVISED,
+                                new ArrayList<>());
                         agencyIdListChangesMap.put(manifestId, ccChange);
                     }
                 });
         return agencyIdListChangesMap.values();
+    }
+
+    public Map<String, String> getLastUpdatedRelease() {
+        Map<String, String> lastUpdatedMap = new HashMap<>();
+        CommonTableExpression<?> t = name("t").fields(
+                "asccp_manifest_id",
+                "release_id",
+                "prev_asccp_manifest_id",
+                "asccp_id").as(
+                        select(
+                                ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                                ASCCP_MANIFEST.RELEASE_ID,
+                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
+                                ASCCP_MANIFEST.ASCCP_ID)
+                                .from(ASCCP_MANIFEST)
+                                .where(ASCCP_MANIFEST.RELEASE_ID.eq(select(max(RELEASE.RELEASE_ID)).from(RELEASE)))
+                                .unionAll(
+                                        select(
+                                                ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                                                ASCCP_MANIFEST.RELEASE_ID,
+                                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
+                                                ASCCP_MANIFEST.ASCCP_ID)
+                                                .from(table(name("t")))
+                                                .join(ASCCP_MANIFEST)
+                                                .on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID
+                                                        .eq(field(name("t", "prev_asccp_manifest_id"), ULong.class))
+                                                        .and(ASCCP_MANIFEST.ASCCP_ID.eq(
+                                                                field(name("t", "asccp_id"), ULong.class))))));
+
+        dslContext
+                .withRecursive(t)
+                .select(ASCCP.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
+                .from(t)
+                .join(ASCCP)
+                .on(ASCCP.ASCCP_ID.eq(field(name("t", "asccp_id"), ULong.class)))
+                .join(RELEASE)
+                .on(RELEASE.RELEASE_ID.eq(field(name("t", "release_id"), ULong.class)))
+                .groupBy(ASCCP.DEN)
+                .fetchStream().forEach(record -> {
+                    String den = record.get(ASCCP.DEN);
+                    String relNum = record.get(RELEASE.RELEASE_NUM);
+                    lastUpdatedMap.put(den, relNum);
+                });
+
+        return lastUpdatedMap;
+
+    }
+
+    public Map<String, String> getSinceRelease() {
+        Map<String, String> sinceMap = new HashMap<>();
+
+        CommonTableExpression<?> t = name("t").fields(
+                "asccp_manifest_id",
+                "release_id",
+                "prev_asccp_manifest_id",
+                "asccp_id").as(
+                        select(
+                                ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                                ASCCP_MANIFEST.RELEASE_ID,
+                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
+                                ASCCP_MANIFEST.ASCCP_ID)
+                                .from(ASCCP_MANIFEST)
+                                .where(ASCCP_MANIFEST.RELEASE_ID.eq(select(max(RELEASE.RELEASE_ID)).from(RELEASE)))
+                                .unionAll(
+                                        select(
+                                                ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
+                                                ASCCP_MANIFEST.RELEASE_ID,
+                                                ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
+                                                ASCCP_MANIFEST.ASCCP_ID)
+                                                .from(table(name("t")))
+                                                .join(ASCCP_MANIFEST)
+                                                .on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID
+                                                        .eq(field(name("t", "prev_asccp_manifest_id"), ULong.class)))));
+
+        dslContext
+                .withRecursive(t)
+                .select(ASCCP.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
+                .from(t)
+                .join(ASCCP)
+                .on(ASCCP.ASCCP_ID.eq(field(name("t", "asccp_id"), ULong.class)))
+                .join(RELEASE)
+                .on(RELEASE.RELEASE_ID.eq(field(name("t", "release_id"), ULong.class)))
+                .groupBy(ASCCP.DEN)
+                .fetchStream().forEach(record -> {
+                    String den = record.get(ASCCP.DEN);
+                    String relNum = record.get(RELEASE.RELEASE_NUM);
+                    sinceMap.put(den, relNum);
+                });
+        return sinceMap;
+
     }
 
 }
