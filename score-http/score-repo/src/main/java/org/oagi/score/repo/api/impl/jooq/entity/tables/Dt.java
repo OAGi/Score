@@ -7,14 +7,19 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function22;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
+import org.jooq.Row22;
 import org.jooq.Schema;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -102,52 +107,6 @@ public class Dt extends TableImpl<DtRecord> {
      * column must not be blank when the DT_TYPE is BDT.
      */
     public final TableField<DtRecord, ULong> BASED_DT_ID = createField(DSL.name("based_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key pointing to the DT table itself. This column must be blank when the DT_TYPE is CDT. This column must not be blank when the DT_TYPE is BDT.");
-
-    /**
-     * The column <code>oagi.dt.facet_min_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public final TableField<DtRecord, ULong> FACET_MIN_LENGTH = createField(DSL.name("facet_min_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
-
-    /**
-     * The column <code>oagi.dt.facet_max_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public final TableField<DtRecord, ULong> FACET_MAX_LENGTH = createField(DSL.name("facet_max_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
-
-    /**
-     * The column <code>oagi.dt.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
-     */
-    public final TableField<DtRecord, String> FACET_PATTERN = createField(DSL.name("facet_pattern"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Defines a constraint on the lexical space of a datatype to literals in a specific pattern.");
-
-    /**
-     * The column <code>oagi.dt.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public final TableField<DtRecord, String> FACET_MIN_INCLUSIVE = createField(DSL.name("facet_min_inclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the lower limit of the range of allowed values. The lower limit is also\nan allowed value.");
-
-    /**
-     * The column <code>oagi.dt.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public final TableField<DtRecord, String> FACET_MIN_EXCLUSIVE = createField(DSL.name("facet_min_exclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the lower limit of the range of allowed values. The lower limit is no\nallowed value.");
-
-    /**
-     * The column <code>oagi.dt.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public final TableField<DtRecord, String> FACET_MAX_INCLUSIVE = createField(DSL.name("facet_max_inclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the upper limit of the range of allowed values. The upper limit is also\nan allowed value.");
-
-    /**
-     * The column <code>oagi.dt.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public final TableField<DtRecord, String> FACET_MAX_EXCLUSIVE = createField(DSL.name("facet_max_exclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the upper limit of the range of allowed values. The upper limit is no\nallowed value");
 
     /**
      * The column <code>oagi.dt.definition</code>. Description of the data type.
@@ -449,5 +408,29 @@ public class Dt extends TableImpl<DtRecord> {
     @Override
     public Dt rename(Table<?> name) {
         return new Dt(name.getQualifiedName(), null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Row22 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, ULong, String, String, ULong, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte, ULong, ULong, ULong> fieldsRow() {
+        return (Row22) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
     }
 }

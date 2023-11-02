@@ -6,7 +6,10 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 import java.time.LocalDateTime;
 
+import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.Record22;
+import org.jooq.Row22;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt;
@@ -17,7 +20,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt;
  * by the TYPE column.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class DtRecord extends UpdatableRecordImpl<DtRecord> {
+public class DtRecord extends UpdatableRecordImpl<DtRecord> implements Record22<ULong, String, String, String, String, String, ULong, String, String, ULong, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte, ULong, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -154,137 +157,17 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.facet_min_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public void setFacetMinLength(ULong value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_min_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public ULong getFacetMinLength() {
-        return (ULong) get(7);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_max_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public void setFacetMaxLength(ULong value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_max_length</code>. Defines the minimum
-     * number of units of length.
-     */
-    public ULong getFacetMaxLength() {
-        return (ULong) get(8);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
-     */
-    public void setFacetPattern(String value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
-     */
-    public String getFacetPattern() {
-        return (String) get(9);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public void setFacetMinInclusive(String value) {
-        set(10, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_min_inclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public String getFacetMinInclusive() {
-        return (String) get(10);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public void setFacetMinExclusive(String value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_min_exclusive</code>. Defines the lower
-     * limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public String getFacetMinExclusive() {
-        return (String) get(11);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public void setFacetMaxInclusive(String value) {
-        set(12, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_max_inclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public String getFacetMaxInclusive() {
-        return (String) get(12);
-    }
-
-    /**
-     * Setter for <code>oagi.dt.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public void setFacetMaxExclusive(String value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>oagi.dt.facet_max_exclusive</code>. Defines the upper
-     * limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public String getFacetMaxExclusive() {
-        return (String) get(13);
-    }
-
-    /**
      * Setter for <code>oagi.dt.definition</code>. Description of the data type.
      */
     public void setDefinition(String value) {
-        set(14, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>oagi.dt.definition</code>. Description of the data type.
      */
     public String getDefinition() {
-        return (String) get(14);
+        return (String) get(7);
     }
 
     /**
@@ -292,7 +175,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * URL identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
-        set(15, value);
+        set(8, value);
     }
 
     /**
@@ -300,7 +183,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * URL identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
-        return (String) get(15);
+        return (String) get(8);
     }
 
     /**
@@ -311,7 +194,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * level.
      */
     public void setNamespaceId(ULong value) {
-        set(16, value);
+        set(9, value);
     }
 
     /**
@@ -322,7 +205,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * level.
      */
     public ULong getNamespaceId() {
-        return (ULong) get(16);
+        return (ULong) get(9);
     }
 
     /**
@@ -330,7 +213,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * of the content component of the data type.
      */
     public void setContentComponentDefinition(String value) {
-        set(17, value);
+        set(10, value);
     }
 
     /**
@@ -338,7 +221,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * of the content component of the data type.
      */
     public String getContentComponentDefinition() {
-        return (String) get(17);
+        return (String) get(10);
     }
 
     /**
@@ -350,7 +233,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * records of when the state was changed.
      */
     public void setState(String value) {
-        set(18, value);
+        set(11, value);
     }
 
     /**
@@ -362,7 +245,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * records of when the state was changed.
      */
     public String getState() {
-        return (String) get(18);
+        return (String) get(11);
     }
 
     /**
@@ -370,7 +253,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * commonly used DT(s) by BCCPs.
      */
     public void setCommonlyUsed(Byte value) {
-        set(19, value);
+        set(12, value);
     }
 
     /**
@@ -378,7 +261,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * commonly used DT(s) by BCCPs.
      */
     public Byte getCommonlyUsed() {
-        return (Byte) get(19);
+        return (Byte) get(12);
     }
 
     /**
@@ -386,7 +269,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. It indicates the user who created this DT.
      */
     public void setCreatedBy(ULong value) {
-        set(20, value);
+        set(13, value);
     }
 
     /**
@@ -394,7 +277,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. It indicates the user who created this DT.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(20);
+        return (ULong) get(13);
     }
 
     /**
@@ -405,7 +288,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(21, value);
+        set(14, value);
     }
 
     /**
@@ -416,7 +299,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(21);
+        return (ULong) get(14);
     }
 
     /**
@@ -427,7 +310,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * rollback the ownership. 
      */
     public void setOwnerUserId(ULong value) {
-        set(22, value);
+        set(15, value);
     }
 
     /**
@@ -438,7 +321,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * rollback the ownership. 
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(22);
+        return (ULong) get(15);
     }
 
     /**
@@ -448,7 +331,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(23, value);
+        set(16, value);
     }
 
     /**
@@ -458,7 +341,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(23);
+        return (LocalDateTime) get(16);
     }
 
     /**
@@ -470,7 +353,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * revision has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(24, value);
+        set(17, value);
     }
 
     /**
@@ -482,7 +365,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * revision has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(24);
+        return (LocalDateTime) get(17);
     }
 
     /**
@@ -491,7 +374,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(25, value);
+        set(18, value);
     }
 
     /**
@@ -500,7 +383,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(25);
+        return (Byte) get(18);
     }
 
     /**
@@ -508,7 +391,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * replacement if the record is deprecated.
      */
     public void setReplacementDtId(ULong value) {
-        set(26, value);
+        set(19, value);
     }
 
     /**
@@ -516,7 +399,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtId() {
-        return (ULong) get(26);
+        return (ULong) get(19);
     }
 
     /**
@@ -524,7 +407,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the previous history record.
      */
     public void setPrevDtId(ULong value) {
-        set(27, value);
+        set(20, value);
     }
 
     /**
@@ -532,7 +415,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the previous history record.
      */
     public ULong getPrevDtId() {
-        return (ULong) get(27);
+        return (ULong) get(20);
     }
 
     /**
@@ -540,7 +423,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the next history record.
      */
     public void setNextDtId(ULong value) {
-        set(28, value);
+        set(21, value);
     }
 
     /**
@@ -548,7 +431,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * indicate the next history record.
      */
     public ULong getNextDtId() {
-        return (ULong) get(28);
+        return (ULong) get(21);
     }
 
     // -------------------------------------------------------------------------
@@ -558,6 +441,509 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record22 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, ULong, String, String, ULong, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte, ULong, ULong, ULong> fieldsRow() {
+        return (Row22) super.fieldsRow();
+    }
+
+    @Override
+    public Row22<ULong, String, String, String, String, String, ULong, String, String, ULong, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte, ULong, ULong, ULong> valuesRow() {
+        return (Row22) super.valuesRow();
+    }
+
+    @Override
+    public Field<ULong> field1() {
+        return Dt.DT.DT_ID;
+    }
+
+    @Override
+    public Field<String> field2() {
+        return Dt.DT.GUID;
+    }
+
+    @Override
+    public Field<String> field3() {
+        return Dt.DT.DATA_TYPE_TERM;
+    }
+
+    @Override
+    public Field<String> field4() {
+        return Dt.DT.QUALIFIER;
+    }
+
+    @Override
+    public Field<String> field5() {
+        return Dt.DT.REPRESENTATION_TERM;
+    }
+
+    @Override
+    public Field<String> field6() {
+        return Dt.DT.SIX_DIGIT_ID;
+    }
+
+    @Override
+    public Field<ULong> field7() {
+        return Dt.DT.BASED_DT_ID;
+    }
+
+    @Override
+    public Field<String> field8() {
+        return Dt.DT.DEFINITION;
+    }
+
+    @Override
+    public Field<String> field9() {
+        return Dt.DT.DEFINITION_SOURCE;
+    }
+
+    @Override
+    public Field<ULong> field10() {
+        return Dt.DT.NAMESPACE_ID;
+    }
+
+    @Override
+    public Field<String> field11() {
+        return Dt.DT.CONTENT_COMPONENT_DEFINITION;
+    }
+
+    @Override
+    public Field<String> field12() {
+        return Dt.DT.STATE;
+    }
+
+    @Override
+    public Field<Byte> field13() {
+        return Dt.DT.COMMONLY_USED;
+    }
+
+    @Override
+    public Field<ULong> field14() {
+        return Dt.DT.CREATED_BY;
+    }
+
+    @Override
+    public Field<ULong> field15() {
+        return Dt.DT.LAST_UPDATED_BY;
+    }
+
+    @Override
+    public Field<ULong> field16() {
+        return Dt.DT.OWNER_USER_ID;
+    }
+
+    @Override
+    public Field<LocalDateTime> field17() {
+        return Dt.DT.CREATION_TIMESTAMP;
+    }
+
+    @Override
+    public Field<LocalDateTime> field18() {
+        return Dt.DT.LAST_UPDATE_TIMESTAMP;
+    }
+
+    @Override
+    public Field<Byte> field19() {
+        return Dt.DT.IS_DEPRECATED;
+    }
+
+    @Override
+    public Field<ULong> field20() {
+        return Dt.DT.REPLACEMENT_DT_ID;
+    }
+
+    @Override
+    public Field<ULong> field21() {
+        return Dt.DT.PREV_DT_ID;
+    }
+
+    @Override
+    public Field<ULong> field22() {
+        return Dt.DT.NEXT_DT_ID;
+    }
+
+    @Override
+    public ULong component1() {
+        return getDtId();
+    }
+
+    @Override
+    public String component2() {
+        return getGuid();
+    }
+
+    @Override
+    public String component3() {
+        return getDataTypeTerm();
+    }
+
+    @Override
+    public String component4() {
+        return getQualifier_();
+    }
+
+    @Override
+    public String component5() {
+        return getRepresentationTerm();
+    }
+
+    @Override
+    public String component6() {
+        return getSixDigitId();
+    }
+
+    @Override
+    public ULong component7() {
+        return getBasedDtId();
+    }
+
+    @Override
+    public String component8() {
+        return getDefinition();
+    }
+
+    @Override
+    public String component9() {
+        return getDefinitionSource();
+    }
+
+    @Override
+    public ULong component10() {
+        return getNamespaceId();
+    }
+
+    @Override
+    public String component11() {
+        return getContentComponentDefinition();
+    }
+
+    @Override
+    public String component12() {
+        return getState();
+    }
+
+    @Override
+    public Byte component13() {
+        return getCommonlyUsed();
+    }
+
+    @Override
+    public ULong component14() {
+        return getCreatedBy();
+    }
+
+    @Override
+    public ULong component15() {
+        return getLastUpdatedBy();
+    }
+
+    @Override
+    public ULong component16() {
+        return getOwnerUserId();
+    }
+
+    @Override
+    public LocalDateTime component17() {
+        return getCreationTimestamp();
+    }
+
+    @Override
+    public LocalDateTime component18() {
+        return getLastUpdateTimestamp();
+    }
+
+    @Override
+    public Byte component19() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong component20() {
+        return getReplacementDtId();
+    }
+
+    @Override
+    public ULong component21() {
+        return getPrevDtId();
+    }
+
+    @Override
+    public ULong component22() {
+        return getNextDtId();
+    }
+
+    @Override
+    public ULong value1() {
+        return getDtId();
+    }
+
+    @Override
+    public String value2() {
+        return getGuid();
+    }
+
+    @Override
+    public String value3() {
+        return getDataTypeTerm();
+    }
+
+    @Override
+    public String value4() {
+        return getQualifier_();
+    }
+
+    @Override
+    public String value5() {
+        return getRepresentationTerm();
+    }
+
+    @Override
+    public String value6() {
+        return getSixDigitId();
+    }
+
+    @Override
+    public ULong value7() {
+        return getBasedDtId();
+    }
+
+    @Override
+    public String value8() {
+        return getDefinition();
+    }
+
+    @Override
+    public String value9() {
+        return getDefinitionSource();
+    }
+
+    @Override
+    public ULong value10() {
+        return getNamespaceId();
+    }
+
+    @Override
+    public String value11() {
+        return getContentComponentDefinition();
+    }
+
+    @Override
+    public String value12() {
+        return getState();
+    }
+
+    @Override
+    public Byte value13() {
+        return getCommonlyUsed();
+    }
+
+    @Override
+    public ULong value14() {
+        return getCreatedBy();
+    }
+
+    @Override
+    public ULong value15() {
+        return getLastUpdatedBy();
+    }
+
+    @Override
+    public ULong value16() {
+        return getOwnerUserId();
+    }
+
+    @Override
+    public LocalDateTime value17() {
+        return getCreationTimestamp();
+    }
+
+    @Override
+    public LocalDateTime value18() {
+        return getLastUpdateTimestamp();
+    }
+
+    @Override
+    public Byte value19() {
+        return getIsDeprecated();
+    }
+
+    @Override
+    public ULong value20() {
+        return getReplacementDtId();
+    }
+
+    @Override
+    public ULong value21() {
+        return getPrevDtId();
+    }
+
+    @Override
+    public ULong value22() {
+        return getNextDtId();
+    }
+
+    @Override
+    public DtRecord value1(ULong value) {
+        setDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value2(String value) {
+        setGuid(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value3(String value) {
+        setDataTypeTerm(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value4(String value) {
+        setQualifier_(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value5(String value) {
+        setRepresentationTerm(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value6(String value) {
+        setSixDigitId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value7(ULong value) {
+        setBasedDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value8(String value) {
+        setDefinition(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value9(String value) {
+        setDefinitionSource(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value10(ULong value) {
+        setNamespaceId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value11(String value) {
+        setContentComponentDefinition(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value12(String value) {
+        setState(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value13(Byte value) {
+        setCommonlyUsed(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value14(ULong value) {
+        setCreatedBy(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value15(ULong value) {
+        setLastUpdatedBy(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value16(ULong value) {
+        setOwnerUserId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value17(LocalDateTime value) {
+        setCreationTimestamp(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value18(LocalDateTime value) {
+        setLastUpdateTimestamp(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value19(Byte value) {
+        setIsDeprecated(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value20(ULong value) {
+        setReplacementDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value21(ULong value) {
+        setPrevDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord value22(ULong value) {
+        setNextDtId(value);
+        return this;
+    }
+
+    @Override
+    public DtRecord values(ULong value1, String value2, String value3, String value4, String value5, String value6, ULong value7, String value8, String value9, ULong value10, String value11, String value12, Byte value13, ULong value14, ULong value15, ULong value16, LocalDateTime value17, LocalDateTime value18, Byte value19, ULong value20, ULong value21, ULong value22) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        value4(value4);
+        value5(value5);
+        value6(value6);
+        value7(value7);
+        value8(value8);
+        value9(value9);
+        value10(value10);
+        value11(value11);
+        value12(value12);
+        value13(value13);
+        value14(value14);
+        value15(value15);
+        value16(value16);
+        value17(value17);
+        value18(value18);
+        value19(value19);
+        value20(value20);
+        value21(value21);
+        value22(value22);
+        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -574,7 +960,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     /**
      * Create a detached, initialised DtRecord
      */
-    public DtRecord(ULong dtId, String guid, String dataTypeTerm, String qualifier, String representationTerm, String sixDigitId, ULong basedDtId, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, String definition, String definitionSource, ULong namespaceId, String contentComponentDefinition, String state, Byte commonlyUsed, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated, ULong replacementDtId, ULong prevDtId, ULong nextDtId) {
+    public DtRecord(ULong dtId, String guid, String dataTypeTerm, String qualifier, String representationTerm, String sixDigitId, ULong basedDtId, String definition, String definitionSource, ULong namespaceId, String contentComponentDefinition, String state, Byte commonlyUsed, ULong createdBy, ULong lastUpdatedBy, ULong ownerUserId, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, Byte isDeprecated, ULong replacementDtId, ULong prevDtId, ULong nextDtId) {
         super(Dt.DT);
 
         setDtId(dtId);
@@ -584,13 +970,6 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
         setRepresentationTerm(representationTerm);
         setSixDigitId(sixDigitId);
         setBasedDtId(basedDtId);
-        setFacetMinLength(facetMinLength);
-        setFacetMaxLength(facetMaxLength);
-        setFacetPattern(facetPattern);
-        setFacetMinInclusive(facetMinInclusive);
-        setFacetMinExclusive(facetMinExclusive);
-        setFacetMaxInclusive(facetMaxInclusive);
-        setFacetMaxExclusive(facetMaxExclusive);
         setDefinition(definition);
         setDefinitionSource(definitionSource);
         setNamespaceId(namespaceId);
