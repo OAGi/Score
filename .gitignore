@@ -3,5 +3,5 @@
 *.iws
 *.iml
 *.ipr
-
+.vscode/settings.json
 docs/user_guide/_build

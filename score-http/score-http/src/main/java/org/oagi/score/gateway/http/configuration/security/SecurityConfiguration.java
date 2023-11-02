@@ -6,8 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,6 +32,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -119,7 +123,46 @@ public class SecurityConfiguration {
         return new OidcIdTokenDecoderFactory();
     }
 
+    @Value("${resource-server.jwk-set-uri}")
+    private String jwkSetUri;
+
     @Bean
+    @ConditionalOnProperty(name = "resource-server.jwk-set-uri", matchIfMissing = false)
+    @Order(1)
+    public SecurityFilterChain externalFilterChain(HttpSecurity http
+    // , HandlerMappingIntrospector introspector
+    )
+            throws Exception {
+        if (StringUtils.hasText(jwkSetUri)) {
+            http
+                    .securityMatchers((matchers) -> matchers
+                            .requestMatchers("/ext/**"))
+                    .authorizeHttpRequests((auth) -> auth
+                            .requestMatchers("/ext/**")
+                            .authenticated())
+
+                    .exceptionHandling(exceptionHandling -> exceptionHandling
+                            .authenticationEntryPoint((request, response, authException) -> response
+                                    .sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+
+                    .cors(cors -> cors.disable())
+                    .csrf(csrf -> csrf.disable())
+                    .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt -> jwt
+                            .jwkSetUri(jwkSetUri)));
+        } else {
+            http
+                    .securityMatchers((matchers) -> matchers
+                            .requestMatchers("/ext/**"))
+                    .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                            .requestMatchers("/ext/**")
+                            .denyAll());
+        }
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .headers(headersConfigurer -> {

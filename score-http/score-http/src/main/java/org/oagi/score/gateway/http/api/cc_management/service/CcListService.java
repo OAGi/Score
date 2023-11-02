@@ -75,19 +75,35 @@ public class CcListService {
     public PageResponse<CcList> getCcList(CcListRequest request) {
         request.setUsernameMap(userRepository.getUsernameMap());
         PageResponse<CcList> response = repository.getCcList(request);
-        Map<Pair<CcType, BigInteger>, List<ShortTag>> tags =
-                tagService.getShortTagsByPairsOfTypeAndManifestId(response.getList().stream()
+        Map<Pair<CcType, BigInteger>, List<ShortTag>> tags = tagService
+                .getShortTagsByPairsOfTypeAndManifestId(response.getList().stream()
                         .map(e -> Pair.of(e.getType(), e.getManifestId())).collect(Collectors.toList()));
         response.getList().forEach(ccList -> {
             ccList.setTagList(
-                    tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList())
-            );
+                    tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList()));
+        });
+        return response;
+    }
+
+    public PageResponse<CcList> getCcListWithLastUpdatedAndSince(CcListRequest request) {
+        PageResponse<CcList> response = getCcList(request);
+        Map<String, String> lastUpdatedReleaseMap = repository.getLastUpdatedRelease();
+        Map<String, String> sinceReleaseMap = repository.getSinceRelease();
+        response.getList().forEach(ccList -> {
+            if (ccList.getType().equals(CcType.ASCCP)) {
+                String lastChangedReleaseNum = lastUpdatedReleaseMap.get(ccList.getDen());
+                ccList.setLastChangedReleaseNum(lastChangedReleaseNum);
+                String sinceReleaseNum = sinceReleaseMap.get(ccList.getDen());
+                ccList.setSinceReleaseNum(sinceReleaseNum);
+            }
+
         });
         return response;
     }
 
     public CcChangesResponse getCcChanges(ScoreUser requester, BigInteger releaseId) {
-        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester, ULong.valueOf(releaseId));
+        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester,
+                ULong.valueOf(releaseId));
         CcChangesResponse response = new CcChangesResponse();
         response.addCcChangeList(changeList);
         return response;
@@ -106,7 +122,8 @@ public class CcListService {
     }
 
     @Transactional
-    public void transferOwnership(AuthenticatedPrincipal user, String type, BigInteger manifestId, String targetLoginId) {
+    public void transferOwnership(AuthenticatedPrincipal user, String type, BigInteger manifestId,
+            String targetLoginId) {
         AppUser targetUser = sessionService.getAppUserByUsername(targetLoginId);
         if (targetUser == null) {
             throw new IllegalArgumentException("Not found a target user.");
@@ -164,8 +181,7 @@ public class CcListService {
                 .where(and(
                         ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
                         ACC_MANIFEST.RELEASE_ID.notEqual(ULong.valueOf(workingRelease.getReleaseId())),
-                        ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))
-                ))
+                        ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))))
                 .fetchInto(ULong.class);
 
         byte isUsed = (byte) 0;
@@ -378,4 +394,3 @@ public class CcListService {
         });
     }
 }
-
