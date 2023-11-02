@@ -9,7 +9,6 @@ import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResourceTagRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasTagRecord;
-import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.security.AccessControl;
@@ -26,7 +25,6 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
@@ -276,6 +274,24 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 request.getPageSize(),
                 length
         );
+    }
+
+    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
+    public GetBieForOasDocResponse getBieForOasDocList(GetBieForOasDocRequest request) throws ScoreDataAccessException {
+        SelectFinalStep finalStep = selectForRequest()
+                .where(getConditions(request))
+                .unionAll(selectForResponse()
+                        .where(getConditions(request)));
+
+        int length = dslContext().fetchCount(finalStep);
+
+        return new GetBieForOasDocResponse(
+                finalStep.fetch(mapper()),
+                request.getPageIndex(),
+                request.getPageSize(),
+                length
+        );
+
     }
 
     @Override
