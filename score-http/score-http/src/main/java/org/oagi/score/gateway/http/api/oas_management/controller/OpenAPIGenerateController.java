@@ -29,10 +29,13 @@ import java.util.Map;
 
 @RestController
 public class OpenAPIGenerateController {
+
     @Autowired
     private AuthenticationService authenticationService;
+
     @Autowired
     private OpenAPIDocService oasDocService;
+
     @Autowired
     private OpenAPIGenerateService generateService;
 
@@ -61,10 +64,10 @@ public class OpenAPIGenerateController {
                 openAPIGenerateExpressionOption.setOasDoc(getOasDocResponse.getOasDoc());
                 openAPIGenerateExpressionOption.setMessageBodyType(bieForOasDoc.getMessageBody());
                 BigInteger topLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (topLevelAsbiepIds != null){
+                if (topLevelAsbiepIds != null) {
                     topLevelAsbiepIds.add(topLevelAsbiepId);
                 }
-                if (getAssignedOasTagResponse != null){
+                if (getAssignedOasTagResponse != null) {
                     openAPIGenerateExpressionOption.setTagName(getAssignedOasTagResponse.getOasTag().getName());
                 }
                 openAPIGenerateExpressionOption.setTopLevelAsbiepId(topLevelAsbiepId);

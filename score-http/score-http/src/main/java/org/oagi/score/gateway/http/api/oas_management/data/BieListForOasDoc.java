@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BieListForOasDoc {
+
     private BigInteger oasDocId;
+
     private List<BieForOasDoc> bieList = new ArrayList<BieForOasDoc>();
 
-    public BieListForOasDoc(BigInteger oasDocId){
+    public BieListForOasDoc(BigInteger oasDocId) {
         this.oasDocId = oasDocId;
     }
 
@@ -29,4 +31,5 @@ public class BieListForOasDoc {
     public void setBieList(List<BieForOasDoc> bieList) {
         this.bieList = bieList;
     }
+
 }

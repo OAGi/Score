@@ -9,7 +9,9 @@ import java.util.List;
 
 @Data
 public class BieForOasDocUpdateRequest {
+
     private BigInteger oasDocId;
+
     private List<BieForOasDoc> bieForOasDocList;
 
     public BieForOasDocUpdateRequest() {
@@ -19,6 +21,5 @@ public class BieForOasDocUpdateRequest {
     public BieForOasDocUpdateRequest(List<BieForOasDoc> bieForOasDocList) {
         this.bieForOasDocList = bieForOasDocList;
     }
-
 
 }

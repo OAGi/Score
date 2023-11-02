@@ -9,7 +9,6 @@ import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
-import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.oagi.score.service.businesscontext.BusinessContextService;
@@ -38,14 +37,19 @@ import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 @RestController
 public class OpenAPIDocController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private AuthenticationService authenticationService;
+
     @Autowired
     private OpenAPIDocService oasDocService;
+
     @Autowired
     private BusinessContextService businessContextService;
+
     @Autowired
     private ApplicationConfigurationService applicationConfigurationService;
+
     @Autowired
     private SessionService sessionService;
 
@@ -63,8 +67,7 @@ public class OpenAPIDocController {
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
-            @RequestParam(name = "pageSize") int pageSize
-    ) {
+            @RequestParam(name = "pageSize") int pageSize) {
         GetOasDocListRequest request = new GetOasDocListRequest(authenticationService.asScoreUser(requester));
 
         request.setOpenAPIVersion(openAPIVersion);
@@ -108,7 +111,6 @@ public class OpenAPIDocController {
             @RequestBody OasDoc oasDoc) {
         return oasDocService.checkOasDocUniqueness(oasDoc);
     }
-
 
     @RequestMapping(value = "/oas_docs/check_title_uniqueness", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -272,8 +274,7 @@ public class OpenAPIDocController {
             @RequestParam(name = "sortActives") String sortActives,
             @RequestParam(name = "sortDirections") String sortDirections,
             @RequestParam(name = "pageIndex") int pageIndex,
-            @RequestParam(name = "pageSize") int pageSize
-         ) {
+            @RequestParam(name = "pageSize") int pageSize) {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(requester));
 
@@ -759,7 +760,7 @@ public class OpenAPIDocController {
             } else {
                 return ResponseEntity.badRequest().build();
             }
-        }else{
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }

@@ -8,12 +8,14 @@ public class SetOperationIdWithVerb {
     private String businessContext;
     private String operationId;
     private boolean isArray;
-    public SetOperationIdWithVerb(String changedVerb, String businessContext, String assignedBiePropertyName, boolean isArray){
+
+    public SetOperationIdWithVerb(String changedVerb, String businessContext, String assignedBiePropertyName, boolean isArray) {
         this.verb = changedVerb;
         this.businessContext = businessContext;
         this.biePropertyTerm = assignedBiePropertyName;
         this.isArray = isArray;
     }
+
     public String verbToOperationId() {
         String businessContextWithoutHyphen = this.businessContext.replace('-', ' ');
         String businessContextCamelCase = camelCase(businessContextWithoutHyphen);
@@ -28,7 +30,7 @@ public class SetOperationIdWithVerb {
                         biePropertyTermWithoutSpace);
                 break;
             case "PUT":
-                this.operationId =businessContextCamelCase + "_replace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_replace" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "PATCH":
@@ -44,7 +46,7 @@ public class SetOperationIdWithVerb {
                         biePropertyTermWithoutSpace);
                 break;
             case "HEAD":
-                this.operationId = businessContextCamelCase + "_head" + ((isArray) ?  biePropertyTermWithoutSpace + "List" :
+                this.operationId = businessContextCamelCase + "_head" + ((isArray) ? biePropertyTermWithoutSpace + "List" :
                         biePropertyTermWithoutSpace);
                 break;
             case "TRACE":
