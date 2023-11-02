@@ -39,3 +39,6 @@ logging:
     org.springframework.messaging: DEBUG
     org.jooq: DEBUG
     org.oagi.score: DEBUG
+
+resource-server:
+  jwk-set-uri: ${RS_JWK_SET_URI:}
