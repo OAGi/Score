@@ -6,7 +6,6 @@ import { ComponentsService } from './components/components.service';
 import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
-import { HttpServiceInterceptor } from './interceptors/http_interceptor';
 import { HttpModule } from '@nestjs/axios';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthGuard } from './auth/auth.guard';
@@ -38,10 +37,7 @@ import { AuthGuard } from './auth/auth.guard';
   providers: [
     AppService,
     ComponentsService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: HttpServiceInterceptor
-    },
+
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

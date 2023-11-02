@@ -5,11 +5,12 @@ import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+
     constructor(
         private readonly httpService: HttpService, private configService: ConfigService
     ) { }
 
-    backendUrl = this.configService.get<string>('backend_server') + this.configService.get<string>('auth_backend_endpoint');
+    authUrl = this.configService.get<string>('backend_server') + this.configService.get<string>('auth_backend_endpoint');
 
     canActivate(
         context: ExecutionContext,
@@ -21,7 +22,18 @@ export class AuthGuard implements CanActivate {
             this.httpService.axiosRef.defaults.headers.common['authorization'] =
                 token;
         }
-        return this.authenticate(request);
+        else {
+            delete this.httpService.axiosRef.defaults.headers.common["authorization"];
+        }
+        var authenticated = this.authenticate(request).then(auth => { return auth; });
+
+        if (!authenticated) {
+            throw new HttpException("Not Authorized", HttpStatus.UNAUTHORIZED);
+        }
+        else {
+            return authenticated;
+        }
+
     }
 
 
@@ -29,12 +41,14 @@ export class AuthGuard implements CanActivate {
         const data =
             await firstValueFrom(
                 this.httpService.get
-                    (this.backendUrl, {
+                    (this.authUrl, {
                         validateStatus: function (status) {
+                            console.log(status);
                             return status == 200; // Resolve only if the status code is 200
                         }
                     })
                     .pipe(map(response => {
+                        //console.log(response);
                         console.log("authenticated");
                         return true;
                     }

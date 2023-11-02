@@ -220,7 +220,7 @@ export class ComponentsService {
     }
 
 
-    async getAllComponentsMetadata(tags?: string, releaseVersion?: string): Promise<JSON> {
+    async getAllComponentsMetadata(tags?: string, releaseVersion?: string, componentTypes?:string): Promise<string[]> {
         var pageSize = this.configService.get('component_metadata_page_size');
         var releaseId;
 
@@ -242,7 +242,7 @@ export class ComponentsService {
             params:
             {
                 releaseId: releaseId,
-                //types: "asccp",
+                types: componentTypes,
                 asccpTypes: "Default",
                 pageSize: pageSize,
                 pageIndex: 0,
@@ -266,6 +266,7 @@ export class ComponentsService {
                         let components = response.data.list;
                         if (components) {
                             for (var i = 0; i < components.length; i++) {
+                                
                                 //delete components[i].manifestId;
                                 delete components[i].basedManifestId;
                                 delete components[i].module;
@@ -277,9 +278,11 @@ export class ComponentsService {
                                     delete components[i].tagList[0].textColor;
                                     delete components[i].tagList[0].backgroundColor;
                                 }
+
                             }
-                            return components;
+                           return components;
                         }
+                        
                     }
                     ))
                     .pipe(

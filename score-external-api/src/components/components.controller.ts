@@ -1,4 +1,4 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Get, Req } from '@nestjs/common';
 import { ComponentsService } from './components.service';
 import { Param, Query } from '@nestjs/common';
@@ -15,8 +15,9 @@ export class ComponentsController {
   findAll(
     @Query('tags') tags,
     @Query('release') release,
+    @Query('types') componentTypes,
   ) {
-    return this.componentsService.getAllComponentsMetadata(tags, release);
+    return this.componentsService.getAllComponentsMetadata(tags, release, componentTypes);
   }
 
 
