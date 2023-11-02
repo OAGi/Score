@@ -10,17 +10,18 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {AuthService} from '../../authentication/auth.service';
 import {AsbieBbieList, BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {UserToken} from '../../authentication/domain/auth';
 import {BusinessTermService} from '../domain/business-term.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-create-bie',
@@ -35,6 +36,7 @@ import {BusinessTermService} from '../domain/business-term.service';
   ],
 })
 export class AssignBusinessTermBieComponent implements OnInit {
+
   title = 'Assign Business Term';
   subtitle = 'Select BIE';
 
@@ -58,6 +60,8 @@ export class AssignBusinessTermBieComponent implements OnInit {
   typeList: string[] = ['BBIE', 'ASBIE'];
   request: BieListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -69,7 +73,8 @@ export class AssignBusinessTermBieComponent implements OnInit {
               private auth: AuthService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -143,9 +148,11 @@ export class AssignBusinessTermBieComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

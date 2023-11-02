@@ -17,6 +17,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.BieEditT
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.DefaultBieEditTreeController;
 import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
 import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
@@ -26,6 +27,8 @@ import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
+import org.oagi.score.repo.api.openapidoc.model.UpdateBieForOasDocRequest;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.abie.AbieReadRepository;
 import org.oagi.score.repo.component.abie.AbieWriteRepository;
@@ -126,6 +129,9 @@ public class BieEditService implements InitializingBean {
 
     @Autowired
     private BieService bieService;
+
+    @Autowired
+    private OpenAPIDocService openAPIDocService;
 
     @Autowired
     private MessageService messageService;
@@ -378,6 +384,13 @@ public class BieEditService implements InitializingBean {
         UpdateTopLevelAsbiepRequest topLevelAsbiepRequest = new UpdateTopLevelAsbiepRequest(user, timestamp,
                 request.getTopLevelAsbiepId(), status, version, inverseMode);
         topLevelAsbiepWriteRepository.updateTopLevelAsbiep(topLevelAsbiepRequest);
+
+        BieForOasDoc bieForOasDoc = request.getTopLevelAsbiepDetail().getBieForOasDoc();
+        if (bieForOasDoc != null) {
+            openAPIDocService.updateDetails(user, new UpdateBieForOasDocRequest(sessionService.asScoreUser(user))
+                    .withOasDocId(bieForOasDoc.getOasDocId())
+                    .withBieForOasDocList(Arrays.asList(bieForOasDoc)));
+        }
         return response;
     }
 
@@ -1105,9 +1118,20 @@ public class BieEditService implements InitializingBean {
                     throw new IllegalArgumentException();
                 }
 
-                bbieRecord.setBdtPriRestriId(ULong.valueOf(bdtPriRestriList.get(0).getBdtPriRestriId()));
-                bbieRecord.setCodeListManifestId(null);
-                bbieRecord.setAgencyIdListManifestId(null);
+                AvailableBdtPriRestri defaultBdtPriRestri = bdtPriRestriList.get(0);
+                if (defaultBdtPriRestri.getCodeListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(ULong.valueOf(defaultBdtPriRestri.getCodeListManifestId()));
+                    bbieRecord.setAgencyIdListManifestId(null);
+                } else if (defaultBdtPriRestri.getAgencyIdListManifestId() != null) {
+                    bbieRecord.setBdtPriRestriId(null);
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(ULong.valueOf(defaultBdtPriRestri.getAgencyIdListManifestId()));
+                } else {
+                    bbieRecord.setBdtPriRestriId(ULong.valueOf(defaultBdtPriRestri.getBdtPriRestriId()));
+                    bbieRecord.setCodeListManifestId(null);
+                    bbieRecord.setAgencyIdListManifestId(null);
+                }
                 bbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                 bbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
 
@@ -1161,9 +1185,21 @@ public class BieEditService implements InitializingBean {
                     throw new IllegalArgumentException();
                 }
 
-                bbieScRecord.setDtScPriRestriId(ULong.valueOf(bdtScPriRestriList.get(0).getBdtScPriRestriId()));
-                bbieScRecord.setCodeListManifestId(null);
-                bbieScRecord.setAgencyIdListManifestId(null);
+                AvailableBdtScPriRestri defaultBdtScPriRestri = bdtScPriRestriList.get(0);
+                if (defaultBdtScPriRestri.getCodeListManifestId() != null) {
+                    bbieScRecord.setDtScPriRestriId(null);
+                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultBdtScPriRestri.getCodeListManifestId()));
+                    bbieScRecord.setAgencyIdListManifestId(null);
+                } else if (defaultBdtScPriRestri.getAgencyIdListManifestId() != null) {
+                    bbieScRecord.setDtScPriRestriId(null);
+                    bbieScRecord.setCodeListManifestId(null);
+                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultBdtScPriRestri.getAgencyIdListManifestId()));
+                } else {
+                    bbieScRecord.setDtScPriRestriId(ULong.valueOf(defaultBdtScPriRestri.getBdtScPriRestriId()));
+                    bbieScRecord.setCodeListManifestId(null);
+                    bbieScRecord.setAgencyIdListManifestId(null);
+                }
+
                 bbieScRecord.setDefaultValue(null);
                 bbieScRecord.setFixedValue(null);
                 bbieScRecord.setExample(null);

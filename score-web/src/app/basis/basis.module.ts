@@ -21,6 +21,7 @@ import {StateProgressBarModule} from '../common/state-progress-bar/state-progres
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {MessageManagementModule} from '../message-management/message-management.module';
+import {MarkdownModule} from 'ngx-markdown';
 
 const routes: Routes = [
   {
@@ -48,7 +49,8 @@ const routes: Routes = [
     NgxMatSelectSearchModule,
     CommonModule,
     ScoreCommonModule,
-    MessageManagementModule
+    MessageManagementModule,
+    MarkdownModule
   ],
   exports: [
     HomepageComponent,

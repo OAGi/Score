@@ -7,8 +7,13 @@ import {CanActivateUser} from '../authentication/auth.service';
 import {SettingsPasswordComponent} from './settings-password/settings-password.component';
 import {SettingsPasswordService} from './settings-password/domain/settings-password.service';
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
-import {SettingsApplicationSettingsComponent} from './settings-application-settings/settings-application-settings.component';
-import {SettingsApplicationSettingsService} from './settings-application-settings/domain/settings-application-settings.service';
+import {
+  SettingsApplicationSettingsComponent
+} from './settings-application-settings/settings-application-settings.component';
+import {
+  SettingsApplicationSettingsService
+} from './settings-application-settings/domain/settings-application-settings.service';
+import {MarkdownModule} from 'ngx-markdown';
 
 const routes: Routes = [
   {
@@ -29,7 +34,8 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule
+    CommonModule,
+    MarkdownModule
   ],
   declarations: [
     SettingsMenuComponent,

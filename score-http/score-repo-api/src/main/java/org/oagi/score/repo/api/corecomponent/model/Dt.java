@@ -20,8 +20,6 @@ public class Dt extends Auditable implements CoreComponent, Serializable {
 
     private String sixDigitId;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -78,14 +76,6 @@ public class Dt extends Auditable implements CoreComponent, Serializable {
 
     public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

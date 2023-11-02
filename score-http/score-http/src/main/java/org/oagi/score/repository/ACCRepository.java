@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +28,7 @@ public class ACCRepository implements ScoreRepository<ACC> {
                 Tables.ACC.ACC_ID,
                 Tables.ACC.GUID,
                 Tables.ACC.OBJECT_CLASS_TERM,
-                Tables.ACC.DEN,
+                Tables.ACC_MANIFEST.DEN,
                 Tables.ACC.DEFINITION,
                 Tables.ACC.DEFINITION_SOURCE,
                 Tables.ACC.BASED_ACC_ID,

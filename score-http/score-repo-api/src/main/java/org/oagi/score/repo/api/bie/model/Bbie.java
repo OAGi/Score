@@ -1,5 +1,6 @@
 package org.oagi.score.repo.api.bie.model;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class Bbie implements BieAssociation {
@@ -27,6 +28,9 @@ public class Bbie implements BieAssociation {
     private String defaultValue;
 
     private String fixedValue;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
 
     private int cardinalityMin;
 
@@ -39,6 +43,8 @@ public class Bbie implements BieAssociation {
     private String remark;
 
     private String example;
+
+    private boolean deprecated;
 
     private boolean used;
 
@@ -140,6 +146,30 @@ public class Bbie implements BieAssociation {
         this.fixedValue = fixedValue;
     }
 
+    public BigInteger getFacetMinLength() {
+        return facetMinLength;
+    }
+
+    public void setFacetMinLength(BigInteger facetMinLength) {
+        this.facetMinLength = facetMinLength;
+    }
+
+    public BigInteger getFacetMaxLength() {
+        return facetMaxLength;
+    }
+
+    public void setFacetMaxLength(BigInteger facetMaxLength) {
+        this.facetMaxLength = facetMaxLength;
+    }
+
+    public String getFacetPattern() {
+        return facetPattern;
+    }
+
+    public void setFacetPattern(String facetPattern) {
+        this.facetPattern = facetPattern;
+    }
+
     public int getCardinalityMin() {
         return cardinalityMin;
     }
@@ -186,6 +216,14 @@ public class Bbie implements BieAssociation {
 
     public void setExample(String example) {
         this.example = example;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public boolean isUsed() {

@@ -7,7 +7,6 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.model.CcType;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleAccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetReleaseRecord;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.module.ModuleSetReleaseWriteRepository;

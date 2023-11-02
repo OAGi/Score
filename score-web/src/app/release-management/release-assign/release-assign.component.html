@@ -115,7 +115,9 @@
                 </div>
                 <div class="tail">
                   <span class="item-owner">
-                    <span class="{{ item.state }} cc-state">{{ item.state | separate }}</span>
+                    <span class="{{ item.state }} cc-state"
+                          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
+                          'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
                     &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
                   </span>
                   <span class="item-timestamp">
@@ -180,7 +182,9 @@
                 </div>
                 <div class="tail">
                   <span class="item-owner">
-                    <span class="{{ item.state }} cc-state">{{ item.state }}</span>
+                    <span class="{{ item.state }} cc-state"
+                          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(item.state).background,
+                          'color': webPageInfo.getComponentStateColorSet(item.state).font}">{{ item.state | separate }}</span>
                     &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
                   </span>
                   <span class="item-timestamp">

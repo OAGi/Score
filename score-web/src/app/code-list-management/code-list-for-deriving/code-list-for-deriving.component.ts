@@ -7,7 +7,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
@@ -18,6 +18,7 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-code-list-for-deriving',
@@ -50,6 +51,8 @@ export class CodeListForDerivingComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -58,7 +61,8 @@ export class CodeListForDerivingComponent implements OnInit {
               private accountService: AccountListService,
               private auth: AuthService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -80,7 +84,7 @@ export class CodeListForDerivingComponent implements OnInit {
     this.releases = [];
 
     forkJoin([
-      this.releaseService.getSimpleReleases(['Published',]),
+      this.releaseService.getSimpleReleases(['Published', ]),
       this.accountService.getAccountNames()
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases);
@@ -130,9 +134,11 @@ export class CodeListForDerivingComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

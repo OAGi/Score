@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
@@ -600,7 +601,7 @@ public class DtScWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (dtRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + dtRecord.getDen() + "' dose not have NamespaceId.");
+            throw new IllegalArgumentException("'" + dtManifestRecord.getDen() + "' dose not have NamespaceId.");
         }
 
         // update dt state.

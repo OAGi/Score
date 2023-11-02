@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.message_management.controller;
 
 import org.oagi.score.gateway.http.api.message_management.data.CountOfUnreadMessages;
+import org.oagi.score.gateway.http.api.message_management.data.DeleteMessagesRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.message.model.GetMessageListRequest;
 import org.oagi.score.repo.api.message.model.GetMessageListResponse;
@@ -113,6 +114,16 @@ public class MessageController {
         messageService.discardMessage(
                 sessionService.asScoreUser(requester),
                 messageId);
+        return ResponseEntity.accepted().build();
+    }
+
+    @RequestMapping(value = "/message/delete", method = RequestMethod.POST)
+    public ResponseEntity discardMessages(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody DeleteMessagesRequest request) {
+        messageService.discardMessages(
+                sessionService.asScoreUser(requester),
+                request.getMessageIdList());
         return ResponseEntity.accepted().build();
     }
 }

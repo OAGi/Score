@@ -1,8 +1,8 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -20,6 +20,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-context-scheme-value-dialog',
@@ -72,6 +73,8 @@ export class CodelistListDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -83,7 +86,8 @@ export class CodelistListDialogComponent implements OnInit {
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -160,9 +164,11 @@ export class CodelistListDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

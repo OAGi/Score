@@ -237,6 +237,7 @@ public class JooqBieWriteRepository
         asbieRecord.setCardinalityMax(asbie.getCardinalityMax());
         asbieRecord.setIsNillable((byte) (asbie.isNillable() ? 1 : 0));
         asbieRecord.setRemark(asbie.getRemark());
+        asbieRecord.setIsDeprecated((byte) (asbie.isDeprecated() ? 1 : 0));
         asbieRecord.setIsUsed((byte) (asbie.isUsed() ? 1 : 0));
         asbieRecord.setSeqKey(BigDecimal.ZERO);
         asbieRecord.setCreatedBy(userId);
@@ -279,6 +280,13 @@ public class JooqBieWriteRepository
         }
         bbieRecord.setDefaultValue(bbie.getDefaultValue());
         bbieRecord.setFixedValue(bbie.getFixedValue());
+        if (bbie.getFacetMinLength() != null) {
+            bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getFacetMinLength()));
+        }
+        if (bbie.getFacetMaxLength() != null) {
+            bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
+        }
+        bbieRecord.setFacetPattern(bbie.getFacetPattern());
         bbieRecord.setDefinition(bbie.getDefinition());
         bbieRecord.setCardinalityMin(bbie.getCardinalityMin());
         bbieRecord.setCardinalityMax(bbie.getCardinalityMax());
@@ -286,6 +294,7 @@ public class JooqBieWriteRepository
         bbieRecord.setIsNull((byte) 0);
         bbieRecord.setRemark(bbie.getRemark());
         bbieRecord.setExample(bbie.getExample());
+        bbieRecord.setIsDeprecated((byte) (bbie.isDeprecated() ? 1 : 0));
         bbieRecord.setIsUsed((byte) (bbie.isUsed() ? 1 : 0));
         bbieRecord.setSeqKey(BigDecimal.ZERO);
         bbieRecord.setCreatedBy(userId);
@@ -327,12 +336,20 @@ public class JooqBieWriteRepository
         }
         bbieScRecord.setDefaultValue(bbieSc.getDefaultValue());
         bbieScRecord.setFixedValue(bbieSc.getFixedValue());
+        if (bbieSc.getFacetMinLength() != null) {
+            bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getFacetMinLength()));
+        }
+        if (bbieSc.getFacetMaxLength() != null) {
+            bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
+        }
+        bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
         bbieScRecord.setDefinition(bbieSc.getDefinition());
         bbieScRecord.setCardinalityMin(bbieSc.getCardinalityMin());
         bbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());
         bbieScRecord.setBizTerm(bbieSc.getBizTerm());
         bbieScRecord.setRemark(bbieSc.getRemark());
         bbieScRecord.setExample(bbieSc.getExample());
+        bbieScRecord.setIsDeprecated((byte) (bbieSc.isDeprecated() ? 1 : 0));
         bbieScRecord.setIsUsed((byte) (bbieSc.isUsed() ? 1 : 0));
         bbieScRecord.setCreatedBy(userId);
         bbieScRecord.setLastUpdatedBy(userId);

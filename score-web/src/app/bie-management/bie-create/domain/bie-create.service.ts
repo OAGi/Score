@@ -13,8 +13,8 @@ export class BieCreateService implements OnInit {
 
   create(asccpManifestId: number, bizCtxIds: number[]): Observable<any> {
     return this.http.put('/api/profile_bie/create', {
-      asccpManifestId: asccpManifestId,
-      bizCtxIds: bizCtxIds
+      asccpManifestId,
+      bizCtxIds
     });
   }
 }

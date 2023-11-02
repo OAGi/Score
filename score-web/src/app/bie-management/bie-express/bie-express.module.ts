@@ -12,7 +12,6 @@ import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
 
-
 const routes: Routes = [
   {
     path: 'profile_bie/express',

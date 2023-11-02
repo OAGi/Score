@@ -2,14 +2,18 @@ package org.oagi.score.repo.api.base;
 
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class PaginationRequest<T> extends Request {
 
     public static int DEFAULT_PAGE_INDEX = 0;
     public static int DEFAULT_PAGE_SIZE = 10;
 
     private final Class<T> type;
-    private String sortActive;
-    private SortDirection sortDirection;
+    private List<String> sortActives;
+    private List<SortDirection> sortDirections;
     private int pageIndex = DEFAULT_PAGE_INDEX;
     private int pageSize = DEFAULT_PAGE_SIZE;
 
@@ -22,20 +26,44 @@ public class PaginationRequest<T> extends Request {
         return this.type;
     }
 
+    public List<String> getSortActives() {
+        if (this.sortActives != null && !this.sortActives.isEmpty()) {
+            return this.sortActives;
+        }
+        return Collections.emptyList();
+    }
+
+    public void setSortActives(List<String> sortActives) {
+        this.sortActives = sortActives;
+    }
+
     public String getSortActive() {
-        return sortActive;
+        List<String> sortActives = getSortActives();
+        return (!sortActives.isEmpty()) ? sortActives.get(0) : null;
     }
 
     public void setSortActive(String sortActive) {
-        this.sortActive = sortActive;
+        setSortActives(Arrays.asList(sortActive));
+    }
+
+    public List<SortDirection> getSortDirections() {
+        if (this.sortDirections != null && !this.sortDirections.isEmpty()) {
+            return this.sortDirections;
+        }
+        return Collections.emptyList();
+    }
+
+    public void setSortDirections(List<SortDirection> sortDirections) {
+        this.sortDirections = sortDirections;
     }
 
     public SortDirection getSortDirection() {
-        return (sortDirection == null) ? SortDirection.ASC : sortDirection;
+        List<SortDirection> sortDirections = getSortDirections();
+        return (!sortDirections.isEmpty()) ? sortDirections.get(0) : SortDirection.ASC;
     }
 
     public void setSortDirection(SortDirection sortDirection) {
-        this.sortDirection = sortDirection;
+        setSortDirections(Arrays.asList(sortDirection));
     }
 
     public int getPageIndex() {

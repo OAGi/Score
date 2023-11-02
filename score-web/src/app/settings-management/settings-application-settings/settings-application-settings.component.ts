@@ -1,8 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {WebPageInfo} from '../../basis/about/domain/about';
+import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -11,15 +14,36 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 })
 export class SettingsApplicationSettingsComponent implements OnInit {
 
+  webPageInfo: WebPageInfo;
+
   title = 'Application settings';
+  loading = false;
 
   constructor(private auth: AuthService,
+              private sanitizer: DomSanitizer,
               private settingsService: SettingsApplicationSettingsService,
               private confirmDialogService: ConfirmDialogService,
+              private webPageInfoService: WebPageInfoService,
               private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
+    this.loading = true;
+    this.webPageInfoService.load().subscribe(resp => {
+      this.webPageInfo = new WebPageInfo(resp);
+
+      this.loading = false;
+    }, error => {
+      this.loading = false;
+    });
+  }
+
+  safetHtml(str: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(str);
+  }
+
+  safeResourceUrl(href: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(href);
   }
 
   get isTenantEnabled(): boolean {
@@ -125,6 +149,30 @@ export class SettingsApplicationSettingsComponent implements OnInit {
           });
         }
       });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent($event: KeyboardEvent) {
+    const charCode = $event.key?.toLowerCase();
+
+    // Handle 'Ctrl/Command+S'
+    const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
+    if (metaOrCtrlKeyPressed && charCode === 's') {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      this.updateWebPageInfo();
+    }
+  }
+
+  updateWebPageInfo() {
+    this.webPageInfoService.update(this.webPageInfo).subscribe(_ => {
+      this.webPageInfoService.set(this.webPageInfo);
+
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+    });
   }
 
 }

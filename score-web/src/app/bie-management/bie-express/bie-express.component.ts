@@ -11,7 +11,7 @@ import {saveAs} from 'file-saver';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -23,6 +23,7 @@ import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {SelectionModel} from '@angular/cdk/collections';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-express',
@@ -62,6 +63,8 @@ export class BieExpressComponent implements OnInit {
   // Memorizer
   previousPackageOption: string;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -73,7 +76,8 @@ export class BieExpressComponent implements OnInit {
               private dialog: MatDialog,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -81,7 +85,7 @@ export class BieExpressComponent implements OnInit {
     this.option.bieDefinition = true;
     this.option.expressionOption = 'XML';
     this.option.packageOption = 'ALL';
-    // Default Open API expression format is 'YAML'.
+    // Default OpenAPI expression format is 'YAML'.
     this.option.openAPIExpressionFormat = 'YAML';
     // Default ODF expression format is 'ODS'.
     this.option.odfExpressionFormat = 'ODS';
@@ -152,9 +156,11 @@ export class BieExpressComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }
@@ -174,7 +180,7 @@ export class BieExpressComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-    this.request.releases = (!!this.selectedRelease) ? [this.selectedRelease,] : [];
+    this.request.releases = (!!this.selectedRelease) ? [this.selectedRelease, ] : [];
 
     this.bieListService.getBieListWithRequest(this.request).pipe(
       finalize(() => {
@@ -283,7 +289,9 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
-      dialogConfig.data = this.selectedRelease;
+      dialogConfig.data = {
+        release: this.selectedRelease
+      };
       const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
@@ -321,7 +329,9 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
-      dialogConfig.data = this.selectedRelease;
+      dialogConfig.data = {
+        release: this.selectedRelease
+      };
       const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {

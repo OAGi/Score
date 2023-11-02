@@ -656,6 +656,7 @@ public class BieUpliftingService {
                                 targetAsbie.setCardinalityMin(targetAscc.getCardinalityMin());
                                 targetAsbie.setCardinalityMax(targetAscc.getCardinalityMax());
                                 targetAsbie.setNillable(false);
+                                targetAsbie.setDeprecated(false);
                                 targetAsbie.setUsed(true);
 
                                 WrappedAsbie wrappedAsbie = new WrappedAsbie();
@@ -928,6 +929,7 @@ public class BieUpliftingService {
                 targetAsbie.setNillable(asbie.isNillable());
                 targetAsbie.setDefinition(asbie.getDefinition());
                 targetAsbie.setRemark(asbie.getRemark());
+                targetAsbie.setDeprecated(asbie.isDeprecated());
                 targetAsbie.setUsed(asbie.isUsed());
 
                 WrappedAsbie upliftingAsbie = new WrappedAsbie();
@@ -1007,10 +1009,14 @@ public class BieUpliftingService {
                 targetBbie.setFixedValue(bbie.getFixedValue());
                 targetBbie.setCardinalityMin(bbie.getCardinalityMin());
                 targetBbie.setCardinalityMax(bbie.getCardinalityMax());
+                targetBbie.setFacetMinLength(bbie.getFacetMinLength());
+                targetBbie.setFacetMaxLength(bbie.getFacetMaxLength());
+                targetBbie.setFacetPattern(bbie.getFacetPattern());
                 targetBbie.setNillable(bbie.isNillable());
                 targetBbie.setDefinition(bbie.getDefinition());
                 targetBbie.setRemark(bbie.getRemark());
                 targetBbie.setExample(bbie.getExample());
+                targetBbie.setDeprecated(bbie.isDeprecated());
                 targetBbie.setUsed(bbie.isUsed());
 
                 setValueDomain(bbie, targetBbie, toBccpManifest.getBdtManifestId(),
@@ -1148,6 +1154,9 @@ public class BieUpliftingService {
                 targetBbieSc.setHashPath(sha256(targetBbieSc.getPath()));
                 targetBbieSc.setDefaultValue(bbieSc.getDefaultValue());
                 targetBbieSc.setFixedValue(bbieSc.getFixedValue());
+                targetBbieSc.setFacetMinLength(bbieSc.getFacetMinLength());
+                targetBbieSc.setFacetMaxLength(bbieSc.getFacetMaxLength());
+                targetBbieSc.setFacetPattern(bbieSc.getFacetPattern());
                 targetBbieSc.setCardinalityMin(bbieSc.getCardinalityMin());
                 targetBbieSc.setCardinalityMax(bbieSc.getCardinalityMax());
                 targetBbieSc.setNillable(bbieSc.isNillable());
@@ -1155,6 +1164,7 @@ public class BieUpliftingService {
                 targetBbieSc.setRemark(bbieSc.getRemark());
                 targetBbieSc.setBizTerm(bbieSc.getBizTerm());
                 targetBbieSc.setExample(bbieSc.getExample());
+                targetBbieSc.setDeprecated(bbieSc.isDeprecated());
                 targetBbieSc.setUsed(bbieSc.isUsed());
 
                 setValueDomain(bbieSc, targetBbieSc, targetDtScManifest.getDtScManifestId(),

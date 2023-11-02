@@ -9,15 +9,16 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {CcListComponent} from '../cc-list.component';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
-import {TagService} from "../../../tag-management/domain/tag.service";
-import {Tag} from "../../../tag-management/domain/tag";
+import {TagService} from '../../../tag-management/domain/tag.service';
+import {Tag} from '../../../tag-management/domain/tag';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-create-bccp-dialog',
@@ -57,6 +58,8 @@ export class CreateBdtDialogComponent implements OnInit {
 
   workingRelease = WorkingRelease;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -64,6 +67,7 @@ export class CreateBdtDialogComponent implements OnInit {
               private ccListService: CcListService,
               private accountService: AccountListService,
               private tagService: TagService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }
@@ -152,9 +156,11 @@ export class CreateBdtDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

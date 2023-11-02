@@ -15,7 +15,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {
   TransferOwnershipDialogComponent
@@ -38,8 +38,9 @@ import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {saveAs} from 'file-saver';
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-cc-list',
@@ -89,6 +90,8 @@ export class CcListComponent implements OnInit {
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: CcList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -97,15 +100,16 @@ export class CcListComponent implements OnInit {
               private releaseService: ReleaseService,
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
-              private auth: AuthService,
               private aboutService: AboutService,
+              private auth: AuthService,
               private tagService: TagService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   get currentUser(): string {
@@ -264,9 +268,11 @@ export class CcListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }
@@ -405,20 +411,17 @@ export class CcListComponent implements OnInit {
           return;
         }
         this.loading = true;
-        this.service.updateStateOnList(actionType, toState, this.selection.selected)
-          .pipe(
-            finalize(() => {
-              this.loading = false;
-            })
-          )
-          .subscribe(_ => {
-            this.loadCcList();
-            this.snackBar.open(notiMsg, '', {
-              duration: 3000
-            });
-            this.selection.clear();
-          }, error => {
+        this.service.updateStateOnList(actionType, toState, this.selection.selected).subscribe(_ => {
+          this.loadCcList();
+          this.snackBar.open(notiMsg, '', {
+            duration: 3000
           });
+          this.selection.clear();
+
+          this.loading = false;
+        }, error => {
+            this.loading = false;
+        });
       });
   }
 
@@ -494,7 +497,7 @@ export class CcListComponent implements OnInit {
     dialogRef.afterClosed().pipe(finalize(() => {
       this.loading = false;
     })).subscribe(roleOfAcc => {
-      if (!roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
+      if (!roleOfAcc || !roleOfAcc.manifestId || !roleOfAcc.objectClassTerm) {
         return;
       }
 

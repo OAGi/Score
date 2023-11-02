@@ -10,6 +10,9 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -111,7 +114,7 @@ public abstract class PageHelper {
     }
 
     public static void invisibilityOfLoadingContainerElement(WebDriver driver) {
-        invisibilityOfLoadingContainerElement(defaultWait(driver));
+        invisibilityOfLoadingContainerElement(wait(driver, Duration.ofSeconds(10L), ofMillis(100L)));
     }
 
     public static void invisibilityOfLoadingContainerElement(Wait<WebDriver> wait) {
@@ -152,6 +155,10 @@ public abstract class PageHelper {
             }
         }
         return element;
+    }
+
+    public static WebElement sendKeys(WebElement element, LocalDateTime localDateTime) {
+        return sendKeys(element, localDateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
     }
 
     public static WebElement sendKeys(WebElement element, CharSequence... keysToSend) {

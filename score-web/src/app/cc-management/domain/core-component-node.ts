@@ -1,9 +1,9 @@
 import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
-import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String, toCamelCase,} from '../../common/utility';
+import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String, toCamelCase, } from '../../common/utility';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
-import {ShortTag} from "../../tag-management/domain/tag";
+import {ShortTag} from '../../tag-management/domain/tag';
 
 export class CcNode {
   type: string;
@@ -1242,6 +1242,8 @@ class BdtDetail {
   lastChangedReleaseId: number;
   lastChangedReleaseNum: string;
 
+  bdtPriRestriList: CcBdtPriRestri[];
+
   constructor(node: BccpFlatNode, obj: any) {
     this._node = node;
 
@@ -1271,6 +1273,8 @@ class BdtDetail {
     this.lastChangedManifestId = obj.lastChangedManifestId;
     this.lastChangedReleaseId = obj.lastChangedReleaseId;
     this.lastChangedReleaseNum = obj.lastChangedReleaseNum;
+
+    this.bdtPriRestriList = obj.bdtPriRestriList;
   }
 }
 
@@ -1771,7 +1775,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
     }
     valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
 
-    let userCodeLists = [];
+    const userCodeLists = [];
     for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
       if (!bdtPriRestri.inherited) {
@@ -1790,7 +1794,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
     }
     valueDomains.push(...userCodeLists);
 
-    let userAgencyIdLists = [];
+    const userAgencyIdLists = [];
     for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtPriRestri = this.bdtPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
       if (!bdtPriRestri.inherited) {
@@ -1879,7 +1883,8 @@ export class CcDtNodeDetail extends CcNodeDetail {
 
   get hashCode(): number {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
-      this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState, this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
+      this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
+      this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
       this._namespaceId, this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtPriRestriList);
   }
@@ -2277,7 +2282,7 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     }
     valueDomains = valueDomains.sort((a, b) => compare(a.name, b.name));
 
-    let userCodeLists = [];
+    const userCodeLists = [];
     for (const codeList of this.codeListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'CodeList' && e.codeListName === codeList.name)[0];
       if (!bdtScPriRestri.inherited) {
@@ -2296,7 +2301,7 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     }
     valueDomains.push(...userCodeLists);
 
-    let userAgencyIdLists = [];
+    const userAgencyIdLists = [];
     for (const agencyIdList of this.agencyIdListList.sort((a, b) => compare(a.name, b.name))) {
       const bdtScPriRestri = this.bdtScPriRestriList.filter(e => e.type === 'AgencyIdList' && e.agencyIdListName === agencyIdList.name)[0];
       if (!bdtScPriRestri.inherited) {

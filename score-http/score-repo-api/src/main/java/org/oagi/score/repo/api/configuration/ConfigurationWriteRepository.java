@@ -6,4 +6,6 @@ public interface ConfigurationWriteRepository {
 
     void upsertBooleanConfiguration(ScoreUser user, String configurationName, boolean value);
 
+    void upsertConfiguration(ScoreUser user, String configurationName, String value);
+
 }

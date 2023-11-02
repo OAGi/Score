@@ -218,7 +218,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignableACCByModuleSetReleaseId(GetAssignableCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN, RELEASE.RELEASE_NUM,
+                ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ACC.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ACC.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ACC_MANIFEST)
@@ -236,7 +236,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(ACC.DEN));
+                    node.setDen(e.get(ACC_MANIFEST.DEN));
                     node.setType("ACC");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -249,7 +249,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignedACCByModuleSetReleaseId(GetAssignedCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN, RELEASE.RELEASE_NUM,
+                ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ACC.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ACC.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ACC_MANIFEST)
@@ -263,7 +263,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(ACC.DEN));
+                    node.setDen(e.get(ACC_MANIFEST.DEN));
                     node.setType("ACC");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -276,7 +276,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignableASCCPByModuleSetReleaseId(GetAssignableCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN, RELEASE.RELEASE_NUM,
+                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ASCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ASCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ASCCP_MANIFEST)
@@ -294,7 +294,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(ASCCP.DEN));
+                    node.setDen(e.get(ASCCP_MANIFEST.DEN));
                     node.setType("ASCCP");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -307,7 +307,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignedASCCPByModuleSetReleaseId(GetAssignedCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN, RELEASE.RELEASE_NUM,
+                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ASCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ASCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ASCCP_MANIFEST)
@@ -321,7 +321,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(ASCCP.DEN));
+                    node.setDen(e.get(ASCCP_MANIFEST.DEN));
                     node.setType("ASCCP");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -341,7 +341,7 @@ public class JooqModuleSetReleaseReadRepository
                         BCC.ENTITY_TYPE.eq(1)))
                 .fetchInto(ULong.class);
         return dslContext().select(
-                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN, RELEASE.RELEASE_NUM,
+                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 BCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, BCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(BCCP_MANIFEST)
@@ -359,7 +359,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(BCCP_MANIFEST.BCCP_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(BCCP.DEN));
+                    node.setDen(e.get(BCCP_MANIFEST.DEN));
                     node.setType("BCCP");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -372,7 +372,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignedBCCPByModuleSetReleaseId(GetAssignedCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN, RELEASE.RELEASE_NUM,
+                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 BCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, BCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(BCCP_MANIFEST)
@@ -386,7 +386,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(BCCP_MANIFEST.BCCP_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(BCCP.DEN));
+                    node.setDen(e.get(BCCP_MANIFEST.DEN));
                     node.setType("BCCP");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -399,7 +399,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignableDTByModuleSetReleaseId(GetAssignableCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                DT_MANIFEST.DT_MANIFEST_ID, DT.DEN, RELEASE.RELEASE_NUM,
+                DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 DT.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, DT.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(DT_MANIFEST)
@@ -417,7 +417,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(DT_MANIFEST.DT_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(DT.DEN));
+                    node.setDen(e.get(DT_MANIFEST.DEN));
                     node.setType("DT");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());
@@ -430,7 +430,7 @@ public class JooqModuleSetReleaseReadRepository
     @Override
     public List<AssignableNode> getAssignedDTByModuleSetReleaseId(GetAssignedCCListRequest request) throws ScoreDataAccessException {
         return dslContext().select(
-                DT_MANIFEST.DT_MANIFEST_ID, DT.DEN, RELEASE.RELEASE_NUM,
+                DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 DT.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, DT.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(DT_MANIFEST)
@@ -444,7 +444,7 @@ public class JooqModuleSetReleaseReadRepository
                 .fetchStream().map(e -> {
                     AssignableNode node = new AssignableNode();
                     node.setManifestId(e.get(DT_MANIFEST.DT_MANIFEST_ID).toBigInteger());
-                    node.setDen(e.get(DT.DEN));
+                    node.setDen(e.get(DT_MANIFEST.DEN));
                     node.setType("DT");
                     node.setOwnerUserId(e.get(APP_USER.LOGIN_ID));
                     node.setRevision(e.get(LOG.REVISION_NUM).toBigInteger());

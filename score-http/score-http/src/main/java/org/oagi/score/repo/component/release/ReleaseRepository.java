@@ -291,6 +291,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ACC_MANIFEST.RELEASE_ID,
                 ACC_MANIFEST.ACC_ID,
                 ACC_MANIFEST.BASED_ACC_MANIFEST_ID,
+                ACC_MANIFEST.DEN,
                 ACC_MANIFEST.CONFLICT,
                 ACC_MANIFEST.LOG_ID,
                 ACC_MANIFEST.PREV_ACC_MANIFEST_ID,
@@ -299,6 +300,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         ACC_MANIFEST.ACC_ID,
                         ACC_MANIFEST.BASED_ACC_MANIFEST_ID,
+                        ACC_MANIFEST.DEN,
                         ACC_MANIFEST.CONFLICT,
                         ACC_MANIFEST.LOG_ID,
                         ACC_MANIFEST.PREV_ACC_MANIFEST_ID,
@@ -466,6 +468,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 DT_MANIFEST.RELEASE_ID,
                 DT_MANIFEST.DT_ID,
                 DT_MANIFEST.BASED_DT_MANIFEST_ID,
+                DT_MANIFEST.DEN,
                 DT_MANIFEST.CONFLICT,
                 DT_MANIFEST.LOG_ID,
                 DT_MANIFEST.PREV_DT_MANIFEST_ID,
@@ -474,6 +477,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         DT_MANIFEST.DT_ID,
                         DT_MANIFEST.BASED_DT_MANIFEST_ID,
+                        DT_MANIFEST.DEN,
                         DT_MANIFEST.CONFLICT,
                         DT_MANIFEST.LOG_ID,
                         DT_MANIFEST.PREV_DT_MANIFEST_ID,
@@ -509,6 +513,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ASCCP_MANIFEST.RELEASE_ID,
                 ASCCP_MANIFEST.ASCCP_ID,
                 ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID,
+                ASCCP_MANIFEST.DEN,
                 ASCCP_MANIFEST.CONFLICT,
                 ASCCP_MANIFEST.LOG_ID,
                 ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
@@ -517,6 +522,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         ASCCP_MANIFEST.ASCCP_ID,
                         ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID,
+                        ASCCP_MANIFEST.DEN,
                         ASCCP_MANIFEST.CONFLICT,
                         ASCCP_MANIFEST.LOG_ID,
                         ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID,
@@ -552,6 +558,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 BCCP_MANIFEST.RELEASE_ID,
                 BCCP_MANIFEST.BCCP_ID,
                 BCCP_MANIFEST.BDT_MANIFEST_ID,
+                BCCP_MANIFEST.DEN,
                 BCCP_MANIFEST.CONFLICT,
                 BCCP_MANIFEST.LOG_ID,
                 BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID,
@@ -560,6 +567,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         inline(ULong.valueOf(releaseId)),
                         BCCP_MANIFEST.BCCP_ID,
                         BCCP_MANIFEST.BDT_MANIFEST_ID,
+                        BCCP_MANIFEST.DEN,
                         BCCP_MANIFEST.CONFLICT,
                         BCCP_MANIFEST.LOG_ID,
                         BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID,
@@ -596,6 +604,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ASCC_MANIFEST.ASCC_ID,
                 ASCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                 ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID,
+                ASCC_MANIFEST.DEN,
                 ASCC_MANIFEST.CONFLICT,
                 ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID,
                 ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID)
@@ -604,6 +613,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         ASCC_MANIFEST.ASCC_ID,
                         ASCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                         ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID,
+                        ASCC_MANIFEST.DEN,
                         ASCC_MANIFEST.CONFLICT,
                         ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID,
                         ASCC_MANIFEST.ASCC_MANIFEST_ID)
@@ -621,6 +631,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 BCC_MANIFEST.BCC_ID,
                 BCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                 BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
+                BCC_MANIFEST.DEN,
                 BCC_MANIFEST.CONFLICT,
                 BCC_MANIFEST.PREV_BCC_MANIFEST_ID,
                 BCC_MANIFEST.NEXT_BCC_MANIFEST_ID)
@@ -629,6 +640,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         BCC_MANIFEST.BCC_ID,
                         BCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                         BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
+                        BCC_MANIFEST.DEN,
                         BCC_MANIFEST.CONFLICT,
                         BCC_MANIFEST.PREV_BCC_MANIFEST_ID,
                         BCC_MANIFEST.BCC_MANIFEST_ID)
@@ -951,6 +963,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         ACC_MANIFEST.as("based").RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set ACC_MANIFEST.ACC_ID to PREV.ACC_ID if the ACC in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(ACC_MANIFEST
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(ACC_MANIFEST.as("prev")).on(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID)))
@@ -958,6 +971,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(ACC_MANIFEST.LOG_ID, ACC_MANIFEST.as("prev").LOG_ID)
                 .where(and(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         ACC.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update ACC_MANIFEST.BASED_ACC_MANIFEST_ID if ACC_MANIFEST.BASED_MANIFEST.ACC_ID is not equal to ACC.BASED_ACC_ID
+        dslContext.update(ACC_MANIFEST
+                        .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                        .join(ACC.as("based")).on(ACC.BASED_ACC_ID.eq(ACC.as("based").ACC_ID))
+                        .join(ACC.as("revised")).on(ACC.as("based").GUID.eq(ACC.as("revised").GUID)) // for the case that the associated component has revised
+                        .join(ACC_MANIFEST.as("based_manifest")).on(and(
+                                ACC.as("revised").ACC_ID.eq(ACC_MANIFEST.as("based_manifest").ACC_ID),
+                                ACC_MANIFEST.as("based_manifest").RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID))))
+                .set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC_MANIFEST.as("based_manifest").ACC_MANIFEST_ID)
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ACC_MANIFEST.BASED_ACC_MANIFEST_ID.notEqual(ACC_MANIFEST.as("based_manifest").ACC_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -990,6 +1019,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set ASCCP_MANIFEST.ASCCP_ID to PREV.ASCCP_ID if the ASCCP in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(ASCCP_MANIFEST
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(ASCCP_MANIFEST.as("prev")).on(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID)))
@@ -997,6 +1027,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(ASCCP_MANIFEST.LOG_ID, ASCCP_MANIFEST.as("prev").LOG_ID)
                 .where(and(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         ASCCP.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID if ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST.ACC_ID is not equal to ASCCP.ROLE_OF_ACC_ID
+        dslContext.update(ASCCP_MANIFEST
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(ACC).on(ASCCP.ROLE_OF_ACC_ID.eq(ACC.ACC_ID))
+                .join(ACC.as("revised")).on(ACC.GUID.eq(ACC.as("revised").GUID)) // for the case that the associated component has revised
+                .join(ACC_MANIFEST).on(and(
+                        ACC.as("revised").ACC_ID.eq(ACC_MANIFEST.ACC_ID),
+                        ACC_MANIFEST.RELEASE_ID.eq(ASCCP_MANIFEST.RELEASE_ID))))
+                .set(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
+                .where(and(
+                        ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.notEqual(ACC_MANIFEST.ACC_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -1030,6 +1076,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set BCCP_MANIFEST.BCCP_ID to PREV.BCCP_ID if the BCCP in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(BCCP_MANIFEST
                 .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                 .join(BCCP_MANIFEST.as("prev")).on(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID)))
@@ -1037,6 +1084,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(BCCP_MANIFEST.LOG_ID, BCCP_MANIFEST.as("prev").LOG_ID)
                 .where(and(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         BCCP.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update BCCP_MANIFEST.BDT_MANIFEST_ID if BCCP_MANIFEST.BDT_MANIFEST.BDT_ID is not equal to BCCP.BDT_ID
+        dslContext.update(BCCP_MANIFEST
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .join(DT).on(BCCP.BDT_ID.eq(DT.DT_ID))
+                .join(DT.as("revised")).on(DT.GUID.eq(DT.as("revised").GUID)) // for the case that the associated component has revised
+                .join(DT_MANIFEST).on(and(
+                        DT.as("revised").DT_ID.eq(DT_MANIFEST.DT_ID),
+                        DT_MANIFEST.RELEASE_ID.eq(BCCP_MANIFEST.RELEASE_ID))))
+                .set(BCCP_MANIFEST.BDT_MANIFEST_ID, DT_MANIFEST.DT_MANIFEST_ID)
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        BCCP_MANIFEST.BDT_MANIFEST_ID.notEqual(DT_MANIFEST.DT_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -1074,6 +1137,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set ASCC_MANIFEST.ASCC_ID to PREV.ASCC_ID if the DT in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(ASCC_MANIFEST
                 .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
                 .join(ASCC_MANIFEST.as("prev")).on(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID))
@@ -1082,6 +1146,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(ASCC_MANIFEST.ASCC_ID, ASCC_MANIFEST.as("prev").ASCC_ID)
                 .where(and(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         ACC.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID if ASCCP_MANIFEST.ASCCP_MANIFEST.ASCCP_ID is not equal to ASCC.TO_ASCCP_ID
+        dslContext.update(ASCC_MANIFEST
+                        .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
+                        .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                        .join(ASCCP.as("revised")).on(ASCCP.GUID.eq(ASCCP.as("revised").GUID)) // for the case that the associated component has revised
+                        .join(ASCCP_MANIFEST).on(and(
+                                ASCCP.as("revised").ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID),
+                                ASCC_MANIFEST.RELEASE_ID.eq(ASCCP_MANIFEST.RELEASE_ID))))
+                .set(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
+                .where(and(
+                        ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.notEqual(ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -1118,6 +1198,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set BCC_MANIFEST.BCC_ID to PREV.BCC_ID if the DT in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(BCC_MANIFEST
                 .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
                 .join(BCC_MANIFEST.as("prev")).on(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID))
@@ -1126,6 +1207,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(BCC_MANIFEST.BCC_ID, BCC_MANIFEST.as("prev").BCC_ID)
                 .where(and(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         ACC.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update BCC_MANIFEST.TO_BCCP_MANIFEST_ID if BCCP_MANIFEST.BCCP_MANIFEST.BCCP_ID is not equal to BCC.TO_BCCP_ID
+        dslContext.update(BCC_MANIFEST
+                        .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                        .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
+                        .join(BCCP.as("revised")).on(BCCP.GUID.eq(BCCP.as("revised").GUID)) // for the case that the associated component has revised
+                        .join(BCCP_MANIFEST).on(and(
+                                BCCP.as("revised").BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID),
+                                BCC_MANIFEST.RELEASE_ID.eq(BCCP_MANIFEST.RELEASE_ID))))
+                .set(BCC_MANIFEST.TO_BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_MANIFEST_ID)
+                .where(and(
+                        BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        BCC_MANIFEST.TO_BCCP_MANIFEST_ID.notEqual(BCCP_MANIFEST.BCCP_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -1158,6 +1255,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         DT_MANIFEST.as("based").RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .execute();
 
+        // Set DT_MANIFEST.DT_ID to PREV.DT_ID if the DT in Working branch is not in ReleaseDraft nor Published states.
         dslContext.update(DT_MANIFEST
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(DT_MANIFEST.as("prev")).on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID)))
@@ -1165,6 +1263,22 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(DT_MANIFEST.LOG_ID, DT_MANIFEST.as("prev").LOG_ID)
                 .where(and(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
                         DT.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // Issue #1552
+        // Update DT_MANIFEST.BASED_DT_MANIFEST_ID if DT_MANIFEST.BASED_MANIFEST.DT_ID is not equal to DT.BASED_DT_ID
+        dslContext.update(DT_MANIFEST
+                        .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                        .join(DT.as("based")).on(DT.BASED_DT_ID.eq(DT.as("based").DT_ID))
+                        .join(DT.as("revised")).on(DT.as("based").GUID.eq(DT.as("revised").GUID)) // for the case that the associated component has revised
+                        .join(DT_MANIFEST.as("based_manifest")).on(and(
+                                DT.as("revised").DT_ID.eq(DT_MANIFEST.as("based_manifest").DT_ID),
+                                DT_MANIFEST.as("based_manifest").RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))))
+                .set(DT_MANIFEST.BASED_DT_MANIFEST_ID, DT_MANIFEST.as("based_manifest").DT_MANIFEST_ID)
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                        DT_MANIFEST.BASED_DT_MANIFEST_ID.notEqual(DT_MANIFEST.as("based_manifest").DT_MANIFEST_ID)
+                ))
                 .execute();
 
         // Update replacement
@@ -1537,7 +1651,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 ULong, String, String, LocalDateTime, String,
                 String, UInteger, UInteger>>> map =
                 dslContext.select(
-                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN, RELEASE.RELEASE_NUM,
+                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                         ACC.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ACC.STATE,
                         LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                         .from(ACC_MANIFEST)
@@ -1577,7 +1691,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // ASCCPs
         map = dslContext.select(
-                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.DEN, RELEASE.RELEASE_NUM,
+                ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 ASCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, ASCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(ASCCP_MANIFEST)
@@ -1617,7 +1731,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // BCCPs
         map = dslContext.select(
-                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.DEN, RELEASE.RELEASE_NUM,
+                BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                 BCCP.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, BCCP.STATE,
                 LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(BCCP_MANIFEST)
@@ -1737,7 +1851,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
 
         // DTs
         map = dslContext.select(
-                        DT_MANIFEST.DT_MANIFEST_ID, DT.DEN, RELEASE.RELEASE_NUM,
+                        DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DEN, RELEASE.RELEASE_NUM,
                         DT.LAST_UPDATE_TIMESTAMP, APP_USER.LOGIN_ID, DT.STATE,
                         LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM)
                 .from(DT_MANIFEST)

@@ -10,7 +10,6 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
-import org.oagi.score.repo.component.acc.PurgeAccRepositoryResponse;
 import org.oagi.score.repo.component.ascc.AsccWriteRepository;
 import org.oagi.score.repo.component.ascc.UpdateAsccPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
@@ -52,9 +51,10 @@ public class AsccpWriteRepository {
     @Autowired
     private LogSerializer serializer;
 
-    private String objectClassTerm(ULong accId) {
+    private String objectClassTerm(ULong accManifestId) {
         return dslContext.select(ACC.OBJECT_CLASS_TERM).from(ACC)
-                .where(ACC.ACC_ID.eq(accId))
+                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
                 .fetchOneInto(String.class);
     }
 
@@ -77,7 +77,6 @@ public class AsccpWriteRepository {
         asccp.setGuid(ScoreGuid.randomGuid());
         asccp.setPropertyTerm(request.getInitialPropertyTerm());
         asccp.setRoleOfAccId(roleOfAccManifest.getAccId());
-        asccp.setDen(asccp.getPropertyTerm() + ". " + objectClassTerm(asccp.getRoleOfAccId()));
         asccp.setState(request.getInitialState().name());
         asccp.setDefinition(request.getDefinition());
         asccp.setDefinitionSource(request.getDefinitionSource());
@@ -104,6 +103,7 @@ public class AsccpWriteRepository {
         asccpManifest.setAsccpId(asccp.getAsccpId());
         asccpManifest.setRoleOfAccManifestId(roleOfAccManifest.getAccManifestId());
         asccpManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
+        asccpManifest.setDen(asccp.getPropertyTerm() + ". " + objectClassTerm(roleOfAccManifest.getAccManifestId()));
         asccpManifest = dslContext.insertInto(ASCCP_MANIFEST)
                 .set(asccpManifest)
                 .returning(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).fetchOne();
@@ -266,8 +266,14 @@ public class AsccpWriteRepository {
         if (compare(asccpRecord.getPropertyTerm(), request.getPropertyTerm()) != 0) {
             propertyTermChanged = true;
             moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(ASCCP.PROPERTY_TERM, request.getPropertyTerm())
-                    .set(ASCCP.DEN, request.getPropertyTerm() + ". " + objectClassTerm(asccpRecord.getRoleOfAccId()));
+                    .set(ASCCP.PROPERTY_TERM, request.getPropertyTerm());
+
+            String den = request.getPropertyTerm() + ". " + objectClassTerm(asccpManifestRecord.getRoleOfAccManifestId());
+            asccpManifestRecord.setDen(den);
+            dslContext.update(ASCCP_MANIFEST)
+                    .set(ASCCP_MANIFEST.DEN, den)
+                    .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
+                    .execute();
         }
         if (compare(asccpRecord.getDefinition(), request.getDefinition()) != 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
@@ -418,11 +424,13 @@ public class AsccpWriteRepository {
                 .fetchOneInto(ULong.class);
 
         asccpRecord.setRoleOfAccId(roleOfAccId);
-        asccpRecord.setDen(asccpRecord.getPropertyTerm() + ". " + objectClassTerm(asccpRecord.getRoleOfAccId()));
         asccpRecord.setLastUpdatedBy(userId);
         asccpRecord.setLastUpdateTimestamp(timestamp);
-        asccpRecord.update(ASCCP.ROLE_OF_ACC_ID, ASCCP.DEN,
+        asccpRecord.update(ASCCP.ROLE_OF_ACC_ID,
                 ASCCP.LAST_UPDATED_BY, ASCCP.LAST_UPDATE_TIMESTAMP);
+
+        asccpManifestRecord.setDen(asccpRecord.getPropertyTerm() + ". " + objectClassTerm(asccpManifestRecord.getRoleOfAccManifestId()));
+        asccpManifestRecord.update(ASCCP_MANIFEST.DEN);
 
         // creates new log for updated record.
         LogRecord logRecord =
@@ -437,7 +445,7 @@ public class AsccpWriteRepository {
         asccpManifestRecord.update(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, ASCCP_MANIFEST.LOG_ID);
 
         return new UpdateAsccpRoleOfAccRepositoryResponse(asccpManifestRecord.getAsccpManifestId().toBigInteger(),
-                asccpRecord.getDen());
+                asccpManifestRecord.getDen());
     }
 
     public UpdateAsccpStateRepositoryResponse updateAsccpState(UpdateAsccpStateRepositoryRequest request) {
@@ -473,7 +481,7 @@ public class AsccpWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (asccpRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + asccpRecord.getDen() + "' dose not have NamespaceId.");
+            throw new IllegalArgumentException("'" + asccpManifestRecord.getDen() + "' dose not have NamespaceId.");
         }
 
         // update asccp state.
@@ -484,6 +492,27 @@ public class AsccpWriteRepository {
         }
         asccpRecord.update(ASCCP.STATE,
                 ASCCP.LAST_UPDATED_BY, ASCCP.LAST_UPDATE_TIMESTAMP, ASCCP.OWNER_USER_ID);
+
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = asccpRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong asccpManifestId = asccpManifestRecord.getAsccpManifestId();
+
+                dslContext.update(ASBIE.join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                        .execute();
+
+                dslContext.update(ASBIE.join(ABIE).on(ASBIE.FROM_ABIE_ID.eq(ABIE.ABIE_ID))
+                                .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID)))
+                        .set(ASBIE.IS_DEPRECATED, isDeprecated)
+                        .where(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                        .execute();
+            }
+        }
 
         // creates new log for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
@@ -575,7 +604,7 @@ public class AsccpWriteRepository {
                 .where(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(asccpManifestRecord.getAsccpManifestId()))
                 .fetch();
         if (!asccManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCs first before purging the ASCCP '" + asccpRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-ASCCs first before purging the ASCCP '" + asccpManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeAsccpRepositoryResponse(asccpManifestRecord.getAsccpManifestId().toBigInteger(), e);
             } else {
@@ -805,13 +834,13 @@ public class AsccpWriteRepository {
 
         AccRecord accRecord = dslContext.selectFrom(ACC).where(ACC.ACC_ID.eq(accManifestRecord.getAccId())).fetchOne();
 
+        asccpManifestRecord.setDen(asccpRecord.getPropertyTerm() + ". " + accRecord.getObjectClassTerm());
         asccpManifestRecord.setRoleOfAccManifestId(accManifestRecord.getAccManifestId());
         asccpManifestRecord.setLogId(cursorLog.getLogId());
-        asccpManifestRecord.update(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, ASCCP_MANIFEST.LOG_ID);
+        asccpManifestRecord.update(ASCCP_MANIFEST.DEN, ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, ASCCP_MANIFEST.LOG_ID);
 
         asccpRecord.setRoleOfAccId(accManifestRecord.getAccId());
         asccpRecord.setPropertyTerm(serializer.getSnapshotString(snapshot.get("propertyTerm")));
-        asccpRecord.setDen(asccpRecord.getPropertyTerm() + ". " + accRecord.getObjectClassTerm());
         asccpRecord.setDefinition(serializer.getSnapshotString(snapshot.get("definition")));
         asccpRecord.setDefinitionSource(serializer.getSnapshotString(snapshot.get("definitionSource")));
         asccpRecord.setNamespaceId(serializer.getSnapshotId(snapshot.get("namespaceId")));

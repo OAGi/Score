@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.service.common.data.CcState;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 public class CcBccpNodeDetail implements CcNodeDetail {
@@ -109,5 +110,7 @@ public class CcBccpNodeDetail implements CcNodeDetail {
         private BigInteger lastChangedManifestId = BigInteger.ZERO;
         private BigInteger lastChangedReleaseId = BigInteger.ZERO;
         private String lastChangedReleaseNum;
+
+        private List<CcBdtPriRestri> bdtPriRestriList;
     }
 }

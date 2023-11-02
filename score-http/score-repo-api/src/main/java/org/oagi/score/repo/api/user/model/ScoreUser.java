@@ -6,6 +6,7 @@ import java.util.*;
 
 public final class ScoreUser implements Serializable {
 
+    public static final String SYSTEM_USER_LOGIN_ID = "sysadm";
     public static final BigInteger SYSTEM_USER_ID = BigInteger.ZERO;
 
     private BigInteger userId;
@@ -13,6 +14,7 @@ public final class ScoreUser implements Serializable {
     private String username;
 
     private Collection<ScoreRole> roles;
+    public ScoreUser(){}
 
     public ScoreUser(BigInteger userId, String username, ScoreRole role) {
         this(userId, username, Arrays.asList(role));

@@ -2,7 +2,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {AgencyIdList, AgencyIdListForListRequest} from './agency-id-list';
-import {PageResponse, PaginationResponse} from '../../basis/basis';
+import {PaginationResponse} from '../../basis/basis';
 import {CcCreateResponse, Comment} from '../../cc-management/domain/core-component-node';
 
 @Injectable()
@@ -202,7 +202,7 @@ export class AgencyIdListService {
 
   uplift(agencyIdList: AgencyIdList, targetReleaseId: number): Observable<any> {
     return this.http.post<any>('/api/agency_id_list/' + agencyIdList.agencyIdListManifestId + '/uplift', {
-      targetReleaseId: targetReleaseId
+      targetReleaseId
     });
   }
 }

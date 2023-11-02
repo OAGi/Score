@@ -1574,7 +1574,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ACCViewEditPage accViewEditPage;
         viewEditCoreComponentPage.openPage();
         {
-            waitFor(Duration.ofMillis(1500));
+            invisibilityOfLoadingContainerElement(getDriver());
             viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();

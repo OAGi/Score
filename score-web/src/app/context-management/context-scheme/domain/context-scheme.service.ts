@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
@@ -129,7 +129,7 @@ export class ContextSchemeService {
       return this.http.delete('/api/context_scheme/' + contextSchemeIds[0]);
     } else {
       return this.http.post<any>('/api/context_scheme/delete', {
-        contextSchemeIds: contextSchemeIds
+        contextSchemeIds
       });
     }
   }

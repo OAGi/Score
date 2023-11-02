@@ -36,7 +36,7 @@ export class ContextCategoryService implements OnInit {
       params = params.set('description', request.filters.description);
     }
 
-    return this.http.get<PageResponse<ContextCategory>>('/api/context_categories', {params: params});
+    return this.http.get<PageResponse<ContextCategory>>('/api/context_categories', {params});
   }
 
   getContextSchemeFromCategoryId(id): Observable<ContextScheme[]> {
@@ -49,15 +49,15 @@ export class ContextCategoryService implements OnInit {
 
   create(contextCategory: ContextCategory): Observable<any> {
     return this.http.put('/api/context_category', {
-      'name': contextCategory.name,
-      'description': contextCategory.description
+      name: contextCategory.name,
+      description: contextCategory.description
     });
   }
 
   update(contextCategory: ContextCategory): Observable<any> {
     return this.http.post('/api/context_category/' + contextCategory.contextCategoryId, {
-      'name': contextCategory.name,
-      'description': contextCategory.description
+      name: contextCategory.name,
+      description: contextCategory.description
     });
   }
 

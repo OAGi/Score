@@ -10,12 +10,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
+import org.jooq.Function10;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.Row10;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -71,6 +71,12 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
      * The column <code>oagi.bccp_manifest.bdt_manifest_id</code>.
      */
     public final TableField<BccpManifestRecord, ULong> BDT_MANIFEST_ID = createField(DSL.name("bdt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+
+    /**
+     * The column <code>oagi.bccp_manifest.den</code>. The dictionary entry name
+     * of the BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
+     */
+    public final TableField<BccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + \". \" + REPRESENTATION_TERM.");
 
     /**
      * The column <code>oagi.bccp_manifest.conflict</code>. This indicates that
@@ -274,18 +280,18 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row10 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<ULong, ULong, ULong, ULong, String, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
+        return (Row10) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -293,7 +299,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

@@ -1,6 +1,7 @@
 package org.oagi.score.service.log.model;
 
 import org.jooq.DSLContext;
+import org.jooq.Record3;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,79 +58,91 @@ public class LogSnapshotResolver {
         return userProperties;
     }
 
-    public Map<String, Object> getAcc(ULong accId) {
-        if (accId == null || accId.longValue() <= 0L) {
+    public Map<String, Object> getAccByManifestId(ULong accManifestId) {
+        if (accManifestId == null || accManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        AccRecord accRecord = dslContext.selectFrom(ACC)
-                .where(ACC.ACC_ID.eq(accId))
-                .fetchOptional().orElse(null);
-        if (accRecord == null) {
+        Record3<String, String, String> record =
+                dslContext.select(ACC.GUID, ACC.OBJECT_CLASS_TERM, ACC_MANIFEST.DEN)
+                        .from(ACC)
+                        .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                        .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
+                        .fetchOptional().orElse(null);
+        if (record == null) {
             return new HashMap();
         }
 
         Map<String, Object> userProperties = new HashMap();
-        userProperties.put("guid", accRecord.getGuid());
-        userProperties.put("objectClassTerm", accRecord.getObjectClassTerm());
-        userProperties.put("den", accRecord.getDen());
+        userProperties.put("guid", record.get(ACC.GUID));
+        userProperties.put("objectClassTerm", record.get(ACC.OBJECT_CLASS_TERM));
+        userProperties.put("den", record.get(ACC_MANIFEST.DEN));
         return userProperties;
     }
 
-    public Map<String, Object> getAsccp(ULong asccpId) {
-        if (asccpId == null || asccpId.longValue() <= 0L) {
+    public Map<String, Object> getAsccpByManifestId(ULong asccpManifestId) {
+        if (asccpManifestId == null || asccpManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        AsccpRecord asccpRecord = dslContext.selectFrom(ASCCP)
-                .where(ASCCP.ASCCP_ID.eq(asccpId))
-                .fetchOptional().orElse(null);
-        if (asccpRecord == null) {
+        Record3<String, String, String> record =
+                dslContext.select(ASCCP.GUID, ASCCP.PROPERTY_TERM, ASCCP_MANIFEST.DEN)
+                        .from(ASCCP)
+                        .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                        .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
+                        .fetchOptional().orElse(null);
+        if (record == null) {
             return new HashMap();
         }
 
         Map<String, Object> userProperties = new HashMap();
-        userProperties.put("guid", asccpRecord.getGuid());
-        userProperties.put("propertyTerm", asccpRecord.getPropertyTerm());
-        userProperties.put("den", asccpRecord.getDen());
+        userProperties.put("guid", record.get(ASCCP.GUID));
+        userProperties.put("propertyTerm", record.get(ASCCP.PROPERTY_TERM));
+        userProperties.put("den", record.get(ASCCP_MANIFEST.DEN));
         return userProperties;
     }
 
-    public Map<String, Object> getBccp(ULong bccpId) {
-        if (bccpId == null || bccpId.longValue() <= 0L) {
+    public Map<String, Object> getBccpByManifestId(ULong bccpManifestId) {
+        if (bccpManifestId == null || bccpManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        BccpRecord bccpRecord = dslContext.selectFrom(BCCP)
-                .where(BCCP.BCCP_ID.eq(bccpId))
-                .fetchOptional().orElse(null);
-        if (bccpRecord == null) {
+        Record3<String, String, String> record =
+                dslContext.select(BCCP.GUID, BCCP.PROPERTY_TERM, BCCP_MANIFEST.DEN)
+                        .from(BCCP)
+                        .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+                        .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestId))
+                        .fetchOptional().orElse(null);
+        if (record == null) {
             return new HashMap();
         }
 
         Map<String, Object> userProperties = new HashMap();
-        userProperties.put("guid", bccpRecord.getGuid());
-        userProperties.put("propertyTerm", bccpRecord.getPropertyTerm());
-        userProperties.put("den", bccpRecord.getDen());
+        userProperties.put("guid", record.get(BCCP.GUID));
+        userProperties.put("propertyTerm", record.get(BCCP.PROPERTY_TERM));
+        userProperties.put("den", record.get(BCCP_MANIFEST.DEN));
         return userProperties;
     }
 
-    public Map<String, Object> getDt(ULong dtId) {
-        if (dtId == null || dtId.longValue() <= 0L) {
+    public Map<String, Object> getDtByManifestId(ULong dtManifestId) {
+        if (dtManifestId == null || dtManifestId.longValue() <= 0L) {
             return new HashMap();
         }
 
-        DtRecord dtRecord = dslContext.selectFrom(DT)
-                .where(DT.DT_ID.eq(dtId))
-                .fetchOptional().orElse(null);
-        if (dtRecord == null) {
+        Record3<String, String, String> record =
+                dslContext.select(DT.GUID, DT.DATA_TYPE_TERM, DT_MANIFEST.DEN)
+                        .from(DT)
+                        .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(dtManifestId))
+                        .fetchOptional().orElse(null);
+        if (record == null) {
             return new HashMap();
         }
 
         Map<String, Object> userProperties = new HashMap();
-        userProperties.put("guid", dtRecord.getGuid());
-        userProperties.put("dataTypeTerm", dtRecord.getDataTypeTerm());
-        userProperties.put("den", dtRecord.getDen());
+        userProperties.put("guid", record.get(DT.GUID));
+        userProperties.put("dataTypeTerm", record.get(DT.DATA_TYPE_TERM));
+        userProperties.put("den", record.get(DT_MANIFEST.DEN));
         return userProperties;
     }
 

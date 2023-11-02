@@ -25,6 +25,7 @@ public class BBIESC implements BIE, FacetRestrictionsAware {
     private String remark;
     private String bizTerm;
     private String example;
+    private boolean deprecated;
     private boolean used;
     private BigInteger ownerTopLevelAsbiepId = BigInteger.ZERO;
 }

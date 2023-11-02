@@ -5,7 +5,6 @@ import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ShortTag} from '../../../tag-management/domain/tag';
-import {BieList} from "../../../bie-management/bie-list/domain/bie-list";
 
 export class CcListRequest {
   release: SimpleRelease;
@@ -368,7 +367,8 @@ export class CcChangeResponse {
 
 export class CcChange {
   type: string;
-  manifestId; number;
+  manifestId;
+  number;
   den: string;
   changeType: string;
   tagList: ShortTag[];

@@ -9,7 +9,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
@@ -23,6 +23,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-code-list-uplift',
@@ -71,6 +72,8 @@ export class CodeListUpliftComponent implements OnInit {
   request: CodeListForListRequest;
 
   contextMenuItem: CodeListForList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -83,7 +86,8 @@ export class CodeListUpliftComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -170,9 +174,11 @@ export class CodeListUpliftComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

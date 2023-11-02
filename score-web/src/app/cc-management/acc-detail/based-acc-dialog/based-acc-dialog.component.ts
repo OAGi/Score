@@ -10,13 +10,14 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ExtensionDetailComponent} from '../../extension-detail/extension-detail.component';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Base, OagisComponentType, Semantics} from '../../domain/core-component-node';
 import {WorkingRelease} from '../../../release-management/domain/release';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -54,12 +55,15 @@ export class BasedAccDialogComponent implements OnInit {
   request: CcListRequest;
   action: string;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }
@@ -143,9 +147,11 @@ export class BasedAccDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

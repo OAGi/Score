@@ -7,11 +7,14 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormControl} from '@angular/forms';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {TenantListService} from '../domain/tenant-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
+import {
+  BusinessContext,
+  BusinessContextListRequest
+} from '../../context-management/business-context/domain/business-context';
 import {PageRequest} from '../../basis/basis';
 import {initFilter} from '../../common/utility';
 
@@ -38,6 +41,8 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -143,9 +148,11 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

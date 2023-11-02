@@ -10,7 +10,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ReleaseList, ReleaseListRequest, WorkingRelease} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -18,8 +18,8 @@ import {initFilter} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 
 @Component({
   selector: 'score-release-list',
@@ -49,6 +49,10 @@ export class ReleaseListComponent implements OnInit {
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: ReleaseList;
+  @ViewChild('createdDateStart', {static: true}) createdDateStart: MatDatepicker<any>;
+  @ViewChild('createdDateEnd', {static: true}) createdDateEnd: MatDatepicker<any>;
+  @ViewChild('updatedDateStart', {static: true}) updatedDateStart: MatDatepicker<any>;
+  @ViewChild('updatedDateEnd', {static: true}) updatedDateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -125,15 +129,19 @@ export class ReleaseListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'created.startDate':
+        this.createdDateStart.select(undefined);
         this.request.createdDate.start = null;
         break;
       case 'created.endDate':
+        this.createdDateEnd.select(undefined);
         this.request.createdDate.end = null;
         break;
       case 'updated.startDate':
+        this.updatedDateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'updated.endDate':
+        this.updatedDateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

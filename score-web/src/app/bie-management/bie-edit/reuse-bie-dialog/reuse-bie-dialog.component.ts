@@ -6,7 +6,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {AuthService} from '../../../authentication/auth.service';
 import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -16,7 +16,8 @@ import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {SimpleRelease} from "../../../release-management/domain/release";
+import {SimpleRelease} from '../../../release-management/domain/release';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -40,6 +41,8 @@ export class ReuseBieDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BieListRequest;
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -51,6 +54,7 @@ export class ReuseBieDialogComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
+    public webPageInfo: WebPageInfoService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
@@ -60,8 +64,8 @@ export class ReuseBieDialogComponent implements OnInit {
     this.request.filters.asccpManifestId = this.data.asccpManifestId;
     const release = new SimpleRelease();
     release.releaseId = this.data.releaseId;
-    this.request.releases = [release,];
-    this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
+    this.request.releases = [release, ];
+    this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId, ];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;
     }
@@ -116,9 +120,11 @@ export class ReuseBieDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

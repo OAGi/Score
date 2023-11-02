@@ -12,7 +12,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BieList, BieListRequest} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
 import {
@@ -26,6 +26,7 @@ import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-list',
@@ -33,6 +34,7 @@ import {UserToken} from '../../authentication/domain/auth';
   styleUrls: ['./bie-list.component.css']
 })
 export class BieListComponent implements OnInit {
+
   title = 'BIE';
 
   displayedColumns: string[] = [
@@ -57,6 +59,8 @@ export class BieListComponent implements OnInit {
   request: BieListRequest;
 
   contextMenuItem: BieList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -69,7 +73,8 @@ export class BieListComponent implements OnInit {
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -144,9 +149,11 @@ export class BieListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }
@@ -296,7 +303,7 @@ export class BieListComponent implements OnInit {
     });
   }
 
-  openBieListDialog(bie: BieList) {
+  openFindReuseBieListDialog(bie: BieList) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
@@ -353,9 +360,9 @@ export class BieListComponent implements OnInit {
     }
 
     const dialogConfig = this.confirmDialogService.newConfig();
-    let notiMsg = 'Updated';
-    let toState = action;
-    let actionType = 'Update';
+    const notiMsg = 'Updated';
+    const toState = action;
+    const actionType = 'Update';
 
     switch (action) {
       case 'WIP':

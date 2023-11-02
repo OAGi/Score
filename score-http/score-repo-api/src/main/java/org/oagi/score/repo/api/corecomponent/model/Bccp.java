@@ -16,8 +16,6 @@ public class Bccp extends Auditable implements CoreComponent, Serializable {
 
     private String representationTerm;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -76,14 +74,6 @@ public class Bccp extends Auditable implements CoreComponent, Serializable {
 
     public void setRepresentationTerm(String representationTerm) {
         this.representationTerm = representationTerm;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

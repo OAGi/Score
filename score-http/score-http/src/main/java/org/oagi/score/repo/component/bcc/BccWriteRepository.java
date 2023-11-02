@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,7 +54,8 @@ public class BccWriteRepository {
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
 
-    private void ensureNoConflictInForward(ULong fromAccManifestId, BccpRecord bccpRecord,
+    private void ensureNoConflictInForward(ULong fromAccManifestId,
+                                           BccpManifestRecord bccpManifestRecord, BccpRecord bccpRecord,
                                            List<String> denPathList) {
         if (fromAccManifestId == null) {
             return;
@@ -64,7 +64,7 @@ public class BccWriteRepository {
         // Issue #1463
         // Find conflicts under 'Group' ACCs.
         {
-            List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+            List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                     .from(ASCC_MANIFEST)
                     .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                     .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
@@ -99,8 +99,8 @@ public class BccWriteRepository {
                         ))
                         .fetchOneInto(Integer.class);
                 if (cnt > 0) {
-                    denPathList.add(groupAccRecord.get(ACC.DEN));
-                    throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has BCCP [" + bccpRecord.getDen() + "]");
+                    denPathList.add(groupAccRecord.get(ACC_MANIFEST.DEN));
+                    throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has BCCP [" + bccpManifestRecord.getDen() + "]");
                 }
             }
         }
@@ -115,10 +115,10 @@ public class BccWriteRepository {
                 ))
                 .fetchOneInto(Integer.class);
         if (cnt > 0) {
-            throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has BCCP [" + bccpRecord.getDen() + "]");
+            throw new IllegalArgumentException("ACC [" + String.join(" > ", denPathList) + "] already has BCCP [" + bccpManifestRecord.getDen() + "]");
         }
 
-        Record2<ULong, String> basedAccRecord = dslContext.select(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC.DEN)
+        Record2<ULong, String> basedAccRecord = dslContext.select(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                 .from(ACC_MANIFEST)
                 .join(ACC_MANIFEST.as("base")).on(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("base").ACC_MANIFEST_ID))
                 .join(ACC).on(ACC_MANIFEST.as("base").ACC_ID.eq(ACC.ACC_ID))
@@ -127,14 +127,15 @@ public class BccWriteRepository {
 
         if (basedAccRecord != null) {
             List<String> childDenPathList = new ArrayList<>(denPathList);
-            childDenPathList.add(basedAccRecord.get(ACC.DEN));
-            ensureNoConflictInForward(basedAccRecord.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID), bccpRecord, childDenPathList);
+            childDenPathList.add(basedAccRecord.get(ACC_MANIFEST.DEN));
+            ensureNoConflictInForward(basedAccRecord.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID), bccpManifestRecord, bccpRecord, childDenPathList);
         }
     }
 
-    private void ensureNoConflictInBackward(ULong fromAccManifestId, BccpRecord bccpRecord,
+    private void ensureNoConflictInBackward(ULong fromAccManifestId,
+                                            BccpManifestRecord bccpManifestRecord, BccpRecord bccpRecord,
                                             List<String> denPathList) {
-        List<Record2<ULong, String>> childAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+        List<Record2<ULong, String>> childAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(fromAccManifestId))
@@ -146,12 +147,12 @@ public class BccWriteRepository {
         for (Record2<ULong, String> childAccRecord : childAccRecords) {
             ULong childAccManifestId = childAccRecord.get(ACC_MANIFEST.ACC_MANIFEST_ID);
             List<String> childDenPathList = new ArrayList<>(denPathList);
-            childDenPathList.add(childAccRecord.get(ACC.DEN));
+            childDenPathList.add(childAccRecord.get(ACC_MANIFEST.DEN));
 
             // Issue #1463
             // Find conflicts under 'Group' ACCs.
             {
-                List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.DEN)
+                List<Record2<ULong, String>> groupAccRecords = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.DEN)
                         .from(ASCC_MANIFEST)
                         .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                         .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
@@ -186,8 +187,8 @@ public class BccWriteRepository {
                             ))
                             .fetchOneInto(Integer.class);
                     if (cnt > 0) {
-                        childDenPathList.add(groupAccRecord.get(ACC.DEN));
-                        throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has BCCP [" + bccpRecord.getDen() + "]");
+                        childDenPathList.add(groupAccRecord.get(ACC_MANIFEST.DEN));
+                        throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has BCCP [" + bccpManifestRecord.getDen() + "]");
                     }
                 }
             }
@@ -201,10 +202,10 @@ public class BccWriteRepository {
                     ))
                     .fetchOneInto(Integer.class);
             if (cnt > 0) {
-                throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has BCCP [" + bccpRecord.getDen() + "]");
+                throw new IllegalArgumentException("ACC [" + String.join(" < ", childDenPathList) + "] already has BCCP [" + bccpManifestRecord.getDen() + "]");
             }
 
-            ensureNoConflictInBackward(childAccManifestId, bccpRecord, childDenPathList);
+            ensureNoConflictInBackward(childAccManifestId, bccpManifestRecord, bccpRecord, childDenPathList);
         }
     }
 
@@ -236,10 +237,10 @@ public class BccWriteRepository {
 
         // Issue #1192
         List<String> denPathList = new ArrayList<>();
-        denPathList.add(accRecord.getDen());
+        denPathList.add(accManifestRecord.getDen());
 
-        ensureNoConflictInForward(accManifestRecord.getAccManifestId(), bccpRecord, denPathList);
-        ensureNoConflictInBackward(accManifestRecord.getAccManifestId(), bccpRecord, denPathList);
+        ensureNoConflictInForward(accManifestRecord.getAccManifestId(), bccpManifestRecord, bccpRecord, denPathList);
+        ensureNoConflictInBackward(accManifestRecord.getAccManifestId(), bccpManifestRecord, bccpRecord, denPathList);
 
         CcState accState = CcState.valueOf(accRecord.getState());
         if (accState != request.getInitialState()) {
@@ -248,7 +249,6 @@ public class BccWriteRepository {
 
         BccRecord bcc = new BccRecord();
         bcc.setGuid(ScoreGuid.randomGuid());
-        bcc.setDen(accRecord.getObjectClassTerm() + ". " + bccpRecord.getDen());
         bcc.setCardinalityMin(0);
         bcc.setCardinalityMax(-1);
         bcc.setSeqKey(0); // @deprecated
@@ -274,6 +274,7 @@ public class BccWriteRepository {
         bccManifestRecord.setReleaseId(ULong.valueOf(request.getReleaseId()));
         bccManifestRecord.setFromAccManifestId(accManifestRecord.getAccManifestId());
         bccManifestRecord.setToBccpManifestId(bccpManifestRecord.getBccpManifestId());
+        bccManifestRecord.setDen(accRecord.getObjectClassTerm() + ". " + bccpManifestRecord.getDen());
         bccManifestRecord.setBccManifestId(
                 dslContext.insertInto(BCC_MANIFEST)
                         .set(bccManifestRecord)
@@ -362,15 +363,12 @@ public class BccWriteRepository {
         UpdateSetFirstStep<BccRecord> firstStep = dslContext.update(BCC);
         UpdateSetMoreStep<BccRecord> moreStep = null;
 
-        String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(BCCP.DEN)
-                .from(BCCP)
-                .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
+        String den = accRecord.getObjectClassTerm() + ". " + dslContext.select(BCCP_MANIFEST.DEN)
+                .from(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccManifestRecord.getToBccpManifestId()))
                 .fetchOneInto(String.class);
-        if (compare(bccRecord.getDen(), den) != 0) {
-            moreStep = ((moreStep != null) ? moreStep : firstStep)
-                    .set(BCC.DEN, den);
-        }
+        boolean denChanged = compare(bccManifestRecord.getDen(), den) != 0;
+
         if (compare(bccRecord.getDefinition(), request.getDefinition()) != 0) {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(BCC.DEFINITION, request.getDefinition());
@@ -423,7 +421,14 @@ public class BccWriteRepository {
                     .set(BCC.FIXED_VALUE, request.getFixedValue());
         }
 
-        if (moreStep != null) {
+        if (moreStep != null || denChanged) {
+            if (denChanged) {
+                dslContext.update(BCC_MANIFEST)
+                        .set(BCC_MANIFEST.DEN, den)
+                        .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestRecord.getBccManifestId()))
+                        .execute();
+            }
+
             moreStep.set(BCC.LAST_UPDATED_BY, userId)
                     .set(BCC.LAST_UPDATE_TIMESTAMP, timestamp)
                     .where(BCC.BCC_ID.eq(bccRecord.getBccId()))
@@ -532,9 +537,8 @@ public class BccWriteRepository {
 
         BccRecord targetBccRecord = dslContext.selectFrom(BCC).where(BCC.BCC_ID.eq(targetBccManifestRecord.getBccId())).fetchOne();
 
-        String bccpDen = dslContext.select(BCCP.DEN)
+        String bccpDen = dslContext.select(BCCP_MANIFEST.DEN)
                 .from(BCCP_MANIFEST)
-                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(targetBccManifestRecord.getToBccpManifestId()))
                 .fetchOneInto(String.class);
 
@@ -616,12 +620,12 @@ public class BccWriteRepository {
         targetBccRecord.setFromAccId(targetAccRecord.getAccId());
         targetBccRecord.setPrevBccId(null);
         targetBccRecord.setNextBccId(null);
-        targetBccRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + bccpDen);
         ULong bccId = dslContext.insertInto(BCC).set(targetBccRecord).returning().fetchOne().getBccId();
 
         targetBccManifestRecord.setBccManifestId(null);
         targetBccManifestRecord.setFromAccManifestId(ULong.valueOf(request.getAccManifestId()));
         targetBccManifestRecord.setBccId(bccId);
+        targetBccManifestRecord.setDen(targetAccRecord.getObjectClassTerm() + ". " + bccpDen);
         targetBccManifestRecord.setSeqKeyId(null);
         targetBccManifestRecord.setPrevBccManifestId(null);
         targetBccManifestRecord.setNextBccManifestId(null);

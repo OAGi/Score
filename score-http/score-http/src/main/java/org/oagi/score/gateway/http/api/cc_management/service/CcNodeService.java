@@ -378,8 +378,8 @@ public class CcNodeService extends EventHandler {
         return bdtScNodeDetail;
     }
 
-    public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpId) {
-        return repository.getAsccp(asccpId);
+    public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpManifestId) {
+        return repository.getAsccp(asccpManifestId);
     }
 
     @Transactional

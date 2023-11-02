@@ -8,9 +8,9 @@ export interface FlatNode {
   expandable: boolean;
 
   parent?: FlatNode;
+  children: FlatNode[];
 
   getChildren(options?: any | undefined): FlatNode[];
-  children: FlatNode[];
 }
 
 export class FlatNodeImpl implements FlatNode {
@@ -95,7 +95,7 @@ export class ExactMatchExpressionEvaluator<T extends FlatNode> implements Expres
 }
 
 export class PathLikeExpressionEvaluator<T extends FlatNode> implements ExpressionEvaluator<T> {
-  private _root: boolean = false;
+  private _root = false;
   private _tokens: string[];
   private _caseSensitive: boolean;
 
@@ -123,7 +123,7 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
 
   eval(node: T): boolean {
     let cur = node;
-    for (let token of Object.assign([], this._tokens).reverse()) {
+    for (const token of Object.assign([], this._tokens).reverse()) {
       if (!cur) {
         return false;
       }

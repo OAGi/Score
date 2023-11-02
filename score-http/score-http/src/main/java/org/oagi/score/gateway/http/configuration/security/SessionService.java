@@ -9,7 +9,6 @@ import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 import org.oagi.score.repo.api.user.model.GetScoreUserRequest;
 import org.oagi.score.repo.api.user.model.GetScoreUsersRequest;
 import org.oagi.score.repo.api.user.model.ScoreRole;
-import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;

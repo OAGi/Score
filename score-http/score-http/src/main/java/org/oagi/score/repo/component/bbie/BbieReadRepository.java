@@ -5,6 +5,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
+import org.oagi.score.data.BdtPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.component.bcc.BccReadRepository;
@@ -62,7 +63,11 @@ public class BbieReadRepository {
         bcc.setGuid(bccRecord.getGuid());
         bcc.setCardinalityMin(bccRecord.getCardinalityMin());
         bcc.setCardinalityMax(bccRecord.getCardinalityMax());
-        bcc.setDen(bccRecord.getDen());
+        String den = dslContext.select(BCC_MANIFEST.DEN)
+                .from(BCC_MANIFEST)
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
+                .fetchOneInto(String.class);
+        bcc.setDen(den);
         bcc.setDefinition(bccRecord.getDefinition());
         bcc.setState(CcState.valueOf(bccRecord.getState()));
         if (bccRecord.getDefaultValue() != null || bccRecord.getFixedValue() != null) {
@@ -91,15 +96,23 @@ public class BbieReadRepository {
                 bbie.setFixedValue(bccpRecord.getFixedValue());
             }
             bbie.setNillable(bccpRecord.getIsNillable() == 1);
-            BigInteger defaultBdtPriRestriId = getDefaultBdtPriRestriIdByBdtId(
+            BdtPriRestri defaultBdtPriRestri = getDefaultBdtPriRestriByBdtManifestId(
                     bccpManifestRecord.getBdtManifestId().toBigInteger());
-            bbie.setBdtPriRestriId(defaultBdtPriRestriId);
+            if (defaultBdtPriRestri.getCodeListManifestId() != null) {
+                bbie.setCodeListManifestId(defaultBdtPriRestri.getCodeListManifestId());
+            } else if (defaultBdtPriRestri.getAgencyIdListManifestId() != null) {
+                bbie.setAgencyIdListManifestId(defaultBdtPriRestri.getAgencyIdListManifestId());
+            } else {
+                BigInteger defaultBdtPriRestriId = getDefaultBdtPriRestriIdByBdtManifestId(
+                        bccpManifestRecord.getBdtManifestId().toBigInteger());
+                bbie.setBdtPriRestriId(defaultBdtPriRestriId);
+            }
         }
 
         return bbieNode;
     }
 
-    public BigInteger getDefaultBdtPriRestriIdByBdtId(BigInteger bdtManifestId) {
+    public BigInteger getDefaultBdtPriRestriIdByBdtManifestId(BigInteger bdtManifestId) {
         ULong dtManifestId = ULong.valueOf(bdtManifestId);
         String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
                 .from(DT)
@@ -133,6 +146,17 @@ public class BbieReadRepository {
                 .fetchOptionalInto(BigInteger.class).orElse(BigInteger.ZERO);
     }
 
+    public BdtPriRestri getDefaultBdtPriRestriByBdtManifestId(BigInteger bdtManifestId) {
+        ULong dtManifestId = ULong.valueOf(bdtManifestId);
+        return dslContext.select(BDT_PRI_RESTRI.fields())
+                .from(BDT_PRI_RESTRI)
+                .where(and(
+                        BDT_PRI_RESTRI.BDT_MANIFEST_ID.eq(dtManifestId),
+                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)
+                ))
+                .fetchOptionalInto(BdtPriRestri.class).orElse(null);
+    }
+
     public BbieNode.Bbie getBbie(BigInteger topLevelAsbiepId, String hashPath) {
         BbieNode.Bbie bbie = new BbieNode.Bbie();
         bbie.setHashPath(hashPath);
@@ -160,18 +184,19 @@ public class BbieReadRepository {
             bbie.setCardinalityMin(bbieRecord.getCardinalityMin());
             bbie.setCardinalityMax(bbieRecord.getCardinalityMax());
             if (bbieRecord.getFacetMinLength() != null) {
-                bbie.setMinLength(bbieRecord.getFacetMinLength().intValue());
+                bbie.setFacetMinLength(bbieRecord.getFacetMinLength().toBigInteger());
             }
             if (bbieRecord.getFacetMaxLength() != null) {
-                bbie.setMaxLength(bbieRecord.getFacetMaxLength().intValue());
+                bbie.setFacetMaxLength(bbieRecord.getFacetMaxLength().toBigInteger());
             }
-            bbie.setPattern(bbieRecord.getFacetPattern());
+            bbie.setFacetPattern(bbieRecord.getFacetPattern());
             bbie.setNillable(bbieRecord.getIsNillable() == 1);
             bbie.setRemark(bbieRecord.getRemark());
             bbie.setDefinition(bbieRecord.getDefinition());
             bbie.setDefaultValue(bbieRecord.getDefaultValue());
             bbie.setFixedValue(bbieRecord.getFixedValue());
             bbie.setExample(bbieRecord.getExample());
+            bbie.setDeprecated(bbieRecord.getIsDeprecated() == 1);
 
             bbie.setBdtPriRestriId((bbieRecord.getBdtPriRestriId() != null) ?
                     bbieRecord.getBdtPriRestriId().toBigInteger() : null);
@@ -187,7 +212,8 @@ public class BbieReadRepository {
     public List<BieEditUsed> getUsedBbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE.IS_USED, BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID,
                         BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
-                        BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX)
+                        BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX,
+                        BBIE.IS_DEPRECATED)
                 .from(BBIE)
                 .join(BBIEP).on(and(
                         BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID),
@@ -204,6 +230,7 @@ public class BbieReadRepository {
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     bieEditUsed.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
+                    bieEditUsed.setDeprecated(record.get(BBIE.IS_DEPRECATED) == 1);
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

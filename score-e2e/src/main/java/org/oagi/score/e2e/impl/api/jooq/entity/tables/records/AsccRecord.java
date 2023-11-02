@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record20;
-import org.jooq.Row20;
+import org.jooq.Record19;
+import org.jooq.Row19;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc;
@@ -20,7 +20,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc;
  * ASCCP. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Record20<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> {
+public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Record19<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -149,26 +149,6 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.ascc.den</code>. DEN (dictionary entry name) of the
-     * ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of
-     * the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " +
-     * OBJECT_CLASS_TERM + ". " + DEN. 
-     */
-    public void setDen(String value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>oagi.ascc.den</code>. DEN (dictionary entry name) of the
-     * ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of
-     * the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " +
-     * OBJECT_CLASS_TERM + ". " + DEN. 
-     */
-    public String getDen() {
-        return (String) get(7);
-    }
-
-    /**
      * Setter for <code>oagi.ascc.definition</code>. This is a documentation or
      * description of the ASCC. Since ASCC is business context independent, this
      * is a business context independent description of the ASCC. Since there
@@ -178,7 +158,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * FROM_ACC_ID) and the ASCCP.
      */
     public void setDefinition(String value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
@@ -191,7 +171,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * FROM_ACC_ID) and the ASCCP.
      */
     public String getDefinition() {
-        return (String) get(8);
+        return (String) get(7);
     }
 
     /**
@@ -199,7 +179,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * URL identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
-        set(9, value);
+        set(8, value);
     }
 
     /**
@@ -207,7 +187,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * URL identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
-        return (String) get(9);
+        return (String) get(8);
     }
 
     /**
@@ -216,7 +196,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(10, value);
+        set(9, value);
     }
 
     /**
@@ -225,7 +205,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(10);
+        return (Byte) get(9);
     }
 
     /**
@@ -233,7 +213,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * replacement if the record is deprecated.
      */
     public void setReplacementAsccId(ULong value) {
-        set(11, value);
+        set(10, value);
     }
 
     /**
@@ -241,7 +221,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * replacement if the record is deprecated.
      */
     public ULong getReplacementAsccId() {
-        return (ULong) get(11);
+        return (ULong) get(10);
     }
 
     /**
@@ -253,7 +233,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * its current record.
      */
     public void setCreatedBy(ULong value) {
-        set(12, value);
+        set(11, value);
     }
 
     /**
@@ -265,7 +245,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * its current record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(12);
+        return (ULong) get(11);
     }
 
     /**
@@ -277,7 +257,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * rollback the ownership. 
      */
     public void setOwnerUserId(ULong value) {
-        set(13, value);
+        set(12, value);
     }
 
     /**
@@ -289,7 +269,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * rollback the ownership. 
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(13);
+        return (ULong) get(12);
     }
 
     /**
@@ -300,7 +280,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(14, value);
+        set(13, value);
     }
 
     /**
@@ -311,7 +291,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(14);
+        return (ULong) get(13);
     }
 
     /**
@@ -321,7 +301,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(15, value);
+        set(14, value);
     }
 
     /**
@@ -331,7 +311,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(15);
+        return (LocalDateTime) get(14);
     }
 
     /**
@@ -343,7 +323,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * change has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(16, value);
+        set(15, value);
     }
 
     /**
@@ -355,7 +335,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * change has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(16);
+        return (LocalDateTime) get(15);
     }
 
     /**
@@ -367,7 +347,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * records of when the state was changed.
      */
     public void setState(String value) {
-        set(17, value);
+        set(16, value);
     }
 
     /**
@@ -379,7 +359,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * records of when the state was changed.
      */
     public String getState() {
-        return (String) get(17);
+        return (String) get(16);
     }
 
     /**
@@ -387,7 +367,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * indicate the previous history record.
      */
     public void setPrevAsccId(ULong value) {
-        set(18, value);
+        set(17, value);
     }
 
     /**
@@ -395,7 +375,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * indicate the previous history record.
      */
     public ULong getPrevAsccId() {
-        return (ULong) get(18);
+        return (ULong) get(17);
     }
 
     /**
@@ -403,7 +383,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * indicate the next history record.
      */
     public void setNextAsccId(ULong value) {
-        set(19, value);
+        set(18, value);
     }
 
     /**
@@ -411,7 +391,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
      * indicate the next history record.
      */
     public ULong getNextAsccId() {
-        return (ULong) get(19);
+        return (ULong) get(18);
     }
 
     // -------------------------------------------------------------------------
@@ -424,17 +404,17 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
     }
 
     // -------------------------------------------------------------------------
-    // Record20 type implementation
+    // Record19 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
-        return (Row20) super.fieldsRow();
+    public Row19<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 
     @Override
-    public Row20<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> valuesRow() {
-        return (Row20) super.valuesRow();
+    public Row19<ULong, String, Integer, Integer, Integer, ULong, ULong, String, String, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, ULong> valuesRow() {
+        return (Row19) super.valuesRow();
     }
 
     @Override
@@ -474,66 +454,61 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
 
     @Override
     public Field<String> field8() {
-        return Ascc.ASCC.DEN;
-    }
-
-    @Override
-    public Field<String> field9() {
         return Ascc.ASCC.DEFINITION;
     }
 
     @Override
-    public Field<String> field10() {
+    public Field<String> field9() {
         return Ascc.ASCC.DEFINITION_SOURCE;
     }
 
     @Override
-    public Field<Byte> field11() {
+    public Field<Byte> field10() {
         return Ascc.ASCC.IS_DEPRECATED;
     }
 
     @Override
-    public Field<ULong> field12() {
+    public Field<ULong> field11() {
         return Ascc.ASCC.REPLACEMENT_ASCC_ID;
     }
 
     @Override
-    public Field<ULong> field13() {
+    public Field<ULong> field12() {
         return Ascc.ASCC.CREATED_BY;
     }
 
     @Override
-    public Field<ULong> field14() {
+    public Field<ULong> field13() {
         return Ascc.ASCC.OWNER_USER_ID;
     }
 
     @Override
-    public Field<ULong> field15() {
+    public Field<ULong> field14() {
         return Ascc.ASCC.LAST_UPDATED_BY;
     }
 
     @Override
-    public Field<LocalDateTime> field16() {
+    public Field<LocalDateTime> field15() {
         return Ascc.ASCC.CREATION_TIMESTAMP;
     }
 
     @Override
-    public Field<LocalDateTime> field17() {
+    public Field<LocalDateTime> field16() {
         return Ascc.ASCC.LAST_UPDATE_TIMESTAMP;
     }
 
     @Override
-    public Field<String> field18() {
+    public Field<String> field17() {
         return Ascc.ASCC.STATE;
     }
 
     @Override
-    public Field<ULong> field19() {
+    public Field<ULong> field18() {
         return Ascc.ASCC.PREV_ASCC_ID;
     }
 
     @Override
-    public Field<ULong> field20() {
+    public Field<ULong> field19() {
         return Ascc.ASCC.NEXT_ASCC_ID;
     }
 
@@ -574,66 +549,61 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
 
     @Override
     public String component8() {
-        return getDen();
-    }
-
-    @Override
-    public String component9() {
         return getDefinition();
     }
 
     @Override
-    public String component10() {
+    public String component9() {
         return getDefinitionSource();
     }
 
     @Override
-    public Byte component11() {
+    public Byte component10() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong component12() {
+    public ULong component11() {
         return getReplacementAsccId();
     }
 
     @Override
-    public ULong component13() {
+    public ULong component12() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong component14() {
+    public ULong component13() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong component15() {
+    public ULong component14() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime component16() {
+    public LocalDateTime component15() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime component17() {
+    public LocalDateTime component16() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String component18() {
+    public String component17() {
         return getState();
     }
 
     @Override
-    public ULong component19() {
+    public ULong component18() {
         return getPrevAsccId();
     }
 
     @Override
-    public ULong component20() {
+    public ULong component19() {
         return getNextAsccId();
     }
 
@@ -674,66 +644,61 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
 
     @Override
     public String value8() {
-        return getDen();
-    }
-
-    @Override
-    public String value9() {
         return getDefinition();
     }
 
     @Override
-    public String value10() {
+    public String value9() {
         return getDefinitionSource();
     }
 
     @Override
-    public Byte value11() {
+    public Byte value10() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong value12() {
+    public ULong value11() {
         return getReplacementAsccId();
     }
 
     @Override
-    public ULong value13() {
+    public ULong value12() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong value14() {
+    public ULong value13() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong value15() {
+    public ULong value14() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime value16() {
+    public LocalDateTime value15() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime value17() {
+    public LocalDateTime value16() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String value18() {
+    public String value17() {
         return getState();
     }
 
     @Override
-    public ULong value19() {
+    public ULong value18() {
         return getPrevAsccId();
     }
 
     @Override
-    public ULong value20() {
+    public ULong value19() {
         return getNextAsccId();
     }
 
@@ -781,84 +746,78 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
 
     @Override
     public AsccRecord value8(String value) {
-        setDen(value);
-        return this;
-    }
-
-    @Override
-    public AsccRecord value9(String value) {
         setDefinition(value);
         return this;
     }
 
     @Override
-    public AsccRecord value10(String value) {
+    public AsccRecord value9(String value) {
         setDefinitionSource(value);
         return this;
     }
 
     @Override
-    public AsccRecord value11(Byte value) {
+    public AsccRecord value10(Byte value) {
         setIsDeprecated(value);
         return this;
     }
 
     @Override
-    public AsccRecord value12(ULong value) {
+    public AsccRecord value11(ULong value) {
         setReplacementAsccId(value);
         return this;
     }
 
     @Override
-    public AsccRecord value13(ULong value) {
+    public AsccRecord value12(ULong value) {
         setCreatedBy(value);
         return this;
     }
 
     @Override
-    public AsccRecord value14(ULong value) {
+    public AsccRecord value13(ULong value) {
         setOwnerUserId(value);
         return this;
     }
 
     @Override
-    public AsccRecord value15(ULong value) {
+    public AsccRecord value14(ULong value) {
         setLastUpdatedBy(value);
         return this;
     }
 
     @Override
-    public AsccRecord value16(LocalDateTime value) {
+    public AsccRecord value15(LocalDateTime value) {
         setCreationTimestamp(value);
         return this;
     }
 
     @Override
-    public AsccRecord value17(LocalDateTime value) {
+    public AsccRecord value16(LocalDateTime value) {
         setLastUpdateTimestamp(value);
         return this;
     }
 
     @Override
-    public AsccRecord value18(String value) {
+    public AsccRecord value17(String value) {
         setState(value);
         return this;
     }
 
     @Override
-    public AsccRecord value19(ULong value) {
+    public AsccRecord value18(ULong value) {
         setPrevAsccId(value);
         return this;
     }
 
     @Override
-    public AsccRecord value20(ULong value) {
+    public AsccRecord value19(ULong value) {
         setNextAsccId(value);
         return this;
     }
 
     @Override
-    public AsccRecord values(ULong value1, String value2, Integer value3, Integer value4, Integer value5, ULong value6, ULong value7, String value8, String value9, String value10, Byte value11, ULong value12, ULong value13, ULong value14, ULong value15, LocalDateTime value16, LocalDateTime value17, String value18, ULong value19, ULong value20) {
+    public AsccRecord values(ULong value1, String value2, Integer value3, Integer value4, Integer value5, ULong value6, ULong value7, String value8, String value9, Byte value10, ULong value11, ULong value12, ULong value13, ULong value14, LocalDateTime value15, LocalDateTime value16, String value17, ULong value18, ULong value19) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -878,7 +837,6 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
         value17(value17);
         value18(value18);
         value19(value19);
-        value20(value20);
         return this;
     }
 
@@ -896,7 +854,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
     /**
      * Create a detached, initialised AsccRecord
      */
-    public AsccRecord(ULong asccId, String guid, Integer cardinalityMin, Integer cardinalityMax, Integer seqKey, ULong fromAccId, ULong toAsccpId, String den, String definition, String definitionSource, Byte isDeprecated, ULong replacementAsccId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong prevAsccId, ULong nextAsccId) {
+    public AsccRecord(ULong asccId, String guid, Integer cardinalityMin, Integer cardinalityMax, Integer seqKey, ULong fromAccId, ULong toAsccpId, String definition, String definitionSource, Byte isDeprecated, ULong replacementAsccId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, ULong prevAsccId, ULong nextAsccId) {
         super(Ascc.ASCC);
 
         setAsccId(asccId);
@@ -906,7 +864,6 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> implements Recor
         setSeqKey(seqKey);
         setFromAccId(fromAccId);
         setToAsccpId(toAsccpId);
-        setDen(den);
         setDefinition(definition);
         setDefinitionSource(definitionSource);
         setIsDeprecated(isDeprecated);

@@ -291,7 +291,7 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
                     return;
                 }
                 SchemaModule schemaModule = moduleMap.get(moduleCCID.getModuleId());
-                schemaModule.addBCCP(new BCCP(bccp, bdt));
+                schemaModule.addBCCP(new BCCP(bccpManifest, bccp, bdtManifest, bdt));
 
                 ModuleCCID dtModuleCCID = moduleSetReleaseDataProvider.findModuleDt(bdtManifest.getDtManifestId());
                 if (dtModuleCCID == null) {
@@ -315,10 +315,10 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
 
     private void createACC(Map<ULong, SchemaModule> moduleMap) {
         moduleSetReleaseDataProvider.findACCManifest().forEach(accManifest -> {
-            AccRecord acc = moduleSetReleaseDataProvider.findACC(accManifest.getAccId());
-            if (acc.getDen().equals("Any Structured Content. Details")) {
+            if (accManifest.getDen().equals("Any Structured Content. Details")) {
                 return;
             }
+            AccRecord acc = moduleSetReleaseDataProvider.findACC(accManifest.getAccId());
             ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAcc(accManifest.getAccManifestId());
             if (moduleCCID == null) {
                 return;
@@ -366,16 +366,16 @@ public class DefaultExportContextBuilder implements SchemaModuleTraversal {
 
     private void createASCCP(Map<ULong, SchemaModule> moduleMap) {
         moduleSetReleaseDataProvider.findASCCPManifest().forEach(asccpManifest -> {
+            if (asccpManifest.getDen().equals(ANY_ASCCP_DEN)) {
+                return;
+            }
+
             AsccpRecord asccp = moduleSetReleaseDataProvider.findASCCP(asccpManifest.getAsccpId());
             if (asccp.getReusableIndicator() == 0) {
                 return;
             }
 
-            if (asccp.getDen().equals(ANY_ASCCP_DEN)) {
-                return;
-            }
             ModuleCCID moduleCCID = moduleSetReleaseDataProvider.findModuleAsccp(asccpManifest.getAsccpManifestId());
-
             if (moduleCCID == null) {
                 return;
             }

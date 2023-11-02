@@ -10,12 +10,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
+import org.jooq.Function10;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.Row10;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -71,6 +71,12 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
      * The column <code>oagi.asccp_manifest.role_of_acc_manifest_id</code>.
      */
     public final TableField<AsccpManifestRecord, ULong> ROLE_OF_ACC_MANIFEST_ID = createField(DSL.name("role_of_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+
+    /**
+     * The column <code>oagi.asccp_manifest.den</code>. The dictionary entry
+     * name of the ASCCP.
+     */
+    public final TableField<AsccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The dictionary entry name of the ASCCP.");
 
     /**
      * The column <code>oagi.asccp_manifest.conflict</code>. This indicates that
@@ -275,18 +281,18 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row10 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<ULong, ULong, ULong, ULong, String, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
+        return (Row10) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -294,7 +300,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

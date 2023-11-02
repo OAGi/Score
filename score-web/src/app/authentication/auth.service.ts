@@ -15,8 +15,8 @@ import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OAuth2AppInfo, UserToken} from './domain/auth';
-import {MultiActionsSnackBarComponent} from "../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
-import {Clipboard} from "@angular/cdk/clipboard";
+import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
+import {Clipboard} from '@angular/cdk/clipboard';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
@@ -75,7 +75,7 @@ export class AuthService implements OnInit, CanActivate {
       .set('password', credentials.password);
     const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
     this.http.post<UserToken>('/api/' + environment.loginPath, params, {
-      headers: headers
+      headers
     }).subscribe(res => {
       this.storeUserInfo(res);
       return callback && callback(res);

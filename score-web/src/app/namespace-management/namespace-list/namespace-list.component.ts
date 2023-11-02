@@ -19,7 +19,7 @@ import {Location} from '@angular/common';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AuthService} from '../../authentication/auth.service';
 
@@ -47,6 +47,8 @@ export class NamespaceListComponent implements OnInit {
   request: NamespaceListRequest;
 
   contextMenuItem: NamespaceList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -99,9 +101,11 @@ export class NamespaceListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

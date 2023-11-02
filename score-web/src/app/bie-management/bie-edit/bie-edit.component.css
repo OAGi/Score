@@ -15,7 +15,8 @@
   align-items: center;
 }
 
-.mat-tree-node .deprecated {
+.mat-tree-node .deprecated, .mat-option .deprecated {
+  text-decoration: line-through;
   background-color: #ececec;
 }
 

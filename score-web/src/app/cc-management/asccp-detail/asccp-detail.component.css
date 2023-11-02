@@ -36,6 +36,7 @@
 }
 
 .mat-tree-node .deprecated {
+  text-decoration: line-through;
   background-color: #ececec;
 }
 

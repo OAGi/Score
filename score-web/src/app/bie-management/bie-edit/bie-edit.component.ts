@@ -41,7 +41,7 @@ import {
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {BusinessTermService} from '../../business-term-management/domain/business-term.service';
 import {AuthService} from '../../authentication/auth.service';
@@ -53,7 +53,9 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {MultiActionsSnackBarComponent} from "../../common/multi-actions-snack-bar/multi-actions-snack-bar.component";
+import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
+import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 
 @Component({
@@ -74,13 +76,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   innerY: number = window.innerHeight;
   dataSource: BieFlatNodeDataSource<BieFlatNode>;
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
-
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
   isUpdating = false;
   _versionChanged: boolean;
   _changedVersionValue: string;
-
   /* Begin business context management */
   businessContextCtrl: FormControl;
   businessContexts: BusinessContext[] = [];
@@ -100,11 +100,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   bieCardinalityMax: FormControl;
 
   /* string facets management */
-  bieMinimumLength: FormControl;
-  bieMaximumLength: FormControl;
-  biePattern: FormControl;
-  biePatternTest: FormControl;
-  biePatternTestErrorStateMatcher: ErrorStateMatcher;
+  facetMinimumLength: FormControl;
+  facetMaximumLength: FormControl;
+  facetPattern: FormControl;
+  facetPatternTest: FormControl;
+  facetPatternTestErrorStateMatcher: ErrorStateMatcher;
 
   /* valueDomain */
   valueDomainFilterCtrl: FormControl = new FormControl();
@@ -163,7 +163,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private businessTermService: BusinessTermService,
               private auth: AuthService,
               private stompService: RxStompService,
-              private clipboard: Clipboard) {
+              private clipboard: Clipboard,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
@@ -424,13 +425,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (!!this.bieCardinalityMax && !this.bieCardinalityMax.disabled && !this.bieCardinalityMax.valid) {
         return false;
       }
-      if (!!this.bieMinimumLength && !this.bieMinimumLength.disabled && !this.bieMinimumLength.valid) {
+      if (!!this.facetMinimumLength && !this.facetMinimumLength.disabled && !this.facetMinimumLength.valid) {
         return false;
       }
-      if (!!this.bieMaximumLength && !this.bieMaximumLength.disabled && !this.bieMaximumLength.valid) {
+      if (!!this.facetMaximumLength && !this.facetMaximumLength.disabled && !this.facetMaximumLength.valid) {
         return false;
       }
-      if (!!this.biePattern && !this.biePattern.disabled && !this.biePattern.valid) {
+      if (!!this.facetPattern && !this.facetPattern.disabled && !this.facetPattern.valid) {
         return false;
       }
     }
@@ -681,6 +682,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         });
       });
     });
+  }
+
+  findReuses(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const reusedNode = node as AsbiepFlatNode;
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {
+      topLevelAsbiepId: reusedNode.topLevelAsbiepId,
+      releaseNum: this.rootNode.releaseNum,
+      den: reusedNode.asccpNode.propertyTerm + '. ' + reusedNode.accNode.objectClassTerm
+    };
+    const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
 
   removeReusedBIE(node: BieFlatNode) {
@@ -990,15 +1008,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   isValidState(state: string): boolean {
     const validState = ['Published', 'Production'];
     return validState.indexOf(state) > -1;
-  }
-
-  isStringTypePrimitive(cdtPrimitives: string[]): boolean {
-    for (const typeName of ['String', 'NormalizedString', 'Token', 'Binary']) {
-      if (cdtPrimitives.includes(typeName)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   goToBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
@@ -1316,23 +1325,37 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
-      bieMinLength = this.asBbiepDetail(detailNode).bbie.minLength;
-      bieMaxLength = this.asBbiepDetail(detailNode).bbie.maxLength;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetMinLength) {
+        bieMinLength = bbiepDetail.bdt.facetMinLength;
+        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbiepDetail.bbie.facetMinLength;
+        bieMaxLength = bbiepDetail.bbie.facetMaxLength;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
-      bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetMinLength) {
+        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbieScDetail.bbieSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
     } else {
-      this.bieMinimumLength = undefined;
+      this.facetMinimumLength = undefined;
       return;
     }
 
-    this.bieMinimumLength = new FormControl({
+    this.facetMinimumLength = new FormControl({
         value: bieMinLength,
         disabled
       }, [
@@ -1357,13 +1380,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         }
       ]
     );
-    this.bieMinimumLength.valueChanges.subscribe(value => {
-      if (this.bieMinimumLength.valid) {
+    this.facetMinimumLength.valueChanges.subscribe(value => {
+      if (this.facetMinimumLength.valid) {
         value = typeof value === 'number' ? value : Number.parseInt(value, 10);
         if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.minLength = Number.isNaN(value) ? undefined : value;
+          this.asBbiepDetail(detailNode).bbie.facetMinLength = Number.isNaN(value) ? undefined : value;
         } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.minLength = Number.isNaN(value) ? undefined : value;
+          this.asBbieScDetail(detailNode).bbieSc.facetMinLength = Number.isNaN(value) ? undefined : value;
         } else {
           return;
         }
@@ -1379,23 +1402,37 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let bieMinLength;
     let bieMaxLength;
     if (this.isBbiepDetail(detailNode)) {
-      bieMinLength = this.asBbiepDetail(detailNode).bbie.minLength;
-      bieMaxLength = this.asBbiepDetail(detailNode).bbie.maxLength;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetMinLength) {
+        bieMinLength = bbiepDetail.bdt.facetMinLength;
+        bieMaxLength = bbiepDetail.bdt.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbiepDetail.bbie.facetMinLength;
+        bieMaxLength = bbiepDetail.bbie.facetMaxLength;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      bieMinLength = this.asBbieScDetail(detailNode).bbieSc.minLength;
-      bieMaxLength = this.asBbieScDetail(detailNode).bbieSc.maxLength;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetMinLength) {
+        bieMinLength = bbieScDetail.bdtSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bdtSc.facetMaxLength;
+        disabled = true;
+      } else {
+        bieMinLength = bbieScDetail.bbieSc.facetMinLength;
+        bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
     } else {
-      this.bieMaximumLength = undefined;
+      this.facetMaximumLength = undefined;
       return;
     }
 
-    this.bieMaximumLength = new FormControl({
+    this.facetMaximumLength = new FormControl({
         value: new UnboundedPipe().transform(bieMaxLength),
         disabled
       }, [
@@ -1420,13 +1457,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         }
       ]
     );
-    this.bieMaximumLength.valueChanges.subscribe(value => {
-      if (this.bieMaximumLength.valid) {
+    this.facetMaximumLength.valueChanges.subscribe(value => {
+      if (this.facetMaximumLength.valid) {
         value = typeof value === 'number' ? value : Number.parseInt(value, 10);
         if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.maxLength = Number.isNaN(value) ? undefined : value;
+          this.asBbiepDetail(detailNode).bbie.facetMaxLength = Number.isNaN(value) ? undefined : value;
         } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.maxLength = Number.isNaN(value) ? undefined : value;
+          this.asBbieScDetail(detailNode).bbieSc.facetMaxLength = Number.isNaN(value) ? undefined : value;
         } else {
           return;
         }
@@ -1442,20 +1479,32 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const disabled = !this.isEditable(detailNode) ||
+    let disabled = !this.isEditable(detailNode) ||
       !detailNode.used || !!detailNode.locked;
 
     let biePattern;
     if (this.isBbiepDetail(detailNode)) {
-      biePattern = this.asBbiepDetail(detailNode).bbie.pattern;
+      const bbiepDetail = this.asBbiepDetail(detailNode);
+      if (!!bbiepDetail.bdt.facetPattern) {
+        biePattern = bbiepDetail.bdt.facetPattern;
+        disabled = true;
+      } else {
+        biePattern = bbiepDetail.bbie.facetPattern;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
-      biePattern = this.asBbieScDetail(detailNode).bbieSc.pattern;
+      const bbieScDetail = this.asBbieScDetail(detailNode);
+      if (!!bbieScDetail.bdtSc.facetPattern) {
+        biePattern = bbieScDetail.bdtSc.facetPattern;
+        disabled = true;
+      } else {
+        biePattern = bbieScDetail.bbieSc.facetPattern;
+      }
     } else {
-      this.biePattern = undefined;
+      this.facetPattern = undefined;
       return;
     }
 
-    this.biePattern = new FormControl({
+    this.facetPattern = new FormControl({
       value: biePattern,
       disabled
     }, [
@@ -1475,12 +1524,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
     ]);
 
-    this.biePattern.valueChanges.subscribe(value => {
-      if (this.biePattern.valid) {
+    this.facetPattern.valueChanges.subscribe(value => {
+      if (this.facetPattern.valid) {
         if (this.isBbiepDetail(detailNode)) {
-          this.asBbiepDetail(detailNode).bbie.pattern = value;
+          this.asBbiepDetail(detailNode).bbie.facetPattern = value;
         } else if (this.isBbieScDetail(detailNode)) {
-          this.asBbieScDetail(detailNode).bbieSc.pattern = value;
+          this.asBbieScDetail(detailNode).bbieSc.facetPattern = value;
         } else {
           return;
         }
@@ -1493,13 +1542,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   _setPatternTestFormControl() {
-    this.biePatternTest = new FormControl({
-      value: (!!this.biePatternTest) ? this.biePatternTest.value : '',
-      disabled: !this.biePattern || !this.biePattern.value || !this.biePattern.valid
+    this.facetPatternTest = new FormControl({
+      value: (!!this.facetPatternTest) ? this.facetPatternTest.value : '',
+      disabled: !this.facetPattern || !this.facetPattern.value || !this.facetPattern.valid
     }, [
-      (this.biePattern.valid) ? Validators.pattern(this.biePattern.value) : Validators.nullValidator
+      (this.facetPattern.valid) ? Validators.pattern(this.facetPattern.value) : Validators.nullValidator
     ]);
-    this.biePatternTestErrorStateMatcher = new BiePatternTestShowOnDirtyErrorStateMatcher(this.biePattern);
+    this.facetPatternTestErrorStateMatcher = new BiePatternTestShowOnDirtyErrorStateMatcher(this.facetPattern);
   }
 
   onChangeFixedOrDefault(value: string) {
@@ -1585,12 +1634,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           valueDomains = list.map(e => new ValueDomain(e.agencyIdListManifestId, e.agencyIdListName, e.state, e.versionId, e.deprecated));
           this._setFilteredValueDomains(valueDomains);
         });
-      } else {
+      } else { // valueDomainType === 'Primitive'
         this.service.getBbiepBdtPriRestriList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
           if (bbiepNodeDetail.bbie.bdtPriRestriId === null) {
             bbiepNodeDetail.bbie.bdtPriRestriId = list.find(e => e.default).bdtPriRestriId;
           }
-          valueDomains = list.map(e => new ValueDomain(e.bdtPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtPriRestriId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }
@@ -1614,7 +1663,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           if (this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId === null) {
             this.asBbieScDetail(detail).bbieSc.bdtScPriRestriId = list.find(e => e.default).bdtScPriRestriId;
           }
-          valueDomains = list.map(e => new ValueDomain(e.bdtScPriRestriId, e.xbtName));
+          valueDomains = list.filter(e => !!e.xbtName).map(e => new ValueDomain(e.bdtScPriRestriId, e.xbtName));
           this._setFilteredValueDomains(valueDomains);
         });
       }
@@ -1840,9 +1889,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = undefined;
           } else if (node.bieType === 'BBIEP') {
             (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.minLength = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.maxLength = undefined;
-            (node.detail as BieEditBbiepNodeDetail).bbie.pattern = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.facetMinLength = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.facetMaxLength = undefined;
+            (node.detail as BieEditBbiepNodeDetail).bbie.facetPattern = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.fixedOrDefault = undefined;
             (node.detail as BieEditBbiepNodeDetail).bbie.fixedValue = null;
             (node.detail as BieEditBbiepNodeDetail).bbie.defaultValue = null;
@@ -1852,9 +1901,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             (node.detail as BieEditBbiepNodeDetail).bbie.agencyIdListManifestId = null;
           } else if (node.bieType === 'BBIE_SC') {
             (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.minLength = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.maxLength = undefined;
-            (node.detail as BieEditBbieScNodeDetail).bbieSc.pattern = undefined;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMinLength = undefined;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetMaxLength = undefined;
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.facetPattern = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedOrDefault = undefined;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.fixedValue = null;
             (node.detail as BieEditBbieScNodeDetail).bbieSc.defaultValue = null;

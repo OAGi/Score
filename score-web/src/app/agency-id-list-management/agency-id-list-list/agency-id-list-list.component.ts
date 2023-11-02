@@ -12,7 +12,7 @@ import {
 } from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AgencyIdList, AgencyIdListForListRequest} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
@@ -26,9 +26,9 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
-import {BieList} from "../../bie-management/bie-list/domain/bie-list";
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -72,6 +72,8 @@ export class AgencyIdListListComponent implements OnInit {
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   contextMenuItem: AgencyIdList;
@@ -86,7 +88,8 @@ export class AgencyIdListListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -169,9 +172,11 @@ export class AgencyIdListListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

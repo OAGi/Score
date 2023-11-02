@@ -168,14 +168,15 @@
                                       [matTooltipDisabled]="getNodeTooltip(node) === ''">
                         </mat-checkbox>
 
-                        <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
-                          node.deprecated ? 'deprecated' : 'dummy',
-                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                          this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd']"
+                        <span [class]="['align-self-center', node.type.toLowerCase(),
+                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                              [class.deprecated]="node.deprecated"
+                              [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>
 
-                        <span [class]="['pl-2']" *ngIf="!dataSource.hideCardinality">
+                        <span [class]="['pl-3']" *ngIf="!dataSource.hideCardinality">
                           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
                         </span>
 
@@ -220,6 +221,10 @@
                       <span class="context-menu-item">Make BIE reusable</span>
                     </button>
                     <mat-divider *ngIf="canRemoveReusedBIE(contextMenuItem)"></mat-divider>
+                    <button mat-menu-item (click)="findReuses(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Find Reuses</span>
+                    </button>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
                             *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
                       <span class="context-menu-item">Remove Reused BIE</span>
@@ -420,7 +425,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [disabled]="!isUsable(selectedNode)"
@@ -432,7 +437,17 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsbiepDetail().asbie.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAsbiepDetail().asbie.nillable"
@@ -444,6 +459,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -673,7 +689,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [checked]="used(selectedNode)"
@@ -685,7 +701,17 @@
                             </mat-checkbox>
                           </div>
                         </div>
-                        <div class="col-5">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbiepDetail().bbie.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbiepDetail().bbie.nillable"
@@ -697,6 +723,7 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -875,11 +902,14 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
-                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
-                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span>{{ codeList.name }}</span>
                                       <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -900,11 +930,14 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
-                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
-                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span>{{ agency.name }}</span>
                                       <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -915,68 +948,70 @@
                         </div>
                       </div>
 
-                      <mat-card>
-                        <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
-                        <mat-card-content>
-                          <div class="row">
-                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
-                              <mat-form-field>
-                                <input matInput placeholder="Minimum Length"
-                                       [formControl]="bieMinimumLength">
-                                <mat-error
-                                  *ngIf="!bieMinimumLength.hasError('min') && bieMinimumLength.hasError('pattern')">
-                                  '{{ bieMinimumLength.value }}' is not allowed for Minimum Length
-                                </mat-error>
-                                <mat-error *ngIf="bieMinimumLength.hasError('min')">
-                                  {{ bieMinimumLength.getError('min') }}
-                                </mat-error>
-                                <mat-error *ngIf="bieMinimumLength.hasError('max')">
-                                  {{ bieMinimumLength.getError('max') }}
-                                </mat-error>
-                              </mat-form-field>
+                      <div class="pt-2">
+                        <mat-card>
+                          <mat-card-subtitle>Facets</mat-card-subtitle>
+                          <mat-card-content>
+                            <div class="row">
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <input matInput placeholder="Minimum Length"
+                                         [formControl]="facetMinimumLength">
+                                  <mat-error
+                                    *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
+                                    '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
+                                  </mat-error>
+                                  <mat-error *ngIf="facetMinimumLength.hasError('min')">
+                                    {{ facetMinimumLength.getError('min') }}
+                                  </mat-error>
+                                  <mat-error *ngIf="facetMinimumLength.hasError('max')">
+                                    {{ facetMinimumLength.getError('max') }}
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <input matInput placeholder="Maximum Length"
+                                         [formControl]="facetMaximumLength">
+                                  <mat-error
+                                    *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
+                                    '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
+                                  </mat-error>
+                                  <mat-error *ngIf="facetMaximumLength.hasError('min')">
+                                    {{ facetMaximumLength.getError('min') }}
+                                  </mat-error>
+                                  <mat-error *ngIf="facetMaximumLength.hasError('max')">
+                                    {{ facetMaximumLength.getError('max') }}
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <input matInput placeholder="Pattern"
+                                         [formControl]="facetPattern">
+                                  <mat-error *ngIf="facetPattern.hasError('pattern')">
+                                    {{ facetPattern.getError('pattern') }}
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <input matInput placeholder="Pattern Test"
+                                         [formControl]="facetPatternTest" [errorStateMatcher]="facetPatternTestErrorStateMatcher">
+                                  <mat-error *ngIf="facetPatternTest.hasError('pattern')">
+                                    The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
+                                  </mat-error>
+                                  <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
+                                    The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
+                                  </mat-hint>
+                                </mat-form-field>
+                              </div>
                             </div>
-                            <div class="col-3" *ngIf="isStringTypePrimitive(asBbiepDetail().bcc.cdtPrimitives)">
-                              <mat-form-field>
-                                <input matInput placeholder="Maximum Length"
-                                       [formControl]="bieMaximumLength">
-                                <mat-error
-                                  *ngIf="!bieMaximumLength.hasError('min') && bieMaximumLength.hasError('pattern')">
-                                  '{{ bieMaximumLength.value }}' is not allowed for Maximum Length
-                                </mat-error>
-                                <mat-error *ngIf="bieMaximumLength.hasError('min')">
-                                  {{ bieMaximumLength.getError('min') }}
-                                </mat-error>
-                                <mat-error *ngIf="bieMaximumLength.hasError('max')">
-                                  {{ bieMaximumLength.getError('max') }}
-                                </mat-error>
-                              </mat-form-field>
-                            </div>
-                            <div class="col-3">
-                              <mat-form-field>
-                                <input matInput placeholder="Pattern"
-                                       [formControl]="biePattern">
-                                <mat-error *ngIf="biePattern.hasError('pattern')">
-                                  {{ biePattern.getError('pattern') }}
-                                </mat-error>
-                              </mat-form-field>
-                            </div>
-                            <div class="col-3">
-                              <mat-form-field>
-                                <input matInput placeholder="Pattern Test"
-                                       [formControl]="biePatternTest" [errorStateMatcher]="biePatternTestErrorStateMatcher">
-                                <mat-error *ngIf="biePatternTest.hasError('pattern')">
-                                  The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
-                                </mat-error>
-                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
-                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
-                                </mat-hint>
-                              </mat-form-field>
-                            </div>
-                          </div>
-                        </mat-card-content>
-                      </mat-card>
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
 
-                      <div class="row">
+                      <div class="row pt-2">
                         <div class="col-12">
                           <mat-form-field>
                             <textarea matInput rows="6"
@@ -1020,7 +1055,7 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-11">
+                        <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
                                           [checked]="used(selectedNode)"
@@ -1032,6 +1067,18 @@
                             </mat-checkbox>
                           </div>
                         </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbieScDetail().bbieSc.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3"></div>
+                        <div class="col-2"></div>
                         <div class="col-1">
                           <button mat-icon-button (click)="resetDetail(selectedNode)"
                                   *ngIf="state === 'WIP'"
@@ -1203,11 +1250,14 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    <div [class]="['d-flex', (codeList.state === 'Deleted' ? 'text-muted' : (!isValidState(codeList.state) ? 'text-warning' : 'dummy')),
-                                          codeList.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
-                                      <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                                      <span>{{ codeList.name }}</span>
                                       <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -1228,11 +1278,14 @@
 
                                   <mat-option *ngFor="let agency of filteredValueDomains | async"
                                               [value]="agency.id">
-                                    <div [class]="['d-flex', (agency.state === 'Deleted' ? 'text-muted' : (!isValidState(agency.state) ? 'text-warning' : 'dummy')),
-                                          agency.deprecated ? 'deprecated': 'dummy']"
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
-                                      <span class="{{ agency.state === 'Deleted' ? 'text-line-through' : '' }}">{{ agency.name }}</span>
+                                      <span>{{ agency.name }}</span>
                                       <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
@@ -1243,68 +1296,70 @@
                         </div>
                       </div>
 
-                      <mat-card *ngIf="isStringTypePrimitive(asBbieScDetail().bdtSc.cdtPrimitives)">
-                        <mat-card-subtitle>Facet Constraints</mat-card-subtitle>
+                      <div class="pt-2">
+                        <mat-card>
+                        <mat-card-subtitle>Facets</mat-card-subtitle>
                         <mat-card-content>
                           <div class="row">
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Minimum Length"
-                                       [formControl]="bieMinimumLength">
+                                       [formControl]="facetMinimumLength">
                                 <mat-error
-                                  *ngIf="!bieMinimumLength.hasError('min') && bieMinimumLength.hasError('pattern')">
-                                  '{{ bieMinimumLength.value }}' is not allowed for Minimum Length
+                                  *ngIf="!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')">
+                                  '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
                                 </mat-error>
-                                <mat-error *ngIf="bieMinimumLength.hasError('min')">
-                                  {{ bieMinimumLength.getError('min') }}
+                                <mat-error *ngIf="facetMinimumLength.hasError('min')">
+                                  {{ facetMinimumLength.getError('min') }}
                                 </mat-error>
-                                <mat-error *ngIf="bieMinimumLength.hasError('max')">
-                                  {{ bieMinimumLength.getError('max') }}
+                                <mat-error *ngIf="facetMinimumLength.hasError('max')">
+                                  {{ facetMinimumLength.getError('max') }}
                                 </mat-error>
                               </mat-form-field>
                             </div>
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Maximum Length"
-                                       [formControl]="bieMaximumLength">
+                                       [formControl]="facetMaximumLength">
                                 <mat-error
-                                  *ngIf="!bieMaximumLength.hasError('min') && bieMaximumLength.hasError('pattern')">
-                                  '{{ bieMaximumLength.value }}' is not allowed for Maximum Length
+                                  *ngIf="!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')">
+                                  '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
                                 </mat-error>
-                                <mat-error *ngIf="bieMaximumLength.hasError('min')">
-                                  {{ bieMaximumLength.getError('min') }}
+                                <mat-error *ngIf="facetMaximumLength.hasError('min')">
+                                  {{ facetMaximumLength.getError('min') }}
                                 </mat-error>
-                                <mat-error *ngIf="bieMaximumLength.hasError('max')">
-                                  {{ bieMaximumLength.getError('max') }}
+                                <mat-error *ngIf="facetMaximumLength.hasError('max')">
+                                  {{ facetMaximumLength.getError('max') }}
                                 </mat-error>
                               </mat-form-field>
                             </div>
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Pattern"
-                                       [formControl]="biePattern">
-                                <mat-error *ngIf="biePattern.hasError('pattern')">
-                                  {{ biePattern.getError('pattern') }}
+                                       [formControl]="facetPattern">
+                                <mat-error *ngIf="facetPattern.hasError('pattern')">
+                                  {{ facetPattern.getError('pattern') }}
                                 </mat-error>
                               </mat-form-field>
                             </div>
                             <div class="col-3">
                               <mat-form-field>
                                 <input matInput placeholder="Pattern Test"
-                                       [formControl]="biePatternTest">
-                                <mat-hint *ngIf="!!biePatternTest.value && biePatternTest.valid">
-                                  The value '{{ biePatternTest.value }}' matches the defined pattern '{{ biePattern.value }}'.
+                                       [formControl]="facetPatternTest">
+                                <mat-hint *ngIf="!!facetPatternTest.value && facetPatternTest.valid">
+                                  The value '{{ facetPatternTest.value }}' matches the defined pattern '{{ facetPattern.value }}'.
                                 </mat-hint>
-                                <mat-error *ngIf="biePatternTest.hasError('pattern')">
-                                  The value '{{ biePatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ biePattern.value }}'.
+                                <mat-error *ngIf="facetPatternTest.hasError('pattern')">
+                                  The value '{{ facetPatternTest.getError('pattern').actualValue }}' does not satisfy the defined pattern '{{ facetPattern.value }}'.
                                 </mat-error>
                               </mat-form-field>
                             </div>
                           </div>
                         </mat-card-content>
                       </mat-card>
+                      </div>
 
-                      <div class="row">
+                      <div class="row pt-2">
                         <div class="col-12">
                           <mat-form-field>
                             <textarea matInput rows="6"

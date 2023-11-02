@@ -40,6 +40,7 @@ public class AsbieNode {
         private Boolean nillable;
         private String remark;
         private String definition;
+        private Boolean deprecated;
     }
 
     private Asbie asbie = new Asbie();

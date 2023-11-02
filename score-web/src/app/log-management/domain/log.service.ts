@@ -11,7 +11,7 @@ export class LogService {
   }
 
   getRevisions(request: LogListRequest): Observable<PageResponse<Log>> {
-    let params = new HttpParams()
+    const params = new HttpParams()
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)

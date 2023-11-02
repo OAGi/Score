@@ -21,7 +21,7 @@ export class AccountListService implements OnInit {
       .set('pageIndex', '' + 0)
       .set('pageSize', '' + 1000);
 
-    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params: params});
+    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params});
   }
 
   getAccountsList(request: AccountListRequest, excludeRequester?: boolean): Observable<PageResponse<AccountList>> {
@@ -60,7 +60,7 @@ export class AccountListService implements OnInit {
     if (excludeRequester) {
       params = params.set('excludeRequester', 'true');
     }
-    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params: params});
+    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params});
   }
 
   getAccount(appUserId: number): Observable<AccountList> {
@@ -74,12 +74,12 @@ export class AccountListService implements OnInit {
   updatePasswordAccount(account: AccountList, newPassword: string): Observable<any> {
     if (newPassword !== '') {
       return this.http.post('/api/account/password', {
-        account: account,
-        newPassword: newPassword
+        account,
+        newPassword
       });
     } else {
       return this.http.post('/api/account/password', {
-        account: account,
+        account,
         newPassword: ''
       });
     }
@@ -88,28 +88,28 @@ export class AccountListService implements OnInit {
   create(account: AccountList, newPassword?: string, pending?: PendingAccount): Observable<any> {
     if (pending && pending.appOauth2UserId !== undefined) {
       return this.http.put('/api/account', {
-        'loginId': account.loginId,
-        'name': account.name,
-        'organization': account.organization,
-        'developer': account.developer,
-        'admin': account.admin,
-        'appOauth2UserId': pending.appOauth2UserId,
-        'sub': pending.sub
+        loginId: account.loginId,
+        name: account.name,
+        organization: account.organization,
+        developer: account.developer,
+        admin: account.admin,
+        appOauth2UserId: pending.appOauth2UserId,
+        sub: pending.sub
       });
     } else {
       return this.http.put('/api/account', {
-        'loginId': account.loginId,
-        'password': newPassword,
-        'name': account.name,
-        'organization': account.organization,
-        'developer': account.developer,
-        'admin': account.admin
+        loginId: account.loginId,
+        password: newPassword,
+        name: account.name,
+        organization: account.organization,
+        developer: account.developer,
+        admin: account.admin
       });
     }
   }
   link(pending: PendingAccount, account: AccountList): Observable<any> {
     return this.http.post('/api/pending/link/' + pending.appOauth2UserId, {
-      'appUserId': account.appUserId});
+      appUserId: account.appUserId});
   }
 
   setEnable(account: AccountList, val: boolean): Observable<any> {

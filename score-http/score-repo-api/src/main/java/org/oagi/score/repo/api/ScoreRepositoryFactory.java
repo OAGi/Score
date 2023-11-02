@@ -18,6 +18,10 @@ import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyWriteRepository;
 import org.oagi.score.repo.api.message.MessageReadRepository;
 import org.oagi.score.repo.api.message.MessageWriteRepository;
 import org.oagi.score.repo.api.module.*;
+import org.oagi.score.repo.api.openapidoc.BieForOasDocReadRepository;
+import org.oagi.score.repo.api.openapidoc.BieForOasDocWriteRepository;
+import org.oagi.score.repo.api.openapidoc.OasDocReadRepository;
+import org.oagi.score.repo.api.openapidoc.OasDocWriteRepository;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 
@@ -67,4 +71,8 @@ public interface ScoreRepositoryFactory {
     BusinessTermWriteRepository createBusinessTermWriteRepository() throws ScoreDataAccessException;
     BusinessTermAssignmentWriteRepository createBusinessTermAssignmentWriteRepository() throws ScoreDataAccessException;
 
+    OasDocReadRepository createOasDocReadRepository() throws ScoreDataAccessException;
+    OasDocWriteRepository createOasDocWriteRepository() throws ScoreDataAccessException;
+    BieForOasDocWriteRepository createBieForOasDocWriteRepository() throws ScoreDataAccessException;
+    BieForOasDocReadRepository createBieForOasDocReadRepository() throws ScoreDataAccessException;
 }

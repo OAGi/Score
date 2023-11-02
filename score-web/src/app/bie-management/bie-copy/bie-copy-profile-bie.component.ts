@@ -12,16 +12,17 @@ import {BusinessContext} from '../../context-management/business-context/domain/
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter, loadBranch, saveBooleanProperty, saveBranch} from '../../common/utility';
+import {base64Decode, initFilter, saveBooleanProperty, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -29,6 +30,7 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./bie-copy-profile-bie.component.css']
 })
 export class BieCopyProfileBieComponent implements OnInit {
+
   title = 'Copy BIE';
   subtitle = 'Select BIE';
 
@@ -55,6 +57,8 @@ export class BieCopyProfileBieComponent implements OnInit {
 
   releases: SimpleRelease[] = [];
 
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -69,7 +73,8 @@ export class BieCopyProfileBieComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -104,7 +109,6 @@ export class BieCopyProfileBieComponent implements OnInit {
           this.releaseService.getSimpleReleases()
         ]);
       })).subscribe(([resp, loginIds, releases]) => {
-
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -153,9 +157,11 @@ export class BieCopyProfileBieComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

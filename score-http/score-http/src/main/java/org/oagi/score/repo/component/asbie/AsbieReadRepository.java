@@ -60,7 +60,11 @@ public class AsbieReadRepository {
         ascc.setGuid(asccRecord.getGuid());
         ascc.setCardinalityMin(asccRecord.getCardinalityMin());
         ascc.setCardinalityMax(asccRecord.getCardinalityMax());
-        ascc.setDen(asccRecord.getDen());
+        String den = dslContext.select(ASCC_MANIFEST.DEN)
+                .from(ASCC_MANIFEST)
+                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
+                .fetchOneInto(String.class);
+        ascc.setDen(den);
         ascc.setDefinition(asccRecord.getDefinition());
         ascc.setState(CcState.valueOf(asccRecord.getState()));
 
@@ -106,6 +110,7 @@ public class AsbieReadRepository {
             asbie.setNillable(asbieRecord.getIsNillable() == 1);
             asbie.setRemark(asbieRecord.getRemark());
             asbie.setDefinition(asbieRecord.getDefinition());
+            asbie.setDeprecated(asbieRecord.getIsDeprecated() == 1);
         }
 
         return asbie;
@@ -114,7 +119,8 @@ public class AsbieReadRepository {
     public List<BieEditUsed> getUsedAsbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(ASBIE.IS_USED, ASBIE.ASBIE_ID, ASBIE.BASED_ASCC_MANIFEST_ID,
                         ASBIE.HASH_PATH, ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
-                        ASBIE.CARDINALITY_MIN, ASBIE.CARDINALITY_MAX)
+                        ASBIE.CARDINALITY_MIN, ASBIE.CARDINALITY_MAX,
+                        ASBIE.IS_DEPRECATED)
                 .from(ASBIE)
                 .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
@@ -128,6 +134,7 @@ public class AsbieReadRepository {
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     bieEditUsed.setCardinalityMin(record.get(ASBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(ASBIE.CARDINALITY_MAX));
+                    bieEditUsed.setDeprecated(record.get(ASBIE.IS_DEPRECATED) == 1);
                     return bieEditUsed;
                 }).collect(Collectors.toList());
     }

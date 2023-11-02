@@ -9,7 +9,6 @@ import java.util.List;
 
 @Data
 public class AssignedBusinessTermListRequest {
-
     private BigInteger assignedBizTermId;
     private String businessContext;
     private BigInteger bieId;

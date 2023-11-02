@@ -91,11 +91,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
     private void addASCCP(SchemaModule parentSchemaModule, ULong asccpManifestId, boolean ignoreReusableIndicator) {
         AsccpManifestRecord asccpManifest =
                 releaseDataProvider.findASCCPManifest(asccpManifestId);
-        AsccpRecord asccp = releaseDataProvider.findASCCP(asccpManifest.getAsccpId());
-        if (asccp.getDen().equals(ANY_ASCCP_DEN)) {
+        if (asccpManifest.getDen().equals(ANY_ASCCP_DEN)) {
             return;
         }
 
+        AsccpRecord asccp = releaseDataProvider.findASCCP(asccpManifest.getAsccpId());
         SchemaModule schemaModule = null;
         if (ignoreReusableIndicator || asccp.getReusableIndicator() != (byte) 0) {
             NamespaceRecord namespace = releaseDataProvider.findNamespace(asccp.getNamespaceId());
@@ -130,7 +130,7 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
             DtManifestRecord dtManifest = releaseDataProvider.findDtManifestByDtManifestId(bccpManifest.getBdtManifestId());
             DtRecord bdt = releaseDataProvider.findDT(dtManifest.getDtId());
-            if (!bccpSchemaModule.addBCCP(new BCCP(bccp, bdt))) {
+            if (!bccpSchemaModule.addBCCP(new BCCP(bccpManifest, bccp, dtManifest, bdt))) {
                 return;
             }
         }
@@ -144,11 +144,11 @@ public class StandaloneExportContextBuilder implements SchemaModuleTraversal {
 
         SchemaModule schemaModule = null;
         try {
-            AccRecord acc = releaseDataProvider.findACC(accManifest.getAccId());
-            if (acc.getDen().equals("Any Structured Content. Details")) {
+            if (accManifest.getDen().equals("Any Structured Content. Details")) {
                 return;
             }
 
+            AccRecord acc = releaseDataProvider.findACC(accManifest.getAccId());
             NamespaceRecord namespace = releaseDataProvider.findNamespace(acc.getNamespaceId());
             schemaModule = getModuleByNamespace(namespace);
             if (parentSchemaModule != null && !parentSchemaModule.getNamespace().equals(schemaModule.getNamespace())) {

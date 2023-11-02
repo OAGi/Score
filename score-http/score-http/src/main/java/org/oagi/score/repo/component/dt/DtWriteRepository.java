@@ -10,8 +10,6 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
-import org.oagi.score.repo.component.bcc.UpdateBccPropertiesRepositoryRequest;
-import org.oagi.score.repo.component.bccp.UpdateBccpPropertiesRepositoryRequest;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.log.LogRepository;
@@ -29,7 +27,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -80,7 +79,6 @@ public class DtWriteRepository {
         if (basedBdt.getQualifier_() != null) {
             bdt.setQualifier_(basedBdt.getQualifier_());
         }
-        bdt.setDen(((bdt.getQualifier_() != null) ? (bdt.getQualifier_() + "_ ") : "") + bdt.getDataTypeTerm() + ". Type");
 
         bdt.setRepresentationTerm(basedBdt.getDataTypeTerm());
         bdt.setBasedDtId(basedBdt.getDtId());
@@ -112,6 +110,7 @@ public class DtWriteRepository {
         bdtManifest.setDtId(bdt.getDtId());
         bdtManifest.setBasedDtManifestId(basedBdtManifest.getDtManifestId());
         bdtManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
+        bdtManifest.setDen(((bdt.getQualifier_() != null) ? (bdt.getQualifier_() + "_ ") : "") + bdt.getDataTypeTerm() + ". Type");
         bdtManifest = dslContext.insertInto(DT_MANIFEST)
                 .set(bdtManifest)
                 .returning(DT_MANIFEST.DT_MANIFEST_ID).fetchOne();
@@ -427,18 +426,21 @@ public class DtWriteRepository {
         boolean denChanged = false;
         String newDen = null;
         if (compare(originalDtRecord.getQualifier_(), request.getQualifier()) != 0) {
+            denChanged = true;
             if (StringUtils.hasLength(request.getQualifier())) {
                 newDen = request.getQualifier() + "_ " + originalDtRecord.getRepresentationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(DT.QUALIFIER, request.getQualifier())
-                        .set(DT.DEN, newDen);
+                        .set(DT.QUALIFIER, request.getQualifier());
             } else {
                 newDen = originalDtRecord.getRepresentationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(DT.QUALIFIER)
-                        .set(DT.DEN, newDen);
+                        .setNull(DT.QUALIFIER);
             }
-            denChanged = true;
+
+            dslContext.update(DT_MANIFEST)
+                    .set(DT_MANIFEST.DEN, newDen)
+                    .where(DT_MANIFEST.DT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
+                    .execute();
         }
         if (compare(originalDtRecord.getSixDigitId(), request.getSixDigitId()) != 0) {
             DtRecord exist = dslContext.selectFrom(DT)
@@ -526,22 +528,21 @@ public class DtWriteRepository {
                     .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(bdtManifestRecord.getDtManifestId()))
                     .fetch()) {
                 String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + newDen.replaceAll(". Type", "");
-                dslContext.update(BCCP)
-                        .set(BCCP.DEN, newBccpDen)
-                        .where(BCCP.BCCP_ID.eq(bccp.get(BCCP.BCCP_ID)))
+                dslContext.update(BCCP_MANIFEST)
+                        .set(BCCP_MANIFEST.DEN, newBccpDen)
+                        .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
                         .execute();
 
-                for (Record2<ULong, String> bcc : dslContext.select(BCC.BCC_ID, ACC.OBJECT_CLASS_TERM)
+                for (Record2<ULong, String> bcc : dslContext.select(BCC_MANIFEST.BCC_MANIFEST_ID, ACC.OBJECT_CLASS_TERM)
                         .from(BCC_MANIFEST)
-                        .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
                         .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
                         .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                         .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
                         .fetch()) {
                     String newBccDen = bcc.get(ACC.OBJECT_CLASS_TERM) + ". " + newBccpDen;
-                    dslContext.update(BCC)
-                            .set(BCC.DEN, newBccDen)
-                            .where(BCC.BCC_ID.eq(bcc.get(BCC.BCC_ID)))
+                    dslContext.update(BCC_MANIFEST)
+                            .set(BCC_MANIFEST.DEN, newBccDen)
+                            .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bcc.get(BCC_MANIFEST.BCC_MANIFEST_ID)))
                             .execute();
                 }
             }
@@ -863,7 +864,7 @@ public class DtWriteRepository {
                 && !prevState.canForceMove(request.getToState())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         } else if (dtRecord.getNamespaceId() == null) {
-            throw new IllegalArgumentException("'" + dtRecord.getDen() + "' dose not have NamespaceId.");
+            throw new IllegalArgumentException("'" + dtManifestRecord.getDen() + "' dose not have NamespaceId.");
         }
 
         // update dt state.
@@ -874,6 +875,24 @@ public class DtWriteRepository {
         }
         dtRecord.update(DT.STATE,
                 DT.LAST_UPDATED_BY, DT.LAST_UPDATE_TIMESTAMP, DT.OWNER_USER_ID);
+
+        // Post-processing
+        if (nextState == CcState.Published || nextState == CcState.Production) {
+            // Issue #1298
+            // Update 'deprecated' properties in associated BIEs
+            byte isDeprecated = dtRecord.getIsDeprecated();
+            if (isDeprecated == 1) {
+                ULong dtManifestId = dtManifestRecord.getDtManifestId();
+
+                dslContext.update(BBIE_SC.join(BBIE).on(BBIE_SC.BBIE_ID.eq(BBIE.BBIE_ID))
+                                .join(BBIEP).on(BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID))
+                                .join(BCCP_MANIFEST).on(BBIEP.BASED_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
+                        .set(BBIE.IS_DEPRECATED, isDeprecated)
+                        .set(BBIE_SC.IS_DEPRECATED, isDeprecated)
+                        .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestId))
+                        .execute();
+            }
+        }
 
         // creates new log for updated record.
         LogAction logAction = (CcState.Deleted == prevState && CcState.WIP == nextState)
@@ -963,7 +982,7 @@ public class DtWriteRepository {
                 .where(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!derivationDtManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge derivations first before purging the DT '" + dtManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
             } else {
@@ -975,7 +994,7 @@ public class DtWriteRepository {
                 .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(dtManifestRecord.getDtManifestId()))
                 .fetch();
         if (!bccpManifestRecords.isEmpty()) {
-            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCPs first before purging the DT '" + dtRecord.getDen() + "'.");
+            IllegalArgumentException e = new IllegalArgumentException("Please purge related-BCCPs first before purging the DT '" + dtManifestRecord.getDen() + "'.");
             if (request.isIgnoreOnError()) {
                 return new PurgeDtRepositoryResponse(dtManifestRecord.getDtManifestId().toBigInteger(), e);
             } else {

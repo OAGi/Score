@@ -36,6 +36,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {BieExpressOpenapi30Module} from './bie-express/bie-express.openapi30/bie-express.openapi30.module';
 
 const routes: Routes = [
   {
@@ -123,6 +124,7 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     BieExpressModule,
+    BieExpressOpenapi30Module,
     TransferOwnershipDialogModule,
     TranslateModule,
     CommonModule,

@@ -150,6 +150,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
             DSLContext txContext = conf.dsl();
             txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
 
+            deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
             deleteBusinessTermByAppUserId(txContext, appUserId);
             deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
             deleteCoreComponentByAppUserId(txContext, appUserId);
@@ -169,6 +170,94 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
 
             txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
         });
+    }
+
+    private void deleteOpenAPIDocumentByAppUserId(DSLContext dslContext, ULong appUserId) {
+        List<ULong> oasDocIdList = dslContext.select(OAS_DOC.OAS_DOC_ID)
+                .from(OAS_DOC)
+                .where(OAS_DOC.CREATED_BY.eq(appUserId))
+                .fetchInto(ULong.class);
+        if (oasDocIdList.isEmpty()) {
+            return;
+        }
+
+        List<ULong> oasResourceIdList = dslContext.select(OAS_RESOURCE.OAS_RESOURCE_ID)
+                .from(OAS_RESOURCE)
+                .where(OAS_RESOURCE.OAS_DOC_ID.in(oasDocIdList))
+                .fetchInto(ULong.class);
+        if (!oasResourceIdList.isEmpty()) {
+            List<ULong> oasOperationIdList = dslContext.select(OAS_OPERATION.OAS_OPERATION_ID)
+                    .from(OAS_OPERATION)
+                    .where(OAS_OPERATION.OAS_RESOURCE_ID.in(oasResourceIdList))
+                    .fetchInto(ULong.class);
+            if (!oasOperationIdList.isEmpty()) {
+                List<ULong> oasRequestIdList = dslContext.select(OAS_REQUEST.OAS_REQUEST_ID)
+                        .from(OAS_REQUEST)
+                        .where(OAS_REQUEST.OAS_OPERATION_ID.in(oasOperationIdList))
+                        .fetchInto(ULong.class);
+                if (!oasRequestIdList.isEmpty()) {
+                    dslContext.deleteFrom(OAS_REQUEST_PARAMETER)
+                            .where(OAS_REQUEST_PARAMETER.OAS_REQUEST_ID.in(oasRequestIdList))
+                            .execute();
+                    dslContext.deleteFrom(OAS_REQUEST)
+                            .where(OAS_REQUEST.OAS_REQUEST_ID.in(oasRequestIdList))
+                            .execute();
+                }
+
+                List<ULong> oasResponseIdList = dslContext.select(OAS_RESPONSE.OAS_RESPONSE_ID)
+                        .from(OAS_RESPONSE)
+                        .where(OAS_RESPONSE.OAS_OPERATION_ID.in(oasOperationIdList))
+                        .fetchInto(ULong.class);
+                if (!oasResponseIdList.isEmpty()) {
+                    dslContext.deleteFrom(OAS_RESPONSE_HEADERS)
+                            .where(OAS_RESPONSE_HEADERS.OAS_RESPONSE_ID.in(oasResponseIdList))
+                            .execute();
+                    dslContext.deleteFrom(OAS_RESPONSE)
+                            .where(OAS_RESPONSE.OAS_RESPONSE_ID.in(oasResponseIdList))
+                            .execute();
+                }
+
+                List<ULong> oasTagIdList = dslContext.select(OAS_RESOURCE_TAG.OAS_TAG_ID)
+                        .from(OAS_RESOURCE_TAG)
+                        .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIdList))
+                        .fetchInto(ULong.class);
+                if (!oasTagIdList.isEmpty()) {
+                    dslContext.deleteFrom(OAS_TAG)
+                            .where(OAS_TAG.OAS_TAG_ID.in(oasTagIdList))
+                            .execute();
+                }
+
+                dslContext.deleteFrom(OAS_RESOURCE_TAG)
+                        .where(OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIdList))
+                        .execute();
+
+                dslContext.deleteFrom(OAS_OPERATION)
+                        .where(OAS_OPERATION.OAS_OPERATION_ID.in(oasOperationIdList))
+                        .execute();
+            }
+
+            dslContext.deleteFrom(OAS_RESOURCE)
+                    .where(OAS_RESOURCE.OAS_RESOURCE_ID.in(oasResourceIdList))
+                    .execute();
+        }
+
+        List<ULong> oasTagIdList = dslContext.select(OAS_DOC_TAG.OAS_TAG_ID)
+                .from(OAS_DOC_TAG)
+                .where(OAS_DOC_TAG.OAS_DOC_ID.in(oasDocIdList))
+                .fetchInto(ULong.class);
+        if (!oasTagIdList.isEmpty()) {
+            dslContext.deleteFrom(OAS_TAG)
+                    .where(OAS_TAG.OAS_TAG_ID.in(oasTagIdList))
+                    .execute();
+        }
+
+        dslContext.deleteFrom(OAS_DOC_TAG)
+                .where(OAS_DOC_TAG.OAS_DOC_ID.in(oasDocIdList))
+                .execute();
+
+        dslContext.deleteFrom(OAS_DOC)
+                .where(OAS_DOC.OAS_DOC_ID.in(oasDocIdList))
+                .execute();
     }
 
     private void deleteBusinessTermByAppUserId(DSLContext dslContext, ULong appUserId) {

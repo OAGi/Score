@@ -48,7 +48,7 @@ export class NamespaceService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
-    return this.http.get<PageResponse<NamespaceList>>('/api/namespace_list', {params: params})
+    return this.http.get<PageResponse<NamespaceList>>('/api/namespace_list', {params})
       .pipe(map((resp: PageResponse<NamespaceList>) => {
         resp.list.forEach(e => {
           e.lastUpdateTimestamp = new Date(e.lastUpdateTimestamp);

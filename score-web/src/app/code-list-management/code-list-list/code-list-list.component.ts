@@ -13,7 +13,7 @@ import {
 } from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
@@ -27,8 +27,9 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-code-list-list',
@@ -75,6 +76,8 @@ export class CodeListListComponent implements OnInit {
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
 
   contextMenuItem: CodeListForList;
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -88,7 +91,8 @@ export class CodeListListComponent implements OnInit {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -171,9 +175,11 @@ export class CodeListListComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateEnd.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

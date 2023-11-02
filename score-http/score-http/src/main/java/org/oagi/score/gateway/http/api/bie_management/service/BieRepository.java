@@ -172,7 +172,7 @@ public class BieRepository {
                 BCC.GUID,
                 BCC.CARDINALITY_MIN,
                 BCC.CARDINALITY_MAX,
-                BCC.DEN,
+                BCC_MANIFEST.DEN,
                 BCC.DEFINITION,
                 ACC_MANIFEST.ACC_ID.as("from_acc_id"),
                 BCCP_MANIFEST.BCCP_ID.as("to_bccp_id"),
@@ -775,19 +775,23 @@ public class BieRepository {
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.as("reusingTopLevelAsbiepId"),
                 TOP_LEVEL_ASBIEP.STATE.as("reusingState"),
                 ASCCP.as("reusing_asccp").PROPERTY_TERM.as("reusingPropertyTerm"),
+                ASCCP_MANIFEST.as("reusing_asccp_manifest").DEN.as("reusingDen"),
                 ABIE.as("reusing_abie").GUID.as("reusingGuid"),
                 APP_USER.as("reusing_app_user").LOGIN_ID.as("reusingOwner"),
                 TOP_LEVEL_ASBIEP.VERSION.as("reusingVersion"),
                 TOP_LEVEL_ASBIEP.STATUS.as("reusingStatus"),
+                ASBIEP.as("reusing_asbiep").REMARK.as("reusingRemark"),
                 ASBIE.PATH,
 
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").TOP_LEVEL_ASBIEP_ID.as("reusedTopLevelAsbiepId"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").STATE.as("reusedState"),
                 ASCCP.as("reused_asccp").PROPERTY_TERM.as("reusedPropertyTerm"),
+                ASCCP_MANIFEST.as("reused_asccp_manifest").DEN.as("reusedDen"),
                 ABIE.as("reused_abie").GUID.as("reusedGuid"),
                 APP_USER.as("reused_app_user").LOGIN_ID.as("reusedOwner"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").VERSION.as("reusedVersion"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").STATUS.as("reusedStatus"),
+                ASBIEP.REMARK.as("reusedRemark"),
 
                 RELEASE.RELEASE_NUM)
 
@@ -837,7 +841,7 @@ public class BieRepository {
             }
         }
         displays.append("/").append(report.getReusedPropertyTerm());
-        return displays.toString();
+        return displays.toString().replaceAll("\s?/\s?", "/");
     }
 
 }

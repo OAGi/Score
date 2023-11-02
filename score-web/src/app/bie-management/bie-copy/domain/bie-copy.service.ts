@@ -13,8 +13,8 @@ export class BieCopyService implements OnInit {
 
   copy(topLevelAsbiepId: number, bizCtxIds: number[]): Observable<any> {
     return this.http.put('/api/profile_bie/copy', {
-      topLevelAsbiepId: topLevelAsbiepId,
-      bizCtxIds: bizCtxIds
+      topLevelAsbiepId,
+      bizCtxIds
     });
   }
 }
