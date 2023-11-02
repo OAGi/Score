@@ -1518,15 +1518,16 @@ public class CcListRepository {
 
         dslContext
                 .withRecursive(t)
-                .select(ASCCP.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
+                .select(ASCCP_MANIFEST.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
                 .from(t)
-                .join(ASCCP)
-                .on(ASCCP.ASCCP_ID.eq(field(name("t", "asccp_id"), ULong.class)))
                 .join(RELEASE)
                 .on(RELEASE.RELEASE_ID.eq(field(name("t", "release_id"), ULong.class)))
-                .groupBy(ASCCP.DEN)
+                .join(ASCCP_MANIFEST)
+                .on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(field(name("t", "asccp_manifest_id"), ULong.class))),
+                        ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .groupBy(ASCCP_MANIFEST.DEN)
                 .fetchStream().forEach(record -> {
-                    String den = record.get(ASCCP.DEN);
+                    String den = record.get(ASCCP_MANIFEST.DEN);
                     String relNum = record.get(RELEASE.RELEASE_NUM);
                     lastUpdatedMap.put(den, relNum);
                 });
@@ -1563,15 +1564,16 @@ public class CcListRepository {
 
         dslContext
                 .withRecursive(t)
-                .select(ASCCP.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
+                .select(ASCCP_MANIFEST.DEN, min(RELEASE.RELEASE_ID).as("RELEASE_ID"), RELEASE.RELEASE_NUM)
                 .from(t)
-                .join(ASCCP)
-                .on(ASCCP.ASCCP_ID.eq(field(name("t", "asccp_id"), ULong.class)))
                 .join(RELEASE)
                 .on(RELEASE.RELEASE_ID.eq(field(name("t", "release_id"), ULong.class)))
-                .groupBy(ASCCP.DEN)
+                .join(ASCCP_MANIFEST)
+                .on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(field(name("t", "asccp_manifest_id"), ULong.class))),
+                        ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .groupBy(ASCCP_MANIFEST.DEN)
                 .fetchStream().forEach(record -> {
-                    String den = record.get(ASCCP.DEN);
+                    String den = record.get(ASCCP_MANIFEST.DEN);
                     String relNum = record.get(RELEASE.RELEASE_NUM);
                     sinceMap.put(den, relNum);
                 });
