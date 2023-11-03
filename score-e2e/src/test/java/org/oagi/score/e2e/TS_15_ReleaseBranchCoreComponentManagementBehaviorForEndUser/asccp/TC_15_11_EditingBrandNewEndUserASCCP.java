@@ -384,7 +384,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(asccpManifestId);
 
         viewEditCoreComponentPage.openPage();
-        waitFor(ofSeconds(1L));
+        waitFor(ofSeconds(8000L));
 
         String den = asccp.getDen();
         {
