@@ -308,84 +308,12 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_sc.facet_min_inclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public void setFacetMinInclusive(String value) {
-        set(14, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie_sc.facet_min_inclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public String getFacetMinInclusive() {
-        return (String) get(14);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie_sc.facet_min_exclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public void setFacetMinExclusive(String value) {
-        set(15, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie_sc.facet_min_exclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public String getFacetMinExclusive() {
-        return (String) get(15);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie_sc.facet_max_inclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public void setFacetMaxInclusive(String value) {
-        set(16, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie_sc.facet_max_inclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public String getFacetMaxInclusive() {
-        return (String) get(16);
-    }
-
-    /**
-     * Setter for <code>oagi.bbie_sc.facet_max_exclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public void setFacetMaxExclusive(String value) {
-        set(17, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bbie_sc.facet_max_exclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public String getFacetMaxExclusive() {
-        return (String) get(17);
-    }
-
-    /**
      * Setter for <code>oagi.bbie_sc.default_value</code>. This column specifies
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
      */
     public void setDefaultValue(String value) {
-        set(18, value);
+        set(14, value);
     }
 
     /**
@@ -394,7 +322,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * be used at the same time.
      */
     public String getDefaultValue() {
-        return (String) get(18);
+        return (String) get(14);
     }
 
     /**
@@ -403,7 +331,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * used at the same time.
      */
     public void setFixedValue(String value) {
-        set(19, value);
+        set(15, value);
     }
 
     /**
@@ -412,7 +340,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * used at the same time.
      */
     public String getFixedValue() {
-        return (String) get(19);
+        return (String) get(15);
     }
 
     /**
@@ -421,7 +349,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * inherited from the based BDT SC.
      */
     public void setDefinition(String value) {
-        set(20, value);
+        set(16, value);
     }
 
     /**
@@ -430,21 +358,21 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * inherited from the based BDT SC.
      */
     public String getDefinition() {
-        return (String) get(20);
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>oagi.bbie_sc.example</code>.
      */
     public void setExample(String value) {
-        set(21, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>oagi.bbie_sc.example</code>.
      */
     public String getExample() {
-        return (String) get(21);
+        return (String) get(17);
     }
 
     /**
@@ -455,7 +383,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * implementation specific instruction or others. 
      */
     public void setRemark(String value) {
-        set(22, value);
+        set(18, value);
     }
 
     /**
@@ -466,7 +394,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * implementation specific instruction or others. 
      */
     public String getRemark() {
-        return (String) get(22);
+        return (String) get(18);
     }
 
     /**
@@ -475,7 +403,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * current design, only one business term is allowed per business context.
      */
     public void setBizTerm(String value) {
-        set(23, value);
+        set(19, value);
     }
 
     /**
@@ -484,7 +412,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * current design, only one business term is allowed per business context.
      */
     public String getBizTerm() {
-        return (String) get(23);
+        return (String) get(19);
     }
 
     /**
@@ -493,7 +421,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the field/component should be generated.
      */
     public void setIsUsed(Byte value) {
-        set(24, value);
+        set(20, value);
     }
 
     /**
@@ -502,7 +430,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the field/component should be generated.
      */
     public Byte getIsUsed() {
-        return (Byte) get(24);
+        return (Byte) get(20);
     }
 
     /**
@@ -510,7 +438,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * BBIE_SC is deprecated.
      */
     public void setIsDeprecated(Byte value) {
-        set(25, value);
+        set(21, value);
     }
 
     /**
@@ -518,7 +446,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * BBIE_SC is deprecated.
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(25);
+        return (Byte) get(21);
     }
 
     /**
@@ -527,7 +455,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * its owner by default.
      */
     public void setCreatedBy(ULong value) {
-        set(26, value);
+        set(22, value);
     }
 
     /**
@@ -536,7 +464,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * its owner by default.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(26);
+        return (ULong) get(22);
     }
 
     /**
@@ -544,7 +472,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * referring to the user who has last updated the BBIE_SC record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(27, value);
+        set(23, value);
     }
 
     /**
@@ -552,7 +480,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * referring to the user who has last updated the BBIE_SC record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(27);
+        return (ULong) get(23);
     }
 
     /**
@@ -560,7 +488,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the BBIE_SC record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(28, value);
+        set(24, value);
     }
 
     /**
@@ -568,7 +496,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the BBIE_SC record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(28);
+        return (LocalDateTime) get(24);
     }
 
     /**
@@ -576,7 +504,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * when the BBIE_SC was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(29, value);
+        set(25, value);
     }
 
     /**
@@ -584,7 +512,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * when the BBIE_SC was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(29);
+        return (LocalDateTime) get(25);
     }
 
     /**
@@ -592,7 +520,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(30, value);
+        set(26, value);
     }
 
     /**
@@ -600,7 +528,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(30);
+        return (ULong) get(26);
     }
 
     // -------------------------------------------------------------------------
@@ -626,7 +554,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     /**
      * Create a detached, initialised BbieScRecord
      */
-    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong dtScPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String facetMinInclusive, String facetMinExclusive, String facetMaxInclusive, String facetMaxExclusive, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
+    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong dtScPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
         super(BbieSc.BBIE_SC);
 
         setBbieScId(bbieScId);
@@ -643,10 +571,6 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setFacetMinLength(facetMinLength);
         setFacetMaxLength(facetMaxLength);
         setFacetPattern(facetPattern);
-        setFacetMinInclusive(facetMinInclusive);
-        setFacetMinExclusive(facetMinExclusive);
-        setFacetMaxInclusive(facetMaxInclusive);
-        setFacetMaxExclusive(facetMaxExclusive);
         setDefaultValue(defaultValue);
         setFixedValue(fixedValue);
         setDefinition(definition);

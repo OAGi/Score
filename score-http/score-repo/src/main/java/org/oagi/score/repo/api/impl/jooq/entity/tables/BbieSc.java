@@ -168,34 +168,6 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     public final TableField<BbieScRecord, String> FACET_PATTERN = createField(DSL.name("facet_pattern"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Defines a constraint on the lexical space of a datatype to literals in a specific pattern.");
 
     /**
-     * The column <code>oagi.bbie_sc.facet_min_inclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is also
-     * an allowed value.
-     */
-    public final TableField<BbieScRecord, String> FACET_MIN_INCLUSIVE = createField(DSL.name("facet_min_inclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the lower limit of the range of allowed values. The lower limit is also\nan allowed value.");
-
-    /**
-     * The column <code>oagi.bbie_sc.facet_min_exclusive</code>. Defines the
-     * lower limit of the range of allowed values. The lower limit is no
-     * allowed value.
-     */
-    public final TableField<BbieScRecord, String> FACET_MIN_EXCLUSIVE = createField(DSL.name("facet_min_exclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the lower limit of the range of allowed values. The lower limit is no\nallowed value.");
-
-    /**
-     * The column <code>oagi.bbie_sc.facet_max_inclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is also
-     * an allowed value.
-     */
-    public final TableField<BbieScRecord, String> FACET_MAX_INCLUSIVE = createField(DSL.name("facet_max_inclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the upper limit of the range of allowed values. The upper limit is also\nan allowed value.");
-
-    /**
-     * The column <code>oagi.bbie_sc.facet_max_exclusive</code>. Defines the
-     * upper limit of the range of allowed values. The upper limit is no
-     * allowed value
-     */
-    public final TableField<BbieScRecord, String> FACET_MAX_EXCLUSIVE = createField(DSL.name("facet_max_exclusive"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Defines the upper limit of the range of allowed values. The upper limit is no\nallowed value");
-
-    /**
      * The column <code>oagi.bbie_sc.default_value</code>. This column specifies
      * the default value constraint. Default and fixed value constraints cannot
      * be used at the same time.
