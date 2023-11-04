@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record22;
-import org.jooq.Row22;
+import org.jooq.Record21;
+import org.jooq.Row21;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp;
@@ -20,7 +20,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp;
  * can be then added as a property of an ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Record22<ULong, String, String, String, ULong, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> {
+public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Record21<ULong, String, String, String, ULong, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> {
 
     private static final long serialVersionUID = 1L;
 
@@ -111,33 +111,17 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     /**
-     * Setter for <code>oagi.bccp.den</code>. The dictionary entry name of the
-     * BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
-     */
-    public void setDen(String value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>oagi.bccp.den</code>. The dictionary entry name of the
-     * BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
-     */
-    public String getDen() {
-        return (String) get(5);
-    }
-
-    /**
      * Setter for <code>oagi.bccp.definition</code>. Description of the BCCP.
      */
     public void setDefinition(String value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>oagi.bccp.definition</code>. Description of the BCCP.
      */
     public String getDefinition() {
-        return (String) get(6);
+        return (String) get(5);
     }
 
     /**
@@ -145,7 +129,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * URL identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
@@ -153,7 +137,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * URL identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
-        return (String) get(7);
+        return (String) get(6);
     }
 
     /**
@@ -164,7 +148,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * level.
      */
     public void setNamespaceId(ULong value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
@@ -175,7 +159,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * level.
      */
     public ULong getNamespaceId() {
-        return (ULong) get(8);
+        return (ULong) get(7);
     }
 
     /**
@@ -184,7 +168,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
-        set(9, value);
+        set(8, value);
     }
 
     /**
@@ -193,7 +177,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * record should be created).
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(9);
+        return (Byte) get(8);
     }
 
     /**
@@ -201,7 +185,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * replacement if the record is deprecated.
      */
     public void setReplacementBccpId(ULong value) {
-        set(10, value);
+        set(9, value);
     }
 
     /**
@@ -209,7 +193,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * replacement if the record is deprecated.
      */
     public ULong getReplacementBccpId() {
-        return (ULong) get(10);
+        return (ULong) get(9);
     }
 
     /**
@@ -221,7 +205,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * its current record.
      */
     public void setCreatedBy(ULong value) {
-        set(11, value);
+        set(10, value);
     }
 
     /**
@@ -233,7 +217,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * its current record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(11);
+        return (ULong) get(10);
     }
 
     /**
@@ -245,7 +229,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
-        set(12, value);
+        set(11, value);
     }
 
     /**
@@ -257,7 +241,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * rollback the ownership.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(12);
+        return (ULong) get(11);
     }
 
     /**
@@ -268,7 +252,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * entity (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
-        set(13, value);
+        set(12, value);
     }
 
     /**
@@ -279,7 +263,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * entity (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(13);
+        return (ULong) get(12);
     }
 
     /**
@@ -289,7 +273,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(14, value);
+        set(13, value);
     }
 
     /**
@@ -299,7 +283,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(14);
+        return (LocalDateTime) get(13);
     }
 
     /**
@@ -311,7 +295,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * revision has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(15, value);
+        set(14, value);
     }
 
     /**
@@ -323,7 +307,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * revision has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(15);
+        return (LocalDateTime) get(14);
     }
 
     /**
@@ -335,7 +319,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * records of when the state was changed.
      */
     public void setState(String value) {
-        set(16, value);
+        set(15, value);
     }
 
     /**
@@ -347,7 +331,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * records of when the state was changed.
      */
     public String getState() {
-        return (String) get(16);
+        return (String) get(15);
     }
 
     /**
@@ -357,7 +341,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * the value is default to false for simplification. 
      */
     public void setIsNillable(Byte value) {
-        set(17, value);
+        set(16, value);
     }
 
     /**
@@ -367,7 +351,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * the value is default to false for simplification. 
      */
     public Byte getIsNillable() {
-        return (Byte) get(17);
+        return (Byte) get(16);
     }
 
     /**
@@ -376,7 +360,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * be used at the same time.
      */
     public void setDefaultValue(String value) {
-        set(18, value);
+        set(17, value);
     }
 
     /**
@@ -385,7 +369,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * be used at the same time.
      */
     public String getDefaultValue() {
-        return (String) get(18);
+        return (String) get(17);
     }
 
     /**
@@ -394,7 +378,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * used at the same time.
      */
     public void setFixedValue(String value) {
-        set(19, value);
+        set(18, value);
     }
 
     /**
@@ -403,7 +387,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * used at the same time.
      */
     public String getFixedValue() {
-        return (String) get(19);
+        return (String) get(18);
     }
 
     /**
@@ -411,7 +395,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * indicate the previous history record.
      */
     public void setPrevBccpId(ULong value) {
-        set(20, value);
+        set(19, value);
     }
 
     /**
@@ -419,7 +403,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * indicate the previous history record.
      */
     public ULong getPrevBccpId() {
-        return (ULong) get(20);
+        return (ULong) get(19);
     }
 
     /**
@@ -427,7 +411,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * indicate the next history record.
      */
     public void setNextBccpId(ULong value) {
-        set(21, value);
+        set(20, value);
     }
 
     /**
@@ -435,7 +419,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
      * indicate the next history record.
      */
     public ULong getNextBccpId() {
-        return (ULong) get(21);
+        return (ULong) get(20);
     }
 
     // -------------------------------------------------------------------------
@@ -448,17 +432,17 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     }
 
     // -------------------------------------------------------------------------
-    // Record22 type implementation
+    // Record21 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row22<ULong, String, String, String, ULong, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> fieldsRow() {
-        return (Row22) super.fieldsRow();
+    public Row21<ULong, String, String, String, ULong, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> fieldsRow() {
+        return (Row21) super.fieldsRow();
     }
 
     @Override
-    public Row22<ULong, String, String, String, ULong, String, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> valuesRow() {
-        return (Row22) super.valuesRow();
+    public Row21<ULong, String, String, String, ULong, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> valuesRow() {
+        return (Row21) super.valuesRow();
     }
 
     @Override
@@ -488,86 +472,81 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
 
     @Override
     public Field<String> field6() {
-        return Bccp.BCCP.DEN;
-    }
-
-    @Override
-    public Field<String> field7() {
         return Bccp.BCCP.DEFINITION;
     }
 
     @Override
-    public Field<String> field8() {
+    public Field<String> field7() {
         return Bccp.BCCP.DEFINITION_SOURCE;
     }
 
     @Override
-    public Field<ULong> field9() {
+    public Field<ULong> field8() {
         return Bccp.BCCP.NAMESPACE_ID;
     }
 
     @Override
-    public Field<Byte> field10() {
+    public Field<Byte> field9() {
         return Bccp.BCCP.IS_DEPRECATED;
     }
 
     @Override
-    public Field<ULong> field11() {
+    public Field<ULong> field10() {
         return Bccp.BCCP.REPLACEMENT_BCCP_ID;
     }
 
     @Override
-    public Field<ULong> field12() {
+    public Field<ULong> field11() {
         return Bccp.BCCP.CREATED_BY;
     }
 
     @Override
-    public Field<ULong> field13() {
+    public Field<ULong> field12() {
         return Bccp.BCCP.OWNER_USER_ID;
     }
 
     @Override
-    public Field<ULong> field14() {
+    public Field<ULong> field13() {
         return Bccp.BCCP.LAST_UPDATED_BY;
     }
 
     @Override
-    public Field<LocalDateTime> field15() {
+    public Field<LocalDateTime> field14() {
         return Bccp.BCCP.CREATION_TIMESTAMP;
     }
 
     @Override
-    public Field<LocalDateTime> field16() {
+    public Field<LocalDateTime> field15() {
         return Bccp.BCCP.LAST_UPDATE_TIMESTAMP;
     }
 
     @Override
-    public Field<String> field17() {
+    public Field<String> field16() {
         return Bccp.BCCP.STATE;
     }
 
     @Override
-    public Field<Byte> field18() {
+    public Field<Byte> field17() {
         return Bccp.BCCP.IS_NILLABLE;
     }
 
     @Override
-    public Field<String> field19() {
+    public Field<String> field18() {
         return Bccp.BCCP.DEFAULT_VALUE;
     }
 
     @Override
-    public Field<String> field20() {
+    public Field<String> field19() {
         return Bccp.BCCP.FIXED_VALUE;
     }
 
     @Override
-    public Field<ULong> field21() {
+    public Field<ULong> field20() {
         return Bccp.BCCP.PREV_BCCP_ID;
     }
 
     @Override
-    public Field<ULong> field22() {
+    public Field<ULong> field21() {
         return Bccp.BCCP.NEXT_BCCP_ID;
     }
 
@@ -598,86 +577,81 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
 
     @Override
     public String component6() {
-        return getDen();
-    }
-
-    @Override
-    public String component7() {
         return getDefinition();
     }
 
     @Override
-    public String component8() {
+    public String component7() {
         return getDefinitionSource();
     }
 
     @Override
-    public ULong component9() {
+    public ULong component8() {
         return getNamespaceId();
     }
 
     @Override
-    public Byte component10() {
+    public Byte component9() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong component11() {
+    public ULong component10() {
         return getReplacementBccpId();
     }
 
     @Override
-    public ULong component12() {
+    public ULong component11() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong component13() {
+    public ULong component12() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong component14() {
+    public ULong component13() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime component15() {
+    public LocalDateTime component14() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime component16() {
+    public LocalDateTime component15() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String component17() {
+    public String component16() {
         return getState();
     }
 
     @Override
-    public Byte component18() {
+    public Byte component17() {
         return getIsNillable();
     }
 
     @Override
-    public String component19() {
+    public String component18() {
         return getDefaultValue();
     }
 
     @Override
-    public String component20() {
+    public String component19() {
         return getFixedValue();
     }
 
     @Override
-    public ULong component21() {
+    public ULong component20() {
         return getPrevBccpId();
     }
 
     @Override
-    public ULong component22() {
+    public ULong component21() {
         return getNextBccpId();
     }
 
@@ -708,86 +682,81 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
 
     @Override
     public String value6() {
-        return getDen();
-    }
-
-    @Override
-    public String value7() {
         return getDefinition();
     }
 
     @Override
-    public String value8() {
+    public String value7() {
         return getDefinitionSource();
     }
 
     @Override
-    public ULong value9() {
+    public ULong value8() {
         return getNamespaceId();
     }
 
     @Override
-    public Byte value10() {
+    public Byte value9() {
         return getIsDeprecated();
     }
 
     @Override
-    public ULong value11() {
+    public ULong value10() {
         return getReplacementBccpId();
     }
 
     @Override
-    public ULong value12() {
+    public ULong value11() {
         return getCreatedBy();
     }
 
     @Override
-    public ULong value13() {
+    public ULong value12() {
         return getOwnerUserId();
     }
 
     @Override
-    public ULong value14() {
+    public ULong value13() {
         return getLastUpdatedBy();
     }
 
     @Override
-    public LocalDateTime value15() {
+    public LocalDateTime value14() {
         return getCreationTimestamp();
     }
 
     @Override
-    public LocalDateTime value16() {
+    public LocalDateTime value15() {
         return getLastUpdateTimestamp();
     }
 
     @Override
-    public String value17() {
+    public String value16() {
         return getState();
     }
 
     @Override
-    public Byte value18() {
+    public Byte value17() {
         return getIsNillable();
     }
 
     @Override
-    public String value19() {
+    public String value18() {
         return getDefaultValue();
     }
 
     @Override
-    public String value20() {
+    public String value19() {
         return getFixedValue();
     }
 
     @Override
-    public ULong value21() {
+    public ULong value20() {
         return getPrevBccpId();
     }
 
     @Override
-    public ULong value22() {
+    public ULong value21() {
         return getNextBccpId();
     }
 
@@ -823,108 +792,102 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
 
     @Override
     public BccpRecord value6(String value) {
-        setDen(value);
-        return this;
-    }
-
-    @Override
-    public BccpRecord value7(String value) {
         setDefinition(value);
         return this;
     }
 
     @Override
-    public BccpRecord value8(String value) {
+    public BccpRecord value7(String value) {
         setDefinitionSource(value);
         return this;
     }
 
     @Override
-    public BccpRecord value9(ULong value) {
+    public BccpRecord value8(ULong value) {
         setNamespaceId(value);
         return this;
     }
 
     @Override
-    public BccpRecord value10(Byte value) {
+    public BccpRecord value9(Byte value) {
         setIsDeprecated(value);
         return this;
     }
 
     @Override
-    public BccpRecord value11(ULong value) {
+    public BccpRecord value10(ULong value) {
         setReplacementBccpId(value);
         return this;
     }
 
     @Override
-    public BccpRecord value12(ULong value) {
+    public BccpRecord value11(ULong value) {
         setCreatedBy(value);
         return this;
     }
 
     @Override
-    public BccpRecord value13(ULong value) {
+    public BccpRecord value12(ULong value) {
         setOwnerUserId(value);
         return this;
     }
 
     @Override
-    public BccpRecord value14(ULong value) {
+    public BccpRecord value13(ULong value) {
         setLastUpdatedBy(value);
         return this;
     }
 
     @Override
-    public BccpRecord value15(LocalDateTime value) {
+    public BccpRecord value14(LocalDateTime value) {
         setCreationTimestamp(value);
         return this;
     }
 
     @Override
-    public BccpRecord value16(LocalDateTime value) {
+    public BccpRecord value15(LocalDateTime value) {
         setLastUpdateTimestamp(value);
         return this;
     }
 
     @Override
-    public BccpRecord value17(String value) {
+    public BccpRecord value16(String value) {
         setState(value);
         return this;
     }
 
     @Override
-    public BccpRecord value18(Byte value) {
+    public BccpRecord value17(Byte value) {
         setIsNillable(value);
         return this;
     }
 
     @Override
-    public BccpRecord value19(String value) {
+    public BccpRecord value18(String value) {
         setDefaultValue(value);
         return this;
     }
 
     @Override
-    public BccpRecord value20(String value) {
+    public BccpRecord value19(String value) {
         setFixedValue(value);
         return this;
     }
 
     @Override
-    public BccpRecord value21(ULong value) {
+    public BccpRecord value20(ULong value) {
         setPrevBccpId(value);
         return this;
     }
 
     @Override
-    public BccpRecord value22(ULong value) {
+    public BccpRecord value21(ULong value) {
         setNextBccpId(value);
         return this;
     }
 
     @Override
-    public BccpRecord values(ULong value1, String value2, String value3, String value4, ULong value5, String value6, String value7, String value8, ULong value9, Byte value10, ULong value11, ULong value12, ULong value13, ULong value14, LocalDateTime value15, LocalDateTime value16, String value17, Byte value18, String value19, String value20, ULong value21, ULong value22) {
+    public BccpRecord values(ULong value1, String value2, String value3, String value4, ULong value5, String value6, String value7, ULong value8, Byte value9, ULong value10, ULong value11, ULong value12, ULong value13, LocalDateTime value14, LocalDateTime value15, String value16, Byte value17, String value18, String value19, ULong value20, ULong value21) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -946,7 +909,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         value19(value19);
         value20(value20);
         value21(value21);
-        value22(value22);
         return this;
     }
 
@@ -964,7 +926,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
     /**
      * Create a detached, initialised BccpRecord
      */
-    public BccpRecord(ULong bccpId, String guid, String propertyTerm, String representationTerm, ULong bdtId, String den, String definition, String definitionSource, ULong namespaceId, Byte isDeprecated, ULong replacementBccpId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, Byte isNillable, String defaultValue, String fixedValue, ULong prevBccpId, ULong nextBccpId) {
+    public BccpRecord(ULong bccpId, String guid, String propertyTerm, String representationTerm, ULong bdtId, String definition, String definitionSource, ULong namespaceId, Byte isDeprecated, ULong replacementBccpId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state, Byte isNillable, String defaultValue, String fixedValue, ULong prevBccpId, ULong nextBccpId) {
         super(Bccp.BCCP);
 
         setBccpId(bccpId);
@@ -972,7 +934,6 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> implements Recor
         setPropertyTerm(propertyTerm);
         setRepresentationTerm(representationTerm);
         setBdtId(bdtId);
-        setDen(den);
         setDefinition(definition);
         setDefinitionSource(definitionSource);
         setNamespaceId(namespaceId);

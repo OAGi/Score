@@ -24,7 +24,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {AgencyIdListCommentControl} from './agency-id-list-comment-component';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
-import {initFilter} from "../../common/utility";
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'score-agency-id-list-detail',
@@ -117,8 +117,8 @@ export class AgencyIdListDetailComponent implements OnInit {
     comment.isNew = true;
 
     if (comment.prevCommentId) {
-      let idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
-      let childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
+      const idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
+      const childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
       this.commentControl.comments.splice(idx + childrenCnt + 1, 0, comment);
     } else {
       this.commentControl.comments.push(comment);
@@ -509,7 +509,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     dialogConfig.data.header = 'Update state to \'' + state + '\'?';
     dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
     if (state === 'Published' || state === 'Production') {
-      dialogConfig.data.content.push(...['Once in the ' + state + ' state it can no longer be changed or discarded.',]);
+      dialogConfig.data.content.push(...['Once in the ' + state + ' state it can no longer be changed or discarded.', ]);
     }
     dialogConfig.data.action = (state === 'Published' || state === 'Production') ? 'Update anyway' : 'Update';
 

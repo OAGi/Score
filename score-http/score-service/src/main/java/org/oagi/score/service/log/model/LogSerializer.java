@@ -17,7 +17,10 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,7 +54,7 @@ public class LogSerializer {
         properties.put("deprecated", (byte) 1 == accRecord.getIsDeprecated());
         properties.put("abstract", (byte) 1 == accRecord.getIsAbstract());
 
-        properties.put("basedAcc", resolver.getAcc(accRecord.getBasedAccId()));
+        properties.put("basedAcc", resolver.getAccByManifestId(accManifestRecord.getBasedAccManifestId()));
         properties.put("ownerUser", resolver.getUser(accRecord.getOwnerUserId()));
         properties.put("namespace", resolver.getNamespace(accRecord.getNamespaceId()));
 
@@ -221,7 +224,7 @@ public class LogSerializer {
         properties.put("definition", asccRecord.getDefinition());
         properties.put("definitionSource", asccRecord.getDefinitionSource());
         properties.put("deprecated", (byte) 1 == asccRecord.getIsDeprecated());
-        properties.put("toAsccp", resolver.getAsccp(asccRecord.getToAsccpId()));
+        properties.put("toAsccp", resolver.getAsccpByManifestId(asccManifestRecord.getToAsccpManifestId()));
 
         return properties;
     }
@@ -241,7 +244,7 @@ public class LogSerializer {
         properties.put("fixedValue", bccRecord.getFixedValue());
         properties.put("deprecated", (byte) 1 == bccRecord.getIsDeprecated());
         properties.put("nillable", (byte) 1 == bccRecord.getIsNillable());
-        properties.put("toBccp", resolver.getBccp(bccRecord.getToBccpId()));
+        properties.put("toBccp", resolver.getBccpByManifestId(bccManifestRecord.getToBccpManifestId()));
 
         return properties;
     }
@@ -260,7 +263,7 @@ public class LogSerializer {
         properties.put("deprecated", (byte) 1 == asccpRecord.getIsDeprecated());
         properties.put("nillable", (byte) 1 == asccpRecord.getIsNillable());
 
-        properties.put("roleOfAcc", resolver.getAcc(asccpRecord.getRoleOfAccId()));
+        properties.put("roleOfAcc", resolver.getAccByManifestId(asccpManifestRecord.getRoleOfAccManifestId()));
         properties.put("ownerUser", resolver.getUser(asccpRecord.getOwnerUserId()));
         properties.put("namespace", resolver.getNamespace(asccpRecord.getNamespaceId()));
 
@@ -294,7 +297,7 @@ public class LogSerializer {
         properties.put("deprecated", (byte) 1 == bccpRecord.getIsDeprecated());
         properties.put("nillable", (byte) 1 == bccpRecord.getIsNillable());
 
-        properties.put("bdt", resolver.getDt(bccpRecord.getBdtId()));
+        properties.put("bdt", resolver.getDtByManifestId(bccpManifestRecord.getBdtManifestId()));
         properties.put("ownerUser", resolver.getUser(bccpRecord.getOwnerUserId()));
         properties.put("namespace", resolver.getNamespace(bccpRecord.getNamespaceId()));
 
@@ -329,7 +332,7 @@ public class LogSerializer {
         properties.put("state", dtRecord.getState());
         properties.put("deprecated", (byte) 1 == dtRecord.getIsDeprecated());
 
-        properties.put("basedDt", resolver.getDt(dtRecord.getBasedDtId()));
+        properties.put("basedDt", resolver.getDtByManifestId(dtManifestRecord.getBasedDtManifestId()));
         properties.put("ownerUser", resolver.getUser(dtRecord.getOwnerUserId()));
         properties.put("namespace", resolver.getNamespace(dtRecord.getNamespaceId()));
 

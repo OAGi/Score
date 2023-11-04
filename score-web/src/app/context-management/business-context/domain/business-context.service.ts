@@ -1,7 +1,12 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {BusinessContext, BusinessContextListRequest, BusinessContextRule, BusinessContextValue} from './business-context';
+import {
+  BusinessContext,
+  BusinessContextListRequest,
+  BusinessContextRule,
+  BusinessContextValue
+} from './business-context';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
 
@@ -41,7 +46,7 @@ export class BusinessContextService implements OnInit {
     if (request.filters.isBieEditing) {
       params = params.set('isBieEditing', 'true');
     }
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
+    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
   }
 
   getBusinessContext(id): Observable<BusinessContext> {
@@ -52,14 +57,14 @@ export class BusinessContextService implements OnInit {
     const params = new HttpParams()
       .set('businessContextIdList', businessContextIdList.join(','));
 
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
+    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
   }
 
   getBusinessContextsByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<PageResponse<BusinessContext>> {
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
-    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
+    return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params});
   }
 
   getBusinessContextValues(): Observable<BusinessContextValue[]> {
@@ -68,15 +73,15 @@ export class BusinessContextService implements OnInit {
 
   create(businessContext: BusinessContext): Observable<any> {
     return this.http.put('/api/business_context', {
-      'name': businessContext.name,
-      'businessContextValueList': businessContext.businessContextValueList
+      name: businessContext.name,
+      businessContextValueList: businessContext.businessContextValueList
     });
   }
 
   update(businessContext: BusinessContext): Observable<any> {
     return this.http.post('/api/business_context/' + businessContext.businessContextId, {
-      'name': businessContext.name,
-      'businessContextValueList': businessContext.businessContextValueList
+      name: businessContext.name,
+      businessContextValueList: businessContext.businessContextValueList
     });
   }
 
@@ -84,14 +89,14 @@ export class BusinessContextService implements OnInit {
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
-    return this.http.put('/api/business_context/' + businessContext.businessContextId, null, {params: params});
+    return this.http.put('/api/business_context/' + businessContext.businessContextId, null, {params});
   }
 
   dismiss(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
-    return this.http.delete('/api/business_context/' + businessContext.businessContextId, {params: params});
+    return this.http.delete('/api/business_context/' + businessContext.businessContextId, {params});
   }
 
   delete(...businessContextIds): Observable<any> {
@@ -110,7 +115,7 @@ export class BusinessContextService implements OnInit {
 
   assignBizCtx(bie: BieEditAbieNode, businessContextList: number[]): Observable<any> {
     return this.http.post('/api/profile_bie/' + bie.topLevelAsbiepId + '/assign_biz_ctx', {
-      businessContextList: businessContextList
+      businessContextList
     });
   }
 }

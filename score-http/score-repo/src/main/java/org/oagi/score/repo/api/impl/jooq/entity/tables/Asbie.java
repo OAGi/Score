@@ -12,13 +12,13 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function19;
+import org.jooq.Function20;
 import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row19;
+import org.jooq.Row20;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -188,6 +188,12 @@ public class Asbie extends TableImpl<AsbieRecord> {
      * field/component should be generated.
      */
     public final TableField<AsbieRecord, Byte> IS_USED = createField(DSL.name("is_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Flag to indicate whether the field/component is used in the content model. It signifies whether the field/component should be generated.");
+
+    /**
+     * The column <code>oagi.asbie.is_deprecated</code>. Indicates whether the
+     * ASBIE is deprecated.
+     */
+    public final TableField<AsbieRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the ASBIE is deprecated.");
 
     /**
      * The column <code>oagi.asbie.owner_top_level_asbiep_id</code>. This is a
@@ -363,18 +369,18 @@ public class Asbie extends TableImpl<AsbieRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row19 type methods
+    // Row20 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row19<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, ULong> fieldsRow() {
-        return (Row19) super.fieldsRow();
+    public Row20<ULong, String, ULong, String, String, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime, BigDecimal, Byte, Byte, ULong> fieldsRow() {
+        return (Row20) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function19<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super String, ? super Integer, ? super Integer, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super BigDecimal, ? super Byte, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function20<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super String, ? super Integer, ? super Integer, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super BigDecimal, ? super Byte, ? super Byte, ? super ULong, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -382,7 +388,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function19<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super String, ? super Integer, ? super Integer, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super BigDecimal, ? super Byte, ? super ULong, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function20<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super String, ? super Integer, ? super Integer, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super BigDecimal, ? super Byte, ? super Byte, ? super ULong, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

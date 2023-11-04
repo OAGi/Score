@@ -16,8 +16,6 @@ public class Acc extends Auditable implements CoreComponent, Serializable {
 
     private String objectClassTerm;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -76,14 +74,6 @@ public class Acc extends Auditable implements CoreComponent, Serializable {
 
     public void setObjectClassTerm(String objectClassTerm) {
         this.objectClassTerm = objectClassTerm;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

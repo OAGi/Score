@@ -4,7 +4,8 @@ import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
   CcBccpNodeDetail,
-  CcBdtScNodeDetail, CcDtNodeDetail,
+  CcBdtScNodeDetail,
+  CcDtNodeDetail,
   CcNodeDetail,
   Comment
 } from './core-component-node';

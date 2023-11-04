@@ -4,6 +4,7 @@ import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.oagi.score.e2e.page.code_list.UpliftCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -92,6 +93,20 @@ public interface BIEMenu {
      * @return the 'Express BIE' page object
      */
     ExpressBIEPage openExpressBIESubMenu();
+
+    /**
+     * Return the UI element of the 'OpenAPI Document' submenu.
+     *
+     * @return the UI element of the 'OpenAPI Document' submenu
+     */
+    WebElement getOpenAPIDocumentSubMenu();
+
+    /**
+     * Open the 'OpenAPI Document' submenu to enter the page.
+     *
+     * @return the 'OpenAPI Document' page object
+     */
+    OpenAPIDocumentPage openOpenAPIDocumentSubMenu();
 
     /**
      * Return the UI element of the 'Reuse Report' submenu.

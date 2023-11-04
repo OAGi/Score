@@ -17,6 +17,8 @@
                   <mat-select-trigger>
                     <span>{{ request.release.releaseNum }}</span>
                     <span class="right cc-state {{ request.release.state }}" style="float: right"
+                          [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet(request.release.state).background,
+                          'color': webPageInfo.getReleaseStateColorSet(request.release.state).font}"
                           *ngIf="request.release.releaseNum !== workingRelease.releaseNum">
                       {{ request.release.state }}
                     </span>
@@ -29,6 +31,8 @@
                   <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
                     <span class="release-num">{{ release.releaseNum }}</span>
                     <span class="release-state {{ release.state }}"
+                          [ngStyle]="{'background-color': webPageInfo.getReleaseStateColorSet(release.state).background,
+                          'color': webPageInfo.getReleaseStateColorSet(release.state).font}"
                           *ngIf="release.releaseNum !== workingRelease.releaseNum">
                       {{ release.state }}</span>
                   </mat-option>
@@ -181,7 +185,9 @@
                    href="/code_list/{{ element.codeListId }}">
                   <span style="margin-right: 10px;">{{ element.codeListName }}</span>
                 </a>
-                <span class="cl-state {{ element.state }}">{{ element.state }}</span>
+                <span class="cl-state {{ element.state }}"
+                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
               </div>
               <div class="description">{{ element.guid }}</div>
             </td>

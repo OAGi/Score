@@ -7,6 +7,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.api.CoreComponentAPI;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.*;
@@ -16,6 +17,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -385,6 +387,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
         String den = asccp.getDen();
         {
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
@@ -396,6 +399,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
             transferCCOwnershipDialog.transfer(anotherDeveloper.getLoginId());
 
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             tr = viewEditCoreComponentPage.getTableRecordByValue(den);
@@ -409,6 +413,7 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         {
             viewEditCoreComponentPage.setDEN(den);
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);

@@ -167,7 +167,7 @@ public class CoreComponentGraphContext implements GraphContext {
         this.releaseId = ULong.valueOf(releaseId);
 
         List<AccManifest> accManifestList = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.BASED_ACC_MANIFEST_ID,
-                ACC.OBJECT_CLASS_TERM, ACC.DEN, ACC.OAGIS_COMPONENT_TYPE, ACC.STATE, ACC.GUID,
+                ACC.OBJECT_CLASS_TERM, ACC_MANIFEST.DEN, ACC.OAGIS_COMPONENT_TYPE, ACC.STATE, ACC.GUID,
                 ACC.IS_DEPRECATED, ACC_MANIFEST.RELEASE_ID, ACC_MANIFEST.PREV_ACC_MANIFEST_ID)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
@@ -176,7 +176,7 @@ public class CoreComponentGraphContext implements GraphContext {
                         record.get(ACC_MANIFEST.ACC_MANIFEST_ID),
                         record.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID),
                         record.get(ACC.OBJECT_CLASS_TERM),
-                        record.get(ACC.DEN),
+                        record.get(ACC_MANIFEST.DEN),
                         OagisComponentType.valueOf(record.get(ACC.OAGIS_COMPONENT_TYPE)),
                         record.get(ACC.STATE),
                         record.get(ACC.GUID),
@@ -348,7 +348,7 @@ public class CoreComponentGraphContext implements GraphContext {
             accManifests.add(accManifestMap.get(bccManifest.getFromAccManifestId()));
         }
         dtManifestMap =
-                dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT.DATA_TYPE_TERM, DT.QUALIFIER, DT.DEN, DT.STATE,
+                dslContext.select(DT_MANIFEST.DT_MANIFEST_ID, DT.DATA_TYPE_TERM, DT.QUALIFIER, DT_MANIFEST.DEN, DT.STATE,
                         DT.IS_DEPRECATED, DT_MANIFEST.RELEASE_ID, DT_MANIFEST.PREV_DT_MANIFEST_ID)
                         .from(DT_MANIFEST)
                         .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
@@ -357,7 +357,7 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(DT_MANIFEST.DT_MANIFEST_ID),
                                 record.get(DT.DATA_TYPE_TERM),
                                 record.get(DT.QUALIFIER),
-                                record.get(DT.DEN),
+                                record.get(DT_MANIFEST.DEN),
                                 record.get(DT.STATE),
                                 record.get(DT.IS_DEPRECATED),
                                 record.get(DT_MANIFEST.RELEASE_ID),
@@ -574,13 +574,14 @@ public class CoreComponentGraphContext implements GraphContext {
     }
 
     public Node toNode(AccManifestRecord record) {
-        Record6<String, String, String, Integer, String, Byte> res = dslContext.select(ACC.OBJECT_CLASS_TERM, ACC.DEN,
+        Record6<String, String, String, Integer, String, Byte> res = dslContext.select(ACC.OBJECT_CLASS_TERM, ACC_MANIFEST.DEN,
                 ACC.GUID, ACC.OAGIS_COMPONENT_TYPE, ACC.STATE, ACC.IS_DEPRECATED)
                 .from(ACC)
-                .where(ACC.ACC_ID.eq(record.getAccId()))
+                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(record.getAccManifestId()))
                 .fetchOne();
         return toNode(new AccManifest(record.getAccManifestId(), record.getBasedAccManifestId(),
-                res.get(ACC.OBJECT_CLASS_TERM), res.get(ACC.DEN), OagisComponentType.valueOf(res.get(ACC.OAGIS_COMPONENT_TYPE)),
+                res.get(ACC.OBJECT_CLASS_TERM), res.get(ACC_MANIFEST.DEN), OagisComponentType.valueOf(res.get(ACC.OAGIS_COMPONENT_TYPE)),
                 res.get(ACC.STATE), res.get(ACC.GUID), res.get(ACC.IS_DEPRECATED), record.getReleaseId(), record.getPrevAccManifestId()));
     }
 
@@ -607,12 +608,13 @@ public class CoreComponentGraphContext implements GraphContext {
 
     public Node toNode(DtManifestRecord record) {
         Record6<String, String, String, String, String, Byte> res =
-                dslContext.select(DT.DATA_TYPE_TERM, DT.QUALIFIER, DT.STATE, DT.GUID, DT.DEN, DT.IS_DEPRECATED)
+                dslContext.select(DT.DATA_TYPE_TERM, DT.QUALIFIER, DT.STATE, DT.GUID, DT_MANIFEST.DEN, DT.IS_DEPRECATED)
                         .from(DT)
-                        .where(DT.DT_ID.eq(record.getDtId()))
+                        .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(record.getDtManifestId()))
                         .fetchOne();
         return toNode(new DtManifest(record.getDtManifestId(),
-                res.get(DT.DATA_TYPE_TERM), res.get(DT.QUALIFIER), res.get(DT.DEN), res.get(DT.STATE), res.get(DT.IS_DEPRECATED),
+                res.get(DT.DATA_TYPE_TERM), res.get(DT.QUALIFIER), res.get(DT_MANIFEST.DEN), res.get(DT.STATE), res.get(DT.IS_DEPRECATED),
                 record.getReleaseId(), record.getPrevDtManifestId()));
     }
 

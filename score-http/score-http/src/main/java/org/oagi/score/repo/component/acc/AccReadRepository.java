@@ -88,7 +88,7 @@ public class AccReadRepository {
         return dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID,
                 ACC.ACC_ID,
                 ACC.GUID,
-                ACC.DEN,
+                ACC_MANIFEST.DEN,
                 ACC.DEFINITION,
                 ACC.DEFINITION_SOURCE,
                 ACC.OBJECT_CLASS_TERM,
@@ -122,7 +122,7 @@ public class AccReadRepository {
                     ccList.setType(CcType.ACC);
                     ccList.setManifestId(e.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
                     ccList.setGuid(e.get(ACC.GUID));
-                    ccList.setDen(e.get(ACC.DEN));
+                    ccList.setDen(e.get(ACC_MANIFEST.DEN));
                     ccList.setDefinition(e.get(ACC.DEFINITION));
                     ccList.setModule(e.get(MODULE.NAME) == null ? "" : e.get(MODULE.PATH) + "\\" + e.get(MODULE.NAME));
                     ccList.setName(e.get(ACC.OBJECT_CLASS_TERM));

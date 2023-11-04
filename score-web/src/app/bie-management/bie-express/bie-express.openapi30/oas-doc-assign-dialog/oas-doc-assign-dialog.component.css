@@ -1,0 +1,50 @@
+.mat-dialog-content {
+  max-height: max-content;
+}
+
+.mat-column-state {
+  width: 100px;
+  font-size: 13px;
+}
+
+.mat-column-den {
+  width: 300px;
+  font-size: 13px;
+}
+
+.mat-column-owner {
+  width: 100px;
+}
+
+.mat-column-version {
+  width: 100px;
+}
+
+.mat-column-remark {
+  width: 300px;
+}
+
+.mat-column-verb, .mat-column-messageBody {
+  width: 200px;
+}
+
+.mat-column-arrayIndicator {
+  width: 100px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.mat-error {
+  font-size: 13px;
+}
+
+.highlight {
+  background: #42A948;
+}

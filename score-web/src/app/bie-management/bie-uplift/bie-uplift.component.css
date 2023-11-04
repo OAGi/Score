@@ -58,6 +58,11 @@ tr.element-row:not(.expanded-row):active {
   align-items: center;
 }
 
+.mat-tree-node .deprecated {
+  text-decoration: line-through;
+  background-color: #ececec;
+}
+
 .mat-tree-node .material-icons {
   font-size: 20px;
 }

@@ -18,6 +18,7 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-code-list-for-deriving',
@@ -60,7 +61,8 @@ export class CodeListForDerivingComponent implements OnInit {
               private accountService: AccountListService,
               private auth: AuthService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -82,7 +84,7 @@ export class CodeListForDerivingComponent implements OnInit {
     this.releases = [];
 
     forkJoin([
-      this.releaseService.getSimpleReleases(['Published',]),
+      this.releaseService.getSimpleReleases(['Published', ]),
       this.accountService.getAccountNames()
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases);

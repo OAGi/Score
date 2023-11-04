@@ -151,7 +151,6 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
         });
-        invisibilityOfLoadingContainerElement(getDriver());
         assert "Deleted".equals(getSnackBarMessage(getDriver()));
     }
 

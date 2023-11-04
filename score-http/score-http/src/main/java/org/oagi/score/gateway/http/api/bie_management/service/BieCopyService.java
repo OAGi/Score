@@ -171,7 +171,8 @@ public class BieCopyService implements InitializingBean {
                 ASBIE.IS_NILLABLE.as("nillable"),
                 ASBIE.REMARK,
                 ASBIE.SEQ_KEY,
-                ASBIE.IS_USED.as("used"))
+                ASBIE.IS_USED.as("used"),
+                ASBIE.IS_DEPRECATED.as("deprecated"))
                 .from(ASBIE)
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId)))
                 .fetchInto(BieCopyAsbie.class);
@@ -192,14 +193,18 @@ public class BieCopyService implements InitializingBean {
                 BBIE.CARDINALITY_MIN,
                 BBIE.CARDINALITY_MAX,
                 BBIE.DEFAULT_VALUE,
-                BBIE.IS_NILLABLE.as("nillable"),
                 BBIE.FIXED_VALUE,
+                BBIE.FACET_MIN_LENGTH,
+                BBIE.FACET_MAX_LENGTH,
+                BBIE.FACET_PATTERN,
+                BBIE.IS_NILLABLE.as("nillable"),
                 BBIE.IS_NULL.as("nill"),
                 BBIE.DEFINITION,
                 BBIE.EXAMPLE,
                 BBIE.REMARK,
                 BBIE.SEQ_KEY,
-                BBIE.IS_USED.as("used"))
+                BBIE.IS_USED.as("used"),
+                BBIE.IS_DEPRECATED.as("deprecated"))
                 .from(BBIE)
                 .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId)))
                 .fetchInto(BieCopyBbie.class);
@@ -251,11 +256,15 @@ public class BieCopyService implements InitializingBean {
                 BBIE_SC.CARDINALITY_MAX,
                 BBIE_SC.DEFAULT_VALUE,
                 BBIE_SC.FIXED_VALUE,
+                BBIE_SC.FACET_MIN_LENGTH,
+                BBIE_SC.FACET_MAX_LENGTH,
+                BBIE_SC.FACET_PATTERN,
                 BBIE_SC.DEFINITION,
                 BBIE_SC.EXAMPLE,
                 BBIE_SC.REMARK,
                 BBIE_SC.BIZ_TERM,
-                BBIE_SC.IS_USED.as("used"))
+                BBIE_SC.IS_USED.as("used"),
+                BBIE_SC.IS_DEPRECATED.as("deprecated"))
                 .from(BBIE_SC)
                 .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId)))
                 .fetchInto(BieCopyBbieSc.class);
@@ -292,6 +301,7 @@ public class BieCopyService implements InitializingBean {
         private String remark;
         private double seqKey;
         private boolean used;
+        private boolean deprecated;
 
     }
 
@@ -313,12 +323,16 @@ public class BieCopyService implements InitializingBean {
         private String defaultValue;
         private boolean nillable;
         private String fixedValue;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private boolean nill;
         private String definition;
         private String example;
         private String remark;
         private double seqKey;
         private boolean used;
+        private boolean deprecated;
 
     }
 
@@ -367,11 +381,15 @@ public class BieCopyService implements InitializingBean {
         private int cardinalityMax;
         private String defaultValue;
         private String fixedValue;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private String definition;
         private String example;
         private String remark;
         private String bizTerm;
         private boolean used;
+        private boolean deprecated;
 
     }
 
@@ -640,6 +658,7 @@ public class BieCopyService implements InitializingBean {
                     .set(ASBIE.CARDINALITY_MAX, asbie.getCardinalityMax())
                     .set(ASBIE.IS_NILLABLE, (byte) ((asbie.isNillable()) ? 1 : 0))
                     .set(ASBIE.IS_USED, (byte) ((asbie.isUsed()) ? 1 : 0))
+                    .set(ASBIE.IS_DEPRECATED, (byte) ((asbie.isDeprecated()) ? 1 : 0))
                     .set(ASBIE.SEQ_KEY, BigDecimal.valueOf(asbie.getSeqKey()))
                     .set(ASBIE.CREATED_BY, ULong.valueOf(userId))
                     .set(ASBIE.LAST_UPDATED_BY, ULong.valueOf(userId))
@@ -663,6 +682,9 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE.AGENCY_ID_LIST_MANIFEST_ID, (bbie.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbie.getAgencyIdListManifestId()) : null)
                     .set(BBIE.DEFAULT_VALUE, bbie.getDefaultValue())
                     .set(BBIE.FIXED_VALUE, bbie.getFixedValue())
+                    .set(BBIE.FACET_MIN_LENGTH, (bbie.getFacetMinLength() != null) ? ULong.valueOf(bbie.getFacetMinLength()) : null)
+                    .set(BBIE.FACET_MAX_LENGTH, (bbie.getFacetMaxLength() != null) ? ULong.valueOf(bbie.getFacetMaxLength()) : null)
+                    .set(BBIE.FACET_PATTERN, bbie.getFacetPattern())
                     .set(BBIE.DEFINITION, bbie.getDefinition())
                     .set(BBIE.EXAMPLE, bbie.getExample())
                     .set(BBIE.REMARK, bbie.getRemark())
@@ -672,6 +694,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE.IS_NULL, (byte) ((bbie.isNill()) ? 1 : 0))
                     .set(BBIE.SEQ_KEY, BigDecimal.valueOf(bbie.getSeqKey()))
                     .set(BBIE.IS_USED, (byte) ((bbie.isUsed()) ? 1 : 0))
+                    .set(BBIE.IS_DEPRECATED, (byte) ((bbie.isDeprecated()) ? 1 : 0))
                     .set(BBIE.CREATED_BY, ULong.valueOf(userId))
                     .set(BBIE.LAST_UPDATED_BY, ULong.valueOf(userId))
                     .set(BBIE.CREATION_TIMESTAMP, timestamp.toLocalDateTime())
@@ -693,6 +716,9 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID, (bbieSc.getAgencyIdListManifestId() != null) ? ULong.valueOf(bbieSc.getAgencyIdListManifestId()) : null)
                     .set(BBIE_SC.DEFAULT_VALUE, bbieSc.getDefaultValue())
                     .set(BBIE_SC.FIXED_VALUE, bbieSc.getFixedValue())
+                    .set(BBIE_SC.FACET_MIN_LENGTH, (bbieSc.getFacetMinLength() != null) ? ULong.valueOf(bbieSc.getFacetMinLength()) : null)
+                    .set(BBIE_SC.FACET_MAX_LENGTH, (bbieSc.getFacetMaxLength() != null) ? ULong.valueOf(bbieSc.getFacetMaxLength()) : null)
+                    .set(BBIE_SC.FACET_PATTERN, bbieSc.getFacetPattern())
                     .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())
                     .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                     .set(BBIE_SC.REMARK, bbieSc.getRemark())
@@ -700,6 +726,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.CARDINALITY_MIN, bbieSc.getCardinalityMin())
                     .set(BBIE_SC.CARDINALITY_MAX, bbieSc.getCardinalityMax())
                     .set(BBIE_SC.IS_USED, (byte) ((bbieSc.isUsed()) ? 1 : 0))
+                    .set(BBIE_SC.IS_DEPRECATED, (byte) ((bbieSc.isDeprecated()) ? 1 : 0))
                     .set(BBIE_SC.CREATED_BY, ULong.valueOf(userId))
                     .set(BBIE_SC.LAST_UPDATED_BY, ULong.valueOf(userId))
                     .set(BBIE_SC.CREATION_TIMESTAMP, timestamp.toLocalDateTime())

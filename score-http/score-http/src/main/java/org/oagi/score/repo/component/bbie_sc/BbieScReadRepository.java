@@ -5,7 +5,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
-import org.oagi.score.data.BdtPriRestri;
 import org.oagi.score.data.BdtScPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieScRecord;
@@ -156,18 +155,19 @@ public class BbieScReadRepository {
             bbieSc.setCardinalityMin(bbieScRecord.getCardinalityMin());
             bbieSc.setCardinalityMax(bbieScRecord.getCardinalityMax());
             if (bbieScRecord.getFacetMinLength() != null) {
-                bbieSc.setMinLength(bbieScRecord.getFacetMinLength().intValue());
+                bbieSc.setFacetMinLength(bbieScRecord.getFacetMinLength().toBigInteger());
             }
             if (bbieScRecord.getFacetMaxLength() != null) {
-                bbieSc.setMaxLength(bbieScRecord.getFacetMaxLength().intValue());
+                bbieSc.setFacetMaxLength(bbieScRecord.getFacetMaxLength().toBigInteger());
             }
-            bbieSc.setPattern(bbieScRecord.getFacetPattern());
+            bbieSc.setFacetPattern(bbieScRecord.getFacetPattern());
             bbieSc.setRemark(bbieScRecord.getRemark());
             bbieSc.setBizTerm(bbieScRecord.getBizTerm());
             bbieSc.setDefinition(bbieScRecord.getDefinition());
             bbieSc.setDefaultValue(bbieScRecord.getDefaultValue());
             bbieSc.setFixedValue(bbieScRecord.getFixedValue());
             bbieSc.setExample(bbieScRecord.getExample());
+            bbieSc.setDeprecated(bbieScRecord.getIsDeprecated() == 1);
 
             bbieSc.setBdtScPriRestriId((bbieScRecord.getDtScPriRestriId() != null) ?
                     bbieScRecord.getDtScPriRestriId().toBigInteger() : null);
@@ -183,7 +183,8 @@ public class BbieScReadRepository {
     public List<BieEditUsed> getUsedBbieScList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE_SC.IS_USED, BBIE_SC.BBIE_SC_ID, BBIE_SC.BASED_DT_SC_MANIFEST_ID,
                         BBIE_SC.HASH_PATH, BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID,
-                        BBIE_SC.CARDINALITY_MIN, BBIE_SC.CARDINALITY_MAX)
+                        BBIE_SC.CARDINALITY_MIN, BBIE_SC.CARDINALITY_MAX,
+                        BBIE_SC.IS_DEPRECATED)
                 .from(BBIE_SC)
                 .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchStream().map(record -> {
@@ -196,6 +197,7 @@ public class BbieScReadRepository {
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     bieEditUsed.setCardinalityMin(record.get(BBIE_SC.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE_SC.CARDINALITY_MAX));
+                    bieEditUsed.setDeprecated(record.get(BBIE_SC.IS_DEPRECATED) == 1);
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

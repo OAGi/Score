@@ -11,8 +11,8 @@ import {hashCode, initFilter} from '../../../common/utility';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {ModuleSet, ModuleSetRelease} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
-import {FormControl} from "@angular/forms";
-import {forkJoin, ReplaySubject} from "rxjs";
+import {FormControl} from '@angular/forms';
+import {forkJoin, ReplaySubject} from 'rxjs';
 
 @Component({
   selector: 'score-module-set-create',

@@ -86,7 +86,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
       switchMap((params: ParamMap) => {
         const bieIds = this.extractArrayParam(params, 'bieIds');
         const bieTypes = this.extractArrayParam(params, 'bieTypes');
-        if(bieIds.length !== bieTypes.length) {
+        if (bieIds.length !== bieTypes.length) {
           this.router.navigateByUrl('/business_term_management/assign_business_term/create');
         }
         const bies: BieToAssign[] = bieIds.map((value, index) => {

@@ -9,7 +9,6 @@ import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
-import org.oagi.score.gateway.http.api.cc_management.data.CcTransferOwnershipListRequest;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -37,13 +36,10 @@ import org.oagi.score.service.message.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.AuthenticatedPrincipal;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -127,7 +123,7 @@ public class BieService {
         }
 
         String asccpPath = "ASCCP-" + asccpManifest.getAsccpManifestId();
-        String accPath =  "ACC-" + asccpManifest.getRoleOfAccManifestId();
+        String accPath = "ACC-" + asccpManifest.getRoleOfAccManifestId();
         accPath = String.join(">",
                 Arrays.asList(asccpPath, accPath));
 
@@ -353,6 +349,19 @@ public class BieService {
         dslContext.deleteFrom(Tables.BIZ_CTX_ASSIGNMENT).where(Tables.BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
 
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();
+
+        List<ULong> topLevelAsbiepListThatHasThisAsSource = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .fetchInto(ULong.class);
+        if (!topLevelAsbiepListThatHasThisAsSource.isEmpty()) {
+            dslContext.update(TOP_LEVEL_ASBIEP)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_ACTION)
+                    .setNull(TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP)
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepListThatHasThisAsSource))
+                    .execute();
+        }
     }
 
     private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {
@@ -384,7 +393,7 @@ public class BieService {
         for (BigInteger topLevelAsbiepId : topLevelAsbiepIds) {
             List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusedTopLevelAsbiepList =
                     bieReadRepository.getReuseBieList(new GetReuseBieListRequest(requester)
-                            .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                                    .withTopLevelAsbiepId(topLevelAsbiepId, true))
                             .getTopLevelAsbiepList();
 
             if (!reusedTopLevelAsbiepList.isEmpty()) {
@@ -483,9 +492,9 @@ public class BieService {
     @Transactional
     public List<BizCtxAssignment> getAssignBizCtx(BigInteger topLevelAsbiepId) {
         return dslContext.select(
-                BIZ_CTX_ASSIGNMENT.BIZ_CTX_ASSIGNMENT_ID,
-                BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID,
-                BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)
+                        BIZ_CTX_ASSIGNMENT.BIZ_CTX_ASSIGNMENT_ID,
+                        BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID,
+                        BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)
                 .from(BIZ_CTX_ASSIGNMENT)
                 .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchInto(BizCtxAssignment.class);

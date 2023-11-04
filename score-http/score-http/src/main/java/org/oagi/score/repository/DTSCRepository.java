@@ -22,7 +22,8 @@ public class DTSCRepository implements ScoreRepository<DTSC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectOnConditionStep<Record16<ULong, ULong, String, String, String,
+    private SelectOnConditionStep<Record16<
+            ULong, ULong, String, String, String,
             String, String, String, String, ULong,
             ULong, Integer, Integer, ULong, ULong,
             UInteger>> getSelectJoinStep() {

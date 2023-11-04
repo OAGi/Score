@@ -5,7 +5,7 @@
       <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
     </div>
     <div class="ui feed">
-      <div class="event" *ngFor="let comment of commentControl.comments" [class]="comment.isNew ? 'new-message': ''">
+      <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
         <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
           <div class="summary">
             <a>{{ comment.loginId }}</a>
@@ -271,11 +271,12 @@
                         </ng-template>
 
                         <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
-                              node.deprecated ? 'deprecated' : 'dummy',
-                              node.inhibited ? 'inhibited' : 'dummy',
-                              this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
-                              this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex ? 'search-index' : 'asd',
-                              node.state === 'Deleted' ? 'text-line-through' : 'text-none']"
+                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
+                              [class.inhibited]="node.inhibited"
+                              [class.deprecated]="node.deprecated"
+                              [class.text-danger]="node.state === 'Deleted'"
+                              [class.text-line-through]="node.state === 'Deleted'"
                               [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
                               [innerHTML]="node.name | highlight : searcher.searchKeyword">
                         </span>

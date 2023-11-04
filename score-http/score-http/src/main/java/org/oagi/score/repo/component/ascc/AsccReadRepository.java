@@ -82,7 +82,7 @@ public class AsccReadRepository {
                 Tables.ACC_MANIFEST.ACC_MANIFEST_ID.as("manifest_id"),
                 Tables.ACC.ACC_ID.as("id"),
                 Tables.ACC.GUID,
-                Tables.ACC.DEN,
+                Tables.ACC_MANIFEST.DEN,
                 Tables.ACC.OBJECT_CLASS_TERM,
                 Tables.ACC.OAGIS_COMPONENT_TYPE.as("oagis_component_type"),
                 Tables.ACC.STATE,

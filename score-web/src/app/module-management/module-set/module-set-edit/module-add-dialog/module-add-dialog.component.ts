@@ -2,14 +2,13 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
-import {PageRequest} from '../../../../basis/basis';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
-import {Module, ModuleElement, ModuleSet, ModuleSetListRequest, Tile} from '../../../domain/module';
+import {Module, ModuleElement, ModuleSet, Tile} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
-import {FormControl} from "@angular/forms";
-import {ReplaySubject} from "rxjs";
-import {initFilter} from "../../../../common/utility";
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../../../common/utility';
 
 @Component({
   selector: 'score-module-add-dialog',
@@ -50,9 +49,9 @@ export class ModuleAddDialogComponent implements OnInit {
               private moduleService: ModuleService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
 
-    this.moduleSetId = data['moduleSetId'];
-    this.parentModuleId = data['parentModuleId'];
-    this.parentDirName = data['parentDirName'];
+    this.moduleSetId = data.moduleSetId;
+    this.parentModuleId = data.parentModuleId;
+    this.parentDirName = data.parentDirName;
   }
 
   ngOnInit() {
@@ -129,7 +128,7 @@ export class ModuleAddDialogComponent implements OnInit {
   onClickElement(tile: Tile, element: ModuleElement) {
     tile.current = element;
     this.selected = element;
-    let tileIndex = this.tiles.indexOf(tile) + 1;
+    const tileIndex = this.tiles.indexOf(tile) + 1;
     if (this.tiles.length > tileIndex) {
       this.tiles.splice(tileIndex, this.tiles.length - tileIndex);
     }
@@ -150,7 +149,7 @@ export class ModuleAddDialogComponent implements OnInit {
     }
     this.isUpdating = true;
     this.moduleService.copyModule(this.selected, this.moduleSetId, this.copySubModules, this.parentModuleId)
-      .pipe(finalize(()=> {
+      .pipe(finalize(() => {
         this.isUpdating = false;
       }))
       .subscribe(resp => {

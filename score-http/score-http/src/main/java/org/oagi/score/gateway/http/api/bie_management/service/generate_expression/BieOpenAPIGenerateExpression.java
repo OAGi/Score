@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
-import org.oagi.score.gateway.http.api.bie_management.data.expression.OpenAPIExpressionFormat;
+import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIExpressionFormat;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -28,8 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -549,23 +549,34 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             properties = oneOf(allOf(properties), isNillable);
         }
 
-        if (isArray) {
-            Map<String, Object> items = new LinkedHashMap();
-            items.putAll(properties);
+        // Issue #1298
+        if (asbie.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
 
+        if (isArray) {
+            Map<String, Object> items = new LinkedHashMap(properties);
             properties = new LinkedHashMap();
 
             String description = (String) items.remove("description");
             if (StringUtils.hasLength(description)) {
                 properties.put("description", description);
             }
+
             properties.put("type", "array");
+
+            Boolean deprecated = (Boolean) items.remove("deprecated");
+            if (deprecated != null) {
+                properties.put("deprecated", deprecated);
+            }
+
             if (minVal > 0) {
                 properties.put("minItems", minVal);
             }
             if (maxVal > 0) {
                 properties.put("maxItems", maxVal);
             }
+
             properties.put("items", items);
 
             // Issue #1483
@@ -646,27 +657,38 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     }
 
     private String fillSchemas(Map<String, Object> schemas,
-                               Xbt xbt, FacetRestrictionsAware facetRestri) {
-        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
-        String name = "type_" + guid;
+                               Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
+        if (!schemas.containsKey(componentName)) {
+            Map<String, Object> content = toProperties(xbt);
 
-        Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getFacetMinLength() != null) {
-            content.put("minLength", facetRestri.getFacetMinLength().longValue());
-        }
-        if (facetRestri.getFacetMaxLength() != null) {
-            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
-            // Override 'pattern' and 'format' properties
-            content.remove("pattern");
-            content.remove("format");
-            content.put("pattern", facetRestri.getFacetPattern());
+            String type;
+            if (content.containsKey("type")) {
+                type = (String) content.get("type");
+            } else {
+                type = "string";
+                content.put("type", type);
+            }
+
+            boolean isTypeString = "string".equals(type);
+            boolean isTypeNumeric = "integer".equals(type) || "number".equals(type);
+
+            if (isTypeString && facetRestri.getFacetMinLength() != null) {
+                content.put("minLength", facetRestri.getFacetMinLength().longValue());
+            }
+            if (isTypeString && facetRestri.getFacetMaxLength() != null) {
+                content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
+            }
+            if (isTypeString && StringUtils.hasLength(facetRestri.getFacetPattern())) {
+                // Override 'pattern' and 'format' properties
+                content.remove("pattern");
+                content.remove("format");
+                content.put("pattern", facetRestri.getFacetPattern());
+            }
+
+            schemas.put(componentName, content);
         }
 
-        schemas.put(name, content);
-
-        return "#/components/schemas/" + name;
+        return "#/components/schemas/" + componentName;
     }
 
     private String fillSchemas(Map<String, Object> schemas,
@@ -930,20 +952,34 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             }
         }
 
+        // Issue #1298
+        if (bbie.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
+
         if (isArray) {
-            String description = (String) properties.remove("description");
             Map<String, Object> items = new LinkedHashMap(properties);
             properties = new LinkedHashMap();
+
+            String description = (String) properties.remove("description");
             if (StringUtils.hasLength(description)) {
                 properties.put("description", description);
             }
+
             properties.put("type", "array");
+
+            Boolean deprecated = (Boolean) items.remove("deprecated");
+            if (deprecated != null) {
+                properties.put("deprecated", deprecated);
+            }
+
             if (minVal > 0) {
                 properties.put("minItems", minVal);
             }
             if (maxVal > 0) {
                 properties.put("maxItems", maxVal);
             }
+
             properties.put("items", items);
         }
 
@@ -1032,11 +1068,10 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
-                    Xbt xbt = getXbt(bbie, bdt);
-                    ref = fillSchemas(schemas, xbt, bbie);
+                Xbt xbt = getXbt(bbie, bdt);
+                if (hasAnyValuesInFacets(bbie)) {
+                    ref = fillSchemas(schemas, xbt, bbie, "type_" + bbie.getGuid());
                 } else if (!isFriendly()) {
-                    Xbt xbt = getXbt(bbie, bdt);
                     ref = fillSchemas(schemas, xbt);
                 } else {
                     ref = null;
@@ -1118,8 +1153,8 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             if (agencyIdList != null) {
                 ref = fillSchemas(schemas, agencyIdList);
             } else {
-                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
-                    ref = fillSchemas(schemas, xbt, bbieSc);
+                if (hasAnyValuesInFacets(bbieSc)) {
+                    ref = fillSchemas(schemas, xbt, bbieSc, "type_" + bbieSc.getGuid());
                 } else if (!isFriendly()) {
                     ref = fillSchemas(schemas, xbt);
                 } else {
@@ -1135,6 +1170,11 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
             properties.put("$ref", ref);
         }
         properties = allOf(properties);
+
+        // Issue #1298
+        if (bbieSc.isDeprecated()) {
+            properties.put("deprecated", true);
+        }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }

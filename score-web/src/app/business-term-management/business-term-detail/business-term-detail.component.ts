@@ -147,7 +147,6 @@ export class BusinessTermDetailComponent implements OnInit {
             });
             this.router.navigateByUrl('/business_term_management/business_term');
           }, err => {
-            console.log(err);
             this.snackBar.open('Discard\'s forbidden! The business term is used.', '', {
               duration: 5000,
             });

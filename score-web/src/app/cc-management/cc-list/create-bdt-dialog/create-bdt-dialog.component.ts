@@ -16,8 +16,9 @@ import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
-import {TagService} from "../../../tag-management/domain/tag.service";
-import {Tag} from "../../../tag-management/domain/tag";
+import {TagService} from '../../../tag-management/domain/tag.service';
+import {Tag} from '../../../tag-management/domain/tag';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-create-bccp-dialog',
@@ -66,6 +67,7 @@ export class CreateBdtDialogComponent implements OnInit {
               private ccListService: CcListService,
               private accountService: AccountListService,
               private tagService: TagService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }

@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
@@ -19,6 +20,8 @@ import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.redisson.api.RLock;
@@ -64,6 +67,9 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
     @Autowired
     private BusinessInformationEntityRepository bieRepository;
+
+    @Autowired
+    private OpenAPIDocService openAPIDocService;
 
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
@@ -171,6 +177,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         rootNode.setHasChild(hasChild(rootNode));
         rootNode.setAccess(accessPrivilege);
 
+        // Issue #1519
+        GetBieForOasDocResponse getBieForOasDocResponse = openAPIDocService.getBieForOasDoc(
+                new GetBieForOasDocRequest(sessionService.asScoreUser(user))
+                        .withTopLevelAsbiepId(topLevelAsbiepId));
+        if (getBieForOasDocResponse.getLength() > 0) {
+            rootNode.setBieForOasDoc(getBieForOasDocResponse.getResults().get(0));
+        }
         return rootNode;
     }
 
@@ -761,26 +774,28 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
         if (bbiepNode.getBbiepId().longValue() > 0L) {
             Record4<String, String, ULong, String> rs =
-                    dslContext.select(BBIEP.BIZ_TERM, BBIEP.REMARK, BCCP.BDT_ID, DT.DEN)
+                    dslContext.select(BBIEP.BIZ_TERM, BBIEP.REMARK, BCCP.BDT_ID, DT_MANIFEST.DEN)
                             .from(BBIEP)
                             .join(BCCP_MANIFEST).on(BBIEP.BASED_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
                             .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
-                            .join(DT).on(BCCP.BDT_ID.eq(DT.DT_ID))
+                            .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                            .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                             .where(BBIEP.BBIEP_ID.eq(ULong.valueOf(bbiepNode.getBbiepId())))
                             .fetchOne();
 
             detail.setBizTerm(rs.getValue(BBIEP.BIZ_TERM));
             detail.setRemark(rs.getValue(BBIEP.REMARK));
             detail.setBdtId(rs.getValue(BCCP.BDT_ID).toBigInteger());
-            detail.setBdtDen(rs.getValue(DT.DEN).replaceAll("_ ", " "));
+            detail.setBdtDen(rs.getValue(DT_MANIFEST.DEN).replaceAll("_ ", " "));
         } else {
             Record2<String, ULong> rs = dslContext.select(
-                    DT.DEN,
-                    BCCP.BDT_ID).from(BCCP)
-                    .join(DT).on(BCCP.BDT_ID.eq(DT.DT_ID))
-                    .where(BCCP.BCCP_ID.eq(ULong.valueOf(bbiepNode.getBbiepId()))).fetchOne();
-            detail.setBdtDen(rs.getValue(DT.DEN));
-            detail.setBdtId(rs.getValue(BCCP.BDT_ID).toBigInteger());
+                    DT_MANIFEST.DEN, DT_MANIFEST.DT_ID)
+                    .from(BBIEP)
+                    .join(BCCP_MANIFEST).on(BBIEP.BASED_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                    .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                    .where(BBIEP.BBIEP_ID.eq(ULong.valueOf(bbiepNode.getBbiepId()))).fetchOne();
+            detail.setBdtDen(rs.getValue(DT_MANIFEST.DEN));
+            detail.setBdtId(rs.getValue(DT_MANIFEST.DT_ID).toBigInteger());
         }
 
         if (bbiepNode.getBbieId().longValue() == 0L) {

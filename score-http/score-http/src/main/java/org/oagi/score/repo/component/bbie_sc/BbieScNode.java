@@ -40,15 +40,16 @@ public class BbieScNode {
         private String guid;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
-        private Integer minLength;
-        private Integer maxLength;
-        private String pattern;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private String remark;
         private String bizTerm;
         private String definition;
         private String defaultValue;
         private String fixedValue;
         private String example;
+        private Boolean deprecated;
 
         private BigInteger bdtScPriRestriId;
         private BigInteger codeListManifestId;

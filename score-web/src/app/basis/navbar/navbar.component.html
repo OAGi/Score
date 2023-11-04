@@ -1,6 +1,6 @@
-<mat-toolbar style="{{ 'background-color: ' + backgroundColor }}">
+<mat-toolbar [ngStyle]="{'background-color': webPageInfo.getUserRoleColorSet(userRole).background,
+                         'color': webPageInfo.getUserRoleColorSet(userRole).font}">
   <mat-toolbar-row>
-
     <a class="navbar-brand" routerLink="">
       <div [innerHTML]="brand"></div>
     </a>
@@ -21,6 +21,9 @@
         <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}">
           Express BIE
         </button>
+        <button *ngIf="!roles.includes('developer')" mat-menu-item routerLink="profile_bie/express/oas_doc" title="{{'BIE_NAV.OPENAPIDOC' | translate}}">
+          OpenAPI Document
+        </button>
         <button mat-menu-item routerLink="profile_bie/report" title="{{'BIE_NAV.REPORT' | translate}}">
           Reuse Report
         </button>
@@ -28,8 +31,9 @@
         <button mat-menu-item
                 [routerLink]="['/code_list']"
                 [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
-                [disabled] ='showTermsAndCodeListButton()'
-        >View/Edit Code List</button>
+                [disabled] ='showTermsAndCodeListButton()'>
+          View/Edit Code List
+        </button>
         <button mat-menu-item routerLink="code_list/uplift" [disabled]="roles.includes('developer') || showTermsAndCodeListButton()">Uplift Code List</button>
         <mat-divider *ngIf="isBusinessTermEnabled && !roles.includes('developer')"></mat-divider>
         <button *ngIf="isBusinessTermEnabled && !roles.includes('developer')" mat-menu-item routerLink="business_term_management/business_term"

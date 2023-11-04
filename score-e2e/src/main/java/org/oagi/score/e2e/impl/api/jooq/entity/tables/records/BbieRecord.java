@@ -544,11 +544,27 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     }
 
     /**
+     * Setter for <code>oagi.bbie.is_deprecated</code>. Indicates whether the
+     * BBIE is deprecated.
+     */
+    public void setIsDeprecated(Byte value) {
+        set(28, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbie.is_deprecated</code>. Indicates whether the
+     * BBIE is deprecated.
+     */
+    public Byte getIsDeprecated() {
+        return (Byte) get(28);
+    }
+
+    /**
      * Setter for <code>oagi.bbie.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(28, value);
+        set(29, value);
     }
 
     /**
@@ -556,7 +572,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(28);
+        return (ULong) get(29);
     }
 
     // -------------------------------------------------------------------------
@@ -582,7 +598,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
     /**
      * Create a detached, initialised BbieRecord
      */
-    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, ULong ownerTopLevelAsbiepId) {
+    public BbieRecord(ULong bbieId, String guid, ULong basedBccManifestId, String path, String hashPath, ULong fromAbieId, ULong toBbiepId, ULong bdtPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, Byte isNillable, String fixedValue, Byte isNull, String definition, String example, String remark, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, BigDecimal seqKey, Byte isUsed, Byte isDeprecated, ULong ownerTopLevelAsbiepId) {
         super(Bbie.BBIE);
 
         setBbieId(bbieId);
@@ -613,6 +629,7 @@ public class BbieRecord extends UpdatableRecordImpl<BbieRecord> {
         setLastUpdateTimestamp(lastUpdateTimestamp);
         setSeqKey(seqKey);
         setIsUsed(isUsed);
+        setIsDeprecated(isDeprecated);
         setOwnerTopLevelAsbiepId(ownerTopLevelAsbiepId);
         resetChangedOnNotNull();
     }

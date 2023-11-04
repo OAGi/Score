@@ -78,6 +78,7 @@ public class ASBIERepository implements ScoreRepository<ASBIE> {
                 Tables.ASBIE.CARDINALITY_MAX,
                 Tables.ASBIE.CARDINALITY_MIN,
                 Tables.ASBIE.IS_NILLABLE.as("nillable"),
+                Tables.ASBIE.IS_DEPRECATED.as("deprecated"),
                 Tables.ASBIE.IS_USED.as("used"),
                 Tables.ASBIE.REMARK,
                 Tables.ASBIE.CREATED_BY,

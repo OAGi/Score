@@ -46,15 +46,15 @@ export class MessageService {
       params = params.set('createEnd', '' + request.createdDate.end.getTime());
     }
 
-    return this.http.get<PageResponse<MessageList>>('/api/message_list', {params: params});
+    return this.http.get<PageResponse<MessageList>>('/api/message_list', {params});
   }
 
-  delete(...messageIds): Observable<any> {
-    if (messageIds.length === 1) {
-      return this.http.delete('/api/message/' + messageIds[0]);
+  delete(...messageIdList): Observable<any> {
+    if (messageIdList.length === 1) {
+      return this.http.delete('/api/message/' + messageIdList[0]);
     } else {
       return this.http.post<any>('/api/message/delete', {
-        messageIds: messageIds
+        messageIdList
       });
     }
   }

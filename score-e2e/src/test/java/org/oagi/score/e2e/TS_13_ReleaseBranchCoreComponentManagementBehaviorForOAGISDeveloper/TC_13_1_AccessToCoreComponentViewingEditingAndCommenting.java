@@ -21,6 +21,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.impl.PageHelper.invisibilityOfLoadingContainerElement;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends BaseTest {
@@ -602,6 +603,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             assertFalse(owner.isDeveloper());
             assertNotEquals(developerA.getAppUserId(), owner.getAppUserId());
             ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            invisibilityOfLoadingContainerElement(getDriver());
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(accExtension.getDen(), release.getReleaseNumber());
             assertTrue(acceptedStates.contains(accExtension.getState()));
             assertDisabled(accViewEditPage.getDefinitionField());

@@ -491,7 +491,7 @@ public class BusinessInformationEntityRepository {
                     TOP_LEVEL_ASBIEP.VERSION,
                     TOP_LEVEL_ASBIEP.STATUS,
                     ABIE.GUID,
-                    ASCCP.DEN,
+                    ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
@@ -505,7 +505,7 @@ public class BusinessInformationEntityRepository {
                     TOP_LEVEL_ASBIEP.SOURCE_ACTION,
                     TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP,
                     TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.as("source_release_id"),
-                    ASCCP.as("source_asccp").DEN.as("source_den"),
+                    ASCCP_MANIFEST.as("source_asccp_manifest").DEN.as("source_den"),
                     RELEASE.as("source_release").RELEASE_NUM.as("source_release_num")));
         }
 
@@ -515,7 +515,7 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
@@ -693,9 +693,9 @@ public class BusinessInformationEntityRepository {
 
                     case "den":
                         if ("asc".equals(direction)) {
-                            sortField = ASCCP.DEN.asc();
+                            sortField = ASCCP_MANIFEST.DEN.asc();
                         } else if ("desc".equals(direction)) {
-                            sortField = ASCCP.DEN.desc();
+                            sortField = ASCCP_MANIFEST.DEN.desc();
                         }
                         break;
 
@@ -896,13 +896,13 @@ public class BusinessInformationEntityRepository {
     public SelectOrderByStep getAsbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(ASCC.DEN.contains(arguments.getDen()));
+            conditions.add(ASCC_MANIFEST.DEN.contains(arguments.getDen()));
         }
         return dslContext.select(
                         inline("ASBIE").as("type"),
                         ASBIE.ASBIE_ID.as("bieId"),
                         ASBIE.GUID,
-                        ASCC.DEN,
+                        ASCC_MANIFEST.DEN,
                         TOP_LEVEL_ASBIEP.STATE,
                         TOP_LEVEL_ASBIEP.VERSION,
                         TOP_LEVEL_ASBIEP.STATUS,
@@ -945,13 +945,13 @@ public class BusinessInformationEntityRepository {
     public SelectOrderByStep getBbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(BCC.DEN.contains(arguments.getDen()));
+            conditions.add(BCC_MANIFEST.DEN.contains(arguments.getDen()));
         }
         return dslContext.select(
                         inline("BBIE").as("type"),
                         BBIE.BBIE_ID.as("bieId"),
                         BBIE.GUID,
-                        BCC.DEN,
+                        BCC_MANIFEST.DEN,
                         TOP_LEVEL_ASBIEP.STATE,
                         TOP_LEVEL_ASBIEP.VERSION,
                         TOP_LEVEL_ASBIEP.STATUS,

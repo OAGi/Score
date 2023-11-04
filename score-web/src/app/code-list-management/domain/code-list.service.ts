@@ -1,13 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {
-  CodeList,
-  CodeListForList,
-  CodeListForListRequest,
-  GetSimpleAgencyIdListValuesResponse,
-  SimpleAgencyIdListValue
-} from './code-list';
+import {CodeList, CodeListForList, CodeListForListRequest, GetSimpleAgencyIdListValuesResponse} from './code-list';
 import {PageResponse} from '../../basis/basis';
 import {CcCreateResponse, Comment} from '../../cc-management/domain/core-component-node';
 
@@ -206,7 +200,7 @@ export class CodeListService {
 
   uplift(codeList: CodeListForList, targetReleaseId: number): Observable<any> {
     return this.http.post<any>('/api/code_list/' + codeList.codeListManifestId + '/uplift', {
-      targetReleaseId: targetReleaseId
+      targetReleaseId
     });
   }
 }

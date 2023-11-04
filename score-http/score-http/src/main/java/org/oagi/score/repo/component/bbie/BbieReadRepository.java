@@ -63,7 +63,11 @@ public class BbieReadRepository {
         bcc.setGuid(bccRecord.getGuid());
         bcc.setCardinalityMin(bccRecord.getCardinalityMin());
         bcc.setCardinalityMax(bccRecord.getCardinalityMax());
-        bcc.setDen(bccRecord.getDen());
+        String den = dslContext.select(BCC_MANIFEST.DEN)
+                .from(BCC_MANIFEST)
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
+                .fetchOneInto(String.class);
+        bcc.setDen(den);
         bcc.setDefinition(bccRecord.getDefinition());
         bcc.setState(CcState.valueOf(bccRecord.getState()));
         if (bccRecord.getDefaultValue() != null || bccRecord.getFixedValue() != null) {
@@ -180,18 +184,19 @@ public class BbieReadRepository {
             bbie.setCardinalityMin(bbieRecord.getCardinalityMin());
             bbie.setCardinalityMax(bbieRecord.getCardinalityMax());
             if (bbieRecord.getFacetMinLength() != null) {
-                bbie.setMinLength(bbieRecord.getFacetMinLength().intValue());
+                bbie.setFacetMinLength(bbieRecord.getFacetMinLength().toBigInteger());
             }
             if (bbieRecord.getFacetMaxLength() != null) {
-                bbie.setMaxLength(bbieRecord.getFacetMaxLength().intValue());
+                bbie.setFacetMaxLength(bbieRecord.getFacetMaxLength().toBigInteger());
             }
-            bbie.setPattern(bbieRecord.getFacetPattern());
+            bbie.setFacetPattern(bbieRecord.getFacetPattern());
             bbie.setNillable(bbieRecord.getIsNillable() == 1);
             bbie.setRemark(bbieRecord.getRemark());
             bbie.setDefinition(bbieRecord.getDefinition());
             bbie.setDefaultValue(bbieRecord.getDefaultValue());
             bbie.setFixedValue(bbieRecord.getFixedValue());
             bbie.setExample(bbieRecord.getExample());
+            bbie.setDeprecated(bbieRecord.getIsDeprecated() == 1);
 
             bbie.setBdtPriRestriId((bbieRecord.getBdtPriRestriId() != null) ?
                     bbieRecord.getBdtPriRestriId().toBigInteger() : null);
@@ -207,7 +212,8 @@ public class BbieReadRepository {
     public List<BieEditUsed> getUsedBbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE.IS_USED, BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID,
                         BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
-                        BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX)
+                        BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX,
+                        BBIE.IS_DEPRECATED)
                 .from(BBIE)
                 .join(BBIEP).on(and(
                         BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID),
@@ -224,6 +230,7 @@ public class BbieReadRepository {
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     bieEditUsed.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
+                    bieEditUsed.setDeprecated(record.get(BBIE.IS_DEPRECATED) == 1);
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

@@ -614,7 +614,6 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             click(elementToBeClickable(getDriver(), By.xpath(
                     "//score-confirm-dialog//span[contains(text(), \"Delete anyway\")]//ancestor::button[1]")));
         });
-        invisibilityOfLoadingContainerElement(getDriver());
         assert "Deleted".equals(getSnackBarMessage(getDriver()));
 
     }

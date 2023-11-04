@@ -75,19 +75,35 @@ public class CcListService {
     public PageResponse<CcList> getCcList(CcListRequest request) {
         request.setUsernameMap(userRepository.getUsernameMap());
         PageResponse<CcList> response = repository.getCcList(request);
-        Map<Pair<CcType, BigInteger>, List<ShortTag>> tags =
-                tagService.getShortTagsByPairsOfTypeAndManifestId(response.getList().stream()
+        Map<Pair<CcType, BigInteger>, List<ShortTag>> tags = tagService
+                .getShortTagsByPairsOfTypeAndManifestId(response.getList().stream()
                         .map(e -> Pair.of(e.getType(), e.getManifestId())).collect(Collectors.toList()));
         response.getList().forEach(ccList -> {
             ccList.setTagList(
-                    tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList())
-            );
+                    tags.getOrDefault(Pair.of(ccList.getType(), ccList.getManifestId()), Collections.emptyList()));
+        });
+        return response;
+    }
+
+    public PageResponse<CcList> getCcListWithLastUpdatedAndSince(CcListRequest request) {
+        PageResponse<CcList> response = getCcList(request);
+        Map<String, String> lastUpdatedReleaseMap = repository.getLastUpdatedRelease();
+        Map<String, String> sinceReleaseMap = repository.getSinceRelease();
+        response.getList().forEach(ccList -> {
+            if (ccList.getType().equals(CcType.ASCCP)) {
+                String lastChangedReleaseNum = lastUpdatedReleaseMap.get(ccList.getDen());
+                ccList.setLastChangedReleaseNum(lastChangedReleaseNum);
+                String sinceReleaseNum = sinceReleaseMap.get(ccList.getDen());
+                ccList.setSinceReleaseNum(sinceReleaseNum);
+            }
+
         });
         return response;
     }
 
     public CcChangesResponse getCcChanges(ScoreUser requester, BigInteger releaseId) {
-        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester, ULong.valueOf(releaseId));
+        Collection<CcChangesResponse.CcChange> changeList = repository.getCcChanges(requester,
+                ULong.valueOf(releaseId));
         CcChangesResponse response = new CcChangesResponse();
         response.addCcChangeList(changeList);
         return response;
@@ -106,7 +122,8 @@ public class CcListService {
     }
 
     @Transactional
-    public void transferOwnership(AuthenticatedPrincipal user, String type, BigInteger manifestId, String targetLoginId) {
+    public void transferOwnership(AuthenticatedPrincipal user, String type, BigInteger manifestId,
+            String targetLoginId) {
         AppUser targetUser = sessionService.getAppUserByUsername(targetLoginId);
         if (targetUser == null) {
             throw new IllegalArgumentException("Not found a target user.");
@@ -164,8 +181,7 @@ public class CcListService {
                 .where(and(
                         ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
                         ACC_MANIFEST.RELEASE_ID.notEqual(ULong.valueOf(workingRelease.getReleaseId())),
-                        ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))
-                ))
+                        ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))))
                 .fetchInto(ULong.class);
 
         byte isUsed = (byte) 0;
@@ -184,8 +200,8 @@ public class CcListService {
                 APP_USER.as("updater").LOGIN_ID,
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.STATE,
-                ASCCP.as("bie").DEN,
-                ASCCP.DEN,
+                ASCCP_MANIFEST.as("bie_manifest").DEN,
+                ASCCP_MANIFEST.DEN,
                 ASBIE.SEQ_KEY)
                 .from(ASCC)
                 .join(ASCC_MANIFEST).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
@@ -193,13 +209,14 @@ public class CcListService {
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(ASBIE).on(and(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ASBIE.BASED_ASCC_MANIFEST_ID), ASBIE.IS_USED.eq(isUsed)))
+                .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(TOP_LEVEL_ASBIEP).on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
-                .join(ASCCP_MANIFEST).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASBIEP.BASED_ASCCP_MANIFEST_ID))
-                .join(ASCCP.as("bie")).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
+                .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASBIEP.BASED_ASCCP_MANIFEST_ID))
+                .join(ASCCP.as("bie")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
@@ -217,8 +234,8 @@ public class CcListService {
                     item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).toBigInteger());
                     item.setTopLevelAsbiepId(e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
-                    item.setDen(e.get(ASCCP.as("bie").DEN));
-                    item.setAssociationDen(e.get(ASCCP.DEN));
+                    item.setDen(e.get(ASCCP_MANIFEST.as("bie_manifest").DEN));
+                    item.setAssociationDen(e.get(ASCCP_MANIFEST.DEN));
                     item.setSeqKey(e.get(ASBIE.SEQ_KEY).intValue());
                     return item;
                 }).collect(Collectors.toList());
@@ -237,8 +254,8 @@ public class CcListService {
                 APP_USER.as("updater").LOGIN_ID,
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.STATE,
-                ASCCP.as("bie").DEN,
-                BCCP.DEN,
+                ASCCP_MANIFEST.as("bie_manifest").DEN,
+                BCCP_MANIFEST.DEN,
                 BBIE.SEQ_KEY)
                 .from(BCC)
                 .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
@@ -246,13 +263,14 @@ public class CcListService {
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
                 .join(BBIE).on(and(BCC_MANIFEST.BCC_MANIFEST_ID.eq(BBIE.BASED_BCC_MANIFEST_ID), BBIE.IS_USED.eq(isUsed)))
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
                 .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(TOP_LEVEL_ASBIEP).on(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
-                .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
-                .join(ASCCP.as("bie")).on(ASCCP.as("bie").ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("bie_manifest").ASCCP_MANIFEST_ID))
+                .join(ASCCP.as("bie")).on(ASCCP.as("bie").ASCCP_ID.eq(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID))
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
@@ -270,8 +288,8 @@ public class CcListService {
                     item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).toBigInteger());
                     item.setTopLevelAsbiepId(e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
-                    item.setDen(e.get(ASCCP.as("bie").DEN));
-                    item.setAssociationDen(e.get(BCCP.DEN));
+                    item.setDen(e.get(ASCCP_MANIFEST.as("bie_manifest").DEN));
+                    item.setAssociationDen(e.get(BCCP_MANIFEST.DEN));
                     item.setSeqKey(e.get(BBIE.SEQ_KEY).intValue());
                     return item;
                 }).collect(Collectors.toList());
@@ -376,4 +394,3 @@ public class CcListService {
         });
     }
 }
-

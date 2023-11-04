@@ -14,13 +14,14 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {SimpleRelease} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {AuthService} from '../../authentication/auth.service';
 import {AsbieBbieList, BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {UserToken} from '../../authentication/domain/auth';
 import {BusinessTermService} from '../domain/business-term.service';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-create-bie',
@@ -35,6 +36,7 @@ import {BusinessTermService} from '../domain/business-term.service';
   ],
 })
 export class AssignBusinessTermBieComponent implements OnInit {
+
   title = 'Assign Business Term';
   subtitle = 'Select BIE';
 
@@ -71,7 +73,8 @@ export class AssignBusinessTermBieComponent implements OnInit {
               private auth: AuthService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {

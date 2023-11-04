@@ -17,6 +17,7 @@ import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {Verb} from '../../domain/core-component-node';
+import {WebPageInfoService} from '../../../basis/basis.service';
 
 @Component({
   selector: 'score-create-verb-dialog',
@@ -61,6 +62,7 @@ export class CreateVerbDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<CcListComponent>,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private confirmDialogService: ConfirmDialogService) {
   }

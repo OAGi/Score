@@ -22,7 +22,6 @@ import java.util.Date;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqReleaseReadRepository
         extends JooqScoreRepository

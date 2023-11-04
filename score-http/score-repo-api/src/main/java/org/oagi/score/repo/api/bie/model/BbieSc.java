@@ -2,6 +2,7 @@ package org.oagi.score.repo.api.bie.model;
 
 import org.oagi.score.repo.api.base.Auditable;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class BbieSc extends Auditable {
@@ -27,6 +28,9 @@ public class BbieSc extends Auditable {
     private String defaultValue;
 
     private String fixedValue;
+    private BigInteger facetMinLength;
+    private BigInteger facetMaxLength;
+    private String facetPattern;
 
     private int cardinalityMin;
 
@@ -41,6 +45,8 @@ public class BbieSc extends Auditable {
     private String bizTerm;
 
     private String example;
+
+    private boolean deprecated;
 
     private boolean used;
 
@@ -134,6 +140,30 @@ public class BbieSc extends Auditable {
         this.fixedValue = fixedValue;
     }
 
+    public BigInteger getFacetMinLength() {
+        return facetMinLength;
+    }
+
+    public void setFacetMinLength(BigInteger facetMinLength) {
+        this.facetMinLength = facetMinLength;
+    }
+
+    public BigInteger getFacetMaxLength() {
+        return facetMaxLength;
+    }
+
+    public void setFacetMaxLength(BigInteger facetMaxLength) {
+        this.facetMaxLength = facetMaxLength;
+    }
+
+    public String getFacetPattern() {
+        return facetPattern;
+    }
+
+    public void setFacetPattern(String facetPattern) {
+        this.facetPattern = facetPattern;
+    }
+
     public int getCardinalityMin() {
         return cardinalityMin;
     }
@@ -188,6 +218,14 @@ public class BbieSc extends Auditable {
 
     public void setExample(String example) {
         this.example = example;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public boolean isUsed() {

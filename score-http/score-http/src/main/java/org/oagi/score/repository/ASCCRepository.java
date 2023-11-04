@@ -5,13 +5,11 @@ import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ASCC;
-import org.oagi.score.data.BCCP;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +33,7 @@ public class ASCCRepository implements ScoreRepository<ASCC> {
                 Tables.ASCC.SEQ_KEY,
                 Tables.ASCC.FROM_ACC_ID,
                 Tables.ASCC.TO_ASCCP_ID,
-                Tables.ASCC.DEN,
+                Tables.ASCC_MANIFEST.DEN,
                 Tables.ASCC.DEFINITION,
                 Tables.ASCC.DEFINITION_SOURCE,
                 Tables.ASCC.CREATED_BY,

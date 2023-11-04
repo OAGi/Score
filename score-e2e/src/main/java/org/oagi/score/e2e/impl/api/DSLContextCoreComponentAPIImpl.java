@@ -40,6 +40,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ACC_MANIFEST.ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.RELEASE_ID);
+        fields.add(ACC_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ACC.fields()));
         return dslContext.select(fields)
                 .from(ACC_MANIFEST)
@@ -55,13 +56,14 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ACC_MANIFEST.ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.RELEASE_ID);
+        fields.add(ACC_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ACC.fields()));
         return dslContext.select(fields)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .where(and(
                         ACC_MANIFEST.RELEASE_ID.eq(releaseId),
-                        ACC.DEN.eq(den)))
+                        ACC_MANIFEST.DEN.eq(den)))
                 .fetchOne(record -> accMapper(record));
     }
 
@@ -72,7 +74,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setAccId(record.get(ACC.ACC_ID).toBigInteger());
         acc.setGuid(record.get(ACC.GUID));
         acc.setObjectClassTerm(record.get(ACC.OBJECT_CLASS_TERM));
-        acc.setDen(record.get(ACC.DEN));
+        acc.setDen(record.get(ACC_MANIFEST.DEN));
         acc.setDefinition(record.get(ACC.DEFINITION));
         acc.setDefinitionSource(record.get(ACC.DEFINITION_SOURCE));
         if (record.get(ACC.NAMESPACE_ID) != null) {
@@ -81,7 +83,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         acc.setAbstract(record.get(ACC.IS_ABSTRACT) == 1);
         acc.setDeprecated(record.get(ACC.IS_DEPRECATED) == 1);
         acc.setState(record.get(ACC.STATE));
-        String den = record.get(ACC.DEN);
+        String den = record.get(ACC_MANIFEST.DEN);
         if (den.contains("User Extension Group")) {
             acc.setLocalExtension(true);
         }
@@ -99,6 +101,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.RELEASE_ID);
+        fields.add(ASCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ASCCP.fields()));
         return dslContext.select(fields)
                 .from(ASCCP_MANIFEST)
@@ -114,13 +117,14 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.RELEASE_ID);
+        fields.add(ASCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(ASCCP.fields()));
         return dslContext.select(fields)
                 .from(ASCCP_MANIFEST)
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .where(and(
                         ASCCP_MANIFEST.RELEASE_ID.eq(releaseId),
-                        ASCCP.DEN.eq(den)))
+                        ASCCP_MANIFEST.DEN.eq(den)))
                 .fetchOne(record -> asccpMapper(record));
     }
 
@@ -131,7 +135,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccp.setAsccpId(record.get(ASCCP.ASCCP_ID).toBigInteger());
         asccp.setGuid(record.get(ASCCP.GUID));
         asccp.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
-        asccp.setDen(record.get(ASCCP.DEN));
+        asccp.setDen(record.get(ASCCP_MANIFEST.DEN));
         asccp.setDefinition(record.get(ASCCP.DEFINITION));
         asccp.setDefinitionSource(record.get(ASCCP.DEFINITION_SOURCE));
         asccp.setRoleOfAccManifestId(record.get(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID).toBigInteger());
@@ -154,6 +158,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(BCCP_MANIFEST.BCCP_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.BDT_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.RELEASE_ID);
+        fields.add(BCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(BCCP.fields()));
         return dslContext.select(fields)
                 .from(BCCP_MANIFEST)
@@ -169,13 +174,14 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(BCCP_MANIFEST.BCCP_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.BDT_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.RELEASE_ID);
+        fields.add(BCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(BCCP.fields()));
         return dslContext.select(fields)
                 .from(BCCP_MANIFEST)
                 .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                 .where(and(
                         BCCP_MANIFEST.RELEASE_ID.eq(releaseId),
-                        BCCP.DEN.eq(den)))
+                        BCCP_MANIFEST.DEN.eq(den)))
                 .fetchOne(record -> bccpMapper(record));
     }
 
@@ -187,7 +193,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccp.setGuid(record.get(BCCP.GUID));
         bccp.setPropertyTerm(record.get(BCCP.PROPERTY_TERM));
         bccp.setRepresentationTerm(record.get(BCCP.REPRESENTATION_TERM));
-        bccp.setDen(record.get(BCCP.DEN));
+        bccp.setDen(record.get(BCCP_MANIFEST.DEN));
         bccp.setDefinition(record.get(BCCP.DEFINITION));
         bccp.setDefinitionSource(record.get(BCCP.DEFINITION_SOURCE));
         if (record.get(BCCP.NAMESPACE_ID) != null) {
@@ -215,6 +221,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -222,7 +229,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .where(and(
                         DT_MANIFEST.BASED_DT_MANIFEST_ID.isNull(),
                         DT_MANIFEST.RELEASE_ID.eq(releaseId),
-                        DT.DEN.eq(den)))
+                        DT_MANIFEST.DEN.eq(den)))
                 .fetchOne(record -> dtMapper(record));
     }
 
@@ -238,6 +245,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -256,6 +264,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -263,7 +272,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .where(and(
                         DT_MANIFEST.BASED_DT_MANIFEST_ID.isNotNull(),
                         DT_MANIFEST.RELEASE_ID.eq(releaseId),
-                        DT.DEN.eq(den)))
+                        DT_MANIFEST.DEN.eq(den)))
                 .fetch(record -> dtMapper(record));
     }
 
@@ -272,6 +281,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -301,7 +311,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
             accRecord.setType("Default");
         }
         accRecord.setObjectClassTerm(acc.getObjectClassTerm());
-        accRecord.setDen(acc.getDen());
         accRecord.setDefinition(acc.getDefinition());
         accRecord.setDefinitionSource(acc.getDefinitionSource());
         accRecord.setNamespaceId(ULong.valueOf(acc.getNamespaceId()));
@@ -343,6 +352,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         if (basedAcc != null) {
             accManifestRecord.setBasedAccManifestId(ULong.valueOf(basedAcc.getAccManifestId()));
         }
+        accManifestRecord.setDen(acc.getDen());
         accManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
         accManifestRecord.setAccId(accId);
         accManifestRecord.setLogId(logId);
@@ -399,13 +409,14 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         RELEASE.RELEASE_NUM.eq(branch),
-                        DT.DEN.eq(den)))
+                        DT_MANIFEST.DEN.eq(den)))
                 .fetchOneInto(ULong.class);
         ULong releaseId = getReleaseIdByReleaseNum(branch);
         List<Field<?>> fields = new ArrayList();
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)
@@ -428,6 +439,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(BCCP_MANIFEST.BCCP_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.BDT_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.RELEASE_ID);
+        fields.add(BCCP_MANIFEST.DEN);
         fields.addAll(Arrays.asList(BCCP.fields()));
         return dslContext.select(fields)
                 .from(BCCP_MANIFEST)
@@ -457,7 +469,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
             asccpRecord.setType("Default");
         }
         asccpRecord.setPropertyTerm(asccp.getPropertyTerm());
-        asccpRecord.setDen(asccp.getDen());
         asccpRecord.setDefinition(asccp.getDefinition());
         asccpRecord.setDefinitionSource(asccp.getDefinitionSource());
         asccpRecord.setNamespaceId(ULong.valueOf(asccp.getNamespaceId()));
@@ -495,6 +506,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccpManifestRecord.setReleaseId(ULong.valueOf(roleOfAcc.getReleaseId()));
         asccpManifestRecord.setRoleOfAccManifestId(ULong.valueOf(roleOfAcc.getAccManifestId()));
         asccpManifestRecord.setAsccpId(asccpId);
+        asccpManifestRecord.setDen(asccp.getDen());
         asccpManifestRecord.setLogId(logId);
 
         ULong asccpManifestId = dslContext.insertInto(ASCCP_MANIFEST)
@@ -547,7 +559,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccpRecord.setPropertyTerm(bccp.getPropertyTerm());
         bccpRecord.setRepresentationTerm(bccp.getRepresentationTerm());
         bccpRecord.setBdtId(ULong.valueOf(bccp.getBdtId()));
-        bccpRecord.setDen(bccp.getDen());
         bccpRecord.setDefinition(bccp.getDefinition());
         bccpRecord.setDefinitionSource(bccp.getDefinitionSource());
         bccpRecord.setDefaultValue(bccp.getDefaultValue());
@@ -587,6 +598,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
         bccpManifestRecord.setReleaseId(ULong.valueOf(dataType.getReleaseId()));
         bccpManifestRecord.setBccpId(bccpId);
+        bccpManifestRecord.setDen(bccp.getDen());
         bccpManifestRecord.setLogId(logId);
         bccpManifestRecord.setBdtManifestId(ULong.valueOf(dataType.getDtManifestId()));
 
@@ -646,7 +658,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dtRecord.setDataTypeTerm(bdt.getDataTypeTerm());
         dtRecord.setRepresentationTerm(bdt.getRepresentationTerm());
         dtRecord.setBasedDtId(ULong.valueOf(bdt.getBasedDtId()));
-        dtRecord.setDen(bdt.getDen());
         dtRecord.setQualifier_(bdt.getQualifier());
         dtRecord.setDefinition(bdt.getDefinition());
         dtRecord.setDefinitionSource(bdt.getDefinitionSource());
@@ -684,6 +695,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
         bdtManifestRecord.setReleaseId(ULong.valueOf(bdt.getReleaseId()));
         bdtManifestRecord.setDtId(bdtId);
+        bdtManifestRecord.setDen(bdt.getDen());
         bdtManifestRecord.setLogId(logId);
         bdtManifestRecord.setBasedDtManifestId(ULong.valueOf(baseDataType.getDtManifestId()));
 
@@ -845,7 +857,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         accRecord.setGuid(acc.getGuid());
         accRecord.setType("Default");
         accRecord.setObjectClassTerm(acc.getObjectClassTerm());
-        accRecord.setDen(acc.getDen());
         accRecord.setDefinition(acc.getDefinition());
         accRecord.setDefinitionSource(acc.getDefinitionSource());
         accRecord.setOagisComponentType(acc.getComponentType().getValue());
@@ -889,6 +900,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         AccManifestRecord accManifestRecord = new AccManifestRecord();
         accManifestRecord.setReleaseId(ULong.valueOf(release.getReleaseId()));
         accManifestRecord.setAccId(accId);
+        accManifestRecord.setDen(acc.getDen());
         accManifestRecord.setLogId(logId);
         accManifestRecord.setPrevAccManifestId(ULong.valueOf(prevAcc.getAccManifestId()));
 
@@ -934,7 +946,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccpRecord.setGuid(asccp.getGuid());
         asccpRecord.setType("Default");
         asccpRecord.setPropertyTerm(asccp.getPropertyTerm());
-        asccpRecord.setDen(asccp.getDen());
         asccpRecord.setDefinition(asccp.getDefinition());
         asccpRecord.setDefinitionSource(asccp.getDefinitionSource());
         asccpRecord.setNamespaceId(ULong.valueOf(asccp.getNamespaceId()));
@@ -972,6 +983,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccpManifestRecord.setReleaseId(ULong.valueOf(roleOfAcc.getReleaseId()));
         asccpManifestRecord.setRoleOfAccManifestId(ULong.valueOf(roleOfAcc.getAccManifestId()));
         asccpManifestRecord.setAsccpId(asccpId);
+        asccpManifestRecord.setDen(asccp.getDen());
         asccpManifestRecord.setLogId(logId);
         asccpManifestRecord.setPrevAsccpManifestId(ULong.valueOf(prevAsccp.getAsccpManifestId()));
 
@@ -1022,7 +1034,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccpRecord.setPropertyTerm(bccp.getPropertyTerm());
         bccpRecord.setRepresentationTerm(bccp.getRepresentationTerm());
         bccpRecord.setBdtId(ULong.valueOf(bccp.getBdtId()));
-        bccpRecord.setDen(bccp.getDen());
         bccpRecord.setDefinition(bccp.getDefinition());
         bccpRecord.setDefinitionSource(bccp.getDefinitionSource());
         bccpRecord.setNamespaceId(ULong.valueOf(bccp.getNamespaceId()));
@@ -1060,6 +1071,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
 
         bccpManifestRecord.setReleaseId(ULong.valueOf(dataType.getReleaseId()));
         bccpManifestRecord.setBccpId(bccpId);
+        bccpManifestRecord.setDen(bccp.getDen());
         bccpManifestRecord.setLogId(logId);
         bccpManifestRecord.setBdtManifestId(ULong.valueOf(dataType.getDtManifestId()));
 
@@ -1076,7 +1088,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     public void updateACC(ACCObject acc) {
         dslContext.update(ACC)
                 .set(ACC.OBJECT_CLASS_TERM, acc.getObjectClassTerm())
-                .set(ACC.DEN, acc.getObjectClassTerm() + ". Details")
                 .set(ACC.DEFINITION, acc.getDefinition())
                 .set(ACC.DEFINITION_SOURCE, acc.getDefinitionSource())
                 .set(ACC.NAMESPACE_ID, ULong.valueOf(acc.getNamespaceId()))
@@ -1087,6 +1098,11 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .set(ACC.CREATION_TIMESTAMP, acc.getCreationTimestamp())
                 .set(ACC.LAST_UPDATE_TIMESTAMP, acc.getLastUpdateTimestamp())
                 .where(ACC.ACC_ID.eq(ULong.valueOf(acc.getAccId())))
+                .execute();
+
+        dslContext.update(ACC_MANIFEST)
+                .set(ACC_MANIFEST.DEN, acc.getObjectClassTerm() + ". Details")
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(acc.getAccManifestId())))
                 .execute();
     }
 
@@ -1138,7 +1154,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         asccRecord.setCardinalityMax(ascc.getCardinalityMax());
         asccRecord.setFromAccId(ULong.valueOf(fromAcc.getAccId()));
         asccRecord.setToAsccpId(ULong.valueOf(toAsccp.getAsccpId()));
-        asccRecord.setDen(ascc.getDen());
         asccRecord.setDefinition(ascc.getDefinition());
         asccRecord.setDefinitionSource(ascc.getDefinitionSource());
         asccRecord.setIsDeprecated((byte) (ascc.isDeprecated() ? 1 : 0));
@@ -1158,6 +1173,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         AsccManifestRecord asccManifestRecord = new AsccManifestRecord();
         asccManifestRecord.setReleaseId(ULong.valueOf(fromAcc.getReleaseId()));
         asccManifestRecord.setAsccId(asccId);
+        asccManifestRecord.setDen(ascc.getDen());
         asccManifestRecord.setFromAccManifestId(ULong.valueOf(fromAcc.getAccManifestId()));
         asccManifestRecord.setToAsccpManifestId(ULong.valueOf(toAsccp.getAsccpManifestId()));
 
@@ -1308,7 +1324,6 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         bccRecord.setCardinalityMax(bcc.getCardinalityMax());
         bccRecord.setFromAccId(ULong.valueOf(fromAcc.getAccId()));
         bccRecord.setToBccpId(ULong.valueOf(toBccp.getBccpId()));
-        bccRecord.setDen(bcc.getDen());
         bccRecord.setDefinition(bcc.getDefinition());
         bccRecord.setDefinitionSource(bcc.getDefinitionSource());
         bccRecord.setEntityType(bcc.isAttribute() ? 0 : 1);
@@ -1332,6 +1347,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         BccManifestRecord bccManifestRecord = new BccManifestRecord();
         bccManifestRecord.setReleaseId(ULong.valueOf(fromAcc.getReleaseId()));
         bccManifestRecord.setBccId(bccId);
+        bccManifestRecord.setDen(bcc.getDen());
         bccManifestRecord.setFromAccManifestId(ULong.valueOf(fromAcc.getAccManifestId()));
         bccManifestRecord.setToBccpManifestId(ULong.valueOf(toBccp.getBccpManifestId()));
 
@@ -1521,7 +1537,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dt.setDataTypeTerm(record.get(DT.DATA_TYPE_TERM));
         dt.setRepresentationTerm(record.get(DT.REPRESENTATION_TERM));
         dt.setQualifier(record.get(DT.QUALIFIER));
-        dt.setDen(record.get(DT.DEN));
+        dt.setDen(record.get(DT_MANIFEST.DEN));
         dt.setDefinition(record.get(DT.DEFINITION));
         dt.setDefinitionSource(record.get(DT.DEFINITION_SOURCE));
         if (record.get(DT.NAMESPACE_ID) != null) {
@@ -1631,6 +1647,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.RELEASE_ID);
+        fields.add(DT_MANIFEST.DEN);
         fields.addAll(Arrays.asList(DT.fields()));
         return dslContext.select(fields)
                 .from(DT_MANIFEST)

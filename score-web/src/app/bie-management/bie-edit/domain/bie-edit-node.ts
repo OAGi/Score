@@ -10,6 +10,7 @@ import {
   ChangeListener
 } from '../../domain/bie-flat-tree';
 import {hashCode4String} from '../../../common/utility';
+import {BieForOasDoc} from '../../bie-express/bie-express.openapi30/domain/openapi-doc';
 
 export class BieEditNode {
   ccManifestId: number;
@@ -94,6 +95,8 @@ export class BieEditAbieNode extends BieEditNode {
   topLevelAsbiepState: string;
   inverseMode: boolean;
 
+  bieForOasDoc: BieForOasDoc;
+
   constructor(obj?: BieEditNode) {
     super(obj);
 
@@ -109,11 +112,13 @@ export class BieEditAbieNode extends BieEditNode {
       this.access = abie.access;
       this.topLevelAsbiepState = abie.topLevelAsbiepState;
       this.inverseMode = abie.inverseMode;
+
+      this.bieForOasDoc = new BieForOasDoc(abie.bieForOasDoc);
     }
   }
 
   get hashCode(): number {
-    return super.hashCode + ((this.inverseMode) ? 1 : 0);
+    return super.hashCode + ((this.inverseMode) ? 1 : 0) + ((!!this.bieForOasDoc) ? this.bieForOasDoc.hashCode : 0);
   }
 }
 
@@ -254,7 +259,8 @@ export class BieDetailUpdateRequest {
       topLevelAsbiepDetail: this.topLevelAsbiepDetail ? {
         version: this.topLevelAsbiepDetail.version,
         status: this.topLevelAsbiepDetail.status,
-        inverseMode: this.topLevelAsbiepDetail.inverseMode
+        inverseMode: this.topLevelAsbiepDetail.inverseMode,
+        bieForOasDoc: this.topLevelAsbiepDetail.bieForOasDoc.json
       } : {},
       abieDetails: this.abieDetails.map(e => e.json),
       asbieDetails: this.asbieDetails.map(e => e.json),
@@ -285,6 +291,7 @@ export class UsedBie {
   ownerTopLevelAsbiepId: number;
   cardinalityMin: number;
   cardinalityMax: number;
+  deprecated: boolean;
 
   constructor(obj) {
     this.used = obj && obj.used;
@@ -295,6 +302,7 @@ export class UsedBie {
     this.ownerTopLevelAsbiepId = obj && obj.ownerTopLevelAsbiepId || 0;
     this.cardinalityMin = obj && obj.cardinalityMin || 0;
     this.cardinalityMax = obj && obj.cardinalityMax || 0;
+    this.deprecated = obj && obj.deprecated || false;
   }
 }
 

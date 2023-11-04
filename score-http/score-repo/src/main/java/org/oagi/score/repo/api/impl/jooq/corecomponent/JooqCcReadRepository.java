@@ -1,7 +1,7 @@
 package org.oagi.score.repo.api.impl.jooq.corecomponent;
 
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.corecomponent.CcReadRepository;
@@ -12,7 +12,6 @@ import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 
-import javax.print.DocFlavor;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
@@ -22,7 +21,6 @@ import java.util.stream.Stream;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 public class JooqCcReadRepository
         extends JooqScoreRepository
@@ -361,7 +359,6 @@ public class JooqCcReadRepository
                 ACC.GUID,
                 ACC.TYPE,
                 ACC.OBJECT_CLASS_TERM,
-                ACC.DEN,
                 ACC.DEFINITION,
                 ACC.DEFINITION_SOURCE,
                 ACC.OBJECT_CLASS_QUALIFIER,
@@ -399,7 +396,6 @@ public class JooqCcReadRepository
             acc.setGuid(record.get(ACC.GUID));
             acc.setType(record.get(ACC.TYPE));
             acc.setObjectClassTerm(record.get(ACC.OBJECT_CLASS_TERM));
-            acc.setDen(record.get(ACC.DEN));
             acc.setDefinition(record.get(ACC.DEFINITION));
             acc.setDefinitionSource(record.get(ACC.DEFINITION_SOURCE));
             acc.setObjectClassQualifier(record.get(ACC.OBJECT_CLASS_QUALIFIER));
@@ -470,7 +466,6 @@ public class JooqCcReadRepository
                 ASCC.GUID,
                 ASCC.CARDINALITY_MIN,
                 ASCC.CARDINALITY_MAX,
-                ASCC.DEN,
                 ASCC.DEFINITION,
                 ASCC.DEFINITION_SOURCE,
                 ASCC.IS_DEPRECATED,
@@ -486,7 +481,6 @@ public class JooqCcReadRepository
             ascc.setGuid(record.get(ASCC.GUID));
             ascc.setCardinalityMin(record.get(ASCC.CARDINALITY_MIN));
             ascc.setCardinalityMax(record.get(ASCC.CARDINALITY_MAX));
-            ascc.setDen(record.get(ASCC.DEN));
             ascc.setDefinition(record.get(ASCC.DEFINITION));
             ascc.setDefinitionSource(record.get(ASCC.DEFINITION_SOURCE));
             ascc.setDeprecated((byte) 1 == record.get(ASCC.IS_DEPRECATED));
@@ -507,7 +501,6 @@ public class JooqCcReadRepository
                 BCC.CARDINALITY_MIN,
                 BCC.CARDINALITY_MAX,
                 BCC.ENTITY_TYPE,
-                BCC.DEN,
                 BCC.DEFINITION,
                 BCC.DEFINITION_SOURCE,
                 BCC.IS_DEPRECATED,
@@ -527,7 +520,6 @@ public class JooqCcReadRepository
             bcc.setCardinalityMin(record.get(BCC.CARDINALITY_MIN));
             bcc.setCardinalityMax(record.get(BCC.CARDINALITY_MAX));
             bcc.setEntityType(EntityType.valueOf(record.get(BCC.ENTITY_TYPE)));
-            bcc.setDen(record.get(BCC.DEN));
             bcc.setDefinition(record.get(BCC.DEFINITION));
             bcc.setDefinitionSource(record.get(BCC.DEFINITION_SOURCE));
             bcc.setDeprecated((byte) 1 == record.get(BCC.IS_DEPRECATED));
@@ -550,7 +542,6 @@ public class JooqCcReadRepository
                 ASCCP.GUID,
                 ASCCP.TYPE,
                 ASCCP.PROPERTY_TERM,
-                ASCCP.DEN,
                 ASCCP.DEFINITION,
                 ASCCP.DEFINITION_SOURCE,
                 ASCCP.NAMESPACE_ID,
@@ -587,7 +578,6 @@ public class JooqCcReadRepository
             asccp.setGuid(record.get(ASCCP.GUID));
             asccp.setType(record.get(ASCCP.TYPE));
             asccp.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
-            asccp.setDen(record.get(ASCCP.DEN));
             asccp.setDefinition(record.get(ASCCP.DEFINITION));
             asccp.setDefinitionSource(record.get(ASCCP.DEFINITION_SOURCE));
             if (record.get(ASCCP.NAMESPACE_ID) != null) {
@@ -657,7 +647,6 @@ public class JooqCcReadRepository
                 BCCP.GUID,
                 BCCP.PROPERTY_TERM,
                 BCCP.REPRESENTATION_TERM,
-                BCCP.DEN,
                 BCCP.DEFINITION,
                 BCCP.DEFINITION_SOURCE,
                 BCCP.NAMESPACE_ID,
@@ -695,7 +684,6 @@ public class JooqCcReadRepository
             bccp.setGuid(record.get(BCCP.GUID));
             bccp.setPropertyTerm(record.get(BCCP.PROPERTY_TERM));
             bccp.setRepresentationTerm(record.get(BCCP.REPRESENTATION_TERM));
-            bccp.setDen(record.get(BCCP.DEN));
             bccp.setDefinition(record.get(BCCP.DEFINITION));
             bccp.setDefinitionSource(record.get(BCCP.DEFINITION_SOURCE));
             if (record.get(BCCP.NAMESPACE_ID) != null) {
@@ -768,7 +756,6 @@ public class JooqCcReadRepository
                 DT.QUALIFIER,
                 DT.REPRESENTATION_TERM,
                 DT.SIX_DIGIT_ID,
-                DT.DEN,
                 DT.DEFINITION,
                 DT.DEFINITION_SOURCE,
                 DT.CONTENT_COMPONENT_DEFINITION,
@@ -807,7 +794,6 @@ public class JooqCcReadRepository
             dt.setQualifier(record.get(DT.QUALIFIER));
             dt.setRepresentationTerm(record.get(DT.REPRESENTATION_TERM));
             dt.setSixDigitId(record.get(DT.SIX_DIGIT_ID));
-            dt.setDen(record.get(DT.DEN));
             dt.setDefinition(record.get(DT.DEFINITION));
             dt.setDefinitionSource(record.get(DT.DEFINITION_SOURCE));
             dt.setContentComponentDefinition(record.get(DT.CONTENT_COMPONENT_DEFINITION));

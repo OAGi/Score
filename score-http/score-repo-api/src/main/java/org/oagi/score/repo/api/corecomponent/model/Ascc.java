@@ -14,8 +14,6 @@ public class Ascc implements CoreComponent, CcAssociation, Serializable {
 
     private int cardinalityMax;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -62,14 +60,6 @@ public class Ascc implements CoreComponent, CcAssociation, Serializable {
 
     public void setCardinalityMax(int cardinalityMax) {
         this.cardinalityMax = cardinalityMax;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

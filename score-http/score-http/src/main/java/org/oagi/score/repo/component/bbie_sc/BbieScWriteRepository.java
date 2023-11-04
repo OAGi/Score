@@ -68,8 +68,12 @@ public class BbieScWriteRepository {
                     ))
                     .fetchOneInto(ULong.class));
 
-            if (bbieSc.getUsed() != null){
+            if (bbieSc.getUsed() != null) {
                 bbieScRecord.setIsUsed((byte) (bbieSc.getUsed() ? 1 : 0));
+            }
+
+            if (bbieSc.getDeprecated() != null) {
+                bbieScRecord.setIsDeprecated((byte) (bbieSc.getDeprecated() ? 1 : 0));
             }
             
             bbieScRecord.setDefinition(bbieSc.getDefinition());
@@ -92,13 +96,13 @@ public class BbieScWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbieSc.getMinLength() != null) {
-                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getMinLength()));
+            if (bbieSc.getFacetMinLength() != null) {
+                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getFacetMinLength()));
             } else {
                 bbieScRecord.setFacetMinLength(null);
             }
-            if (bbieSc.getMaxLength() != null) {
-                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getMaxLength()));
+            if (bbieSc.getFacetMaxLength() != null) {
+                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
             } else {
                 bbieScRecord.setFacetMaxLength(null);
             }
@@ -110,8 +114,8 @@ public class BbieScWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbieSc.getPattern())) {
-                bbieScRecord.setFacetPattern(bbieSc.getPattern());
+            if (StringUtils.hasLength(bbieSc.getFacetPattern())) {
+                bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
             } else {
                 bbieScRecord.setFacetPattern(null);
             }
@@ -185,6 +189,10 @@ public class BbieScWriteRepository {
                 bbieScRecord.setIsUsed((byte) (bbieSc.getUsed() ? 1 : 0));
             }
 
+            if (bbieSc.getDeprecated() != null) {
+                bbieScRecord.setIsDeprecated((byte) (bbieSc.getDeprecated() ? 1 : 0));
+            }
+
             if (bbieSc.getDefinition() != null) {
                 bbieScRecord.setDefinition(emptyToNull(bbieSc.getDefinition()));
             }
@@ -201,13 +209,13 @@ public class BbieScWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbieSc.getMinLength() != null) {
-                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getMinLength()));
+            if (bbieSc.getFacetMinLength() != null) {
+                bbieScRecord.setFacetMinLength(ULong.valueOf(bbieSc.getFacetMinLength()));
             } else {
                 bbieScRecord.setFacetMinLength(null);
             }
-            if (bbieSc.getMaxLength() != null) {
-                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getMaxLength()));
+            if (bbieSc.getFacetMaxLength() != null) {
+                bbieScRecord.setFacetMaxLength(ULong.valueOf(bbieSc.getFacetMaxLength()));
             } else {
                 bbieScRecord.setFacetMaxLength(null);
             }
@@ -219,8 +227,8 @@ public class BbieScWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbieSc.getPattern())) {
-                bbieScRecord.setFacetPattern(bbieSc.getPattern());
+            if (StringUtils.hasLength(bbieSc.getFacetPattern())) {
+                bbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
             } else {
                 bbieScRecord.setFacetPattern(null);
             }
@@ -267,6 +275,7 @@ public class BbieScWriteRepository {
 
                 bbieScRecord.update(
                         BBIE_SC.IS_USED,
+                        BBIE_SC.IS_DEPRECATED,
                         BBIE_SC.DEFINITION,
                         BBIE_SC.CARDINALITY_MIN,
                         BBIE_SC.CARDINALITY_MAX,

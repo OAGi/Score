@@ -42,5 +42,4 @@ public class DT implements CoreComponent {
     public BigInteger getId() {
         return getDtId();
     }
-
 }

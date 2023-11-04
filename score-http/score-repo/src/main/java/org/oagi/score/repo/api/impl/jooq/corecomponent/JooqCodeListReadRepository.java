@@ -1,26 +1,20 @@
 package org.oagi.score.repo.api.impl.jooq.corecomponent;
 
-import org.jooq.*;
+import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
-import org.oagi.score.repo.api.corecomponent.CcReadRepository;
 import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
-import org.oagi.score.repo.api.corecomponent.model.*;
+import org.oagi.score.repo.api.corecomponent.model.CodeList;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
-import org.oagi.score.repo.api.security.AccessControl;
-import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
-import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CODE_LIST;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CODE_LIST_MANIFEST;
 
 public class JooqCodeListReadRepository
         extends JooqScoreRepository

@@ -7,15 +7,16 @@ import {Router} from '@angular/router';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {BieList} from '../../bie-management/bie-list/domain/bie-list';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
-import {OagisComponentTypes, UserExtensionGroup} from '../../cc-management/domain/core-component-node';
+import {UserExtensionGroup} from '../../cc-management/domain/core-component-node';
 import {StateProgressBarItem} from '../../common/state-progress-bar/state-progress-bar';
 import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {base64Encode, filter, initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {base64Encode, initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {CcList, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
+import {WebPageInfoService} from '../basis.service';
 
 export interface UserStatesItem {
   username: string;
@@ -116,12 +117,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
               private ccService: CcListService,
               private authService: AuthService,
               private releaseService: ReleaseService,
-              private router: Router) {
+              private router: Router,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
     const userToken = this.authService.getUserToken();
-    this.releaseService.getSimpleReleases().subscribe(resp => {
+    forkJoin([
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([resp]) => {
       resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
       initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
 
@@ -167,8 +171,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/core_component', [{key: 'states', value: item.state}]],
           disabled: false,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
         this.numberOfMyCCByStates.push({
@@ -177,8 +181,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/core_component', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}]],
           disabled: false,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
       }
@@ -222,8 +226,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/profile_bie', [{key: 'states', value: item.state}, releaseParam]],
           disabled: this.selectedRelease.releaseId < 0,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
         this.numberOfMyBieByStates.push({
@@ -232,8 +236,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}, releaseParam]],
           disabled: this.selectedRelease.releaseId < 0,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
       }
@@ -280,8 +284,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/core_component', [{key: 'states', value: item.state} , releaseParam, typeParam, componentTypeParam]],
           disabled: this.selectedRelease.releaseId < 0,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
         this.numberOfMyCcExtByStates.push({
@@ -290,8 +294,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
           disabled: this.selectedRelease.releaseId < 0,
           style: {
-            bg_color: item.color,
-            text_color: '#ffffff'
+            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
+            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
           }
         });
       }
@@ -350,7 +354,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   q(set: any): string {
     let params = new HttpParams();
     for (const param of set) {
-      params = params.set(param['key'], param['value']);
+      params = params.set(param.key, param.value);
     }
     return base64Encode(params.toString());
   }

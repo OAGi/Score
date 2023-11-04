@@ -1,4 +1,4 @@
-import {BieFlatNode, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {
   CcAccNodeDetail,
@@ -14,7 +14,7 @@ import {CcNodeService} from './core-component-node.service';
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 import {BehaviorSubject, empty, Observable} from 'rxjs';
 import {sha256} from '../../common/utility';
-import {ShortTag} from "../../tag-management/domain/tag";
+import {ShortTag} from '../../tag-management/domain/tag';
 
 export interface CcFlatNode extends FlatNode {
   type: string;
@@ -45,13 +45,13 @@ export interface CcFlatNode extends FlatNode {
 
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
 
+  showCopyLinkIcon: boolean;
+  queryPath: string;
+
   addChangeListener(listener: ChangeListener<CcFlatNode>);
   removeChangeListener(listener: ChangeListener<CcFlatNode>);
   fireChangeEvent(propertyName: string, val: any);
   reset();
-
-  showCopyLinkIcon: boolean;
-  queryPath: string;
 }
 
 export abstract class CcFlatNodeImpl implements CcFlatNode {
@@ -949,8 +949,8 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
   listeners: ChangeListener<DataSource<T>>[] = [];
   dataChange = new BehaviorSubject<T[]>([]);
 
-  _hideCardinality: boolean = false;
-  _hideProhibited: boolean = false;
+  _hideCardinality = false;
+  _hideProhibited = false;
 
   addListener(listener: ChangeListener<CcFlatNodeDataSource<T>>) {
     if (!!listener && this.listeners.indexOf(listener) === -1) {
@@ -1326,7 +1326,7 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
       const threshold = 100;
       let expandingLimit = 1000;
       let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0],] : [selectedNode,]) :
+        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0], ] : [selectedNode, ]) :
         this.searchedData;
       while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
         const item = data.shift();

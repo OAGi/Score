@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { FindUsagesDialogComponent } from './find-usages-dialog.component';
+import {FindUsagesDialogComponent} from './find-usages-dialog.component';
 
 describe('FindUsagesDialogComponent', () => {
   let component: FindUsagesDialogComponent;

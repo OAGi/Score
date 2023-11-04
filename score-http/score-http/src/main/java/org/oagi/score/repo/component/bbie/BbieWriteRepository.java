@@ -84,6 +84,10 @@ public class BbieWriteRepository {
                 bbieRecord.setIsNillable((byte) (bbie.getNillable() ? 1 : 0));
             }
 
+            if (bbie.getDeprecated() != null) {
+                bbieRecord.setIsDeprecated((byte) (bbie.getDeprecated() ? 1 : 0));
+            }
+
             bbieRecord.setDefinition(bbie.getDefinition());
             BccRecord bccRecord = bccReadRepository.getBccByManifestId(bbie.getBasedBccManifestId());
             if (bccRecord == null) {
@@ -105,13 +109,13 @@ public class BbieWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbie.getMinLength() != null) {
-                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            if (bbie.getFacetMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getFacetMinLength()));
             } else {
                 bbieRecord.setFacetMinLength(null);
             }
-            if (bbie.getMaxLength() != null) {
-                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            if (bbie.getFacetMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
             } else {
                 bbieRecord.setFacetMaxLength(null);
             }
@@ -123,8 +127,8 @@ public class BbieWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbie.getPattern())) {
-                bbieRecord.setFacetPattern(bbie.getPattern());
+            if (StringUtils.hasLength(bbie.getFacetPattern())) {
+                bbieRecord.setFacetPattern(bbie.getFacetPattern());
             } else {
                 bbieRecord.setFacetPattern(null);
             }
@@ -203,6 +207,10 @@ public class BbieWriteRepository {
                 bbieRecord.setIsNillable((byte) (bbie.getNillable() ? 1 : 0));
             }
 
+            if (bbie.getDeprecated() != null) {
+                bbieRecord.setIsDeprecated((byte) (bbie.getDeprecated() ? 1 : 0));
+            }
+
             if (bbie.getDefinition() != null) {
                 bbieRecord.setDefinition(emptyToNull(bbie.getDefinition()));
             }
@@ -219,13 +227,13 @@ public class BbieWriteRepository {
                 throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
-            if (bbie.getMinLength() != null) {
-                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getMinLength()));
+            if (bbie.getFacetMinLength() != null) {
+                bbieRecord.setFacetMinLength(ULong.valueOf(bbie.getFacetMinLength()));
             } else {
                 bbieRecord.setFacetMinLength(null);
             }
-            if (bbie.getMaxLength() != null) {
-                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getMaxLength()));
+            if (bbie.getFacetMaxLength() != null) {
+                bbieRecord.setFacetMaxLength(ULong.valueOf(bbie.getFacetMaxLength()));
             } else {
                 bbieRecord.setFacetMaxLength(null);
             }
@@ -237,8 +245,8 @@ public class BbieWriteRepository {
                     throw new IllegalArgumentException("Minimum Length must be less than equals to Maximum Length.");
                 }
             }
-            if (StringUtils.hasLength(bbie.getPattern())) {
-                bbieRecord.setFacetPattern(bbie.getPattern());
+            if (StringUtils.hasLength(bbie.getFacetPattern())) {
+                bbieRecord.setFacetPattern(bbie.getFacetPattern());
             } else {
                 bbieRecord.setFacetPattern(null);
             }
@@ -275,13 +283,14 @@ public class BbieWriteRepository {
                 }
             }
 
-            if (bbieRecord.changed()){
+            if (bbieRecord.changed()) {
                 bbieRecord.setLastUpdatedBy(requesterId);
                 bbieRecord.setLastUpdateTimestamp(request.getLocalDateTime());
                 bbieRecord.update(
                         BBIE.SEQ_KEY,
                         BBIE.IS_USED,
                         BBIE.IS_NILLABLE,
+                        BBIE.IS_DEPRECATED,
                         BBIE.DEFINITION,
                         BBIE.CARDINALITY_MIN,
                         BBIE.CARDINALITY_MAX,

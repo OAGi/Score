@@ -85,18 +85,20 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(1500));
+            invisibilityOfLoadingContainerElement(getDriver());
             viewEditCoreComponentPage.setBranch(branch);
             viewEditCoreComponentPage.setDEN(acc.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.setDEN(asccp.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
+            waitFor(Duration.ofMillis(8000L));
             viewEditCoreComponentPage.setDEN(bccp.getDen());
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
@@ -548,7 +550,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
         viewEditCoreComponentPage.hitBackToWIPButton();
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
+        waitFor(Duration.ofMillis(8000L));
         viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("WIP");
         escape(getDriver());
@@ -572,7 +574,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
         viewEditCoreComponentPage.hitMoveToQAButton();
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
+        waitFor(Duration.ofMillis(8000L));
         viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("QA");
         escape(getDriver());
@@ -593,7 +595,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
 
         viewEditCoreComponentPage.hitMoveToProductionButton();
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(3000L));
+        waitFor(Duration.ofMillis(8000L));
         viewEditCoreComponentPage.setBranch(branch);
         viewEditCoreComponentPage.setState("Production");
         escape(getDriver());

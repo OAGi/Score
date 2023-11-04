@@ -14,6 +14,8 @@ import {
 } from '../../settings-management/settings-application-settings/domain/settings-application-settings.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AboutService} from '../about/domain/about.service';
+import {WebPageInfoService} from '../basis.service';
+import {WebPageInfo} from "../about/domain/about";
 
 @Component({
   selector: 'score-navbar',
@@ -22,8 +24,8 @@ import {AboutService} from '../about/domain/about.service';
 })
 export class NavbarComponent implements OnInit {
 
-  private _notiCount: number = -1;
-  public notiMatIcon: string = 'notifications_none';
+  private _notiCount = -1;
+  public notiMatIcon = 'notifications_none';
   public brand: SafeHtml;
 
   constructor(private auth: AuthService,
@@ -33,6 +35,7 @@ export class NavbarComponent implements OnInit {
               private router: Router,
               private message: MessageService,
               private stompService: RxStompService,
+              public webPageInfo: WebPageInfoService,
               public translate: TranslateService) {
     translate.addLangs(['ccts', 'oagis']);
     translate.setDefaultLang('ccts');
@@ -41,14 +44,12 @@ export class NavbarComponent implements OnInit {
     translate.onLangChange.subscribe((event: LangChangeEvent) => {
     });
 
-    aboutService.getWebPageInfo().subscribe(webPageInfo => {
-      if (!!webPageInfo.brand) {
-        this.brand = sanitizer.bypassSecurityTrustHtml(webPageInfo.brand);
-      }
-      if (!!webPageInfo.favicon) {
-        (document.querySelector('#appIcon') as HTMLLinkElement).href = webPageInfo.favicon;
-      }
-    });
+    if (!!webPageInfo.brand) {
+      this.brand = sanitizer.bypassSecurityTrustHtml(webPageInfo.brand);
+    }
+    if (!!webPageInfo.favicon) {
+      (document.querySelector('#appIcon') as HTMLLinkElement).href = webPageInfo.favicon;
+    }
   }
 
   get isTenantEnabled(): boolean {
@@ -66,14 +67,14 @@ export class NavbarComponent implements OnInit {
     return userToken.businessTerm.enabled;
   }
 
-  get backgroundColor(): string {
+  get userRole(): string {
     const userToken = this.auth.getUserToken();
     if (userToken.roles.includes(this.auth.ROLE_ADMIN)) {
-      return '#FFE4E1'; // Light red
+      return 'Admin';
     } else if (userToken.roles.includes(this.auth.ROLE_DEVELOPER)) {
-      return '#FAFAD2'; // Light yellow
+      return 'Developer';
     } else {
-      return '';
+      return 'End-User';
     }
   }
 
@@ -85,11 +86,15 @@ export class NavbarComponent implements OnInit {
     if (userToken) {
       this.stompService.watch('/topic/message/' + userToken.username).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
-        if (!!data.messageId) {
+        if (!!data.messageId || !!data.messageIdList) {
           this.reloadNotiCount();
         }
       });
     }
+
+    this.stompService.watch('/topic/webpage/info').subscribe((message: Message) => {
+      this.webPageInfo.load().subscribe(_ => {});
+    });
   }
 
   reloadNotiCount() {
@@ -161,7 +166,7 @@ export class NavbarComponent implements OnInit {
   q(set: any): string {
     let params = new HttpParams();
     for (const param of set) {
-      params = params.set(param['key'], param['value']);
+      params = params.set(param.key, param.value);
     }
     return base64Encode(params.toString());
   }

@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CodeListUpliftComponent } from './code-list-uplift.component';
+import {CodeListUpliftComponent} from './code-list-uplift.component';
 
 describe('CodeListUpliftComponent', () => {
   let component: CodeListUpliftComponent;

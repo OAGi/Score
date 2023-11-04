@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class DeleteAssignedBusinessTermRequest extends Request {
+public class  DeleteAssignedBusinessTermRequest extends Request {
 
     private List<BieToAssign> assignedBtList = Collections.emptyList();
 

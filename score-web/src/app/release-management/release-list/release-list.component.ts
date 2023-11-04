@@ -18,8 +18,8 @@ import {initFilter} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
-import {SimpleNamespace} from "../../namespace-management/domain/namespace";
-import {NamespaceService} from "../../namespace-management/domain/namespace.service";
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 
 @Component({
   selector: 'score-release-list',

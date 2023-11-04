@@ -1,0 +1,251 @@
+<div class="context-section">
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header class="display-flow-root">
+      <mat-card-title class="float-left">{{ title }}</mat-card-title>
+      <div class="action-group float-right mt-n2">
+        <div class="col-12 actions-wrap">
+          <button mat-raised-button color="primary" (click)="update()"
+                  [disabled]="!isChanged() || isDisabled(oasDoc)">
+            Update
+          </button>
+          <button mat-raised-button color="warn" (click)="discard()">
+            Discard
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <div class="row">
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>OpenAPI Version</mat-label>
+              <mat-select required [(value)]="oasDoc.openAPIVersion">
+                <mat-option [value]="'3.0.3'">3.0.3</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Title</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.title" maxlength="255"/>
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Document Version</mat-label>
+              <input matInput required [(ngModel)]="oasDoc.version" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Terms of Service</mat-label>
+              <input matInput [(ngModel)]="oasDoc.termsOfService" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact Name</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactName" maxlength="255">
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact URL</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactUrl" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Contact Email</mat-label>
+              <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>License Name</mat-label>
+              <input matInput [(ngModel)]="oasDoc.licenseName" maxlength="255">
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>License URL</mat-label>
+              <input matInput [(ngModel)]="oasDoc.licenseUrl" maxlength="255">
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field>
+              <mat-label>Description</mat-label>
+              <textarea rows="3" cols="2000" matInput [(ngModel)]="oasDoc.description"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header class="align-items-baseline">
+      <mat-card-title>BIE List</mat-card-title>
+      <mat-card-content class="mat-card-container">
+        <div class="loading-container" *ngIf="loading">
+          <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+      <div style="padding: 8px 0 8px 12px;">
+        <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary">
+          <mat-icon>add</mat-icon>
+          Add
+        </button>
+        <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
+                [hidden]="table.dataSource.data.length == 0"
+                [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
+                color="warn">
+          <mat-icon>delete</mat-icon>
+          Remove
+        </button>
+        <button mat-raised-button color="primary" (click)="generate()"
+                [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
+          Generate
+        </button>
+      </div>
+      </mat-card-content>
+    </mat-card-header>
+    <mat-card-content class="mat-card-container">
+      <div class="container-fluid pb-2">
+        <div class="row">
+          <div class="col-12">
+            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
+              <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+                {{ columnName }}
+                <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+              </ng-template>
+            </mat-multi-sort-table-settings>
+          </div>
+        </div>
+      </div>
+      <div class="mat-elevation-z1">
+        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="den">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"> DEN</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <div class="den word-break-all">
+                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                   matTooltip="{{ element.den }}">
+                  <span>{{ element.den }}</span>
+                </a>
+              </div>
+              <div class="bie-guid">{{ element.guid }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.remark }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="verb">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="verb"> Verb</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-select [(ngModel)]="element.verb"
+                          (ngModelChange)="onChange('verb', element)">
+                <mat-option value="GET">GET</mat-option>
+                <mat-option value="PUT">PUT</mat-option>
+                <mat-option value="POST">POST</mat-option>
+                <mat-option value="DELETE">DELETE</mat-option>
+                <mat-option value="PATCH">PATCH</mat-option>
+              </mat-select>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="arrayIndicator">
+            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="suppressRootIndicator">
+            <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="messageBody">
+            <th mat-header-cell *matHeaderCellDef> Message Body</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-select [(ngModel)]="element.messageBody">
+                <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
+                <mat-option value="Response">Response</mat-option>
+              </mat-select>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="resourceName">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="resourceName"> Resource Name</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-form-field>
+                <input matInput [(ngModel)]="element.resourceName">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="operationId">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="operationId"> Operation ID</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-form-field>
+                <input matInput [(ngModel)]="element.operationId">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tagName">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="tagName"> Tag Name</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-form-field>
+                <input matInput [(ngModel)]="element.tagName">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdateTimestamp">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"> Updated on</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: table.displayedColumns; let entry" [ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

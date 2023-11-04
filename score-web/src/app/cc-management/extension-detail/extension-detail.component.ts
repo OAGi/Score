@@ -24,7 +24,7 @@ import {
   Base,
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail,
+  CcBccpNodeDetail, CcBdtPriRestri,
   CcBdtScNodeDetail,
   CcId,
   CcNodeDetail,
@@ -43,7 +43,9 @@ import {
   UserExtensionGroup
 } from '../domain/core-component-node';
 import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
-import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {
+  AppendAssociationDialogComponent
+} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
@@ -59,7 +61,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {Tag, ShortTag} from '../../tag-management/domain/tag';
+import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 

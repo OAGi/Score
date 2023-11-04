@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jooq.*;
-import org.jooq.Record;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.CcASCCPType;
@@ -15,7 +14,6 @@ import org.oagi.score.repo.component.dt.BdtReadRepository;
 import org.oagi.score.repository.UserRepository;
 import org.oagi.score.service.common.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
@@ -51,7 +49,7 @@ public class CcNodeRepository {
         return dslContext.select(
                         ACC.ACC_ID,
                         ACC.GUID,
-                        ACC.DEN.as("name"),
+                        ACC_MANIFEST.DEN.as("name"),
                         ACC_MANIFEST.BASED_ACC_MANIFEST_ID,
                         ACC.OAGIS_COMPONENT_TYPE,
                         ACC.OBJECT_CLASS_TERM,
@@ -270,8 +268,8 @@ public class CcNodeRepository {
         return dslContext.select(
                         DT.DT_ID.as("bdt_id"),
                         DT.GUID,
-                        DT.DEN.as("name"),
-                        DT.DEN,
+                        DT_MANIFEST.DEN.as("name"),
+                        DT_MANIFEST.DEN,
                         DT.STATE,
                         DT_MANIFEST.LOG_ID,
                         LOG.REVISION_NUM,
@@ -472,7 +470,7 @@ public class CcNodeRepository {
                         ACC.ACC_ID,
                         ACC.GUID,
                         ACC.OBJECT_CLASS_TERM,
-                        ACC.DEN,
+                        ACC_MANIFEST.DEN,
                         ACC.OAGIS_COMPONENT_TYPE.as("oagis_component_type"),
                         ACC.IS_ABSTRACT.as("abstracted"),
                         ACC.IS_DEPRECATED.as("deprecated"),
@@ -556,7 +554,7 @@ public class CcNodeRepository {
                             ASCC_MANIFEST.ASCC_MANIFEST_ID.as("manifest_id"),
                             ASCC.ASCC_ID,
                             ASCC.GUID,
-                            ASCC.DEN,
+                            ASCC_MANIFEST.DEN,
                             ASCC.CARDINALITY_MIN,
                             ASCC.CARDINALITY_MAX,
                             ASCC.IS_DEPRECATED.as("deprecated"),
@@ -596,7 +594,7 @@ public class CcNodeRepository {
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
                         ASCCP.PROPERTY_TERM,
-                        ASCCP.DEN,
+                        ASCCP_MANIFEST.DEN,
                         ASCCP.NAMESPACE_ID,
                         ASCCP.REUSABLE_INDICATOR.as("reusable"),
                         ASCCP.IS_DEPRECATED.as("deprecated"),
@@ -715,16 +713,17 @@ public class CcNodeRepository {
         }
     }
 
-    public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpId) {
+    public CcAsccpNodeDetail.Asccp getAsccp(BigInteger asccpManifestId) {
         CcAsccpNodeDetail.Asccp asccp = dslContext.select(
                         ASCCP.ASCCP_ID,
-                        ASCCP.DEN,
                         ASCCP.PROPERTY_TERM,
+                        ASCCP_MANIFEST.DEN,
                         ASCCP.DEFINITION,
                         ASCCP.GUID,
                         ASCCP.ROLE_OF_ACC_ID)
                 .from(ASCCP)
-                .where(ASCCP.ASCCP_ID.eq(ULong.valueOf(asccpId)))
+                .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
                 .fetchOneInto(CcAsccpNodeDetail.Asccp.class);
         return asccp;
     }
@@ -743,7 +742,7 @@ public class CcNodeRepository {
             CcBccpNodeDetail.Bcc bcc = dslContext.select(
                             BCC.BCC_ID,
                             BCC.GUID,
-                            BCC.DEN,
+                            BCC_MANIFEST.DEN,
                             BCC.ENTITY_TYPE,
                             BCC.CARDINALITY_MIN,
                             BCC.CARDINALITY_MAX,
@@ -785,7 +784,7 @@ public class CcNodeRepository {
                         BCCP.BCCP_ID,
                         BCCP.GUID,
                         BCCP.PROPERTY_TERM,
-                        BCCP.DEN,
+                        BCCP_MANIFEST.DEN,
                         BCCP.IS_NILLABLE.as("nillable"),
                         BCCP.IS_DEPRECATED.as("deprecated"),
                         BCCP.NAMESPACE_ID,
@@ -825,7 +824,7 @@ public class CcNodeRepository {
                         DT.REPRESENTATION_TERM,
                         DT.QUALIFIER,
                         DT.NAMESPACE_ID,
-                        DT.DEN,
+                        DT_MANIFEST.DEN,
                         DT.DEFINITION,
                         DT.DEFINITION_SOURCE,
                         DT.STATE,
@@ -860,6 +859,15 @@ public class CcNodeRepository {
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
                 .fetchStreamInto(Integer.class).reduce(0, Integer::sum);
         bdt.setHasNoSc(cardinalityMaxOfDtScListSum == 0);
+
+        // TODO: Replace `bdt` in `bccpNodeDetail` with `bdtNodeDetail`
+        CcBdtNode bdtNode = new CcBdtNode();
+        bdtNode.setManifestId(dslContext.select(BCCP_MANIFEST.BDT_MANIFEST_ID)
+                .from(BCCP_MANIFEST)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
+                .fetchOneInto(BigInteger.class));
+        CcBdtNodeDetail bdtNodeDetail = this.getBdtNodeDetail(user, bdtNode);
+        bdt.setBdtPriRestriList(bdtNodeDetail.getBdtPriRestriList());
 
         return bccpNodeDetail;
     }
@@ -1056,14 +1064,14 @@ public class CcNodeRepository {
                         DT.QUALIFIER,
                         DT.as("based").DT_ID.as("basedBdtId"),
                         DT_MANIFEST.as("basedManifest").DT_MANIFEST_ID.as("basedBdtManifestId"),
-                        DT.as("based").DEN.as("basedBdtDen"),
+                        DT_MANIFEST.as("basedManifest").DEN.as("basedBdtDen"),
                         DT.as("based").STATE.as("basedBdtState"),
                         DT.SIX_DIGIT_ID,
                         DT.CONTENT_COMPONENT_DEFINITION,
                         DT.COMMONLY_USED,
                         DT.IS_DEPRECATED.as("deprecated"),
                         DT_MANIFEST.REPLACEMENT_DT_MANIFEST_ID,
-                        DT.DEN,
+                        DT_MANIFEST.DEN,
                         DT.DEFINITION,
                         DT.DEFINITION_SOURCE,
                         DT.STATE,

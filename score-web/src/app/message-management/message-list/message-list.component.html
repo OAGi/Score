@@ -3,6 +3,12 @@
     <mat-toolbar class="bg-white">
       <span class="title">{{ title }}</span>
       <span class="flex-11-auto"></span>
+
+      <button mat-raised-button class="ml-2" color="warn" matTooltip="Discard"
+              [hidden]="selection.selected.length === 0"
+              (click)="discard()">
+        Discard
+      </button>
     </mat-toolbar>
   </div>
 
@@ -15,9 +21,11 @@
               <mat-form-field>
                 <mat-label>Sender</mat-label>
                 <mat-select [(ngModel)]="request.senderUsernameList" multiple>
-                  <ngx-mat-select-search [formControl]="senderIdListFilterCtrl"
-                                         [placeholderLabel]="'Search...'"
-                                         [noEntriesFoundLabel]="'No matching sender found.'"></ngx-mat-select-search>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="senderIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching sender found.'"></ngx-mat-select-search>
+                  </mat-option>
                   <mat-option *ngFor="let loginId of filteredSenderIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>

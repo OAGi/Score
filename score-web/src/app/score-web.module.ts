@@ -32,6 +32,7 @@ import {BusinessTermManagementModule} from './business-term-management/business-
 
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
 import {SettingsManagementModule} from './settings-management/settings-management.module';
+import {WebPageInfoService} from './basis/basis.service';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -94,6 +95,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   providers: [
     MatIconRegistry,
     AuthService,
+    WebPageInfoService,
     httpInterceptorsProviders,
     {
       provide: RxStompService,

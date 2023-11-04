@@ -1,0 +1,49 @@
+.mat-column-den {
+  width: 150px;
+  font-size: 13px;
+}
+
+.mat-column-remark {
+  width: 250px;
+}
+
+.mat-column-verb {
+  width: 80px;
+}
+
+.mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
+  width: 50px;
+}
+
+.mat-column-messageBody {
+  width: 100px;
+}
+
+.mat-column-resourceName {
+  width: 250px;
+}
+
+.mat-column-operationId {
+  width: 250px;
+}
+
+.mat-column-tagName {
+  width: 10%;
+}
+
+.mat-column-tagName .tagName:not(:last-child)::after {
+  content: ', ';
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.highlight {
+  background: #42A948;
+}

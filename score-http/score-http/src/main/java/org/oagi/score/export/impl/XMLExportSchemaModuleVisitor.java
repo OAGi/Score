@@ -2,7 +2,10 @@ package org.oagi.score.export.impl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.jdom2.*;
+import org.jdom2.CDATA;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -282,6 +285,7 @@ public class XMLExportSchemaModuleVisitor {
     }
 
     private void setDocumentation(Element typeElement, BDTSimple bdtSimple) {
+        DtManifestRecord dataTypeManifest = bdtSimple.getDataTypeManifest();
         DtRecord dataType = bdtSimple.getDataType();
 
         Element annotationElement = new Element("annotation", XSD_NS);
@@ -292,7 +296,7 @@ public class XMLExportSchemaModuleVisitor {
 
         documentationElement.setAttribute("lang", "en", org.jdom2.Namespace.XML_NAMESPACE);
 
-        String den = dataType.getDen();
+        String den = dataTypeManifest.getDen();
 
         if (bdtSimple.isDefaultBDT()) {
             Element ccts_UniqueID = new Element("ccts_UniqueID", OAGI_NS);
@@ -872,7 +876,7 @@ public class XMLExportSchemaModuleVisitor {
             if (seqKey.getAsccManifestId() != null) {
                 AsccManifestRecord asccManifest = dataProvider.findASCCManifest(seqKey.getAsccManifestId());
                 AsccRecord ascc = dataProvider.findASCC(asccManifest.getAsccId());
-                if (ascc.getDen().endsWith("Any Structured Content")) {
+                if (asccManifest.getDen().endsWith("Any Structured Content")) {
                     Element anyElement = new Element("any", XSD_NS);
 
                     anyElement.setAttribute("namespace", "##any");
@@ -907,7 +911,7 @@ public class XMLExportSchemaModuleVisitor {
                             element.setAttribute("ref", attachNamespacePrefixIfExists(ref, asccp.getNamespaceId()));
                         } else {
                             element.setAttribute("name", Utility.toCamelCase(asccp.getPropertyTerm()));
-                            String typeName = Utility.toCamelCase(asccp.getDen().substring((asccp.getPropertyTerm() + ". ").length())) + "Type";
+                            String typeName = Utility.toCamelCase(asccpManifest.getDen().substring((asccp.getPropertyTerm() + ". ").length())) + "Type";
                             element.setAttribute("type", attachNamespacePrefixIfExists(typeName, asccp.getNamespaceId()));
                         }
 
@@ -969,7 +973,7 @@ public class XMLExportSchemaModuleVisitor {
                     Element attributeElement = new Element("attribute", XSD_NS);
 
                     attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.getPropertyTerm()));
-                    attributeElement.setAttribute("type", attachNamespacePrefixIfExists(ModelUtils.getTypeName(bdt), bdt.getNamespaceId()));
+                    attributeElement.setAttribute("type", attachNamespacePrefixIfExists(ModelUtils.getTypeName(dtManifestRecord, bdt), bdt.getNamespaceId()));
 
                     int useInt = bcc.getCardinalityMin() * 2 + bcc.getCardinalityMax();
                     String useVal = getUseAttributeValue(useInt);

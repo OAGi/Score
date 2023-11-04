@@ -26,6 +26,7 @@ import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
+import {WebPageInfoService} from '../../basis/basis.service';
 
 @Component({
   selector: 'score-bie-list',
@@ -33,6 +34,7 @@ import {UserToken} from '../../authentication/domain/auth';
   styleUrls: ['./bie-list.component.css']
 })
 export class BieListComponent implements OnInit {
+
   title = 'BIE';
 
   displayedColumns: string[] = [
@@ -71,7 +73,8 @@ export class BieListComponent implements OnInit {
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
@@ -357,9 +360,9 @@ export class BieListComponent implements OnInit {
     }
 
     const dialogConfig = this.confirmDialogService.newConfig();
-    let notiMsg = 'Updated';
-    let toState = action;
-    let actionType = 'Update';
+    const notiMsg = 'Updated';
+    const toState = action;
+    const actionType = 'Update';
 
     switch (action) {
       case 'WIP':

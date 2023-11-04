@@ -54,7 +54,7 @@ import {initFilter, loadBooleanProperty, saveBooleanProperty} from '../../common
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {Tag, ShortTag} from '../../tag-management/domain/tag';
+import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 import {FormControl} from "@angular/forms";

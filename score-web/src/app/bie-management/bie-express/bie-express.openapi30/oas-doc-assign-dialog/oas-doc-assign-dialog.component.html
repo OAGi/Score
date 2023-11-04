@@ -1,0 +1,266 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <mat-card-title>Add BIE For OpenAPI Document</mat-card-title>
+    </mat-toolbar>
+  </div>
+
+  <mat-dialog-content class="pt-2 pb-2 mat-card-container">
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Branch</mat-label>
+                <mat-select [(ngModel)]="request.release"
+                            (ngModelChange)="onChange('branch', request.release);
+                                            this.paginator.pageIndex = 0; this.selection.clear();this.selectBieForOasDocList();">
+                  <mat-select-trigger class="d-flex">
+                    <span>{{ request.release.releaseNum }}</span>
+                    <span class="f12 ml-auto {{ request.release.state }}">
+                      {{ request.release.state | separate }}
+                    </span>
+                  </mat-select-trigger>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+                    <div class="d-flex">
+                      <span class="release-num">{{ release.releaseNum }}</span>
+                      <span class="f12 ml-auto {{ release.state }}">
+                        {{ release.state | separate }}
+                      </span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>State</mat-label>
+                <mat-select [(ngModel)]="request.states" multiple>
+                  <mat-option *ngFor="let state of states" [value]="state">
+                    {{state}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Owner</mat-label>
+                <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Updater</mat-label>
+                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                           [placeholderLabel]="'Search...'"
+                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.den"
+                         (ngModelChange)="onChange('filters.den', request.filters.den)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.selectBieForOasDocList();"
+                         placeholder="DEN">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.businessContext"
+                         (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.selectBieForOasDocList(); "
+                         placeholder="Business Context">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.selectBieForOasDocList();">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <div class="mat-elevation-z1">
+        <table mat-table multiTemplateDataRows
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+               [dataSource]="dataSource">
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="bie-state {{ element.state }}"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="den">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <div class="den word-break-all">
+                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                   matTooltip="{{ element.den }}">
+                  <span>{{ element.den }}</span>
+                </a>
+              </div>
+              <div class="bie-guid">{{ element.guid }}</div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.remark }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef> Version</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.version">{{ element.version }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="verb">
+            <th mat-header-cell *matHeaderCellDef> Verb</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
+                          (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
+                          (click)="$event.stopPropagation()">
+                <mat-option value="GET">GET</mat-option>
+                <mat-option value="PUT">PUT</mat-option>
+                <mat-option value="POST">POST</mat-option>
+                <mat-option value="DELETE">DELETE</mat-option>
+                <mat-option value="PATCH">PATCH</mat-option>
+              </mat-select>
+              <mat-error *ngIf="isSelected(element) && !verbSelection[element.topLevelAsbiepId]">
+                Verb is required.
+              </mat-error>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="messageBody">
+            <th mat-header-cell *matHeaderCellDef> Message Body</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
+                          (click)="$event.stopPropagation()">
+                <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
+                <mat-option value="Response">Response</mat-option>
+              </mat-select>
+              <mat-error *ngIf="isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]">
+                Message Body is required.
+              </mat-error>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="arrayIndicator">
+            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"
+              (click)="toggle(row)"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 15]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+  </mat-dialog-content>
+  <div class="actions mt-4">
+    <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary"
+            [disabled]="selection.isEmpty() || isOptionMissing()">
+      <mat-icon>add</mat-icon>
+      Add
+    </button>
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+      Close
+    </button>
+  </div>
+</div>
+
+

@@ -16,8 +16,6 @@ public class Bcc implements CoreComponent, CcAssociation, Serializable {
 
     private EntityType entityType;
 
-    private String den;
-
     private String definition;
 
     private String definitionSource;
@@ -78,14 +76,6 @@ public class Bcc implements CoreComponent, CcAssociation, Serializable {
 
     public void setEntityType(EntityType entityType) {
         this.entityType = entityType;
-    }
-
-    public String getDen() {
-        return den;
-    }
-
-    public void setDen(String den) {
-        this.den = den;
     }
 
     public String getDefinition() {

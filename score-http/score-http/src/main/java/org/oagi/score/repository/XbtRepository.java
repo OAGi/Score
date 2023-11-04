@@ -1,6 +1,8 @@
 package org.oagi.score.repository;
 
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record18;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Xbt;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,7 +5,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {MessageService} from '../domain/message.service';
 import {Message} from '../domain/message';
 import {finalize} from 'rxjs/operators';
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'score-message-view',

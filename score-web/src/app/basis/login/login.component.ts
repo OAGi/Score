@@ -5,8 +5,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {OAuth2AppInfo} from '../../authentication/domain/auth';
 import {Observable} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {AboutService} from '../about/domain/about.service';
 import {WebPageInfo} from '../about/domain/about';
+import {WebPageInfoService} from '../basis.service';
 
 @Component({
   selector: 'score-login',
@@ -23,7 +23,7 @@ export class LoginComponent {
   webPageInfo: Observable<WebPageInfo>;
 
   constructor(public auth: AuthService,
-              private aboutService: AboutService,
+              private webPageInfoService: WebPageInfoService,
               private snackBar: MatSnackBar,
               private http: HttpClient,
               private route: ActivatedRoute,
@@ -39,7 +39,7 @@ export class LoginComponent {
     });
 
     this.oauth2AppInfos = this.auth.getOAuth2AppInfos();
-    this.webPageInfo = this.aboutService.getWebPageInfo();
+    this.webPageInfo = this.webPageInfoService.load();
   }
 
   login() {

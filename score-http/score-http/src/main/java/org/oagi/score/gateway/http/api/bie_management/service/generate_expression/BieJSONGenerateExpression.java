@@ -19,14 +19,13 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
-import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.convertIdentifierToId;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -350,27 +349,38 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
-                                   Xbt xbt, FacetRestrictionsAware facetRestri) {
-        String guid = (facetRestri instanceof BIE) ? ((BIE) facetRestri).getGuid() : ScoreGuid.randomGuid();
-        String name = "type_" + guid;
+                                   Xbt xbt, FacetRestrictionsAware facetRestri, String componentName) {
+        if (!definitions.containsKey(componentName)) {
+            Map<String, Object> content = toProperties(xbt);
 
-        Map<String, Object> content = toProperties(xbt);
-        if (facetRestri.getFacetMinLength() != null) {
-            content.put("minLength", facetRestri.getFacetMinLength().longValue());
-        }
-        if (facetRestri.getFacetMaxLength() != null) {
-            content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
-        }
-        if (StringUtils.hasLength(facetRestri.getFacetPattern())) {
-            // Override 'pattern' and 'format' properties
-            content.remove("pattern");
-            content.remove("format");
-            content.put("pattern", facetRestri.getFacetPattern());
+            String type;
+            if (content.containsKey("type")) {
+                type = (String) content.get("type");
+            } else {
+                type = "string";
+                content.put("type", type);
+            }
+
+            boolean isTypeString = "string".equals(type);
+            boolean isTypeNumeric = "integer".equals(type) || "number".equals(type);
+
+            if (isTypeString && facetRestri.getFacetMinLength() != null) {
+                content.put("minLength", facetRestri.getFacetMinLength().longValue());
+            }
+            if (isTypeString && facetRestri.getFacetMaxLength() != null) {
+                content.put("maxLength", facetRestri.getFacetMaxLength().longValue());
+            }
+            if (isTypeString && StringUtils.hasLength(facetRestri.getFacetPattern())) {
+                // Override 'pattern' and 'format' properties
+                content.remove("pattern");
+                content.remove("format");
+                content.put("pattern", facetRestri.getFacetPattern());
+            }
+
+            definitions.put(componentName, content);
         }
 
-        definitions.put(name, content);
-
-        return "#/definitions/" + name;
+        return "#/definitions/" + componentName;
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -713,8 +723,8 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = Helper.getXbt(generationContext, bdtPriRestri);
                 }
 
-                if (bbie.getFacetMinLength() != null || bbie.getFacetMaxLength() != null || StringUtils.hasLength(bbie.getFacetPattern())) {
-                    ref = fillDefinitions(definitions, xbt, bbie);
+                if (hasAnyValuesInFacets(bbie)) {
+                    ref = fillDefinitions(definitions, xbt, bbie, "type_" + bbie.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }
@@ -791,8 +801,8 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                     xbt = generationContext.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
                 }
 
-                if (bbieSc.getFacetMinLength() != null || bbieSc.getFacetMaxLength() != null || StringUtils.hasLength(bbieSc.getFacetPattern())) {
-                    ref = fillDefinitions(definitions, xbt, bbieSc);
+                if (hasAnyValuesInFacets(bbieSc)) {
+                    ref = fillDefinitions(definitions, xbt, bbieSc, "type_" + bbieSc.getGuid());
                 } else {
                     ref = fillDefinitions(definitions, xbt);
                 }
