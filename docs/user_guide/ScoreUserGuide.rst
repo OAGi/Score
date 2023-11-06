@@ -355,6 +355,28 @@ configuration is enabled. Note that the BIE expression could be failed
 if system does not have enough memory to express a large size of BIEs.
 See `Restrict a BIE <#restrict-a-bie>`__ for more details.
 
+Web Page Settings
+~~~~~~~~~~~~~~~~~
+
+In Web Page Settings, administrators can change the brand logo on the navigation bar, the favicon of the webpage,
+the sign-in page statement, and colors for component state, release state, and user role.
+To change the brand logo, favicon, sign-in page statement, and colors in Web Page Settings:
+
+1. Brand Logo: Paste the text of the brand logo in SVG format into the "Brand Logo" input field.
+A preview of the brand logo will appear on the right side of the input field.
+
+2. Favicon: Paste the URL of the favicon into the "Favicon URL" input field.
+A preview of the favicon will appear on the right side of the input field.
+
+3. Sign-in Page Statement: Paste the text of the sign-in page statement in Markdown format
+into the "Sign-in Page Statement" input field.
+A preview of the statement will appear on the right side of the input field.
+
+4. Component State/Release State/User Role Colors: Enter the font and background colors in RGB format (e.g., #000000)
+for each item. A preview of the item will appear on the upper side of the input fields.
+
+After changing the settings, click the "Update" button to apply the changes.
+
 Customize UI
 ------------
 

@@ -80,17 +80,19 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(acc.getDen());
-            waitFor(Duration.ofMillis(1500L));
+            waitFor(Duration.ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(asccp.getDen());
+            waitFor(Duration.ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
 
             viewEditCoreComponentPage.openPage();
             viewEditCoreComponentPage.setDEN(bccp.getDen());
+            waitFor(Duration.ofMillis(5000L));
             viewEditCoreComponentPage.hitSearchButton();
             assertTrue(viewEditCoreComponentPage.getTableRecordAtIndex(1).isDisplayed());
         }
@@ -1090,6 +1092,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1108,6 +1111,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1150,6 +1154,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1169,6 +1174,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1213,6 +1219,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
@@ -1232,6 +1239,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
+                waitFor(Duration.ofMillis(8000L));
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
