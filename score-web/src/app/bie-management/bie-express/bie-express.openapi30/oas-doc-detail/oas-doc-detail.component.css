@@ -1,6 +1,10 @@
 .mat-column-den {
-  width: 150px;
+  width: 250px;
   font-size: 13px;
+}
+
+.mat-column-branch{
+  width: 100px
 }
 
 .mat-column-remark {

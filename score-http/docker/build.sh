@@ -25,10 +25,10 @@ docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.1.2 .
 echo "Scanning vulnerabilities..."
 docker scout cves oagi1docker/srt-http-gateway:3.1.2
 =======
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.2.0 .
+docker build --no-cache -f Dockerfile -t oagi1docker/srt-http-gateway:3.2.0-alpha .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-http-gateway:3.2.0
+docker scout cves oagi1docker/srt-http-gateway:3.2.0-alpha
 >>>>>>> v3.2
 
 echo "Done."

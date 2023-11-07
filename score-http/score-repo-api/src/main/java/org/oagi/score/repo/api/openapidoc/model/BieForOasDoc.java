@@ -17,6 +17,7 @@ public class BieForOasDoc extends Auditable {
     private BigInteger oasOperationId;
     private String den;
     private String propertyTerm;
+    private String releaseNum;
     private String remark;
     private String guid;
     private List<BusinessContext> businessContexts;
@@ -79,6 +80,14 @@ public class BieForOasDoc extends Auditable {
 
     public void setDen(String den) {
         this.den = den;
+    }
+
+    public String getReleaseNum() {
+        return releaseNum;
+    }
+
+    public void setReleaseNum(String releaseNum) {
+        this.releaseNum = releaseNum;
     }
 
     public String getPropertyTerm() {
@@ -274,6 +283,7 @@ public class BieForOasDoc extends Auditable {
                 ", oasOperationId=" + oasOperationId +
                 ", den='" + den + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", releaseNum='" + releaseNum + '\'' +
                 ", remark='" + remark + '\'' +
                 ", guid='" + guid + '\'' +
                 ", businessContexts=" + businessContexts +
