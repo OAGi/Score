@@ -21,6 +21,10 @@ RUN rm -rf /usr/local/tomcat/webapps/* && \
 
 USER 1001
 COPY web.xml /usr/local/tomcat/conf/web.xml
+<<<<<<< HEAD
+COPY score-http-3.1.2.war /usr/local/tomcat/webapps/ROOT.war
+=======
 COPY score-http-3.2.0.war /usr/local/tomcat/webapps/ROOT.war
+>>>>>>> v3.2
 
 CMD ["catalina.sh", "run"]

@@ -137,11 +137,6 @@ public class CoreComponentRepositoryForModuleSetRelease {
     public List<CdtAwdPriXpsTypeMapRecord> findAllCdtAwdPriXpsTypeMap(ULong moduleSetReleaseId) {
         return dslContext.select(CDT_AWD_PRI_XPS_TYPE_MAP.fields())
                 .from(CDT_AWD_PRI_XPS_TYPE_MAP)
-                .join(CDT_AWD_PRI).on(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI.CDT_AWD_PRI_ID))
-                .join(DT).on(CDT_AWD_PRI.CDT_ID.eq(DT.DT_ID))
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))
-                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(CdtAwdPriXpsTypeMapRecord.class);
     }
 
@@ -157,31 +152,18 @@ public class CoreComponentRepositoryForModuleSetRelease {
     public List<CdtScAwdPriXpsTypeMapRecord> findAllCdtScAwdPriXpsTypeMap(ULong moduleSetReleaseId) {
         return dslContext.select(CDT_SC_AWD_PRI_XPS_TYPE_MAP.fields())
                 .from(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
-                .join(CDT_SC_AWD_PRI).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID))
-                .join(DT_SC).on(CDT_SC_AWD_PRI.CDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID))
-                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(CdtScAwdPriXpsTypeMapRecord.class);
     }
 
     public List<CdtScAwdPriRecord> findAllCdtScAwdPri(ULong moduleSetReleaseId) {
         return dslContext.select(CDT_SC_AWD_PRI.fields())
                 .from(CDT_SC_AWD_PRI)
-                .join(DT_SC).on(CDT_SC_AWD_PRI.CDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID))
-                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(CdtScAwdPriRecord.class);
     }
 
     public List<CdtAwdPriRecord> findAllCdtAwdPri(ULong moduleSetReleaseId) {
         return dslContext.select(CDT_AWD_PRI.fields())
                 .from(CDT_AWD_PRI)
-                .join(DT).on(CDT_AWD_PRI.CDT_ID.eq(DT.DT_ID))
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .join(MODULE_SET_RELEASE).on(MODULE_SET_RELEASE.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID))
-                .where(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.eq(moduleSetReleaseId))
                 .fetchInto(CdtAwdPriRecord.class);
     }
 

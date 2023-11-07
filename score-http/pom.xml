@@ -5,7 +5,11 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-gateway</artifactId>
+<<<<<<< HEAD
+    <version>3.1.2</version>
+=======
     <version>3.2.0</version>
+>>>>>>> v3.2
     <packaging>pom</packaging>
 
     <name>score-gateway</name>
