@@ -498,6 +498,7 @@ public class BusinessInformationEntityRepository {
                     APP_USER.LOGIN_ID.as("owner"),
                     ASBIEP.BIZ_TERM,
                     ASBIEP.REMARK,
+                    ASCCP.REUSABLE_INDICATOR,
                     TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
                     APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                     TOP_LEVEL_ASBIEP.STATE,
@@ -750,6 +751,13 @@ public class BusinessInformationEntityRepository {
         public SelectBieListArguments setOwnedByDeveloper(Boolean ownedByDeveloper) {
             if (ownedByDeveloper != null) {
                 conditions.add(APP_USER.IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
+            }
+            return this;
+        }
+
+        public SelectBieListArguments setReusableIndicator(Boolean reusableIndicator) {
+            if (reusableIndicator != null) {
+                conditions.add(ASCCP.REUSABLE_INDICATOR.eq(reusableIndicator ? (byte) 1 : 0));
             }
             return this;
         }

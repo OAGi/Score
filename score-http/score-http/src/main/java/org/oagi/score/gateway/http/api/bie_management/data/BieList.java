@@ -28,6 +28,7 @@ public class BieList {
     private Date lastUpdateTimestamp;
     private String lastUpdateUser;
     private BieState state;
+    private Boolean reusableIndicator;
 
     private BigInteger sourceTopLevelAsbiepId;
     private BigInteger sourceReleaseId;

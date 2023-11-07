@@ -188,6 +188,7 @@ public class BieService {
                 .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
+                .setReusableIndicator(request.getReusableIndicator())
                 .setTenantBusinessCtx(requester.isAdmin(), userTenantIds)
                 .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
@@ -283,6 +284,7 @@ public class BieService {
                 .setAsccBccDen(request.getAsccBccDen())
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
+                .setReusableIndicator(request.getReusableIndicator())
                 .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchAsbieBbieInto(request.getTypes(), AsbieListRecord.class);

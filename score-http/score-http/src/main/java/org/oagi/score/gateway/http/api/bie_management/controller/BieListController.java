@@ -47,6 +47,7 @@ public class BieListController {
                                             @RequestParam(name = "updateStart", required = false) String updateStart,
                                             @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
+                                            @RequestParam(name = "reusableIndicator", required = false) Boolean reusableIndicator,
                                             @RequestParam(name = "releaseIds", required = false) String releaseIds,
                                             @RequestParam(name = "sortActive") String sortActive,
                                             @RequestParam(name = "sortDirection") String sortDirection,
@@ -59,6 +60,7 @@ public class BieListController {
         request.setPropertyTerm(propertyTerm);
         request.setBusinessContext(businessContext);
         request.setAsccpManifestId(asccpManifestId);
+        request.setReusableIndicator(reusableIndicator);
         request.setAccess(StringUtils.hasLength(access) ? AccessPrivilege.valueOf(access) : null);
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()

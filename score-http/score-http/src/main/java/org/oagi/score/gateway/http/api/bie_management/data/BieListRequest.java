@@ -31,6 +31,7 @@ public class BieListRequest {
     private Date updateEndDate;
     private PageRequest pageRequest = PageRequest.EMPTY_INSTANCE;
     private Boolean ownedByDeveloper;
+    private Boolean reusableIndicator;
     private String asccBccDen;
     private BigInteger bieId;
 }
