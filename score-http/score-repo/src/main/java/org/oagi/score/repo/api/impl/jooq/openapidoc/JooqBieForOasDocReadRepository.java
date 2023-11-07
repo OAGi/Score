@@ -45,6 +45,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
                         ASCCP_MANIFEST.DEN,
+                        RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
                         APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
@@ -77,6 +78,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
                 .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
                 .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
@@ -96,6 +98,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
                         ASCCP_MANIFEST.DEN,
+                        RELEASE.RELEASE_NUM,
                         ASBIEP.REMARK,
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
                         APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
@@ -128,6 +131,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 .leftJoin(OAS_RESOURCE_TAG.as("oas_resource_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_OPERATION_ID.eq(OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID))
                 .leftJoin(OAS_TAG.as("oas_tag")).on(OAS_RESOURCE_TAG.as("oas_resource_tag").OAS_TAG_ID.eq(OAS_TAG.as("oas_tag").OAS_TAG_ID))
                 .rightJoin(TOP_LEVEL_ASBIEP).on(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
@@ -143,6 +147,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
             bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
             bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
+            bieForOasDoc.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
             bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));
             bieForOasDoc.setGuid(record.get(ASCCP.GUID));
             bieForOasDoc.setMessageBody(record.get(field("oas_doc_message_body_type", String.class)));
