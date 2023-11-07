@@ -51,17 +51,17 @@ export class OasDocDetailComponent implements OnInit {
   bizCtxSearch: string;
   disabled: boolean;
   displayedColumns = [
-    { id: 'select', name: '' },
-    { id: 'den', name: 'DEN' },
-    { id: 'branch', name: 'Branch'},
-    { id: 'remark', name: 'Remark' },
-    { id: 'verb', name: 'Verb' },
-    { id: 'arrayIndicator', name: 'Array Indicator' },
-    { id: 'suppressRootIndicator', name: 'Suppress Root Indicator' },
-    { id: 'messageBody', name: 'Message Body' },
-    { id: 'resourceName', name: 'Resource Name' },
-    { id: 'operationId', name: 'Operation ID' },
-    { id: 'tagName', name: 'Tag Name' },
+    {id: 'select', name: ''},
+    {id: 'den', name: 'DEN'},
+    {id: 'branch', name: 'Branch'},
+    {id: 'remark', name: 'Remark'},
+    {id: 'verb', name: 'Verb'},
+    {id: 'arrayIndicator', name: 'Array Indicator'},
+    {id: 'suppressRootIndicator', name: 'Suppress Root Indicator'},
+    {id: 'messageBody', name: 'Message Body'},
+    {id: 'resourceName', name: 'Resource Name'},
+    {id: 'operationId', name: 'Operation ID'},
+    {id: 'tagName', name: 'Tag Name'},
   ];
   table: TableData<BieForOasDoc>;
   selection = new SelectionModel<BieForOasDoc>(true, []);

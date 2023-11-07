@@ -376,29 +376,27 @@ public class BieService {
                 .from(OAS_DOC)
                 .fetch();
         List<BigInteger> oasDocIds = Collections.emptyList();
-        if (resultForOasDocId != null){
+        if (resultForOasDocId != null) {
             oasDocIds = resultForOasDocId.stream().map(r -> r.value1().toBigInteger()).collect(Collectors.toList());
         }
         if (!oasDocIds.isEmpty()) {
-            for (BigInteger oasDocId : oasDocIds){
+            for (BigInteger oasDocId : oasDocIds) {
                 List<BigInteger> topLevelAsbiepIdsInOasDoc = new ArrayList<>();
                 GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(requester);
                 getBieForOasDocRequest.setOasDocId(oasDocId);
                 GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieListForOasDoc(getBieForOasDocRequest);
                 List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
-                if (bieListForOasDoc != null){
+                if (bieListForOasDoc != null) {
                     topLevelAsbiepIdsInOasDoc = bieListForOasDoc.stream().map(s -> s.getTopLevelAsbiepId()).collect(Collectors.toList());
-                    if (topLevelAsbiepIdsInOasDoc != null){
-                        for (BigInteger topLevelAsbiepId : topLevelAsbiepIds){
-                            if (topLevelAsbiepIdsInOasDoc.contains(topLevelAsbiepId)){
+                    if (topLevelAsbiepIdsInOasDoc != null) {
+                        for (BigInteger topLevelAsbiepId : topLevelAsbiepIds) {
+                            if (topLevelAsbiepIdsInOasDoc.contains(topLevelAsbiepId)) {
                                 throw new DataAccessForbiddenException("Cannot delete the BIE'" + topLevelAsbiepId + "' please remove the BIE from the OpenAPI document first.");
                             }
                         }
                     }
                 }
-
             }
-
         }
 
         Result<Record2<String, ULong>> result =
