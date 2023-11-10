@@ -10,7 +10,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -19,7 +19,7 @@ import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/m
 import {Clipboard} from '@angular/cdk/clipboard';
 
 @Injectable()
-export class AuthService implements OnInit, CanActivate {
+export class AuthService  implements OnInit {
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
   USER_INFO_KEY = 'X-Score-UserInfo';
@@ -270,7 +270,7 @@ function getResolvedUrl(route: ActivatedRouteSnapshot): string {
 }
 
 @Injectable()
-export class CanActivateDeveloper implements CanActivate {
+export class CanActivateDeveloper  {
 
   constructor(private authService: AuthService) {
   }
@@ -290,7 +290,7 @@ export class CanActivateDeveloper implements CanActivate {
 }
 
 @Injectable()
-export class CanActivateAdmin implements CanActivate {
+export class CanActivateAdmin  {
 
   constructor(private authService: AuthService) {
   }
@@ -310,7 +310,7 @@ export class CanActivateAdmin implements CanActivate {
 }
 
 @Injectable()
-export class CanActivateUser implements CanActivate {
+export class CanActivateUser  {
 
   constructor(private authService: AuthService) {
   }
@@ -330,7 +330,7 @@ export class CanActivateUser implements CanActivate {
 }
 
 @Injectable()
-export class CanActivateTenantInstance implements CanActivate {
+export class CanActivateTenantInstance  {
 
   constructor(private authService: AuthService) {
   }

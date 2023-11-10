@@ -44,9 +44,6 @@ const routes: Routes = [
   ],
   declarations: [
     ExtensionDetailComponent
-  ],
-  entryComponents: [
-    AppendAssociationDialogComponent
   ]
 })
 export class ExtensionDetailModule {

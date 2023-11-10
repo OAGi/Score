@@ -65,9 +65,6 @@ const routes: Routes = [
     CodeListValueDialogComponent,
     CodeListUpliftComponent
   ],
-  entryComponents: [
-    CodeListValueDialogComponent
-  ],
   providers: [
     CodeListService
   ]

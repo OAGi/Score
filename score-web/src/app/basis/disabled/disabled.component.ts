@@ -3,12 +3,12 @@ import {Component, Injectable, OnInit} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 import {AuthService} from '../../authentication/auth.service';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import {Observable} from 'rxjs';
 import {UserToken} from '../../authentication/domain/auth';
 
 @Injectable()
-export class DisabledActivate implements CanActivate {
+export class DisabledActivate  {
   constructor(private auth: AuthService,
               private router: Router,
               private http: HttpClient) {

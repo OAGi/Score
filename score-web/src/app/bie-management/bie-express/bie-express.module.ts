@@ -35,10 +35,6 @@ const routes: Routes = [
     MetaHeaderDialogComponent,
     PaginationResponseDialogComponent,
   ],
-  entryComponents: [
-    MetaHeaderDialogComponent,
-    PaginationResponseDialogComponent,
-  ],
   providers: [
     BieExpressService,
     {provide: MatDialogRef, useValue: {}},
