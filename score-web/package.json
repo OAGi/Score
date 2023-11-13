@@ -12,8 +12,7 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
+    "e2e": "ng e2e"
   },
   "dependencies": {
     "@angular/animations": "~17.0.2",
@@ -35,7 +34,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
-    "@stomp/rx-stomp": "^1.2.0",
+    "@stomp/rx-stomp": "^2.0.0",
     "@types/uuid": "^8.3.4",
     "angular-split": "^14.1.0",
     "bootstrap": "^4.6.2",
