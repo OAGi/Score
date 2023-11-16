@@ -916,7 +916,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         properties.put("x-oagis-bie-guid", typeAbie.getGuid());
         properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
         properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
-        properties.put("x-oagis-bie-uri", "https://oagiscore.net/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
+        properties.put("x-oagis-bie-uri", option.getHost() + "/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
         properties.put("x-oagis-release", release.getReleaseNum());
         properties.put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()));
         properties.put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "");

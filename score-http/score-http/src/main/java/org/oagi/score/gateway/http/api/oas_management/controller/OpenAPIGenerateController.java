@@ -14,10 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +38,7 @@ public class OpenAPIGenerateController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @PathVariable("id") BigInteger oasDocId) throws IOException {
+                                                        @PathVariable("id") BigInteger oasDocId, @RequestHeader String host) throws IOException {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(user));
 
@@ -75,6 +72,7 @@ public class OpenAPIGenerateController {
                 openAPIGenerateExpressionOption.setOperationId(bieForOasDoc.getOperationId());
                 openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
                 openAPIGenerateExpressionOption.setOpenAPICodeGenerationFriendly(true);
+                openAPIGenerateExpressionOption.setHost(host);
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 String templateKey = "";
                 switch (verbOption) {
