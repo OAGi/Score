@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.ImmutableMap;
-import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
@@ -22,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -405,7 +403,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
         properties.put("x-oagis-bie-guid", typeAbie.getGuid());
         properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
         properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
-        properties.put("x-oagis-bie-uri", option.getHost() + "/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
+        properties.put("x-oagis-bie-uri", option.getScheme() + "://" + option.getHost() + "/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
         properties.put("x-oagis-release", release.getReleaseNum());
         properties.put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()));
         properties.put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "");

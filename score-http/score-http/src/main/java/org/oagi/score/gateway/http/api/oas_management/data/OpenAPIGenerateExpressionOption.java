@@ -26,6 +26,7 @@ public class OpenAPIGenerateExpressionOption {
     private String messageBodyType;
     private String openAPIExpressionFormat;
     private boolean openAPICodeGenerationFriendly;
+    private String scheme;
     private String host;
     private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
 

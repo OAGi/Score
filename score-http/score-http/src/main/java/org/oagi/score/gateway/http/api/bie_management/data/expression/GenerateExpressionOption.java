@@ -39,6 +39,7 @@ public class GenerateExpressionOption {
     private boolean suppressRootPropertyForOpenAPI30GetTemplate;
     private boolean includeMetaHeaderForJsonForOpenAPI30GetTemplate;
 
+    private String scheme;
     private String host;
 
     public boolean isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate() {

@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPITemplateForVerbOption;
@@ -24,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.oagi.score.common.util.ControllerHelper.getRequestHostname;
+import static org.oagi.score.common.util.ControllerHelper.getRequestScheme;
+
 @RestController
 public class OpenAPIGenerateController {
 
@@ -38,7 +42,8 @@ public class OpenAPIGenerateController {
 
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @PathVariable("id") BigInteger oasDocId, @RequestHeader String host) throws IOException {
+                                                        @PathVariable("id") BigInteger oasDocId,
+                                                        HttpServletRequest httpServletRequest) throws IOException {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(user));
 
@@ -72,7 +77,9 @@ public class OpenAPIGenerateController {
                 openAPIGenerateExpressionOption.setOperationId(bieForOasDoc.getOperationId());
                 openAPIGenerateExpressionOption.setVerb(bieForOasDoc.getVerb());
                 openAPIGenerateExpressionOption.setOpenAPICodeGenerationFriendly(true);
-                openAPIGenerateExpressionOption.setHost(host);
+                openAPIGenerateExpressionOption.setScheme(getRequestScheme(httpServletRequest));
+                openAPIGenerateExpressionOption.setHost(getRequestHostname(httpServletRequest));
+
                 String verbOption = openAPIGenerateExpressionOption.getVerb();
                 String templateKey = "";
                 switch (verbOption) {

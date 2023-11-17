@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
@@ -21,6 +22,9 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.common.util.ControllerHelper.getRequestHostname;
+import static org.oagi.score.common.util.ControllerHelper.getRequestScheme;
+
 @RestController
 public class BieGenerateController {
 
@@ -32,13 +36,15 @@ public class BieGenerateController {
 
     @RequestMapping(value = "/profile_bie/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @RequestParam("data") String data, @RequestHeader String host) throws IOException {
+                                                        @RequestParam("data") String data,
+                                                        HttpServletRequest httpServletRequest) throws IOException {
 
         Map<String, Object> params = convertValue(data);
         List<BigInteger> topLevelAsbiepIds = popTopLevelAsbiepIds(params);
         GenerateExpressionOption option =
                 objectMapper.convertValue(params, GenerateExpressionOption.class);
-        option.setHost(host);
+        option.setScheme(getRequestScheme(httpServletRequest));
+        option.setHost(getRequestHostname(httpServletRequest));
         BieGenerateExpressionResult bieGenerateExpressionResult = service.generate(user, topLevelAsbiepIds, option);
 
         return ResponseEntity.ok()
