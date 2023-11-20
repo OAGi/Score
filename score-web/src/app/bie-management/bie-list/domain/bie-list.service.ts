@@ -58,6 +58,9 @@ export class BieListService {
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
+    if (request.deprecated && request.deprecated.length === 1) {
+      params = params.set('deprecated', '' + request.deprecated[0]);
+    }
     if (request.access) {
       params = params.set('access', request.access);
     }

@@ -25,6 +25,9 @@ public class BieList {
     private String status;
     private String bizTerm;
     private String remark;
+    private boolean deprecated;
+    private String deprecatedReason;
+    private String deprecatedRemark;
     private Date lastUpdateTimestamp;
     private String lastUpdateUser;
     private BieState state;

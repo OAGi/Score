@@ -8,6 +8,7 @@ import org.oagi.score.data.ACC;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.agency_id_management.data.AgencyIdListState;
+import org.oagi.score.gateway.http.api.bie_management.data.DeprecateBIERequest;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAsbiepNode;
@@ -21,6 +22,7 @@ import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
@@ -29,6 +31,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
 import org.oagi.score.repo.api.openapidoc.model.UpdateBieForOasDocRequest;
+import org.oagi.score.repo.api.user.model.ScoreRole;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.abie.AbieReadRepository;
 import org.oagi.score.repo.component.abie.AbieWriteRepository;
@@ -200,7 +204,7 @@ public class BieEditService implements InitializingBean {
         BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
         return !bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
                         .withTopLevelAsbiepId(topLevelAsbiepId, true))
-                        .getTopLevelAsbiepList().isEmpty();
+                .getTopLevelAsbiepList().isEmpty();
     }
 
     private void ensureReusingRelationships(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
@@ -211,7 +215,7 @@ public class BieEditService implements InitializingBean {
         if (state == BieState.WIP) { // 'Move to WIP' Case.
             List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusingTopLevelAsbiepList =
                     bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
-                            .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                                    .withTopLevelAsbiepId(topLevelAsbiepId, true))
                             .getTopLevelAsbiepList();
 
             reusingTopLevelAsbiepList = reusingTopLevelAsbiepList.stream()
@@ -243,7 +247,7 @@ public class BieEditService implements InitializingBean {
         } else {
             List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusedTopLevelAsbiepList =
                     bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
-                            .withTopLevelAsbiepId(topLevelAsbiepId, false))
+                                    .withTopLevelAsbiepId(topLevelAsbiepId, false))
                             .getTopLevelAsbiepList();
 
             reusedTopLevelAsbiepList = reusedTopLevelAsbiepList.stream()
@@ -1232,5 +1236,29 @@ public class BieEditService implements InitializingBean {
             default:
                 throw new IllegalArgumentException("Cannot fount target BIE.");
         }
+    }
+
+    @Transactional
+    public void deprecateBIE(AuthenticatedPrincipal user, DeprecateBIERequest request) {
+        TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getTopLevelAsbiepId())))
+                .fetchOptional().orElse(null);
+        if (topLevelAsbiepRecord == null) {
+            throw new ScoreDataAccessException();
+        }
+
+        ScoreUser requester = sessionService.asScoreUser(user);
+        boolean isAdmin = requester.hasRole(ScoreRole.ADMINISTRATOR);
+        boolean isOwner = topLevelAsbiepRecord.getOwnerUserId().toBigInteger().equals(requester.getUserId());
+        if (!isAdmin && !isOwner) {
+            throw new ScoreDataAccessException();
+        }
+
+        dslContext.update(TOP_LEVEL_ASBIEP)
+                .set(TOP_LEVEL_ASBIEP.IS_DEPRECATED, (byte) 1)
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, request.getReason())
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, request.getRemark())
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
+                .execute();
     }
 }

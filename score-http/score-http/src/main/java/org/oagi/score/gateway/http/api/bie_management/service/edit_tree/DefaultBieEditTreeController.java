@@ -158,6 +158,9 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 ABIE.BASED_ACC_MANIFEST_ID.as("acc_manifest_id"),
                 inline("abie").as("type"),
                 inline(true).as("used"),
+                TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
+                TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
+                TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
                 TOP_LEVEL_ASBIEP.INVERSE_MODE)
                 .from(TOP_LEVEL_ASBIEP)
                 .join(ASBIEP).on(and(

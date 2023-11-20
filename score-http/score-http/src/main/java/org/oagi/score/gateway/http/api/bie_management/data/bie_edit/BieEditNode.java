@@ -29,6 +29,10 @@ public class BieEditNode {
     private BieState topLevelAsbiepState;
     private String ownerLoginId;
 
+    private boolean deprecated;
+    private String deprecatedReason;
+    private String deprecatedRemark;
+
     // Issue #1519
     private BieForOasDoc bieForOasDoc;
 

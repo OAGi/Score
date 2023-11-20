@@ -18,6 +18,7 @@ export class BieListRequest {
   excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
+  deprecated: boolean[] = [false];
   types: string[] = [];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
@@ -60,6 +61,7 @@ export class BieListRequest {
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access');
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
@@ -96,6 +98,9 @@ export class BieListRequest {
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
+    }
+    if (this.deprecated !== undefined && this.deprecated.length > 0) {
+      params = params.set('deprecated', this.deprecated.map(e => (e) ? 'true' : 'false').join(','));
     }
     if (this.types && this.types.length > 0) {
       params = params.set('types', this.types.join(','));
@@ -151,6 +156,9 @@ export class BieList {
   status: string;
   bizTerm: string;
   remark: string;
+  deprecated: boolean;
+  deprecatedReason: string;
+  deprecatedRemark: string;
   lastUpdateTimestamp: Date;
   lastUpdateUser: string;
   state: string;

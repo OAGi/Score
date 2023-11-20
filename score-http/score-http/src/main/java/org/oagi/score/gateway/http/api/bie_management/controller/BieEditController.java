@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.oagi.score.gateway.http.api.bie_management.data.DeprecateBIERequest;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAsbiepNode;
@@ -288,5 +289,16 @@ public class BieEditController {
 
         request.setTopLevelAsbiepId(topLevelAsbiepId);
         service.resetDetailBIE(user, request);
+    }
+
+    @RequestMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/deprecate",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public void deprecateBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                             @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
+                             @RequestBody DeprecateBIERequest request) {
+
+        request.setTopLevelAsbiepId(topLevelAsbiepId);
+        service.deprecateBIE(user, request);
     }
 }

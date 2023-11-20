@@ -140,4 +140,11 @@ export class BieEditService {
     const url = '/api/profile_bie/' + topLevelAsbiepId + '/reset_detail';
     return this.http.post<any>(url, {bieType: type, path});
   }
+
+  deprecate(topLevelAsbiepId: number, reason: string, remark: string): Observable<any> {
+    return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepId + '/deprecate', {
+      reason,
+      remark
+    });
+  }
 }

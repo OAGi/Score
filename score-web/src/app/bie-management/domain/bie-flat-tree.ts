@@ -2470,6 +2470,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     const node = this.toAbieNode('ASCCP-' + this._abieNode.asccpManifestId);
     node.topLevelAsbiepId = this._topLevelAsbiepId;
     node.rootNode = this._abieNode;
+    node.deprecated = this._abieNode.deprecated;
     return node as unknown as T;
   }
 

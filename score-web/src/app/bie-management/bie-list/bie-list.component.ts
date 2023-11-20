@@ -27,6 +27,8 @@ import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {BieDeprecateDialogComponent} from "../bie-deprecate-dialog/bie-deprecate-dialog.component";
+import {BieEditService} from "../bie-edit/domain/bie-edit.service";
 
 @Component({
   selector: 'score-bie-list',
@@ -65,6 +67,7 @@ export class BieListComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private service: BieListService,
+              private bieEditService: BieEditService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
               private auth: AuthService,
@@ -239,12 +242,20 @@ export class BieListComponent implements OnInit {
     return element.owner === this.username && element.state === 'WIP';
   }
 
+  isDeprecable(element: BieList): boolean {
+    if (!element) {
+      return false;
+    }
+
+    return (element.owner === this.username || this.auth.isAdmin()) && element.state === 'Production';
+  }
+
   discardAllSelected() {
     this.openDialogBieDiscard(this.selection.selected);
   }
 
   discard(bieList: BieList) {
-    this.openDialogBieDiscard([bieList, ]);
+    this.openDialogBieDiscard([bieList,]);
   }
 
   openDialogBieDiscard(bieLists: BieList[]) {
@@ -414,6 +425,32 @@ export class BieListComponent implements OnInit {
         this.loading = true;
         this.service.transferOwnershipOnList(this.selection.selected, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
+            duration: 3000,
+          });
+          this.loadBieList();
+          this.selectionClear();
+          this.loading = false;
+        }, error => {
+          this.loading = false;
+        });
+      }
+    });
+  }
+
+  deprecate(bie: BieList) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {
+      reason: bie.deprecatedReason,
+      remark: bie.deprecatedRemark
+    };
+    const dialogRef = this.dialog.open(BieDeprecateDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result: AccountList) => {
+      if (result) {
+        this.loading = true;
+        this.bieEditService.deprecate(bie.topLevelAsbiepId, result['reason'], result['remark']).subscribe(_ => {
+          this.snackBar.open('Deprecated', '', {
             duration: 3000,
           });
           this.loadBieList();

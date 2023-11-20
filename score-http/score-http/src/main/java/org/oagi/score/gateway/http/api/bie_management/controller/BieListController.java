@@ -39,6 +39,7 @@ public class BieListController {
                                             @RequestParam(name = "asccpManifestId", required = false) BigInteger asccpManifestId,
                                             @RequestParam(name = "access", required = false) String access,
                                             @RequestParam(name = "states", required = false) String states,
+                                            @RequestParam(name = "deprecated", required = false) String deprecated,
                                             @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
                                             @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
                                             @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
@@ -63,6 +64,13 @@ public class BieListController {
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
                         .map(e -> BieState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
+        if (StringUtils.hasLength(deprecated)) {
+            if ("true".equalsIgnoreCase(deprecated.toLowerCase())) {
+                request.setDeprecated(true);
+            } else if ("false".equalsIgnoreCase(deprecated.toLowerCase())) {
+                request.setDeprecated(false);
+            }
+        }
         request.setExcludePropertyTerms(!StringUtils.hasLength(excludePropertyTerms) ? Collections.emptyList() :
                 Arrays.asList(excludePropertyTerms.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setTopLevelAsbiepIds(!StringUtils.hasLength(topLevelAsbiepIds) ? Collections.emptyList() :

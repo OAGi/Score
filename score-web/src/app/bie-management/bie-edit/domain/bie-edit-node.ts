@@ -93,6 +93,9 @@ export class BieEditAbieNode extends BieEditNode {
 
   access: string;
   topLevelAsbiepState: string;
+  deprecated: boolean;
+  deprecatedReason: string;
+  deprecatedRemark: string;
   inverseMode: boolean;
 
   bieForOasDoc: BieForOasDoc;
@@ -111,6 +114,9 @@ export class BieEditAbieNode extends BieEditNode {
 
       this.access = abie.access;
       this.topLevelAsbiepState = abie.topLevelAsbiepState;
+      this.deprecated = abie.deprecated;
+      this.deprecatedReason = abie.deprecatedReason;
+      this.deprecatedRemark = abie.deprecatedRemark;
       this.inverseMode = abie.inverseMode;
 
       this.bieForOasDoc = new BieForOasDoc(abie.bieForOasDoc);
