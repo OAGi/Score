@@ -107,12 +107,18 @@ export class AccountListService implements OnInit {
       });
     }
   }
+
   link(pending: PendingAccount, account: AccountList): Observable<any> {
     return this.http.post('/api/pending/link/' + pending.appOauth2UserId, {
-      appUserId: account.appUserId});
+      appUserId: account.appUserId
+    });
   }
 
   setEnable(account: AccountList, val: boolean): Observable<any> {
     return this.http.post('/api/accounts/' + account.appUserId + '/' + ((val) ? 'enable' : 'disable'), {});
+  }
+
+  transferOwnership(account: AccountList): Observable<any> {
+    return this.http.post('/api/accounts/' + account.appUserId + '/transfer_ownership', {});
   }
 }
