@@ -78,6 +78,7 @@
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
+        <button mat-menu-item routerLink="account/transfer_ownership">Transfer Ownership</button>
         <button mat-menu-item routerLink="account/pending">Pending SSO</button>
         <button *ngIf="isTenantEnabled" mat-menu-item routerLink="tenant">Tenant</button>
       </ng-template>
