@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+
+# IDE
+/.idea
+
+### macOS template
+# General
+.DS_Store
+
+# local
+.env
+dist

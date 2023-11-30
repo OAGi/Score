@@ -10,6 +10,7 @@ import org.oagi.score.gateway.http.api.application_management.service.Applicatio
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
+import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
@@ -26,6 +27,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
+import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.ABIERepository;
 import org.oagi.score.repository.BizCtxRepository;
@@ -59,6 +61,8 @@ public class BieService {
 
     @Autowired
     private BieEditService bieEditService;
+    @Autowired
+    private OpenAPIDocService oasDocService;
 
     @Autowired
     private ABIERepository abieRepository;
@@ -365,6 +369,36 @@ public class BieService {
     }
 
     private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {
+        ScoreUser requester = sessionService.asScoreUser(prinpical);
+        // Issue#1569
+        // check to see if the BIE is referenced in an OpenAPI document
+        Result<Record1<ULong>> resultForOasDocId = dslContext.select(OAS_DOC.OAS_DOC_ID)
+                .from(OAS_DOC)
+                .fetch();
+        List<BigInteger> oasDocIds = Collections.emptyList();
+        if (resultForOasDocId != null) {
+            oasDocIds = resultForOasDocId.stream().map(r -> r.value1().toBigInteger()).collect(Collectors.toList());
+        }
+        if (!oasDocIds.isEmpty()) {
+            for (BigInteger oasDocId : oasDocIds) {
+                List<BigInteger> topLevelAsbiepIdsInOasDoc = new ArrayList<>();
+                GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(requester);
+                getBieForOasDocRequest.setOasDocId(oasDocId);
+                GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieListForOasDoc(getBieForOasDocRequest);
+                List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
+                if (bieListForOasDoc != null) {
+                    topLevelAsbiepIdsInOasDoc = bieListForOasDoc.stream().map(s -> s.getTopLevelAsbiepId()).collect(Collectors.toList());
+                    if (topLevelAsbiepIdsInOasDoc != null) {
+                        for (BigInteger topLevelAsbiepId : topLevelAsbiepIds) {
+                            if (topLevelAsbiepIdsInOasDoc.contains(topLevelAsbiepId)) {
+                                throw new DataAccessForbiddenException("Cannot delete the BIE'" + topLevelAsbiepId + "' please remove the BIE from the OpenAPI document first.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Result<Record2<String, ULong>> result =
                 dslContext.select(TOP_LEVEL_ASBIEP.STATE, TOP_LEVEL_ASBIEP.OWNER_USER_ID)
                         .from(TOP_LEVEL_ASBIEP)
@@ -373,7 +407,7 @@ public class BieService {
                         ))
                         .fetch();
 
-        ScoreUser requester = sessionService.asScoreUser(prinpical);
+
         BigInteger requesterUserId = requester.getUserId();
         for (Record2<String, ULong> record : result) {
             BieState bieState = BieState.valueOf(record.value1());

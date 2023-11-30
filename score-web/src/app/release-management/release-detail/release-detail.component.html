@@ -87,4 +87,16 @@
       </div>
     </div>
   </div>
+
+  <div class="row action-group m-0" *ngIf="!userToken.roles.includes('developer')">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="info"
+                *ngIf="releaseDetail.state === 'Draft' || releaseDetail.state === 'Published'"
+                (click)="openWhatsChangedDialog()">
+          What's changed
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

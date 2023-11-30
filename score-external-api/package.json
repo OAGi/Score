@@ -1,10 +1,10 @@
 {
-  "name": "score-api",
-  "version": "0.0.1",
+  "name": "score-external-api",
+  "version": "3.2.1",
   "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "author": "Kenneth Burnett <kenneth.j.burnett@lmco.com>",
+  "private": false,
+  "license": "MIT License",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

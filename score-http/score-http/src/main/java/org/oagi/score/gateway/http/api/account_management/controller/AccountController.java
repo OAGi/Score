@@ -159,6 +159,14 @@ public class AccountController implements InitializingBean {
         return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(value = "/accounts/{id:[\\d]+}/transfer_ownership", method = RequestMethod.POST)
+    public ResponseEntity transferOwnership(
+            @PathVariable("id") BigInteger id,
+            @AuthenticationPrincipal AuthenticatedPrincipal user) {
+        accountService.transferOwnership(user, id);
+        return ResponseEntity.accepted().build();
+    }
+
     @RequestMapping(value = "/oauth2/logout", method = RequestMethod.GET)
     public void oauth2Logout(@AuthenticationPrincipal AuthenticatedPrincipal user,
                              HttpServletRequest request,

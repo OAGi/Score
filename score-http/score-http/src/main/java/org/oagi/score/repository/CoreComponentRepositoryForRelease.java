@@ -123,10 +123,6 @@ public class CoreComponentRepositoryForRelease {
     public List<CdtAwdPriXpsTypeMapRecord> findAllCdtAwdPriXpsTypeMap(ULong releaseId) {
         return dslContext.select(CDT_AWD_PRI_XPS_TYPE_MAP.fields())
                 .from(CDT_AWD_PRI_XPS_TYPE_MAP)
-                .join(CDT_AWD_PRI).on(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID.eq(CDT_AWD_PRI.CDT_AWD_PRI_ID))
-                .join(DT).on(CDT_AWD_PRI.CDT_ID.eq(DT.DT_ID))
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchInto(CdtAwdPriXpsTypeMapRecord.class);
     }
 
@@ -141,28 +137,18 @@ public class CoreComponentRepositoryForRelease {
     public List<CdtScAwdPriXpsTypeMapRecord> findAllCdtScAwdPriXpsTypeMap(ULong releaseId) {
         return dslContext.select(CDT_SC_AWD_PRI_XPS_TYPE_MAP.fields())
                 .from(CDT_SC_AWD_PRI_XPS_TYPE_MAP)
-                .join(CDT_SC_AWD_PRI).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_ID.eq(CDT_SC_AWD_PRI.CDT_SC_AWD_PRI_ID))
-                .join(DT_SC).on(CDT_SC_AWD_PRI.CDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchInto(CdtScAwdPriXpsTypeMapRecord.class);
     }
 
     public List<CdtScAwdPriRecord> findAllCdtScAwdPri(ULong releaseId) {
         return dslContext.select(CDT_SC_AWD_PRI.fields())
                 .from(CDT_SC_AWD_PRI)
-                .join(DT_SC).on(CDT_SC_AWD_PRI.CDT_SC_ID.eq(DT_SC.DT_SC_ID))
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchInto(CdtScAwdPriRecord.class);
     }
 
     public List<CdtAwdPriRecord> findAllCdtAwdPri(ULong releaseId) {
         return dslContext.select(CDT_AWD_PRI.fields())
                 .from(CDT_AWD_PRI)
-                .join(DT).on(CDT_AWD_PRI.CDT_ID.eq(DT.DT_ID))
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchInto(CdtAwdPriRecord.class);
     }
 
@@ -174,9 +160,6 @@ public class CoreComponentRepositoryForRelease {
     public List<XbtRecord> findAllXbt(ULong releaseId) {
         return dslContext.select(XBT.fields())
                 .from(XBT)
-                .join(XBT_MANIFEST)
-                .on(XBT.XBT_ID.eq(XBT_MANIFEST.XBT_ID))
-                .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
                 .fetchInto(XbtRecord.class);
     }
 

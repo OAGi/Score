@@ -17,11 +17,11 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {forkJoin} from 'rxjs';
-import {hashCode, saveBranch} from 'src/app/common/utility';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {hashCode, initFilter, saveBranch} from 'src/app/common/utility';
 import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
-import {WorkingRelease} from '../../../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../../../release-management/domain/release';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
@@ -31,6 +31,8 @@ import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WebPageInfoService} from '../../../../basis/basis.service';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
+import {FormControl} from '@angular/forms';
+import {ReleaseService} from '../../../../release-management/domain/release.service';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -49,17 +51,17 @@ export class OasDocDetailComponent implements OnInit {
   bizCtxSearch: string;
   disabled: boolean;
   displayedColumns = [
-    { id: 'select', name: '' },
-    { id: 'den', name: 'DEN' },
-    { id: 'remark', name: 'Remark' },
-    { id: 'verb', name: 'Verb' },
-    { id: 'arrayIndicator', name: 'Array Indicator' },
-    { id: 'suppressRootIndicator', name: 'Suppress Root Indicator' },
-    { id: 'messageBody', name: 'Message Body' },
-    { id: 'resourceName', name: 'Resource Name' },
-    { id: 'operationId', name: 'Operation ID' },
-    { id: 'tagName', name: 'Tag Name' },
-    { id: 'lastUpdateTimestamp', name: 'Last Update Timestamp' },
+    {id: 'select', name: ''},
+    {id: 'den', name: 'DEN'},
+    {id: 'branch', name: 'Branch'},
+    {id: 'remark', name: 'Remark'},
+    {id: 'verb', name: 'Verb'},
+    {id: 'arrayIndicator', name: 'Array Indicator'},
+    {id: 'suppressRootIndicator', name: 'Suppress Root Indicator'},
+    {id: 'messageBody', name: 'Message Body'},
+    {id: 'resourceName', name: 'Resource Name'},
+    {id: 'operationId', name: 'Operation ID'},
+    {id: 'tagName', name: 'Tag Name'},
   ];
   table: TableData<BieForOasDoc>;
   selection = new SelectionModel<BieForOasDoc>(true, []);
@@ -121,7 +123,7 @@ export class OasDocDetailComponent implements OnInit {
 
     forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieListForOasDoc(this.request, oasDocId)
+      this.openAPIService.getBieListForOasDoc(this.request, oasDocId),
     ]).subscribe(([simpleOasDoc, bieForOasDoc]) => {
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);

@@ -17,25 +17,13 @@ fi
 
 cd ..
 
-echo "Running 'npm install'..."
-npm install
-
 echo "Building project..."
 rm -rf dist
-ng build --configuration production --optimization --aot --build-optimizer --common-chunk --vendor-chunk
-
-echo "Preparing files..."
-rm -rf docker/score-web
-cp -rf dist/score-web docker/score-web
-
-rm -rf docker/docs
-cp -rf ../docs/user_guide/_build/html docker/docs
 
 echo "Building docker image..."
-cd docker
-docker build --no-cache -f Dockerfile -t oagi1docker/srt-web:3.2.1 .
+docker build --no-cache -f docker/Dockerfile --target runner -t oagi1docker/srt-external-api:3.2.1 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-web:3.2.1
+docker scout cves oagi1docker/srt-external-api:3.2.1
 
 echo "Done."

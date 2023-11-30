@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
@@ -11,10 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,6 +21,9 @@ import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.oagi.score.common.util.ControllerHelper.getRequestHostname;
+import static org.oagi.score.common.util.ControllerHelper.getRequestScheme;
 
 @RestController
 public class BieGenerateController {
@@ -35,13 +36,15 @@ public class BieGenerateController {
 
     @RequestMapping(value = "/profile_bie/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                        @RequestParam("data") String data) throws IOException {
+                                                        @RequestParam("data") String data,
+                                                        HttpServletRequest httpServletRequest) throws IOException {
 
         Map<String, Object> params = convertValue(data);
         List<BigInteger> topLevelAsbiepIds = popTopLevelAsbiepIds(params);
         GenerateExpressionOption option =
                 objectMapper.convertValue(params, GenerateExpressionOption.class);
-
+        option.setScheme(getRequestScheme(httpServletRequest));
+        option.setHost(getRequestHostname(httpServletRequest));
         BieGenerateExpressionResult bieGenerateExpressionResult = service.generate(user, topLevelAsbiepIds, option);
 
         return ResponseEntity.ok()
