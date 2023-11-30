@@ -44,9 +44,6 @@ const routes: Routes = [
     AgencyIdListDetailComponent,
     AgencyIdListValueDialogComponent,
   ],
-  entryComponents: [
-    AgencyIdListValueDialogComponent
-  ],
   providers: [
     AgencyIdListService
   ]

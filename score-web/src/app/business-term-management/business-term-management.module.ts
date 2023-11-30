@@ -96,12 +96,6 @@ const routes: Routes = [
     AssignBusinessTermBieComponent,
     AssignedBusinessTermDetailComponent
   ],
-  entryComponents: [
-    BusinessTermListComponent,
-    AssignedBusinessTermListComponent,
-    AssignBusinessTermBtComponent,
-    AssignedBusinessTermDetailComponent
-  ],
   providers: [
     BusinessTermService
   ]
