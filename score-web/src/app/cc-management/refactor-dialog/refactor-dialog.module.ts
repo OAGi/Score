@@ -21,6 +21,9 @@ import {ScoreCommonModule} from '../../common/score-common.module';
   declarations: [
     RefactorDialogComponent,
   ],
+  entryComponents: [
+    RefactorDialogComponent
+  ],
   providers: [
     RefactorDialogService,
   ]

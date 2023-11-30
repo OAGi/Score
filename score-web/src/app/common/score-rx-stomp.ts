@@ -6,9 +6,6 @@ import {scoreRxStompConfig} from './score-rx-stomp-config';
   providedIn: 'root',
 })
 export class RxStompService extends RxStomp {
-  public constructor() {
-    super();
-  }
 }
 
 export function rxStompServiceFactory() {

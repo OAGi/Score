@@ -44,6 +44,13 @@ const routes: Routes = [
     CreateBodDialogComponent,
     CreateVerbDialogComponent,
   ],
+  entryComponents: [
+    CreateAsccpDialogComponent,
+    CreateBccpDialogComponent,
+    CreateBdtDialogComponent,
+    CreateBodDialogComponent,
+    CreateVerbDialogComponent,
+  ],
   providers: [
     CcListService,
     CcNodeService,

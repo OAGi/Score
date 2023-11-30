@@ -89,18 +89,18 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "proxyConfig": "src/proxy.conf.json",
-            "buildTarget": "score-web:build"
+            "browserTarget": "score-web:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "score-web:build:production"
+              "browserTarget": "score-web:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "score-web:build"
+            "browserTarget": "score-web:build"
           }
         },
         "test": {
@@ -147,5 +147,6 @@
         }
       }
     }
-  }
+  },
+  "defaultProject": "score-web"
 }

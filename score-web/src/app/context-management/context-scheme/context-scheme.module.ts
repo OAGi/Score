@@ -55,6 +55,10 @@ const routes: Routes = [
     ContextSchemeValueDialogComponent,
     CodelistListDialogComponent
   ],
+  entryComponents: [
+    ContextSchemeValueDialogComponent,
+    CodelistListDialogComponent
+  ],
   providers: [
     ContextSchemeService
   ]

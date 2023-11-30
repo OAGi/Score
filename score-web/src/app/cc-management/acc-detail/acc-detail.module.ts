@@ -51,6 +51,10 @@ const routes: Routes = [
     AppendAssociationDialogComponent,
     BasedAccDialogComponent
   ],
+  entryComponents: [
+    AppendAssociationDialogComponent,
+    BasedAccDialogComponent
+  ],
   providers: [
     TagService
   ]

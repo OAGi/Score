@@ -17,6 +17,9 @@ import {FindUsagesDialogService} from './domain/find-usages-dialog.service';
   declarations: [
     FindUsagesDialogComponent,
   ],
+  entryComponents: [
+    FindUsagesDialogComponent
+  ],
   providers: [
     FindUsagesDialogService,
   ]

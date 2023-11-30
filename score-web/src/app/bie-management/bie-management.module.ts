@@ -149,6 +149,9 @@ const routes: Routes = [
     BieEditComponent,
     ReuseBieDialogComponent
   ],
+  entryComponents: [
+    ReuseBieDialogComponent
+  ],
   providers: [
     ReleaseService,
     BieCreateService,
