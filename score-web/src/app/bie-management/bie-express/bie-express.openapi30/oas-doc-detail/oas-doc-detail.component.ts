@@ -63,7 +63,7 @@ export class OasDocDetailComponent implements OnInit {
     {id: 'operationId', name: 'Operation ID'},
     {id: 'tagName', name: 'Tag Name'},
   ];
-  table: TableData<BieForOasDoc>;
+  // table: TableData<BieForOasDoc>;
   selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
   request: BieForOasDocListRequest;
@@ -72,7 +72,7 @@ export class OasDocDetailComponent implements OnInit {
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
-  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
+  // @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private bizCtxService: BusinessContextService,
@@ -89,8 +89,8 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BieForOasDoc>(this.displayedColumns);
-    this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
+    // this.table = new TableData<BieForOasDoc>(this.displayedColumns);
+    // this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
 
     this.topLevelAsbiepIds = [];
     this.option = new BieExpressOption();
@@ -110,16 +110,16 @@ export class OasDocDetailComponent implements OnInit {
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.table.sortParams = this.request.page.sortActives;
-    this.table.sortDirs = this.request.page.sortDirections;
-    this.table.sortObservable.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieListForOasDoc();
-    });
+    // this.table.sortParams = this.request.page.sortActives;
+    // this.table.sortDirs = this.request.page.sortDirections;
+    // this.table.sortObservable.subscribe(() => {
+    //   this.paginator.pageIndex = 0;
+    //   this.loadBieListForOasDoc();
+    // });
 
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
+    // this.request.page = new PageRequest(
+      // this.table.sortParams, this.table.sortDirs,
+      // this.paginator.pageIndex, this.paginator.pageSize);
 
     forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
@@ -142,9 +142,9 @@ export class OasDocDetailComponent implements OnInit {
   loadBieListForOasDoc(isInit?: boolean) {
     this.loading = true;
 
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
+    // this.request.page = new PageRequest(
+    //   // this.table.sortParams, this.table.sortDirs,
+    //   this.paginator.pageIndex, this.paginator.pageSize);
 
     this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
       finalize(() => {
@@ -152,30 +152,31 @@ export class OasDocDetailComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
-        elm = new BieForOasDoc(elm);
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
-        return elm;
-      });
-      this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
-      });
+      // this.table.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
+      //   elm = new BieForOasDoc(elm);
+      //   elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+      //   elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
+      //   return elm;
+      // });
+      // this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
+      //   this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
+      // });
 
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
-      this.table.dataSource.data = [];
+      // this.table.dataSource.data = [];
       this.businessContextSelection = {};
     });
   }
 
   getChanged(): BieForOasDoc[] {
-    if (!this.table.dataSource) {
-      return [];
-    }
-    return this.table.dataSource.data.filter(e => e.isChanged);
+    // if (!this.table.dataSource) {
+    //   return [];
+    // }
+    // return this.table.dataSource.data.filter(e => e.isChanged);
+    return [];
   }
 
   isChanged(): boolean {
@@ -205,8 +206,8 @@ export class OasDocDetailComponent implements OnInit {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
     if (property === 'filters.den') {
-      this.sort.active = '';
-      this.sort.direction = '';
+      // this.sort.active = '';
+      // this.sort.direction = '';
     }
     if (property === 'verb') {
       if (source.verb === 'GET' && source.messageBody === 'Request') {
@@ -346,7 +347,7 @@ export class OasDocDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.table.dataSource.data;
+    // dialogConfig.data = this.table.dataSource.data;
     dialogConfig.data.webPageInfo = this.webPageInfo;
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
@@ -373,7 +374,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   _updateDataSource(data: BieForOasDoc[]) {
-    this.table.dataSource.data = data;
+    // this.table.dataSource.data = data;
     this.oasDoc.bieList = data;
   }
 
@@ -448,11 +449,11 @@ export class OasDocDetailComponent implements OnInit {
             });
           });
           const newData = [];
-          this.table.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
-              newData.push(row);
-            }
-          });
+          // this.table.dataSource.data.forEach(row => {
+          //   if (!this.selection.isSelected(row)) {
+          //     newData.push(row);
+          //   }
+          // });
           this.selection.clear();
           this._updateDataSource(newData);
         }

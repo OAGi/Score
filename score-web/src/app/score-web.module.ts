@@ -8,7 +8,7 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/h
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MarkdownModule, MarkedOptions} from 'ngx-markdown';
+import {MARKED_OPTIONS, MarkdownModule, MarkedOptions} from 'ngx-markdown';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {RxStompService, rxStompServiceFactory} from './common/score-rx-stomp';
 
@@ -63,7 +63,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MarkdownModule.forRoot({
       loader: HttpClient,
       markedOptions: {
-        provide: MarkedOptions,
+        provide: MARKED_OPTIONS,
         useValue: {
           gfm: true,
           breaks: false,

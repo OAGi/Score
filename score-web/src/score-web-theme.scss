@@ -1,24 +1,44 @@
-@import '@angular/material/theming';
-// Plus imports for other components in your app.
-
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
-@include mat-core();
+@use '@angular/material' as mat; 
+@include mat.core();
 
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$score-web-primary: mat-palette($mat-blue-grey);
-$score-web-accent: mat-palette($mat-amber);
+$score-web-primary: mat.define-palette(mat.$blue-grey-palette);
+$score-web-accent: mat.define-palette(mat.$amber-palette);
 
 // The warn palette is optional (defaults to red).
-$score-web-warn: mat-palette($mat-deep-orange);
+$score-web-warn: mat.define-palette(mat.$deep-orange-palette);
 
 // Create the theme object (a Sass map containing all of the palettes).
-$score-web-theme: mat-light-theme($score-web-primary, $score-web-accent, $score-web-warn);
+$score-web-theme: mat.define-light-theme((
+  color: (
+    primary: $score-web-primary,
+    accent: $score-web-accent,
+    warn: $score-web-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: -1,
+ ));
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-@include angular-material-theme($score-web-theme);
+@include mat.core-theme($score-web-theme);
+@include mat.all-component-themes($score-web-theme);
+
+.mat-mdc-form-field {
+  min-width: 100% !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  background-color: white !important;
+
+  .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+
+    &:hover .mat-mdc-form-field-focus-overlay {
+      background-color: white !important;
+      opacity: initial;
+    }
+  }
+}
