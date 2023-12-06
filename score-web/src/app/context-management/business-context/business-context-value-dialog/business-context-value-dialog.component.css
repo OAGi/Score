@@ -5,11 +5,11 @@
 }
 
 
-.mat-card-container .mat-card {
+.mat-mdc-card-container .mat-mdc-card {
   margin-right: 10px;
   margin-top: 3px;
 }
 
-.mat-card-container .mat-card:last-child {
+.mat-mdc-card-container .mat-mdc-card:last-child {
   margin-top: 3px;
 }

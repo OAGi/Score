@@ -148,7 +148,7 @@ tr.element-row:not(.expanded-row):active {
   padding-bottom: 0.5rem;
 }
 
-.tree-search-box .mat-form-field {
+.tree-search-box .mat-mdc-form-field {
   font-size: 12px;
 }
 

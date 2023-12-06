@@ -156,20 +156,20 @@ div.context-section {
   padding: 0;
 }
 
-div.context-section > .mat-card {
+div.context-section > .mat-mdc-card {
   box-shadow: none;
 }
 
-.mat-card-container {
+.mat-mdc-card-container {
   display: flex;
   flex-direction: column;
 }
 
-.mat-card-container > * {
+.mat-mdc-card-container > * {
   width: 100%;
 }
 
-.mat-card-container .mat-card {
+.mat-mdc-card-container .mat-mdc-card {
   margin-bottom: 24px;
 }
 
@@ -177,7 +177,7 @@ div.context-section > .mat-card {
   margin: 0 4px;
 }
 
-.context-section .mat-card > .mat-card-actions:last-child {
+.context-section .mat-mdc-card > .mat-mdc-card-actions:last-child {
   padding-bottom: 4px;
 }
 
@@ -185,7 +185,7 @@ table {
   width: 100%;
 }
 
-.mat-form-field {
+.mat-mdc-form-field {
   font-size: 14px;
   width: 100%;
 }
@@ -245,7 +245,7 @@ fa-icon {
   color: #495057;
 }
 
-.mat-card-title {
+.mat-mdc-card-title {
   flex: 1 1 auto;
   font-size: 18px !important;
   font-weight: 400;
@@ -268,7 +268,7 @@ fa-icon {
   margin-bottom: 24px;
 }
 
-.search-box .mat-card-header-text {
+.search-box .mat-mdc-card-header-text {
   margin: 0 8px;
 }
 
@@ -276,8 +276,9 @@ fa-icon {
   margin: 0 8px;
 }
 
-.search-box .mat-card-actions {
+.search-box .mat-mdc-card-actions {
   margin: 0 8px;
+  padding: 8px 0 !important;
 }
 
 div.mat-form-field-wrapper div.mat-form-field-infix mat-icon.datepicker-cancel {
@@ -374,7 +375,7 @@ span.release-state.Published {
   align-items: center;
 }
 
-.mat-card-actions.fab-container, .mat-dialog-actions.fab-container {
+.mat-mdc-card-actions.fab-container, .mat-dialog-actions.fab-container {
   padding: 8px 0 18px 0px;
 }
 
@@ -783,15 +784,15 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
   padding: 18px 24px 18px 24px;
 }
 
-.mat-card-actions button {
+.mat-mdc-card-actions button {
   outline: none;
 }
 
-td.mat-cell {
+td.mat-mdc-cell {
   padding-right: 8px !important;
 }
 
-td.mat-cell:last-child {
+td.mat-mdc-cell:last-child {
   padding-right: 0 !important;
 }
 
@@ -901,6 +902,10 @@ td.mat-cell:last-child {
   padding-top: 1px;
 }
 
+.mat-mdc-menu-item-text {
+  font-size: 13px !important;
+}
+
 span.context-menu-item {
   display: block;
   font-size: 13px;
@@ -920,6 +925,17 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
   text-decoration: line-through !important;
 }
 
+.mat-toolbar-row {
+  height: 64px !important;
+}
+
+.mat-mdc-button > .mat-icon, .mat-mdc-button-base > .mat-icon {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 24px !important;
+  margin-right: 0 !important;
+}
+
 .mat-toolbar-row, .mat-toolbar-single-row {
   -webkit-box-shadow: inset 0 -1px 0 0 rgba(100, 121, 143, 0.122);
   box-shadow: inset 0 -1px 0 0 rgba(100, 121, 143, 0.122);
@@ -934,4 +950,142 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
   background-color: #fff;
   border-color: #333;
   border: 1px solid;
+}
+
+/* Angular 17 fixes */
+.mdc-button {
+  letter-spacing: normal !important;
+  padding: 0 16px !important;
+}
+.mat-mdc-tab-header {
+  border-bottom: 1px solid rgba(0, 0, 0, .12);
+}
+.mat-mdc-tab {
+  height: 48px !important;
+  letter-spacing: normal !important;
+  color: #000000de !important;
+  padding: 0 !important;
+}
+.mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
+  flex-grow: 0 !important;
+}
+.mdc-tab__text-label {
+  opacity: 0.6;
+  color: #000000de !important;
+  width: 160px;
+  justify-content: center;
+}
+.mat-mdc-header-cell {
+  color: #0000008a;
+  font-size: 12px;
+  padding-left: 24px !important;
+}
+.mat-mdc-cell.mdc-data-table__cell.cdk-cell {
+  padding-left: 24px;
+}
+.mat-mdc-form-field-infix {
+  padding-bottom: 0 !important;
+  padding-top: 18px !important;
+  min-height: 40px !important;
+  width: auto !important;
+}
+.mat-mdc-form-field {
+  width: 100% !important;
+  font-size: 14px !important;
+  background-color: white !important;
+}
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+  padding: 0;
+}
+.mat-mdc-form-field .mat-mdc-text-field-wrapper:hover .mat-mdc-form-field-focus-overlay {
+  background-color: white !important;
+  opacity: initial;
+}
+.mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-focus-overlay {
+  background-color: white;
+}
+.mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
+  font-size: 14px;
+  margin-bottom: 0 !important;
+}
+.mat-mdc-form-field .mat-datepicker-toggle .mdc-icon-button {
+  padding: 0;
+  margin-top: 10px;
+  width: 21px !important;
+  height: 21px;
+}
+.mat-mdc-form-field .mat-datepicker-toggle .mat-datepicker-toggle-default-icon {
+  width: 15px;
+  height: 15px;
+}
+.mat-mdc-paginator-page-size {
+  align-items: initial !important;
+  color: #0000008a !important;
+}
+.mat-mdc-paginator-page-size .mat-mdc-paginator-page-size-select {
+  width: 60px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.mat-mdc-paginator-page-size .mat-mdc-paginator-page-size-label {
+  display: flex;
+  align-items: center;
+}
+.mat-mdc-paginator-page-size .mat-mdc-text-field-wrapper {
+  flex: initial !important;
+}
+.mat-mdc-paginator-page-size .mat-mdc-text-field-wrapper .mdc-notched-outline__leading {
+  border: 0;
+  border-bottom: 1px solid black;
+  border-bottom-left-radius: 0 !important;
+}
+.mat-mdc-paginator-page-size .mat-mdc-text-field-wrapper .mdc-notched-outline__trailing {
+  border: 0;
+  border-bottom: 1px solid black;
+  border-bottom-right-radius: 0 !important;
+}
+.mat-mdc-paginator-page-size .mat-mdc-form-field-infix {
+  padding-top: 0 !important;
+  min-height: auto !important;
+}
+.mat-mdc-paginator-range-label {
+  color: #0000008a !important;
+}
+.mat-mdc-checkbox .mdc-label, .mat-mdc-radio-button .mdc-label {
+  margin-bottom: 0 !important;
+  cursor: pointer;
+}
+.mat-mdc-checkbox .mdc-checkbox__checkmark, .mat-mdc-radio-button .mdc-checkbox__checkmark {
+  color: white !important;
+}
+
+.mat-mdc-card {
+  padding: 16px;
+}
+
+.mat-mdc-card .mat-mdc-card-content {
+  padding: 0 !important;
+}
+
+.mat-mdc-form-field + div.mat-form-field-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+div.mat-form-field-wrapper div.mat-form-field-flex {
+  display: inline-flex;
+  align-items: baseline;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
+  display: block;
+  position: relative;
+  flex: auto;
+  min-width: 0;
+  width: 180px;
 }

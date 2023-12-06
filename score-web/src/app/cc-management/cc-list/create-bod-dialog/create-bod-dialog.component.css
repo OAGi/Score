@@ -47,7 +47,7 @@ tr.element-row:not(.expanded-row):active {
   display: flex;
 }
 
-.mat-card-content p {
+.mat-mdc-card-content p {
   font-family: 'Roboto', 'sans-serif';
 }
 
