@@ -104,13 +104,14 @@
           Add
         </button>
         <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
+                [hidden]="table.dataSource.data.length == 0"
                 [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
                 color="warn">
           <mat-icon>delete</mat-icon>
           Remove
         </button>
         <button mat-raised-button color="primary" (click)="generate()"
-                [disabled]="isDisabled(oasDoc)">
+                [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
           Generate
         </button>
       </div>
@@ -120,17 +121,18 @@
       <div class="container-fluid pb-2">
         <div class="row">
           <div class="col-12">
-            <!-- <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
               <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
                 {{ columnName }}
                 <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
               </ng-template>
-            </mat-multi-sort-table-settings> -->
+            </mat-multi-sort-table-settings>
           </div>
         </div>
       </div>
       <div class="mat-elevation-z1">
-        <table mat-table>
+        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef></th>

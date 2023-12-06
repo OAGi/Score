@@ -1,0 +1,48 @@
+{
+  "name": "ngx-mat-multi-sort",
+  "version": "16.0.2",
+  "description": "An extension for the angular material table to support multi-sorting.",
+  "author": "Maximilian Balluff",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maxl94/ngx-multi-sort-table"
+  },
+  "bugs": {
+    "url": "https://github.com/Maxl94/ngx-multi-sort-table/issues"
+  },
+  "keywords": [
+    "angular",
+    "javascript",
+    "typescript",
+    "angular-material",
+    "table",
+    "multi-sort"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
+  "peerDependencies": {
+    "@angular/common": "^17.0.2",
+    "@angular/core": "^17.0.2",
+    "@angular/material": "^17.0.1",
+    "@angular/cdk": "^17.0.1"
+  },
+  "module": "fesm2022/ngx-mat-multi-sort.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/ngx-mat-multi-sort.mjs",
+      "esm": "./esm2022/ngx-mat-multi-sort.mjs",
+      "default": "./fesm2022/ngx-mat-multi-sort.mjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled by Ivy in full compilation mode. This is not allowed.\\nPlease delete and rebuild the package with Ivy partial compilation mode, before attempting to publish.\\n')\" && exit 1"
+  }
+}

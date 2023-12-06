@@ -43,6 +43,7 @@ import {MatTreeModule} from '@angular/material/tree';
 import {NgModule} from '@angular/core';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatBadgeModule} from '@angular/material/badge';
+import {MatMultiSortModule} from "ngx-mat-multi-sort";
 
 @NgModule({
   exports: [
@@ -86,6 +87,7 @@ import {MatBadgeModule} from '@angular/material/badge';
     MatSnackBarModule,
     MatStepperModule,
     MatTableModule,
+    MatMultiSortModule,
     MatTreeModule,
     MatPaginatorModule,
     MatTabsModule,
