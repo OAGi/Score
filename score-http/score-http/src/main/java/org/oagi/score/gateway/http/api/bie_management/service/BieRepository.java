@@ -774,6 +774,7 @@ public class BieRepository {
         SelectOnConditionStep step = dslContext.select(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.as("reusingTopLevelAsbiepId"),
                 TOP_LEVEL_ASBIEP.STATE.as("reusingState"),
+                TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("reusingDeprecated"),
                 ASCCP.as("reusing_asccp").PROPERTY_TERM.as("reusingPropertyTerm"),
                 ASCCP_MANIFEST.as("reusing_asccp_manifest").DEN.as("reusingDen"),
                 ABIE.as("reusing_abie").GUID.as("reusingGuid"),
@@ -785,6 +786,7 @@ public class BieRepository {
 
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").TOP_LEVEL_ASBIEP_ID.as("reusedTopLevelAsbiepId"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").STATE.as("reusedState"),
+                TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").IS_DEPRECATED.as("reusedDeprecated"),
                 ASCCP.as("reused_asccp").PROPERTY_TERM.as("reusedPropertyTerm"),
                 ASCCP_MANIFEST.as("reused_asccp_manifest").DEN.as("reusedDen"),
                 ABIE.as("reused_abie").GUID.as("reusedGuid"),

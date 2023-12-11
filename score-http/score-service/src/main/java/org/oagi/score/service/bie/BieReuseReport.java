@@ -8,6 +8,7 @@ import java.math.BigInteger;
 public class BieReuseReport {
     private BigInteger reusingTopLevelAsbiepId;
     private String reusingState;
+    private Boolean reusingDeprecated;
     private String reusingPropertyTerm;
     private String reusingDen;
     private String reusingGuid;
@@ -20,6 +21,7 @@ public class BieReuseReport {
 
     private BigInteger reusedTopLevelAsbiepId;
     private String reusedState;
+    private Boolean reusedDeprecated;
     private String reusedPropertyTerm;
     private String reusedDen;
     private String reusedGuid;

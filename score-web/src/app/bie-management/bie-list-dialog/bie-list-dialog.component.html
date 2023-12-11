@@ -20,6 +20,9 @@
           <span class="bie-state {{ element.reusingState }}"
                 [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
                 'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
+          <span *ngIf="element.deprecated" class="bie-state Deprecated"
+                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
         </td>
       </ng-container>
 
@@ -81,6 +84,9 @@
           <span class="bie-state {{ element.reusedState }}"
                 [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
                 'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
+          <span *ngIf="element.deprecated" class="bie-state Deprecated"
+                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
         </td>
       </ng-container>
 
