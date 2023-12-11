@@ -870,6 +870,9 @@ td.mat-mdc-cell:last-child {
 
 .actions {
   align-self: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .actions button:first-child {
@@ -909,7 +912,6 @@ td.mat-mdc-cell:last-child {
 span.context-menu-item {
   display: block;
   font-size: 13px;
-  width: 92%;
   outline: 0;
   font-weight: 400;
   border: solid 1px transparent;
@@ -1088,4 +1090,30 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
   flex: auto;
   min-width: 0;
   width: 180px;
+}
+
+.tree-search-box {
+  margin-bottom: 7px;
+}
+
+.tree-search-box .mat-mdc-form-field-subscript-wrapper {
+  height: 0;
+}
+
+.tree-search-box .mat-mdc-icon-button:hover {
+  --mat-icon-button-hover-state-layer-opacity: 0;
+}
+
+.cdk-virtual-scroll-content-wrapper .mdc-icon-button {
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.mdc-list-item__primary-text {
+  flex-grow: 1;
+}
+
+.mdc-list-item__primary-text + .mat-mdc-option-pseudo-checkbox {
+  display: none !important;
 }
