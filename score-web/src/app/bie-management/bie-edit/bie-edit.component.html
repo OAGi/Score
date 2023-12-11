@@ -274,7 +274,7 @@
             </as-split-area>
             <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
               <!-- ABIE -->
-              <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded ">
+              <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded">
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
@@ -309,16 +309,20 @@
                       <div class="row">
                         <div class="col-md-12 col-sm-12">
                           <mat-form-field class="{{ !canEdit ? 'mat-form-field-disabled' : '' }}">
-                            <mat-chip-list #businessContextChipList aria-label="Business Contexts">
-                              <mat-chip
-                                *ngFor="let businessContext of businessContexts"
-                                [disabled]="!canEdit"
-                                [selectable]="false"
-                                [removable]="isBusinessContextRemovable"
-                                (removed)="removeBusinessContext(businessContext)">
-                                {{ businessContext.name }}
-                                <mat-icon matChipRemove disabled="isBusinessContextRemovable">cancel</mat-icon>
-                              </mat-chip>
+                            <mat-label>Business Contexts</mat-label>
+                            <mat-chip-grid #businessContextChipList>
+                              @for (businessContext of businessContexts; track businessContext) {
+                                <mat-chip-row
+                                    [disabled]="!canEdit"
+                                    [selectable]="false"
+                                    [removable]="isBusinessContextRemovable"
+                                    (removed)="removeBusinessContext(businessContext)">
+                                  {{ businessContext.name }}
+                                  <button matChipRemove [attr.aria-label]="isBusinessContextRemovable">
+                                    <mat-icon>cancel</mat-icon>
+                                  </button>
+                                </mat-chip-row>
+                              }
                               <input
                                 placeholder="Business Context"
                                 #businessContextInput
@@ -328,7 +332,7 @@
                                 [matChipInputFor]="businessContextChipList"
                                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                 [matChipInputAddOnBlur]="addOnBlur">
-                            </mat-chip-list>
+                            </mat-chip-grid>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBusinessContext($event)">
                               <mat-option *ngFor="let businessContext of filteredBusinessContexts | async"
                                           [value]="businessContext">
@@ -395,6 +399,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
                                       [(ngModel)]="asAbieDetail().asbiep.definition"
@@ -406,6 +411,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Component Definition" [disabled]="true"
                                       value="{{ asAbieDetail().asccp.definition || ' ' }}">
@@ -416,6 +422,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Type Definition" [disabled]="true"
                                       value="{{ asAbieDetail().acc.definition || ' ' }}">
@@ -482,6 +489,7 @@
                       <div class="row">
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
                             <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
@@ -502,6 +510,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
                             <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().ascc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
@@ -558,6 +567,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
                                       [(ngModel)]="asAsbiepDetail().asbie.definition"
@@ -657,16 +667,18 @@
                         </div>
 
                         <mat-form-field>
-                        <textarea matInput rows="6"
-                                  placeholder="Context Definition"
-                                  [value]="reusedNodeDetail.asbiep.definition"
-                                  [disabled]="true"></textarea>
+                          <mat-label>Context Definition</mat-label>
+                          <textarea matInput rows="6"
+                                    placeholder="Context Definition"
+                                    [value]="reusedNodeDetail.asbiep.definition"
+                                    [disabled]="true"></textarea>
                         </mat-form-field>
                       </div>
 
                       <div class="row">
                         <div class="col-md-12 col-sm-12">
                           <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Association Definition" [disabled]="true"
                                       value="{{ asAsbiepDetail().ascc.definition || ' ' }}">
@@ -678,6 +690,7 @@
                       <div class="row">
                         <div class="col-md-12 col-sm-12">
                           <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Component Definition" [disabled]="true"
                                       value="{{ asAsbiepDetail().asccp.definition || ' ' }}">
@@ -689,6 +702,7 @@
                       <div class="row">
                         <div class="col-md-12 col-sm-12">
                           <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Type Definition" [disabled]="true"
                                       value="{{ asAsbiepDetail().acc.definition || ' ' }}">
@@ -754,6 +768,7 @@
                       <div class="row">
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
                             <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
@@ -773,6 +788,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
                             <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().bcc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
@@ -1032,6 +1048,7 @@
                       <div class="row pt-2">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
                                       [(ngModel)]="asBbiepDetail().bbie.definition"
@@ -1044,6 +1061,7 @@
                       <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                           <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Association Definition" [disabled]="true"
                                       value="{{ asBbiepDetail().bcc.definition || ' ' }}">
@@ -1055,6 +1073,7 @@
                       <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                           <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Component Definition" [disabled]="true"
                                       value="{{ asBbiepDetail().bccp.definition || ' ' }}">
@@ -1110,6 +1129,7 @@
                       <div class="row">
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min" required
                                    [formControl]="bieCardinalityMin">
                             <mat-error *ngIf="bieCardinalityMin.hasError('required') || bieCardinalityMin.hasError('whitespace')">
@@ -1130,6 +1150,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
                             <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().bdtSc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
@@ -1380,6 +1401,7 @@
                       <div class="row pt-2">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Context Definition"
                                       [(ngModel)]="asBbieScDetail().bbieSc.definition"
@@ -1392,6 +1414,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
                             <textarea matInput rows="6"
                                       placeholder="Component Definition" [disabled]="true"
                                       value="{{ asBbieScDetail().bdtSc.definition || ' ' }}">
