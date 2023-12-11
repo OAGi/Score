@@ -666,16 +666,17 @@ public class BieEditService implements InitializingBean {
             throw new IllegalArgumentException("Target BIE already has reused BIE.");
         }
 
-        ULong reuseAsbiepId = dslContext.select(TOP_LEVEL_ASBIEP.ASBIEP_ID)
-                .from(TOP_LEVEL_ASBIEP)
+        TopLevelAsbiepRecord reuseAsbiep = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(request.getReuseTopLevelAsbiepId())))
-                .fetchOneInto(ULong.class);
+                .fetchOne();
 
-        asbieRecord.setToAsbiepId(reuseAsbiepId);
+        asbieRecord.setToAsbiepId(reuseAsbiep.getAsbiepId());
+        asbieRecord.setIsDeprecated(reuseAsbiep.getIsDeprecated());
         asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
         asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
         asbieRecord.update(
                 ASBIE.TO_ASBIEP_ID,
+                ASBIE.IS_DEPRECATED,
                 ASBIE.LAST_UPDATED_BY,
                 ASBIE.LAST_UPDATE_TIMESTAMP);
 

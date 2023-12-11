@@ -595,13 +595,22 @@
                         </mat-form-field>
 
                         <div class="row">
-                          <div class="col-md-12 col-sm-12">
+                          <div class="col-md-3 col-sm-6">
                             <div class="checkbox">
-                              <mat-slide-toggle color="accent"
-                                                [(ngModel)]="reusedNode.inverseMode"
-                                                [disabled]="true">
+                              <mat-checkbox color="primary"
+                                            [(ngModel)]="reusedNode.deprecated"
+                                            [disabled]="true">
+                                Deprecated
+                              </mat-checkbox>
+                            </div>
+                          </div>
+                          <div class="col-md-3 col-sm-6" *ngIf="isBIEInverseModeEnabled">
+                            <div class="checkbox">
+                              <mat-checkbox color="primary"
+                                            [(ngModel)]="reusedNode.inverseMode"
+                                            [disabled]="true">
                                 Inverse Mode
-                              </mat-slide-toggle>
+                              </mat-checkbox>
                             </div>
                           </div>
                         </div>
