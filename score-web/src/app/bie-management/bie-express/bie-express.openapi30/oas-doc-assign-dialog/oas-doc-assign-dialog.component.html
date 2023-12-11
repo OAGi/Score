@@ -171,7 +171,7 @@
               <span class="bie-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                     'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-              <span *ngIf="element.deprecated" class="bie-state Deprecated"
+              <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
             </td>

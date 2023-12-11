@@ -29,7 +29,7 @@
               <span class="bie-state {{ element.reusingState }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
                     'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
-              <span *ngIf="element.reusingDeprecated" class="bie-state Deprecated"
+              <span *ngIf="element.reusingDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
             </td>
@@ -86,7 +86,7 @@
               <span class="bie-state {{ element.reusedState }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
                     'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
-              <span *ngIf="element.reusedDeprecated" class="bie-state Deprecated"
+              <span *ngIf="element.reusedDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
             </td>

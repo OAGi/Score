@@ -3,6 +3,8 @@ export class ReuseReport {
   reusingTopLevelAsbiepId: number;
   reusingState: string;
   reusingDeprecated: boolean;
+  reusingDeprecatedReason: string;
+  reusingDeprecatedRemark: string;
   reusingPropertyTerm: string;
   reusingDen: string;
   reusingGuid: string;
@@ -15,6 +17,8 @@ export class ReuseReport {
   reusedTopLevelAsbiepId: number;
   reusedState: string;
   reusedDeprecated: boolean;
+  reusedDeprecatedReason: string;
+  reusedDeprecatedRemark: string;
   reusedPropertyTerm: string;
   reusedDen: string;
   reusedGuid: string;

@@ -441,6 +441,7 @@ export class BieListComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     dialogConfig.data = {
+      deprecated: bie.deprecated,
       reason: bie.deprecatedReason,
       remark: bie.deprecatedRemark
     };

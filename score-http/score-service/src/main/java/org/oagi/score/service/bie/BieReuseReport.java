@@ -9,6 +9,8 @@ public class BieReuseReport {
     private BigInteger reusingTopLevelAsbiepId;
     private String reusingState;
     private Boolean reusingDeprecated;
+    private String reusingDeprecatedReason;
+    private String reusingDeprecatedRemark;
     private String reusingPropertyTerm;
     private String reusingDen;
     private String reusingGuid;
@@ -22,6 +24,8 @@ public class BieReuseReport {
     private BigInteger reusedTopLevelAsbiepId;
     private String reusedState;
     private Boolean reusedDeprecated;
+    private String reusedDeprecatedReason;
+    private String reusedDeprecatedRemark;
     private String reusedPropertyTerm;
     private String reusedDen;
     private String reusedGuid;

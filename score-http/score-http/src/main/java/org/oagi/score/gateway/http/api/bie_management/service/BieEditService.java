@@ -1259,6 +1259,8 @@ public class BieEditService implements InitializingBean {
                 .set(TOP_LEVEL_ASBIEP.IS_DEPRECATED, (byte) 1)
                 .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, request.getReason())
                 .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, request.getRemark())
+                .set(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY, ULong.valueOf(requester.getUserId()))
+                .set(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
                 .execute();
     }
