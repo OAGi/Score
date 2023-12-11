@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 tomcat:10.1.13-jdk21-openjdk
+FROM --platform=linux/amd64 tomcat:10.1.16-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
