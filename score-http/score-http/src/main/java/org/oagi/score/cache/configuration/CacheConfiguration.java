@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.BatchStrategies;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -32,7 +33,7 @@ public class CacheConfiguration {
     @Bean
     public RedisCacheManager redisCacheManager() {
         ScoreRedisCacheManager redisCacheManager = new ScoreRedisCacheManager(redisConnectionFactory,
-                new ScoreRedisCacheWriter(redisConnectionFactory), redisCacheConfiguration());
+                new ScoreRedisCacheWriter(redisConnectionFactory, BatchStrategies.keys()), redisCacheConfiguration());
 
         return redisCacheManager;
     }

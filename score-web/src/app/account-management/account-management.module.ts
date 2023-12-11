@@ -23,6 +23,7 @@ import {TenantListService} from './domain/tenant-list.service';
 import {TenantUserDetailComponent} from './tenant-user-detail/tenant-user-detail.component';
 import {TenantCreateComponent} from './tenant-create/tenant-create.component';
 import {UpdateTenantComponent} from './tenant-update/tenant-update.component';
+import {TransferOwnershipListComponent} from './take-ownership-list/transfer-ownership-list.component';
 
 
 const routes: Routes = [
@@ -34,6 +35,11 @@ const routes: Routes = [
   {
     path: 'account/create',
     component: AccountCreateComponent,
+    canActivate: [CanActivateAdmin]
+  },
+  {
+    path: 'account/transfer_ownership',
+    component: TransferOwnershipListComponent,
     canActivate: [CanActivateAdmin]
   },
   {
@@ -93,6 +99,7 @@ const routes: Routes = [
     PendingDetailComponent,
     PendingListComponent,
     AccountListDialogComponent,
+    TransferOwnershipListComponent,
     TenantListComponent,
     TenantBusinessCtxDetailComponent,
     TenantUserDetailComponent,
