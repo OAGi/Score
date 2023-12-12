@@ -11,13 +11,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBusinessTermPage {
 
-    private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::mat-form-field//input[1]");
+    private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::mat-mdc-form-field//input[1]");
 
-    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::mat-form-field//input[1]");
+    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::mat-mdc-form-field//input[1]");
 
-    private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::mat-form-field//input[1]");
+    private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::mat-mdc-form-field//input[1]");
 
-    private static final By COMMENT_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Comment\")]//ancestor::mat-form-field//input[1]");
+    private static final By COMMENT_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Comment\")]//ancestor::mat-mdc-form-field//input[1]");
 
     private static final By CREATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
@@ -42,7 +42,7 @@ public class CreateBusinessTermPageImpl extends BasePageImpl implements CreateBu
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

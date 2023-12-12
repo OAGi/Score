@@ -34,27 +34,27 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
     private static final By CODE_LIST_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
     private static final By VERSION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-mdc-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-mdc-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-mdc-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-mdc-form-field//input");
     private static final By LIST_ID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-mdc-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-mdc-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
     private static final By REMARK_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-mdc-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CANCEL_REVISION_VALUE_BUTTON_LOCATOR =
@@ -127,7 +127,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+                By.xpath("//mat-mdc-card-title/span[1]"));
     }
 
     @Override

@@ -14,13 +14,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CreateModuleSetPageImpl extends BasePageImpl implements CreateModuleSetPage {
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-mdc-form-field//textarea");
    private static final By RELEASE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Release\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[text()= \"Release\"]//ancestor::mat-mdc-form-field[1]//mat-select/div/div[1]");
     private static final By MODULE_SET_RELEASE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Copy CC assignment from Module Set Release\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//*[text()= \"Copy CC assignment from Module Set Release\"]//ancestor::mat-mdc-form-field[1]//mat-select/div/div[1]");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
@@ -42,7 +42,7 @@ public class CreateModuleSetPageImpl extends BasePageImpl implements CreateModul
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

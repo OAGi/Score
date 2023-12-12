@@ -46,7 +46,7 @@ public class ContextSchemeValueDialogImpl implements ContextSchemeValueDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
     }
 
     @Override

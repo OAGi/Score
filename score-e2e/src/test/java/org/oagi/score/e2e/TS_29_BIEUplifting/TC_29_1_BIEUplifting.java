@@ -438,7 +438,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
                         "/Enterprise Unit/Extension")) {
             WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE(path);
             waitFor(ofMillis(1000L));
-            assertFalse(isElementPresent(By.xpath("//mat-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+            assertFalse(isElementPresent(By.xpath("//mat-mdc-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         }
 
         for (String path :
@@ -451,8 +451,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
             waitFor(ofMillis(1000L));
             WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE(path);
             waitFor(ofMillis(1000L));
-            assertChecked(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
-            assertTrue(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]//input[@disabled]")).isDisplayed());
+            assertChecked(getDriver().findElement(By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+            assertTrue(getDriver().findElement(By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]//input[@disabled]")).isDisplayed());
         }
         escape(getDriver());
         EditBIEPage editBIEPage = upliftBIEVerificationPage.uplift();
@@ -519,11 +519,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         WebElement sourceNode = upliftBIEVerificationPage.goToNodeInSourceBIE("/Enterprise Unit/Extension/Indicator");
         WebElement targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/GL Entity Identifier/Scheme Version Identifier");
-        assertTrue(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")).isEnabled());
+        assertTrue(getDriver().findElement(By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")).isEnabled());
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("/Enterprise Unit/General Ledger Element");
-        assertEnabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+        assertEnabled(getDriver().findElement(By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         targetNode = upliftBIEVerificationPage.goToNodeInTargetBIE("Enterprise Unit/Profit Center Identifier");
-        assertEnabled(getDriver().findElement(By.xpath("//mat-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
+        assertEnabled(getDriver().findElement(By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//ancestor::div[1]/mat-checkbox[1]")));
         homePage.logout();
     }
 

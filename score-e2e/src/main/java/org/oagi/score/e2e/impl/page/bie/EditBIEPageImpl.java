@@ -31,7 +31,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");

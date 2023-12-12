@@ -20,13 +20,13 @@ public class ContextMenuImpl extends DelegateBasePageImpl implements ContextMenu
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Context\")]//ancestor::button[1]");
 
     private final By VIEW_EDIT_CONTEXT_CATEGORY_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Context Category\")]");
+            By.xpath("//button/span[contains(text(), \"View/Edit Context Category\")]");
 
     private final By VIEW_EDIT_CONTEXT_SCHEME_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Context Scheme\")]");
+            By.xpath("//button/span[contains(text(), \"View/Edit Context Scheme\")]");
 
     private final By VIEW_EDIT_BUSINESS_CONTEXT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Business Context\")]");
+            By.xpath("//button/span[contains(text(), \"View/Edit Business Context\")]");
 
     public ContextMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

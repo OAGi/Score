@@ -14,7 +14,7 @@ public class AddCommentDialogImpl implements AddCommentDialog {
     private static final By COMMENT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Comment\")]//ancestor::button[1]");
     private static final By COMMENT_FIELD_LOCATOR =
-            By.xpath("//mat-sidenav//mat-form-field//textarea");
+            By.xpath("//mat-sidenav//mat-mdc-form-field//textarea");
     private static final By CLOSE_BUTTON_LOCATOR =
             By.xpath("//div/mat-icon[contains(text(), \"close\")]");
 

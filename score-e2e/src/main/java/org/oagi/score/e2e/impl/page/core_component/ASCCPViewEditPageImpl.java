@@ -41,7 +41,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -67,13 +67,13 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Show History\")]");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-mdc-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
 
     private final ASCCPObject asccp;
 

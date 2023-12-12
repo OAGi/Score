@@ -224,7 +224,7 @@ public abstract class PageHelper {
      * @return the text message from the snackbar
      */
     public static String getSnackBarMessage(WebDriver driver) {
-        String xpathExpr = "//simple-snack-bar/span";
+        String xpathExpr = "//simple-snack-bar/div";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
     }
@@ -237,7 +237,7 @@ public abstract class PageHelper {
      * @return the UI element of the snackbar
      */
     public static WebElement getSnackBar(WebDriver driver, String message) {
-        String xpathExpr = "//simple-snack-bar//span[contains(text(), \"" + message + "\")]";
+        String xpathExpr = "//simple-snack-bar//div[contains(text(), \"" + message + "\")]";
         return visibilityOfElementLocated(driver, By.xpath(xpathExpr));
     }
 

@@ -38,15 +38,15 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
@@ -58,7 +58,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {

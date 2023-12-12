@@ -24,10 +24,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -36,10 +36,10 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");

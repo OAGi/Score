@@ -19,13 +19,13 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By CONTEXT_CATEGORY_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Category\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Context Category\")]//ancestor::mat-mdc-form-field//mat-select");
 
     private static final By CONTEXT_CATEGORY_DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Category\")]//ancestor::mat-form-field/ancestor::mat-card-content/mat-form-field[2]//textarea");
+            By.xpath("//mat-label[contains(text(), \"Context Category\")]//ancestor::mat-mdc-form-field/ancestor::mat-mdc-card-content/mat-mdc-form-field[2]//textarea");
 
     private static final By CONTEXT_SCHEME_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Scheme\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Context Scheme\")]//ancestor::mat-mdc-form-field//mat-select");
 
     private static final By CONTEXT_SCHEME_ID_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Scheme ID\")]//ancestor::div[1]/input");
@@ -37,12 +37,12 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
             By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::div[1]/input");
 
     private static final By CONTEXT_SCHEME_DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Scheme\")]//ancestor::mat-form-field/ancestor::mat-card-content/mat-form-field[5]//textarea");
+            By.xpath("//mat-label[contains(text(), \"Context Scheme\")]//ancestor::mat-mdc-form-field/ancestor::mat-mdc-card-content/mat-mdc-form-field[5]//textarea");
     private static final By CONTEXT_SCHEME_VALUE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Scheme Value\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Context Scheme Value\")]//ancestor::mat-mdc-form-field//mat-select");
 
     private static final By CONTEXT_SCHEME_VALUE_MEANING_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Context Scheme Value\")]//ancestor::mat-form-field/ancestor::mat-card-content/mat-form-field[2]//textarea");
+            By.xpath("//mat-label[contains(text(), \"Context Scheme Value\")]//ancestor::mat-mdc-form-field/ancestor::mat-mdc-card-content/mat-mdc-form-field[2]//textarea");
 
     private static final By ADD_BUTTON_LOCATOR
             = By.xpath("//mat-dialog-container//mat-icon[contains(text(), \"add\")]//ancestor::button[1]");
@@ -72,7 +72,7 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
     }
 
     @Override

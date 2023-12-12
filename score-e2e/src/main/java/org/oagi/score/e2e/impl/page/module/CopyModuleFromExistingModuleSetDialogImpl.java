@@ -15,7 +15,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFromExistingModuleSetDialog {
     private static final By MODULE_SET_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-expansion-panel//*[text()= \"Module Set\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//mat-expansion-panel//*[text()= \"Module Set\"]//ancestor::mat-mdc-form-field[1]//mat-select/div/div[1]");
     private static final By COPY_BUTTON_LOCATOR =
             By.xpath("//mat-expansion-panel//span[contains(text(), \"Copy\")]//ancestor::button[1]");
 
@@ -42,7 +42,7 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
     }
 
     @Override

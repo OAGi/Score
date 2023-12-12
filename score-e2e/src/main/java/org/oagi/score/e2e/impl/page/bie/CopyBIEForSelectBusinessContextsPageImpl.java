@@ -57,12 +57,12 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override
     public WebElement getSubtitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
     }
 
     @Override

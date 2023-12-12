@@ -20,52 +20,52 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
-            By.xpath("//label/span[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
+            By.xpath("//label/span[contains(text(), \"Qualifier\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-mdc-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-mdc-form-field//input");
     private static final By REPRESENTATION_TERM_SELECTOR_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-mdc-form-field//mat-select");
 
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-mdc-form-field//mat-select");
     private static final By CARDINALITY_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-mdc-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-mdc-form-field//mat-select");
 
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
 
@@ -85,9 +85,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Default\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Default\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]");
     private static final By SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
@@ -97,11 +97,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-mdc-form-field//input");
     private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-mdc-form-field//input");
     private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-mdc-form-field//textarea");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
     private static final By DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR =
@@ -825,10 +825,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         public WebElement getValueConstraintField() {
             String selectedValueConstraintType = getValueConstraintTypeFieldValue();
             if (selectedValueConstraintType.equals("None")){
-                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"No value constraints\")]/ancestor::mat-form-field//input"));
+                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"No value constraints\")]/ancestor::mat-mdc-form-field//input"));
             } else{
                 return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + selectedValueConstraintType +
-                        "\")]/ancestor::mat-form-field//input"));
+                        "\")]/ancestor::mat-mdc-form-field//input"));
             }
         }
 

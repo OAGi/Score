@@ -17,7 +17,7 @@ public class LoginIDMenuImpl extends DelegateBasePageImpl implements LoginIDMenu
 
     private final HomePageImpl homePage;
 
-    private final By SIGN_IN_LABEL_LOCATOR = By.xpath("//button[contains(text(), \"Signed in as\")]");
+    private final By SIGN_IN_LABEL_LOCATOR = By.xpath("//button/span[contains(text(), \"Signed in as\")]");
 
     private final By OAGIS_TERMINOLOGY_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"OAGIS Terminology\")]//ancestor::button[1]");
 
@@ -28,9 +28,9 @@ public class LoginIDMenuImpl extends DelegateBasePageImpl implements LoginIDMenu
     private final By CCTS_TERMINOLOGY_CHECKED_LOCATOR = By.xpath("//span[contains(text(), \"CCTS Terminology\")]//ancestor::button[1]//mat-icon[contains(text(), \"done\")]");
 
     private final By SETTINGS_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Settings\")]");
+            By.xpath("//button/span[contains(text(), \"Settings\")]");
 
-    private final By LOGOUT_BUTTON_LOCATOR = By.xpath("//button[contains(text(), \"Logout\")]");
+    private final By LOGOUT_BUTTON_LOCATOR = By.xpath("//button/span[contains(text(), \"Logout\")]");
 
     public LoginIDMenuImpl(HomePageImpl homePage) {
         super(homePage);

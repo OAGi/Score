@@ -35,11 +35,11 @@ public class FindWhereUsedDialogImpl implements FindWhereUsedDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//span[contains(text(), \"" + value + "\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content//span[contains(text(), \"" + value + "\")]"));
     }
 }

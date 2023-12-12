@@ -11,9 +11,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditContextCategoryPageImpl extends BasePageImpl implements EditContextCategoryPage {
 
-    private static final By NAME_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input[1]");
+    private static final By NAME_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input[1]");
 
-    private static final By DESCRIPTION_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea[1]");
+    private static final By DESCRIPTION_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-mdc-form-field//textarea[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
 
@@ -47,7 +47,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

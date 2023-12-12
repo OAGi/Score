@@ -49,7 +49,7 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

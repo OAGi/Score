@@ -37,13 +37,13 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Module\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Module\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");

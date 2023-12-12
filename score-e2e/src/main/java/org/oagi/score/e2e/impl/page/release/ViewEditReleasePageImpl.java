@@ -25,16 +25,16 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditReleasePage {
 
     private static final By CREATOR_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By CREATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Created start date\")]");
@@ -59,7 +59,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
     private static final By DISCARD_RELEASE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
@@ -409,7 +409,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content//tbody/tr[" + idx + "]"));
     }
     @Override
     public WebElement clickOnDropDownMenu(WebElement element) {

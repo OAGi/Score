@@ -12,13 +12,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
     private static final By CODE_FIELD_LOCATOR =
-            By.xpath("//mat-label[text() = \"Code\"]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[text() = \"Code\"]//ancestor::mat-mdc-form-field//input");
     private static final By MEANING_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Meaning\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Meaning\")]//ancestor::mat-mdc-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::mat-dialog-actions/button[1]");
     private static final By SAVE_BUTTON_LOCATOR =
@@ -48,7 +48,7 @@ public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
     }
 
     @Override

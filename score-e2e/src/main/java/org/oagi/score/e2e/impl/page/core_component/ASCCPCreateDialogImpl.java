@@ -16,13 +16,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ASCCPCreateDialogImpl implements ASCCPCreateDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By TAG_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Tag\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Tag\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-container//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -40,13 +40,13 @@ public class ASCCPCreateDialogImpl implements ASCCPCreateDialog {
             By.xpath("//mat-dialog-container//input[contains(@data-placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Module\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Module\")]//ancestor::mat-mdc-form-field//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Search\")]//ancestor::button[1]");

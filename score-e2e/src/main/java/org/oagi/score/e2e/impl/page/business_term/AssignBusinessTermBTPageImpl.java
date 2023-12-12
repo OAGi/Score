@@ -80,11 +80,11 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     public WebElement getSubTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
     }
 
     @Override

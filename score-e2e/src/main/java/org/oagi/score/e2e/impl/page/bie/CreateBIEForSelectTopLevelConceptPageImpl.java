@@ -23,13 +23,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl implements CreateBIEForSelectTopLevelConceptPage {
 
     private static final By SELECTED_BUSINESS_CONTEXTS_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
@@ -67,7 +67,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
 
     @Override
     public WebElement getSubtitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
     }
 
     @Override

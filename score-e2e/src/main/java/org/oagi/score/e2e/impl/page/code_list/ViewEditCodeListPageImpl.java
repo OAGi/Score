@@ -21,7 +21,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -29,11 +29,11 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Code List\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field[1]//mat-select");
 
     public ViewEditCodeListPageImpl(BasePage parent) {
         super(parent);

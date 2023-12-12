@@ -18,10 +18,10 @@ public class HelpMenuImpl extends DelegateBasePageImpl implements HelpMenu {
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Help\")]//ancestor::button[1]");
 
     private final By ABOUT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"About\")]");
+            By.xpath("//button/span[contains(text(), \"About\")]");
 
     private final By USER_GUIDE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"User Guide\")]");
+            By.xpath("//button/span[contains(text(), \"User Guide\")]");
 
     public HelpMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

@@ -45,7 +45,7 @@ public class SettingsPasswordPageImpl extends BasePageImpl implements SettingsPa
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

@@ -27,15 +27,15 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button/span");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Type\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Type\"]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Owner\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Owner\"]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =

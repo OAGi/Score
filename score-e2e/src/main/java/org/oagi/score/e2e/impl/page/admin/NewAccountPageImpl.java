@@ -53,7 +53,7 @@ public class NewAccountPageImpl extends BasePageImpl implements NewAccountPage {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
     }
 
     @Override

@@ -23,7 +23,7 @@ public class ViewEditModuleSetReleasePageImpl extends BasePageImpl implements Vi
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
 
     public ViewEditModuleSetReleasePageImpl(BasePage parent) {
         super(parent);
@@ -109,7 +109,7 @@ public class ViewEditModuleSetReleasePageImpl extends BasePageImpl implements Vi
     }
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content//tbody/tr[" + idx + "]"));
     }
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
