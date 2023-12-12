@@ -186,6 +186,7 @@ public class BieService {
                 .setTopLevelAsbiepIds(request.getTopLevelAsbiepIds())
                 .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
                 .setStates(request.getStates())
+                .setDeprecated(request.getDeprecated())
                 .setReleaseIds(request.getReleaseIds())
                 .setOwnerLoginIds(request.getOwnerLoginIds())
                 .setUpdaterLoginIds(request.getUpdaterLoginIds())

@@ -19,6 +19,9 @@ public class BieEditAbieNode extends BieEditNode {
     private String loginId;
     private String releaseNum;
     private AccessPrivilege access;
+    private boolean deprecated;
+    private String deprecatedReason;
+    private String deprecatedRemark;
     private boolean inverseMode;
 
 }

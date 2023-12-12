@@ -23,6 +23,7 @@ public class BieListRequest {
     private List<BigInteger> topLevelAsbiepIds = Collections.emptyList();
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();
     private List<BieState> states = Collections.emptyList();
+    private Boolean deprecated;
     private List<String> types = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();

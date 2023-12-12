@@ -37,6 +37,7 @@ import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {BieExpressOpenapi30Module} from './bie-express/bie-express.openapi30/bie-express.openapi30.module';
+import {BieDeprecateDialogComponent} from "./bie-deprecate-dialog/bie-deprecate-dialog.component";
 
 const routes: Routes = [
   {
@@ -147,6 +148,7 @@ const routes: Routes = [
     ReportDialogComponent,
     BieReportComponent,
     BieEditComponent,
+    BieDeprecateDialogComponent,
     ReuseBieDialogComponent
   ],
   entryComponents: [

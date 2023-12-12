@@ -89,6 +89,19 @@
             </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
+                <mat-label>Deprecated</mat-label>
+                <mat-select [(ngModel)]="request.deprecated" multiple>
+                  <mat-option [value]="true">
+                    True
+                  </mat-option>
+                  <mat-option [value]="false">
+                    False
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
                 <mat-label>Owner</mat-label>
                 <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
                   <mat-option>
@@ -216,6 +229,9 @@
               <span class="bie-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                     'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
+              <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
             </td>
           </ng-container>
 
@@ -354,6 +370,10 @@
       <button mat-menu-item (click)="openTransferDialog(contextMenuItem)"
               [disabled]="!isEditable(contextMenuItem)">
         <span class="context-menu-item">Transfer Ownership</span>
+      </button>
+      <button mat-menu-item (click)="deprecate(contextMenuItem)"
+              [disabled]="!isDeprecable(contextMenuItem)">
+        <span class="context-menu-item">Deprecate</span>
       </button>
       <button mat-menu-item (click)="discard(contextMenuItem)"
               [disabled]="!isEditable(contextMenuItem)">

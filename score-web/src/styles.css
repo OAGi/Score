@@ -296,6 +296,10 @@ span.cc-type, span.cc-state, span.bie-state {
   margin-top: 2px;
 }
 
+.mat-tooltip {
+  white-space: pre-line;
+}
+
 span.Initiating {
   background-color: #bfdadc;
   color: #000000;

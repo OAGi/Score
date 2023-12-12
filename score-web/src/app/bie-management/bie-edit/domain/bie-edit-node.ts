@@ -27,6 +27,7 @@ export class BieEditNode {
   derived: boolean;
   topLevelAsbiepState: string;
   inverseMode: boolean;
+  deprecated: boolean;
   private $hashCode: number;
   private _version: string;
   private _status: string;
@@ -46,6 +47,7 @@ export class BieEditNode {
     this.locked = obj && obj.locked || false;
     this.topLevelAsbiepState = obj && obj.topLevelAsbiepState || '';
     this.inverseMode = obj && obj.inverseMode || false;
+    this.deprecated = obj && obj.deprecated || false;
     this.releaseNum = obj && obj.releaseNum || '';
     this.loginId = obj && obj.loginId || '';
     this.version = obj && obj.version || '';
@@ -93,6 +95,9 @@ export class BieEditAbieNode extends BieEditNode {
 
   access: string;
   topLevelAsbiepState: string;
+  deprecated: boolean;
+  deprecatedReason: string;
+  deprecatedRemark: string;
   inverseMode: boolean;
 
   bieForOasDoc: BieForOasDoc;
@@ -111,6 +116,9 @@ export class BieEditAbieNode extends BieEditNode {
 
       this.access = abie.access;
       this.topLevelAsbiepState = abie.topLevelAsbiepState;
+      this.deprecated = abie.deprecated;
+      this.deprecatedReason = abie.deprecatedReason;
+      this.deprecatedRemark = abie.deprecatedRemark;
       this.inverseMode = abie.inverseMode;
 
       this.bieForOasDoc = new BieForOasDoc(abie.bieForOasDoc);

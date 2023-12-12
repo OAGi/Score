@@ -498,6 +498,9 @@ public class BusinessInformationEntityRepository {
                     APP_USER.LOGIN_ID.as("owner"),
                     ASBIEP.BIZ_TERM,
                     ASBIEP.REMARK,
+                    TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
+                    TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
+                    TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
                     TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
                     APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                     TOP_LEVEL_ASBIEP.STATE,
@@ -584,6 +587,13 @@ public class BusinessInformationEntityRepository {
         public SelectBieListArguments setStates(List<BieState> states) {
             if (!states.isEmpty()) {
                 conditions.add(TOP_LEVEL_ASBIEP.STATE.in(states.stream().map(e -> e.name()).collect(Collectors.toList())));
+            }
+            return this;
+        }
+
+        public SelectBieListArguments setDeprecated(Boolean deprecated) {
+            if (deprecated != null) {
+                conditions.add(TOP_LEVEL_ASBIEP.IS_DEPRECATED.eq((byte) (deprecated ? 1 : 0)));
             }
             return this;
         }

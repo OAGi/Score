@@ -1,0 +1,26 @@
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>Deprecate BIE</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Reason</mat-label>
+    <textarea rows="6" cols="2000" matInput [(ngModel)]="data.reason"></textarea>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Remark</mat-label>
+    <textarea rows="6" cols="2000" matInput [(ngModel)]="data.remark"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="warn" (click)="onNoClick()">
+    <mat-icon>close</mat-icon>
+    Close
+  </button>
+  <button mat-raised-button color="primary"
+          [mat-dialog-close]="data">
+    Deprecate
+  </button>
+</mat-dialog-actions>

@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function13;
+import org.jooq.Function16;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row13;
+import org.jooq.Row16;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -119,6 +119,24 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * treated as used BIEs.
      */
     public final TableField<TopLevelAsbiepRecord, Byte> INVERSE_MODE = createField(DSL.name("inverse_mode"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "If this is true, all BIEs not edited by users under this TOP_LEVEL_ASBIEP will be treated as used BIEs.");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.is_deprecated</code>. Indicates
+     * whether the TOP_LEVEL_ASBIEP is deprecated.
+     */
+    public final TableField<TopLevelAsbiepRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the TOP_LEVEL_ASBIEP is deprecated.");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.deprecated_reason</code>. The
+     * reason for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public final TableField<TopLevelAsbiepRecord, String> DEPRECATED_REASON = createField(DSL.name("deprecated_reason"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The reason for the deprecation of the TOP_LEVEL_ASBIEP.");
+
+    /**
+     * The column <code>oagi.top_level_asbiep.deprecated_remark</code>. The
+     * remark for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public final TableField<TopLevelAsbiepRecord, String> DEPRECATED_REMARK = createField(DSL.name("deprecated_remark"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The remark for the deprecation of the TOP_LEVEL_ASBIEP.");
 
     /**
      * The column <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
@@ -292,18 +310,18 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row16 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row16<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, Byte, String, String, ULong, String, LocalDateTime> fieldsRow() {
+        return (Row16) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function13<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function16<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super Byte, ? super String, ? super String, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -311,7 +329,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function16<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super Byte, ? super String, ? super String, ? super ULong, ? super String, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
