@@ -170,6 +170,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         generationContext.referenceCounter().increase(asbiep);
         try {
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
+            Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
 
             Map<String, Object> paths = new LinkedHashMap<>();
             Map<String, Object> schemas = new LinkedHashMap<>();
@@ -211,7 +212,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
                     infoBuilder = infoBuilder.put("license", licenseBuilder.build());
                 }
-                infoBuilder = infoBuilder.put("version", option.getOasDoc().getVersion());
+                infoBuilder = infoBuilder.put("version", option.getOasDoc().getVersion())
+                        .put("x-oagis-license", StringUtils.hasLength(release.getReleaseLicense()) ? release.getReleaseLicense() : "");
                 root.put("info", infoBuilder.build());
 
                 paths = new LinkedHashMap();
@@ -911,11 +913,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private Map<String, Object> makeProperties(ABIE typeAbie, TopLevelAsbiep topLevelAsbiep) {
         Map<String, Object> properties = new LinkedHashMap();
-        Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
         // Issue #1148
         properties.put("x-oagis-bie-guid", typeAbie.getGuid());
         properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
         properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
+        // Issue #1574
+        Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
         properties.put("x-oagis-bie-uri", option.getScheme() + "://" + option.getHost() + "/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
         properties.put("x-oagis-release", release.getReleaseNum());
         properties.put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.getLastUpdateTimestamp()));
