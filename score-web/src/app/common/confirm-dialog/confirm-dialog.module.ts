@@ -18,9 +18,6 @@ import {ConfirmDialogService} from './confirm-dialog.service';
   declarations: [
     ConfirmDialogComponent
   ],
-  entryComponents: [
-    ConfirmDialogComponent
-  ],
   providers: [
     ConfirmDialogService
   ]

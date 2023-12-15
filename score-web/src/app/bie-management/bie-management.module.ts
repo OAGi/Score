@@ -151,9 +151,6 @@ const routes: Routes = [
     BieDeprecateDialogComponent,
     ReuseBieDialogComponent
   ],
-  entryComponents: [
-    ReuseBieDialogComponent
-  ],
   providers: [
     ReleaseService,
     BieCreateService,
