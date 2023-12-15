@@ -60,3 +60,8 @@
   color: red;
   background-color: transparent;
 }
+
+.vertical-align {
+  display: flex; 
+  align-items: center
+}
