@@ -44,3 +44,8 @@ mat-toolbar button:focus, .mat-mdc-menu-item:focus {
   color: green;
   background-color: transparent;
 }
+
+.notIcon {
+  vertical-align: middle;
+}
+
