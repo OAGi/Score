@@ -525,7 +525,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
-      $event.preventDefault();
       $event.stopPropagation();
     }
 
