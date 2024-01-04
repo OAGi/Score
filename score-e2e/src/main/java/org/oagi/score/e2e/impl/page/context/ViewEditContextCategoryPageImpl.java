@@ -29,7 +29,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
             By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
 
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
+            By.xpath("//input[@placeholder=\"Name\"]");
 
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Description\")]//ancestor::div[1]/input");

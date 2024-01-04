@@ -156,7 +156,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
 
     @Override
     public String getPasswordErrorMessage() {
-        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../..//mat-error")));
+        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../../..//mat-error")));
     }
 
     @Override
