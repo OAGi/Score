@@ -106,13 +106,13 @@ b {
   text-align: center;
 }
 
-.mat-table {
+.mat-mdc-table {
   width: 100%;
-  table-layout: fixed;
+  table-layout: fixed !important;
 }
 
-.mat-table .mat-column-select {
-  width: 66px;
+.mat-mdc-table .mat-column-select {
+  width: 66px !important;
 }
 
 .ellipsis {
