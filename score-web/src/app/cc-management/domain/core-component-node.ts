@@ -247,7 +247,7 @@ export class CcAccNodeDetail extends CcNodeDetail {
   }
 
   set objectClassTerm(value: string) {
-    value = toCamelCase(emptyToUndefined(value));
+    value = emptyToUndefined(value);
     this._objectClassTerm = value;
     this._node.fireChangeEvent('objectClassTerm', value);
   }
@@ -651,7 +651,7 @@ class AsccpDetail {
   }
 
   set propertyTerm(value: string) {
-    value = toCamelCase(emptyToUndefined(value));
+    value = emptyToUndefined(value);
     this._propertyTerm = value;
     this._node.fireChangeEvent('propertyTerm', value);
   }
@@ -1109,7 +1109,7 @@ class BccpDetail {
   }
 
   set propertyTerm(value: string) {
-    value = toCamelCase(emptyToUndefined(value));
+    value = emptyToUndefined(value);
     this._propertyTerm = value;
     this._node.fireChangeEvent('propertyTerm', value);
   }
@@ -2364,7 +2364,7 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   }
 
   set propertyTerm(value: string) {
-    value = toCamelCase(emptyToUndefined(value));
+    value = emptyToUndefined(value);
     this._propertyTerm = value;
     (this._node as DtScFlatNode).dtScNode.propertyTerm = value;
     this._node.fireChangeEvent('propertyTerm', value);
