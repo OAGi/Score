@@ -23,31 +23,31 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By DEN_COMPONENT_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field");
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-mdc-form-field//mat-select");
+            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
+            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
@@ -94,7 +94,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("mat-tab-header div.mat-tab-label"));
+                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
     }
 
     @Override
@@ -336,7 +336,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchField();
-        click(searchInput);
+        click(getDriver(), searchInput);
         WebElement node = sendKeys(searchInput, path);
         node.sendKeys(Keys.ENTER);
         click(node);

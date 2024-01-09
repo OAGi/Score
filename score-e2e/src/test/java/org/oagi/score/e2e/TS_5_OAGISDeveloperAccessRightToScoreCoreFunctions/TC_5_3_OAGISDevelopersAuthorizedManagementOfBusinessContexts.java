@@ -13,8 +13,10 @@ import org.oagi.score.e2e.page.context.BusinessContextValueDialog;
 import org.oagi.score.e2e.page.context.CreateBusinessContextPage;
 import org.oagi.score.e2e.page.context.EditBusinessContextPage;
 import org.oagi.score.e2e.page.context.ViewEditBusinessContextPage;
-import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -575,7 +577,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         viewEditBusinessContextPage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
+                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(ofSeconds(3L))
@@ -583,8 +585,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
-            new Actions(getDriver()).moveToElement(checkboxOfFirstRecord).perform();
-            checkboxOfFirstRecord.sendKeys(Keys.SPACE);
+            click(checkboxOfFirstRecord);
         });
 
         viewEditBusinessContextPage.goToNextPage();

@@ -23,16 +23,16 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//input[@placeholder=\"Name\"]");
 
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Description\")]//ancestor::div[1]/input");
+            By.xpath("//input[@placeholder=\"Description\"]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");

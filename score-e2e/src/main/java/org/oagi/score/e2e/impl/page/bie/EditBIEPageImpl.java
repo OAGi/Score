@@ -31,7 +31,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
@@ -55,7 +55,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             By.xpath("//span[contains(text(), \"Make BIE reusable\")]");
 
     private static final By SETTINGS_ICON_LOCATOR =
-            By.xpath("//mat-icon[text() = \"settings\"]");
+            By.xpath("//mat-icon[text() = \"settings\"]//ancestor::button[1]");
 
     private static final By HIDE_CARDINALITY_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Hide cardinality\")]//ancestor::mat-checkbox");
@@ -135,7 +135,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("mat-tab-header div.mat-tab-label"));
+                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
     }
 
     @Override
@@ -373,13 +373,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public void expandTree(String nodeName) {
         try {
             By chevronRightLocator = By.xpath(
-                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(), \"chevron_right\")]//ancestor::span[1]");
+                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]");
             click(elementToBeClickable(getDriver(), chevronRightLocator));
         } catch (TimeoutException maybeAlreadyExpanded) {
         }
 
         By expandMoreLocator = By.xpath(
-                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(), \"expand_more\")]//ancestor::span[1]");
+                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"expand_more\")]//ancestor::button[1]");
         assert elementToBeClickable(getDriver(), expandMoreLocator).isEnabled();
     }
 
@@ -600,12 +600,12 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private WebElement getInputFieldByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/input"));
+                "//input[contains(@placeholder, \"" + name + "\")]"));
     }
 
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 
     private WebElement getTextAreaFieldByName(String name) {
@@ -643,7 +643,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public List<WebElement> getBusinessContextList() {
             return visibilityOfAllElementsLocatedBy(getDriver(),
-                    By.xpath("//mat-chip-list[contains(@aria-label, \"Business Contexts\")]//mat-chip"));
+                    By.xpath("//mat-label[contains(text(), \"Business Contexts\")]//ancestor::mat-form-field//mat-chip-grid//mat-chip-row"));
         }
 
         @Override
@@ -674,8 +674,8 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public void removeBusinessContext(String businessContextName) {
             WebElement businessContextChipCancelButton = elementToBeClickable(getDriver(), By.xpath(
-                    "//mat-chip-list[contains(@aria-label, \"Business Contexts\")]" +
-                            "//mat-chip[contains(text(), \"" + businessContextName + "\")]/mat-icon[text() = \"cancel\"]"));
+                    "//mat-label[contains(text(), \"Business Contexts\")]//ancestor::mat-form-field//mat-chip-grid" +
+                            "//*[contains(text(), \"" + businessContextName + "\")]//ancestor::mat-chip-row//mat-icon[text() = \"cancel\"]//ancestor::button"));
             click(businessContextChipCancelButton);
             assert "Updated".equals(getSnackBarMessage(getDriver()));
         }
@@ -1119,7 +1119,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
             return elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
+                    "//mat-label[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
         }
 
         @Override
@@ -1132,7 +1132,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainField() {
             return elementToBeClickable(getDriver(), By.xpath(
-                    "//span[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
+                    "//mat-label[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
         }
 
         @Override
@@ -1327,7 +1327,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainRestrictionSelectField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//span[contains(text(), \"Value Domain Restriction\")]//ancestor::div[1]/mat-select"));
+                    "//mat-select[@placeholder = \"Value Domain Restriction\"]"));
         }
 
         @Override
@@ -1340,7 +1340,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public WebElement getValueDomainField() {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    "//span[text() = \"Value Domain\"]//ancestor::div[1]/mat-select"));
+                    "//mat-select[@placeholder = \"Value Domain\"]"));
         }
 
         @Override

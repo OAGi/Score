@@ -13,7 +13,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateModuleDirectoryDialogImpl implements CreateModuleDirectoryDialog {
     private static final By MODULE_DIRECTORY_NAME_FIELD_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Create new module directory\")]//ancestor::mat-expansion-panel" +
-                    "//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+                    "//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By CREATE_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Create new module directory\")]//ancestor::mat-expansion-panel" +
                     "//span[contains(text(), \"Create\")]//ancestor::button[1]");
@@ -40,7 +40,7 @@ public class CreateModuleDirectoryDialogImpl implements CreateModuleDirectoryDia
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
     }
 
     @Override

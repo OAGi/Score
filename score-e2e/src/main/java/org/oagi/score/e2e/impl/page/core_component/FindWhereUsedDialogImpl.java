@@ -35,7 +35,7 @@ public class FindWhereUsedDialogImpl implements FindWhereUsedDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
     }
 
     @Override

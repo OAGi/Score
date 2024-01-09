@@ -60,14 +60,14 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     }
 
     public void expandNodeInSourceBIE(String node) {
-        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(),\"chevron_right\")]//ancestor::span[1]"
+        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
 
     }
 
     public void expandNodeInTargetBIE(String node) {
-        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(),\"chevron_right\")]//ancestor::span[1]"
+        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
     }

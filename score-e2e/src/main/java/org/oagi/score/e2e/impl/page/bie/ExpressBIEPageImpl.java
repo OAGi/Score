@@ -38,27 +38,27 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"DEN\")]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Format\")]//ancestor::mat-form-field[1]//mat-select");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
@@ -78,7 +78,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     }
 
     private String getCheckedAttribute(WebElement element) {
-        return element.findElement(By.xpath("label/span[1]/input")).getAttribute("aria-checked");
+        return element.getAttribute("class").contains("mat-mdc-checkbox-checked") ? "true" : "false";
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         retry(() -> {
             WebElement tr = getTableRecordByValue(topLevelASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
-            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+            WebElement ele = td.findElement(By.xpath("mat-checkbox"));
             click(getDriver(), ele);
         });
     }
@@ -111,7 +111,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
         retry(() -> {
             WebElement tr = getTableRecordByValue(topLevelASBIEPDEN);
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
         });
 
     }
@@ -213,7 +213,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -513,17 +513,17 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 
     private WebElement getCheckboxByNameAndClassInCheckbox(String name, String classInCheckbox) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[contains(@class, \"" + classInCheckbox + "\")]"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[contains(@class, \"" + classInCheckbox + "\")]"));
     }
 
     private WebElement getRadioButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
     }
 
     @Override
@@ -533,7 +533,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
             retry(() -> {
                 WebElement tr = getTableRecordByValue(bie.getDen());
                 WebElement td = getColumnByName(tr, "select");
-                click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+                click(td.findElement(By.xpath("mat-checkbox")));
             });
         }
     }

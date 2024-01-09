@@ -25,10 +25,10 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
@@ -60,7 +60,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
     }
 
     @Override
@@ -131,7 +131,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         retry(() -> {
             WebElement tr = getTableRecordByValue(bie.getPropertyTerm());
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());
@@ -142,7 +142,7 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
         retry(() -> {
             WebElement tr = getTableRecordByValue(topLevelBIEPropertyName);
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());

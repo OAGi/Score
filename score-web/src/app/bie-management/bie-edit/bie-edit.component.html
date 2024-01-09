@@ -282,19 +282,19 @@
                         <div class="col-4">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
-                            <input matInput [(ngModel)]="rootNode.releaseNum" [disabled]="true">
+                            <input matInput placeholder="Release" [(ngModel)]="rootNode.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-4">
                           <mat-form-field>
                             <mat-label>State</mat-label>
-                            <input matInput [(ngModel)]="rootNode.topLevelAsbiepState" [disabled]="true">
+                            <input matInput placeholder="State" [(ngModel)]="rootNode.topLevelAsbiepState" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-3">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
-                            <input matInput [(ngModel)]="rootNode.loginId" [disabled]="true">
+                            <input matInput placeholder="Owner" [(ngModel)]="rootNode.loginId" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-1">
@@ -893,6 +893,7 @@
                           <mat-card>
                             <mat-card-content>
                               <mat-form-field>
+                                <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbiepDetail().bbie.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
@@ -904,6 +905,7 @@
                                 </mat-select>
                               </mat-form-field>
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Primitive'">
+                                <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.bdtPriRestriId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
@@ -923,6 +925,7 @@
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Code'">
+                                <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
@@ -951,6 +954,7 @@
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.valueDomainType === 'Agency'">
+                                <mat-label>Value Domain</mat-label>
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"

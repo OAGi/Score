@@ -21,37 +21,37 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgencyIDListPage {
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By BASED_AGENCY_ID_LIST_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Based Agency ID List\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Based Agency ID List\")]//ancestor::mat-form-field//input");
     private static final By AGENCY_ID_LIST_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By LIST_ID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"List ID\")]//ancestor::mat-form-field//input");
     private static final By VERSION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-mdc-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//mat-select");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox[1]");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By REMARK_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Remark\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By DELETE_BUTTON_LOCATOR =
@@ -93,7 +93,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[text() = \"search\"]");
     private static final By COMMENT_BUTTON_LOCATOR =
@@ -127,7 +127,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-mdc-card-title/span[1]"));
+                By.xpath("//mat-card-title/span[1]"));
     }
 
     @Override
@@ -562,7 +562,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -570,14 +570,14 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getPreviousPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Previous page\"]"));
     }
 
     @Override
     public WebElement getNextPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Next page\"]"));
     }
 

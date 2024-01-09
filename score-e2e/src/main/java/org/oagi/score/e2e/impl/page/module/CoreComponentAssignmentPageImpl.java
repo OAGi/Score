@@ -13,9 +13,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class CoreComponentAssignmentPageImpl extends BasePageImpl implements CoreComponentAssignmentPage {
     private static final By DEN_UNASSIGNED_FIELD_LOCATOR =
-            By.xpath("//h4[contains(text(),\"Unassigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//h4[contains(text(),\"Unassigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-form-field//input");
     private static final By DEN_ASSIGNED_FIELD_LOCATOR =
-            By.xpath("//h4[contains(text(),\"Assigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//h4[contains(text(),\"Assigned\")]//ancestor::div[2]//mat-label[contains(text(), \"Den\")]//ancestor::mat-form-field//input");
     private static final By ASSIGN_BUTTON_LOCATOR =
             By.xpath("//button[@mattooltip=\"Assign\"]");
     private static final By UNASSIGN_BUTTON_LOCATOR =

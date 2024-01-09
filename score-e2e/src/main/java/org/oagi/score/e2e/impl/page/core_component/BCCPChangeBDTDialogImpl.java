@@ -13,13 +13,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class BCCPChangeBDTDialogImpl implements BCCPChangeBDTDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By COMMONLY_USED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//*[contains(text(), \"Commonly Used\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Commonly Used\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-container//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -31,19 +31,19 @@ public class BCCPChangeBDTDialogImpl implements BCCPChangeBDTDialog {
             By.xpath("//mat-dialog-container//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"DEN\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"DEN\")]");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Definition\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Definition\")]");
 
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Module\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Module\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Search\")]//ancestor::button[1]");

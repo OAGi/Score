@@ -17,13 +17,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage {
     private static final By RELEASE_NUMBER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release Number\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release Number\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Release Namespace\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(),\"Release Namespace\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By RELEASE_NOTE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Release Note\")]//ancestor::div[1]/textarea");
     private static final By RELEASE_LICENSE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release License\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Release License\")]//ancestor::mat-form-field//input");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By CREATE_DRAFT_BUTTON_LOCATOR =

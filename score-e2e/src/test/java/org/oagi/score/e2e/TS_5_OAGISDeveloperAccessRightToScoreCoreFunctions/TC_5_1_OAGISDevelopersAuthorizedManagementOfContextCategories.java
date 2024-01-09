@@ -29,6 +29,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
+import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.retry;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -455,7 +456,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         viewEditContextCategoryPage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
+                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(Duration.ofSeconds(3L))
@@ -463,8 +464,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
-            new Actions(getDriver()).moveToElement(checkboxOfFirstRecord).perform();
-            checkboxOfFirstRecord.sendKeys(Keys.SPACE);
+            click(checkboxOfFirstRecord);
         });
 
         viewEditContextCategoryPage.goToNextPage();

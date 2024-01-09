@@ -111,7 +111,7 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
     public WebElement getSelectCheckboxAtIndex(int idx) {
         WebElement tr = getTableRecordAtIndex(idx);
         WebElement td = getColumnByName(tr, "select");
-        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+        return td.findElement(By.xpath("mat-checkbox"));
     }
 
     @Override
@@ -149,7 +149,7 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
                 throw new NoSuchElementException("Cannot locate an account using " + loginID);
             }
             td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
 
             click(getTransferButton());
             invisibilityOfLoadingContainerElement(getDriver());

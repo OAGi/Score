@@ -446,12 +446,14 @@
                         </div>
                         <div class="col-4">
                           <mat-form-field>
+                            <mat-label>Data Type Term</mat-label>
                             <input matInput placeholder="Data Type Term" maxlength="45"
                                    [(ngModel)]="asBdtDetail().dataTypeTerm" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-4">
                           <mat-form-field>
+                            <mat-label>Representation Term</mat-label>
                             <input matInput placeholder="Representation Term" maxlength="100"
                                    [(ngModel)]="asBdtDetail().representationTerm" [disabled]="true">
                           </mat-form-field>
@@ -461,6 +463,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field *ngIf="selectedNode.level === 0 && isEditable() && !hasRevision()">
+                            <mat-label>Namespace</mat-label>
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asBdtDetail().namespaceId"
                                         [required]="true">
@@ -475,6 +478,7 @@
                             </mat-select>
                           </mat-form-field>
                           <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
+                            <mat-label>Namespace</mat-label>
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asBdtDetail().namespaceId"
                                         [required]="true"
@@ -489,6 +493,7 @@
                       <div class="row">
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Qualifier</mat-label>
                             <input matInput placeholder="Qualifier" maxlength="100"
                                    [(ngModel)]="asBdtDetail().qualifier"
                                    [disabled]="!isEditable() || hasRevision()"/>
@@ -637,6 +642,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="200"
                                    [(ngModel)]="asBdtDetail().definitionSource" [disabled]="!isEditable()">
                           </mat-form-field>
@@ -646,6 +652,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition</mat-label>
                             <textarea matInput rows="6" cols="30"
                                       placeholder="Definition"
                                       [(ngModel)]="asBdtDetail().definition"
@@ -840,17 +847,20 @@
                         </div>
                         <div class="col-md-9 col-sm-9">
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'none'">
+                            <mat-label>No value constraints</mat-label>
                             <input matInput placeholder="No value constraints"
                                    [disabled]="true">
                           </mat-form-field>
 
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'fixed'">
+                            <mat-label>Fixed Value</mat-label>
                             <input matInput placeholder="Fixed Value"
                                    [(ngModel)]="asBdtScDetail().fixedValue"
                                    [disabled]="!isEditable()">
                           </mat-form-field>
 
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'default'">
+                            <mat-label>Default Value</mat-label>
                             <input matInput placeholder="Default Value"
                                    [(ngModel)]="asBdtScDetail().defaultValue"
                                    [disabled]="!isEditable()">
@@ -977,6 +987,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="200"
                                    [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="!isEditable()">
                           </mat-form-field>
@@ -986,6 +997,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition</mat-label>
                             <textarea matInput rows="6" cols="30"
                                       placeholder="Definition"
                                       [(ngModel)]="asBdtScDetail().definition"

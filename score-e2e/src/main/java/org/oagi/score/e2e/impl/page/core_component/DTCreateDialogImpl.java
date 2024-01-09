@@ -8,7 +8,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class DTCreateDialogImpl implements DTCreateDialog {
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
+            By.xpath("//mat-dialog-content//input[contains(@placeholder, \"DEN\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-content//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CREATE_BUTTON_LOCATOR =

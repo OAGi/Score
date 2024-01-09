@@ -73,8 +73,8 @@ public class HistoryCompareDialogImpl implements HistoryCompareDialog {
         @Override
         public HistoryItemPanel getHistoryItemPanel(int idx) {
             return new HistoryItemPanelImpl(
-                    this.baseElement.findElements(By.xpath("//mat-mdc-card-title")).get(idx),
-                    this.baseElement.findElements(By.xpath("//mat-mdc-card-content")).get(idx)
+                    this.baseElement.findElements(By.xpath("//mat-card-title")).get(idx),
+                    this.baseElement.findElements(By.xpath("//mat-card-content")).get(idx)
             );
         }
 

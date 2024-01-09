@@ -47,7 +47,7 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-mdc-card-title[contains(@class, \"mat-mdc-card-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title[contains(@class, \"mat-mdc-card-title\")]"));
     }
 
     @Override

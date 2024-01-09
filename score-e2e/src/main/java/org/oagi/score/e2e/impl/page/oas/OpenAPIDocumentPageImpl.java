@@ -26,16 +26,16 @@ public class OpenAPIDocumentPageImpl extends BasePageImpl implements OpenAPIDocu
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By TITLE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Title\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Title\")]//ancestor::mat-form-field//input");
 
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Description\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Description\")]//ancestor::mat-form-field//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -165,7 +165,7 @@ public class OpenAPIDocumentPageImpl extends BasePageImpl implements OpenAPIDocu
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -173,14 +173,14 @@ public class OpenAPIDocumentPageImpl extends BasePageImpl implements OpenAPIDocu
     @Override
     public WebElement getPreviousPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Previous page\"]"));
     }
 
     @Override
     public WebElement getNextPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Next page\"]"));
     }
 

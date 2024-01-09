@@ -13,9 +13,9 @@ import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSetPage {
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-mdc-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
 

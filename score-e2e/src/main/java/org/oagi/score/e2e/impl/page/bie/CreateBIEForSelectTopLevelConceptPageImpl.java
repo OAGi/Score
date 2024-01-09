@@ -23,13 +23,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl implements CreateBIEForSelectTopLevelConceptPage {
 
     private static final By SELECTED_BUSINESS_CONTEXTS_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
@@ -37,15 +37,15 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
+            By.xpath("//input[contains(@placeholder, \"DEN\")]");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::div[1]/input");
+            By.xpath("//input[contains(@placeholder, \"Definition\")]");
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Module\")]//ancestor::div[1]/input");
+            By.xpath("//input[contains(@placeholder, \"Module\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CREATE_BUTTON_LOCATOR =
@@ -262,7 +262,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     public EditBIEPage createBIE(String asccpDEN, String branch) {
         setDEN(asccpDEN);
         setBranch(branch);
-        waitFor(Duration.ofMillis(5000));
+        waitFor(Duration.ofMillis(1000));
         hitSearchButton();
 
         WebElement tr;

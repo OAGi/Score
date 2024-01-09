@@ -250,7 +250,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     public void toggleContextSchemeValue(String value) {
         WebElement tr = getTableRecordByValue(value);
         WebElement td = getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(td.findElement(By.xpath("mat-checkbox")));
     }
 
     @Override

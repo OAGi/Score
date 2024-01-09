@@ -27,10 +27,10 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
@@ -307,6 +307,6 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     public WebElement getSelectCheckboxAtIndex(int idx) {
         WebElement tr = getTableRecordAtIndex(idx);
         WebElement td = getColumnByName(tr, "select");
-        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+        return td.findElement(By.xpath("mat-checkbox"));
     }
 }

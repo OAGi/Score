@@ -21,7 +21,7 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DISCARD_MODULE_SET_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =

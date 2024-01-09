@@ -14,37 +14,37 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateOpenAPIDocumentPageImpl extends BasePageImpl implements CreateOpenAPIDocumentPage {
 
     private static final By OPENAPI_VERSION_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"OpenAPI Version\")]//ancestor::mat-mdc-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"OpenAPI Version\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By TITLE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Title\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Title\")]//ancestor::mat-form-field//input");
 
     private static final By DOCUMENT_VERSION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Document Version\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Document Version\")]//ancestor::mat-form-field//input");
 
     private static final By TERMS_OF_SERVICE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Terms of Service\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Terms of Service\")]//ancestor::mat-form-field//input");
 
     private static final By CONTACT_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Contact Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Contact Name\")]//ancestor::mat-form-field//input");
 
     private static final By CONTACT_URL_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Contact URL\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Contact URL\")]//ancestor::mat-form-field//input");
 
     private static final By CONTACT_EMAIL_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Contact Email\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Contact Email\")]//ancestor::mat-form-field//input");
 
     private static final By LICENSE_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"License Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"License Name\")]//ancestor::mat-form-field//input");
 
     private static final By LICENSE_URL_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"License URL\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"License URL\")]//ancestor::mat-form-field//input");
 
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-mdc-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
 
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");

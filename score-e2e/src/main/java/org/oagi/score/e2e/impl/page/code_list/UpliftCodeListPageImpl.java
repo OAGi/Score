@@ -15,19 +15,19 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeListPage {
     private static final By SOURCE_BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Source Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Source Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By TARGET_BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Target Branch\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Target Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-mdc-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CODE_LIST_FIELD_LOCATOR =
-            By.xpath("//mat-mdc-card-content//span[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//mat-mdc-card-content//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By UPLIFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 

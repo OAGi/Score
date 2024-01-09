@@ -23,7 +23,7 @@ public class ViewEditModuleSetReleasePageImpl extends BasePageImpl implements Vi
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-mdc-form-field//input");
+            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
 
     public ViewEditModuleSetReleasePageImpl(BasePage parent) {
         super(parent);
