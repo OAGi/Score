@@ -796,6 +796,10 @@ td.mat-mdc-cell:last-child {
   padding-right: 0 !important;
 }
 
+th.mat-mdc-header-cell:has(mat-checkbox), td.mat-mdc-cell:has(mat-checkbox) {
+  text-overflow: inherit !important;
+}
+
 .tree-breadcrumbs-wrap {
   padding: 6px 15px;
   width: 100%;
