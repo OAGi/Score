@@ -122,7 +122,11 @@ b {
 }
 
 .f12 {
-  font-size: 12px;
+  font-size: 12px !important;
+}
+
+.f14 {
+  font-size: 14px !important;
 }
 
 .description {

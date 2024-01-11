@@ -1,16 +1,17 @@
-<div class="row">
-  <div class="col-12">
-    <mat-card style="box-shadow: none; padding: 0;">
-      <mat-card-header>
-        <mat-card-title>Select a base ACC to move "{{title}}"</mat-card-title>
-      </mat-card-header>
-    </mat-card>
-
-    <mat-dialog-content class="mat-card-container" style="padding-bottom: 20px;">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
+<div class="d-block">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+  <div>
+    <div class="header d-flex align-items-center" mat-dialog-title>
+      <span>Select a base ACC to move "{{title}}"</span>
+      <div class="close pr-2">
+        <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
-
+    </div>
+    <div class="content" mat-dialog-content>
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
                [dataSource]="dataSource">
@@ -112,34 +113,20 @@
               (click)="toggle(row);"></tr>
         </table>
       </div>
-    </mat-dialog-content>
-
-    <div class="row action-group m-0">
-      <div class="col-12 actions-wrap p-0">
-        <div class="actions">
-          <button mat-raised-button color="info"
-                  [disabled]="selection.selected.length === 0"
-                  (click)="checkValidation()">
-            Analyze
-          </button>
-        </div>
-      </div>
+    </div>
+    <div class="actions ml-auto" mat-dialog-actions>
+      <button mat-raised-button color="info"
+              [disabled]="selection.selected.length === 0"
+              (click)="checkValidation()">
+        Analyze
+      </button>
     </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-12">
-    <mat-card style="box-shadow: none; padding: 40px 0 0 0;">
-      <mat-card-header>
-        <mat-card-title>Analysis result and required action.</mat-card-title>
-      </mat-card-header>
-    </mat-card>
-
-    <mat-dialog-content class="mat-card-container" style="padding-bottom: 20px;">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
-
+  <div>
+    <div class="header d-flex align-items-center" mat-dialog-title>
+      <span>Analysis result and required action.</span>
+    </div>
+    <div class="content" mat-dialog-content>
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
                [dataSource]="issueDataSource">
@@ -216,22 +203,17 @@
           <tr mat-row *matRowDef="let element; columns: issueDisplayedColumns;" class="element-row"></tr>
         </table>
       </div>
-    </mat-dialog-content>
-
-    <div class="row action-group m-0">
-      <div class="col-12 actions-wrap p-0">
-        <div class="actions">
-          <button mat-raised-button color="warn" (click)="onNoClick()">
-            Cancel
-          </button>
-          <button mat-raised-button color="primary"
-                  class="float-right"
-                  [disabled]="!isValid"
-                  (click)="doRefactor()">
-            Refactor
-          </button>
-        </div>
-      </div>
+    </div>
+    <div class="actions ml-auto" mat-dialog-actions>
+      <button mat-raised-button color="warn" (click)="onNoClick()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary"
+              class="float-right"
+              [disabled]="!isValid"
+              (click)="doRefactor()">
+        Refactor
+      </button>
     </div>
   </div>
 </div>

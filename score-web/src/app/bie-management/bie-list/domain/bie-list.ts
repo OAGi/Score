@@ -40,7 +40,9 @@ export class BieListRequest {
     if (this.releases.length === 0 && params.get('releaseId')) {
       const release = new SimpleRelease();
       release.releaseId = Number(params.get('releaseId'));
-      this.releases = [release];
+      if (release.releaseId >= 0) {
+        this.releases = [release];
+      }
     }
     this.page.sortActive = params.get('sortActive');
     if (this.page.sortActive !== '' && !this.page.sortActive) {

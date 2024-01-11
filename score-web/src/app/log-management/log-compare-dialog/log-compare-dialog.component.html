@@ -13,6 +13,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="before.ownerUserLoginId || ' '"
@@ -20,6 +21,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Based ACC</mat-label>
               <input matInput placeholder="Based ACC" maxlength="41"
                      [class]="diffClass(asAcc(before).basedAccObjectClassTerm, asAcc(after).basedAccObjectClassTerm)"
                      [value]="asAcc(before).basedAccObjectClassTerm || ' '"
@@ -27,6 +29,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="before.state || ' '"
@@ -34,6 +37,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Object Class Term</mat-label>
               <input matInput placeholder="Object Class Term" maxlength="100"
                      [class]="diffClass(asAcc(before).objectClassTerm, asAcc(after).objectClassTerm)"
                      [value]="asAcc(before).objectClassTerm || ' '"
@@ -56,7 +60,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -78,6 +82,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asAcc(before).namespaceUrl, asAcc(after).namespaceUrl)"
                      [value]="asAcc(before).namespaceUrl || ' '"
@@ -157,7 +162,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row pb-3">
                 <div class="col-12">
                   <div class="checkbox">
                     <mat-checkbox color="primary"
@@ -225,6 +230,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="after.ownerUserLoginId || ' '"
@@ -232,6 +238,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Based ACC</mat-label>
               <input matInput placeholder="Based ACC" maxlength="41"
                      [class]="diffClass(asAcc(before).basedAccObjectClassTerm, asAcc(after).basedAccObjectClassTerm)"
                      [value]="asAcc(after).basedAccObjectClassTerm || ' '"
@@ -239,6 +246,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="after.state || ' '"
@@ -246,6 +254,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Object Class Term</mat-label>
               <input matInput placeholder="Object Class Term" maxlength="100"
                      [class]="diffClass(asAcc(before).objectClassTerm, asAcc(after).objectClassTerm)"
                      [value]="asAcc(after).objectClassTerm || ' '"
@@ -261,13 +270,14 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Component Type</mat-label>
               <input matInput placeholder="Component Type"
                      [class]="diffClass(asAcc(before).componentType, asAcc(after).componentType)"
                      [value]="asAcc(after).componentType || ' '"
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -289,6 +299,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asAcc(before).namespaceUrl, asAcc(after).namespaceUrl)"
                      [value]="asAcc(after).namespaceUrl || ' '"
@@ -337,6 +348,7 @@
               </mat-form-field>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <mat-label>Entity Type</mat-label>
                 <input matInput placeholder="Entity Type" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).entityType, asAssociation(assoc.after).entityType)"
@@ -367,7 +379,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row pb-3">
                 <div class="col-12">
                   <div class="checkbox">
                     <mat-checkbox color="primary"
@@ -439,6 +451,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="before.ownerUserLoginId || ' '"
@@ -446,6 +459,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Role Of ACC</mat-label>
               <input matInput placeholder="Role Of ACC" maxlength="41"
                      [class]="diffClass(asAsccp(before).roleOfAccObjectClassTerm, asAsccp(after).roleOfAccObjectClassTerm)"
                      [value]="asAsccp(before).roleOfAccObjectClassTerm || ' '"
@@ -453,6 +467,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="before.state || ' '"
@@ -475,7 +490,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-4">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -506,6 +521,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asAsccp(before).namespaceUrl, asAsccp(after).namespaceUrl)"
                      [value]="asAsccp(before).namespaceUrl || ' '"
@@ -545,6 +561,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="after.ownerUserLoginId || ' '"
@@ -552,6 +569,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Role Of ACC</mat-label>
               <input matInput placeholder="Role Of ACC" maxlength="41"
                      [class]="diffClass(asAsccp(before).roleOfAccObjectClassTerm, asAsccp(after).roleOfAccObjectClassTerm)"
                      [value]="asAsccp(after).roleOfAccObjectClassTerm || ' '"
@@ -559,6 +577,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="after.state || ' '"
@@ -581,7 +600,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-4">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -612,6 +631,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asAsccp(before).namespaceUrl, asAsccp(after).namespaceUrl)"
                      [value]="asAsccp(after).namespaceUrl || ' '"
@@ -656,6 +676,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="before.ownerUserLoginId || ' '"
@@ -663,6 +684,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Business Data Type</mat-label>
               <input matInput placeholder="Business Data Type" maxlength="41"
                      [class]="diffClass(asBccp(before).bdtDen, asBccp(after).bdtDen)"
                      [value]="asBccp(before).bdtDen || ' '"
@@ -670,6 +692,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="before.state || ' '"
@@ -692,7 +715,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -730,6 +753,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asBccp(before).namespaceUrl, asBccp(after).namespaceUrl)"
                      [value]="asBccp(before).namespaceUrl || ' '"
@@ -769,6 +793,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="after.ownerUserLoginId || ' '"
@@ -776,6 +801,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Business Data Type</mat-label>
               <input matInput placeholder="Business Data Type" maxlength="41"
                      [class]="diffClass(asBccp(before).bdtDen, asBccp(after).bdtDen)"
                      [value]="asBccp(after).bdtDen || ' '"
@@ -783,6 +809,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="after.state || ' '"
@@ -805,7 +832,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -843,6 +870,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asBccp(before).namespaceUrl, asBccp(after).namespaceUrl)"
                      [value]="asBccp(after).namespaceUrl || ' '"
@@ -887,6 +915,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="before.ownerUserLoginId || ' '"
@@ -894,6 +923,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="before.state || ' '"
@@ -901,6 +931,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Data Type Term</mat-label>
               <input matInput placeholder="Data Type Term" maxlength="100"
                      [class]="diffClass(asDt(before).dataTypeTerm, asDt(after).dataTypeTerm)"
                      [value]="asDt(before).dataTypeTerm || ' '"
@@ -923,7 +954,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -936,6 +967,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asDt(before).namespaceUrl, asDt(after).namespaceUrl)"
                      [value]="asDt(before).namespaceUrl || ' '"
@@ -1005,7 +1037,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row pb-3">
                 <div class="col-12">
                   <div class="checkbox">
                     <mat-checkbox color="primary"
@@ -1072,6 +1104,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Owner</mat-label>
               <input matInput placeholder="Owner" maxlength="41"
                      [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
                      [value]="after.ownerUserLoginId || ' '"
@@ -1079,6 +1112,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>State</mat-label>
               <input matInput placeholder="State" maxlength="41"
                      [class]="diffClass(before.state, after.state)"
                      [value]="after.state || ' '"
@@ -1086,6 +1120,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Data Type Term</mat-label>
               <input matInput placeholder="Data Type Term" maxlength="100"
                      [class]="diffClass(asDt(before).dataTypeTerm, asDt(after).dataTypeTerm)"
                      [value]="asDt(after).dataTypeTerm || ' '"
@@ -1108,7 +1143,7 @@
                      [disabled]="true">
             </mat-form-field>
 
-            <div class="row">
+            <div class="row pb-3">
               <div class="col-6">
                 <div class="checkbox">
                   <mat-checkbox color="primary"
@@ -1121,6 +1156,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Namespace</mat-label>
               <input matInput placeholder="Namespace"
                      [class]="diffClass(asDt(before).namespaceUrl, asDt(after).namespaceUrl)"
                      [value]="asDt(after).namespaceUrl || ' '"
@@ -1190,7 +1226,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row pb-3">
                 <div class="col-12">
                   <div class="checkbox">
                     <mat-checkbox color="primary"

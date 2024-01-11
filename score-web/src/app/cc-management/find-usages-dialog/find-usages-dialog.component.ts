@@ -159,7 +159,7 @@ export class FindUsagesDialogComponent implements OnInit {
   }
 
   get innerHeight(): number {
-    return this._innerHeight - 180;
+    return this._innerHeight - 280;
   }
 
   onClick(node: CcFlatNode, $event?: MouseEvent) {

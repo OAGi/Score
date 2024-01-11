@@ -1,51 +1,57 @@
-<mat-sidenav-container class="example-container" [hasBackdrop]="false">
-  <mat-sidenav-content>
-    <div class="loading-container" *ngIf="isUpdating">
-      <mat-spinner [diameter]="40"></mat-spinner>
+<div class="d-block">
+  <div class="loading-container" *ngIf="isUpdating">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>{{ title }}</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
-    <div class="context-section">
-      <div class="row m-0" (window:resize)="onResize($event)">
-        <div class="col-12 p-0">
-          <mat-card class="cc-node-tree-panel">
-            <mat-card-title>{{ title }}</mat-card-title>
-            <mat-card-content class="mat-card-container">
-              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                                           [style.height.px]="innerHeight" #virtualScroll>
-                <div *cdkVirtualFor="let node of dataSource" class="example-item">
-                  <div class="mat-tree-node d-flex pointer"
-                       tabIndex="0"
-                       [class]="{'tree-node-selected': cursorNode === node}"
-                       (click)="onClick(node, $event)"
-                       (keydown)="keyNavigation($event)"
-                       [matTooltip]="'Circular reference detected.'"
-                       [matTooltipDisabled]="!node.isCycle"
-                       [style.padding-left]="node.level * paddingPixel + 'px'">
-                    <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
-                            (click)="toggle(node, $event)"
-                            class="align-self-center"
-                            mat-icon-button>
-                      <mat-icon class="mat-icon-rtl-mirror">
-                        {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                      </mat-icon>
-                    </button>
-                    <ng-template #disabledRef>
-                      <button mat-icon-button disabled></button>
-                    </ng-template>
+  </div>
+  <div class="content" mat-dialog-content>
+    <div class="row m-0" (window:resize)="onResize($event)">
+      <div class="col-12 p-0">
+        <mat-card class="cc-node-tree-panel">
+          <mat-card-content class="mat-card-container">
+            <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}"
+                                         maxBufferPx="{{ maxBufferPx }}"
+                                         [style.height.px]="innerHeight" #virtualScroll>
+              <div *cdkVirtualFor="let node of dataSource" class="example-item">
+                <div class="mat-tree-node d-flex pointer"
+                     tabIndex="0"
+                     [class]="{'tree-node-selected': cursorNode === node}"
+                     (click)="onClick(node, $event)"
+                     (keydown)="keyNavigation($event)"
+                     [matTooltip]="'Circular reference detected.'"
+                     [matTooltipDisabled]="!node.isCycle"
+                     [style.padding-left]="node.level * paddingPixel + 'px'">
+                  <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
+                          (click)="toggle(node, $event)"
+                          class="align-self-center"
+                          mat-icon-button>
+                    <mat-icon class="mat-icon-rtl-mirror">
+                      {{ dataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                    </mat-icon>
+                  </button>
+                  <ng-template #disabledRef>
+                    <button mat-icon-button disabled></button>
+                  </ng-template>
 
-                    <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase()]"
-                          [class.deprecated]="node.deprecated"
-                          [class.text-danger]="node.state === 'Deleted'"
-                          [class.text-line-through]="node.state === 'Deleted'"
-                          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
-                          [innerHTML]="node.name" (click)="openCoreComponent(node)">
+                  <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase()]"
+                        [class.deprecated]="node.deprecated"
+                        [class.text-danger]="node.state === 'Deleted'"
+                        [class.text-line-through]="node.state === 'Deleted'"
+                        [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
+                        [innerHTML]="node.name" (click)="openCoreComponent(node)">
                     </span>
-                  </div>
                 </div>
-              </cdk-virtual-scroll-viewport>
-            </mat-card-content>
-          </mat-card>
-        </div>
+              </div>
+            </cdk-virtual-scroll-viewport>
+          </mat-card-content>
+        </mat-card>
       </div>
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+</div>
