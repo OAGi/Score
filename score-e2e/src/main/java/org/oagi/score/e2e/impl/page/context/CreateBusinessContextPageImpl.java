@@ -45,7 +45,7 @@ public class CreateBusinessContextPageImpl extends BasePageImpl implements Creat
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

@@ -407,7 +407,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void toggleIncludeCCTSDefinitionTag() {
-        click(getIncludeCCTSDefinitionTagCheckbox().findElement(By.tagName("label")));
+        click(getIncludeCCTSDefinitionTagCheckbox());
     }
 
     @Override
@@ -437,7 +437,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void toggleIncludeWHOColumns() {
-        click(getIncludeWHOColumnsCheckbox().findElement(By.tagName("label")));
+        click(getIncludeWHOColumnsCheckbox());
     }
 
     @Override
@@ -477,38 +477,38 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void selectXMLSchemaExpression() {
-        click(getXMLSchemaExpressionRadioButton());
+        click(getXMLSchemaExpressionRadioButton().findElement(By.tagName("input")));
     }
 
     @Override
     public JSONSchemaExpressionOptions selectJSONSchemaExpression() {
-        click(getJSONSchemaExpressionRadioButton());
+        click(getJSONSchemaExpressionRadioButton().findElement(By.tagName("input")));
         return new JSONSchemaExpressionOptionsImpl();
     }
 
     @Override
     public WebElement getXMLSchemaExpressionRadioButton() {
-        return getRadioButtonByName("XML Schema");
+        return getElementByID("expr-XML");
     }
 
     @Override
     public WebElement getJSONSchemaExpressionRadioButton() {
-        return getRadioButtonByName("JSON Schema");
+        return getElementByID("expr-JSON");
     }
 
     @Override
     public WebElement getOpenAPIExpressionRadioButton() {
-        return getRadioButtonByName("OpenAPI 3.0 (Template)");
+        return getElementByID("expr-OpenAPI30");
     }
 
     @Override
     public void selectPutAllSchemasInTheSameFile() {
-        click(getPutAllSchemasInTheSameFileRadioButton());
+        click(getPutAllSchemasInTheSameFileRadioButton().findElement(By.tagName("input")));
     }
 
     @Override
     public WebElement getPutAllSchemasInTheSameFileRadioButton() {
-        return getRadioButtonByName("Put all schemas in the same file");
+        return getElementByID("schema-opt-ALL");
     }
 
     private WebElement getCheckboxByName(String name) {
@@ -523,7 +523,16 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     private WebElement getRadioButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]"));
+                "//*[contains(text(), \"" + name + "\")]//ancestor::mat-radio-button[1]//input"));
+    }
+
+    private WebElement getRadioButtonByValue(String value) {
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-radio-group/mat-radio-button[@value = \"" + value + "\"]//input"));
+    }
+
+    private WebElement getElementByID(String id) {
+        return visibilityOfElementLocated(getDriver(), By.id(id));
     }
 
     @Override
@@ -540,12 +549,12 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public void selectPutEachSchemaInAnIndividualFile() {
-        click(getPutEachSchemaInAnIndividualFileRadioButton());
+        click(getPutEachSchemaInAnIndividualFileRadioButton().findElement(By.tagName("input")));
     }
 
     @Override
     public WebElement getPutEachSchemaInAnIndividualFileRadioButton() {
-        return getRadioButtonByName("Put each schema in an individual file");
+        return getElementByID("schema-opt-EACH");
     }
 
     @Override

@@ -49,7 +49,7 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

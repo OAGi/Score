@@ -44,7 +44,7 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

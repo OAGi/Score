@@ -69,7 +69,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

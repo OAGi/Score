@@ -82,7 +82,7 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

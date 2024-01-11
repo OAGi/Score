@@ -338,10 +338,10 @@
             <div class="option-body">
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption"
                                (change)="expressionOptionChange()">
-                <mat-radio-button class="option-radio-button" value="XML">
+                <mat-radio-button class="option-radio-button" value="XML" id="expr-XML">
                   XML Schema
                 </mat-radio-button>
-                <mat-radio-button class="option-radio-button" value="JSON">
+                <mat-radio-button class="option-radio-button" value="JSON" id="expr-JSON">
                   JSON Schema
                 </mat-radio-button>
                 <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
@@ -363,7 +363,7 @@
                     <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
                   </mat-checkbox>
                 </div>
-                <mat-radio-button class="option-radio-button" value="OpenAPI30">
+                <mat-radio-button class="option-radio-button" value="OpenAPI30" id="expr-OpenAPI30">
                   OpenAPI 3.0 (Template)
                 </mat-radio-button>
                 <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
@@ -437,7 +437,7 @@
                     <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                   </mat-checkbox>
                 </div>
-                <mat-radio-button class="option-radio-button" value="ODF">
+                <mat-radio-button class="option-radio-button" value="ODF" id="expr-ODF">
                   Open Document Spreadsheet (supports CSV)
                 </mat-radio-button>
                 <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'ODF'">
@@ -451,7 +451,7 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-                <mat-radio-button class="option-radio-button" value="AVRO">
+                <mat-radio-button class="option-radio-button" value="AVRO" id="expr-AVRO">
                   Avro™ Schema
                 </mat-radio-button>
               </mat-radio-group>
@@ -462,12 +462,12 @@
             <span class="option-header">Schema File Option</span>
             <div class="option-body">
               <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
-                <mat-radio-button class="option-radio-button" value="ALL"
+                <mat-radio-button class="option-radio-button" value="ALL" id="schema-opt-ALL"
                                   [disabled]="(option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)) ||
                                               (option.expressionOption === 'ODF') || (option.expressionOption === 'AVRO')">
                   Put all schemas in the same file
                 </mat-radio-button>
-                <mat-radio-button class="option-radio-button" value="EACH">
+                <mat-radio-button class="option-radio-button" value="EACH" id="schema-opt-EACH">
                   Put each schema in an individual file
                 </mat-radio-button>
               </mat-radio-group>

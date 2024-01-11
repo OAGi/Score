@@ -53,7 +53,7 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

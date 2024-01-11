@@ -49,7 +49,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"title\")]"));
     }
 
     @Override

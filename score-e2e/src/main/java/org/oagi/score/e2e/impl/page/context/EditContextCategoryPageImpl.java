@@ -47,7 +47,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

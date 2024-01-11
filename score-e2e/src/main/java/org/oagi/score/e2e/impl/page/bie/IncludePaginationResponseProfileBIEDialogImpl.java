@@ -11,26 +11,26 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePaginationResponseProfileBIEDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//input[contains(@placeholder, \"Business Context\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Business Context\")]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//input[contains(@placeholder, \"Updated start date\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//input[contains(@placeholder, \"Updated end date\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-content//*[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By SELECT_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-actions//*[contains(text(), \"Select\")]//ancestor::button[1]");
+            By.id("btn-pagination-response-dialog-select");
     private final BasePageImpl parent;
 
     public IncludePaginationResponseProfileBIEDialogImpl(BasePageImpl parent) {
@@ -54,7 +54,7 @@ public class IncludePaginationResponseProfileBIEDialogImpl implements IncludePag
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override

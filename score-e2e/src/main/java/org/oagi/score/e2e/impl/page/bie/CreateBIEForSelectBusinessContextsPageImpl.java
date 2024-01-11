@@ -60,7 +60,7 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BasePageImpl imp
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

@@ -70,7 +70,7 @@ public class CreateOpenAPIDocumentPageImpl extends BasePageImpl implements Creat
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
 

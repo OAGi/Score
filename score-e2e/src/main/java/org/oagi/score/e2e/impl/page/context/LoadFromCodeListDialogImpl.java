@@ -61,7 +61,7 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"title\")]"));
     }
 
     @Override

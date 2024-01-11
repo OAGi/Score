@@ -64,7 +64,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     public WebElement getSubTitle() {

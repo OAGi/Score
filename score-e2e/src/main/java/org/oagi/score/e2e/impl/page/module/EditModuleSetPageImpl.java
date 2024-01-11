@@ -39,7 +39,7 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

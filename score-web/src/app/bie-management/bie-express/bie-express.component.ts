@@ -276,7 +276,6 @@ export class BieExpressComponent implements OnInit {
   toggleMetaHeaderOption(event, disabled: boolean,
                          includeMetaHeaderForJsonPropertyKey: string,
                          metaHeaderTopLevelAsbiepIdPropertyKey: string) {
-    event.preventDefault();
     if (disabled) {
       return;
     }
@@ -316,7 +315,6 @@ export class BieExpressComponent implements OnInit {
   togglePaginationResponseOption(event, disabled: boolean,
                                  includePaginationResponseForJsonPropertyKey: string,
                                  paginationResponseTopLevelAsbiepIdPropertyKey: string) {
-    event.preventDefault();
     if (disabled) {
       return;
     }
