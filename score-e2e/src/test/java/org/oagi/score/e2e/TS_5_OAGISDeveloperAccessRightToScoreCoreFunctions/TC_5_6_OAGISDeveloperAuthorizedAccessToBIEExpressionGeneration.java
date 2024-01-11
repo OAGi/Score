@@ -806,7 +806,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
-        expressBIEPage.selectJSONSchemaExpression();
+        // TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
         jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
 
@@ -851,8 +853,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
         expressBIEPage.selectMultipleBIEsForExpression(nonLatestRelease, topLevelASBIEPs);
-        expressBIEPage.selectJSONSchemaExpression();
-        expressBIEPage.selectPutEachSchemaInAnIndividualFile();
+        // TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         ExpressBIEPage.JSONSchemaExpressionOptions jsonSchemaExpressionOptions = expressBIEPage.selectJSONSchemaExpression();
         jsonSchemaExpressionOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
 
@@ -967,6 +970,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         openAPIExpressionOptions.selectJSONOpenAPIFormat();
 
         ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        // TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1011,6 +1017,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
 
         ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        // TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1269,7 +1278,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
 
@@ -1315,7 +1326,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectMultipleBIEsForExpression(nonLatestRelease, topLevelASBIEPs);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
 
@@ -1353,7 +1366,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
 
@@ -1402,7 +1417,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectMultipleBIEsForExpression(nonLatestRelease, topLevelASBIEPs);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
@@ -1512,7 +1529,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         postOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
 
         File generatedBIEExpression = null;
@@ -1557,7 +1576,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectMultipleBIEsForExpression(nonLatestRelease, topLevelASBIEPs);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         postOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         expressBIEPage.selectPutEachSchemaInAnIndividualFile();
 
@@ -1595,7 +1616,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1645,7 +1668,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectMultipleBIEsForExpression(nonLatestRelease, topLevelASBIEPs);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1704,7 +1729,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectYAMLOpenAPIFormat();
 
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1768,7 +1795,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectJSONOpenAPIFormat();
 
-        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionGETOperationOptions getOperationOptions = openAPIExpressionOptions.toggleGETOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         getOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
         getOperationOptions.toggleIncludePaginationResponse(paginationResponse, randomBusinessContext);
         getOperationOptions.toggleMakeAsAnArray();
@@ -1849,7 +1878,9 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectBIEForExpression(topLevelASBIEP);
         ExpressBIEPage.OpenAPIExpressionOptions openAPIExpressionOptions = expressBIEPage.selectOpenAPIExpression();
         openAPIExpressionOptions.selectJSONOpenAPIFormat();
-        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();
+        ExpressBIEPage.OpenAPIExpressionPOSTOperationOptions postOperationOptions = openAPIExpressionOptions.togglePOSTOperationTemplate();// TODO:
+        // Failed to select a 'Meta Header' record in a small size of the screen.
+        getDriver().manage().window().maximize();
         postOperationOptions.toggleIncludeMetaHeader(metaHeader, randomBusinessContext);
 
         // Refresh

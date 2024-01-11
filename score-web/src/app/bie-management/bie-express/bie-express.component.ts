@@ -287,7 +287,7 @@ export class BieExpressComponent implements OnInit {
       this.option.packageOption = this.previousPackageOption;
     } else {
       const dialogConfig = new MatDialogConfig();
-      dialogConfig.minWidth = 1000;
+      dialogConfig.width = window.innerWidth + 'px';
       dialogConfig.data = {
         release: this.selectedRelease
       };
@@ -326,7 +326,7 @@ export class BieExpressComponent implements OnInit {
       this.option.packageOption = this.previousPackageOption;
     } else {
       const dialogConfig = new MatDialogConfig();
-      dialogConfig.minWidth = 1000;
+      dialogConfig.width = window.innerWidth + 'px';
       dialogConfig.data = {
         release: this.selectedRelease
       };
