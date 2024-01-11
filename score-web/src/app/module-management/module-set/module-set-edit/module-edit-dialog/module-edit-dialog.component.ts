@@ -75,6 +75,10 @@ export class ModuleEditDialogComponent implements OnInit {
     this.dialogRef.close('Canceled');
   }
 
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
   changed() {
     return this.$hashCode !== sha256(JSON.stringify({
       name: this.element.name,

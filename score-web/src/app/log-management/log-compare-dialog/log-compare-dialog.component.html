@@ -6,6 +6,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="before.guid || ' '"
                      [disabled]="true">
@@ -40,6 +41,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="before.den || ' '"
@@ -47,6 +49,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Component Type</mat-label>
               <input matInput placeholder="Component Type"
                      [class]="diffClass(asAcc(before).componentType, asAcc(after).componentType)"
                      [value]="asAcc(before).componentType || ' '"
@@ -82,6 +85,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [value]="before.definitionSource || ' '"
@@ -89,10 +93,11 @@
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="before.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="before.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -105,12 +110,14 @@
             <div class="cc-node-detail-container"
                  [style]="'visibility: ' + ((!assoc.before.guid) ? 'hidden' : 'inherit')">
               <mat-form-field>
+                <mat-label>GUID</mat-label>
                 <input matInput placeholder="GUID" maxlength="41"
                        [value]="assoc.before.guid || ' '"
                        [disabled]="true">
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>DEN</mat-label>
                 <input matInput placeholder="DEN" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                         diffClass(before.den, after.den)"
@@ -119,6 +126,7 @@
               </mat-form-field>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <mat-label>Entity Type</mat-label>
                 <input matInput placeholder="Entity Type" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                         diffClass(asAssociation(assoc.before).entityType, asAssociation(assoc.after).entityType)"
@@ -129,6 +137,7 @@
               <div class="row">
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Min</mat-label>
                     <input matInput placeholder="Cardinality Min"
                            [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                             diffClass(asAssociation(assoc.before).cardinalityMin, asAssociation(assoc.after).cardinalityMin)"
@@ -138,6 +147,7 @@
                 </div>
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Max</mat-label>
                     <input matInput placeholder="Cardinality Max"
                            [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                             diffClass(asAssociation(assoc.before).cardinalityMax, asAssociation(assoc.after).cardinalityMax)"
@@ -161,6 +171,7 @@
               </div>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <mat-label>Default Value</mat-label>
                 <input matInput placeholder="Default Value" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                         diffClass(asAssociation(assoc.before).defaultValue, asAssociation(assoc.after).defaultValue)"
@@ -169,7 +180,8 @@
               </mat-form-field>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
-                <input matInput placeholder="Fixed value" maxlength="200"
+                <mat-label>Fixed Value</mat-label>
+                <input matInput placeholder="Fixed Value" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                         diffClass(asAssociation(assoc.before).fixedValue, asAssociation(assoc.after).fixedValue)"
                        [value]="asAssociation(assoc.before).fixedValue || ' '"
@@ -177,6 +189,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition Source</mat-label>
                 <input matInput placeholder="Definition Source" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                         diffClass(asAssociation(assoc.before).definitionSource, asAssociation(assoc.after).definitionSource)"
@@ -184,6 +197,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition</mat-label>
                 <textarea matInput rows="6" cols="30" placeholder="Definition"
                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).definition, asAssociation(assoc.after).definition)"
@@ -204,6 +218,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="after.guid || ' '"
                      [disabled]="true">
@@ -238,6 +253,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="after.den || ' '"
@@ -280,6 +296,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [value]="after.definitionSource || ' '"
@@ -287,10 +304,11 @@
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="after.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="after.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -303,12 +321,14 @@
             <div class="cc-node-detail-container"
                  [style]="'visibility: ' + (!(assoc.after.guid) ? 'hidden' : 'inherit')">
               <mat-form-field>
+                <mat-label>GUID</mat-label>
                 <input matInput placeholder="GUID" maxlength="41"
                        [value]="assoc.after.guid || ' '"
                        [disabled]="true">
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>DEN</mat-label>
                 <input matInput placeholder="DEN" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).den, asAssociation(assoc.after).den)"
@@ -327,6 +347,7 @@
               <div class="row">
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Min</mat-label>
                     <input matInput placeholder="Cardinality Min"
                            [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).cardinalityMin, asAssociation(assoc.after).cardinalityMin)"
@@ -336,6 +357,7 @@
                 </div>
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Max</mat-label>
                     <input matInput placeholder="Cardinality Max"
                            [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).cardinalityMax, asAssociation(assoc.after).cardinalityMax)"
@@ -359,6 +381,7 @@
               </div>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <mat-label>Default Value</mat-label>
                 <input matInput placeholder="Default Value" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).defaultValue, asAssociation(assoc.after).defaultValue)"
@@ -367,7 +390,8 @@
               </mat-form-field>
 
               <mat-form-field *ngIf="assoc.component === 'BCC'">
-                <input matInput placeholder="Fixed value" maxlength="200"
+                <mat-label>Fixed Value</mat-label>
+                <input matInput placeholder="Fixed Value" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).fixedValue, asAssociation(assoc.after).fixedValue)"
                        [value]="asAssociation(assoc.after).fixedValue || ' '"
@@ -375,6 +399,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition Source</mat-label>
                 <input matInput placeholder="Definition Source" maxlength="200"
                        [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).definitionSource, asAssociation(assoc.after).definitionSource)"
@@ -383,6 +408,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition</mat-label>
                 <textarea matInput rows="6" cols="30" placeholder="Definition"
                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
                               diffClass(asAssociation(assoc.before).definition, asAssociation(assoc.after).definition)"
@@ -406,6 +432,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="before.guid || ' '"
                      [disabled]="true">
@@ -433,6 +460,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Property Term</mat-label>
               <input matInput placeholder="Property Term" maxlength="100"
                      [class]="diffClass(asAsccp(before).propertyTerm, asAsccp(after).propertyTerm)"
                      [value]="asAsccp(before).propertyTerm || ' '"
@@ -440,6 +468,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="before.den || ' '"
@@ -484,16 +513,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="before.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="before.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="before.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -507,6 +538,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="after.guid || ' '"
                      [disabled]="true">
@@ -534,6 +566,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Property Term</mat-label>
               <input matInput placeholder="Property Term" maxlength="100"
                      [class]="diffClass(asAsccp(before).propertyTerm, asAsccp(after).propertyTerm)"
                      [value]="asAsccp(after).propertyTerm || ' '"
@@ -541,6 +574,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="after.den || ' '"
@@ -585,16 +619,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="after.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="after.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="after.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -613,6 +649,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="asBccp(before).guid || ' '"
                      [disabled]="true">
@@ -640,6 +677,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Property Term</mat-label>
               <input matInput placeholder="Property Term" maxlength="100"
                      [class]="diffClass(asBccp(before).propertyTerm, asBccp(after).propertyTerm)"
                      [value]="asBccp(before).propertyTerm || ' '"
@@ -647,6 +685,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="before.den || ' '"
@@ -675,6 +714,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Default Value</mat-label>
               <input matInput placeholder="Default Value"
                      [class]="diffClass(asBccp(before).defaultValue, asBccp(after).defaultValue)"
                      [value]="asBccp(before).defaultValue || ' '"
@@ -682,6 +722,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Fixed Value</mat-label>
               <input matInput placeholder="Fixed Value"
                      [class]="diffClass(asBccp(before).fixedValue, asBccp(after).fixedValue)"
                      [value]="asBccp(before).fixedValue || ' '"
@@ -696,16 +737,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="before.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="before.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="before.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -719,6 +762,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="asBccp(after).guid || ' '"
                      [disabled]="true">
@@ -746,6 +790,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Property Term</mat-label>
               <input matInput placeholder="Property Term" maxlength="100"
                      [class]="diffClass(asBccp(before).propertyTerm, asBccp(after).propertyTerm)"
                      [value]="asBccp(after).propertyTerm || ' '"
@@ -753,6 +798,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="after.den || ' '"
@@ -781,6 +827,7 @@
             </div>
 
             <mat-form-field>
+              <mat-label>Default Value</mat-label>
               <input matInput placeholder="Default Value"
                      [class]="diffClass(asBccp(before).defaultValue, asBccp(after).defaultValue)"
                      [value]="asBccp(after).defaultValue || ' '"
@@ -788,6 +835,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Fixed Value</mat-label>
               <input matInput placeholder="Fixed Value"
                      [class]="diffClass(asBccp(before).fixedValue, asBccp(after).fixedValue)"
                      [value]="asBccp(after).fixedValue || ' '"
@@ -802,16 +850,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="after.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="after.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="after.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -830,6 +880,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="asDt(before).guid || ' '"
                      [disabled]="true">
@@ -857,6 +908,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Representation Term</mat-label>
               <input matInput placeholder="Representation Term" maxlength="100"
                      [class]="diffClass(asDt(before).representationTerm, asDt(after).representationTerm)"
                      [value]="asDt(before).representationTerm || ' '"
@@ -864,6 +916,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="before.den || ' '"
@@ -890,16 +943,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="before.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="before.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="before.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -912,12 +967,14 @@
             <div class="cc-node-detail-container"
                  [style]="'visibility: ' + ((!assoc.before.guid) ? 'hidden' : 'inherit')">
               <mat-form-field>
+                <mat-label>GUID</mat-label>
                 <input matInput placeholder="GUID" maxlength="41"
                        [value]="assoc.before.guid || ' '"
                        [disabled]="true">
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Property Term</mat-label>
                 <input matInput placeholder="Property Term" maxlength="100"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                         diffClass(asDtSc(before).propertyTerm, asDtSc(after).propertyTerm)"
@@ -928,6 +985,7 @@
               <div class="row">
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Min</mat-label>
                     <input matInput placeholder="Cardinality Min"
                            [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                             diffClass(asDtSc(assoc.before).cardinalityMin, asDtSc(assoc.after).cardinalityMin)"
@@ -937,6 +995,7 @@
                 </div>
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Max</mat-label>
                     <input matInput placeholder="Cardinality Max"
                            [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                             diffClass(asDtSc(assoc.before).cardinalityMax, asDtSc(assoc.after).cardinalityMax)"
@@ -960,6 +1019,7 @@
               </div>
 
               <mat-form-field>
+                <mat-label>Default Value</mat-label>
                 <input matInput placeholder="Default Value" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                         diffClass(asDtSc(assoc.before).defaultValue, asDtSc(assoc.after).defaultValue)"
@@ -968,7 +1028,8 @@
               </mat-form-field>
 
               <mat-form-field>
-                <input matInput placeholder="Fixed value" maxlength="200"
+                <mat-label>Fixed Value</mat-label>
+                <input matInput placeholder="Fixed Value" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                         diffClass(asDtSc(assoc.before).fixedValue, asDtSc(assoc.after).fixedValue)"
                        [value]="asDtSc(assoc.before).fixedValue || ' '"
@@ -976,6 +1037,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition Source</mat-label>
                 <input matInput placeholder="Definition Source" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                         diffClass(asDtSc(assoc.before).definitionSource, asDtSc(assoc.after).definitionSource)"
@@ -983,6 +1045,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition</mat-label>
                 <textarea matInput rows="6" cols="30" placeholder="Definition"
                           [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).definition, asDtSc(assoc.after).definition)"
@@ -1002,6 +1065,7 @@
         <mat-card-content>
           <div class="cc-node-detail-container">
             <mat-form-field>
+              <mat-label>GUID</mat-label>
               <input matInput placeholder="GUID" maxlength="41"
                      [value]="asDt(after).guid || ' '"
                      [disabled]="true">
@@ -1029,6 +1093,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Representation Term</mat-label>
               <input matInput placeholder="Representation Term" maxlength="100"
                      [class]="diffClass(asDt(before).representationTerm, asDt(after).representationTerm)"
                      [value]="asDt(after).representationTerm || ' '"
@@ -1036,6 +1101,7 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>DEN</mat-label>
               <input matInput placeholder="DEN" maxlength="200"
                      [class]="diffClass(before.den, after.den)"
                      [value]="after.den || ' '"
@@ -1062,16 +1128,18 @@
             </mat-form-field>
 
             <mat-form-field>
+              <mat-label>Definition Source</mat-label>
               <input matInput placeholder="Definition Source" maxlength="200"
                      [class]="diffClass(before.definitionSource, after.definitionSource)"
                      [disabled]="true" [value]="after.definitionSource || ' '">
             </mat-form-field>
 
             <mat-form-field>
-                <textarea matInput rows="6" cols="30" placeholder="Definition"
-                          [class]="diffClass(before.definition, after.definition)"
-                          [value]="after.definition || ' '"
-                          [disabled]="true"></textarea>
+              <mat-label>Definition</mat-label>
+              <textarea matInput rows="6" cols="30" placeholder="Definition"
+                        [class]="diffClass(before.definition, after.definition)"
+                        [value]="after.definition || ' '"
+                        [disabled]="true"></textarea>
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -1084,12 +1152,14 @@
             <div class="cc-node-detail-container"
                  [style]="'visibility: ' + (!(assoc.after.guid) ? 'hidden' : 'inherit')">
               <mat-form-field>
+                <mat-label>GUID</mat-label>
                 <input matInput placeholder="GUID" maxlength="41"
                        [value]="assoc.after.guid || ' '"
                        [disabled]="true">
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Property Term</mat-label>
                 <input matInput placeholder="Property Term" maxlength="100"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).propertyTerm, asDtSc(assoc.after).propertyTerm)"
@@ -1100,6 +1170,7 @@
               <div class="row">
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Min</mat-label>
                     <input matInput placeholder="Cardinality Min"
                            [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).cardinalityMin, asDtSc(assoc.after).cardinalityMin)"
@@ -1109,6 +1180,7 @@
                 </div>
                 <div class="col-6">
                   <mat-form-field>
+                    <mat-label>Cardinality Max</mat-label>
                     <input matInput placeholder="Cardinality Max"
                            [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).cardinalityMax, asDtSc(assoc.after).cardinalityMax)"
@@ -1132,6 +1204,7 @@
               </div>
 
               <mat-form-field>
+                <mat-label>Default Value</mat-label>
                 <input matInput placeholder="Default Value" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).defaultValue, asDtSc(assoc.after).defaultValue)"
@@ -1140,7 +1213,8 @@
               </mat-form-field>
 
               <mat-form-field>
-                <input matInput placeholder="Fixed value" maxlength="200"
+                <mat-label>Fixed Value</mat-label>
+                <input matInput placeholder="Fixed Value" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).fixedValue, asDtSc(assoc.after).fixedValue)"
                        [value]="asDtSc(assoc.after).fixedValue || ' '"
@@ -1148,6 +1222,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition Source</mat-label>
                 <input matInput placeholder="Definition Source" maxlength="200"
                        [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).definitionSource, asDtSc(assoc.after).definitionSource)"
@@ -1156,6 +1231,7 @@
               </mat-form-field>
 
               <mat-form-field>
+                <mat-label>Definition</mat-label>
                 <textarea matInput rows="6" cols="30" placeholder="Definition"
                           [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
                               diffClass(asDtSc(assoc.before).definition, asDtSc(assoc.after).definition)"

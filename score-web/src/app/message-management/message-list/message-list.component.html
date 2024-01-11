@@ -41,7 +41,7 @@
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -58,7 +58,7 @@
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -73,7 +73,7 @@
         <button mat-raised-button color="primary" type="submit"
                 (click)="this.paginator.pageIndex = 0; this.loadMessageList();">
           <mat-icon>search</mat-icon>
-          Search
+          <span class="ml-2">Search</span>
         </button>
       </mat-card-actions>
     </mat-card>

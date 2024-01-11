@@ -164,6 +164,10 @@ export class ModuleAddDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
   canCreateModule(): boolean {
     return !!this.module.name;
   }

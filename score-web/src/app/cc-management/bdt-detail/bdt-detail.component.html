@@ -1,8 +1,12 @@
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
-  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15" >
-    <div class="ui header">
-      <h3 class="dividing">Comment</h3>
-      <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
+  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15">
+    <div class="ui header d-flex align-items-center justify-content-between">
+      <h4 class="dividing">Comment</h4>
+      <div class="close">
+        <button mat-icon-button (click)="commentControl.closeCommentSlide()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
@@ -67,7 +71,7 @@
               <div class="container-fluid" *ngIf="searcher && dataSource">
                 <div class="row">
                   <div class="col-5 tree-search-box">
-                    <div class="row">
+                    <div class="row align-items-center">
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
@@ -84,24 +88,24 @@
                         </mat-form-field>
                       </div>
                       <div class="col-3 buttons">
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(-1)">
                           <mat-icon>keyboard_arrow_up</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(1)">
                           <mat-icon>keyboard_arrow_down</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [hidden]="searcher.fullSearched"
                                 [disabled]="searcher.isSearching"
                                 [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                                 (click)="search(searcher.inputKeyword, false, true)">
                           <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching"
                                 [hidden]="!searcher.inputKeyword"
                                 (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
@@ -116,7 +120,7 @@
                   </div>
                   <div class="col-7 actions-wrap">
                     <div class="actions ml-auto" *ngIf="isWorkingRelease()">
-                      <button mat-icon-button [id]="'cc-settings'"
+                      <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                         <mat-icon>settings</mat-icon>
@@ -589,7 +593,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtPriRestri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
-                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -934,7 +938,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtScPriRestri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
-                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>

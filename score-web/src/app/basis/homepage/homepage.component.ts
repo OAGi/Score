@@ -14,7 +14,7 @@ import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {base64Encode, initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {CcList, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
-import {SimpleRelease} from '../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {WebPageInfoService} from '../basis.service';
 
@@ -161,6 +161,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryCCs(userToken) {
+    const releaseParam = {key: 'releaseId', value: WorkingRelease.releaseId};
     this.ccService.getSummaryCcList().subscribe(summaryCcInfo => {
       this.numberOfTotalCCByStates = [];
       this.numberOfMyCCByStates = [];
@@ -168,7 +169,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfTotalCCByStates.push({
           name: item.state,
           value: summaryCcInfo.numberOfTotalCcByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}]],
+          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
@@ -178,7 +179,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.numberOfMyCCByStates.push({
           name: item.state,
           value: summaryCcInfo.numberOfMyCcByStates[item.state] || 0,
-          href: ['/core_component', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}]],
+          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, {key: 'ownerLoginIds', value: userToken.username}]],
           disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
@@ -224,7 +225,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           name: item.state,
           value: summaryBieInfo.numberOfTotalBieByStates[item.state] || 0,
           href: ['/profile_bie', [{key: 'states', value: item.state}, releaseParam]],
-          disabled: this.selectedRelease.releaseId < 0,
+          disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
             text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
@@ -234,7 +235,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           name: item.state,
           value: summaryBieInfo.numberOfMyBieByStates[item.state] || 0,
           href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}, releaseParam]],
-          disabled: this.selectedRelease.releaseId < 0,
+          disabled: false,
           style: {
             bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
             text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'

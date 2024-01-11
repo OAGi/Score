@@ -1,18 +1,18 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title-group>
-        <mat-card-title>{{ "BIE_UPLIFT.TITLE" | translate }}</mat-card-title>
-        <mat-card-subtitle>Verification</mat-card-subtitle>
-      </mat-card-title-group>
-    </mat-card-header>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white d-flex flex-column align-items-start">
+      <span class="title">{{ "BIE_UPLIFT.TITLE" | translate }}</span>
+      <mat-card-subtitle>Verification</mat-card-subtitle>
+    </mat-toolbar>
+  </div>
 
+  <div class="pb-2">
     <mat-card-content class="mat-card-container">
       <div class="loading-container" *ngIf="loading">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
       <div class="row" [hidden]="loading">
-        <div class="col-md-12 ml-3 pt-2 pb-2 d-flex">
+        <div class="col-md-12 pt-2 pb-2 d-flex">
           <button mat-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(-1)"
                   [hidden]="unmatchedSource.length === 0">
             <mat-icon>arrow_back_ios</mat-icon>
@@ -30,13 +30,13 @@
         </div>
       </div>
 
-      <div class="row pt-2 ml-0 mr-0" (window:resize)="onResize($event)">
-        <div class="col-6">
+      <div class="row ml-0 mr-0" (window:resize)="onResize($event)">
+        <div class="col-6 pl-0">
           <div class="row tree-search-box" *ngIf="sourceSearcher && sourceDataSource">
             <div class="col-8">
               <mat-form-field>
-                <mat-placeholder *ngIf="!sourceSelectedNode">Search</mat-placeholder>
-                <mat-placeholder *ngIf="sourceSelectedNode">Search > {{sourceSelectedNode.name}}</mat-placeholder>
+                <mat-label *ngIf="!sourceSelectedNode">Search</mat-label>
+                <mat-label *ngIf="sourceSelectedNode">Search > {{sourceSelectedNode.name}}</mat-label>
                 <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
                        [disabled]="sourceSearcher.isSearching"
                        (keyup.enter)="search('source')">
@@ -48,25 +48,25 @@
                           align="end">0 results</mat-hint>
               </mat-form-field>
             </div>
-            <div class="col-3 actions-wrap">
-              <button mat-icon-button
+            <div class="col-3 buttons">
+              <button mat-icon-button mat-small-icon-button
                       [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
                       (click)="move('source', -1)">
                 <mat-icon>keyboard_arrow_up</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
                       (click)="move('source', 1)">
                 <mat-icon>keyboard_arrow_down</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [hidden]="sourceSearcher.fullSearched"
                       [disabled]="sourceSearcher.isSearching"
                       [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
                       (click)="search('source', false, true)">
                 <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [hidden]="!sourceSearcher.inputKeyword"
                       (click)="sourceSearcher.resetSearch()">
                 <mat-icon>close</mat-icon>
@@ -76,9 +76,9 @@
                                       [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
               </div>
             </div>
-            <div class="col-1 actions-wrap">
+            <div class="col-1 buttons">
               <div class="actions ml-auto">
-                <button mat-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
+                <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="sourceSettingsContextMenu">
                   <mat-icon>settings</mat-icon>
                 </button>
               </div>
@@ -128,8 +128,7 @@
                       <button mat-icon-button disabled></button>
                     </ng-template>
 
-                    <mat-checkbox class="pr-2"
-                                  *ngIf="(node.level > 0 && !node.fixed)"
+                    <mat-checkbox *ngIf="(node.level > 0 && !node.fixed)"
                                   [checked]="node.target !== undefined"
                                   [disabled]="true"></mat-checkbox>
                     <span [class]="['align-self-center', node.typeClass.toLowerCase(),
@@ -161,16 +160,16 @@
           <div class="row">
             <div class="col-12 text-center"
                  matTooltip="All nodes in the Source BIE tree are used nodes. An unchecked checkbox means the node is not mapped.">
-              <span>Source BIE Tree <mat-icon [inline]="true">live_help</mat-icon></span>
-              </div>
+              <div class="d-flex justify-content-center">Source BIE Tree <mat-icon [inline]="true">live_help</mat-icon></div>
+            </div>
           </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 pl-0 pr-0">
           <div class="row tree-search-box" *ngIf="targetSearcher && targetDataSource">
             <div class="col-8">
               <mat-form-field>
-                <mat-placeholder *ngIf="!targetSelectedNode">Search</mat-placeholder>
-                <mat-placeholder *ngIf="targetSelectedNode">Search > {{targetSelectedNode.name}}</mat-placeholder>
+                <mat-label *ngIf="!targetSelectedNode">Search</mat-label>
+                <mat-label *ngIf="targetSelectedNode">Search > {{targetSelectedNode.name}}</mat-label>
                 <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
                        [disabled]="targetSearcher.isSearching"
                        (keyup.enter)="search('target')">
@@ -182,25 +181,25 @@
                           align="end">0 results</mat-hint>
               </mat-form-field>
             </div>
-            <div class="col-3 actions-wrap">
-              <button mat-icon-button
+            <div class="col-3 buttons">
+              <button mat-icon-button mat-small-icon-button
                       [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
                       (click)="move('target', -1)">
                 <mat-icon>keyboard_arrow_up</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
                       (click)="move('target', 1)">
                 <mat-icon>keyboard_arrow_down</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [hidden]="targetSearcher.fullSearched"
                       [disabled]="targetSearcher.isSearching"
                       [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
                       (click)="search('target', false, true)">
                 <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
               </button>
-              <button mat-icon-button
+              <button mat-icon-button mat-small-icon-button
                       [hidden]="!targetSearcher.inputKeyword"
                       (click)="targetSearcher.resetSearch()">
                 <mat-icon>close</mat-icon>
@@ -210,9 +209,9 @@
                                       [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
               </div>
             </div>
-            <div class="col-1 actions-wrap">
+            <div class="col-1 buttons">
               <div class="actions ml-auto">
-                <button mat-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
+                <button mat-icon-button mat-small-icon-button [matMenuTriggerFor]="targetSettingsContextMenu">
                   <mat-icon>settings</mat-icon>
                 </button>
               </div>
@@ -261,8 +260,7 @@
                     <ng-template #disabledRef>
                       <button mat-icon-button disabled></button>
                     </ng-template>
-                    <mat-checkbox class="pr-2"
-                                  *ngIf="node.level > 0"
+                    <mat-checkbox *ngIf="node.level > 0"
                                   [checked]="node.source !== undefined"
                                   (change)="checkMatch($event, node)"
                                   [disabled]="!canMatch(node)"></mat-checkbox>
@@ -299,7 +297,9 @@
             </mat-card-content>
           </mat-card>
           <div class="row">
-            <div class="col-12 text-center">Target BIE Tree</div>
+            <div class="col-12 text-center">
+              <div class="d-flex justify-content-center">Target BIE Tree</div>
+            </div>
           </div>
         </div>
       </div>
@@ -335,5 +335,5 @@
         </div>
       </div>
     </mat-card-content>
-  </mat-card>
+  </div>
 </div>

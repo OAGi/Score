@@ -1,0 +1,12 @@
+.header {
+  padding-top: 8px;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 0 24px 16px;
+}

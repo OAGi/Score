@@ -1,120 +1,126 @@
-<mat-card style="box-shadow: none; padding: 0;">
-  <mat-card-header>
-    <mat-card-title>Transfer ownership</mat-card-title>
-  </mat-card-header>
-</mat-card>
-
-<mat-dialog-content class="mat-card-container" style="padding-bottom: 20px;">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>Transfer ownership</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
   </div>
+  <div class="content" mat-dialog-content>
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
 
-  <mat-card class="search-box">
-    <mat-card-content class="mat-card-container">
-      <div class="container-fluid" style="padding: 0;">
-        <div class="row">
-          <div class="col-md-2 col-sm-12">
-            <mat-form-field>
-              <input matInput [(ngModel)]="request.filters.loginId"
-                     (ngModelChange)="onChange('filters.loginId', request.filters.loginId)"
-                     (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                     placeholder="Login ID">
-            </mat-form-field>
-          </div>
-          <div class="col-md-2 col-sm-12">
-            <mat-form-field>
-              <input matInput [(ngModel)]="request.filters.name"
-                     (ngModelChange)="onChange('filters.name', request.filters.name)"
-                     (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                     placeholder="Name">
-            </mat-form-field>
-          </div>
-          <div class="col-md-2 col-sm-12">
-            <mat-form-field>
-              <input matInput [(ngModel)]="request.filters.organization"
-                     (ngModelChange)="onChange('filters.organization', request.filters.organization)"
-                     (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                     placeholder="Organization">
-            </mat-form-field>
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Login ID</mat-label>
+                <input matInput [(ngModel)]="request.filters.loginId"
+                       (ngModelChange)="onChange('filters.loginId', request.filters.loginId)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
+                       placeholder="Login ID">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput [(ngModel)]="request.filters.name"
+                       (ngModelChange)="onChange('filters.name', request.filters.name)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
+                       placeholder="Name">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Organization</mat-label>
+                <input matInput [(ngModel)]="request.filters.organization"
+                       (ngModelChange)="onChange('filters.organization', request.filters.organization)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
+                       placeholder="Organization">
+              </mat-form-field>
+            </div>
           </div>
         </div>
-      </div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" type="submit"
-              (click)="this.paginator.pageIndex = 0; this.loadAccounts();">
-        <mat-icon>search</mat-icon>
-        Search
-      </button>
-    </mat-card-actions>
-  </mat-card>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit"
+                (click)="this.paginator.pageIndex = 0; this.loadAccounts();">
+          <mat-icon>search</mat-icon>
+          <span class="ml-2">Search</span>
+        </button>
+      </mat-card-actions>
+    </mat-card>
 
-  <div class="mat-elevation-z1">
-    <table mat-table
-           matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-           [dataSource]="dataSource">
+    <div class="mat-elevation-z1">
+      <table mat-table
+             matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+             [dataSource]="dataSource">
 
-      <!-- Checkbox Column -->
-      <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row">
-          <mat-checkbox (click)="$event.stopPropagation()"
-                        (change)="$event ? toggle(row) : null"
-                        [checked]="isSelected(row)">
-          </mat-checkbox>
-        </td>
-      </ng-container>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? toggle(row) : null"
+                          [checked]="isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="loginId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Login ID</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.loginId }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="loginId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Login ID</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.loginId }}
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.name }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.name }}
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="organization">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Organization</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.organization }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="organization">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Organization</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.organization }}
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="developer">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer</th>
-        <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
-          <span *ngSwitchCase="true">Yes</span>
-          <span *ngSwitchCase="false">No</span>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="developer">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer</th>
+          <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
+            <span *ngSwitchCase="true">Yes</span>
+            <span *ngSwitchCase="false">No</span>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-          (click)="toggle(row)"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            (click)="toggle(row)"></tr>
+      </table>
 
-    <mat-paginator
-      [pageSizeOptions]="[10, 25, 50]"
-      (page)="onPageChange($event)"
-      showFirstLastButtons></mat-paginator>
+      <mat-paginator
+        [pageSizeOptions]="[10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons></mat-paginator>
+    </div>
   </div>
-</mat-dialog-content>
-
-<mat-dialog-actions>
-  <button mat-raised-button color="warn" (click)="onNoClick()">
-    <mat-icon>close</mat-icon>
-    Cancel
-  </button>
-  <button mat-raised-button color="primary"
-          [disabled]="selection.selected.length === 0"
-          [mat-dialog-close]="selection.selected[0]">
-    <mat-icon>send</mat-icon>
-    Transfer
-  </button>
-</mat-dialog-actions>
+  <div class="actions ml-auto" mat-dialog-actions>
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+      Cancel
+    </button>
+    <button mat-raised-button color="primary"
+            [disabled]="selection.selected.length === 0"
+            [mat-dialog-close]="selection.selected[0]">
+      <mat-icon>send</mat-icon>
+      Transfer
+    </button>
+  </div>
+</div>

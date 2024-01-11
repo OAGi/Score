@@ -2,12 +2,15 @@
   <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
 
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
@@ -54,9 +57,12 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-checkbox [(ngModel)]="moduleSetRelease.default">Default</mat-checkbox>
+        <div class="d-flex flex-column pb-2">
+          <mat-checkbox [(ngModel)]="moduleSetRelease.default">Default</mat-checkbox>
 
-        <mat-checkbox [(ngModel)]="copyFromOther">Copy CC assignment from Module Set Release</mat-checkbox>
+          <mat-checkbox [(ngModel)]="copyFromOther">Copy CC assignment from Module Set Release</mat-checkbox>
+        </div>
+
         <mat-form-field>
           <mat-label>Module Set Release</mat-label>
           <mat-select [(ngModel)]="copyTargetModuleSetRelease" [disabled]="!copyFromOther">
@@ -76,7 +82,7 @@
 
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

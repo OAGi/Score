@@ -12,7 +12,7 @@
 }
 
 .option-body {
-  padding-top: 13px;
+  padding-top: 0;
 }
 
 .toggle-disabled {
@@ -21,7 +21,7 @@
 }
 
 .generate-option {
-  padding: 5px 0 5px 0;
+  padding: 0;
 }
 
 .generate-second-option {
@@ -40,7 +40,7 @@
 }
 
 .option-radio-button {
-  margin: 5px;
+  margin: 0;
 }
 
 .element-detail {

@@ -10,12 +10,12 @@
     <div class="context-section">
       <div class="row m-0">
         <div class="col-12 p-0">
-          <mat-card class="search-box-container p-md-0">
+          <mat-card class="search-box-container mb-1">
             <mat-card-content>
               <div class="container-fluid" *ngIf="searcher && dataSource">
                 <div class="row">
                   <div class="col-5 tree-search-box">
-                    <div class="row">
+                    <div class="row align-items-center">
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
@@ -31,25 +31,25 @@
                                     align="end">0 results</mat-hint>
                         </mat-form-field>
                       </div>
-                      <div class="col-3 actions-wrap">
-                        <button mat-icon-button
+                      <div class="col-3 buttons">
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(-1)">
                           <mat-icon>keyboard_arrow_up</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(1)">
                           <mat-icon>keyboard_arrow_down</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [hidden]="searcher.fullSearched"
                                 [disabled]="searcher.isSearching"
                                 [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                                 (click)="search(searcher.inputKeyword, false, true)">
                           <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching"
                                 [hidden]="!searcher.inputKeyword"
                                 (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
@@ -65,7 +65,7 @@
                   <div class="col-7 actions-wrap">
                     <div class="actions ml-auto d-flex align-items-center">
                       <div>
-                        <button mat-icon-button [id]="'bie-settings'"
+                        <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
                                 [matMenuTriggerFor]="settingsContextMenu"
                                 [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                           <mat-icon>settings</mat-icon>
@@ -342,7 +342,7 @@
                           </mat-form-field>
                         </div>
                       </div>
-                      <div class="row">
+                      <div class="row align-items-center">
                         <div class="col-md-3 col-sm-6">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
@@ -440,7 +440,7 @@
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
-                      <div class="row">
+                      <div class="row align-items-center">
                         <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
@@ -720,7 +720,7 @@
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
-                      <div class="row">
+                      <div class="row align-items-center">
                         <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
@@ -868,11 +868,13 @@
                                 <mat-label>Value Constraint</mat-label>
                               </mat-form-field>
                               <mat-form-field *ngIf="asBbiepDetail().bbie.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
                                 <input matInput placeholder="No value constraints"
                                        [disabled]="true">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbiepDetail().bbie.fixedValue"
                                        [disabled]="!isEditable(selectedNode) ||
@@ -880,6 +882,7 @@
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
                                 <input matInput placeholder="Default Value"
                                        [(ngModel)]="asBbiepDetail().bbie.defaultValue"
                                        [disabled]="!isEditable(selectedNode) ||
@@ -947,7 +950,7 @@
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                       <span>{{ codeList.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -976,7 +979,7 @@
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                       <span>{{ agency.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -1095,7 +1098,7 @@
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
-                      <div class="row">
+                      <div class="row align-items-center">
                         <div class="col-3">
                           <div class="checkbox">
                             <mat-checkbox color="primary"
@@ -1225,11 +1228,13 @@
                                 <mat-label>Value Constraint</mat-label>
                               </mat-form-field>
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
                                 <input matInput placeholder="No value constraints"
                                        [disabled]="true">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.fixedValue"
                                        [disabled]="!isEditable(selectedNode)||
@@ -1237,6 +1242,7 @@
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
                                 <input matInput placeholder="Default Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.defaultValue"
                                        [disabled]="!isEditable(selectedNode)||
@@ -1301,7 +1307,7 @@
                                          [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                       <span>{{ codeList.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>
@@ -1329,7 +1335,7 @@
                                          [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
                                          [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                       <span>{{ agency.name }}</span>
-                                      <span class="f12 ml-auto"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
                                     </div>
                                   </mat-option>
                                 </mat-select>

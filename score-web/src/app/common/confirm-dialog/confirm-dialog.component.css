@@ -2,13 +2,11 @@
   border-bottom: 1px solid transparent;
   box-sizing: border-box;
   font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: .1px;
   line-height: 24px;
-  padding-bottom: 8px;
-  padding-top: 7px;
-  border-bottom: 0;
+  padding-top: 8px;
   height: auto;
   left: 0;
   top: 0;
@@ -17,8 +15,8 @@
 
 .close {
   position: relative;
-  top: -5px;
-  right: -12px;
+  margin-left: auto;
+  left: 12px;
 }
 
 .close button {
@@ -57,6 +55,7 @@
   overflow: visible;
   width: 100%;
   opacity: 1;
+  direction: rtl;
 }
 
 .btn {
