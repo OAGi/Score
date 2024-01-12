@@ -57,25 +57,25 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =

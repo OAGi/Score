@@ -23,13 +23,13 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     public static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -63,17 +63,17 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//label/span[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
-            By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::label");
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::label");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =

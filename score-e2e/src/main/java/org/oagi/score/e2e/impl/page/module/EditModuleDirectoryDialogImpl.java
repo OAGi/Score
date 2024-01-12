@@ -19,7 +19,7 @@ public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog 
     private static final By DISCARD_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 

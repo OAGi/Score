@@ -23,9 +23,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
 
     public static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =

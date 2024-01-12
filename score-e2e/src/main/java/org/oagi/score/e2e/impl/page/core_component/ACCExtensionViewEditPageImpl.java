@@ -19,9 +19,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
 
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
@@ -174,7 +174,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public String getObjectClassTermFieldLabel() {
-        return getObjectClassTermField().getAttribute("data-placeholder");
+        return getObjectClassTermField().getAttribute("placeholder");
     }
 
     @Override

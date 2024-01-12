@@ -25,7 +25,7 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     private static final By DISCARD_MODULE_SET_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     public ViewEditModuleSetPageImpl(BasePage parent) {
         super(parent);

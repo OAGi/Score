@@ -23,23 +23,23 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     public static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =

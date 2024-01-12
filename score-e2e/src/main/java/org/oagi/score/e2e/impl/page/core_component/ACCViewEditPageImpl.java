@@ -31,7 +31,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By RESTORE_BUTTON_LOCATOR =
@@ -39,7 +39,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
@@ -63,15 +63,15 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By CARDINALITY_COMPONENT_LOCATOR =
-            By.xpath("//span[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
 
@@ -258,7 +258,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public String getObjectClassTermFieldLabel() {
-        return getObjectClassTermField().getAttribute("data-placeholder");
+        return getObjectClassTermField().getAttribute("placeholder");
     }
 
     @Override
@@ -593,7 +593,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public void hitCancelButton() {
         click(getCancelButton());
-        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span")));
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button")));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }
@@ -703,7 +703,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public String getCardinalityLabel() {
-        return visibilityOfElementLocated(getDriver(), CARDINALITY_COMPONENT_LOCATOR).getAttribute("data-placeholder");
+        return visibilityOfElementLocated(getDriver(), CARDINALITY_COMPONENT_LOCATOR).getAttribute("placeholder");
     }
 
     @Override

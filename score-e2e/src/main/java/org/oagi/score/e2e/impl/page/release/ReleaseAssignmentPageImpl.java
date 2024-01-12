@@ -30,7 +30,7 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
     private static final By VALIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(),\"Validate\")]//ancestor::button[1]");
     public static final By CONTINUE_CREATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button");
 
     private final ReleaseObject releaseObject;
 

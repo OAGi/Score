@@ -57,13 +57,13 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
             By.xpath("//span[contains(text(), \"Move back to Initialized\")]//ancestor::button[1]");
 
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DISCARD_RELEASE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);

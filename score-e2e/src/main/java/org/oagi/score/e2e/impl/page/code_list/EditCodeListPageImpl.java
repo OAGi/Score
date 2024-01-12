@@ -22,17 +22,17 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPage {
 
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     public static final By CONTINUE_REMOVE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By CODE_LIST_NAME_FIELD_LOCATOR =
@@ -96,9 +96,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
     private static final By UPDATE_ANYWAY_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update Anyway\")]//ancestor::button");
     private static final By CONTINUE_CANCEL_REVISION_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
     private final CodeListObject codeList;
 
     public EditCodeListPageImpl(BasePage parent, CodeListObject codeList) {

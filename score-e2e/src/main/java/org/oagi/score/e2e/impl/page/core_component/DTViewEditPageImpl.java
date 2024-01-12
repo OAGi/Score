@@ -49,23 +49,23 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
 
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
 
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
 
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By CARDINALITY_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
 
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
 
@@ -81,9 +81,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Default\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By SEARCH_FIELD_LOCATOR =
@@ -95,7 +95,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Based Data Type\")]//ancestor::mat-form-field//input");
     private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
@@ -107,9 +107,9 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By BACK_TO_WIP_BUTTON_LOCATOR =
@@ -230,7 +230,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public String getDataTypeTermFieldLabel() {
-        return getDataTypeTermField().getAttribute("data-placeholder");
+        return getDataTypeTermField().getAttribute("placeholder");
     }
 
     @Override
@@ -245,7 +245,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public String getRepresentationTermFieldLabel() {
-        return getRepresentationTermField().getAttribute("data-placeholder");
+        return getRepresentationTermField().getAttribute("placeholder");
     }
 
     @Override

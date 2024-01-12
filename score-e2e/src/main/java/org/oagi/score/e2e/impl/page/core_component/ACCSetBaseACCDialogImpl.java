@@ -172,7 +172,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public String getDENFieldLabel() {
-        return getDENField().getAttribute("data-placeholder");
+        return getDENField().getAttribute("placeholder");
     }
 
     @Override
@@ -197,7 +197,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public String getModuleFieldLabel() {
-        return getModuleField().getAttribute("data-placeholder");
+        return getModuleField().getAttribute("placeholder");
     }
 
     @Override

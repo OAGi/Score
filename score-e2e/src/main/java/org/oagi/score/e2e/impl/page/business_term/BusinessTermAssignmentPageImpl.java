@@ -65,7 +65,7 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     private final List<String> bieTypes;
 

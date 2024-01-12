@@ -31,7 +31,7 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     private static final By BACK_TO_INITIALIZED_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Back to Initialized\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By PUBLISH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Publish\")]//ancestor::button[1]");
 

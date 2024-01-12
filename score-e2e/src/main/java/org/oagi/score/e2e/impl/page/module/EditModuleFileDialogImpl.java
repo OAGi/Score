@@ -22,7 +22,7 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-dialog-content//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 

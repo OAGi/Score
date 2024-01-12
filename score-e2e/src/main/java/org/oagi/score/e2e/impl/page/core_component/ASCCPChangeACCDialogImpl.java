@@ -174,7 +174,7 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
     @Override
     public String getDENFieldLabel() {
-        return getDENField().getAttribute("data-placeholder");
+        return getDENField().getAttribute("placeholder");
     }
 
     @Override
@@ -199,7 +199,7 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
 
     @Override
     public String getModuleFieldLabel() {
-        return getModuleField().getAttribute("data-placeholder");
+        return getModuleField().getAttribute("placeholder");
     }
 
     @Override
