@@ -345,7 +345,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateACCButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ACC\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"ACC\"]//ancestor::button"));
     }
 
     @Override
@@ -367,7 +367,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateASCCPButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ASCCP\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"ASCCP\"]//ancestor::button"));
     }
 
     @Override
@@ -384,7 +384,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateBCCPButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"BCCP\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"BCCP\"]//ancestor::button"));
     }
 
     @Override
@@ -401,7 +401,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateDTButton() {
         click(getDriver(), getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"DT\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"DT\"]//ancestor::button"));
     }
 
     @Override

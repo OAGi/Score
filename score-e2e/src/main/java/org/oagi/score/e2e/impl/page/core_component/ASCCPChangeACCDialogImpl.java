@@ -72,13 +72,13 @@ public class ASCCPChangeACCDialogImpl implements ASCCPChangeACCDialog {
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to update ASCCP".equals(getText(title));
+        assert "Select ACC to update ASCCP".equals(getText(title.findElement(By.tagName("span"))));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//span[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override

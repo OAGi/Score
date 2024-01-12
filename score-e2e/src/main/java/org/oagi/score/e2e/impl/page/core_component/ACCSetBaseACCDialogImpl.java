@@ -72,7 +72,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to set a base ACC".equals(getText(title));
+        assert "Select ACC to set a base ACC".equals(getText(title.findElement(By.tagName("span"))));
         return true;
     }
 

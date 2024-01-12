@@ -202,7 +202,7 @@ public interface ACCExtensionViewEditPage extends Page {
      */
     WebElement clickOnDropDownMenuByPath(String path);
 
-    WebElement getSearchField();
+    WebElement getSearchInputTextField();
 
     /**
      * Return the UI element of the 'Update' button.

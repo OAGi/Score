@@ -91,46 +91,46 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
 
     private static final By SET_BASE_ACC_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Set Base ACC\")]");
+            By.xpath("//span[contains(text(), \"Set Base ACC\")]//ancestor::button[1]");
 
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+            By.xpath("//span[contains(text(), \"Append Property at Last\")]//ancestor::button[1]");
 
     private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Open in new tab\")]");
+            By.xpath("//span[contains(text(), \"Open in new tab\")]//ancestor::button[1]");
 
     private static final By WHERE_USED_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Where Used\")]");
+            By.xpath("//span[contains(text(), \"Where Used\")]//ancestor::button[1]");
 
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
+            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]//ancestor::button[1]");
 
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
 
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Show History\")]");
+            By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
 
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
+            By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]//ancestor::button[1]");
 
     private static final By INSERT_PROPERTY_BEFORE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert Property Before\")]");
+            By.xpath("//span[contains(text(), \"Insert Property Before\")]//ancestor::button[1]");
 
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert Property After\")]");
+            By.xpath("//span[contains(text(), \"Insert Property After\")]//ancestor::button[1]");
 
     private static final By REFACTOR_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Refactor\")]");
+            By.xpath("//span[contains(text(), \"Refactor\")]//ancestor::button[1]");
 
     private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Refactor to Base\")]");
+            By.xpath("//span[contains(text(), \"Refactor to Base\")]//ancestor::button[1]");
 
     private static final By UNGROUP_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Ungroup\")]");
+            By.xpath("//span[contains(text(), \"Ungroup\")]//ancestor::button[1]");
 
     private static final By REMOVE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Remove\")]");
+            By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By DELETE_OPTION_LOCATOR =
             By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(),\"Delete\")]");
 

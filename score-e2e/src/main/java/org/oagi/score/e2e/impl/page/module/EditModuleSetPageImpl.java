@@ -95,7 +95,7 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
         return createModuleFileDialog;
     }
     private WebElement getAddNewModuleButton() {
-        return elementToBeClickable(getDriver(), By.xpath("//mat-mdc-card-content//span[contains(text(), \"Add\")]"));
+        return elementToBeClickable(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//span[contains(text(), \"Add\")]"));
     }
 
     private WebElement getAddNewModuleFileButton() {

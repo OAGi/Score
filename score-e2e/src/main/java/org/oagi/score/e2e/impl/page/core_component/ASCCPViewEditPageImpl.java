@@ -59,13 +59,13 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Open in new tab\")]");
+            By.xpath("//span[contains(text(), \"Open in new tab\")]//ancestor::button[1]");
     private static final By CHANGE_ACC_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Change ACC\")]");
+            By.xpath("//span[contains(text(), \"Change ACC\")]//ancestor::button[1]");
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Show History\")]");
+            By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
@@ -399,7 +399,13 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = sendKeys(searchInput, path);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(searchInput);

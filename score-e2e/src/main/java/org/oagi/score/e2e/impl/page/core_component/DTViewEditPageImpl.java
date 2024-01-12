@@ -89,11 +89,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
     private static final By SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Add Supplementary Component\")]");
+            By.xpath("//span[contains(text(), \"Add Supplementary Component\")]//ancestor::button[1]");
     private static final By REMOVE_SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Remove\")]");
+            By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_RESTORE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     private static final By BASED_DATA_TYPE_FIELD_LOCATOR =

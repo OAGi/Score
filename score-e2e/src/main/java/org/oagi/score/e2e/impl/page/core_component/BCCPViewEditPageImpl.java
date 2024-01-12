@@ -43,11 +43,11 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     private static final By CHANGE_BDT_OPTION_LOCATOR =
-            By.xpath("//button/span[contains(text(), \"Change BDT\")]");
+            By.xpath("//span[contains(text(), \"Change BDT\")]//ancestor::button[1]");
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Show History\")]");
+            By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
@@ -396,7 +396,13 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = sendKeys(searchInput, path);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(searchInput);

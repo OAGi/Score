@@ -46,7 +46,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-    private static final By SEARCH_FIELD_LOCATOR =
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -313,8 +313,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
-    public WebElement getSearchField() {
-        return elementToBeClickable(getDriver(), SEARCH_FIELD_LOCATOR);
+    public WebElement getSearchInputTextField() {
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -335,9 +335,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     private WebElement goToNode(String path) {
-        WebElement searchInput = getSearchField();
+        WebElement searchInput = getSearchInputTextField();
         click(getDriver(), searchInput);
-        WebElement node = sendKeys(searchInput, path);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(searchInput);

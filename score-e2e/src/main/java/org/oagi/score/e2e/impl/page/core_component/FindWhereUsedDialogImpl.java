@@ -40,6 +40,6 @@ public class FindWhereUsedDialogImpl implements FindWhereUsedDialog {
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content//span[contains(text(), \"" + value + "\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//span[contains(text(), \"" + value + "\")]"));
     }
 }

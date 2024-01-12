@@ -108,7 +108,7 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     }
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//tbody/tr[" + idx + "]"));
     }
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {

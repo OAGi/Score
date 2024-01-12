@@ -27,10 +27,10 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
     private static final By SOURCE_SEARCH_INPUT_LOCATOR =
-            By.xpath("//mat-mdc-card-content/div[2]/div[1]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[1]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
 
     private static final By TARGET_SEARCH_INPUT_LOCATOR =
-            By.xpath("//mat-mdc-card-content/div[2]/div[2]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
 
     public UpliftBIEVerificationPageImpl(BasePage parent) {
         super(parent);
@@ -60,14 +60,14 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     }
 
     public void expandNodeInSourceBIE(String node) {
-        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
+        By chevronRightLocator = By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
 
     }
 
     public void expandNodeInTargetBIE(String node) {
-        By chevronRightLocator = By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
+        By chevronRightLocator = By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
     }
@@ -141,7 +141,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement getCheckBoxOfNodeInTargetBIE(String node) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[1]/mat-checkbox[1]/label/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[1]/mat-checkbox[1]/label/span[1]"));
     }
 
     @Override
@@ -163,7 +163,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement getReusedIconOfNodeInTargetBIE(String nodeName) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-mdc-card-content/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + nodeName + "\")]//ancestor::div[1]//fa-icon[@mattooltip=\"Select BIE\"]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + nodeName + "\")]//ancestor::div[1]//fa-icon[@mattooltip=\"Select BIE\"]"));
     }
 
     @Override
