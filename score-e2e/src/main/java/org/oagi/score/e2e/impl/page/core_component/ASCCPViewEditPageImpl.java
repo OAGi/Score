@@ -69,9 +69,9 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 

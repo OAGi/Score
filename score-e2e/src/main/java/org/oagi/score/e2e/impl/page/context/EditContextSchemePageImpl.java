@@ -55,7 +55,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
             = By.xpath("//mat-dialog-container//p");
 
     private static final By CONTINUE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Continue\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Continue\")]//ancestor::button");
 
     private final ViewEditContextSchemePageImpl parent;
 
@@ -134,7 +134,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     }
 
     @Override
-    public LoadFromCodeListDialog continuToLoadFromCodeListDialog() {
+    public LoadFromCodeListDialog continueToLoadFromCodeListDialog() {
         return retry(() -> {
             click(elementToBeClickable(getDriver(), CONTINUE_BUTTON_IN_DIALOG_LOCATOR));
             LoadFromCodeListDialog loadFromCodeListDialog = new LoadFromCodeListDialogImpl(this);

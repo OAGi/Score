@@ -82,13 +82,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             By.xpath("//mat-dialog-container//p");
 
     private static final By YES_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Yes\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Yes\")]//ancestor::button");
 
     private static final By RESET_BUTTON_LOCATOR =
             By.xpath("//button[@mattooltip=\"Reset detail\"]");
 
     private static final By CONTINUE_RESET_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Reset\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Reset\")]//ancestor::button");
 
     private static final By RESET_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");

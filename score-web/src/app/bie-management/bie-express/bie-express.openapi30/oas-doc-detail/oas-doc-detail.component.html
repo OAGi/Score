@@ -1,20 +1,20 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header class="display-flow-root">
-      <mat-card-title class="float-left">{{ title }}</mat-card-title>
-      <div class="action-group float-right mt-n2">
-        <div class="col-12 actions-wrap">
-          <button mat-raised-button color="primary" (click)="update()"
-                  [disabled]="!isChanged() || isDisabled(oasDoc)">
-            Update
-          </button>
-          <button mat-raised-button color="warn" (click)="discard()">
-            Discard
-          </button>
-        </div>
-      </div>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button mat-raised-button class="ml-2" color="primary" (click)="update()"
+              [disabled]="!isChanged() || isDisabled(oasDoc)">
+        Update
+      </button>
+      <button mat-raised-button class="ml-2" color="warn" (click)="discard()">
+        Discard
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-3 pb-0">
+    <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="row">
           <div class="col-2">
@@ -91,41 +91,43 @@
     </mat-card>
   </mat-card>
 
-  <mat-card>
+  <mat-card class="pt-0">
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
     <mat-card-header class="align-items-baseline">
-      <mat-card-title>BIE List</mat-card-title>
-      <mat-card-content class="mat-card-container">
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
+      <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
+        <span class="title">BIE List</span>
+        <div style="padding: 8px 12px 8px 24px;">
+          <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary">
+            <mat-icon>add</mat-icon>
+            Add
+          </button>
+          <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
+                  [hidden]="table.dataSource.data.length == 0"
+                  [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
+                  color="warn">
+            <mat-icon>delete</mat-icon>
+            Remove
+          </button>
+          <button mat-raised-button color="primary" (click)="generate()"
+                  [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
+            Generate
+          </button>
         </div>
-      <div style="padding: 8px 0 8px 12px;">
-        <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary">
-          <mat-icon>add</mat-icon>
-          Add
-        </button>
-        <button mat-raised-button class="mr-2" (click)="removeBieForOasDoc()"
-                [hidden]="table.dataSource.data.length == 0"
-                [disabled]="isDisabled(oasDoc) || this.selection.selected.length == 0"
-                color="warn">
-          <mat-icon>delete</mat-icon>
-          Remove
-        </button>
-        <button mat-raised-button color="primary" (click)="generate()"
-                [disabled]="isDisabled(oasDoc) || table.dataSource.data.length == 0">
-          Generate
-        </button>
-      </div>
-      </mat-card-content>
+      </mat-toolbar>
     </mat-card-header>
     <mat-card-content class="mat-card-container">
-      <div class="container-fluid pb-2">
+      <div class="container-fluid p-2">
         <div class="row">
           <div class="col-12">
             <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
               <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
               <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
-                {{ columnName }}
-                <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                <div class="d-inline-flex align-items-center">
+                  <span class="p-1 f12">{{ columnName }}</span>
+                  <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                </div>
               </ng-template>
             </mat-multi-sort-table-settings>
           </div>

@@ -235,7 +235,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
             click(editContextSchemePage.getLoadFromCodeListButton());
             assertEquals("All existing values will be removed and replaced with values from the code list.",
                     editContextSchemePage.getConfirmationDialogMessage());
-            LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continuToLoadFromCodeListDialog();
+            LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continueToLoadFromCodeListDialog();
             ReleaseObject release = codeListReleaseMap.get(codeList);
             loadFromCodeListDialog.selectCodeListByCodeListNameAndBranch(codeList.getName(), release.getReleaseNumber());
 
@@ -255,7 +255,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
         // The EU cannot add values from a developer code list which is in the Working branch.
         editContextSchemePage.getLoadFromCodeListButton().click();
-        LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continuToLoadFromCodeListDialog();
+        LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continueToLoadFromCodeListDialog();
         ReleaseObject release = codeListReleaseMap.get(codeListWorkingBranch);
         // Assert Working branch is not present.
         assertThrows(NoSuchElementException.class, () -> {
@@ -337,7 +337,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
         for (CodeListObject codeList : codeListsForTesting) {
             editContextSchemePage.getLoadFromCodeListButton().click();
-            LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continuToLoadFromCodeListDialog();
+            LoadFromCodeListDialog loadFromCodeListDialog = editContextSchemePage.continueToLoadFromCodeListDialog();
             ReleaseObject release = codeListReleaseMap.get(codeList);
             if (codeList.getState().equals("Production")) {
                 if (codeList.getBasedCodeListManifestId() != null) {
@@ -391,7 +391,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
         ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
+                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(ofSeconds(3L))
@@ -399,8 +399,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
-            new Actions(getDriver()).moveToElement(checkboxOfFirstRecord).perform();
-            checkboxOfFirstRecord.sendKeys(Keys.SPACE);
+            click(checkboxOfFirstRecord);
         });
 
         viewEditContextSchemePage.goToNextPage();

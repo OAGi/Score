@@ -42,7 +42,7 @@
     "jquery": "^3.6.1",
     "mat-icon-button-sizes": "^1.0.6",
     "ngx-markdown": "^17.1.1",
-    "ngx-mat-multi-sort": "file:./libs/mat-multi-sort/",
+    "ngx-mat-multi-sort": "^17.0.0",
     "ngx-mat-select-search": "^7.0.5",
     "notiflix": "^3.2.5",
     "popper.js": "^1.16.1",

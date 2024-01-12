@@ -39,13 +39,13 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By SEARCH_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =

@@ -207,6 +207,14 @@ mat-checkbox > .mat-checkbox-layout {
   font-size: 11px !important;
 }
 
+mat-multi-sort-table-settings .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
+  background-color: #ffffff !important;
+}
+
+mat-multi-sort-table-settings mat-chip {
+  min-height: 32px;
+}
+
 .mat-icon.fa {
   height: 13px;
   width: 13px;

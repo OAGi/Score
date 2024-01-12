@@ -230,7 +230,7 @@ public interface EditContextSchemePage extends Page {
 
     String getConfirmationDialogMessage();
 
-    LoadFromCodeListDialog continuToLoadFromCodeListDialog();
+    LoadFromCodeListDialog continueToLoadFromCodeListDialog();
 
 
 }

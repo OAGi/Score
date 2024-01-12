@@ -1,11 +1,13 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ "OAS_DOC_CREATE.TITLE" | translate }}</mat-card-title>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white d-flex flex-column align-items-start">
+      <span class="title">{{ "OAS_DOC_CREATE.TITLE" | translate }}</span>
       <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
-    </mat-card-header>
+    </mat-toolbar>
+  </div>
 
-    <mat-card class="mb-2">
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>OpenAPI Version</mat-label>
@@ -71,7 +73,7 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">
