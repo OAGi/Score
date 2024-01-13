@@ -34,7 +34,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By OWNER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
-            By.xpath("//label/span[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
 
     private static final By GUID_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");

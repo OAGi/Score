@@ -126,8 +126,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -550,7 +549,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),

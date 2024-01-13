@@ -12,7 +12,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog {
     private static final By MODULE_DIRECTORY_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
 
     private static final By UPDATE_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]");

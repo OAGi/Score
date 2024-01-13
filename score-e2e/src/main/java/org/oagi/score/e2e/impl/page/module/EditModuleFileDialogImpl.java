@@ -16,11 +16,11 @@ public class EditModuleFileDialogImpl implements EditModuleFileDialog {
     private static final By DISCARD_MODULE_FILE_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]");
     private static final By MODULE_FILE_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By MODULE_FILE_VERSION_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[text()= \"Namespace\"]//ancestor::mat-form-field[1]//mat-select/div/div[1]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =

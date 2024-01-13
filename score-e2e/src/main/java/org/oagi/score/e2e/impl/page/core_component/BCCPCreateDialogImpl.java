@@ -238,7 +238,7 @@ public class BCCPCreateDialogImpl implements BCCPCreateDialog {
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),

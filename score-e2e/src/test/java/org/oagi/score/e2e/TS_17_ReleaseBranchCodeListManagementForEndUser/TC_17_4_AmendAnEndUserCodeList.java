@@ -281,10 +281,8 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = codeListValueMap.get(cl);
-            editCodeListPage.selectCodeListValue(value.getValue());
-            assertThrows(Exception.class, () -> {
-                editCodeListPage.removeCodeListValue();
-            });
+            assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
+            assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");
@@ -340,10 +338,8 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = values.get(0);
-            editCodeListPage.selectCodeListValue(value.getValue());
-            assertThrows(Exception.class, () -> {
-                editCodeListPage.removeCodeListValue();
-            });
+            assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
+            assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");

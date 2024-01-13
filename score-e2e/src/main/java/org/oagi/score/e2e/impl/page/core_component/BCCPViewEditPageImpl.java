@@ -85,7 +85,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
-            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+            By.xpath("//mat-icon[contains(text(), \"comments\")]//ancestor::button[1]");
 
     private final BCCPObject bccp;
 

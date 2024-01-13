@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -76,7 +77,13 @@ public class TC_11_4_CreatingANewRevisionOfADeveloperCodeList extends BaseTest {
             assertEquals(codeList.getDefinitionSource(), getText(editCodeListPage.getDefinitionSourceField()));
             assertEquals(codeList.getVersionId() + "_New", getText(editCodeListPage.getVersionField()));
             CodeListValueObject value = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
-            assertDoesNotThrow(() -> editCodeListPage.selectCodeListValue(value.getValue()));
+
+            WebElement tr = editCodeListPage.getTableRecordByValue(value.getValue());
+            WebElement td = editCodeListPage.getColumnByName(tr, "value");
+            assertEquals(value.getValue(), getText(td));
+
+            td = editCodeListPage.getColumnByName(tr, "meaning");
+            assertEquals(value.getMeaning(), getText(td));
         }
 
     }

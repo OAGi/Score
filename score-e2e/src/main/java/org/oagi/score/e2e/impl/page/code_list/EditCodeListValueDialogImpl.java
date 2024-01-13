@@ -12,19 +12,19 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditCodeListValueDialogImpl implements EditCodeListValueDialog {
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By CODE_FIELD_LOCATOR =
             By.xpath("//mat-label[text() = \"Code\"]//ancestor::mat-form-field//input");
     private static final By MEANING_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Meaning\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By ADD_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::div[contains(@class, \"mat-mdc-dialog-actions\")]/button[1]");
     private static final By SAVE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Save\")]//ancestor::div[contains(@class, \"mat-mdc-dialog-actions\")]/button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//span[contains(text(),\"Deprecated\")]//ancestor::mat-checkbox");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//span[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
 
     private final BasePageImpl parent;
 

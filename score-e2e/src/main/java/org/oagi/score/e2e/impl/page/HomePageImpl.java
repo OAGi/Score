@@ -350,7 +350,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             try {
                 retry(() -> {
                     WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
                     click(getDriver(), itemsPerPageField);
                     waitFor(Duration.ofMillis(500L));
                     WebElement itemField = elementToBeClickable(getDriver(),
@@ -481,7 +481,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             try {
                 retry(() -> {
                     WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
                     click(getDriver(), itemsPerPageField);
                     waitFor(Duration.ofMillis(500L));
                     WebElement itemField = elementToBeClickable(getDriver(),

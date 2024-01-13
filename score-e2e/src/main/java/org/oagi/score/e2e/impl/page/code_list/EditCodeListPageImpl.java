@@ -82,7 +82,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     private static final By REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By ADD_COMMENT_ICON_LOCATOR =
-            By.xpath("//span/mat-icon[contains(text(), \"comments\")]");
+            By.xpath("//mat-icon[contains(text(), \"comments\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
@@ -126,8 +126,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

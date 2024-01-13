@@ -318,7 +318,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -409,8 +409,9 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
     }
+
     @Override
     public WebElement clickOnDropDownMenu(WebElement element) {
         return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));

@@ -137,10 +137,8 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             List<CodeListValueObject> values = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             for (CodeListValueObject value : values) {
-                editCodeListPage.selectCodeListValue(value.getValue());
-                assertThrows(Exception.class, () -> {
-                    editCodeListPage.removeCodeListValue();
-                });
+                assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
+                assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
                 EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
                 editCodeListValueDialog.setMeaning("new meaning for value");
                 editCodeListValueDialog.setDefinition("new definition for value");

@@ -110,7 +110,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
