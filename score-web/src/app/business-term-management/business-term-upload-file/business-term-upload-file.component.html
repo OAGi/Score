@@ -5,7 +5,7 @@
       <span class="flex-11-auto"></span>
       <button mat-raised-button class="ml-2" (click)="downloadFile()">
         <mat-icon>file_download</mat-icon>
-        Download template
+        <span class="pl-2">Download template</span>
       </button>
     </mat-toolbar>
   </div>
@@ -18,14 +18,12 @@
                [accept]="requiredFileType"
                (change)="onFileSelected($event)" #fileUpload>
 
-        <div class="file-upload">
+        <div class="file-upload d-flex align-items-center">
+          <span>{{ fileName || "No file uploaded yet." }}</span>
 
-          {{ fileName || "No file uploaded yet." }}
-
-          <button mat-mini-fab color="primary" class="upload-btn"
+          <button mat-mini-fab color="primary" class="upload-btn ml-2"
                   (click)="fileUpload.click()">
             <mat-icon>attach_file</mat-icon>
-
           </button>
 
         </div>
