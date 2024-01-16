@@ -80,7 +80,7 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <div class="finder-wrapper">
+          <div class="finder-wrapper" *ngIf="!!selectedModuleSetId">
             <div class="finder-content">
               <div *ngFor="let tile of tiles;" class="finder-grid">
                 <div class="finder-grid-left">
@@ -98,14 +98,12 @@
               </div>
             </div>
           </div>
-          <div>
+          <div class="d-flex align-items-center">
             <button (click)="onCopy()" color="primary" mat-raised-button [disabled]="!this.selected">
               <mat-icon>content_copy</mat-icon>
-              Copy
+              <span class="pl-2">Copy</span>
             </button>
-            <mat-checkbox [(ngModel)]="copySubModules" style="margin-left: 10px; display: inline-flex;">Copy all
-              submodules. Overwrite if there's duplicated module name.
-            </mat-checkbox>
+            <mat-checkbox [(ngModel)]="copySubModules" style="margin-left: 10px; display: inline-flex;">Copy all submodules. Overwrite if there's duplicated module name.</mat-checkbox>
           </div>
         </div>
       </mat-expansion-panel>

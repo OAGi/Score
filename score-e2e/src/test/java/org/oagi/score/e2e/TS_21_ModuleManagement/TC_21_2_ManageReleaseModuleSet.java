@@ -120,7 +120,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             assertThrows(TimeoutException.class, () -> createModuleSetReleasePage.hitCreateButton());
 
             WebElement createButtonInDialog = elementToBeClickable(getDriver(),
-                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button/span"));
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button"));
             click(createButtonInDialog);
 
             viewEditModuleSetReleasePage.openPage();
@@ -165,7 +165,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             assertThrows(TimeoutException.class, () -> createModuleSetReleasePage.hitCreateButton());
 
             WebElement createButtonInDialog = elementToBeClickable(getDriver(),
-                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button/span"));
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button"));
             click(createButtonInDialog);
 
             viewEditModuleSetReleasePage.openPage();
@@ -175,11 +175,11 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             assertThrows(TimeoutException.class, () -> finalEditModuleSetReleasePage.hitUpdateButton());
 
             WebElement confirmDialogContent = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//score-confirm-dialog//div[@class = \"content\"]"));
+                    By.xpath("//score-confirm-dialog//div[contains(@class, \"content\")]"));
             assertTrue(getText(confirmDialogContent).contains("There is another default module set release"));
 
             WebElement updateButtonInDialog = elementToBeClickable(getDriver(),
-                    By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span"));
+                    By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button"));
             click(updateButtonInDialog);
 
             viewEditModuleSetReleasePage.openPage();
@@ -335,7 +335,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
 
         viewEditReleasePage.openPage();
         viewEditReleasePage.hitDiscardButton(newRelease.getReleaseNumber());
-        String errorMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath("//snack-bar-container//div[contains(@class, 'message')]//span")));
+        String errorMessage = getText(getMultiActionSnackBar(getDriver()).getMessageElement());
         assertTrue(errorMessage.contains("It cannot be discarded because there are dependent module set releases."));
     }
 
@@ -366,7 +366,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         assertDoesNotThrow(() -> editModuleSetReleasePage.hitValidateButton());
 
         WebElement dialogHeader = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[@class = \"header\"]"));
+                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]/span"));
         assertEquals("Module Set Release - XML Schema Validation", getText(dialogHeader));
     }
 

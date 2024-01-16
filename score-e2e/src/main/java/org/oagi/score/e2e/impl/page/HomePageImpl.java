@@ -118,12 +118,12 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
     @Override
     public WebElement getBIEsTab() {
-        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"BIEs\")]"));
+        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//div[contains(@class, \"mat-mdc-tab\")]//span[contains(text(), \"BIEs\")]"));
     }
 
     @Override
     public WebElement getUserExtensionsTab() {
-        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"User Extensions\")]"));
+        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//div[contains(@class, \"mat-mdc-tab\")]//span[contains(text(), \"User Extensions\")]"));
     }
 
 
@@ -144,7 +144,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         retry(() -> {
             click(getDriver(), getBranchSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]"));
             click(getDriver(), optionField);
             waitFor(ofMillis(500L));
         });

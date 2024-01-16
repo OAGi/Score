@@ -247,9 +247,9 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
 
-        assertTrue(getDriver().findElements(By.xpath("//mat-mdc-card-content/div/div[2]//*[contains(text(), \"Candidate\")]")).size() > 0);
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-mdc-card-content/div/div[2]//*[contains(text(), \"WIP\")]")).size());
-        assertEquals(0, getDriver().findElements(By.xpath("//mat-mdc-card-content/div/div[2]//*[contains(text(), \"Draft\")]")).size());
+        assertTrue(getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(), \"Candidate\")]")).size() > 0);
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(), \"WIP\")]")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//mat-card-content/div/div[2]//*[contains(text(), \"Draft\")]")).size());
     }
 
     @Test

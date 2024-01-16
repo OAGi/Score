@@ -73,7 +73,7 @@ public class CreateModuleSetPageImpl extends BasePageImpl implements CreateModul
         retry(() -> {
             click(getReleaseSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + releaseNumber + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + releaseNumber + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });
@@ -88,7 +88,7 @@ public class CreateModuleSetPageImpl extends BasePageImpl implements CreateModul
         retry(() -> {
             click(getModuleSetReleaseSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + moduleSetRelease + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + moduleSetRelease + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });

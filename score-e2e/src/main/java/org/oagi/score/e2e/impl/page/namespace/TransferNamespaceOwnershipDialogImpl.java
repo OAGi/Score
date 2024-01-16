@@ -10,13 +10,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOwershipDialog {
 
     private static final By LOGIN_ID_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
 
     private static final By NAME_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Name\")]//ancestor::div[1]/input");
 
     private static final By ORGANIZATION_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Organization\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Organization\")]//ancestor::div[1]/input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Search\")]//ancestor::button[1]");

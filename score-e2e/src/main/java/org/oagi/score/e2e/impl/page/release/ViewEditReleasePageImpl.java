@@ -414,6 +414,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement clickOnDropDownMenu(WebElement element) {
-        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]"));
     }
 }

@@ -34,7 +34,7 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Business Context\")]");

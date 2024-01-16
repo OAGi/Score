@@ -1,90 +1,98 @@
-<mat-card style="box-shadow: none; padding: 0;">
-  <mat-card-header>
-    <mat-card-title>Uplift BIE Report</mat-card-title>
-  </mat-card-header>
-</mat-card>
-
-<mat-dialog-content class="mat-card-container">
-  <mat-card>
-    <mat-card-content class="mat-card-container">
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
-      <div class="container-fluid" [hidden]="loading">
-        <div class="row">
-          <div class="col-md-12">
-            <mat-checkbox class="checklist-leaf-node"
-                          [(ngModel)]="hideSystemMatched"
-                          (ngModelChange)="onToggleHide()">View Issues Only</mat-checkbox>
+<div class="d-block">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>Uplift BIE Report</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="content" mat-dialog-content>
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+    <mat-card class="search-box" *ngIf="!loading">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-12">
+              <mat-checkbox class="checklist-leaf-node"
+                            [(ngModel)]="hideSystemMatched"
+                            (ngModelChange)="onToggleHide()">View Issues Only
+              </mat-checkbox>
+            </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <table mat-table matSort [dataSource]="dataSource">
-              <ng-container matColumnDef="ccType" size="10">
-                <th mat-header-cell *matHeaderCellDef>Type</th>
-                <td mat-cell *matCellDef="let row">
-                  {{ row.ccType }}
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="displayPath">
-                <th mat-header-cell *matHeaderCellDef>Source {{data.sourceReleaseNum}} Path &rarr; Target {{data.targetReleaseNum}} Path</th>
-                <td mat-cell *matCellDef="let row">
-                  <div class="display-path-content">
-                    <span>{{ row.sourceDisplayPath }}</span>
-                    <span>&darr;</span>
-                    <span>{{ row.targetDisplayPath }}</span>
-                  </div>
-                </td>
-              </ng-container>
+      </mat-card-content>
+    </mat-card>
 
-              <ng-container matColumnDef="context">
-                <th mat-header-cell *matHeaderCellDef>Context Definition</th>
-                <td mat-cell *matCellDef="let row">
-                  {{ row.context }}
-                </td>
-              </ng-container>
+    <div class="mat-elevation-z1">
+      <table mat-table matSort [dataSource]="dataSource">
+        <ng-container matColumnDef="ccType" size="10">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.ccType }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="displayPath">
+          <th mat-header-cell *matHeaderCellDef>Source {{ data.sourceReleaseNum }} Path &rarr;
+            Target {{ data.targetReleaseNum }} Path
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <div class="display-path-content">
+              <span>{{ row.sourceDisplayPath }}</span>
+              <span>&darr;</span>
+              <span>{{ row.targetDisplayPath }}</span>
+            </div>
+          </td>
+        </ng-container>
 
-              <ng-container matColumnDef="match" size="10">
-                <th mat-header-cell *matHeaderCellDef>Matched</th>
-                <td mat-cell *matCellDef="let row">
-                  {{ row.match }}
-                </td>
-              </ng-container>
+        <ng-container matColumnDef="context">
+          <th mat-header-cell *matHeaderCellDef>Context Definition</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.context }}
+          </td>
+        </ng-container>
 
-              <ng-container matColumnDef="reuse" size="10">
-                <th mat-header-cell *matHeaderCellDef>Reused</th>
-                <td mat-cell *matCellDef="let row">
-                  {{ row.reuse }}
-                </td>
-              </ng-container>
+        <ng-container matColumnDef="match" size="10">
+          <th mat-header-cell *matHeaderCellDef>Matched</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.match }}
+          </td>
+        </ng-container>
 
-              <ng-container matColumnDef="validCode" size="10">
-                <th mat-header-cell *matHeaderCellDef>Issue</th>
-                <td mat-cell *matCellDef="let row">
-                  <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
-                </td>
-              </ng-container>
+        <ng-container matColumnDef="reuse" size="10">
+          <th mat-header-cell *matHeaderCellDef>Reused</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.reuse }}
+          </td>
+        </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</mat-dialog-content>
+        <ng-container matColumnDef="validCode" size="10">
+          <th mat-header-cell *matHeaderCellDef>Issue</th>
+          <td mat-cell *matCellDef="let row">
+            <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
+          </td>
+        </ng-container>
 
-<mat-dialog-actions class="mt-2">
-  <button mat-raised-button color="warn" (click)="onClose()">
-    <mat-icon>close</mat-icon>
-    Cancel
-  </button>
-  <button mat-raised-button (click)="onDownload()">
-    Download
-  </button>
-  <button mat-raised-button color="primary" (click)="onUplift()">
-    Uplift
-  </button>
-</mat-dialog-actions>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+  <div class="actions ml-auto" mat-dialog-actions>
+    <button mat-raised-button color="warn" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+      <span class="pl-2">Cancel</span>
+    </button>
+    <button mat-raised-button (click)="onDownload()">
+      Download
+    </button>
+    <button mat-raised-button color="primary" (click)="onUplift()">
+      Uplift
+    </button>
+  </div>
+</div>

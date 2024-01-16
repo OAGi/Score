@@ -50,7 +50,7 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
         retry(() -> {
             click(getModuleSetSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + moduleSetName + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + moduleSetName + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });
@@ -87,7 +87,7 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
 
     @Override
     public void toggleCopyAllSubmodules() {
-        click(getCopyAllSubmodulesSelectField().findElement(By.tagName("label")));
+        click(getCopyAllSubmodulesSelectField());
     }
 
     @Override
@@ -96,6 +96,6 @@ public class CopyModuleFromExistingModuleSetDialogImpl implements CopyModuleFrom
     }
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+                "//label[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 }

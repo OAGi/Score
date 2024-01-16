@@ -27,10 +27,10 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
     private static final By SOURCE_SEARCH_INPUT_LOCATOR =
-            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[1]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
+            By.xpath("//mat-card-content/div[2]/div[1]//mat-label[contains(text(), \"Search\")]//ancestor::div[1]//input");
 
     private static final By TARGET_SEARCH_INPUT_LOCATOR =
-            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//mat-placeholder[contains(text(),\"Search\")]//ancestor::div[1]//input");
+            By.xpath("//mat-card-content/div[2]/div[2]//mat-label[contains(text(), \"Search\")]//ancestor::div[1]//input");
 
     public UpliftBIEVerificationPageImpl(BasePage parent) {
         super(parent);
@@ -60,14 +60,18 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     }
 
     public void expandNodeInSourceBIE(String node) {
-        By chevronRightLocator = By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
+        By chevronRightLocator = By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                "/div[2]/div[1]//cdk-virtual-scroll-viewport//span[contains(text(), \"" + node + "\")]" +
+                "//ancestor::div[1]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
 
     }
 
     public void expandNodeInTargetBIE(String node) {
-        By chevronRightLocator = By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(),\"" + node + "\")]//ancestor::div[1]//mat-icon[contains(text(),\"chevron_right\")]//ancestor::button[1]"
+        By chevronRightLocator = By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                "/div[2]/div[2]//cdk-virtual-scroll-viewport//span[contains(text(), \"" + node + "\")]" +
+                "//ancestor::div[1]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]"
         );
         click(elementToBeClickable(getDriver(), chevronRightLocator));
     }
@@ -75,7 +79,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement goToNodeInSourceBIE(String nodePath) {
         WebElement ele = getSearchInputOfSourceTree();
-        click(ele);
+        click(getDriver(), ele);
         retry(() -> {
             WebElement e = sendKeys(ele, nodePath);
             if (!nodePath.equals(getText(ele))) {
@@ -93,8 +97,9 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         String nodeName = nodes[nodes.length - 1];
 
         WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
-                "//score-bie-uplift/div/mat-mdc-card/mat-mdc-card-content/div[2]/div[1]//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]")));
-        click(node);
+                "//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                        "/div[2]/div[1]//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]")));
+        click(getDriver(), node);
         clear(getSearchInputOfSourceTree());
         return node;
 
@@ -103,7 +108,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement goToNodeInTargetBIE(String nodePath) {
         WebElement ele = getSearchInputOfTargetTree();
-        click(ele);
+        click(getDriver(), ele);
         retry(() -> {
             WebElement e = sendKeys(ele, nodePath);
             if (!nodePath.equals(getText(ele))) {
@@ -121,10 +126,10 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         String nodeName = nodes[nodes.length - 1];
 
         WebElement node = retry(() -> visibilityOfElementLocated(getDriver(), By.xpath(
-                "//score-bie-uplift/div/mat-mdc-card/mat-mdc-card-content/div[2]/div[2]" +
-                        "//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]")));
+                "//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                        "/div[2]/div[2]//div[contains(@class, \"mat-tree-node\")]//*[contains(text(), \"" + nodeName + "\")]")));
 
-        click(node);
+        click(getDriver(), node);
         clear(getSearchInputOfTargetTree());
         return node;
     }
@@ -141,7 +146,8 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement getCheckBoxOfNodeInTargetBIE(String node) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[1]/mat-checkbox[1]/label/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                "/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[1]/mat-checkbox[1]"));
     }
 
     @Override
@@ -163,7 +169,8 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
 
     @Override
     public WebElement getReusedIconOfNodeInTargetBIE(String nodeName) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + nodeName + "\")]//ancestor::div[1]//fa-icon[@mattooltip=\"Select BIE\"]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
+                "/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + nodeName + "\")]//ancestor::div[1]//fa-icon[@mattooltip=\"Select BIE\"]"));
     }
 
     @Override

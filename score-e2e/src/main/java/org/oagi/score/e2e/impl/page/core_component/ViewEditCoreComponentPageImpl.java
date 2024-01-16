@@ -4,10 +4,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -222,7 +219,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             String href = link.getAttribute("href");
             String accId = href.substring(href.indexOf("/acc/") + "/acc/".length());
             ACCObject accObject = getAPIFactory().getCoreComponentAPI().getACCByManifestId(new BigInteger(accId));
-            click(link);
+            try {
+                click(link);
+            } catch (ElementNotInteractableException e) {
+                getDriver().get(href);
+            }
 
             ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, accObject);
             assert accViewEditPage.isOpened();
@@ -264,8 +265,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             String href = link.getAttribute("href");
             String asccpId = href.substring(href.indexOf("/asccp/") + "/asccp/".length());
             ASCCPObject asccpObject = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(new BigInteger(asccpId));
-
-            click(link);
+            try {
+                click(link);
+            } catch (ElementNotInteractableException e) {
+                getDriver().get(href);
+            }
 
             ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccpObject);
 

@@ -21,7 +21,7 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DISCARD_MODULE_SET_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
@@ -108,7 +108,7 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     }
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
     }
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
@@ -158,6 +158,6 @@ public class ViewEditModuleSetPageImpl extends BasePageImpl implements ViewEditM
     }
     @Override
     public WebElement clickOnDropDownMenu(WebElement element) {
-        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]"));
     }
 }

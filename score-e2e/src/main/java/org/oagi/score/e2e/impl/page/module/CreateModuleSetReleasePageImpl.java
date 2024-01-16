@@ -18,9 +18,9 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//textarea");
     private static final By RELEASE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Release\"]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Release\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By MODULE_SET_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Module Set\"]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[contains(text(), \"Module Set\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By CREATE_BUTTON_LOCATOR =
@@ -71,7 +71,7 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
         retry(() -> {
             click(getModuleSetSelectField());
             WebElement optionField = elementToBeClickable(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });
@@ -88,7 +88,7 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
             click(getReleaseSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), releaseNumber);
             WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + releaseNumber + "\")]"));
+                    By.xpath("//mat-option//span[text() = \"" + releaseNumber + "\"]"));
             click(searchedSelectField);
             waitFor(ofMillis(500L));
             escape(getDriver());
@@ -125,6 +125,6 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     }
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+                "//label[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 }

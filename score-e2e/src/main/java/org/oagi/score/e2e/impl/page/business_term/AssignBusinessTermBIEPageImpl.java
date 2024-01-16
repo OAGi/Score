@@ -80,7 +80,7 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
+            WebElement optionField = visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });

@@ -40,10 +40,10 @@ public class ViewEditNamespacePageImpl extends BasePageImpl implements ViewEditN
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By URI_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"URI\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"URI\")]//ancestor::div[1]/input");
 
     private static final By PREFIX_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Prefix\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Prefix\")]//ancestor::div[1]/input");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NEW_NAMESPACE_BUTTON_LOCATOR =

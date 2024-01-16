@@ -31,7 +31,7 @@ public class EditModuleSetReleasePageImpl extends BasePageImpl implements EditMo
     private static final By RELEASE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Release\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DEFAULT_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Default\")]//ancestor::mat-checkbox");
+            By.xpath("//label[contains(text(), \"Default\")]//ancestor::mat-checkbox");
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By EXPORT_BUTTON_LOCATOR =
