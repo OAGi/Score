@@ -49,7 +49,7 @@ public class ViewEditAgencyIDListPageImpl extends BasePageImpl implements ViewEd
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"Name\")]");
 
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Definition\")]");

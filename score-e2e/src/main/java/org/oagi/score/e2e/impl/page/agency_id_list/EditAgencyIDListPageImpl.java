@@ -97,7 +97,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[text() = \"search\"]");
     private static final By COMMENT_BUTTON_LOCATOR =
-            By.xpath("//mat-icon[text() = \"comments\"]");
+            By.xpath("//mat-icon[text() = \"comments\"]//ancestor::button[1]");
 
     private final AgencyIDListObject agencyIDList;
 

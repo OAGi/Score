@@ -27,19 +27,19 @@ public class AssignBusinessTermBTPageImpl extends BasePageImpl implements Assign
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR = By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
+    private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
 
-    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
+    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
 
-    private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"External Reference ID\")]//ancestor::div[1]/input");
+    private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::div[1]/input");
 
-    private static final By FILTER_BY_SAME_CC_CHECKBOX_LOCATOR = By.xpath("//span[contains(text(), \"Filter by same CC\")]//ancestor::mat-checkbox[1]");
+    private static final By FILTER_BY_SAME_CC_CHECKBOX_LOCATOR = By.xpath("//label[contains(text(), \"Filter by same CC\")]//ancestor::mat-checkbox[1]");
 
     private static final By SEARCH_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By TYPE_CODE_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
 
-    private static final By PREFERRED_BUSINESS_TERM_CHECKBOX_LOCATOR = By.xpath("//span[contains(text(), \"Preferred Business Term\")]//ancestor::mat-checkbox[1]");
+    private static final By PREFERRED_BUSINESS_TERM_CHECKBOX_LOCATOR = By.xpath("//label[contains(text(), \"Preferred Business Term\")]//ancestor::mat-checkbox[1]");
 
     private static final By CREATE_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 

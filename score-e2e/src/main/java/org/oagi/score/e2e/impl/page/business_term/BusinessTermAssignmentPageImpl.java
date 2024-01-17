@@ -36,19 +36,19 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By BIE_DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"BIE DEN\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"BIE DEN\")]//ancestor::div[1]/input");
 
     private static final By BUSINESS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
 
     private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
 
     private static final By TYPE_CODE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
 
     private static final By PREFERRED_ONLY_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
+            By.xpath("//label[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[contains(text(), \"search\")]//ancestor::button[1]");

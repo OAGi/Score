@@ -209,6 +209,7 @@ mat-checkbox > .mat-checkbox-layout {
 
 mat-multi-sort-table-settings .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
   background-color: #ffffff !important;
+  margin-right: 8px;
 }
 
 mat-multi-sort-table-settings mat-chip {
@@ -386,6 +387,11 @@ span.release-state.Published {
 
 mat-checkbox.hide-unused > .mat-checkbox-layout {
   margin-bottom: 0 !important;
+}
+
+.mat-mdc-form-field-hint-wrapper, .mat-mdc-form-field-error-wrapper {
+  padding: 0 !important;
+  font-size: 12px;
 }
 
 .pointer {

@@ -20,54 +20,43 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_SELECTOR_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By CARDINALITY_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
-
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By VALUE_DOMAIN_LOCATOR =
-            By.xpath("//mat-panel-title[contains(text(), \"Value Domain\")]");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
 
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
@@ -86,8 +75,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     public static final By DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Default\")]//ancestor::mat-form-field[1]//mat-select");
-    private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By COMMENTS_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
     private static final By SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR =
@@ -101,7 +90,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
     private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
     private static final By DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR =
@@ -287,10 +276,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void showValueDomain() {
         click(getDriver(), getShowValueDomain());
     }
+
     @Override
     public WebElement getShowValueDomain() {
         return elementToBeClickable(getDriver(), VALUE_DOMAIN_LOCATOR);
     }
+
     @Override
     public WebElement getAddValueDomainButton() {
         return elementToBeClickable(getDriver(), ADD_VALUE_DOMAIN_LOCATOR);
@@ -307,13 +298,15 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ valueDomainName +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
     }
+
     @Override
     public WebElement getTheLastTableRecord() {
         defaultWait(getDriver());
         return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//tr[last()]"));
     }
+
     @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
@@ -339,6 +332,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(500L));
     }
+
     @Override
     public WebElement getUpdateAnywayButton() {
         return elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR);
@@ -357,6 +351,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void setQualifier(String qualifier) {
         sendKeys(getQualifierField(), qualifier);
     }
+
     @Override
     public WebElement getQualifierField() {
         return visibilityOfElementLocated(getDriver(), QUALIFIER_FIELD_LOCATOR);
@@ -383,15 +378,16 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ codeListName +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]")));
     }
 
     @Override
     public void setDefaultValueDomain(String name) {
         click(getDefaultValueDomainField());
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \""+ name +"\")]//ancestor::mat-option[1]")));
+                "//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
     }
+
     @Override
     public WebElement getDefaultValueDomainField() {
         return visibilityOfElementLocated(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
@@ -459,13 +455,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             return e;
         });
         node.sendKeys(Keys.ENTER);
-        click(node);
+        click(getDriver(), node);
         clear(searchInput);
         return node;
     }
+
     @Override
     public WebElement getSearchField() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_FIELD_LOCATOR);
+        return visibilityOfElementLocated(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     public WebElement getNodeByName(String name) {
@@ -548,14 +545,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getValueDomainByTypeNameAndXSDExpression(String valueDomainType, String valueDomainName, String XSDExpression) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]" +
-                "/ancestor::tr[1]//*[contains(text(),\""+valueDomainName+"\")]//ancestor::tr//*[contains(text(),\""+XSDExpression+"\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[text() = \"" + valueDomainType + "\"]//ancestor::tr" +
+                "//span[text() = \"" + valueDomainName + "\"]//ancestor::tr//*[contains(text(), \"" + XSDExpression + "\")]"));
     }
 
     @Override
     public WebElement getCheckboxForValueDomainByTypeAndName(String valueDomainType, String valueDomainName) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(),\""+valueDomainType+"\")]/ancestor::tr[1]//*[contains(text()" +
-                ",\""+valueDomainName+"\")]//ancestor::tr/td[1]//label/span[1]//input"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[text() = \"" + valueDomainType + "\"]//ancestor::tr" +
+                "//span[text() = \"" + valueDomainName + "\"]//ancestor::tr/td[contains(@class, \"mat-column-select\")]//mat-checkbox"));
     }
 
     @Override
@@ -564,7 +561,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
-    public WebElement getDiscardValueDomainButton(){
+    public WebElement getDiscardValueDomainButton() {
         return elementToBeClickable(getDriver(), DISCARD_VALUE_DOMAIN_LOCATOR);
     }
 
@@ -575,7 +572,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//span[contains(text(), \""+value+"\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-expansion-panel//table//tbody//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -583,7 +580,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         retry(() -> {
             WebElement tr = getTableRecordByValue(name);
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox")));
+            click(td.findElement(By.tagName("mat-checkbox")));
         });
 
         invisibilityOfLoadingContainerElement(getDriver());
@@ -600,6 +597,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             click(elementToBeClickable(getDriver(), SUPPLEMENTARY_COMPONENT_OPTION_LOCATOR));
         }
     }
+
     @Override
     public WebElement getNodeByPath(String path) {
         return retry(() -> {
@@ -653,6 +651,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
     }
+
     @Override
     public WebElement getMoveToCandidate(boolean enabled) {
         if (enabled) {
@@ -670,6 +669,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
     }
+
     @Override
     public WebElement getBackToWIPButton(boolean enabled) {
         if (enabled) {
@@ -687,6 +687,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
     }
+
     @Override
     public WebElement getDeleteButton() {
         return elementToBeClickable(getDriver(), DELETE_BUTTON_LOCATOR);
@@ -800,6 +801,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
                     "//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
             click(option);
         }
+
         @Override
         public WebElement getCardinalityField() {
             return visibilityOfElementLocated(getDriver(), CARDINALITY_FIELD_LOCATOR);
@@ -813,6 +815,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
                     "//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
             click(option);
         }
+
         @Override
         public WebElement getValueConstraintTypeField() {
             return visibilityOfElementLocated(getDriver(), VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
@@ -822,13 +825,14 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         public void setValueConstraint(String constraintValue) {
             sendKeys(getValueConstraintField(), constraintValue);
         }
+
         @Override
         public WebElement getValueConstraintField() {
             String selectedValueConstraintType = getValueConstraintTypeFieldValue();
-            if (selectedValueConstraintType.equals("None")){
-                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"No value constraints\")]/ancestor::mat-form-field//input"));
-            } else{
-                return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + selectedValueConstraintType +
+            if (selectedValueConstraintType.equals("None")) {
+                return visibilityOfElementLocated(getDriver(), By.xpath("//mat-label[contains(text(), \"No value constraints\")]/ancestor::mat-form-field//input"));
+            } else {
+                return visibilityOfElementLocated(getDriver(), By.xpath("//mat-label[contains(text(), \"" + selectedValueConstraintType +
                         "\")]/ancestor::mat-form-field//input"));
             }
         }
@@ -902,12 +906,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         public void selectRepresentationTerm(String representationTerm) {
             click(getRepresentationSelectField());
             click(elementToBeClickable(getDriver(), By.xpath(
-                    "//span[text()=\""+ representationTerm +"\"]//ancestor::mat-option[1]")));
+                    "//span[text() = \"" + representationTerm + "\"]//ancestor::mat-option[1]")));
         }
 
         @Override
         public WebElement getTableRecordByValue(String value) {
-            return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \""+value+"\")]/ancestor::tr"));
+            return visibilityOfElementLocated(getDriver(), By.xpath("//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
         }
 
         @Override
@@ -929,7 +933,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         public void setDefaultValueDomain(String valueDomain) {
             click(getDefaultValueDomainField());
             click(elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(),\"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+                    "//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
         }
 
         @Override

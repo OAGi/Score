@@ -47,7 +47,7 @@ public class HistoryCompareDialogImpl implements HistoryCompareDialog {
 
     private List<WebElement> getDialogContents() {
         return visibilityOfAllElementsLocatedBy(getDriver(),
-                By.xpath("//score-log-compare-dialog//div[contains(@class, \"mat-mdc-dialog-content\")]"));
+                By.xpath("//score-log-compare-dialog//mat-dialog-content[contains(@class, \"mat-mdc-dialog-content\")]"));
     }
 
     @Override

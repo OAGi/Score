@@ -33,9 +33,9 @@ public class AssignBusinessTermBIEPageImpl extends BasePageImpl implements Assig
 
     private static final By DEN_FIELD_LOCATOR = By.xpath("//input[contains(@placeholder, \"DEN\")]");
 
-    private static final By BUSINESS_CONTEXT_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::div[1]/input");
+    private static final By BUSINESS_CONTEXT_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Context\")]//ancestor::div[1]/input");
 
-    private static final By TOP_LEVEL_BIE_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"Top Level BIE\")]//ancestor::div[1]/input");
+    private static final By TOP_LEVEL_BIE_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Top Level BIE\")]//ancestor::div[1]/input");
 
     private static final By SEARCH_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 

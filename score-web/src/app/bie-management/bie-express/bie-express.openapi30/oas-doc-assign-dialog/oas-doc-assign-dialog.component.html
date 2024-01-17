@@ -1,11 +1,16 @@
-<div class="context-section">
-  <div class="pl-2 pr-2">
-    <mat-toolbar class="bg-white">
-      <mat-card-title>Add BIE For OpenAPI Document</mat-card-title>
-    </mat-toolbar>
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>Add BIE For OpenAPI Document</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
   </div>
-
-  <mat-dialog-content class="pt-2 pb-2 mat-card-container">
+  <div class="content" mat-dialog-content>
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
@@ -149,123 +154,119 @@
       </mat-card-actions>
     </mat-card>
 
-      <div class="loading-container" *ngIf="loading">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
+    <div class="mat-elevation-z1">
+      <table mat-table multiTemplateDataRows
+             matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+             [dataSource]="dataSource">
 
-      <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? toggle(row) : null"
+                          [checked]="isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
 
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? toggle(row) : null"
-                            [checked]="isSelected(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="state">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="bie-state {{ element.state }}"
+                  [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                  'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
+            <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                  [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                  'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="bie-state {{ element.state }}"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-              <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="den">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+          <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+            <div class="den word-break-all">
+              <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                 matTooltip="{{ element.den }}">
+                <span>{{ element.den }}</span>
+              </a>
+            </div>
+            <div class="bie-guid">{{ element.guid }}</div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="remark">
+          <th mat-header-cell *matHeaderCellDef> Remark</th>
+          <td mat-cell *matCellDef="let element">
+            <div>{{ element.remark }}</div>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
-            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
-              <div class="den word-break-all">
-                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                   matTooltip="{{ element.den }}">
-                  <span>{{ element.den }}</span>
-                </a>
-              </div>
-              <div class="bie-guid">{{ element.guid }}</div>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="remark">
-            <th mat-header-cell *matHeaderCellDef> Remark</th>
-            <td mat-cell *matCellDef="let element">
-              <div>{{ element.remark }}</div>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="version">
+          <th mat-header-cell *matHeaderCellDef> Version</th>
+          <td mat-cell *matCellDef="let element">
+            <div [matTooltip]="element.version">{{ element.version }}</div>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="version">
-            <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element">
-              <div [matTooltip]="element.version">{{ element.version }}</div>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="verb">
+          <th mat-header-cell *matHeaderCellDef> Verb</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
+                        (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
+                        (click)="$event.stopPropagation()">
+              <mat-option value="GET">GET</mat-option>
+              <mat-option value="PUT">PUT</mat-option>
+              <mat-option value="POST">POST</mat-option>
+              <mat-option value="DELETE">DELETE</mat-option>
+              <mat-option value="PATCH">PATCH</mat-option>
+            </mat-select>
+            <mat-error *ngIf="isSelected(element) && !verbSelection[element.topLevelAsbiepId]">
+              Verb is required.
+            </mat-error>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="verb">
-            <th mat-header-cell *matHeaderCellDef> Verb</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
-                          (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
-                          (click)="$event.stopPropagation()">
-                <mat-option value="GET">GET</mat-option>
-                <mat-option value="PUT">PUT</mat-option>
-                <mat-option value="POST">POST</mat-option>
-                <mat-option value="DELETE">DELETE</mat-option>
-                <mat-option value="PATCH">PATCH</mat-option>
-              </mat-select>
-              <mat-error *ngIf="isSelected(element) && !verbSelection[element.topLevelAsbiepId]">
-                Verb is required.
-              </mat-error>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="messageBody">
+          <th mat-header-cell *matHeaderCellDef> Message Body</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
+                        (click)="$event.stopPropagation()">
+              <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
+              <mat-option value="Response">Response</mat-option>
+            </mat-select>
+            <mat-error *ngIf="isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]">
+              Message Body is required.
+            </mat-error>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="messageBody">
-            <th mat-header-cell *matHeaderCellDef> Message Body</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
-                          (click)="$event.stopPropagation()">
-                <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
-                <mat-option value="Response">Response</mat-option>
-              </mat-select>
-              <mat-error *ngIf="isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]">
-                Message Body is required.
-              </mat-error>
-            </td>
-          </ng-container>
+        <ng-container matColumnDef="arrayIndicator">
+          <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
+          </td>
+        </ng-container>
 
-          <ng-container matColumnDef="arrayIndicator">
-            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
-            </td>
-          </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"
+            (click)="toggle(row)"></tr>
+      </table>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"
-              (click)="toggle(row)"></tr>
-        </table>
-
-        <mat-paginator
-          [pageSizeOptions]="[5, 10, 15]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
-      </div>
-  </mat-dialog-content>
-  <div class="actions mt-4">
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 15]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons></mat-paginator>
+  </div>
+  </div>
+  <div class="actions ml-auto" mat-dialog-actions>
     <button mat-raised-button class="mr-2" (click)="addBieForOasDoc()" color="primary"
             [disabled]="selection.isEmpty() || isOptionMissing()">
       <mat-icon>add</mat-icon>
-      Add
+      <span class="pl-2">Add</span>
     </button>
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
-      Close
+      <span class="pl-2">Close</span>
     </button>
   </div>
 </div>

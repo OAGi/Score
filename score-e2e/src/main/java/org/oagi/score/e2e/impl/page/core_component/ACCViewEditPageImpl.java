@@ -40,6 +40,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
+
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =

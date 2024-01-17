@@ -15,6 +15,7 @@
         </mat-form-field>
 
         <mat-form-field>
+          <mat-label>External Reference URI</mat-label>
           <div class="d-flex align-items-center">
             <input disabled="true" matInput required placeholder="External Reference URI"
                    [(ngModel)]="assignedBusinessTerm.externalReferenceUri" maxlength="45"/>
@@ -39,13 +40,9 @@
           <input matInput [(ngModel)]="assignedBusinessTerm.typeCode" maxlength="45"/>
         </mat-form-field>
 
-        <mat-form-field>
-          <input hidden=true matInput>
-          <mat-checkbox matInput
-                        [(ngModel)]="assignedBusinessTerm.primary">
-            Preferred Business Term
-          </mat-checkbox>
-        </mat-form-field>
+        <mat-checkbox [(ngModel)]="assignedBusinessTerm.primary">
+          Preferred Business Term
+        </mat-checkbox>
       </mat-card-content>
     </mat-card>
   </div>

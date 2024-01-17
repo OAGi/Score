@@ -69,6 +69,7 @@
               <div class="row">
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
+                    <mat-label>Business Term</mat-label>
                     <input matInput [(ngModel)]="request.filters.businessTerm"
                            (ngModelChange)="onChange('filters.businessTerm', request.filters.businessTerm)"
                            (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
@@ -77,6 +78,7 @@
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
+                    <mat-label>External Reference URI</mat-label>
                     <input matInput [(ngModel)]="request.filters.externalReferenceUri"
                            (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
                            (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
@@ -85,6 +87,7 @@
                 </div>
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
+                    <mat-label>External Reference ID</mat-label>
                     <input matInput [(ngModel)]="request.filters.externalReferenceId"
                            (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
                            (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"

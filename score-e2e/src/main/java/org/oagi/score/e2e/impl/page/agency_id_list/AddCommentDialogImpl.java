@@ -41,7 +41,7 @@ public class AddCommentDialogImpl implements AddCommentDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav//h3"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav//h4"));
     }
 
     @Override

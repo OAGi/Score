@@ -30,13 +30,13 @@ public class ViewEditBusinessTermPageImpl extends BasePageImpl implements ViewEd
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Term\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Term\")]//ancestor::div[1]/input");
 
     private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
 
     private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"External Reference ID\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::div[1]/input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");

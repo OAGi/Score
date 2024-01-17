@@ -32,10 +32,10 @@ public class OpenAPIDocumentPageImpl extends BasePageImpl implements OpenAPIDocu
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By TITLE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Title\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Title\")]//ancestor::mat-form-field//input");
 
     private static final By DESCRIPTION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Description\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Description\")]//ancestor::mat-form-field//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
