@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.configuration.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ import java.util.Arrays;
 
 @Configuration
 public class SecurityConfiguration {
+
+    private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
     private AppUserDetailsService userDetailsService;
@@ -130,7 +134,7 @@ public class SecurityConfiguration {
     @ConditionalOnProperty(name = "resource-server.jwk-set-uri", matchIfMissing = false)
     @Order(1)
     public SecurityFilterChain externalFilterChain(HttpSecurity http
-    // , HandlerMappingIntrospector introspector
+                                                   // , HandlerMappingIntrospector introspector
     )
             throws Exception {
         if (StringUtils.hasText(jwkSetUri)) {
@@ -219,6 +223,13 @@ public class SecurityConfiguration {
                             .loginPage("/login")
                             .loginProcessingUrl("/oauth2/code/*")
                             .successHandler(authenticationSuccessHandler)
+                            .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
+                                @Override
+                                public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                    logger.error("OAuth2 login failure", exception);
+                                    super.onAuthenticationFailure(request, response, exception);
+                                }
+                            })
                             .authorizedClientService(oAuth2AuthorizedClientService)
                             .authorizationEndpoint(authorizationEndpointConfig -> {
                                 authorizationEndpointConfig

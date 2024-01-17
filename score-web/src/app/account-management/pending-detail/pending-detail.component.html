@@ -6,66 +6,68 @@
     </mat-toolbar>
   </div>
 
-  <mat-card class="pt-3">
-    <mat-card-content class="mat-card-container" *ngIf="pending !== undefined">
-      <mat-form-field *ngIf="!!pending.providerName">
-        <mat-label>Provider</mat-label>
-        <input matInput data-id="pending.providerName"
-               [(ngModel)]="pending.providerName" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+  <div class="p-3">
+    <mat-card>
+      <mat-card-content class="mat-card-container" *ngIf="pending !== undefined">
+        <mat-form-field *ngIf="!!pending.providerName">
+          <mat-label>Provider</mat-label>
+          <input matInput data-id="pending.providerName"
+                 [(ngModel)]="pending.providerName" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field *ngIf="!!pending.email">
-        <mat-label>Email</mat-label>
-        <input matInput data-id="pending.email"
-               [(ngModel)]="pending.email" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+        <mat-form-field *ngIf="!!pending.email">
+          <mat-label>Email</mat-label>
+          <input matInput data-id="pending.email"
+                 [(ngModel)]="pending.email" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field *ngIf="!!pending.name">
-        <mat-label>Name</mat-label>
-        <input matInput data-id="pending.name"
-               [(ngModel)]="pending.name" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+        <mat-form-field *ngIf="!!pending.name">
+          <mat-label>Name</mat-label>
+          <input matInput data-id="pending.name"
+                 [(ngModel)]="pending.name" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field *ngIf="!!pending.nickname">
-        <mat-label>Nickname</mat-label>
-        <input matInput data-id="pending.nickname"
-               [(ngModel)]="pending.nickname" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+        <mat-form-field *ngIf="!!pending.nickname">
+          <mat-label>Nickname</mat-label>
+          <input matInput data-id="pending.nickname"
+                 [(ngModel)]="pending.nickname" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field *ngIf="!!pending.preferredUsername">
-        <mat-label>Preferred Username</mat-label>
-        <input matInput data-id="pending.preferredUsername"
-               [(ngModel)]="pending.preferredUsername" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+        <mat-form-field *ngIf="!!pending.preferredUsername">
+          <mat-label>Preferred Username</mat-label>
+          <input matInput data-id="pending.preferredUsername"
+                 [(ngModel)]="pending.preferredUsername" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field *ngIf="!!pending.phoneNumber">
-        <mat-label>Phone</mat-label>
-        <input matInput data-id="pending.phoneNumber"
-               [(ngModel)]="pending.phoneNumber" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
+        <mat-form-field *ngIf="!!pending.phoneNumber">
+          <mat-label>Phone</mat-label>
+          <input matInput data-id="pending.phoneNumber"
+                 [(ngModel)]="pending.phoneNumber" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Status</mat-label>
-        <input matInput [value]="status" [readonly]="true" maxlength="255"/>
-      </mat-form-field>
-    </mat-card-content>
+        <mat-form-field>
+          <mat-label>Status</mat-label>
+          <input matInput [value]="status" [readonly]="true" maxlength="255"/>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </div>
 
-    <mat-card-actions *ngIf="this.status === 'Pending'">
-      <div class="row">
-        <div class="col-12">
-          <button mat-raised-button color="primary"
-                  (click)="createNewAccount()" style="margin-right: 10px">
-            Create new account
-          </button>
-          <button mat-raised-button color="accent"
-                  (click)="linkToAccount()" style="margin-right: 10px">
-            Link to existing account
-          </button>
-          <button mat-raised-button color="warn" (click)="reject()" style="margin-right: 10px">
-            Reject
-          </button>
-        </div>
+  <div class="row action-group m-0" *ngIf="this.status === 'Pending'">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary"
+                (click)="createNewAccount()" style="margin-right: 10px">
+          Create new account
+        </button>
+        <button mat-raised-button color="accent"
+                (click)="linkToAccount()" style="margin-right: 10px">
+          Link to existing account
+        </button>
+        <button mat-raised-button color="warn" (click)="reject()" style="margin-right: 10px">
+          Reject
+        </button>
       </div>
-    </mat-card-actions>
-  </mat-card>
+    </div>
+  </div>
 </div>
