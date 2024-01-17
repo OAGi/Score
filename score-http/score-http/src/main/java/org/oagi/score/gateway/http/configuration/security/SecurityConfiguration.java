@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.configuration.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,12 @@ public class SecurityConfiguration {
 
     @Autowired
     private ScoreClientRegistrationRepository clientRegistrationRepository;
+    
+    @Autowired
+    private ApplicationConfigurationService applicationConfigurationService;
+
+    @Value("${resource-server.jwk-set-uri}")
+    private String jwkSetUri;
 
     @Bean
     public OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver() {
@@ -123,8 +131,6 @@ public class SecurityConfiguration {
         return new OidcIdTokenDecoderFactory();
     }
 
-    @Value("${resource-server.jwk-set-uri}")
-    private String jwkSetUri;
 
     @Bean
     @ConditionalOnProperty(name = "resource-server.jwk-set-uri", matchIfMissing = false)
@@ -133,7 +139,7 @@ public class SecurityConfiguration {
     // , HandlerMappingIntrospector introspector
     )
             throws Exception {
-        if (StringUtils.hasText(jwkSetUri)) {
+        if (!applicationConfigurationService.isTenantEnabled() && StringUtils.hasText(jwkSetUri)) {
             http
                     .securityMatchers((matchers) -> matchers
                             .requestMatchers("/ext/**"))
