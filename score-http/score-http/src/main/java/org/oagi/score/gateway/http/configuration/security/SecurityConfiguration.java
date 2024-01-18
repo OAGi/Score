@@ -3,7 +3,8 @@ package org.oagi.score.gateway.http.configuration.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
@@ -45,6 +46,8 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfiguration {
 
+    private final Log logger = LogFactory.getLog(getClass());
+
     @Autowired
     private AppUserDetailsService userDetailsService;
 
@@ -56,12 +59,13 @@ public class SecurityConfiguration {
 
     @Autowired
     private ScoreClientRegistrationRepository clientRegistrationRepository;
-    
+
     @Autowired
     private ApplicationConfigurationService applicationConfigurationService;
 
     @Value("${resource-server.jwk-set-uri}")
     private String jwkSetUri;
+
 
     @Bean
     public OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver() {
