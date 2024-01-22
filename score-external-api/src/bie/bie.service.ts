@@ -11,7 +11,7 @@ export class BieService {
     cachePath = "cache";
     backendServer = this.configService.get<string>('backend_server');
     metadataUrl = this.backendServer + this.configService.get<string>('bie_backend_endpoint');
-    schemaUrlXsd = this.backendServer + this.configService.get<string>('components_xsd_backend_endpoint');
+    schemaUrlXsd = this.backendServer + this.configService.get<string>('bie_xsd_backend_endpoint');
     localServer = this.configService.get<string>('local_server') + ':' + this.configService.get<string>('api_port');
     fs = require('fs');
     path = require('path');
