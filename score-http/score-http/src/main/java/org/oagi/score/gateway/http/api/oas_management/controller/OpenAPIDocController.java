@@ -64,8 +64,8 @@ public class OpenAPIDocController {
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
             @RequestParam(name = "licenseName", required = false) String licenseName,
-            @RequestParam(name = "sortActive") String sortActive,
-            @RequestParam(name = "sortDirection") String sortDirection,
+            @RequestParam(name = "sortActives") String sortActives,
+            @RequestParam(name = "sortDirections") String sortDirections,
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize) {
         GetOasDocListRequest request = new GetOasDocListRequest(authenticationService.asScoreUser(requester));
@@ -91,8 +91,10 @@ public class OpenAPIDocController {
 
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
-        request.setSortActive(sortActive);
-        request.setSortDirection("asc".equalsIgnoreCase(sortDirection) ? ASC : DESC);
+        request.setSortActives(!hasLength(sortActives) ? Collections.emptyList() :
+                Arrays.asList(sortActives.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).collect(Collectors.toList()));
+        request.setSortDirections(!hasLength(sortDirections) ? Collections.emptyList() :
+                Arrays.asList(sortDirections.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).map(e -> SortDirection.valueOf(e.toUpperCase())).collect(Collectors.toList()));
 
         GetOasDocListResponse response = oasDocService.getOasDocList(request);
         PageResponse<OasDoc> pageResponse = new PageResponse<>();

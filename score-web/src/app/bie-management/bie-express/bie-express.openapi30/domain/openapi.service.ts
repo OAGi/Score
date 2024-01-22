@@ -22,8 +22,8 @@ export class OpenAPIService {
 
   getOasDocList(request: OasDocListRequest): Observable<PageResponse<OasDoc>> {
     let params = new HttpParams()
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
+      .set('sortActives', request.page.sortActives.join(','))
+      .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
     if (request.filters.title) {
