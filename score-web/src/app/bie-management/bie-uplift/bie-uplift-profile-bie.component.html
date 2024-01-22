@@ -54,6 +54,29 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>State</mat-label>
+                  <mat-select [(ngModel)]="request.states" multiple>
+                    <mat-option *ngFor="let state of states" [value]="state">
+                      {{state}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Deprecated</mat-label>
+                  <mat-select [(ngModel)]="request.deprecated" multiple>
+                    <mat-option [value]="true">
+                      True
+                    </mat-option>
+                    <mat-option [value]="false">
+                      False
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </div>
           </div>
 
@@ -132,11 +155,11 @@
               <div class="row">
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
-                    <mat-label>Property Term</mat-label>
-                    <input matInput [(ngModel)]="request.filters.propertyTerm"
-                           (ngModelChange)="onChange('filters.propertyTerm', request.filters.propertyTerm)"
+                    <mat-label>DEN</mat-label>
+                    <input matInput [(ngModel)]="request.filters.den"
+                           (ngModelChange)="onChange('filters.den', request.filters.den)"
                            (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                           placeholder="Property Term">
+                           placeholder="DEN">
                   </mat-form-field>
                 </div>
                 <div class="col-md-2 col-sm-12">
@@ -146,29 +169,6 @@
                            (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
                            (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
                            placeholder="Business Context">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>State</mat-label>
-                    <mat-select [(ngModel)]="request.states" multiple>
-                      <mat-option *ngFor="let state of states" [value]="state">
-                        {{state}}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Deprecated</mat-label>
-                    <mat-select [(ngModel)]="request.deprecated" multiple>
-                      <mat-option [value]="true">
-                        True
-                      </mat-option>
-                      <mat-option [value]="false">
-                        False
-                      </mat-option>
-                    </mat-select>
                   </mat-form-field>
                 </div>
               </div>
@@ -226,12 +226,12 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="propertyTerm">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
+            <ng-container matColumnDef="den">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
               <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
                 <div class="den word-break-all">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}">
-                    <span>{{ element.propertyTerm }}</span>
+                    <span>{{ element.den }}</span>
                   </a>
                 </div>
                 <div class="bie-guid">{{ element.guid }}</div>
