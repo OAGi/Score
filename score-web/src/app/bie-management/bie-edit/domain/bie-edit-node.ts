@@ -94,11 +94,8 @@ export class BieEditAbieNode extends BieEditNode {
   businessContexts: BusinessContext[] = [];
 
   access: string;
-  topLevelAsbiepState: string;
-  deprecated: boolean;
   deprecatedReason: string;
   deprecatedRemark: string;
-  inverseMode: boolean;
 
   constructor(obj?: BieEditNode) {
     super(obj);

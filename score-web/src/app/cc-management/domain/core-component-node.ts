@@ -47,11 +47,9 @@ export class CcNode {
 
 export class CcAccNode extends CcNode {
   accId: number;
-  guid: string;
   objectClassTerm: string;
   group: boolean;
   den: string;
-  state: string;
   definition: string;
   oagisComponentType: number;
   abstracted: boolean;
