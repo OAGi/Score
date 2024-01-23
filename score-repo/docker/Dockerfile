@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 mariadb:11.0.3
+FROM --platform=linux/amd64 mariadb:11.0.4
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
