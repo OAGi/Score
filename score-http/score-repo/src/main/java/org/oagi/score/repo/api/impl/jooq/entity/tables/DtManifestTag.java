@@ -6,18 +6,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag.TagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtManifestTagRecord;
 
 
@@ -75,11 +82,11 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
     public final TableField<DtManifestTagRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was first created.");
 
     private DtManifestTag(Name alias, Table<DtManifestTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private DtManifestTag(Name alias, Table<DtManifestTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private DtManifestTag(Name alias, Table<DtManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -103,8 +110,35 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
         this(DSL.name("dt_manifest_tag"), null);
     }
 
-    public <O extends Record> DtManifestTag(Table<O> child, ForeignKey<O, DtManifestTagRecord> key) {
-        super(child, key, DT_MANIFEST_TAG);
+    public <O extends Record> DtManifestTag(Table<O> path, ForeignKey<O, DtManifestTagRecord> childPath, InverseForeignKey<O, DtManifestTagRecord> parentPath) {
+        super(path, childPath, parentPath, DT_MANIFEST_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class DtManifestTagPath extends DtManifestTag implements Path<DtManifestTagRecord> {
+        public <O extends Record> DtManifestTagPath(Table<O> path, ForeignKey<O, DtManifestTagRecord> childPath, InverseForeignKey<O, DtManifestTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private DtManifestTagPath(Name alias, Table<DtManifestTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public DtManifestTagPath as(String alias) {
+            return new DtManifestTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public DtManifestTagPath as(Name alias) {
+            return new DtManifestTagPath(alias, this);
+        }
+
+        @Override
+        public DtManifestTagPath as(Table<?> alias) {
+            return new DtManifestTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -122,36 +156,38 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
         return Arrays.asList(Keys.DT_MANIFEST_TAG_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_TAG_TAG_ID_FK, Keys.DT_MANIFEST_TAG_CREATED_BY_FK);
     }
 
-    private transient DtManifest _dtManifest;
-    private transient Tag _tag;
-    private transient AppUser _appUser;
+    private transient DtManifestPath _dtManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
      */
-    public DtManifest dtManifest() {
+    public DtManifestPath dtManifest() {
         if (_dtManifest == null)
-            _dtManifest = new DtManifest(this, Keys.DT_MANIFEST_TAG_DT_MANIFEST_ID_FK);
+            _dtManifest = new DtManifestPath(this, Keys.DT_MANIFEST_TAG_DT_MANIFEST_ID_FK, null);
 
         return _dtManifest;
     }
 
+    private transient TagPath _tag;
+
     /**
      * Get the implicit join path to the <code>oagi.tag</code> table.
      */
-    public Tag tag() {
+    public TagPath tag() {
         if (_tag == null)
-            _tag = new Tag(this, Keys.DT_MANIFEST_TAG_TAG_ID_FK);
+            _tag = new TagPath(this, Keys.DT_MANIFEST_TAG_TAG_ID_FK, null);
 
         return _tag;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.DT_MANIFEST_TAG_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.DT_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -195,27 +231,87 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
         return new DtManifestTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, LocalDateTime> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public DtManifestTag where(Condition condition) {
+        return new DtManifestTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public DtManifestTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public DtManifestTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtManifestTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtManifestTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtManifestTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtManifestTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtManifestTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtManifestTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtManifestTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

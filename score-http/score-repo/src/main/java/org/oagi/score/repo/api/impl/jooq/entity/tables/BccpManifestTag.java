@@ -6,18 +6,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag.TagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpManifestTagRecord;
 
 
@@ -75,11 +82,11 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
     public final TableField<BccpManifestTagRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was first created.");
 
     private BccpManifestTag(Name alias, Table<BccpManifestTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BccpManifestTag(Name alias, Table<BccpManifestTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private BccpManifestTag(Name alias, Table<BccpManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -103,8 +110,35 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
         this(DSL.name("bccp_manifest_tag"), null);
     }
 
-    public <O extends Record> BccpManifestTag(Table<O> child, ForeignKey<O, BccpManifestTagRecord> key) {
-        super(child, key, BCCP_MANIFEST_TAG);
+    public <O extends Record> BccpManifestTag(Table<O> path, ForeignKey<O, BccpManifestTagRecord> childPath, InverseForeignKey<O, BccpManifestTagRecord> parentPath) {
+        super(path, childPath, parentPath, BCCP_MANIFEST_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BccpManifestTagPath extends BccpManifestTag implements Path<BccpManifestTagRecord> {
+        public <O extends Record> BccpManifestTagPath(Table<O> path, ForeignKey<O, BccpManifestTagRecord> childPath, InverseForeignKey<O, BccpManifestTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BccpManifestTagPath(Name alias, Table<BccpManifestTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BccpManifestTagPath as(String alias) {
+            return new BccpManifestTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BccpManifestTagPath as(Name alias) {
+            return new BccpManifestTagPath(alias, this);
+        }
+
+        @Override
+        public BccpManifestTagPath as(Table<?> alias) {
+            return new BccpManifestTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -122,36 +156,38 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
         return Arrays.asList(Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK);
     }
 
-    private transient BccpManifest _bccpManifest;
-    private transient Tag _tag;
-    private transient AppUser _appUser;
+    private transient BccpManifestPath _bccpManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table.
      */
-    public BccpManifest bccpManifest() {
+    public BccpManifestPath bccpManifest() {
         if (_bccpManifest == null)
-            _bccpManifest = new BccpManifest(this, Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK);
+            _bccpManifest = new BccpManifestPath(this, Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifest;
     }
 
+    private transient TagPath _tag;
+
     /**
      * Get the implicit join path to the <code>oagi.tag</code> table.
      */
-    public Tag tag() {
+    public TagPath tag() {
         if (_tag == null)
-            _tag = new Tag(this, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK);
+            _tag = new TagPath(this, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK, null);
 
         return _tag;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -195,27 +231,87 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
         return new BccpManifestTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, LocalDateTime> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public BccpManifestTag where(Condition condition) {
+        return new BccpManifestTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BccpManifestTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BccpManifestTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifestTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifestTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifestTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifestTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifestTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifestTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifestTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

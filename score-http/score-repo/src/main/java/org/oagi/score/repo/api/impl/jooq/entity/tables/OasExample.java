@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,7 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasExampleRecord;
 
 
@@ -114,11 +119,11 @@ public class OasExample extends TableImpl<OasExampleRecord> {
     public final TableField<OasExampleRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasExample(Name alias, Table<OasExampleRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasExample(Name alias, Table<OasExampleRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasExample(Name alias, Table<OasExampleRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -142,8 +147,35 @@ public class OasExample extends TableImpl<OasExampleRecord> {
         this(DSL.name("oas_example"), null);
     }
 
-    public <O extends Record> OasExample(Table<O> child, ForeignKey<O, OasExampleRecord> key) {
-        super(child, key, OAS_EXAMPLE);
+    public <O extends Record> OasExample(Table<O> path, ForeignKey<O, OasExampleRecord> childPath, InverseForeignKey<O, OasExampleRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_EXAMPLE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasExamplePath extends OasExample implements Path<OasExampleRecord> {
+        public <O extends Record> OasExamplePath(Table<O> path, ForeignKey<O, OasExampleRecord> childPath, InverseForeignKey<O, OasExampleRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasExamplePath(Name alias, Table<OasExampleRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasExamplePath as(String alias) {
+            return new OasExamplePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasExamplePath as(Name alias) {
+            return new OasExamplePath(alias, this);
+        }
+
+        @Override
+        public OasExamplePath as(Table<?> alias) {
+            return new OasExamplePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -166,27 +198,28 @@ public class OasExample extends TableImpl<OasExampleRecord> {
         return Arrays.asList(Keys.OAS_EXAMPLE_CREATED_BY_FK, Keys.OAS_EXAMPLE_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _oasExampleCreatedByFk;
-    private transient AppUser _oasExampleLastUpdatedByFk;
+    private transient AppUserPath _oasExampleCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_example_created_by_fk</code> key.
      */
-    public AppUser oasExampleCreatedByFk() {
+    public AppUserPath oasExampleCreatedByFk() {
         if (_oasExampleCreatedByFk == null)
-            _oasExampleCreatedByFk = new AppUser(this, Keys.OAS_EXAMPLE_CREATED_BY_FK);
+            _oasExampleCreatedByFk = new AppUserPath(this, Keys.OAS_EXAMPLE_CREATED_BY_FK, null);
 
         return _oasExampleCreatedByFk;
     }
+
+    private transient AppUserPath _oasExampleLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_example_last_updated_by_fk</code> key.
      */
-    public AppUser oasExampleLastUpdatedByFk() {
+    public AppUserPath oasExampleLastUpdatedByFk() {
         if (_oasExampleLastUpdatedByFk == null)
-            _oasExampleLastUpdatedByFk = new AppUser(this, Keys.OAS_EXAMPLE_LAST_UPDATED_BY_FK);
+            _oasExampleLastUpdatedByFk = new AppUserPath(this, Keys.OAS_EXAMPLE_LAST_UPDATED_BY_FK, null);
 
         return _oasExampleLastUpdatedByFk;
     }
@@ -230,27 +263,87 @@ public class OasExample extends TableImpl<OasExampleRecord> {
         return new OasExample(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, String, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public OasExample where(Condition condition) {
+        return new OasExample(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasExample where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasExample where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasExample where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasExample where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasExample where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasExample where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasExample where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasExample whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasExample whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

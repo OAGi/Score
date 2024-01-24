@@ -6,20 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,8 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccBizterm.BccBiztermPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieBiztermRecord;
 
 
@@ -113,11 +119,11 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
     public final TableField<BbieBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the bbie_bizterm was last updated.");
 
     private BbieBizterm(Name alias, Table<BbieBiztermRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BbieBizterm(Name alias, Table<BbieBiztermRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The bbie_bizterm table stores information about the aggregation between the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing."), TableOptions.table());
+    private BbieBizterm(Name alias, Table<BbieBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The bbie_bizterm table stores information about the aggregation between the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -141,8 +147,35 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
         this(DSL.name("bbie_bizterm"), null);
     }
 
-    public <O extends Record> BbieBizterm(Table<O> child, ForeignKey<O, BbieBiztermRecord> key) {
-        super(child, key, BBIE_BIZTERM);
+    public <O extends Record> BbieBizterm(Table<O> path, ForeignKey<O, BbieBiztermRecord> childPath, InverseForeignKey<O, BbieBiztermRecord> parentPath) {
+        super(path, childPath, parentPath, BBIE_BIZTERM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BbieBiztermPath extends BbieBizterm implements Path<BbieBiztermRecord> {
+        public <O extends Record> BbieBiztermPath(Table<O> path, ForeignKey<O, BbieBiztermRecord> childPath, InverseForeignKey<O, BbieBiztermRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BbieBiztermPath(Name alias, Table<BbieBiztermRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BbieBiztermPath as(String alias) {
+            return new BbieBiztermPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BbieBiztermPath as(Name alias) {
+            return new BbieBiztermPath(alias, this);
+        }
+
+        @Override
+        public BbieBiztermPath as(Table<?> alias) {
+            return new BbieBiztermPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -170,25 +203,26 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
         return Arrays.asList(Keys.BBIE_BIZTERM_BCC_BIZTERM_FK, Keys.BBIE_BIZTERM_BBIE_FK);
     }
 
-    private transient BccBizterm _bccBizterm;
-    private transient Bbie _bbie;
+    private transient BccBiztermPath _bccBizterm;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc_bizterm</code> table.
      */
-    public BccBizterm bccBizterm() {
+    public BccBiztermPath bccBizterm() {
         if (_bccBizterm == null)
-            _bccBizterm = new BccBizterm(this, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK);
+            _bccBizterm = new BccBiztermPath(this, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK, null);
 
         return _bccBizterm;
     }
 
+    private transient BbiePath _bbie;
+
     /**
      * Get the implicit join path to the <code>oagi.bbie</code> table.
      */
-    public Bbie bbie() {
+    public BbiePath bbie() {
         if (_bbie == null)
-            _bbie = new Bbie(this, Keys.BBIE_BIZTERM_BBIE_FK);
+            _bbie = new BbiePath(this, Keys.BBIE_BIZTERM_BBIE_FK, null);
 
         return _bbie;
     }
@@ -232,27 +266,87 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
         return new BbieBizterm(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public BbieBizterm where(Condition condition) {
+        return new BbieBizterm(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BbieBizterm where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BbieBizterm where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieBizterm where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieBizterm where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieBizterm where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieBizterm where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieBizterm where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieBizterm whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieBizterm whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -6,10 +6,7 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record7;
-import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx;
@@ -20,7 +17,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx;
  * of one or more business context values.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> implements Record7<ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> {
+public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -145,179 +142,6 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> implements R
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record7 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row7<ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
-    }
-
-    @Override
-    public Row7<ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
-        return (Row7) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return BizCtx.BIZ_CTX.BIZ_CTX_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return BizCtx.BIZ_CTX.GUID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return BizCtx.BIZ_CTX.NAME;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return BizCtx.BIZ_CTX.CREATED_BY;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return BizCtx.BIZ_CTX.LAST_UPDATED_BY;
-    }
-
-    @Override
-    public Field<LocalDateTime> field6() {
-        return BizCtx.BIZ_CTX.CREATION_TIMESTAMP;
-    }
-
-    @Override
-    public Field<LocalDateTime> field7() {
-        return BizCtx.BIZ_CTX.LAST_UPDATE_TIMESTAMP;
-    }
-
-    @Override
-    public ULong component1() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public String component2() {
-        return getGuid();
-    }
-
-    @Override
-    public String component3() {
-        return getName();
-    }
-
-    @Override
-    public ULong component4() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public ULong component5() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public LocalDateTime component6() {
-        return getCreationTimestamp();
-    }
-
-    @Override
-    public LocalDateTime component7() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public ULong value1() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public String value2() {
-        return getGuid();
-    }
-
-    @Override
-    public String value3() {
-        return getName();
-    }
-
-    @Override
-    public ULong value4() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public ULong value5() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public LocalDateTime value6() {
-        return getCreationTimestamp();
-    }
-
-    @Override
-    public LocalDateTime value7() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public BizCtxRecord value1(ULong value) {
-        setBizCtxId(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value2(String value) {
-        setGuid(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value3(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value4(ULong value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value5(ULong value) {
-        setLastUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value6(LocalDateTime value) {
-        setCreationTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord value7(LocalDateTime value) {
-        setLastUpdateTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxRecord values(ULong value1, String value2, String value3, ULong value4, ULong value5, LocalDateTime value6, LocalDateTime value7) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        return this;
     }
 
     // -------------------------------------------------------------------------

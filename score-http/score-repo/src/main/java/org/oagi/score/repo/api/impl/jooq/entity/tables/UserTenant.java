@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function3;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant.TenantPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UserTenantRecord;
 
 
@@ -70,11 +76,11 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     public final TableField<UserTenantRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Application user.");
 
     private UserTenant(Name alias, Table<UserTenantRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private UserTenant(Name alias, Table<UserTenantRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the tenant roles of the user"), TableOptions.table());
+    private UserTenant(Name alias, Table<UserTenantRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table captures the tenant roles of the user"), TableOptions.table(), where);
     }
 
     /**
@@ -98,8 +104,35 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
         this(DSL.name("user_tenant"), null);
     }
 
-    public <O extends Record> UserTenant(Table<O> child, ForeignKey<O, UserTenantRecord> key) {
-        super(child, key, USER_TENANT);
+    public <O extends Record> UserTenant(Table<O> path, ForeignKey<O, UserTenantRecord> childPath, InverseForeignKey<O, UserTenantRecord> parentPath) {
+        super(path, childPath, parentPath, USER_TENANT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class UserTenantPath extends UserTenant implements Path<UserTenantRecord> {
+        public <O extends Record> UserTenantPath(Table<O> path, ForeignKey<O, UserTenantRecord> childPath, InverseForeignKey<O, UserTenantRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private UserTenantPath(Name alias, Table<UserTenantRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public UserTenantPath as(String alias) {
+            return new UserTenantPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public UserTenantPath as(Name alias) {
+            return new UserTenantPath(alias, this);
+        }
+
+        @Override
+        public UserTenantPath as(Table<?> alias) {
+            return new UserTenantPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -127,25 +160,26 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
         return Arrays.asList(Keys.USER_TENANT_TENANT_ID_FK, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK);
     }
 
-    private transient Tenant _tenant;
-    private transient AppUser _appUser;
+    private transient TenantPath _tenant;
 
     /**
      * Get the implicit join path to the <code>oagi.tenant</code> table.
      */
-    public Tenant tenant() {
+    public TenantPath tenant() {
         if (_tenant == null)
-            _tenant = new Tenant(this, Keys.USER_TENANT_TENANT_ID_FK);
+            _tenant = new TenantPath(this, Keys.USER_TENANT_TENANT_ID_FK, null);
 
         return _tenant;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK);
+            _appUser = new AppUserPath(this, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK, null);
 
         return _appUser;
     }
@@ -189,27 +223,87 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
         return new UserTenant(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row3 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public UserTenant where(Condition condition) {
+        return new UserTenant(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public UserTenant where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public UserTenant where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UserTenant where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UserTenant where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UserTenant where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UserTenant where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UserTenant where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UserTenant whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UserTenant whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

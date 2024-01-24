@@ -5,18 +5,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.time.LocalDateTime;
-import java.util.function.Function;
+import java.util.Collection;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -27,6 +31,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccBizterm.AsccBiztermPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccBizterm.BccBiztermPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BusinessTermRecord;
 
 
@@ -121,11 +127,11 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
     public final TableField<BusinessTermRecord, String> COMMENT = createField(DSL.name("comment"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Comment of the business term.");
 
     private BusinessTerm(Name alias, Table<BusinessTermRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BusinessTerm(Name alias, Table<BusinessTermRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The Business Term table stores information about the business term, which is usually associated to BIE or CC. TODO: Placeeholder, definition is missing."), TableOptions.table());
+    private BusinessTerm(Name alias, Table<BusinessTermRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The Business Term table stores information about the business term, which is usually associated to BIE or CC. TODO: Placeeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -149,8 +155,35 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
         this(DSL.name("business_term"), null);
     }
 
-    public <O extends Record> BusinessTerm(Table<O> child, ForeignKey<O, BusinessTermRecord> key) {
-        super(child, key, BUSINESS_TERM);
+    public <O extends Record> BusinessTerm(Table<O> path, ForeignKey<O, BusinessTermRecord> childPath, InverseForeignKey<O, BusinessTermRecord> parentPath) {
+        super(path, childPath, parentPath, BUSINESS_TERM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BusinessTermPath extends BusinessTerm implements Path<BusinessTermRecord> {
+        public <O extends Record> BusinessTermPath(Table<O> path, ForeignKey<O, BusinessTermRecord> childPath, InverseForeignKey<O, BusinessTermRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BusinessTermPath(Name alias, Table<BusinessTermRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BusinessTermPath as(String alias) {
+            return new BusinessTermPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BusinessTermPath as(Name alias) {
+            return new BusinessTermPath(alias, this);
+        }
+
+        @Override
+        public BusinessTermPath as(Table<?> alias) {
+            return new BusinessTermPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -166,6 +199,32 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
     @Override
     public UniqueKey<BusinessTermRecord> getPrimaryKey() {
         return Keys.KEY_BUSINESS_TERM_PRIMARY;
+    }
+
+    private transient AsccBiztermPath _asccBizterm;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc_bizterm</code>
+     * table
+     */
+    public AsccBiztermPath asccBizterm() {
+        if (_asccBizterm == null)
+            _asccBizterm = new AsccBiztermPath(this, null, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK.getInverseKey());
+
+        return _asccBizterm;
+    }
+
+    private transient BccBiztermPath _bccBizterm;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc_bizterm</code>
+     * table
+     */
+    public BccBiztermPath bccBizterm() {
+        if (_bccBizterm == null)
+            _bccBizterm = new BccBiztermPath(this, null, Keys.BCC_BIZTERM_BUSINESS_TERM_FK.getInverseKey());
+
+        return _bccBizterm;
     }
 
     @Override
@@ -207,27 +266,87 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
         return new BusinessTerm(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime, String, String, String> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public BusinessTerm where(Condition condition) {
+        return new BusinessTerm(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super String, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BusinessTerm where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super String, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BusinessTerm where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BusinessTerm where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BusinessTerm where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BusinessTerm where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BusinessTerm where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BusinessTerm where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BusinessTerm whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BusinessTerm whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

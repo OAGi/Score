@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function13;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row13;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,18 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAccManifest.ModuleAccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAgencyIdListManifest.ModuleAgencyIdListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAsccpManifest.ModuleAsccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleBccpManifest.ModuleBccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleBlobContentManifest.ModuleBlobContentManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleCodeListManifest.ModuleCodeListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleDtManifest.ModuleDtManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSet.ModuleSetPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleRecord;
 
 
@@ -139,11 +155,11 @@ public class Module extends TableImpl<ModuleRecord> {
     public final TableField<ModuleRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private Module(Name alias, Table<ModuleRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Module(Name alias, Table<ModuleRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The module table stores information about a physical file, into which CC components will be generated during the expression generation."), TableOptions.table());
+    private Module(Name alias, Table<ModuleRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The module table stores information about a physical file, into which CC components will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -167,8 +183,35 @@ public class Module extends TableImpl<ModuleRecord> {
         this(DSL.name("module"), null);
     }
 
-    public <O extends Record> Module(Table<O> child, ForeignKey<O, ModuleRecord> key) {
-        super(child, key, MODULE);
+    public <O extends Record> Module(Table<O> path, ForeignKey<O, ModuleRecord> childPath, InverseForeignKey<O, ModuleRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModulePath extends Module implements Path<ModuleRecord> {
+        public <O extends Record> ModulePath(Table<O> path, ForeignKey<O, ModuleRecord> childPath, InverseForeignKey<O, ModuleRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModulePath(Name alias, Table<ModuleRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModulePath as(String alias) {
+            return new ModulePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModulePath as(Name alias) {
+            return new ModulePath(alias, this);
+        }
+
+        @Override
+        public ModulePath as(Table<?> alias) {
+            return new ModulePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -191,74 +234,183 @@ public class Module extends TableImpl<ModuleRecord> {
         return Arrays.asList(Keys.MODULE_MODULE_SET_ID_FK, Keys.MODULE_PARENT_MODULE_ID_FK, Keys.MODULE_NAMESPACE_ID_FK, Keys.MODULE_CREATED_BY_FK, Keys.MODULE_LAST_UPDATED_BY_FK, Keys.MODULE_OWNER_USER_ID_FK);
     }
 
-    private transient ModuleSet _moduleSet;
-    private transient Module _module;
-    private transient Namespace _namespace;
-    private transient AppUser _moduleCreatedByFk;
-    private transient AppUser _moduleLastUpdatedByFk;
-    private transient AppUser _moduleOwnerUserIdFk;
+    private transient ModuleSetPath _moduleSet;
 
     /**
      * Get the implicit join path to the <code>oagi.module_set</code> table.
      */
-    public ModuleSet moduleSet() {
+    public ModuleSetPath moduleSet() {
         if (_moduleSet == null)
-            _moduleSet = new ModuleSet(this, Keys.MODULE_MODULE_SET_ID_FK);
+            _moduleSet = new ModuleSetPath(this, Keys.MODULE_MODULE_SET_ID_FK, null);
 
         return _moduleSet;
     }
 
+    private transient ModulePath _module;
+
     /**
      * Get the implicit join path to the <code>oagi.module</code> table.
      */
-    public Module module() {
+    public ModulePath module() {
         if (_module == null)
-            _module = new Module(this, Keys.MODULE_PARENT_MODULE_ID_FK);
+            _module = new ModulePath(this, Keys.MODULE_PARENT_MODULE_ID_FK, null);
 
         return _module;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.MODULE_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.MODULE_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AppUserPath _moduleCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_created_by_fk</code> key.
      */
-    public AppUser moduleCreatedByFk() {
+    public AppUserPath moduleCreatedByFk() {
         if (_moduleCreatedByFk == null)
-            _moduleCreatedByFk = new AppUser(this, Keys.MODULE_CREATED_BY_FK);
+            _moduleCreatedByFk = new AppUserPath(this, Keys.MODULE_CREATED_BY_FK, null);
 
         return _moduleCreatedByFk;
     }
+
+    private transient AppUserPath _moduleLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_last_updated_by_fk</code> key.
      */
-    public AppUser moduleLastUpdatedByFk() {
+    public AppUserPath moduleLastUpdatedByFk() {
         if (_moduleLastUpdatedByFk == null)
-            _moduleLastUpdatedByFk = new AppUser(this, Keys.MODULE_LAST_UPDATED_BY_FK);
+            _moduleLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_LAST_UPDATED_BY_FK, null);
 
         return _moduleLastUpdatedByFk;
     }
+
+    private transient AppUserPath _moduleOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_owner_user_id_fk</code> key.
      */
-    public AppUser moduleOwnerUserIdFk() {
+    public AppUserPath moduleOwnerUserIdFk() {
         if (_moduleOwnerUserIdFk == null)
-            _moduleOwnerUserIdFk = new AppUser(this, Keys.MODULE_OWNER_USER_ID_FK);
+            _moduleOwnerUserIdFk = new AppUserPath(this, Keys.MODULE_OWNER_USER_ID_FK, null);
 
         return _moduleOwnerUserIdFk;
+    }
+
+    private transient ModuleAccManifestPath _moduleAccManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_acc_manifest</code> table
+     */
+    public ModuleAccManifestPath moduleAccManifest() {
+        if (_moduleAccManifest == null)
+            _moduleAccManifest = new ModuleAccManifestPath(this, null, Keys.MODULE_ACC_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleAccManifest;
+    }
+
+    private transient ModuleAgencyIdListManifestPath _moduleAgencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_agency_id_list_manifest</code> table
+     */
+    public ModuleAgencyIdListManifestPath moduleAgencyIdListManifest() {
+        if (_moduleAgencyIdListManifest == null)
+            _moduleAgencyIdListManifest = new ModuleAgencyIdListManifestPath(this, null, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleAgencyIdListManifest;
+    }
+
+    private transient ModuleAsccpManifestPath _moduleAsccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_asccp_manifest</code> table
+     */
+    public ModuleAsccpManifestPath moduleAsccpManifest() {
+        if (_moduleAsccpManifest == null)
+            _moduleAsccpManifest = new ModuleAsccpManifestPath(this, null, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleAsccpManifest;
+    }
+
+    private transient ModuleBccpManifestPath _moduleBccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_bccp_manifest</code> table
+     */
+    public ModuleBccpManifestPath moduleBccpManifest() {
+        if (_moduleBccpManifest == null)
+            _moduleBccpManifest = new ModuleBccpManifestPath(this, null, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleBccpManifest;
+    }
+
+    private transient ModuleBlobContentManifestPath _moduleBlobContentManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_blob_content_manifest</code> table
+     */
+    public ModuleBlobContentManifestPath moduleBlobContentManifest() {
+        if (_moduleBlobContentManifest == null)
+            _moduleBlobContentManifest = new ModuleBlobContentManifestPath(this, null, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleBlobContentManifest;
+    }
+
+    private transient ModuleCodeListManifestPath _moduleCodeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_code_list_manifest</code> table
+     */
+    public ModuleCodeListManifestPath moduleCodeListManifest() {
+        if (_moduleCodeListManifest == null)
+            _moduleCodeListManifest = new ModuleCodeListManifestPath(this, null, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleCodeListManifest;
+    }
+
+    private transient ModuleDtManifestPath _moduleDtManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_dt_manifest</code> table
+     */
+    public ModuleDtManifestPath moduleDtManifest() {
+        if (_moduleDtManifest == null)
+            _moduleDtManifest = new ModuleDtManifestPath(this, null, Keys.MODULE_DT_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleDtManifest;
+    }
+
+    private transient ModuleXbtManifestPath _moduleXbtManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_xbt_manifest</code> table
+     */
+    public ModuleXbtManifestPath moduleXbtManifest() {
+        if (_moduleXbtManifest == null)
+            _moduleXbtManifest = new ModuleXbtManifestPath(this, null, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK.getInverseKey());
+
+        return _moduleXbtManifest;
     }
 
     @Override
@@ -300,27 +452,87 @@ public class Module extends TableImpl<ModuleRecord> {
         return new Module(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row13 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row13<ULong, ULong, ULong, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Module where(Condition condition) {
+        return new Module(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function13<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Module where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Module where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Module where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Module where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Module where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Module where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Module where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Module whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Module whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

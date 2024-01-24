@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function10;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row10;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasServer.OasServerPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasServerVariableRecord;
 
 
@@ -120,11 +126,11 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
     public final TableField<OasServerVariableRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasServerVariable(Name alias, Table<OasServerVariableRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasServerVariable(Name alias, Table<OasServerVariableRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasServerVariable(Name alias, Table<OasServerVariableRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -148,8 +154,35 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
         this(DSL.name("oas_server_variable"), null);
     }
 
-    public <O extends Record> OasServerVariable(Table<O> child, ForeignKey<O, OasServerVariableRecord> key) {
-        super(child, key, OAS_SERVER_VARIABLE);
+    public <O extends Record> OasServerVariable(Table<O> path, ForeignKey<O, OasServerVariableRecord> childPath, InverseForeignKey<O, OasServerVariableRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_SERVER_VARIABLE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasServerVariablePath extends OasServerVariable implements Path<OasServerVariableRecord> {
+        public <O extends Record> OasServerVariablePath(Table<O> path, ForeignKey<O, OasServerVariableRecord> childPath, InverseForeignKey<O, OasServerVariableRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasServerVariablePath(Name alias, Table<OasServerVariableRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasServerVariablePath as(String alias) {
+            return new OasServerVariablePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasServerVariablePath as(Name alias) {
+            return new OasServerVariablePath(alias, this);
+        }
+
+        @Override
+        public OasServerVariablePath as(Table<?> alias) {
+            return new OasServerVariablePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -172,38 +205,40 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
         return Arrays.asList(Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK, Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK);
     }
 
-    private transient OasServer _oasServer;
-    private transient AppUser _oasServerVariableCreatedByFk;
-    private transient AppUser _oasServerVariableLastUpdatedByFk;
+    private transient OasServerPath _oasServer;
 
     /**
      * Get the implicit join path to the <code>oagi.oas_server</code> table.
      */
-    public OasServer oasServer() {
+    public OasServerPath oasServer() {
         if (_oasServer == null)
-            _oasServer = new OasServer(this, Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK);
+            _oasServer = new OasServerPath(this, Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK, null);
 
         return _oasServer;
     }
+
+    private transient AppUserPath _oasServerVariableCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_server_variable_created_by_fk</code> key.
      */
-    public AppUser oasServerVariableCreatedByFk() {
+    public AppUserPath oasServerVariableCreatedByFk() {
         if (_oasServerVariableCreatedByFk == null)
-            _oasServerVariableCreatedByFk = new AppUser(this, Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK);
+            _oasServerVariableCreatedByFk = new AppUserPath(this, Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK, null);
 
         return _oasServerVariableCreatedByFk;
     }
+
+    private transient AppUserPath _oasServerVariableLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_server_variable_last_updated_by_fk</code> key.
      */
-    public AppUser oasServerVariableLastUpdatedByFk() {
+    public AppUserPath oasServerVariableLastUpdatedByFk() {
         if (_oasServerVariableLastUpdatedByFk == null)
-            _oasServerVariableLastUpdatedByFk = new AppUser(this, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK);
+            _oasServerVariableLastUpdatedByFk = new AppUserPath(this, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK, null);
 
         return _oasServerVariableLastUpdatedByFk;
     }
@@ -247,27 +282,87 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
         return new OasServerVariable(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row10 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row10<ULong, ULong, String, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public OasServerVariable where(Condition condition) {
+        return new OasServerVariable(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasServerVariable where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasServerVariable where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasServerVariable where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasServerVariable where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasServerVariable where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasServerVariable where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasServerVariable where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasServerVariable whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasServerVariable whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,13 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc.AsccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccManifest.AsccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey.SeqKeyPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccManifestRecord;
 
 
@@ -113,11 +124,11 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
     public final TableField<AsccManifestRecord, ULong> NEXT_ASCC_MANIFEST_ID = createField(DSL.name("next_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AsccManifest(Name alias, Table<AsccManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AsccManifest(Name alias, Table<AsccManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private AsccManifest(Name alias, Table<AsccManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -141,8 +152,35 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         this(DSL.name("ascc_manifest"), null);
     }
 
-    public <O extends Record> AsccManifest(Table<O> child, ForeignKey<O, AsccManifestRecord> key) {
-        super(child, key, ASCC_MANIFEST);
+    public <O extends Record> AsccManifest(Table<O> path, ForeignKey<O, AsccManifestRecord> childPath, InverseForeignKey<O, AsccManifestRecord> parentPath) {
+        super(path, childPath, parentPath, ASCC_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsccManifestPath extends AsccManifest implements Path<AsccManifestRecord> {
+        public <O extends Record> AsccManifestPath(Table<O> path, ForeignKey<O, AsccManifestRecord> childPath, InverseForeignKey<O, AsccManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsccManifestPath(Name alias, Table<AsccManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsccManifestPath as(String alias) {
+            return new AsccManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsccManifestPath as(Name alias) {
+            return new AsccManifestPath(alias, this);
+        }
+
+        @Override
+        public AsccManifestPath as(Table<?> alias) {
+            return new AsccManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -165,96 +203,115 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return Arrays.asList(Keys.ASCC_MANIFEST_RELEASE_ID_FK, Keys.ASCC_MANIFEST_ASCC_ID_FK, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
     }
 
-    private transient Release _release;
-    private transient Ascc _ascc;
-    private transient SeqKey _seqKey;
-    private transient AccManifest _accManifest;
-    private transient AsccpManifest _asccpManifest;
-    private transient AsccManifest _asccReplacementAsccManifestIdFk;
-    private transient AsccManifest _asccManifestPrevAsccManifestIdFk;
-    private transient AsccManifest _asccManifestNextAsccManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.ASCC_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.ASCC_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
 
+    private transient AsccPath _ascc;
+
     /**
      * Get the implicit join path to the <code>oagi.ascc</code> table.
      */
-    public Ascc ascc() {
+    public AsccPath ascc() {
         if (_ascc == null)
-            _ascc = new Ascc(this, Keys.ASCC_MANIFEST_ASCC_ID_FK);
+            _ascc = new AsccPath(this, Keys.ASCC_MANIFEST_ASCC_ID_FK, null);
 
         return _ascc;
     }
 
+    private transient SeqKeyPath _seqKey;
+
     /**
      * Get the implicit join path to the <code>oagi.seq_key</code> table.
      */
-    public SeqKey seqKey() {
+    public SeqKeyPath seqKey() {
         if (_seqKey == null)
-            _seqKey = new SeqKey(this, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK);
+            _seqKey = new SeqKeyPath(this, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK, null);
 
         return _seqKey;
     }
 
+    private transient AccManifestPath _accManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
      */
-    public AccManifest accManifest() {
+    public AccManifestPath accManifest() {
         if (_accManifest == null)
-            _accManifest = new AccManifest(this, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
+            _accManifest = new AccManifestPath(this, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, null);
 
         return _accManifest;
     }
 
+    private transient AsccpManifestPath _asccpManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
      */
-    public AsccpManifest asccpManifest() {
+    public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifest(this, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK);
+            _asccpManifest = new AsccpManifestPath(this, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
     }
+
+    private transient AsccManifestPath _asccReplacementAsccManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
      * via the <code>ascc_replacement_ascc_manifest_id_fk</code> key.
      */
-    public AsccManifest asccReplacementAsccManifestIdFk() {
+    public AsccManifestPath asccReplacementAsccManifestIdFk() {
         if (_asccReplacementAsccManifestIdFk == null)
-            _asccReplacementAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK);
+            _asccReplacementAsccManifestIdFk = new AsccManifestPath(this, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK, null);
 
         return _asccReplacementAsccManifestIdFk;
     }
+
+    private transient AsccManifestPath _asccManifestPrevAsccManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
      * via the <code>ascc_manifest_prev_ascc_manifest_id_fk</code> key.
      */
-    public AsccManifest asccManifestPrevAsccManifestIdFk() {
+    public AsccManifestPath asccManifestPrevAsccManifestIdFk() {
         if (_asccManifestPrevAsccManifestIdFk == null)
-            _asccManifestPrevAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK);
+            _asccManifestPrevAsccManifestIdFk = new AsccManifestPath(this, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK, null);
 
         return _asccManifestPrevAsccManifestIdFk;
     }
+
+    private transient AsccManifestPath _asccManifestNextAsccManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.ascc_manifest</code> table,
      * via the <code>ascc_manifest_next_ascc_manifest_id_fk</code> key.
      */
-    public AsccManifest asccManifestNextAsccManifestIdFk() {
+    public AsccManifestPath asccManifestNextAsccManifestIdFk() {
         if (_asccManifestNextAsccManifestIdFk == null)
-            _asccManifestNextAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
+            _asccManifestNextAsccManifestIdFk = new AsccManifestPath(this, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK, null);
 
         return _asccManifestNextAsccManifestIdFk;
+    }
+
+    private transient AsbiePath _asbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table
+     */
+    public AsbiePath asbie() {
+        if (_asbie == null)
+            _asbie = new AsbiePath(this, null, Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK.getInverseKey());
+
+        return _asbie;
     }
 
     @Override
@@ -296,27 +353,87 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return new AsccManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, ULong, ULong, ULong, ULong, ULong, String, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public AsccManifest where(Condition condition) {
+        return new AsccManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AsccManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AsccManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

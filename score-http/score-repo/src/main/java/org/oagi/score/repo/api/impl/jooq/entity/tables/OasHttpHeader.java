@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,11 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasParameter.OasParameterPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResponse.OasResponsePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasResponseHeaders.OasResponseHeadersPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasHttpHeaderRecord;
 
 
@@ -122,11 +131,11 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
     public final TableField<OasHttpHeaderRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasHttpHeader(Name alias, Table<OasHttpHeaderRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasHttpHeader(Name alias, Table<OasHttpHeaderRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasHttpHeader(Name alias, Table<OasHttpHeaderRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -150,8 +159,35 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
         this(DSL.name("oas_http_header"), null);
     }
 
-    public <O extends Record> OasHttpHeader(Table<O> child, ForeignKey<O, OasHttpHeaderRecord> key) {
-        super(child, key, OAS_HTTP_HEADER);
+    public <O extends Record> OasHttpHeader(Table<O> path, ForeignKey<O, OasHttpHeaderRecord> childPath, InverseForeignKey<O, OasHttpHeaderRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_HTTP_HEADER);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasHttpHeaderPath extends OasHttpHeader implements Path<OasHttpHeaderRecord> {
+        public <O extends Record> OasHttpHeaderPath(Table<O> path, ForeignKey<O, OasHttpHeaderRecord> childPath, InverseForeignKey<O, OasHttpHeaderRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasHttpHeaderPath(Name alias, Table<OasHttpHeaderRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasHttpHeaderPath as(String alias) {
+            return new OasHttpHeaderPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasHttpHeaderPath as(Name alias) {
+            return new OasHttpHeaderPath(alias, this);
+        }
+
+        @Override
+        public OasHttpHeaderPath as(Table<?> alias) {
+            return new OasHttpHeaderPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -174,53 +210,90 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
         return Arrays.asList(Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, Keys.OAS_HTTP_HEADER_CREATED_BY_FK, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK);
     }
 
-    private transient AgencyIdListValue _agencyIdListValue;
-    private transient AppUser _oasHttpHeaderOwnerUserIdFk;
-    private transient AppUser _oasHttpHeaderCreatedByFk;
-    private transient AppUser _oasHttpHeaderLastUpdatedByFk;
+    private transient AgencyIdListValuePath _agencyIdListValue;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
      * table.
      */
-    public AgencyIdListValue agencyIdListValue() {
+    public AgencyIdListValuePath agencyIdListValue() {
         if (_agencyIdListValue == null)
-            _agencyIdListValue = new AgencyIdListValue(this, Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK);
+            _agencyIdListValue = new AgencyIdListValuePath(this, Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK, null);
 
         return _agencyIdListValue;
     }
+
+    private transient AppUserPath _oasHttpHeaderOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_http_header_owner_user_id_fk</code> key.
      */
-    public AppUser oasHttpHeaderOwnerUserIdFk() {
+    public AppUserPath oasHttpHeaderOwnerUserIdFk() {
         if (_oasHttpHeaderOwnerUserIdFk == null)
-            _oasHttpHeaderOwnerUserIdFk = new AppUser(this, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK);
+            _oasHttpHeaderOwnerUserIdFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, null);
 
         return _oasHttpHeaderOwnerUserIdFk;
     }
+
+    private transient AppUserPath _oasHttpHeaderCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_http_header_created_by_fk</code> key.
      */
-    public AppUser oasHttpHeaderCreatedByFk() {
+    public AppUserPath oasHttpHeaderCreatedByFk() {
         if (_oasHttpHeaderCreatedByFk == null)
-            _oasHttpHeaderCreatedByFk = new AppUser(this, Keys.OAS_HTTP_HEADER_CREATED_BY_FK);
+            _oasHttpHeaderCreatedByFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_CREATED_BY_FK, null);
 
         return _oasHttpHeaderCreatedByFk;
     }
+
+    private transient AppUserPath _oasHttpHeaderLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_http_header_last_updated_by_fk</code> key.
      */
-    public AppUser oasHttpHeaderLastUpdatedByFk() {
+    public AppUserPath oasHttpHeaderLastUpdatedByFk() {
         if (_oasHttpHeaderLastUpdatedByFk == null)
-            _oasHttpHeaderLastUpdatedByFk = new AppUser(this, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK);
+            _oasHttpHeaderLastUpdatedByFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK, null);
 
         return _oasHttpHeaderLastUpdatedByFk;
+    }
+
+    private transient OasParameterPath _oasParameter;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_parameter</code>
+     * table
+     */
+    public OasParameterPath oasParameter() {
+        if (_oasParameter == null)
+            _oasParameter = new OasParameterPath(this, null, Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK.getInverseKey());
+
+        return _oasParameter;
+    }
+
+    private transient OasResponseHeadersPath _oasResponseHeaders;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_response_headers</code> table
+     */
+    public OasResponseHeadersPath oasResponseHeaders() {
+        if (_oasResponseHeaders == null)
+            _oasResponseHeaders = new OasResponseHeadersPath(this, null, Keys.OAS_RESPONSE_HEADERS_OAS_HTTP_HEADER_ID_FK.getInverseKey());
+
+        return _oasResponseHeaders;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.oas_response</code> table
+     */
+    public OasResponsePath oasResponse() {
+        return oasResponseHeaders().oasResponse();
     }
 
     @Override
@@ -262,27 +335,87 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
         return new OasHttpHeader(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, String, String, String, ULong, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public OasHttpHeader where(Condition condition) {
+        return new OasHttpHeader(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasHttpHeader where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasHttpHeader where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasHttpHeader where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasHttpHeader where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasHttpHeader where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasHttpHeader where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasHttpHeader where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasHttpHeader whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasHttpHeader whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

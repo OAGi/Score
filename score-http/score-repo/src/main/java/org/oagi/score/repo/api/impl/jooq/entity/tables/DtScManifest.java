@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,12 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc.BbieScPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri.BdtScPriRestriPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc.DtScPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScManifestRecord;
 
 
@@ -101,11 +111,11 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     public final TableField<DtScManifestRecord, ULong> NEXT_DT_SC_MANIFEST_ID = createField(DSL.name("next_dt_sc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private DtScManifest(Name alias, Table<DtScManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private DtScManifest(Name alias, Table<DtScManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private DtScManifest(Name alias, Table<DtScManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -129,8 +139,35 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         this(DSL.name("dt_sc_manifest"), null);
     }
 
-    public <O extends Record> DtScManifest(Table<O> child, ForeignKey<O, DtScManifestRecord> key) {
-        super(child, key, DT_SC_MANIFEST);
+    public <O extends Record> DtScManifest(Table<O> path, ForeignKey<O, DtScManifestRecord> childPath, InverseForeignKey<O, DtScManifestRecord> parentPath) {
+        super(path, childPath, parentPath, DT_SC_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class DtScManifestPath extends DtScManifest implements Path<DtScManifestRecord> {
+        public <O extends Record> DtScManifestPath(Table<O> path, ForeignKey<O, DtScManifestRecord> childPath, InverseForeignKey<O, DtScManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private DtScManifestPath(Name alias, Table<DtScManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public DtScManifestPath as(String alias) {
+            return new DtScManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public DtScManifestPath as(Name alias) {
+            return new DtScManifestPath(alias, this);
+        }
+
+        @Override
+        public DtScManifestPath as(Table<?> alias) {
+            return new DtScManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -153,86 +190,117 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return Arrays.asList(Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.BASED_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
     }
 
-    private transient Release _release;
-    private transient DtSc _dtSc;
-    private transient DtManifest _dtManifest;
-    private transient DtScManifest _basedDtScManifestIdFk;
-    private transient DtScManifest _dtScReplacementDtScManifestIdFk;
-    private transient DtScManifest _dtScPrevDtScManifestIdFk;
-    private transient DtScManifest _dtScNextDtScManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
 
+    private transient DtScPath _dtSc;
+
     /**
      * Get the implicit join path to the <code>oagi.dt_sc</code> table.
      */
-    public DtSc dtSc() {
+    public DtScPath dtSc() {
         if (_dtSc == null)
-            _dtSc = new DtSc(this, Keys.DT_SC_MANIFEST_DT_SC_ID_FK);
+            _dtSc = new DtScPath(this, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, null);
 
         return _dtSc;
     }
 
+    private transient DtManifestPath _dtManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
      */
-    public DtManifest dtManifest() {
+    public DtManifestPath dtManifest() {
         if (_dtManifest == null)
-            _dtManifest = new DtManifest(this, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK);
+            _dtManifest = new DtManifestPath(this, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, null);
 
         return _dtManifest;
     }
+
+    private transient DtScManifestPath _basedDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
      * via the <code>based_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifest basedDtScManifestIdFk() {
+    public DtScManifestPath basedDtScManifestIdFk() {
         if (_basedDtScManifestIdFk == null)
-            _basedDtScManifestIdFk = new DtScManifest(this, Keys.BASED_DT_SC_MANIFEST_ID_FK);
+            _basedDtScManifestIdFk = new DtScManifestPath(this, Keys.BASED_DT_SC_MANIFEST_ID_FK, null);
 
         return _basedDtScManifestIdFk;
     }
+
+    private transient DtScManifestPath _dtScReplacementDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
      * via the <code>dt_sc_replacement_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifest dtScReplacementDtScManifestIdFk() {
+    public DtScManifestPath dtScReplacementDtScManifestIdFk() {
         if (_dtScReplacementDtScManifestIdFk == null)
-            _dtScReplacementDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK);
+            _dtScReplacementDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, null);
 
         return _dtScReplacementDtScManifestIdFk;
     }
+
+    private transient DtScManifestPath _dtScPrevDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
      * via the <code>dt_sc_prev_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifest dtScPrevDtScManifestIdFk() {
+    public DtScManifestPath dtScPrevDtScManifestIdFk() {
         if (_dtScPrevDtScManifestIdFk == null)
-            _dtScPrevDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK);
+            _dtScPrevDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, null);
 
         return _dtScPrevDtScManifestIdFk;
     }
+
+    private transient DtScManifestPath _dtScNextDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
      * via the <code>dt_sc_next_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifest dtScNextDtScManifestIdFk() {
+    public DtScManifestPath dtScNextDtScManifestIdFk() {
         if (_dtScNextDtScManifestIdFk == null)
-            _dtScNextDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
+            _dtScNextDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK, null);
 
         return _dtScNextDtScManifestIdFk;
+    }
+
+    private transient BbieScPath _bbieSc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code> table
+     */
+    public BbieScPath bbieSc() {
+        if (_bbieSc == null)
+            _bbieSc = new BbieScPath(this, null, Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK.getInverseKey());
+
+        return _bbieSc;
+    }
+
+    private transient BdtScPriRestriPath _bdtScPriRestri;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bdt_sc_pri_restri</code> table
+     */
+    public BdtScPriRestriPath bdtScPriRestri() {
+        if (_bdtScPriRestri == null)
+            _bdtScPriRestri = new BdtScPriRestriPath(this, null, Keys.BDT_SC_PRI_RESTRI_BDT_MANIFEST_ID_FK.getInverseKey());
+
+        return _bdtScPriRestri;
     }
 
     @Override
@@ -274,27 +342,87 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return new DtScManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public DtScManifest where(Condition condition) {
+        return new DtScManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public DtScManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public DtScManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtScManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtScManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtScManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtScManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DtScManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtScManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DtScManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

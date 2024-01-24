@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetRecord;
 
 
@@ -101,11 +108,11 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
     public final TableField<ModuleSetRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private ModuleSet(Name alias, Table<ModuleSetRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private ModuleSet(Name alias, Table<ModuleSetRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private ModuleSet(Name alias, Table<ModuleSetRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -129,8 +136,35 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
         this(DSL.name("module_set"), null);
     }
 
-    public <O extends Record> ModuleSet(Table<O> child, ForeignKey<O, ModuleSetRecord> key) {
-        super(child, key, MODULE_SET);
+    public <O extends Record> ModuleSet(Table<O> path, ForeignKey<O, ModuleSetRecord> childPath, InverseForeignKey<O, ModuleSetRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE_SET);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModuleSetPath extends ModuleSet implements Path<ModuleSetRecord> {
+        public <O extends Record> ModuleSetPath(Table<O> path, ForeignKey<O, ModuleSetRecord> childPath, InverseForeignKey<O, ModuleSetRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModuleSetPath(Name alias, Table<ModuleSetRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModuleSetPath as(String alias) {
+            return new ModuleSetPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModuleSetPath as(Name alias) {
+            return new ModuleSetPath(alias, this);
+        }
+
+        @Override
+        public ModuleSetPath as(Table<?> alias) {
+            return new ModuleSetPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -153,29 +187,55 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
         return Arrays.asList(Keys.MODULE_SET_CREATED_BY_FK, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _moduleSetCreatedByFk;
-    private transient AppUser _moduleSetLastUpdatedByFk;
+    private transient AppUserPath _moduleSetCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_set_created_by_fk</code> key.
      */
-    public AppUser moduleSetCreatedByFk() {
+    public AppUserPath moduleSetCreatedByFk() {
         if (_moduleSetCreatedByFk == null)
-            _moduleSetCreatedByFk = new AppUser(this, Keys.MODULE_SET_CREATED_BY_FK);
+            _moduleSetCreatedByFk = new AppUserPath(this, Keys.MODULE_SET_CREATED_BY_FK, null);
 
         return _moduleSetCreatedByFk;
     }
+
+    private transient AppUserPath _moduleSetLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_set_last_updated_by_fk</code> key.
      */
-    public AppUser moduleSetLastUpdatedByFk() {
+    public AppUserPath moduleSetLastUpdatedByFk() {
         if (_moduleSetLastUpdatedByFk == null)
-            _moduleSetLastUpdatedByFk = new AppUser(this, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
+            _moduleSetLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_SET_LAST_UPDATED_BY_FK, null);
 
         return _moduleSetLastUpdatedByFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module</code> table
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, null, Keys.MODULE_MODULE_SET_ID_FK.getInverseKey());
+
+        return _module;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_set_release</code> table
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, null, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK.getInverseKey());
+
+        return _moduleSetRelease;
     }
 
     @Override
@@ -217,27 +277,87 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
         return new ModuleSet(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public ModuleSet where(Condition condition) {
+        return new ModuleSet(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public ModuleSet where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public ModuleSet where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleSet where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleSet where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleSet where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleSet where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleSet where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleSet whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleSet whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
@@ -17,7 +14,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
  * This table captures the tenant role and theirs business contexts.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessCtxRecord> implements Record3<ULong, ULong, ULong> {
+public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessCtxRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,91 +71,6 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
-    }
-
-    @Override
-    public Row3<ULong, ULong, ULong> valuesRow() {
-        return (Row3) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return TenantBusinessCtx.TENANT_BUSINESS_CTX.TENANT_BUSINESS_CTX_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return TenantBusinessCtx.TENANT_BUSINESS_CTX.TENANT_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return TenantBusinessCtx.TENANT_BUSINESS_CTX.BIZ_CTX_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getTenantBusinessCtxId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getTenantId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getTenantBusinessCtxId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getTenantId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public TenantBusinessCtxRecord value1(ULong value) {
-        setTenantBusinessCtxId(value);
-        return this;
-    }
-
-    @Override
-    public TenantBusinessCtxRecord value2(ULong value) {
-        setTenantId(value);
-        return this;
-    }
-
-    @Override
-    public TenantBusinessCtxRecord value3(ULong value) {
-        setBizCtxId(value);
-        return this;
-    }
-
-    @Override
-    public TenantBusinessCtxRecord values(ULong value1, ULong value2, ULong value3) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        return this;
     }
 
     // -------------------------------------------------------------------------

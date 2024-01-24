@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri.BdtPriRestriPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri.CdtAwdPriPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Xbt.XbtPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtAwdPriXpsTypeMapRecord;
 
 
@@ -94,11 +101,11 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
     public final TableField<CdtAwdPriXpsTypeMapRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicating a default value domain mapping.");
 
     private CdtAwdPriXpsTypeMap(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CdtAwdPriXpsTypeMap(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. "), TableOptions.table());
+    private CdtAwdPriXpsTypeMap(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. "), TableOptions.table(), where);
     }
 
     /**
@@ -124,8 +131,35 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
         this(DSL.name("cdt_awd_pri_xps_type_map"), null);
     }
 
-    public <O extends Record> CdtAwdPriXpsTypeMap(Table<O> child, ForeignKey<O, CdtAwdPriXpsTypeMapRecord> key) {
-        super(child, key, CDT_AWD_PRI_XPS_TYPE_MAP);
+    public <O extends Record> CdtAwdPriXpsTypeMap(Table<O> path, ForeignKey<O, CdtAwdPriXpsTypeMapRecord> childPath, InverseForeignKey<O, CdtAwdPriXpsTypeMapRecord> parentPath) {
+        super(path, childPath, parentPath, CDT_AWD_PRI_XPS_TYPE_MAP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CdtAwdPriXpsTypeMapPath extends CdtAwdPriXpsTypeMap implements Path<CdtAwdPriXpsTypeMapRecord> {
+        public <O extends Record> CdtAwdPriXpsTypeMapPath(Table<O> path, ForeignKey<O, CdtAwdPriXpsTypeMapRecord> childPath, InverseForeignKey<O, CdtAwdPriXpsTypeMapRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CdtAwdPriXpsTypeMapPath(Name alias, Table<CdtAwdPriXpsTypeMapRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CdtAwdPriXpsTypeMapPath as(String alias) {
+            return new CdtAwdPriXpsTypeMapPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CdtAwdPriXpsTypeMapPath as(Name alias) {
+            return new CdtAwdPriXpsTypeMapPath(alias, this);
+        }
+
+        @Override
+        public CdtAwdPriXpsTypeMapPath as(Table<?> alias) {
+            return new CdtAwdPriXpsTypeMapPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -148,27 +182,41 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
         return Arrays.asList(Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
     }
 
-    private transient CdtAwdPri _cdtAwdPri;
-    private transient Xbt _xbt;
+    private transient CdtAwdPriPath _cdtAwdPri;
 
     /**
      * Get the implicit join path to the <code>oagi.cdt_awd_pri</code> table.
      */
-    public CdtAwdPri cdtAwdPri() {
+    public CdtAwdPriPath cdtAwdPri() {
         if (_cdtAwdPri == null)
-            _cdtAwdPri = new CdtAwdPri(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK);
+            _cdtAwdPri = new CdtAwdPriPath(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK, null);
 
         return _cdtAwdPri;
     }
 
+    private transient XbtPath _xbt;
+
     /**
      * Get the implicit join path to the <code>oagi.xbt</code> table.
      */
-    public Xbt xbt() {
+    public XbtPath xbt() {
         if (_xbt == null)
-            _xbt = new Xbt(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
+            _xbt = new XbtPath(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK, null);
 
         return _xbt;
+    }
+
+    private transient BdtPriRestriPath _bdtPriRestri;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bdt_pri_restri</code> table
+     */
+    public BdtPriRestriPath bdtPriRestri() {
+        if (_bdtPriRestri == null)
+            _bdtPriRestri = new BdtPriRestriPath(this, null, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK.getInverseKey());
+
+        return _bdtPriRestri;
     }
 
     @Override
@@ -210,27 +258,87 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
         return new CdtAwdPriXpsTypeMap(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public CdtAwdPriXpsTypeMap where(Condition condition) {
+        return new CdtAwdPriXpsTypeMap(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CdtAwdPriXpsTypeMap where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CdtAwdPriXpsTypeMap where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtAwdPriXpsTypeMap where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtAwdPriXpsTypeMap where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtAwdPriXpsTypeMap where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtAwdPriXpsTypeMap where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtAwdPriXpsTypeMap where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtAwdPriXpsTypeMap whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtAwdPriXpsTypeMap whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }
