@@ -22,7 +22,7 @@ npm install
 
 echo "Building project..."
 rm -rf dist
-ng build --configuration production --optimization --aot --build-optimizer --common-chunk --vendor-chunk
+ng build --configuration production --optimization --aot
 
 echo "Preparing files..."
 rm -rf docker/score-web

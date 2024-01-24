@@ -14,12 +14,15 @@
       "prefix": "score",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/score-web",
+            "outputPath": {
+              "base": "dist/score-web"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -48,11 +51,10 @@
             "sourceMap": true,
             "namedChunks": false,
             "extractLicenses": false,
-            "vendorChunk": false,
-            "buildOptimizer": false,
             "allowedCommonJsDependencies": [
               "webfontloader", "util", "crypto-js", "@types/uuid", "@stomp/rx-stomp", "angular2-uuid", "file-saver"
-            ]
+            ],
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
@@ -67,9 +69,7 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
               "aot": true,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
