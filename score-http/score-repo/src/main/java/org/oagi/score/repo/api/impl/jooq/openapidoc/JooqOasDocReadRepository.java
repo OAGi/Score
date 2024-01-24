@@ -4,6 +4,7 @@ import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.impl.jooq.JooqScoreRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasRequestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasResponseRecord;
@@ -153,30 +154,44 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
         return conditions;
     }
 
-    private SortField getSortField(GetOasDocListRequest request) {
-        if (!StringUtils.hasLength(request.getSortActive())) {
-            return null;
+    private List<SortField<?>> getSortFields(GetOasDocListRequest request) {
+        List<SortField<?>> sortFields = new ArrayList<>();
+
+        for (int i = 0, len = request.getSortActives().size(); i < len; ++i) {
+            String sortActive = request.getSortActives().get(i);
+            SortDirection sortDirection = request.getSortDirections().get(i);
+
+            Field field;
+            switch (sortActive.toLowerCase()) {
+                case "title":
+                    field = OAS_DOC.TITLE;
+                    break;
+                case "openapiversion":
+                    field = OAS_DOC.OPEN_API_VERSION;
+                    break;
+                case "version":
+                    field = OAS_DOC.VERSION;
+                    break;
+                case "licensename":
+                    field = OAS_DOC.LICENSE_NAME;
+                    break;
+                case "description":
+                    field = OAS_DOC.DESCRIPTION;
+                    break;
+                case "lastupdatetimestamp":
+                    field = OAS_DOC.LAST_UPDATE_TIMESTAMP;
+                    break;
+                default:
+                    continue;
+            }
+
+            if (sortDirection == ASC) {
+                sortFields.add(field.asc());
+            } else {
+                sortFields.add(field.desc());
+            }
         }
-
-        Field field;
-        switch (trim(request.getSortActive()).toLowerCase()) {
-            case "title":
-                field = OAS_DOC.TITLE;
-                break;
-
-            case "description":
-                field = OAS_DOC.DESCRIPTION;
-                break;
-
-            case "lastupdatetimestamp":
-                field = OAS_DOC.LAST_UPDATE_TIMESTAMP;
-                break;
-
-            default:
-                return null;
-        }
-
-        return (request.getSortDirection() == ASC) ? field.asc() : field.desc();
+        return sortFields;
     }
 
     @Override
@@ -186,10 +201,10 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
         Collection<Condition> conditions = getConditions(request);
         SelectConditionStep conditionStep = select().where(conditions);
 
-        SortField sortField = getSortField(request);
+        List<SortField<?>> sortFields = getSortFields(request);
         int length = dslContext().fetchCount(conditionStep);
         SelectFinalStep finalStep;
-        if (sortField == null) {
+        if (sortFields == null || sortFields.isEmpty()) {
             if (request.isPagination()) {
                 finalStep = conditionStep.limit(request.getPageOffset(), request.getPageSize());
             } else {
@@ -197,10 +212,10 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             }
         } else {
             if (request.isPagination()) {
-                finalStep = conditionStep.orderBy(sortField)
+                finalStep = conditionStep.orderBy(sortFields)
                         .limit(request.getPageOffset(), request.getPageSize());
             } else {
-                finalStep = conditionStep.orderBy(sortField);
+                finalStep = conditionStep.orderBy(sortFields);
             }
         }
 

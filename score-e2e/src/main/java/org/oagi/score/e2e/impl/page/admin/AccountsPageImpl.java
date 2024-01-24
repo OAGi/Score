@@ -19,7 +19,7 @@ public class AccountsPageImpl extends BasePageImpl implements AccountsPage {
             By.xpath("//span[contains(text(), \"New Account\")]//ancestor::button[1]");
 
     private static final By LOGIN_ID_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
+            By.xpath("//input[@placeholder=\"Login ID\"]");
 
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Name\")]//ancestor::div[1]/input");

@@ -147,8 +147,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove Reused BIE\")]//ancestor::button[1]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -586,10 +586,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         viewEditBIEPage.setDEN(reusedBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
-        click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]")));
-        click(elementToBeClickable(getDriver(), By.xpath("//span[contains(text(),\"Find Reuses\")]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Find Reuses\")]//ancestor::button[1]")));
         waitFor(Duration.ofMillis(1000L));
-        assertTrue(getDriver().findElement(By.xpath("//mat-dialog-content//a[contains(text(),\"" + developer_asccp_root.getPropertyTerm() + "\")]//ancestor::tr/td[1]")).isDisplayed());
+        assertTrue(getDriver().findElement(By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//a[contains(text(), \"" + developer_asccp_root.getPropertyTerm() + "\")]//ancestor::tr/td[1]")).isDisplayed());
         escape(getDriver());
 
         //Check ReUse Report
@@ -695,7 +695,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Failed to discard BIE"));
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -769,7 +769,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Failed to update BIE state"));
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -850,7 +850,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Failed to update BIE state"));
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -1072,7 +1072,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Failed to update BIE state"));
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
     }
 
@@ -1386,8 +1386,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove Reused BIE\")]")));
-        click(getDriver().findElement(By.xpath("//span[contains(text(),\"Remove\")]//ancestor::button[1]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove Reused BIE\")]//ancestor::button[1]")));
+        click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
 
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());

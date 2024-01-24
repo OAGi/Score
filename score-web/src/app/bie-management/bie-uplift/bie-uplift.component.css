@@ -142,13 +142,15 @@ tr.element-row:not(.expanded-row):active {
   text-shadow: inherit !important;
 }
 
-.buttons {
-  display: flex;
-  align-self: center;
-  padding-bottom: 0.5rem;
+.tree-search-box {
+  align-items: center;
 }
 
-.tree-search-box .mat-form-field {
+.tree-search-box .mat-form-field-wrapper {
+  padding: 0 !important;
+}
+
+.tree-search-box .mat-mdc-form-field {
   font-size: 12px;
 }
 
@@ -157,19 +159,13 @@ tr.element-row:not(.expanded-row):active {
   padding-bottom: 0;
 }
 
-.tree-search-box .mat-icon {
-  width: 24px;
-  height: 24px;
-  font-size: 24px;
-  cursor: pointer;
+.tree-search-box .buttons {
+  display: flex;
+  padding-top: 6px;
 }
 
-.tree-search-box .mat-icon-button {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  outline: none;
-  margin-right: 0.5rem;
+.tree-search-box .mat-icon {
+  cursor: pointer;
 }
 
 section {

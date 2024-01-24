@@ -2650,7 +2650,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         retry(() -> {
             WebElement tr = createBIEForSelectBusinessContextsPage.getTableRecordAtIndex(1);
             WebElement td = createBIEForSelectBusinessContextsPage.getColumnByName(tr, "name");
-            assertEquals(name, td.findElement(By.cssSelector("a")).getText());
+            assertEquals(name, getText(td.findElement(By.cssSelector("a"))));
         });
     }
 
@@ -2725,7 +2725,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         retry(() -> {
             WebElement tr = createBIEForSelectTopLevelConceptPage.getTableRecordAtIndex(1);
             WebElement td = createBIEForSelectTopLevelConceptPage.getColumnByName(tr, "den");
-            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+            assertEquals(den, getText(td.findElement(By.cssSelector("a"))));
         });
     }
 
@@ -2855,7 +2855,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         retry(() -> {
             WebElement tr = viewEditBIEPage.getTableRecordAtIndex(1);
             WebElement td = viewEditBIEPage.getColumnByName(tr, "den");
-            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+            assertEquals(den, getText(td.findElement(By.cssSelector("a"))));
         });
     }
 
@@ -2934,7 +2934,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         retry(() -> {
             WebElement tr = copyBIEForSelectBusinessContextsPage.getTableRecordAtIndex(1);
             WebElement td = copyBIEForSelectBusinessContextsPage.getColumnByName(tr, "name");
-            assertEquals(name, td.findElement(By.cssSelector("a")).getText());
+            assertEquals(name, getText(td.findElement(By.cssSelector("a"))));
         });
     }
 
@@ -3050,7 +3050,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         retry(() -> {
             WebElement tr = copyBIEForSelectBIEPage.getTableRecordAtIndex(1);
             WebElement td = copyBIEForSelectBIEPage.getColumnByName(tr, "den");
-            assertEquals(den, td.findElement(By.cssSelector("a")).getText());
+            assertEquals(den, getText(td.findElement(By.cssSelector("a"))));
         });
     }
 
@@ -3080,7 +3080,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertTrue(identifierSet1st.isDisplayed());
         //check that the second Identifier is not expanded automatically
         WebElement identifier2nd = visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[text() = \"Identifier\"]//ancestor::div[@data-level = \"2\"]/button/span/mat-icon[contains(text(), \"chevron_right\")]"
+                "//span[text() = \"Identifier\"]//ancestor::div[@data-level = \"2\"]//mat-icon[contains(text(), \"chevron_right\")]"
         ));
         assertTrue(identifier2nd.isDisplayed());
         WebElement typeCode =

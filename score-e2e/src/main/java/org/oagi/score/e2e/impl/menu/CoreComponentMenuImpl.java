@@ -26,19 +26,19 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Core Component\")]//ancestor::button[1]");
 
     private final By VIEW_EDIT_CORE_COMPONENT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Core Component\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Core Component\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Code List\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Code List\")]");
 
     private final By VIEW_EDIT_AGENCY_ID_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Agency ID List\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Agency ID List\")]");
 
     private final By VIEW_EDIT_RELEASE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Release\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Release\")]");
 
     private final By VIEW_EDIT_NAMESPACE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Namespace\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Namespace\")]");
 
     public CoreComponentMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

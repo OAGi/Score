@@ -198,7 +198,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> bccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
     }
 
     @Test

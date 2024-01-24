@@ -21,7 +21,7 @@ public class AssertionHelper {
                 assertEquals("true", element.getAttribute("ng-reflect-checked"));
             } catch (Error retry) {
                 try {
-                    assertTrue(element.getAttribute("class").contains("mat-checkbox-checked"));
+                    assertTrue(element.getAttribute("class").contains("mat-mdc-checkbox-checked"));
                 } catch (Error retryfirst) {
                     assertEquals("true", element.getAttribute("aria-checked"));
                 }
@@ -36,7 +36,7 @@ public class AssertionHelper {
             try {
                 assertEquals("false", element.getAttribute("ng-reflect-checked"));
             } catch (Error retry) {
-                assertFalse(element.getAttribute("class").contains("mat-checkbox-checked"));
+                assertFalse(element.getAttribute("class").contains("mat-mdc-checkbox-checked"));
             }
         }
     }
@@ -71,7 +71,7 @@ public class AssertionHelper {
                     assertEquals("true", element.getAttribute("disabled"));
                 } catch (Error | Exception e) {
                     try {
-                        assertTrue(element.getAttribute("class").contains("mat-checkbox-disabled"));
+                        assertTrue(element.getAttribute("class").contains("mat-mdc-checkbox-disabled"));
                     } catch (Error rerun3) {
                         try {
                             assertTrue(!element.isEnabled());

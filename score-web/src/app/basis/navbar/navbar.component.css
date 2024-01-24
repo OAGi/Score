@@ -11,11 +11,7 @@
   color: #333;
 }
 
-.mat-menu-item {
-  font-size: 13px;
-}
-
-mat-toolbar button:focus, .mat-menu-item:focus {
+mat-toolbar button:focus, .mat-mdc-menu-item:focus {
   border: none;
   outline: none;
 }
@@ -48,3 +44,8 @@ mat-toolbar button:focus, .mat-menu-item:focus {
   color: green;
   background-color: transparent;
 }
+
+.notIcon {
+  vertical-align: middle;
+}
+

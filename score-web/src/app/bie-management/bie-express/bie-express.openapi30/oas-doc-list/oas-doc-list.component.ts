@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
+import {BieForOasDoc, OasDoc, OasDocListRequest} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -17,6 +17,7 @@ import {PageRequest} from '../../../../basis/basis';
 import {initFilter} from '../../../../common/utility';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
+import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 
 @Component({
   selector: 'score-oas-doc-list',
@@ -26,11 +27,16 @@ import {finalize} from 'rxjs/operators';
 export class OasDocListComponent implements OnInit {
 
   title = 'OpenAPI Document';
-  displayedColumns: string[] = [
-    'select', 'title', 'openAPIVersion', 'version', 'licenseName', 'description',
-    'lastUpdateTimestamp'
+  displayedColumns = [
+    {id: 'select', name: ''},
+    {id: 'title', name: 'Title'},
+    {id: 'openAPIVersion', name: 'OpenAPI Version'},
+    {id: 'version', name: 'Version'},
+    {id: 'licenseName', name: 'License Name'},
+    {id: 'description', name: 'Description'},
+    {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp'},
   ];
-  dataSource = new MatTableDataSource<OasDoc>();
+  table: TableData<OasDoc>;
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
@@ -38,7 +44,7 @@ export class OasDocListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: OasDocListRequest;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private openAPIService: OpenAPIService,
@@ -52,16 +58,19 @@ export class OasDocListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.table = new TableData<OasDoc>(this.displayedColumns);
+    this.table.dataSource = new MatMultiSortTableDataSource<OasDoc>(this.sort, false);
+
     this.request = new OasDocListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
+      new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    this.sort.sortChange.subscribe(() => {
+    this.table.sortParams = this.request.page.sortActives;
+    this.table.sortDirs = this.request.page.sortDirections;
+    this.table.sortObservable.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadOasDocList();
     });
@@ -107,7 +116,7 @@ export class OasDocListComponent implements OnInit {
     this.loading = true;
 
     this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
+      this.table.sortParams, this.table.sortDirs,
       this.paginator.pageIndex, this.paginator.pageSize);
 
     this.openAPIService.getOasDocList(this.request).pipe(
@@ -116,7 +125,7 @@ export class OasDocListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.dataSource.data = resp.list.map((elm: OasDoc) => {
+      this.table.dataSource.data = resp.list.map((elm: OasDoc) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
@@ -124,14 +133,14 @@ export class OasDocListComponent implements OnInit {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
-      this.dataSource.data = [];
+      this.table.dataSource.data = [];
     });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
+    const numRows = this.table.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -139,7 +148,7 @@ export class OasDocListComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
+      this.table.dataSource.data.forEach(row => this.select(row));
   }
 
   select(row: OasDoc) {

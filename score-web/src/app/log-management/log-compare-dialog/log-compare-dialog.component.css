@@ -57,3 +57,8 @@ span {
 .association-box:last-child {
   padding-bottom: 12px;
 }
+
+mat-card-title {
+  font-size: 16px !important;
+  color: #333333;
+}

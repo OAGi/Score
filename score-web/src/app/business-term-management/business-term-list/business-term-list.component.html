@@ -39,13 +39,14 @@
 
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
+                <mat-label>Updated start date</mat-label>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end"
                        (dateInput)="onDateEvent('startDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -56,13 +57,14 @@
 
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
+                <mat-label>Updated end date</mat-label>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start"
                        (dateInput)="onDateEvent('endDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -76,6 +78,7 @@
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
+                  <mat-label>Term</mat-label>
                   <input matInput [(ngModel)]="request.filters.businessTerm"
                          (ngModelChange)="onChange('filters.businessTerm', request.filters.businessTerm)"
                          (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
@@ -84,6 +87,7 @@
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
+                  <mat-label>External Reference URI</mat-label>
                   <input matInput [(ngModel)]="request.filters.externalReferenceUri"
                          (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
                          (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
@@ -92,6 +96,7 @@
               </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
+                  <mat-label>External Reference ID</mat-label>
                   <input matInput [(ngModel)]="request.filters.externalReferenceId"
                          (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
                          (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
@@ -106,7 +111,7 @@
         <button mat-raised-button color="primary" type="submit"
                 (click)="this.paginator.pageIndex = 0; this.loadBusinessTermList();">
           <mat-icon>search</mat-icon>
-          Search
+          <span class="ml-2">Search</span>
         </button>
       </mat-card-actions>
     </mat-card>

@@ -31,7 +31,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By RESTORE_BUTTON_LOCATOR =
@@ -39,11 +39,12 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
+
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
@@ -63,15 +64,15 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By CARDINALITY_COMPONENT_LOCATOR =
-            By.xpath("//span[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
 
@@ -91,46 +92,46 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//span[contains(text(), \"Move to Candidate\")]//ancestor::button[1]");
 
     private static final By SET_BASE_ACC_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Set Base ACC\")]");
+            By.xpath("//span[contains(text(), \"Set Base ACC\")]//ancestor::button[1]");
 
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append Property at Last\")]");
+            By.xpath("//span[contains(text(), \"Append Property at Last\")]//ancestor::button[1]");
 
     private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Open in new tab\")]");
+            By.xpath("//span[contains(text(), \"Open in new tab\")]//ancestor::button[1]");
 
     private static final By WHERE_USED_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Where Used\")]");
+            By.xpath("//span[contains(text(), \"Where Used\")]//ancestor::button[1]");
 
     private static final By CREATE_ASCCP_FROM_THIS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]");
+            By.xpath("//span[contains(text(), \"Create ASCCP from this\")]//ancestor::button[1]");
 
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
 
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Show History\")]");
+            By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
 
     private static final By CREATE_OAGI_EXTENSION_COMPONENT_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]");
+            By.xpath("//span[contains(text(), \"Create OAGi Extension Component\")]//ancestor::button[1]");
 
     private static final By INSERT_PROPERTY_BEFORE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert Property Before\")]");
+            By.xpath("//span[contains(text(), \"Insert Property Before\")]//ancestor::button[1]");
 
     private static final By INSERT_PROPERTY_AFTER_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert Property After\")]");
+            By.xpath("//span[contains(text(), \"Insert Property After\")]//ancestor::button[1]");
 
     private static final By REFACTOR_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Refactor\")]");
+            By.xpath("//span[contains(text(), \"Refactor\")]//ancestor::button[1]");
 
     private static final By REFACTOR_TO_BASE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Refactor to Base\")]");
+            By.xpath("//span[contains(text(), \"Refactor to Base\")]//ancestor::button[1]");
 
     private static final By UNGROUP_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Ungroup\")]");
+            By.xpath("//span[contains(text(), \"Ungroup\")]//ancestor::button[1]");
 
     private static final By REMOVE_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Remove\")]");
+            By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By DELETE_OPTION_LOCATOR =
             By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(),\"Delete\")]");
 
@@ -163,7 +164,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("div.mat-tab-list div.mat-tab-label"));
+                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
     }
 
     @Override
@@ -258,7 +259,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public String getObjectClassTermFieldLabel() {
-        return getObjectClassTermField().getAttribute("data-placeholder");
+        return getObjectClassTermField().getAttribute("placeholder");
     }
 
     @Override
@@ -593,7 +594,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     @Override
     public void hitCancelButton() {
         click(getCancelButton());
-        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span")));
+        click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button")));
         invisibilityOfLoadingContainerElement(getDriver());
         assert "Canceled".equals(getSnackBarMessage(getDriver()));
     }
@@ -669,19 +670,19 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     public void expandTree(String nodeName) {
         try {
             By chevronRightLocator = By.xpath(
-                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(), \"chevron_right\")]//ancestor::span[1]");
+                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]");
             click(elementToBeClickable(getDriver(), chevronRightLocator));
         } catch (TimeoutException maybeAlreadyExpanded) {
         }
 
         By expandMoreLocator = By.xpath(
-                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]/button/span/mat-icon[contains(text(), \"expand_more\")]//ancestor::span[1]");
+                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"expand_more\")]//ancestor::button[1]");
         assert elementToBeClickable(getDriver(), expandMoreLocator).isEnabled();
     }
 
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
-        click(searchInput);
+        click(getDriver(), searchInput);
         WebElement node = retry(() -> {
             WebElement e = sendKeys(searchInput, path);
             if (!path.equals(getText(searchInput))) {
@@ -703,7 +704,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     @Override
     public String getCardinalityLabel() {
-        return visibilityOfElementLocated(getDriver(), CARDINALITY_COMPONENT_LOCATOR).getAttribute("data-placeholder");
+        return visibilityOfElementLocated(getDriver(), CARDINALITY_COMPONENT_LOCATOR).getAttribute("placeholder");
     }
 
     @Override

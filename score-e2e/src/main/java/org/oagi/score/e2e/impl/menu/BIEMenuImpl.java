@@ -24,34 +24,34 @@ public class BIEMenuImpl extends DelegateBasePageImpl implements BIEMenu {
             By.xpath("//mat-toolbar-row/button/span[contains(text(), \"BIE\")]//ancestor::button[1]");
 
     private final By VIEW_EDIT_BIE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit BIE\")]");
+            By.xpath("//span[contains(text(), \"View/Edit BIE\")]//ancestor::button[1]");
 
     private final By CREATE_BIE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Create BIE\")]");
+            By.xpath("//span[contains(text(), \"Create BIE\")]//ancestor::button[1]");
 
     private final By COPY_BIE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Copy BIE\")]");
+            By.xpath("//span[contains(text(), \"Copy BIE\")]//ancestor::button[1]");
 
     private final By UPLIFT_BIE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Uplift BIE\")]");
+            By.xpath("//span[contains(text(), \"Uplift BIE\")]//ancestor::button[1]");
 
     private final By EXPRESS_BIE_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Express BIE\")]");
+            By.xpath("//span[contains(text(), \"Express BIE\")]//ancestor::button[1]");
 
     private final By OPENAPI_DOCUMENT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"OpenAPI Document\")]");
+            By.xpath("//span[contains(text(), \"OpenAPI Document\")]//ancestor::button[1]");
 
     private final By REUSE_REPORT_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Reuse Report\")]");
+            By.xpath("//span[contains(text(), \"Reuse Report\")]//ancestor::button[1]");
 
     private final By VIEW_EDIT_BUSINESS_TERM_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Business Term\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Business Term\")]//ancestor::button[1]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"View/Edit Code List\")]");
+            By.xpath("//span[contains(text(), \"View/Edit Code List\")]//ancestor::button[1]");
 
     private final By UPLIFT_CODE_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//button[contains(text(), \"Uplift Code List\")]");
+            By.xpath("//span[contains(text(), \"Uplift Code List\")]//ancestor::button[1]");
 
     public BIEMenuImpl(HomePageImpl homePage) {
         super(homePage);

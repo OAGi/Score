@@ -13,7 +13,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
 
     private static final By BUSINESS_TERM_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::mat-form-field//input[1]");
 
-    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::mat-form-field//input[1]");
+    private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::mat-form-field//input[1]");
 
     private static final By EXTERNAL_REFERENCE_ID_FIELD_LOCATOR = By.xpath("//mat-label[contains(text(), \"External Reference ID\")]//ancestor::mat-form-field//input[1]");
 
@@ -26,7 +26,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
     private static final By DISCARD_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     private final ViewEditBusinessTermPageImpl parent;
 
@@ -53,7 +53,7 @@ public class EditBusinessTermPageImpl extends BasePageImpl implements EditBusine
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

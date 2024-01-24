@@ -4,10 +4,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -23,23 +20,23 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
 
     public static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Type\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Type\"]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Owner\"]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[text() = \"Owner\"]//ancestor::mat-form-field[1]//mat-select");
     private static final By COMPONENT_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(), \"Component Type\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
@@ -154,12 +151,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"DEN\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"DEN\")]"));
     }
 
     @Override
     public String getDENFieldLabel() {
-        return getDENField().getAttribute("data-placeholder");
+        return getDENField().getAttribute("placeholder");
     }
 
     @Override
@@ -169,7 +166,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Definition\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Definition\")]"));
     }
 
     @Override
@@ -179,12 +176,12 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getModuleField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Module\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Module\")]"));
     }
 
     @Override
     public String getModuleFieldLabel() {
-        return getModuleField().getAttribute("data-placeholder");
+        return getModuleField().getAttribute("placeholder");
     }
 
     @Override
@@ -222,7 +219,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             String href = link.getAttribute("href");
             String accId = href.substring(href.indexOf("/acc/") + "/acc/".length());
             ACCObject accObject = getAPIFactory().getCoreComponentAPI().getACCByManifestId(new BigInteger(accId));
-            click(link);
+            try {
+                click(link);
+            } catch (ElementNotInteractableException e) {
+                getDriver().get(href);
+            }
 
             ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, accObject);
             assert accViewEditPage.isOpened();
@@ -264,8 +265,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             String href = link.getAttribute("href");
             String asccpId = href.substring(href.indexOf("/asccp/") + "/asccp/".length());
             ASCCPObject asccpObject = getAPIFactory().getCoreComponentAPI().getASCCPByManifestId(new BigInteger(asccpId));
-
-            click(link);
+            try {
+                click(link);
+            } catch (ElementNotInteractableException e) {
+                getDriver().get(href);
+            }
 
             ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccpObject);
 
@@ -345,7 +349,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateACCButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ACC\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"ACC\"]//ancestor::button"));
     }
 
     @Override
@@ -367,7 +371,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateASCCPButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"ASCCP\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"ASCCP\"]//ancestor::button"));
     }
 
     @Override
@@ -384,7 +388,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateBCCPButton() {
         click(getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"BCCP\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"BCCP\"]//ancestor::button"));
     }
 
     @Override
@@ -401,7 +405,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public WebElement getCreateDTButton() {
         click(getDriver(), getCreateComponentButton());
         return elementToBeClickable(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-menu-content\")]/button/span[text() = \"DT\"]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//button[contains(@class, \"mat-mdc-menu-item\")]//span[text() = \"DT\"]//ancestor::button"));
     }
 
     @Override
@@ -487,7 +491,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),

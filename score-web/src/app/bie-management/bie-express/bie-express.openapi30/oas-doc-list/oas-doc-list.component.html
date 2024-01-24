@@ -36,13 +36,14 @@
 
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
+                <mat-label>Updated start date</mat-label>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end" [value]="request.updatedDate.start"
                        (dateInput)="onDateEvent('startDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -53,13 +54,14 @@
 
             <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
+                <mat-label>Updated end date</mat-label>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start" [value]="request.updatedDate.end"
                        (dateInput)="onDateEvent('endDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -73,6 +75,7 @@
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
+                  <mat-label>Title</mat-label>
                   <input matInput [(ngModel)]="request.filters.title"
                          (ngModelChange)="onChange('filters.title', request.filters.title)"
                          (keyup.enter)="this.paginator.pageIndex = 0; this.loadOasDocList();"
@@ -82,6 +85,7 @@
 
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
+                  <mat-label>Description</mat-label>
                   <input matInput [(ngModel)]="request.filters.description"
                          (ngModelChange)="onChange('filters.description', request.filters.description)"
                          (keyup.enter)="this.paginator.pageIndex = 0; this.loadOasDocList();"
@@ -96,17 +100,29 @@
         <button mat-raised-button color="primary" type="submit"
                 (click)="this.paginator.pageIndex = 0; this.loadOasDocList();">
           <mat-icon>search</mat-icon>
-          Search
+          <span class="ml-2">Search</span>
         </button>
       </mat-card-actions>
     </mat-card>
 
     <mat-card-content class="mat-card-container">
+      <div class="container-fluid p-2">
+        <div class="row">
+          <div class="col-12">
+            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
+              <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+                <div class="d-inline-flex align-items-center">
+                  <span class="p-1 f12">{{ columnName }}</span>
+                  <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                </div>
+              </ng-template>
+            </mat-multi-sort-table-settings>
+          </div>
+        </div>
+      </div>
       <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
-
+        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
@@ -126,7 +142,7 @@
           </ng-container>
 
           <ng-container matColumnDef="title">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="title"> Title</th>
             <td mat-cell *matCellDef="let element">
               <div class="businessTerm word-break-all">
                 <a routerLink="{{ element.oasDocId }}">
@@ -138,7 +154,7 @@
           </ng-container>
 
           <ng-container matColumnDef="openAPIVersion">
-            <th mat-header-cell *matHeaderCellDef> OpenAPI Version</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="openAPIVersion"> OpenAPI Version</th>
             <td mat-cell *matCellDef="let element">
               <a target="_blank" rel="noopener noreferrer"
                  href="{{ element.openAPIVersion }}">
@@ -147,36 +163,36 @@
           </ng-container>
 
           <ng-container matColumnDef="version">
-            <th mat-header-cell *matHeaderCellDef>Document Version</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version">Document Version</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.version }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="licenseName">
-            <th mat-header-cell *matHeaderCellDef> License Name</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="licenseName"> License Name</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.licenseName }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef> Description</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="description"> Description</th>
             <td mat-cell *matCellDef="let element">
               <span class="word-break-all">{{ element.description }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
               <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: table.displayedColumns;"
               (click)="toggle(row)"></tr>
         </table>
 

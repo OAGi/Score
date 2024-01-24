@@ -1,11 +1,16 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
+
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
+          <mat-label>Context Category</mat-label>
           <mat-select placeholder="Context Category" required [(ngModel)]="contextScheme.contextCategoryId">
             <mat-option>
               <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
@@ -23,7 +28,7 @@
           <input matInput required [(ngModel)]="contextScheme.schemeName" maxlength="255"/>
         </mat-form-field>
 
-        <div class="row" style="padding: 8px 0 8px 12px;">
+        <div class="row" style="padding: 0 0 8px 12px; margin-bottom: 8px;">
           <button mat-raised-button
                   *ngIf="canImport()"
                   (click)="openCodeListDialog()" color="primary">
@@ -52,13 +57,12 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Context Scheme Values</mat-card-title>
-    </mat-card-header>
-
+  <div class="p-3">
+    <mat-toolbar class="bg-white">
+      <span class="title">Context Scheme Values</span>
+    </mat-toolbar>
     <mat-card>
       <mat-card-content class="mat-card-container">
         <div class="mat-elevation-z1">
@@ -103,12 +107,13 @@
             showFirstLastButtons></mat-paginator>
         </div>
       </mat-card-content>
-      <mat-card-actions style="padding: 8px 0 8px 12px;">
+      <mat-card-actions style="padding: 16px 0 0 0;">
         <button mat-raised-button (click)="openDialog()" color="primary">
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeSchemeValues()" [hidden]="dataSource.data.length === 0"
+        <button mat-raised-button (click)="removeSchemeValues()" class="ml-2"
+                [hidden]="dataSource.data.length === 0"
                 [disabled]="this.selection.selected.length === 0"
                 color="warn">
           <mat-icon>delete</mat-icon>
@@ -116,7 +121,7 @@
         </button>
       </mat-card-actions>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

@@ -2,18 +2,23 @@
   <div class="pr-md-3 pr-0">
     <mat-list>
       <h5 class="ml-2 mb-2">General</h5>
-      <mat-list-item class="nav-item {{ active === 'Password' ? 'active' : '' }}"
-                     routerLink="/settings/password">
-        <mat-icon mat-list-icon>lock</mat-icon>
-        <div mat-line>Password</div>
-      </mat-list-item>
+      <a class="vertical-allign" mat-list-item class="nav-item {{ active === 'Password' ? 'active' : '' }}"
+        routerLink="/settings/password">
+        <div class="d-flex">
+          <mat-icon mat-list-icon class="mat-icon">lock</mat-icon>
+          <div mat-line class="mat-line">
+            <span style="padding-left: 10px;">Password</span>
+          </div>
+        </div>
+      </a>
       <mat-list-item class="nav-item {{ active === 'ApplicationSettings' ? 'active' : '' }}"
-                     routerLink="/settings/application_settings"
-                     [disabled]="!isAdmin">
-        <mat-icon mat-list-icon>developer_mode</mat-icon>
-        <div mat-line>
-          Application settings
-          <div class="admin-only" *ngIf="!isAdmin">Admin only</div>
+        routerLink="/settings/application_settings" [disabled]="!isAdmin">
+        <div class="d-flex">
+          <mat-icon mat-list-icon>developer_mode</mat-icon>
+          <div mat-line>
+            <span style="padding-left: 10px;">Application settings</span>
+            <div class="admin-only" *ngIf="!isAdmin">Admin only</div>
+          </div>
         </div>
       </mat-list-item>
     </mat-list>

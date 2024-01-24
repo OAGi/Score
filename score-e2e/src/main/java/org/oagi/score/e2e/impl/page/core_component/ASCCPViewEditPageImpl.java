@@ -23,25 +23,25 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     public static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONFIRM_CANCEL_REVISION_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     public static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-icon[text() = \"search\"]");
     private static final By UPDATE_BUTTON_LOCATOR =
@@ -59,19 +59,19 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-checkbox");
     private static final By OPEN_IN_NEW_TAB_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Open in new tab\")]");
+            By.xpath("//span[contains(text(), \"Open in new tab\")]//ancestor::button[1]");
     private static final By CHANGE_ACC_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Change ACC\")]");
+            By.xpath("//span[contains(text(), \"Change ACC\")]//ancestor::button[1]");
     private static final By COMMENTS_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Comments\")]");
+            By.xpath("//span[contains(text(), \"Comments\")]//ancestor::button[1]");
     private static final By SHOW_HISTORY_OPTION_LOCATOR =
-            By.xpath("//span[contains(text(), \"Show History\")]");
+            By.xpath("//span[contains(text(), \"Show History\")]//ancestor::button[1]");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
@@ -100,7 +100,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("div.mat-tab-list div.mat-tab-label-content"));
+                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
     }
 
     @Override
@@ -398,8 +398,14 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private WebElement goToNode(String path) {
         WebElement searchInput = getSearchInputTextField();
-        click(searchInput);
-        WebElement node = sendKeys(searchInput, path);
+        click(getDriver(), searchInput);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(searchInput);

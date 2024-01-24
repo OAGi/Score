@@ -12,12 +12,12 @@ import org.openqa.selenium.support.ui.Wait;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static java.time.Duration.ofMillis;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 public abstract class PageHelper {
@@ -137,6 +137,12 @@ public abstract class PageHelper {
                 break;
             default:
                 s = trim(element.getText());
+                if (isEmpty(s)) {
+                    s = trim(element.getAttribute("value"));
+                    if (isEmpty(s)) {
+                        s = trim(element.getAttribute("innerText"));
+                    }
+                }
         }
         return (s.length() > 0) ? s : null;
     }
@@ -224,7 +230,7 @@ public abstract class PageHelper {
      * @return the text message from the snackbar
      */
     public static String getSnackBarMessage(WebDriver driver) {
-        String xpathExpr = "//simple-snack-bar/span";
+        String xpathExpr = "//simple-snack-bar/div";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
     }
@@ -237,7 +243,7 @@ public abstract class PageHelper {
      * @return the UI element of the snackbar
      */
     public static WebElement getSnackBar(WebDriver driver, String message) {
-        String xpathExpr = "//simple-snack-bar//span[contains(text(), \"" + message + "\")]";
+        String xpathExpr = "//simple-snack-bar//div[contains(text(), \"" + message + "\")]";
         return visibilityOfElementLocated(driver, By.xpath(xpathExpr));
     }
 
@@ -290,6 +296,6 @@ public abstract class PageHelper {
                 "true".equals(element.getAttribute("ng-reflect-checked")) ||
                 "checked".equals(element.getAttribute("ng-reflect-state")) ||
                 "true".equals(element.getAttribute("aria-checked")) ||
-                (!StringUtils.isEmpty(klass) && klass.contains("mat-checkbox-checked"));
+                (!StringUtils.isEmpty(klass) && klass.contains("mat-mdc-checkbox-checked"));
     }
 }

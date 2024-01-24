@@ -50,7 +50,7 @@ public class CreateModuleFileDialogImpl implements CreateModuleFileDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class CreateModuleFileDialogImpl implements CreateModuleFileDialog {
         retry(() -> {
             click(getNamespaceSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + namespaceURI + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + namespaceURI + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
         });

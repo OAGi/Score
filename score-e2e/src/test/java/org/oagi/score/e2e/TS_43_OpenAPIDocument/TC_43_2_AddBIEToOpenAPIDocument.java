@@ -14,6 +14,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.oas.AddBIEForOpenAPIDocumentDialog;
 import org.oagi.score.e2e.page.oas.EditOpenAPIDocumentPage;
 import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
+import org.openqa.selenium.By;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         EditOpenAPIDocumentPage editOpenAPIDocumentPage = openAPIDocumentPage.openEditOpenAPIDocumentPage(randomOpenAPIDocument);
         AddBIEForOpenAPIDocumentDialog addBIEForOpenAPIDocumentDialog = editOpenAPIDocumentPage.openAddBIEForOpenAPIDocumentDialog();
-        assertEquals("Add BIE For OpenAPI Document", getText(addBIEForOpenAPIDocumentDialog.getTitle()));
+        assertEquals("Add BIE For OpenAPI Document", getText(addBIEForOpenAPIDocumentDialog.getTitle().findElement(By.tagName("span"))));
     }
 
     @AfterEach

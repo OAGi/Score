@@ -39,7 +39,7 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class EditModuleSetPageImpl extends BasePageImpl implements EditModuleSet
         return createModuleFileDialog;
     }
     private WebElement getAddNewModuleButton() {
-        return elementToBeClickable(getDriver(), By.xpath("//mat-card-content//span[contains(text(), \"Add\")]"));
+        return elementToBeClickable(getDriver(), By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]//span[contains(text(), \"Add\")]"));
     }
 
     private WebElement getAddNewModuleFileButton() {

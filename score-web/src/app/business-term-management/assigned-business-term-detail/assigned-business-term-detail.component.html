@@ -1,9 +1,13 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
+
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Business Term</mat-label>
@@ -11,9 +15,14 @@
         </mat-form-field>
 
         <mat-form-field>
-          <input disabled="true" matInput placeholder="External Reference URI" [(ngModel)]="assignedBusinessTerm.externalReferenceUri" maxlength="45"/>
-          <button mat-button matSuffix  mat-icon-button aria-label="Clear" (click)=followTheExternalUri()>
-          </button>
+          <mat-label>External Reference URI</mat-label>
+          <div class="d-flex align-items-center">
+            <input disabled="true" matInput required placeholder="External Reference URI"
+                   [(ngModel)]="assignedBusinessTerm.externalReferenceUri" maxlength="45"/>
+            <button mat-icon-button mat-small-icon-button aria-label="Clear" (click)="followTheExternalUri()">
+              <mat-icon>link</mat-icon>
+            </button>
+          </div>
         </mat-form-field>
 
         <mat-form-field>
@@ -31,16 +40,12 @@
           <input matInput [(ngModel)]="assignedBusinessTerm.typeCode" maxlength="45"/>
         </mat-form-field>
 
-        <mat-form-field>
-          <input hidden=true matInput>
-          <mat-checkbox matInput
-                        [(ngModel)]="assignedBusinessTerm.primary">
-            Preferred Business Term
-          </mat-checkbox>
-        </mat-form-field>
+        <mat-checkbox [(ngModel)]="assignedBusinessTerm.primary">
+          Preferred Business Term
+        </mat-checkbox>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

@@ -2,15 +2,15 @@
   <div class="loading-container" *ngIf="isLoading">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
-
-  <div class="row action-group m-0">
-    <div class="col-3 title-wrap">
-      <mat-label class="title">{{ title }}</mat-label>
-    </div>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
   </div>
 
-  <mat-card class="pt-2 pb-0">
-    <mat-card class="mb-2">
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Release Number</mat-label>
@@ -48,7 +48,7 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0" *ngIf="userToken.roles.includes('developer')">
     <div class="col-12 actions-wrap">

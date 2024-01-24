@@ -1,58 +1,61 @@
-<mat-card style="box-shadow: none; padding: 0;">
-  <mat-card-header>
-    <mat-card-title>{{ actionName }} Agency ID List Value</mat-card-title>
-  </mat-card-header>
-</mat-card>
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>{{ actionName }} Agency ID List Value</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="content" mat-dialog-content>
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>Value</mat-label>
+          <input matInput required maxlength="255"
+                 [disabled]="!isEditable || derived || hasRevision"
+                 [(ngModel)]="agencyIdListValue.value">
+        </mat-form-field>
 
-<mat-dialog-content class="mat-card-container">
-  <mat-card style="margin-bottom: 24px;">
-    <mat-card-content>
-      <mat-form-field>
-        <mat-label>Value</mat-label>
-        <input matInput required maxlength="255"
-               [disabled]="!isEditable || derived || hasRevision"
-               [(ngModel)]="agencyIdListValue.value">
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>Meaning</mat-label>
+          <input matInput required maxlength="100"
+                 [disabled]="!isEditable"
+                 [(ngModel)]="agencyIdListValue.name">
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Meaning</mat-label>
-        <input matInput required maxlength="100"
-               [disabled]="!isEditable"
-               [(ngModel)]="agencyIdListValue.name">
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>Definition</mat-label>
+          <textarea matInput rows="6" cols="30"
+                    [disabled]="!isEditable"
+                    [(ngModel)]="agencyIdListValue.definition"></textarea>
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Definition</mat-label>
-        <textarea matInput rows="6" cols="30"
-                  [disabled]="!isEditable"
-                  [(ngModel)]="agencyIdListValue.definition"></textarea>
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>Definition Source</mat-label>
+          <input matInput maxlength="100"
+                 [disabled]="!isEditable"
+                 [(ngModel)]="agencyIdListValue.definitionSource">
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Definition Source</mat-label>
-        <input matInput maxlength="100"
-               [disabled]="!isEditable"
-               [(ngModel)]="agencyIdListValue.definitionSource">
-      </mat-form-field>
-
-      <div class="row">
-        <div class="col-12">
-          <mat-checkbox color="warn"
-                        [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
-                        [(ngModel)]="agencyIdListValue.deprecated">
-            <span>Deprecated</span>
-          </mat-checkbox>
+        <div class="row">
+          <div class="col-12">
+            <mat-checkbox color="warn"
+                          [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
+                          [(ngModel)]="agencyIdListValue.deprecated">
+              <span>Deprecated</span>
+            </mat-checkbox>
+          </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</mat-dialog-content>
-
-<mat-dialog-actions *ngIf="isEditable">
-  <button mat-raised-button color="primary"
-          [disabled]="isDisabled()"
-          [mat-dialog-close]="agencyIdListValue">
-    <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-    {{ (actionName === 'Add') ? 'Add' : 'Save' }}
-  </button>
-</mat-dialog-actions>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="actions ml-auto" mat-dialog-actions *ngIf="isEditable">
+    <button mat-raised-button color="primary"
+            [disabled]="isDisabled()"
+            [mat-dialog-close]="agencyIdListValue">
+      <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
+      {{ (actionName === 'Add') ? 'Add' : 'Save' }}
+    </button>
+  </div>
+</div>

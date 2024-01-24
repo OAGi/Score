@@ -13,55 +13,55 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class SelectAssociationDialogImpl implements SelectAssociationDialog {
 
     private static final By TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"State\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Deprecated\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
+            By.xpath("//mat-dialog-container//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"DEN\")]");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Definition\")]");
 
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Module\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Module\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By INSERT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Insert\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Insert\")]//ancestor::button[1]");
 
     private static final By APPEND_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Append\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Append\")]//ancestor::button[1]");
 
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
 
     private static final By UPDATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]");
 
     private static final By ASSOCIATION_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//mat-label[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     private final BasePageImpl parent;
 
@@ -88,7 +88,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override
@@ -105,7 +105,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     public void setState(String state) {
         click(getStateSelectField());
         WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + state + "\")]"));
         click(optionField);
         escape(getDriver());
     }
@@ -119,7 +119,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     public void setDeprecated(boolean deprecated) {
         click(getDeprecatedSelectField());
         WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
         click(optionField);
         escape(getDriver());
     }
@@ -134,7 +134,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
         click(getOwnerSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + owner + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -150,7 +150,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
         try {
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), type);
             WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + type + "\")]"));
+                    By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + type + "\")]"));
             click(searchedSelectField);
             escape(getDriver());
         } catch (TimeoutException e) {
@@ -168,7 +168,7 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
         click(getUpdaterSelectField());
         sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
+                By.xpath("//mat-dialog-container//mat-option//span[contains(text(), \"" + updater + "\")]"));
         click(searchedSelectField);
         escape(getDriver());
     }
@@ -227,12 +227,12 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
 
     @Override
     public String getDENFieldLabel() {
-        return getDENField().getAttribute("data-placeholder");
+        return getDENField().getAttribute("placeholder");
     }
 
     @Override
     public String getModuleFieldLabel() {
-        return getModuleField().getAttribute("data-placeholder");
+        return getModuleField().getAttribute("placeholder");
     }
 
     @Override
@@ -248,12 +248,12 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override
@@ -264,11 +264,11 @@ public class SelectAssociationDialogImpl implements SelectAssociationDialog {
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
-                By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
+                By.xpath("//mat-dialog-container//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
         click(itemField);
         waitFor(ofMillis(500L));
     }

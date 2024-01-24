@@ -2,12 +2,15 @@
   <div *ngIf="isUpdating" class="loading-container">
     <mat-spinner [diameter]="40"></mat-spinner>
   </div>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">Core Component Assignment</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
 
-  <mat-card class="mt-4">
-    <mat-card-header>
-      <mat-card-title>Core Component Assignment</mat-card-title>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <mat-card class="pt-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <div class="finder-wrapper">
           <div class="finder-content">
@@ -31,13 +34,12 @@
     </mat-card>
   </mat-card>
 
+  <div class="p-3">
+    <mat-toolbar class="bg-white" style="box-shadow: none;">
+      <span class="title">Assign CCs</span>
+    </mat-toolbar>
 
-  <mat-card class="mt-4">
-    <mat-card-header>
-      <mat-card-title>Assign CCs</mat-card-title>
-    </mat-card-header>
-
-    <mat-card class="mb-2">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <div class="d-flex">
           <div style="width: 47%;">
@@ -249,5 +251,5 @@
         </div>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 </div>

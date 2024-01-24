@@ -13,7 +13,6 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.context.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -1038,7 +1037,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         EditContextSchemePage editContextSchemePage =
                 contextMenu.openViewEditContextSchemeSubMenu()
                         .openEditContextSchemePageByContextSchemeName(randomContextScheme.getSchemeName());
-        assertThrows(TimeoutException.class, () -> {
+        assertThrows(ElementClickInterceptedException.class, () -> {
             editContextSchemePage.removeContextSchemeValue(randomContextSchemeValue);
         });
     }
@@ -1526,7 +1525,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         viewEditContextSchemePage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]//input");
+                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(Duration.ofSeconds(3L))
@@ -1534,8 +1533,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
 
             // Click the checkbox
-            new Actions(getDriver()).moveToElement(checkboxOfFirstRecord).perform();
-            checkboxOfFirstRecord.sendKeys(Keys.SPACE);
+            click(checkboxOfFirstRecord);
         });
 
         viewEditContextSchemePage.goToNextPage();

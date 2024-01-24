@@ -16,9 +16,6 @@ import {CommonModule} from '@angular/common';
   declarations: [
     TransferOwnershipDialogComponent
   ],
-  entryComponents: [
-    TransferOwnershipDialogComponent
-  ],
 })
 export class TransferOwnershipDialogModule {
 }

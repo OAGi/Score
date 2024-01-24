@@ -169,37 +169,14 @@
 }
 
 .tree-search-box {
+  align-items: center;
 }
 
 .tree-search-box .mat-form-field-wrapper {
   padding: 0 !important;
 }
 
-.tree-search-box .buttons {
-  display: inline-flex;
-  align-items: baseline;
-  padding-top: 4px;
-}
-
-.tree-search-box .buttons button {
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
-  outline: none;
-}
-
-.tree-search-box .options button {
-  font-size: 12px;
-  line-height: 36px;
-  margin: 6px 4px;
-}
-
-.tree-search-box button mat-icon {
-  font-size: 16px;
-  margin: 0;
-}
-
-.tree-search-box .mat-form-field {
+.tree-search-box .mat-mdc-form-field {
   font-size: 12px;
 }
 
@@ -208,11 +185,12 @@
   padding-bottom: 0;
 }
 
+.tree-search-box .buttons {
+  display: flex;
+  padding-top: 6px;
+}
+
 .tree-search-box .mat-icon {
-  width: 16px;
-  height: 16px;
-  font-size: 16px;
-  margin: 12px 4px;
   cursor: pointer;
 }
 

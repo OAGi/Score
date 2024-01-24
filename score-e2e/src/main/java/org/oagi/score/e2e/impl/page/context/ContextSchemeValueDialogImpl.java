@@ -19,7 +19,7 @@ public class ContextSchemeValueDialogImpl implements ContextSchemeValueDialog {
             By.xpath("//mat-label[.=\"Meaning\"]//ancestor::div[1]/textarea[1]");
 
     private static final By ADD_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Add\")]//ancestor::mat-dialog-actions[1]/button[1]");
+            By.xpath("//span[contains(text(), \"Add\")]//ancestor::div[contains(@class, \"mat-mdc-dialog-actions\")]/button[1]");
 
     private static final By SAVE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Save\")]//ancestor::button[1]");
@@ -46,7 +46,7 @@ public class ContextSchemeValueDialogImpl implements ContextSchemeValueDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override

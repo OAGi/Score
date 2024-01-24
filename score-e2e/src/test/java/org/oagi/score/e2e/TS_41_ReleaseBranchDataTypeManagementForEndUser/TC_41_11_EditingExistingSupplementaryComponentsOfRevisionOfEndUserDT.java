@@ -87,11 +87,11 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
             String representationTerm = SCPanel.getRepresentationSelectFieldValue();
             List<String> valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTerm);
             String defaultValueDomain = getAPIFactory().getCoreComponentAPI().getDefaultValueDomainByCDTRepresentationTerm(representationTerm);
-            if (!valueDomains.contains("Token")){
-                for (String representationTermNew: representationTermsForCDTs){
+            if (!valueDomains.contains("Token")) {
+                for (String representationTermNew : representationTermsForCDTs) {
                     valueDomains = getAPIFactory().getCoreComponentAPI().getValueDomainsByCDTRepresentationTerm(representationTermNew);
                     defaultValueDomain = getAPIFactory().getCoreComponentAPI().getDefaultValueDomainByCDTRepresentationTerm(representationTermNew);
-                    if (valueDomains.contains("Token")){
+                    if (valueDomains.contains("Token")) {
                         SCPanel.selectRepresentationTerm(representationTermNew);
                         String propertyTerm = SCPanel.getPropertyTermFieldValue();
                         representationTerm = SCPanel.getRepresentationSelectFieldValue();
@@ -127,13 +127,13 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
              * Test Assertion #41.7.3
              */
             dtViewEditPage.showValueDomain();
-            String randomValueDomain = valueDomains.get(valueDomains.size()-1);
-            dtViewEditPage.selectValueDomain(randomValueDomain);
+            String randomValueDomain = valueDomains.get(valueDomains.size() - 1);
+            assertThrows(Exception.class, () -> dtViewEditPage.selectValueDomain(randomValueDomain));
             assertThrows(Exception.class, () -> dtViewEditPage.getDiscardValueDomainButton());
             /**
              * Test Assertion #41.7.4
              */
-            if (valueDomains.contains("Token")){
+            if (valueDomains.contains("Token")) {
                 assertDoesNotThrow(() -> dtViewEditPage.addCodeListValueDomain(codeList.getName()));
                 dtViewEditPage.selectValueDomain(codeList.getName());
                 dtViewEditPage.discardValueDomain();
@@ -143,8 +143,8 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
             /**
              * Test Assertion #41.7.5
              */
-            for (String valueDomain: valueDomains){
-                if (!valueDomain.equals(defaultValueDomain)){
+            for (String valueDomain : valueDomains) {
+                if (!valueDomain.equals(defaultValueDomain)) {
                     SCPanel.setDefaultValueDomain(valueDomain);
                     break;
                 }
@@ -152,7 +152,7 @@ public class TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserD
             /**
              * Test Assertion #41.7.6
              */
-            if (SCPanel.getCardinalityFieldValue().equals("Optional")){
+            if (SCPanel.getCardinalityFieldValue().equals("Optional")) {
                 SCPanel.setCardinality("Required");
                 SCPanel.setCardinality("Optional");
                 SCPanel.setCardinality("Required");

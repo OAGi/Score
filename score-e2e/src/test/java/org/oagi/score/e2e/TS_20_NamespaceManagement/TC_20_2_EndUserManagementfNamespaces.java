@@ -80,7 +80,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Namespace '" + testURI + "' exists."));
-        click(elementToBeClickable(getDriver(), By.xpath("//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' exists."));
-        click(elementToBeClickable(getDriver(), By.xpath("//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        click(elementToBeClickable(getDriver(), By.xpath("//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
         editNamespacePage.hitBackButton();
         waitFor(Duration.ofMillis(3000L));
         String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";

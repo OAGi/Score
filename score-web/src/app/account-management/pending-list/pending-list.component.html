@@ -38,13 +38,14 @@
 
             <div class="col-md-2 col-sm-12" style="display: flex;">
               <mat-form-field>
+                <mat-label>Created start date</mat-label>
                 <input matInput [matDatepicker]="dateStart" placeholder="Created start date"
                        [max]="request.createdDate.end" [value]="request.createdDate.start"
                        (dateInput)="onDateEvent('startDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                 <mat-datepicker #dateStart></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -55,13 +56,14 @@
 
             <div class="col-md-2 col-sm-12" style="display: flex;">
               <mat-form-field>
+                <mat-label>Created end date</mat-label>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Created end date"
                        [min]="request.createdDate.start" [value]="request.createdDate.end"
                        (dateInput)="onDateEvent('endDate', $event)">
                 <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                 <mat-datepicker #dateEnd></mat-datepicker>
               </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
+              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                 <div class="mat-form-field-flex">
                   <div class="mat-form-field-infix">
                     <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -76,7 +78,7 @@
         <button mat-raised-button color="primary" type="submit"
                 (click)="this.paginator.pageIndex = 0; this.loadPendingList();">
           <mat-icon>search</mat-icon>
-          Search
+          <span class="ml-2">Search</span>
         </button>
       </mat-card-actions>
     </mat-card>

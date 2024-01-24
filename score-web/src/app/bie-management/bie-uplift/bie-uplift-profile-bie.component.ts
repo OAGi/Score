@@ -32,7 +32,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
   subtitle = 'Select BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'branch', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();

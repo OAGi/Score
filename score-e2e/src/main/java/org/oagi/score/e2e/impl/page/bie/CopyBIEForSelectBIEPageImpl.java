@@ -21,7 +21,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIEForSelectBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -30,19 +30,19 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
+            By.xpath("//input[contains(@placeholder, \"DEN\")]");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"Business Context\")]");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -70,7 +70,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public WebElement getSubtitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
     }
 
     @Override
@@ -221,7 +221,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -233,7 +233,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }

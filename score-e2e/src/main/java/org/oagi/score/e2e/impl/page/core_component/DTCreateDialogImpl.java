@@ -8,9 +8,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class DTCreateDialogImpl implements DTCreateDialog {
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//span[contains(text(), \"DEN\")]//ancestor::div[1]/input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"DEN\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-content//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
@@ -35,13 +35,13 @@ public class DTCreateDialogImpl implements DTCreateDialog {
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select based DT".equals(getText(title));
+        assert "Select based DT".equals(getText(title.findElement(By.tagName("span"))));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//span[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class DTCreateDialogImpl implements DTCreateDialog {
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-content//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//tbody/tr[" + idx + "]"));
     }
 
     @Override

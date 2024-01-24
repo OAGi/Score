@@ -1,41 +1,46 @@
-<div class="close" *ngIf="resp.done">
-  <button mat-icon-button (click)="onNoClick()">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
-<div class="header">
-  <span>Module Set Release - XML Schema Validation</span>
-</div>
-
-<mat-progress-bar mode="indeterminate" *ngIf="!determinate"></mat-progress-bar>
-<mat-progress-bar mode="determinate" *ngIf="determinate"
-                  color="{{ invalidKeys.length > 0 ? 'warn' : 'primary' }}" value="{{ progress }}"></mat-progress-bar>
-<p *ngIf="!determinate">Generating schemas...</p>
-<p *ngIf="resp.progress > 0">{{ resp.progress }} / {{ resp.length }} ({{ progress }}% - {{ validKeys.length }} valid, {{ invalidKeys.length }} invalid)</p>
-
-<div class="content">
-  <p *ngIf="resp.done && invalidKeys.length === 0">
-    All schemas are valid.
-  </p>
-  <div>
-    <div class="invalid-list">
-      <ul *ngFor="let key of invalidKeys">
-        <li>{{ key }}: <b>{{ value(key) }}</b></li>
-      </ul>
-    </div>
-    <div class="valid-list">
-      <ul *ngFor="let key of validKeys">
-        <li>{{ key }}: {{ value(key) }}</li>
-      </ul>
+<div class="d-block">
+  <div class="header d-flex align-items-center" mat-dialog-title>
+    <span>Module Set Release - XML Schema Validation</span>
+    <div class="close pr-2">
+      <button mat-icon-button mat-small-icon-button (click)="onNoClick()" *ngIf="resp.done">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
   </div>
-</div>
 
-<div class="actions ml-auto">
-  <button mat-button class="btn" color="warn" (click)="onNoClick()" *ngIf="resp.done">
-    <span>Close</span>
-  </button>
-  <button mat-button class="btn" color="primary" (click)="copyToClipboard()" *ngIf="resp.done">
-    <span>Copy to clipboard</span>
-  </button>
+  <div class="content" mat-dialog-content>
+    <mat-progress-bar mode="indeterminate" *ngIf="!determinate"></mat-progress-bar>
+    <mat-progress-bar mode="determinate" *ngIf="determinate"
+                      color="{{ invalidKeys.length > 0 ? 'warn' : 'primary' }}" value="{{ progress }}"></mat-progress-bar>
+    <p *ngIf="!determinate">Generating schemas...</p>
+    <p *ngIf="resp.progress > 0">{{ resp.progress }} / {{ resp.length }} ({{ progress }}% - {{ validKeys.length }} valid, {{ invalidKeys.length }} invalid)</p>
+
+    <mat-card class="pt-2">
+      <mat-card-content class="result">
+        <p *ngIf="resp.done && invalidKeys.length === 0">
+          All schemas are valid.
+        </p>
+        <div>
+          <div class="invalid-list">
+            <ul *ngFor="let key of invalidKeys">
+              <li>{{ key }}: <b>{{ value(key) }}</b></li>
+            </ul>
+          </div>
+          <div class="valid-list">
+            <ul *ngFor="let key of validKeys">
+              <li>{{ key }}: {{ value(key) }}</li>
+            </ul>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="actions ml-auto" mat-dialog-actions>
+    <button mat-button class="btn" color="warn" (click)="onNoClick()" [disabled]="!resp.done">
+      <span>Close</span>
+    </button>
+    <button mat-button class="btn" color="primary" (click)="copyToClipboard()" [disabled]="!resp.done">
+      <span>Copy to clipboard</span>
+    </button>
+  </div>
 </div>

@@ -57,25 +57,25 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
     public static final By CONFIRM_DELETE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     private static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By CONFIRM_RESTORE_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Restore\")]//ancestor::button");
     public static final By CONTINUE_TO_CHANGE_STATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By REVISE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Revise\")]//ancestor::button[1]");
     public static final By CONTINUE_REVISE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Revise\")]//ancestor::button");
     private static final By AMEND_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Amend\")]//ancestor::button[1]");
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     private static final By CANCEL_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
     public static final By CONTINUE_CANCEL_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Okay\")]//ancestor::button");
     private static final By MOVE_TO_DRAFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Draft\")]//ancestor::button[1]");
     private static final By MOVE_TO_CANDIDATE_BUTTON_LOCATOR =
@@ -97,7 +97,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[text() = \"search\"]");
     private static final By COMMENT_BUTTON_LOCATOR =
-            By.xpath("//mat-icon[text() = \"comments\"]");
+            By.xpath("//mat-icon[text() = \"comments\"]//ancestor::button[1]");
 
     private final AgencyIDListObject agencyIDList;
 
@@ -126,8 +126,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
-        return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.xpath("//mat-card-title/span[1]"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -550,7 +549,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -562,7 +561,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -570,14 +569,14 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public WebElement getPreviousPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Previous page\"]"));
     }
 
     @Override
     public WebElement getNextPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Next page\"]"));
     }
 

@@ -79,7 +79,7 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
 
     @Override
     public void clickSignIn() {
-        click(getSignInButton());
+        click(getDriver(), getSignInButton());
     }
 
     @Override
@@ -97,7 +97,7 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
             assert homePage.getScoreLogo().isDisplayed();
         } catch (TimeoutException e) {
             try {
-                WebElement redirectedPageTitle = getDriver().findElement(By.cssSelector(".mat-card-title"));
+                WebElement redirectedPageTitle = getDriver().findElement(By.cssSelector(".mat-mdc-card-title"));
                 throw new SignInException(getText(redirectedPageTitle), e);
             } catch (NoSuchElementException ignore) {
                 throw new SignInException(getAlertMessage(), e);

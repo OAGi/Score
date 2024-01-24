@@ -24,13 +24,13 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
+            By.xpath("//input[contains(@placeholder, \"Name\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -57,12 +57,12 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
     public WebElement getSubtitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
     }
 
     @Override
@@ -148,7 +148,7 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
             hitSearchButton();
             WebElement tr = getTableRecordByValue(businessContext.getName());
             WebElement td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
         });
     }
 

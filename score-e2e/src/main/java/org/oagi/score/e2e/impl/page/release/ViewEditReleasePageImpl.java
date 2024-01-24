@@ -25,28 +25,28 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditReleasePage {
 
     private static final By CREATOR_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//span[contains(text(),\"Updater\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(),\"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//mat-label[contains(text(),\"Namespace\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By CREATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Created start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Created start date\")]");
 
     private static final By CREATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Created end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Created end date\")]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -57,13 +57,13 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
             By.xpath("//span[contains(text(), \"Move back to Initialized\")]//ancestor::button[1]");
 
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By NAME_FIELD_LOCATOR =
             By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DISCARD_RELEASE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     public ViewEditReleasePageImpl(BasePage parent) {
         super(parent);
@@ -199,7 +199,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getReleaseNumField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Release Num\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Release Num\")]"));
     }
 
     @Override
@@ -318,7 +318,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -330,7 +330,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -338,14 +338,14 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     @Override
     public WebElement getPreviousPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Previous page\"]"));
     }
 
     @Override
     public WebElement getNextPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Next page\"]"));
     }
 
@@ -409,10 +409,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
     }
+
     @Override
     public WebElement clickOnDropDownMenu(WebElement element) {
-        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return element.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]//ancestor::button[1]"));
     }
 }

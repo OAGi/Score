@@ -276,7 +276,6 @@ export class BieExpressComponent implements OnInit {
   toggleMetaHeaderOption(event, disabled: boolean,
                          includeMetaHeaderForJsonPropertyKey: string,
                          metaHeaderTopLevelAsbiepIdPropertyKey: string) {
-    event.preventDefault();
     if (disabled) {
       return;
     }
@@ -288,7 +287,7 @@ export class BieExpressComponent implements OnInit {
       this.option.packageOption = this.previousPackageOption;
     } else {
       const dialogConfig = new MatDialogConfig();
-      dialogConfig.minWidth = 1000;
+      dialogConfig.width = window.innerWidth + 'px';
       dialogConfig.data = {
         release: this.selectedRelease
       };
@@ -316,7 +315,6 @@ export class BieExpressComponent implements OnInit {
   togglePaginationResponseOption(event, disabled: boolean,
                                  includePaginationResponseForJsonPropertyKey: string,
                                  paginationResponseTopLevelAsbiepIdPropertyKey: string) {
-    event.preventDefault();
     if (disabled) {
       return;
     }
@@ -328,7 +326,7 @@ export class BieExpressComponent implements OnInit {
       this.option.packageOption = this.previousPackageOption;
     } else {
       const dialogConfig = new MatDialogConfig();
-      dialogConfig.minWidth = 1000;
+      dialogConfig.width = window.innerWidth + 'px';
       dialogConfig.data = {
         release: this.selectedRelease
       };

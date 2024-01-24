@@ -27,28 +27,28 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By BIE_DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"BIE DEN\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"BIE DEN\")]//ancestor::div[1]/input");
 
     private static final By BUSINESS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
 
     private static final By EXTERNAL_REFERENCE_URI_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"External Reference URI\")]//ancestor::div[1]/input");
 
     private static final By TYPE_CODE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
+            By.xpath("//mat-label[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
 
     private static final By PREFERRED_ONLY_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
+            By.xpath("//label[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//mat-icon[contains(text(), \"search\")]//ancestor::button[1]");
@@ -65,7 +65,7 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     private final List<String> bieTypes;
 
@@ -307,6 +307,6 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     public WebElement getSelectCheckboxAtIndex(int idx) {
         WebElement tr = getTableRecordAtIndex(idx);
         WebElement td = getColumnByName(tr, "select");
-        return td.findElement(By.xpath("mat-checkbox/label/span[1]"));
+        return td.findElement(By.xpath("mat-checkbox"));
     }
 }

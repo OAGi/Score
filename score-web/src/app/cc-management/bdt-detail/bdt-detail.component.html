@@ -1,8 +1,12 @@
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
-  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15" >
-    <div class="ui header">
-      <h3 class="dividing">Comment</h3>
-      <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
+  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15">
+    <div class="ui header d-flex align-items-center justify-content-between">
+      <h4 class="dividing">Comment</h4>
+      <div class="close">
+        <button mat-icon-button (click)="commentControl.closeCommentSlide()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
@@ -67,11 +71,11 @@
               <div class="container-fluid" *ngIf="searcher && dataSource">
                 <div class="row">
                   <div class="col-5 tree-search-box">
-                    <div class="row">
+                    <div class="row align-items-center">
                       <div class="col-9">
                         <mat-form-field>
-                          <mat-placeholder *ngIf="!selectedNode">Search</mat-placeholder>
-                          <mat-placeholder *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-placeholder>
+                          <mat-label *ngIf="!selectedNode">Search</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
@@ -84,24 +88,24 @@
                         </mat-form-field>
                       </div>
                       <div class="col-3 buttons">
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(-1)">
                           <mat-icon>keyboard_arrow_up</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
                                 (click)="move(1)">
                           <mat-icon>keyboard_arrow_down</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [hidden]="searcher.fullSearched"
                                 [disabled]="searcher.isSearching"
                                 [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
                                 (click)="search(searcher.inputKeyword, false, true)">
                           <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
                         </button>
-                        <button mat-icon-button
+                        <button mat-icon-button mat-small-icon-button
                                 [disabled]="searcher.isSearching"
                                 [hidden]="!searcher.inputKeyword"
                                 (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
@@ -116,7 +120,7 @@
                   </div>
                   <div class="col-7 actions-wrap">
                     <div class="actions ml-auto" *ngIf="isWorkingRelease()">
-                      <button mat-icon-button [id]="'cc-settings'"
+                      <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
                               [matMenuTriggerFor]="settingsContextMenu"
                               [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
                         <mat-icon>settings</mat-icon>
@@ -446,12 +450,14 @@
                         </div>
                         <div class="col-4">
                           <mat-form-field>
+                            <mat-label>Data Type Term</mat-label>
                             <input matInput placeholder="Data Type Term" maxlength="45"
                                    [(ngModel)]="asBdtDetail().dataTypeTerm" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-4">
                           <mat-form-field>
+                            <mat-label>Representation Term</mat-label>
                             <input matInput placeholder="Representation Term" maxlength="100"
                                    [(ngModel)]="asBdtDetail().representationTerm" [disabled]="true">
                           </mat-form-field>
@@ -461,6 +467,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field *ngIf="selectedNode.level === 0 && isEditable() && !hasRevision()">
+                            <mat-label>Namespace</mat-label>
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asBdtDetail().namespaceId"
                                         [required]="true">
@@ -475,6 +482,7 @@
                             </mat-select>
                           </mat-form-field>
                           <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
+                            <mat-label>Namespace</mat-label>
                             <mat-select placeholder="Namespace"
                                         [(ngModel)]="asBdtDetail().namespaceId"
                                         [required]="true"
@@ -489,6 +497,7 @@
                       <div class="row">
                         <div class="col-6">
                           <mat-form-field>
+                            <mat-label>Qualifier</mat-label>
                             <input matInput placeholder="Qualifier" maxlength="100"
                                    [(ngModel)]="asBdtDetail().qualifier"
                                    [disabled]="!isEditable() || hasRevision()"/>
@@ -584,7 +593,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtPriRestri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
-                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -616,7 +625,7 @@
                               <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
                             </table>
                             <mat-toolbar>
-                              <mat-toolbar-row>
+                              <mat-toolbar-row class="p-0">
                                 <mat-form-field class="pt-2 w-50 pl-2">
                                   <mat-label>Default</mat-label>
                                   <mat-select [(ngModel)]="asBdtDetail().defaultValueDomain">
@@ -637,6 +646,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="200"
                                    [(ngModel)]="asBdtDetail().definitionSource" [disabled]="!isEditable()">
                           </mat-form-field>
@@ -646,6 +656,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition</mat-label>
                             <textarea matInput rows="6" cols="30"
                                       placeholder="Definition"
                                       [(ngModel)]="asBdtDetail().definition"
@@ -657,6 +668,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Content Component Definition</mat-label>
                             <textarea matInput rows="6" cols="30"
                                       placeholder="Content Component Definition"
                                       [(ngModel)]="asBdtDetail().contentComponentDefinition"
@@ -840,17 +852,20 @@
                         </div>
                         <div class="col-md-9 col-sm-9">
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'none'">
+                            <mat-label>No value constraints</mat-label>
                             <input matInput placeholder="No value constraints"
                                    [disabled]="true">
                           </mat-form-field>
 
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'fixed'">
+                            <mat-label>Fixed Value</mat-label>
                             <input matInput placeholder="Fixed Value"
                                    [(ngModel)]="asBdtScDetail().fixedValue"
                                    [disabled]="!isEditable()">
                           </mat-form-field>
 
                           <mat-form-field *ngIf="asBdtScDetail().fixedOrDefault == 'default'">
+                            <mat-label>Default Value</mat-label>
                             <input matInput placeholder="Default Value"
                                    [(ngModel)]="asBdtScDetail().defaultValue"
                                    [disabled]="!isEditable()">
@@ -924,7 +939,7 @@
                                       <mat-option *ngFor="let codeList of filteredCodeLists(element)" [value]="codeList"
                                                   [disabled]="!isEditable() || element.bdtScPriRestri.inherited">
                                         <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.codeListName }}</span>
-                                        <span class="f12 ml-auto"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                        <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
                                       </mat-option>
                                     </mat-select>
                                   </mat-form-field>
@@ -956,7 +971,7 @@
                               <tr mat-row *cdkRowDef="let row; columns: restrictionListDisplayedColumns;"></tr>
                             </table>
                             <mat-toolbar>
-                              <mat-toolbar-row>
+                              <mat-toolbar-row class="p-0">
                                 <mat-form-field class="pt-2 w-50 pl-2">
                                   <mat-label>Default</mat-label>
                                   <mat-select [(ngModel)]="asBdtScDetail().defaultValueDomain">
@@ -977,6 +992,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="200"
                                    [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="!isEditable()">
                           </mat-form-field>
@@ -986,6 +1002,7 @@
                       <div class="row">
                         <div class="col-12">
                           <mat-form-field>
+                            <mat-label>Definition</mat-label>
                             <textarea matInput rows="6" cols="30"
                                       placeholder="Definition"
                                       [(ngModel)]="asBdtScDetail().definition"

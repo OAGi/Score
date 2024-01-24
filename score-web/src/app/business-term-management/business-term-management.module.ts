@@ -17,6 +17,7 @@ import {
   AssignedBusinessTermDetailComponent
 } from './assigned-business-term-detail/assigned-business-term-detail.component';
 import {BusinessTermUploadFileComponent} from './business-term-upload-file/business-term-upload-file.component';
+import {TranslateModule} from "@ngx-translate/core";
 
 const routes: Routes = [
   {
@@ -77,15 +78,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        TranslateModule
+    ],
   declarations: [
     BusinessTermListComponent,
     BusinessTermCreateComponent,
@@ -94,12 +96,6 @@ const routes: Routes = [
     AssignedBusinessTermListComponent,
     AssignBusinessTermBtComponent,
     AssignBusinessTermBieComponent,
-    AssignedBusinessTermDetailComponent
-  ],
-  entryComponents: [
-    BusinessTermListComponent,
-    AssignedBusinessTermListComponent,
-    AssignBusinessTermBtComponent,
     AssignedBusinessTermDetailComponent
   ],
   providers: [

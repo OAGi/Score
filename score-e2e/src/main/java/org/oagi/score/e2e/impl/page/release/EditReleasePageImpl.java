@@ -19,7 +19,7 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     private static final By RELEASE_NUMBER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Release Number\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(),\"Release Namespace\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(),\"Release Namespace\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By RELEASE_NOTE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Release Note\")]//ancestor::div[1]/textarea");
     private static final By RELEASE_LICENSE_FIELD_LOCATOR =
@@ -31,7 +31,7 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     private static final By BACK_TO_INITIALIZED_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Back to Initialized\")]//ancestor::button[1]");
     public static final By CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     private static final By PUBLISH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Publish\")]//ancestor::button[1]");
 

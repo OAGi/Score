@@ -27,7 +27,7 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CODE_LIST_FIELD_LOCATOR =
-            By.xpath("//mat-card-content//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By UPLIFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
@@ -49,7 +49,7 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

@@ -69,7 +69,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
 
     @Override
     public String getPasswordErrorMessage() {
-        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../..//mat-error")));
+        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../../..//mat-error")));
     }
 
     @Override

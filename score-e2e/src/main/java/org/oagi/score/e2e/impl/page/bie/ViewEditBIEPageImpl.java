@@ -9,10 +9,7 @@ import org.oagi.score.e2e.page.bie.CreateBIEForSelectBusinessContextsPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -24,10 +21,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -36,19 +33,19 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"DEN\")]");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"Business Context\")]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -199,6 +196,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     public void hitSearchButton() {
         click(getSearchButton());
         invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(1000L));
     }
 
     @Override
@@ -219,7 +217,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -231,7 +229,7 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public int getTotalNumberOfItems() {
         WebElement paginatorRangeLabelElement = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[@class = \"mat-paginator-range-label\"]"));
+                By.xpath("//div[@class = \"mat-mdc-paginator-range-label\"]"));
         String paginatorRangeLabel = getText(paginatorRangeLabelElement);
         return Integer.valueOf(paginatorRangeLabel.substring(paginatorRangeLabel.indexOf("of") + 2).trim());
     }
@@ -239,14 +237,14 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
     @Override
     public WebElement getPreviousPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Previous page\"]"));
     }
 
     @Override
     public WebElement getNextPageButton() {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//div[contains(@class, \"mat-paginator-range-actions\")]" +
+                "//div[contains(@class, \"mat-mdc-paginator-range-actions\")]" +
                         "//button[@aria-label = \"Next page\"]"));
     }
 
@@ -301,7 +299,12 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
                 throw new NoSuchElementException("Cannot locate a BIE using " + topLevelASBIEP.getDen());
             }
             WebElement tdName = td.findElement(By.tagName("a"));
-            click(tdName);
+            try {
+                click(tdName);
+            } catch (ElementNotInteractableException e) {
+                String href = tdName.getAttribute("href");
+                getDriver().get(href);
+            }
             waitFor(ofMillis(500L));
             invisibilityOfLoadingContainerElement(getDriver());
 
@@ -329,8 +332,11 @@ public class ViewEditBIEPageImpl extends BasePageImpl implements ViewEditBIEPage
             String href = link.getAttribute("href");
             String topLevelAsbiepId = href.substring(href.indexOf("/profile_bie/") + "/profile_bie/".length());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().getTopLevelASBIEPByID(new BigInteger(topLevelAsbiepId));
-
-            click(link);
+            try {
+                click(link);
+            } catch (ElementNotInteractableException e) {
+                getDriver().get(href);
+            }
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this, topLevelASBIEP);
             assert editBIEPage.isOpened();

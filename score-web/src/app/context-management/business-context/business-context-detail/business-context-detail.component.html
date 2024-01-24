@@ -1,9 +1,13 @@
 <div class="context-section">
-  <mat-card class="pt-4 pb-2">
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
-    <mat-card class="mb-2">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
+
+  <div class="p-3">
+    <mat-card>
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
@@ -11,13 +15,12 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-  </mat-card>
+  </div>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Business Context Values</mat-card-title>
-    </mat-card-header>
-
+  <div class="p-3">
+    <mat-toolbar class="bg-white">
+      <span class="title">Business Context Values</span>
+    </mat-toolbar>
     <mat-card>
       <mat-card-content class="mat-card-container">
         <div class="mat-elevation-z1">
@@ -67,15 +70,14 @@
             [pageSizeOptions]="[10, 25, 50]"
             showFirstLastButtons></mat-paginator>
         </div>
-
       </mat-card-content>
-
-      <mat-card-actions style="padding: 8px 0 8px 12px;">
+      <mat-card-actions style="padding: 16px 0 0 0;">
         <button mat-raised-button (click)="openDialog();" color="primary">
           <mat-icon>add</mat-icon>
           Add
         </button>
-        <button mat-raised-button (click)="removeBizCtxValues()" [hidden]="dataSource.data.length == 0"
+        <button mat-raised-button (click)="removeBizCtxValues()" class="ml-2"
+                [hidden]="dataSource.data.length == 0"
                 [disabled]="this.selection.selected.length == 0"
                 color="warn">
           <mat-icon>delete</mat-icon>
@@ -83,7 +85,7 @@
         </button>
       </mat-card-actions>
     </mat-card>
-  </mat-card>
+  </div>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

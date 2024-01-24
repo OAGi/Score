@@ -14,7 +14,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CreateOpenAPIDocumentPageImpl extends BasePageImpl implements CreateOpenAPIDocumentPage {
 
     private static final By OPENAPI_VERSION_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"OpenAPI Version\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"OpenAPI Version\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -70,7 +70,7 @@ public class CreateOpenAPIDocumentPageImpl extends BasePageImpl implements Creat
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
 

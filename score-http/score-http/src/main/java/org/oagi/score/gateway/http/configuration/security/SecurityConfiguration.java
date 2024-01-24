@@ -140,7 +140,7 @@ public class SecurityConfiguration {
     @ConditionalOnProperty(name = "resource-server.jwk-set-uri", matchIfMissing = false)
     @Order(1)
     public SecurityFilterChain externalFilterChain(HttpSecurity http
-    // , HandlerMappingIntrospector introspector
+                                                   // , HandlerMappingIntrospector introspector
     )
             throws Exception {
         if (!applicationConfigurationService.isTenantEnabled() && StringUtils.hasText(jwkSetUri)) {
@@ -229,6 +229,13 @@ public class SecurityConfiguration {
                             .loginPage("/login")
                             .loginProcessingUrl("/oauth2/code/*")
                             .successHandler(authenticationSuccessHandler)
+                            .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
+                                @Override
+                                public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                    logger.error("OAuth2 login failure", exception);
+                                    super.onAuthenticationFailure(request, response, exception);
+                                }
+                            })
                             .authorizedClientService(oAuth2AuthorizedClientService)
                             .authorizationEndpoint(authorizationEndpointConfig -> {
                                 authorizationEndpointConfig

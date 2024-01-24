@@ -48,7 +48,7 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -145,7 +145,7 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
 
         WebElement tr = getTableRecordByValue(contextCategory.getName());
         WebElement td = getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(td.findElement(By.xpath("mat-checkbox")));
         click(getRemoveBusinessContextValueButton());
 
         assert "Remove Business Context?".equals(getDialogTitle(getDriver()));

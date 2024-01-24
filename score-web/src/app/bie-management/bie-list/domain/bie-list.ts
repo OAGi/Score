@@ -37,6 +37,13 @@ export class BieListRequest {
       release.releaseId = Number(e);
       return release;
     })) : [];
+    if (this.releases.length === 0 && params.get('releaseId')) {
+      const release = new SimpleRelease();
+      release.releaseId = Number(params.get('releaseId'));
+      if (release.releaseId >= 0) {
+        this.releases = [release];
+      }
+    }
     this.page.sortActive = params.get('sortActive');
     if (this.page.sortActive !== '' && !this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';

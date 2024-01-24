@@ -88,6 +88,7 @@ export class BusinessContextDetailComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.panelClass = ['center-dialog'];
+    dialogConfig.height = 'fit-content';
     dialogConfig.data = new BusinessContextValue();
 
     if (businessContextValue) { // deep copy

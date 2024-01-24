@@ -72,7 +72,7 @@ public class CreateContextSchemePageImpl extends BasePageImpl implements CreateC
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -217,7 +217,7 @@ public class CreateContextSchemePageImpl extends BasePageImpl implements CreateC
     public void toggleContextSchemeValue(String value) {
         WebElement tr = getTableRecordByValue(value);
         WebElement td = getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(td.findElement(By.xpath("mat-checkbox")));
     }
 
     @Override

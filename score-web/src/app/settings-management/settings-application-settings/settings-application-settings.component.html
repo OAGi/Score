@@ -7,10 +7,11 @@
     <score-settings-menu active="ApplicationSettings"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>{{ title }}</mat-card-title>
-          </mat-card-header>
+        <mat-card class="p-0">
+          <mat-toolbar class="bg-white">
+            <span class="title">{{ title }}</span>
+            <span class="flex-11-auto"></span>
+          </mat-toolbar>
           <mat-card class="mb-2">
             <mat-card-content class="mat-card-container">
               <div>
@@ -481,13 +482,14 @@
                   </div>
                 </div>
                 <div class="actions pt-2">
-                  <button mat-raised-button color="primary"
-                          (click)="updateWebPageInfo()">
-                    Update
-                  </button>
-                  <div class="pt-2 d-flex align-items-center info">
-                    <mat-icon fontIcon="info"></mat-icon>
-                    <mat-label class="pl-1">Some changes will take effect on users after they sign in again.</mat-label>
+                  <div>
+                    <button mat-raised-button color="primary" (click)="updateWebPageInfo()">
+                      Update
+                    </button>
+                    <div class="pt-2 d-flex align-items-center info">
+                      <mat-icon fontIcon="info"></mat-icon>
+                      <mat-label class="pl-1">Some changes will take effect on users after they sign in again.</mat-label>
+                    </div>
                   </div>
                 </div>
               </div>

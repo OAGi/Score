@@ -76,7 +76,7 @@ export class CreateBccpDialogComponent implements OnInit {
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.request.types = ['DT'];
-    this.request.dtTypes = [];
+    this.request.dtTypes = ['BDT'];
     this.request.states = ['Published'];
     this.request.excludes = this.data.excludes ? this.data.excludes : [];
     this.request.states = [];

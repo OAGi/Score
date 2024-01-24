@@ -1,8 +1,12 @@
 <mat-sidenav-container class="example-container" [hasBackdrop]="false">
   <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15">
-    <div class="ui header">
-      <h3 class="dividing">Comment</h3>
-      <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
+    <div class="ui header d-flex align-items-center justify-content-between">
+      <h4 class="dividing">Comment</h4>
+      <div class="close">
+        <button mat-icon-button (click)="commentControl.closeCommentSlide()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="ui feed">
       <div class="event" *ngFor="let comment of commentControl.comments" [class.new-message]="comment.isNew">
@@ -60,14 +64,13 @@
       <div class="loading-container" *ngIf="isUpdating">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
-      <mat-card class="pt-4 pb-2">
-        <mat-card-header class="display-flow-root">
-          <mat-card-title class="float-left">
-            <span>{{ title }}</span>
-            <span><mat-icon class="btn-comment" (click)="openComments()">comments</mat-icon></span>
-          </mat-card-title>
-          <div class="action-group float-right mt-n2">
-            <div class="col-12 actions-wrap" *ngIf="isWorkingRelease()">
+      <div class="pl-2 pr-2">
+        <mat-toolbar class="bg-white">
+          <span class="title">{{ title }}</span>
+          <button mat-icon-button (click)="openComments()"><mat-icon>comments</mat-icon></button>
+          <span class="flex-11-auto"></span>
+          <div class="action-group">
+            <div class="actions-wrap" *ngIf="isWorkingRelease()">
               <button mat-raised-button color="primary" (click)="update()"
                       *ngIf="state === 'WIP' && access === 'CanEdit'"
                       [disabled]="updateDisabled">
@@ -107,7 +110,7 @@
                 Cancel
               </button>
             </div>
-            <div class="col-12 actions-wrap" *ngIf="!isWorkingRelease()">
+            <div class="actions-wrap" *ngIf="!isWorkingRelease()">
               <button mat-raised-button color="accent" (click)="derive()"
                       *ngIf="agencyIdList.state === 'Published' &&
                              agencyIdList.releaseState === 'Published' &&
@@ -154,9 +157,11 @@
               </button>
             </div>
           </div>
-        </mat-card-header>
+        </mat-toolbar>
+      </div>
 
-        <mat-card class="mb-2">
+      <div class="p-3">
+        <mat-card>
           <mat-card-content class="mat-card-container">
             <div class="row">
               <div class="col-2">
@@ -246,10 +251,10 @@
             </div>
 
             <div class="row">
-              <div class="col-4">
+              <div class="col-4" style="padding-top: 5px;">
                 <mat-form-field>
                   <mat-label>Definition</mat-label>
-                  <textarea rows="5" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition"
+                  <textarea rows="4" cols="30" matInput data-id="agencyIdList.definition" [(ngModel)]="agencyIdList.definition"
                             [disabled]="access !== 'CanEdit'"></textarea>
                 </mat-form-field>
               </div>
@@ -313,16 +318,16 @@
             </div>
           </mat-card-content>
         </mat-card>
-      </mat-card>
+      </div>
 
-      <mat-card>
-        <mat-card-header class="align-items-baseline">
-          <mat-card-title>Agency ID List Values</mat-card-title>
+      <div class="p-3">
+        <mat-toolbar class="bg-white">
+          <span class="title">Agency ID List Values</span>
           <div style="padding: 8px 0 8px 12px;" *ngIf="state === 'WIP' && access === 'CanEdit'">
             <button mat-raised-button class="mr-2" (click)="openDialog()" color="primary"
                     [disabled]="access !== 'CanEdit' || isDisabled(agencyIdList)">
               <mat-icon>add</mat-icon>
-              Add
+              <span class="ml-2">Add</span>
             </button>
             <button mat-raised-button class="mr-2" (click)="removeAgencyIdListValues()"
                     [hidden]="dataSource.data.length == 0"
@@ -332,10 +337,9 @@
               Remove
             </button>
           </div>
-        </mat-card-header>
-
+        </mat-toolbar>
         <mat-card>
-          <mat-card-header>
+          <mat-card-header class="pt-0">
             <mat-card-subtitle>
               <mat-form-field>
                 <mat-label>Search</mat-label>
@@ -411,7 +415,7 @@
             </div>
           </mat-card-content>
         </mat-card>
-      </mat-card>
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

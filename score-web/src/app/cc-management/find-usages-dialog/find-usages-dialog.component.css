@@ -175,7 +175,7 @@
   margin: 0;
 }
 
-.tree-search-box .mat-form-field {
+.tree-search-box .mat-mdc-form-field {
   font-size: 12px;
 }
 
@@ -233,4 +233,42 @@
 button:focus, button:active:focus, button.active:focus {
   outline: none !important;
   outline-style: none !important;
+}
+
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-top: 8px;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.content {
+  max-height: fit-content;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 0 24px;
 }

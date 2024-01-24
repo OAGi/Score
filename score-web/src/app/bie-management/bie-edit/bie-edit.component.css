@@ -149,7 +149,7 @@
 }
 
 .bie-edit-detail-container div.checkbox {
-  padding: 10px 0 20px 0;
+  padding: 8px 0 18px 0;
 }
 
 .bie-edit-detail-panel {
@@ -169,27 +169,14 @@
 }
 
 .tree-search-box {
+  align-items: center;
 }
 
 .tree-search-box .mat-form-field-wrapper {
   padding: 0 !important;
 }
 
-.tree-search-box .buttons {
-  display: inline-flex;
-  align-items: baseline;
-  padding-top: 4px;
-}
-
-.tree-search-box button, .actions-wrap .mat-icon-button {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  margin-right: 0.5rem;
-  outline: none;
-}
-
-.tree-search-box .mat-form-field {
+.tree-search-box .mat-mdc-form-field {
   font-size: 12px;
 }
 
@@ -198,9 +185,12 @@
   padding-bottom: 0;
 }
 
-.tree-search-box .mat-icon, .actions-wrap .mat-icon-button {
-  width: 24px;
-  height: 24px;
+.tree-search-box .buttons {
+  display: flex;
+  padding-top: 6px;
+}
+
+.tree-search-box .mat-icon {
   cursor: pointer;
 }
 

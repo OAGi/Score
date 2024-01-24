@@ -10,13 +10,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialog {
 
     private static final By LOGIN_ID_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//input[contains(@placeholder, \"Login ID\")]");
 
     private static final By NAME_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Name\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//input[contains(@placeholder, \"Name\")]");
 
     private static final By ORGANIZATION_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Organization\")]//ancestor::div[1]/input");
+            = By.xpath("//score-transfer-ownership-dialog//input[contains(@placeholder, \"Organization\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -49,7 +49,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"title\")]"));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -142,7 +142,7 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
                 throw new NoSuchElementException("Cannot locate an account using " + loginID);
             }
             td = getColumnByName(tr, "select");
-            click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+            click(td.findElement(By.xpath("mat-checkbox")));
 
             click(getTransferButton());
             invisibilityOfLoadingContainerElement(getDriver());

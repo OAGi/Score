@@ -55,7 +55,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
             = By.xpath("//mat-dialog-container//p");
 
     private static final By CONTINUE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Continue\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Continue\")]//ancestor::button");
 
     private final ViewEditContextSchemePageImpl parent;
 
@@ -82,7 +82,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     }
 
     @Override
-    public LoadFromCodeListDialog continuToLoadFromCodeListDialog() {
+    public LoadFromCodeListDialog continueToLoadFromCodeListDialog() {
         return retry(() -> {
             click(elementToBeClickable(getDriver(), CONTINUE_BUTTON_IN_DIALOG_LOCATOR));
             LoadFromCodeListDialog loadFromCodeListDialog = new LoadFromCodeListDialogImpl(this);
@@ -250,7 +250,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
     public void toggleContextSchemeValue(String value) {
         WebElement tr = getTableRecordByValue(value);
         WebElement td = getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(td.findElement(By.xpath("mat-checkbox")));
     }
 
     @Override

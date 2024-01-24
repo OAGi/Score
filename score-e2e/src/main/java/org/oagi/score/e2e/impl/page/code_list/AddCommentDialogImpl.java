@@ -16,7 +16,7 @@ public class AddCommentDialogImpl implements AddCommentDialog {
     private static final By COMMENT_FIELD_LOCATOR =
             By.xpath("//mat-sidenav//mat-form-field//textarea");
     private static final By CLOSE_BUTTON_LOCATOR =
-            By.xpath("//div/mat-icon[contains(text(), \"close\")]");
+            By.xpath("//mat-sidenav//mat-icon[contains(text(), \"close\")]//ancestor::button[1]");
 
     private final BasePageImpl parent;
 
@@ -40,7 +40,7 @@ public class AddCommentDialogImpl implements AddCommentDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav//h3"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-sidenav//h4"));
     }
 
     @Override

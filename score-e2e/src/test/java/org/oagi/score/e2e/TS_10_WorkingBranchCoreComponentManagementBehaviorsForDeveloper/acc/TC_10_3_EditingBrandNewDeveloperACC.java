@@ -201,7 +201,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"header\")]"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
     }
 
     @Test
@@ -437,6 +437,6 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
         assertTrue(snackBarMessage.contains("Namespace is required."));
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//snack-bar-container//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
     }
 }

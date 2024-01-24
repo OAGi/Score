@@ -94,13 +94,8 @@ export class BieEditAbieNode extends BieEditNode {
   businessContexts: BusinessContext[] = [];
 
   access: string;
-  topLevelAsbiepState: string;
-  deprecated: boolean;
   deprecatedReason: string;
   deprecatedRemark: string;
-  inverseMode: boolean;
-
-  bieForOasDoc: BieForOasDoc;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -120,13 +115,11 @@ export class BieEditAbieNode extends BieEditNode {
       this.deprecatedReason = abie.deprecatedReason;
       this.deprecatedRemark = abie.deprecatedRemark;
       this.inverseMode = abie.inverseMode;
-
-      this.bieForOasDoc = new BieForOasDoc(abie.bieForOasDoc);
     }
   }
 
   get hashCode(): number {
-    return super.hashCode + ((this.inverseMode) ? 1 : 0) + ((!!this.bieForOasDoc) ? this.bieForOasDoc.hashCode : 0);
+    return super.hashCode + ((this.inverseMode) ? 1 : 0);
   }
 }
 
@@ -267,8 +260,7 @@ export class BieDetailUpdateRequest {
       topLevelAsbiepDetail: this.topLevelAsbiepDetail ? {
         version: this.topLevelAsbiepDetail.version,
         status: this.topLevelAsbiepDetail.status,
-        inverseMode: this.topLevelAsbiepDetail.inverseMode,
-        bieForOasDoc: this.topLevelAsbiepDetail.bieForOasDoc.json
+        inverseMode: this.topLevelAsbiepDetail.inverseMode
       } : {},
       abieDetails: this.abieDetails.map(e => e.json),
       asbieDetails: this.asbieDetails.map(e => e.json),

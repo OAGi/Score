@@ -21,7 +21,7 @@ public class NewAccountPageImpl extends BasePageImpl implements NewAccountPage {
             By.xpath("//mat-label[contains(text(), \"Organization\")]//ancestor::div[1]/input");
 
     private static final By DEVELOPER_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Standard Developer\")]");
+            By.xpath("//label[contains(text(), \"Standard Developer\")]");
 
     private static final By ADMIN_CHECKBOX_LOCATOR =
             By.xpath("//span[contains(text(), \"Admin\")]");
@@ -53,7 +53,7 @@ public class NewAccountPageImpl extends BasePageImpl implements NewAccountPage {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -152,6 +152,6 @@ public class NewAccountPageImpl extends BasePageImpl implements NewAccountPage {
 
     @Override
     public String getPasswordErrorMessage() {
-        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../..//mat-error")));
+        return getText(visibilityOfElementLocated(getDriver(), By.xpath("//input[@data-id=\"user.newPassword\"]/../../../..//mat-error")));
     }
 }

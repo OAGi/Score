@@ -21,7 +21,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -82,7 +82,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Name\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Name\")]"));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
@@ -327,7 +327,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getDefinitionField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Definition\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Definition\")]"));
     }
 
     @Override
@@ -355,7 +355,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getModuleField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Module\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Module\")]"));
     }
 
     @Override
@@ -382,7 +382,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getUpdatedDateField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Updated start date\")]"));
     }
 
     @Override

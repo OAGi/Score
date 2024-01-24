@@ -12,14 +12,14 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog {
     private static final By MODULE_DIRECTORY_NAME_FIELD_LOCATOR =
-            By.xpath("//mat-dialog-content//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
 
     private static final By UPDATE_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By DISCARD_MODULE_DIRECTORY_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button[1]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard anyway\")]//ancestor::button");
     private static final By DISCARD_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
 
@@ -45,7 +45,7 @@ public class EditModuleDirectoryDialogImpl implements EditModuleDirectoryDialog 
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override

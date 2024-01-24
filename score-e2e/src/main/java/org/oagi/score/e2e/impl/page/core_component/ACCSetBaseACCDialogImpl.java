@@ -31,19 +31,19 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"DEN\")]");
 
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"Definition\")]");
 
     private static final By MODULE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Module\")]//ancestor::mat-form-field//input");
+            By.xpath("//input[contains(@placeholder, \"Module\")]");
 
     private static final By SEARCH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
@@ -72,13 +72,13 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to set a base ACC".equals(getText(title));
+        assert "Select ACC to set a base ACC".equals(getText(title.findElement(By.tagName("span"))));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title[contains(@class, \"mat-card-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public String getDENFieldLabel() {
-        return getDENField().getAttribute("data-placeholder");
+        return getDENField().getAttribute("placeholder");
     }
 
     @Override
@@ -197,7 +197,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
 
     @Override
     public String getModuleFieldLabel() {
-        return getModuleField().getAttribute("data-placeholder");
+        return getModuleField().getAttribute("placeholder");
     }
 
     @Override
@@ -243,7 +243,7 @@ public class ACCSetBaseACCDialogImpl implements ACCSetBaseACCDialog {
     @Override
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::div[5]"));
+                By.xpath("//mat-dialog-container//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
         click(itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),

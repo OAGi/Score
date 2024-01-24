@@ -53,9 +53,6 @@ const routes: Routes = [
     BusinessContextDetailComponent,
     BusinessContextValueDialogComponent,
   ],
-  entryComponents: [
-    BusinessContextValueDialogComponent,
-  ],
   providers: [
     ContextSchemeService,
     BusinessContextService

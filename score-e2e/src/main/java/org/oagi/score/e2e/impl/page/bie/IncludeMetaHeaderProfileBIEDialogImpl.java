@@ -6,31 +6,34 @@ import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.bie.IncludeMetaHeaderProfileBIEDialog;
 import org.openqa.selenium.*;
 
+import java.io.File;
+
 import static org.oagi.score.e2e.impl.PageHelper.*;
+import static org.openqa.selenium.OutputType.FILE;
 
 public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderProfileBIEDialog {
 
     private static final By STATE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Business Context\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Business Context\")]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated start date\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@data-placeholder, \"Updated end date\")]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"Updated end date\")]");
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//*[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By SELECT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
+            By.id("btn-meta-header-dialog-select");
     private final BasePageImpl parent;
 
     public IncludeMetaHeaderProfileBIEDialogImpl(BasePageImpl parent) {
@@ -53,7 +56,7 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
     }
 
     @Override
@@ -92,8 +95,10 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
         retry(() -> {
             WebElement tr = getTableRecordByValue(metaHeaderASBIEP.getDen());
             WebElement td = getColumnByName(tr, "select");
-            WebElement ele = td.findElement(By.xpath("mat-checkbox/label/span[1]"));
-            click(getDriver(), ele);
+            WebElement ele = td.findElement(By.xpath("mat-checkbox"));
+            if (!isChecked(ele)) {
+                click(getDriver(), ele);
+            }
         });
         click(getSelectButton());
         invisibilityOfLoadingContainerElement(getDriver());

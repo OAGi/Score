@@ -29,10 +29,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class HomePageImpl extends BasePageImpl implements HomePage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By USER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"User\")]//ancestor::mat-form-field[1]//mat-select//div[contains(@class, \"mat-select-arrow-wrapper\")]");
+            By.xpath("//*[contains(text(), \"User\")]//ancestor::mat-form-field[1]//mat-select");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
@@ -118,12 +118,12 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
     @Override
     public WebElement getBIEsTab() {
-        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"BIEs\")]"));
+        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//div[contains(@class, \"mat-mdc-tab\")]//span[contains(text(), \"BIEs\")]"));
     }
 
     @Override
     public WebElement getUserExtensionsTab() {
-        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//mat-tab-header//div[contains(text(),\"User Extensions\")]"));
+        return visibilityOfElementLocated(defaultWait(getDriver()), By.xpath("//div[contains(@class, \"mat-mdc-tab\")]//span[contains(text(), \"User Extensions\")]"));
     }
 
 
@@ -144,7 +144,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         retry(() -> {
             click(getDriver(), getBranchSelectField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]/span"));
+                    By.xpath("//span[contains(text(), \"" + branch + "\")]//ancestor::mat-option[1]"));
             click(getDriver(), optionField);
             waitFor(ofMillis(500L));
         });
@@ -350,7 +350,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             try {
                 retry(() -> {
                     WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                            By.xpath("//div[contains(@class, \"bies-by-users-and-states\")]//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
                     click(getDriver(), itemsPerPageField);
                     waitFor(Duration.ofMillis(500L));
                     WebElement itemField = elementToBeClickable(getDriver(),
@@ -481,7 +481,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             try {
                 retry(() -> {
                     WebElement itemsPerPageField = elementToBeClickable(getDriver(),
-                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//div[.=\" Items per page: \"]/following::div[5]"));
+                            By.xpath("//div[contains(@class, \"cc-exts-by-users-and-states\")]//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
                     click(getDriver(), itemsPerPageField);
                     waitFor(Duration.ofMillis(500L));
                     WebElement itemField = elementToBeClickable(getDriver(),

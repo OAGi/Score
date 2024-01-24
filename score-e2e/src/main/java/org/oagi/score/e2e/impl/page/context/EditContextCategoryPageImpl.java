@@ -20,7 +20,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
     private static final By DISCARD_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
 
     private static final By DISCARD_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Discard\")]//ancestor::button");
 
     private final ViewEditContextCategoryPageImpl parent;
 
@@ -47,7 +47,7 @@ public class EditContextCategoryPageImpl extends BasePageImpl implements EditCon
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

@@ -36,12 +36,12 @@ tr.element-row:not(.expanded-row):active {
   color: #767676 !important;
 }
 
-.mat-card-content p {
+.mat-mdc-card-content p {
   font-family: 'Roboto', 'sans-serif';
   margin-bottom: 0.5rem;
 }
 
-.mat-card-content {
+.mat-mdc-card-content {
   margin-bottom: 0;
 }
 
@@ -78,4 +78,38 @@ tr.element-row:not(.expanded-row):active {
 
 .f12 {
   font-size: 12px;
+}
+
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-top: 8px;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 0 24px;
 }

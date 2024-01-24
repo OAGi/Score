@@ -17,9 +17,6 @@ import {SearchOptionsService} from './domain/search-options-service';
   declarations: [
     SearchOptionsDialogComponent,
   ],
-  entryComponents: [
-    SearchOptionsDialogComponent
-  ],
   providers: [
     SearchOptionsService
   ]

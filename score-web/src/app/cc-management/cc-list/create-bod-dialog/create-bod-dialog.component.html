@@ -53,13 +53,14 @@
 
               <div class="col-md-3 col-sm-12 d-flex">
                 <mat-form-field>
+                  <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                          [max]="verbRequest.updatedDate.end" [value]="verbRequest.updatedDate.start"
                          (dateInput)="onDateEvent('startDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                   <div class="mat-form-field-flex">
                     <div class="mat-form-field-infix">
                       <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -70,13 +71,14 @@
 
               <div class="col-md-3 col-sm-12 d-flex">
                 <mat-form-field>
+                  <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                          [min]="verbRequest.updatedDate.start" [value]="verbRequest.updatedDate.end"
                          (dateInput)="onDateEvent('endDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                   <div class="mat-form-field-flex">
                     <div class="mat-form-field-infix">
                       <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -113,7 +115,7 @@
           <button mat-raised-button color="primary" type="submit"
                   (click)="this.verbPaginator.pageIndex = 0; this.loadCcList('verb');">
             <mat-icon>search</mat-icon>
-            Search
+            <span class="ml-2">Search</span>
           </button>
         </mat-card-actions>
       </mat-card>
@@ -257,13 +259,14 @@
 
               <div class="col-md-3 col-sm-12 d-flex">
                 <mat-form-field>
+                  <mat-label>Updated start date</mat-label>
                   <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                          [max]="nounRequest.updatedDate.end" [value]="nounRequest.updatedDate.start"
                          (dateInput)="onDateEvent('startDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
                   <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                   <div class="mat-form-field-flex">
                     <div class="mat-form-field-infix">
                       <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
@@ -274,13 +277,14 @@
 
               <div class="col-md-3 col-sm-12 d-flex">
                 <mat-form-field>
+                  <mat-label>Updated end date</mat-label>
                   <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                          [min]="nounRequest.updatedDate.start" [value]="nounRequest.updatedDate.end"
                          (dateInput)="onDateEvent('endDate', $event)">
                   <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
                   <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
                   <div class="mat-form-field-flex">
                     <div class="mat-form-field-infix">
                       <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
@@ -317,7 +321,7 @@
           <button mat-raised-button color="primary" type="submit"
                   (click)="this.nounPaginator.pageIndex = 0; this.loadCcList('noun');">
             <mat-icon>search</mat-icon>
-            Search
+            <span class="ml-2">Search</span>
           </button>
         </mat-card-actions>
       </mat-card>

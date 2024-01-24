@@ -45,7 +45,7 @@ public class CreateBusinessContextPageImpl extends BasePageImpl implements Creat
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class CreateBusinessContextPageImpl extends BasePageImpl implements Creat
 
         WebElement tr = getTableRecordByValue(contextCategory.getName());
         WebElement td = getColumnByName(tr, "select");
-        click(td.findElement(By.xpath("mat-checkbox/label/span[1]")));
+        click(td.findElement(By.xpath("mat-checkbox")));
         click(getRemoveBusinessContextValueButton());
 
         assert "Remove Business Context?".equals(getDialogTitle(getDriver()));

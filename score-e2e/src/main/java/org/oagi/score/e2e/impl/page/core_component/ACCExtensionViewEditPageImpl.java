@@ -19,9 +19,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExtensionViewEditPage {
 
     public static final By CONTINUE_AMEND_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By CONTINUE_DELETE_BUTTON_IN_DIALOG_LOCATOR =
-            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button/span");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Delete anyway\")]//ancestor::button");
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
@@ -39,15 +39,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//*[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
-    private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-placeholder[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+    private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
+            By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By APPEND_PROPERTY_AT_LAST_OPTION_LOCATOR =
@@ -94,7 +94,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     public WebElement getTitle() {
         invisibilityOfLoadingContainerElement(getDriver());
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                By.cssSelector("mat-tab-header div.mat-tab-label"));
+                By.xpath("//mat-tab-header//div[@class=\"mat-mdc-tab-labels\"]/div[contains(@class, \"mdc-tab\")][1]"));
     }
 
     @Override
@@ -174,7 +174,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
     @Override
     public String getObjectClassTermFieldLabel() {
-        return getObjectClassTermField().getAttribute("data-placeholder");
+        return getObjectClassTermField().getAttribute("placeholder");
     }
 
     @Override
@@ -313,8 +313,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
-    public WebElement getSearchField() {
-        return elementToBeClickable(getDriver(), SEARCH_FIELD_LOCATOR);
+    public WebElement getSearchInputTextField() {
+        return elementToBeClickable(getDriver(), SEARCH_INPUT_TEXT_FIELD_LOCATOR);
     }
 
     @Override
@@ -335,9 +335,15 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     private WebElement goToNode(String path) {
-        WebElement searchInput = getSearchField();
-        click(searchInput);
-        WebElement node = sendKeys(searchInput, path);
+        WebElement searchInput = getSearchInputTextField();
+        click(getDriver(), searchInput);
+        WebElement node = retry(() -> {
+            WebElement e = sendKeys(searchInput, path);
+            if (!path.equals(getText(searchInput))) {
+                throw new WebDriverException();
+            }
+            return e;
+        });
         node.sendKeys(Keys.ENTER);
         click(node);
         clear(searchInput);

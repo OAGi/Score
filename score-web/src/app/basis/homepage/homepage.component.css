@@ -142,12 +142,12 @@ a {
   color: #767676 !important;
 }
 
-.mat-card-content p {
+.mat-mdc-card-content p {
   font-family: 'Roboto', 'sans-serif';
   margin-bottom: 0.5rem;
 }
 
-.mat-card-content {
+.mat-mdc-card-content {
   margin-bottom: 0;
 }
 
@@ -174,7 +174,7 @@ a {
   width: 160px;
 }
 
-td.mat-cell {
+td.mat-mdc-cell {
   border-bottom-width: 0;
 }
 
@@ -182,7 +182,7 @@ td.mat-cell {
   width: 20%;
 }
 
-.mat-tab-body-content {
+.mat-mdc-tab-body-content {
   overflow-x: hidden !important;
 }
 

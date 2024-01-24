@@ -20,7 +20,7 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
     private static final By UPDATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Update\")]//ancestor::button[1]");
     private static final By STANDARD_CHECKBOX_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(),\"Standard\")]//ancestor::mat-checkbox[1]");
+            By.xpath("//label[contains(text(),\"Standard\")]//ancestor::mat-checkbox[1]");
 
     private static final By DISCARD_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]//ancestor::button[1]");
@@ -53,7 +53,7 @@ public class EditNamespacePageImpl extends BasePageImpl implements EditNamespace
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-card-title"));
+        return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
     @Override

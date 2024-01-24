@@ -1,15 +1,32 @@
-.mat-dialog-content {
+.mat-mdc-dialog-content {
   display: flex;
   flex-direction: row;
-  max-height: none;
 }
 
+.mat-mdc-dialog-content > mat-card {
+  width: 33%;
+  padding: 0 8px;
+  overflow-y: scroll;
+}
 
-.mat-card-container .mat-card {
+.mat-mdc-card-container .mat-mdc-card {
   margin-right: 10px;
   margin-top: 3px;
 }
 
-.mat-card-container .mat-card:last-child {
+.mat-mdc-card-container .mat-mdc-card:last-child {
   margin-top: 3px;
+}
+
+.header {
+  padding-top: 8px;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 0 24px 16px;
 }

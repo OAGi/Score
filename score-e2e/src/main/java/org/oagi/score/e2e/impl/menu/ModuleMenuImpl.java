@@ -27,12 +27,12 @@ public class ModuleMenuImpl extends DelegateBasePageImpl implements ModuleMenu {
 
     private By VIEW_EDIT_MODULE_SET_SUB_MENU_LOCATOR() {
         String menuName = this.user.isDeveloper() ? "View/Edit Module Set" : "View Module Set";
-        return By.xpath("//button[contains(text(), \"" + menuName + "\")]");
+        return By.xpath("//span[contains(text(), \"" + menuName + "\")]");
     }
 
     private By VIEW_EDIT_MODULE_SET_RELEASE_SUB_MENU_LOCATOR() {
         String menuName = this.user.isDeveloper() ? "View/Edit Module Set Release" : "View Module Set Release";
-        return By.xpath("//button[contains(text(), \"" + menuName + "\")]");
+        return By.xpath("//span[contains(text(), \"" + menuName + "\")]");
     }
 
     private boolean isExpanded() {
