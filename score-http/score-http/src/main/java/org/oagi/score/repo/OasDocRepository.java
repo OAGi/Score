@@ -91,7 +91,7 @@ public class OasDocRepository {
                     TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                     TOP_LEVEL_ASBIEP.VERSION,
                     TOP_LEVEL_ASBIEP.STATUS,
-                    ABIE.GUID,
+                    ASBIEP.GUID,
                     ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
                     ASBIEP.REMARK,
