@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPriXpsTypeMap;
@@ -30,7 +27,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPriXpsTypeMap;
  * types. 
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsTypeMapRecord> implements Record4<ULong, ULong, ULong, Byte> {
+public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsTypeMapRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -113,113 +110,6 @@ public class CdtAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtAwdPriXpsT
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row4) super.fieldsRow();
-    }
-
-    @Override
-    public Row4<ULong, ULong, ULong, Byte> valuesRow() {
-        return (Row4) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID;
-    }
-
-    @Override
-    public Field<Byte> field4() {
-        return CdtAwdPriXpsTypeMap.CDT_AWD_PRI_XPS_TYPE_MAP.IS_DEFAULT;
-    }
-
-    @Override
-    public ULong component1() {
-        return getCdtAwdPriXpsTypeMapId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getCdtAwdPriId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getXbtId();
-    }
-
-    @Override
-    public Byte component4() {
-        return getIsDefault();
-    }
-
-    @Override
-    public ULong value1() {
-        return getCdtAwdPriXpsTypeMapId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getCdtAwdPriId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getXbtId();
-    }
-
-    @Override
-    public Byte value4() {
-        return getIsDefault();
-    }
-
-    @Override
-    public CdtAwdPriXpsTypeMapRecord value1(ULong value) {
-        setCdtAwdPriXpsTypeMapId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriXpsTypeMapRecord value2(ULong value) {
-        setCdtAwdPriId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriXpsTypeMapRecord value3(ULong value) {
-        setXbtId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriXpsTypeMapRecord value4(Byte value) {
-        setIsDefault(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriXpsTypeMapRecord values(ULong value1, ULong value2, ULong value3, Byte value4) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        return this;
     }
 
     // -------------------------------------------------------------------------

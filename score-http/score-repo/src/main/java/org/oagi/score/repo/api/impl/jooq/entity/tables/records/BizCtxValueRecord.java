@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxValue;
@@ -19,7 +16,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxValue;
  * value.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> implements Record3<ULong, ULong, ULong> {
+public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,91 +75,6 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> im
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
-    }
-
-    @Override
-    public Row3<ULong, ULong, ULong> valuesRow() {
-        return (Row3) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return BizCtxValue.BIZ_CTX_VALUE.BIZ_CTX_VALUE_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return BizCtxValue.BIZ_CTX_VALUE.BIZ_CTX_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return BizCtxValue.BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getBizCtxValueId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getCtxSchemeValueId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getBizCtxValueId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getBizCtxId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getCtxSchemeValueId();
-    }
-
-    @Override
-    public BizCtxValueRecord value1(ULong value) {
-        setBizCtxValueId(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxValueRecord value2(ULong value) {
-        setBizCtxId(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxValueRecord value3(ULong value) {
-        setCtxSchemeValueId(value);
-        return this;
-    }
-
-    @Override
-    public BizCtxValueRecord values(ULong value1, ULong value2, ULong value3) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        return this;
     }
 
     // -------------------------------------------------------------------------

@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,7 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.MessageRecord;
 
 
@@ -99,11 +104,11 @@ public class Message extends TableImpl<MessageRecord> {
     public final TableField<MessageRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     private Message(Name alias, Table<MessageRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Message(Name alias, Table<MessageRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Message(Name alias, Table<MessageRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -127,8 +132,35 @@ public class Message extends TableImpl<MessageRecord> {
         this(DSL.name("message"), null);
     }
 
-    public <O extends Record> Message(Table<O> child, ForeignKey<O, MessageRecord> key) {
-        super(child, key, MESSAGE);
+    public <O extends Record> Message(Table<O> path, ForeignKey<O, MessageRecord> childPath, InverseForeignKey<O, MessageRecord> parentPath) {
+        super(path, childPath, parentPath, MESSAGE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class MessagePath extends Message implements Path<MessageRecord> {
+        public <O extends Record> MessagePath(Table<O> path, ForeignKey<O, MessageRecord> childPath, InverseForeignKey<O, MessageRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private MessagePath(Name alias, Table<MessageRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public MessagePath as(String alias) {
+            return new MessagePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public MessagePath as(Name alias) {
+            return new MessagePath(alias, this);
+        }
+
+        @Override
+        public MessagePath as(Table<?> alias) {
+            return new MessagePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -151,27 +183,28 @@ public class Message extends TableImpl<MessageRecord> {
         return Arrays.asList(Keys.MESSAGE_SENDER_ID_FK, Keys.MESSAGE_RECIPIENT_ID_FK);
     }
 
-    private transient AppUser _messageSenderIdFk;
-    private transient AppUser _messageRecipientIdFk;
+    private transient AppUserPath _messageSenderIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>message_sender_id_fk</code> key.
      */
-    public AppUser messageSenderIdFk() {
+    public AppUserPath messageSenderIdFk() {
         if (_messageSenderIdFk == null)
-            _messageSenderIdFk = new AppUser(this, Keys.MESSAGE_SENDER_ID_FK);
+            _messageSenderIdFk = new AppUserPath(this, Keys.MESSAGE_SENDER_ID_FK, null);
 
         return _messageSenderIdFk;
     }
+
+    private transient AppUserPath _messageRecipientIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>message_recipient_id_fk</code> key.
      */
-    public AppUser messageRecipientIdFk() {
+    public AppUserPath messageRecipientIdFk() {
         if (_messageRecipientIdFk == null)
-            _messageRecipientIdFk = new AppUser(this, Keys.MESSAGE_RECIPIENT_ID_FK);
+            _messageRecipientIdFk = new AppUserPath(this, Keys.MESSAGE_RECIPIENT_ID_FK, null);
 
         return _messageRecipientIdFk;
     }
@@ -215,27 +248,87 @@ public class Message extends TableImpl<MessageRecord> {
         return new Message(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, ULong, ULong, String, String, String, Byte, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Message where(Condition condition) {
+        return new Message(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Message where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super Byte, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Message where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Message where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Message where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Message where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Message where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Message where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Message whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Message whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

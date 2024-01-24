@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri;
@@ -19,7 +16,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPri;
  * each of the CDT Content Component section/table in CCTS DTC3.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> implements Record4<ULong, ULong, ULong, Byte> {
+public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -98,113 +95,6 @@ public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> implem
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row4) super.fieldsRow();
-    }
-
-    @Override
-    public Row4<ULong, ULong, ULong, Byte> valuesRow() {
-        return (Row4) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return CdtAwdPri.CDT_AWD_PRI.CDT_AWD_PRI_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return CdtAwdPri.CDT_AWD_PRI.CDT_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return CdtAwdPri.CDT_AWD_PRI.CDT_PRI_ID;
-    }
-
-    @Override
-    public Field<Byte> field4() {
-        return CdtAwdPri.CDT_AWD_PRI.IS_DEFAULT;
-    }
-
-    @Override
-    public ULong component1() {
-        return getCdtAwdPriId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getCdtId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getCdtPriId();
-    }
-
-    @Override
-    public Byte component4() {
-        return getIsDefault();
-    }
-
-    @Override
-    public ULong value1() {
-        return getCdtAwdPriId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getCdtId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getCdtPriId();
-    }
-
-    @Override
-    public Byte value4() {
-        return getIsDefault();
-    }
-
-    @Override
-    public CdtAwdPriRecord value1(ULong value) {
-        setCdtAwdPriId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriRecord value2(ULong value) {
-        setCdtId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriRecord value3(ULong value) {
-        setCdtPriId(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriRecord value4(Byte value) {
-        setIsDefault(value);
-        return this;
-    }
-
-    @Override
-    public CdtAwdPriRecord values(ULong value1, ULong value2, ULong value3, Byte value4) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        return this;
     }
 
     // -------------------------------------------------------------------------

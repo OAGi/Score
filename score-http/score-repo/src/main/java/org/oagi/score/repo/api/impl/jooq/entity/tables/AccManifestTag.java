@@ -6,18 +6,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag.TagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestTagRecord;
 
 
@@ -75,11 +82,11 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
     public final TableField<AccManifestTagRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was first created.");
 
     private AccManifestTag(Name alias, Table<AccManifestTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AccManifestTag(Name alias, Table<AccManifestTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private AccManifestTag(Name alias, Table<AccManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -103,8 +110,35 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
         this(DSL.name("acc_manifest_tag"), null);
     }
 
-    public <O extends Record> AccManifestTag(Table<O> child, ForeignKey<O, AccManifestTagRecord> key) {
-        super(child, key, ACC_MANIFEST_TAG);
+    public <O extends Record> AccManifestTag(Table<O> path, ForeignKey<O, AccManifestTagRecord> childPath, InverseForeignKey<O, AccManifestTagRecord> parentPath) {
+        super(path, childPath, parentPath, ACC_MANIFEST_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AccManifestTagPath extends AccManifestTag implements Path<AccManifestTagRecord> {
+        public <O extends Record> AccManifestTagPath(Table<O> path, ForeignKey<O, AccManifestTagRecord> childPath, InverseForeignKey<O, AccManifestTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AccManifestTagPath(Name alias, Table<AccManifestTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AccManifestTagPath as(String alias) {
+            return new AccManifestTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AccManifestTagPath as(Name alias) {
+            return new AccManifestTagPath(alias, this);
+        }
+
+        @Override
+        public AccManifestTagPath as(Table<?> alias) {
+            return new AccManifestTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -122,36 +156,38 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
         return Arrays.asList(Keys.ACC_MANIFEST_TAG_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_TAG_TAG_ID_FK, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK);
     }
 
-    private transient AccManifest _accManifest;
-    private transient Tag _tag;
-    private transient AppUser _appUser;
+    private transient AccManifestPath _accManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
      */
-    public AccManifest accManifest() {
+    public AccManifestPath accManifest() {
         if (_accManifest == null)
-            _accManifest = new AccManifest(this, Keys.ACC_MANIFEST_TAG_ACC_MANIFEST_ID_FK);
+            _accManifest = new AccManifestPath(this, Keys.ACC_MANIFEST_TAG_ACC_MANIFEST_ID_FK, null);
 
         return _accManifest;
     }
 
+    private transient TagPath _tag;
+
     /**
      * Get the implicit join path to the <code>oagi.tag</code> table.
      */
-    public Tag tag() {
+    public TagPath tag() {
         if (_tag == null)
-            _tag = new Tag(this, Keys.ACC_MANIFEST_TAG_TAG_ID_FK);
+            _tag = new TagPath(this, Keys.ACC_MANIFEST_TAG_TAG_ID_FK, null);
 
         return _tag;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -195,27 +231,87 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
         return new AccManifestTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, LocalDateTime> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public AccManifestTag where(Condition condition) {
+        return new AccManifestTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AccManifestTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AccManifestTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AccManifestTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AccManifestTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AccManifestTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AccManifestTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AccManifestTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AccManifestTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AccManifestTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

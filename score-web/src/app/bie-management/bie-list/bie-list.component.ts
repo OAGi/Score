@@ -342,12 +342,6 @@ export class BieListComponent implements OnInit {
             return e;
           }
         }).length === this.selection.selected.length;
-      case 'Transfer':
-        return this.selection.selected.filter(e => {
-          if (e.state === 'WIP' && e.owner === this.username) {
-            return e;
-          }
-        }).length === this.selection.selected.length;
       case 'Production':
         return this.selection.selected.filter(e => {
           if (e.state === 'QA' && e.owner === this.username) {

@@ -6,20 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function13;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row13;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,11 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbiepRecord;
 
 
@@ -148,11 +157,11 @@ public class Bbiep extends TableImpl<BbiepRecord> {
     public final TableField<BbiepRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private Bbiep(Name alias, Table<BbiepRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Bbiep(Name alias, Table<BbiepRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("BBIEP represents the usage of basic property in a specific business context. It is a contextualization of a BCCP."), TableOptions.table());
+    private Bbiep(Name alias, Table<BbiepRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("BBIEP represents the usage of basic property in a specific business context. It is a contextualization of a BCCP."), TableOptions.table(), where);
     }
 
     /**
@@ -176,8 +185,35 @@ public class Bbiep extends TableImpl<BbiepRecord> {
         this(DSL.name("bbiep"), null);
     }
 
-    public <O extends Record> Bbiep(Table<O> child, ForeignKey<O, BbiepRecord> key) {
-        super(child, key, BBIEP);
+    public <O extends Record> Bbiep(Table<O> path, ForeignKey<O, BbiepRecord> childPath, InverseForeignKey<O, BbiepRecord> parentPath) {
+        super(path, childPath, parentPath, BBIEP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BbiepPath extends Bbiep implements Path<BbiepRecord> {
+        public <O extends Record> BbiepPath(Table<O> path, ForeignKey<O, BbiepRecord> childPath, InverseForeignKey<O, BbiepRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BbiepPath(Name alias, Table<BbiepRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BbiepPath as(String alias) {
+            return new BbiepPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BbiepPath as(Name alias) {
+            return new BbiepPath(alias, this);
+        }
+
+        @Override
+        public BbiepPath as(Table<?> alias) {
+            return new BbiepPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -205,52 +241,80 @@ public class Bbiep extends TableImpl<BbiepRecord> {
         return Arrays.asList(Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK, Keys.BBIEP_CREATED_BY_FK, Keys.BBIEP_LAST_UPDATED_BY_FK, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient BccpManifest _bccpManifest;
-    private transient AppUser _bbiepCreatedByFk;
-    private transient AppUser _bbiepLastUpdatedByFk;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient BccpManifestPath _bccpManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table.
      */
-    public BccpManifest bccpManifest() {
+    public BccpManifestPath bccpManifest() {
         if (_bccpManifest == null)
-            _bccpManifest = new BccpManifest(this, Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK);
+            _bccpManifest = new BccpManifestPath(this, Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifest;
     }
+
+    private transient AppUserPath _bbiepCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bbiep_created_by_fk</code> key.
      */
-    public AppUser bbiepCreatedByFk() {
+    public AppUserPath bbiepCreatedByFk() {
         if (_bbiepCreatedByFk == null)
-            _bbiepCreatedByFk = new AppUser(this, Keys.BBIEP_CREATED_BY_FK);
+            _bbiepCreatedByFk = new AppUserPath(this, Keys.BBIEP_CREATED_BY_FK, null);
 
         return _bbiepCreatedByFk;
     }
+
+    private transient AppUserPath _bbiepLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bbiep_last_updated_by_fk</code> key.
      */
-    public AppUser bbiepLastUpdatedByFk() {
+    public AppUserPath bbiepLastUpdatedByFk() {
         if (_bbiepLastUpdatedByFk == null)
-            _bbiepLastUpdatedByFk = new AppUser(this, Keys.BBIEP_LAST_UPDATED_BY_FK);
+            _bbiepLastUpdatedByFk = new AppUserPath(this, Keys.BBIEP_LAST_UPDATED_BY_FK, null);
 
         return _bbiepLastUpdatedByFk;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient BbiePath _bbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table
+     */
+    public BbiePath bbie() {
+        if (_bbie == null)
+            _bbie = new BbiePath(this, null, Keys.BBIE_TO_BBIEP_ID_FK.getInverseKey());
+
+        return _bbie;
+    }
+
+    private transient BieUsageRulePath _bieUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_usage_rule</code> table
+     */
+    public BieUsageRulePath bieUsageRule() {
+        if (_bieUsageRule == null)
+            _bieUsageRule = new BieUsageRulePath(this, null, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK.getInverseKey());
+
+        return _bieUsageRule;
     }
 
     @Override
@@ -292,27 +356,87 @@ public class Bbiep extends TableImpl<BbiepRecord> {
         return new Bbiep(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row13 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row13<ULong, String, ULong, String, String, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime, ULong> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Bbiep where(Condition condition) {
+        return new Bbiep(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function13<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Bbiep where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Bbiep where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bbiep where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bbiep where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bbiep where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bbiep where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bbiep where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bbiep whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bbiep whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

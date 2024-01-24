@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record6;
-import org.jooq.Row6;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUserExtRevision;
@@ -25,7 +22,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUserExtRevision;
  * component/ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevisionRecord> implements Record6<ULong, ULong, ULong, ULong, Byte, ULong> {
+public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevisionRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -166,157 +163,6 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row6<ULong, ULong, ULong, ULong, Byte, ULong> fieldsRow() {
-        return (Row6) super.fieldsRow();
-    }
-
-    @Override
-    public Row6<ULong, ULong, ULong, ULong, Byte, ULong> valuesRow() {
-        return (Row6) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.BIE_USER_EXT_REVISION_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.EXT_ABIE_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.EXT_ACC_ID;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.USER_EXT_ACC_ID;
-    }
-
-    @Override
-    public Field<Byte> field5() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.REVISED_INDICATOR;
-    }
-
-    @Override
-    public Field<ULong> field6() {
-        return BieUserExtRevision.BIE_USER_EXT_REVISION.TOP_LEVEL_ASBIEP_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getBieUserExtRevisionId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getExtAbieId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getExtAccId();
-    }
-
-    @Override
-    public ULong component4() {
-        return getUserExtAccId();
-    }
-
-    @Override
-    public Byte component5() {
-        return getRevisedIndicator();
-    }
-
-    @Override
-    public ULong component6() {
-        return getTopLevelAsbiepId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getBieUserExtRevisionId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getExtAbieId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getExtAccId();
-    }
-
-    @Override
-    public ULong value4() {
-        return getUserExtAccId();
-    }
-
-    @Override
-    public Byte value5() {
-        return getRevisedIndicator();
-    }
-
-    @Override
-    public ULong value6() {
-        return getTopLevelAsbiepId();
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value1(ULong value) {
-        setBieUserExtRevisionId(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value2(ULong value) {
-        setExtAbieId(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value3(ULong value) {
-        setExtAccId(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value4(ULong value) {
-        setUserExtAccId(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value5(Byte value) {
-        setRevisedIndicator(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord value6(ULong value) {
-        setTopLevelAsbiepId(value);
-        return this;
-    }
-
-    @Override
-    public BieUserExtRevisionRecord values(ULong value1, ULong value2, ULong value3, ULong value4, Byte value5, ULong value6) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        return this;
     }
 
     // -------------------------------------------------------------------------

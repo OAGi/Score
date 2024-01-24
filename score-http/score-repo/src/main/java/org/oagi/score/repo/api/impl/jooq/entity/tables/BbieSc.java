@@ -6,15 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +35,13 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri.BdtScPriRestriPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieScRecord;
 
 
@@ -254,11 +270,11 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     public final TableField<BbieScRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private BbieSc(Name alias, Table<BbieScRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BbieSc(Name alias, Table<BbieScRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT's SCs. "), TableOptions.table());
+    private BbieSc(Name alias, Table<BbieScRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT's SCs. "), TableOptions.table(), where);
     }
 
     /**
@@ -282,8 +298,35 @@ public class BbieSc extends TableImpl<BbieScRecord> {
         this(DSL.name("bbie_sc"), null);
     }
 
-    public <O extends Record> BbieSc(Table<O> child, ForeignKey<O, BbieScRecord> key) {
-        super(child, key, BBIE_SC);
+    public <O extends Record> BbieSc(Table<O> path, ForeignKey<O, BbieScRecord> childPath, InverseForeignKey<O, BbieScRecord> parentPath) {
+        super(path, childPath, parentPath, BBIE_SC);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BbieScPath extends BbieSc implements Path<BbieScRecord> {
+        public <O extends Record> BbieScPath(Table<O> path, ForeignKey<O, BbieScRecord> childPath, InverseForeignKey<O, BbieScRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BbieScPath(Name alias, Table<BbieScRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BbieScPath as(String alias) {
+            return new BbieScPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BbieScPath as(Name alias) {
+            return new BbieScPath(alias, this);
+        }
+
+        @Override
+        public BbieScPath as(Table<?> alias) {
+            return new BbieScPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -311,97 +354,104 @@ public class BbieSc extends TableImpl<BbieScRecord> {
         return Arrays.asList(Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK, Keys.BBIE_SC_BBIE_ID_FK, Keys.BBIE_SC_DT_SC_PRI_RESTRI_ID_FK, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.BBIE_SC_CREATED_BY_FK, Keys.BBIE_SC_LAST_UPDATED_BY_FK, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient DtScManifest _dtScManifest;
-    private transient Bbie _bbie;
-    private transient BdtScPriRestri _bdtScPriRestri;
-    private transient CodeListManifest _codeListManifest;
-    private transient AgencyIdListManifest _agencyIdListManifest;
-    private transient AppUser _bbieScCreatedByFk;
-    private transient AppUser _bbieScLastUpdatedByFk;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient DtScManifestPath _dtScManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table.
      */
-    public DtScManifest dtScManifest() {
+    public DtScManifestPath dtScManifest() {
         if (_dtScManifest == null)
-            _dtScManifest = new DtScManifest(this, Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK);
+            _dtScManifest = new DtScManifestPath(this, Keys.BBIE_SC_BASED_DT_SC_MANIFEST_ID_FK, null);
 
         return _dtScManifest;
     }
 
+    private transient BbiePath _bbie;
+
     /**
      * Get the implicit join path to the <code>oagi.bbie</code> table.
      */
-    public Bbie bbie() {
+    public BbiePath bbie() {
         if (_bbie == null)
-            _bbie = new Bbie(this, Keys.BBIE_SC_BBIE_ID_FK);
+            _bbie = new BbiePath(this, Keys.BBIE_SC_BBIE_ID_FK, null);
 
         return _bbie;
     }
+
+    private transient BdtScPriRestriPath _bdtScPriRestri;
 
     /**
      * Get the implicit join path to the <code>oagi.bdt_sc_pri_restri</code>
      * table.
      */
-    public BdtScPriRestri bdtScPriRestri() {
+    public BdtScPriRestriPath bdtScPriRestri() {
         if (_bdtScPriRestri == null)
-            _bdtScPriRestri = new BdtScPriRestri(this, Keys.BBIE_SC_DT_SC_PRI_RESTRI_ID_FK);
+            _bdtScPriRestri = new BdtScPriRestriPath(this, Keys.BBIE_SC_DT_SC_PRI_RESTRI_ID_FK, null);
 
         return _bdtScPriRestri;
     }
+
+    private transient CodeListManifestPath _codeListManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table.
      */
-    public CodeListManifest codeListManifest() {
+    public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
-            _codeListManifest = new CodeListManifest(this, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK);
+            _codeListManifest = new CodeListManifestPath(this, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifest;
     }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdListManifest agencyIdListManifest() {
+    public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.BBIE_SC_AGENCY_ID_LIST_MANIFEST_ID_FK);
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.BBIE_SC_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifest;
     }
+
+    private transient AppUserPath _bbieScCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bbie_sc_created_by_fk</code> key.
      */
-    public AppUser bbieScCreatedByFk() {
+    public AppUserPath bbieScCreatedByFk() {
         if (_bbieScCreatedByFk == null)
-            _bbieScCreatedByFk = new AppUser(this, Keys.BBIE_SC_CREATED_BY_FK);
+            _bbieScCreatedByFk = new AppUserPath(this, Keys.BBIE_SC_CREATED_BY_FK, null);
 
         return _bbieScCreatedByFk;
     }
+
+    private transient AppUserPath _bbieScLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bbie_sc_last_updated_by_fk</code> key.
      */
-    public AppUser bbieScLastUpdatedByFk() {
+    public AppUserPath bbieScLastUpdatedByFk() {
         if (_bbieScLastUpdatedByFk == null)
-            _bbieScLastUpdatedByFk = new AppUser(this, Keys.BBIE_SC_LAST_UPDATED_BY_FK);
+            _bbieScLastUpdatedByFk = new AppUserPath(this, Keys.BBIE_SC_LAST_UPDATED_BY_FK, null);
 
         return _bbieScLastUpdatedByFk;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
     }
@@ -443,5 +493,89 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     @Override
     public BbieSc rename(Table<?> name) {
         return new BbieSc(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc where(Condition condition) {
+        return new BbieSc(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieSc where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieSc where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieSc where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BbieSc where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BbieSc whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

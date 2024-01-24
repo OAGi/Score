@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleAgencyIdListManifestRecord;
 
 
@@ -111,11 +119,11 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
     public final TableField<ModuleAgencyIdListManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private ModuleAgencyIdListManifest(Name alias, Table<ModuleAgencyIdListManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private ModuleAgencyIdListManifest(Name alias, Table<ModuleAgencyIdListManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private ModuleAgencyIdListManifest(Name alias, Table<ModuleAgencyIdListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -141,8 +149,35 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
         this(DSL.name("module_agency_id_list_manifest"), null);
     }
 
-    public <O extends Record> ModuleAgencyIdListManifest(Table<O> child, ForeignKey<O, ModuleAgencyIdListManifestRecord> key) {
-        super(child, key, MODULE_AGENCY_ID_LIST_MANIFEST);
+    public <O extends Record> ModuleAgencyIdListManifest(Table<O> path, ForeignKey<O, ModuleAgencyIdListManifestRecord> childPath, InverseForeignKey<O, ModuleAgencyIdListManifestRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE_AGENCY_ID_LIST_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModuleAgencyIdListManifestPath extends ModuleAgencyIdListManifest implements Path<ModuleAgencyIdListManifestRecord> {
+        public <O extends Record> ModuleAgencyIdListManifestPath(Table<O> path, ForeignKey<O, ModuleAgencyIdListManifestRecord> childPath, InverseForeignKey<O, ModuleAgencyIdListManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModuleAgencyIdListManifestPath(Name alias, Table<ModuleAgencyIdListManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModuleAgencyIdListManifestPath as(String alias) {
+            return new ModuleAgencyIdListManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModuleAgencyIdListManifestPath as(Name alias) {
+            return new ModuleAgencyIdListManifestPath(alias, this);
+        }
+
+        @Override
+        public ModuleAgencyIdListManifestPath as(Table<?> alias) {
+            return new ModuleAgencyIdListManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -165,62 +200,66 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
         return Arrays.asList(Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
-    private transient ModuleSetRelease _moduleSetRelease;
-    private transient AgencyIdListManifest _agencyIdListManifest;
-    private transient Module _module;
-    private transient AppUser _moduleAgencyIdListManifestCreatedByFk;
-    private transient AppUser _moduleAgencyIdListManifestLastUpdatedByFk;
+    private transient ModuleSetReleasePath _moduleSetRelease;
 
     /**
      * Get the implicit join path to the <code>oagi.module_set_release</code>
      * table.
      */
-    public ModuleSetRelease moduleSetRelease() {
+    public ModuleSetReleasePath moduleSetRelease() {
         if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
 
         return _moduleSetRelease;
     }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdListManifest agencyIdListManifest() {
+    public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifest;
     }
 
+    private transient ModulePath _module;
+
     /**
      * Get the implicit join path to the <code>oagi.module</code> table.
      */
-    public Module module() {
+    public ModulePath module() {
         if (_module == null)
-            _module = new Module(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_ID_FK);
+            _module = new ModulePath(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_ID_FK, null);
 
         return _module;
     }
+
+    private transient AppUserPath _moduleAgencyIdListManifestCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_agency_id_list_manifest_created_by_fk</code> key.
      */
-    public AppUser moduleAgencyIdListManifestCreatedByFk() {
+    public AppUserPath moduleAgencyIdListManifestCreatedByFk() {
         if (_moduleAgencyIdListManifestCreatedByFk == null)
-            _moduleAgencyIdListManifestCreatedByFk = new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK);
+            _moduleAgencyIdListManifestCreatedByFk = new AppUserPath(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK, null);
 
         return _moduleAgencyIdListManifestCreatedByFk;
     }
+
+    private transient AppUserPath _moduleAgencyIdListManifestLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_agency_id_list_manifest_last_updated_by_fk</code> key.
      */
-    public AppUser moduleAgencyIdListManifestLastUpdatedByFk() {
+    public AppUserPath moduleAgencyIdListManifestLastUpdatedByFk() {
         if (_moduleAgencyIdListManifestLastUpdatedByFk == null)
-            _moduleAgencyIdListManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+            _moduleAgencyIdListManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleAgencyIdListManifestLastUpdatedByFk;
     }
@@ -264,27 +303,87 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
         return new ModuleAgencyIdListManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public ModuleAgencyIdListManifest where(Condition condition) {
+        return new ModuleAgencyIdListManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public ModuleAgencyIdListManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public ModuleAgencyIdListManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAgencyIdListManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAgencyIdListManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAgencyIdListManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAgencyIdListManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAgencyIdListManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAgencyIdListManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAgencyIdListManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

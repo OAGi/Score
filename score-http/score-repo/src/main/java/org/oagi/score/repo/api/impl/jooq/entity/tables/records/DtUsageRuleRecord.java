@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
@@ -21,7 +18,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
  * both.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> implements Record4<ULong, ULong, ULong, ULong> {
+public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -100,113 +97,6 @@ public class DtUsageRuleRecord extends UpdatableRecordImpl<DtUsageRuleRecord> im
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row4<ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row4) super.fieldsRow();
-    }
-
-    @Override
-    public Row4<ULong, ULong, ULong, ULong> valuesRow() {
-        return (Row4) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return DtUsageRule.DT_USAGE_RULE.DT_USAGE_RULE_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return DtUsageRule.DT_USAGE_RULE.ASSIGNED_USAGE_RULE_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return DtUsageRule.DT_USAGE_RULE.TARGET_DT_ID;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return DtUsageRule.DT_USAGE_RULE.TARGET_DT_SC_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getDtUsageRuleId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getAssignedUsageRuleId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getTargetDtId();
-    }
-
-    @Override
-    public ULong component4() {
-        return getTargetDtScId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getDtUsageRuleId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getAssignedUsageRuleId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getTargetDtId();
-    }
-
-    @Override
-    public ULong value4() {
-        return getTargetDtScId();
-    }
-
-    @Override
-    public DtUsageRuleRecord value1(ULong value) {
-        setDtUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public DtUsageRuleRecord value2(ULong value) {
-        setAssignedUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public DtUsageRuleRecord value3(ULong value) {
-        setTargetDtId(value);
-        return this;
-    }
-
-    @Override
-    public DtUsageRuleRecord value4(ULong value) {
-        setTargetDtScId(value);
-        return this;
-    }
-
-    @Override
-    public DtUsageRuleRecord values(ULong value1, ULong value2, ULong value3, ULong value4) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        return this;
     }
 
     // -------------------------------------------------------------------------

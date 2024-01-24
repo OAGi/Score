@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,11 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListValueManifest.AgencyIdListValueManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AgencyIdListValueManifestRecord;
 
 
@@ -107,11 +116,11 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
     public final TableField<AgencyIdListValueManifestRecord, ULong> NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID = createField(DSL.name("next_agency_id_list_value_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private AgencyIdListValueManifest(Name alias, Table<AgencyIdListValueManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AgencyIdListValueManifest(Name alias, Table<AgencyIdListValueManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private AgencyIdListValueManifest(Name alias, Table<AgencyIdListValueManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -137,8 +146,35 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
         this(DSL.name("agency_id_list_value_manifest"), null);
     }
 
-    public <O extends Record> AgencyIdListValueManifest(Table<O> child, ForeignKey<O, AgencyIdListValueManifestRecord> key) {
-        super(child, key, AGENCY_ID_LIST_VALUE_MANIFEST);
+    public <O extends Record> AgencyIdListValueManifest(Table<O> path, ForeignKey<O, AgencyIdListValueManifestRecord> childPath, InverseForeignKey<O, AgencyIdListValueManifestRecord> parentPath) {
+        super(path, childPath, parentPath, AGENCY_ID_LIST_VALUE_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AgencyIdListValueManifestPath extends AgencyIdListValueManifest implements Path<AgencyIdListValueManifestRecord> {
+        public <O extends Record> AgencyIdListValueManifestPath(Table<O> path, ForeignKey<O, AgencyIdListValueManifestRecord> childPath, InverseForeignKey<O, AgencyIdListValueManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AgencyIdListValueManifestPath(Name alias, Table<AgencyIdListValueManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AgencyIdListValueManifestPath as(String alias) {
+            return new AgencyIdListValueManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AgencyIdListValueManifestPath as(Name alias) {
+            return new AgencyIdListValueManifestPath(alias, this);
+        }
+
+        @Override
+        public AgencyIdListValueManifestPath as(Table<?> alias) {
+            return new AgencyIdListValueManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -161,45 +197,45 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
         return Arrays.asList(Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_BASED_AGENCY_ID_LIST_VAL_MNF_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK);
     }
 
-    private transient Release _release;
-    private transient AgencyIdListValue _agencyIdListValue;
-    private transient AgencyIdListManifest _agencyIdListManifest;
-    private transient AgencyIdListValueManifest _agencyIdListValueManifestBasedAgencyIdListValMnfIdFk;
-    private transient AgencyIdListValueManifest _agencyIdListValueReplacementAgencyIdListManifFk;
-    private transient AgencyIdListValueManifest _agencyIdListValueManifestPrevAgencyIdListValueManifFk;
-    private transient AgencyIdListValueManifest _agencyIdListValueManifestNextAgencyIdListValueManifFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
+
+    private transient AgencyIdListValuePath _agencyIdListValue;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
      * table.
      */
-    public AgencyIdListValue agencyIdListValue() {
+    public AgencyIdListValuePath agencyIdListValue() {
         if (_agencyIdListValue == null)
-            _agencyIdListValue = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK);
+            _agencyIdListValue = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK, null);
 
         return _agencyIdListValue;
     }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdListManifest agencyIdListManifest() {
+    public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifest;
     }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifestBasedAgencyIdListValMnfIdFk;
 
     /**
      * Get the implicit join path to the
@@ -207,12 +243,14 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * <code>agency_id_list_value_manifest_based_agency_id_list_val_mnf_id_fk</code>
      * key.
      */
-    public AgencyIdListValueManifest agencyIdListValueManifestBasedAgencyIdListValMnfIdFk() {
+    public AgencyIdListValueManifestPath agencyIdListValueManifestBasedAgencyIdListValMnfIdFk() {
         if (_agencyIdListValueManifestBasedAgencyIdListValMnfIdFk == null)
-            _agencyIdListValueManifestBasedAgencyIdListValMnfIdFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_BASED_AGENCY_ID_LIST_VAL_MNF_ID_FK);
+            _agencyIdListValueManifestBasedAgencyIdListValMnfIdFk = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_BASED_AGENCY_ID_LIST_VAL_MNF_ID_FK, null);
 
         return _agencyIdListValueManifestBasedAgencyIdListValMnfIdFk;
     }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueReplacementAgencyIdListManifFk;
 
     /**
      * Get the implicit join path to the
@@ -220,12 +258,14 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * <code>agency_id_list_value_replacement_agency_id_list_manif_fk</code>
      * key.
      */
-    public AgencyIdListValueManifest agencyIdListValueReplacementAgencyIdListManifFk() {
+    public AgencyIdListValueManifestPath agencyIdListValueReplacementAgencyIdListManifFk() {
         if (_agencyIdListValueReplacementAgencyIdListManifFk == null)
-            _agencyIdListValueReplacementAgencyIdListManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK);
+            _agencyIdListValueReplacementAgencyIdListManifFk = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK, null);
 
         return _agencyIdListValueReplacementAgencyIdListManifFk;
     }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifestPrevAgencyIdListValueManifFk;
 
     /**
      * Get the implicit join path to the
@@ -233,12 +273,14 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * <code>agency_id_list_value_manifest_prev_agency_id_list_value_manif_fk</code>
      * key.
      */
-    public AgencyIdListValueManifest agencyIdListValueManifestPrevAgencyIdListValueManifFk() {
+    public AgencyIdListValueManifestPath agencyIdListValueManifestPrevAgencyIdListValueManifFk() {
         if (_agencyIdListValueManifestPrevAgencyIdListValueManifFk == null)
-            _agencyIdListValueManifestPrevAgencyIdListValueManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK);
+            _agencyIdListValueManifestPrevAgencyIdListValueManifFk = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK, null);
 
         return _agencyIdListValueManifestPrevAgencyIdListValueManifFk;
     }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifestNextAgencyIdListValueManifFk;
 
     /**
      * Get the implicit join path to the
@@ -246,11 +288,24 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * <code>agency_id_list_value_manifest_next_agency_id_list_value_manif_fk</code>
      * key.
      */
-    public AgencyIdListValueManifest agencyIdListValueManifestNextAgencyIdListValueManifFk() {
+    public AgencyIdListValueManifestPath agencyIdListValueManifestNextAgencyIdListValueManifFk() {
         if (_agencyIdListValueManifestNextAgencyIdListValueManifFk == null)
-            _agencyIdListValueManifestNextAgencyIdListValueManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK);
+            _agencyIdListValueManifestNextAgencyIdListValueManifFk = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK, null);
 
         return _agencyIdListValueManifestNextAgencyIdListValueManifFk;
+    }
+
+    private transient CodeListManifestPath _codeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_manifest</code> table
+     */
+    public CodeListManifestPath codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifestPath(this, null, Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK.getInverseKey());
+
+        return _codeListManifest;
     }
 
     @Override
@@ -292,27 +347,87 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
         return new AgencyIdListValueManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public AgencyIdListValueManifest where(Condition condition) {
+        return new AgencyIdListValueManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AgencyIdListValueManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AgencyIdListValueManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdListValueManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdListValueManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdListValueManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdListValueManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdListValueManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdListValueManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdListValueManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

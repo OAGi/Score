@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,11 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtAwdPriXpsTypeMap.CdtAwdPriXpsTypeMapPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BdtPriRestriRecord;
 
 
@@ -102,11 +111,11 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
     public final TableField<BdtPriRestriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.");
 
     private BdtPriRestri(Name alias, Table<BdtPriRestriRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BdtPriRestri(Name alias, Table<BdtPriRestriRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record."), TableOptions.table());
+    private BdtPriRestri(Name alias, Table<BdtPriRestriRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record."), TableOptions.table(), where);
     }
 
     /**
@@ -130,8 +139,35 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         this(DSL.name("bdt_pri_restri"), null);
     }
 
-    public <O extends Record> BdtPriRestri(Table<O> child, ForeignKey<O, BdtPriRestriRecord> key) {
-        super(child, key, BDT_PRI_RESTRI);
+    public <O extends Record> BdtPriRestri(Table<O> path, ForeignKey<O, BdtPriRestriRecord> childPath, InverseForeignKey<O, BdtPriRestriRecord> parentPath) {
+        super(path, childPath, parentPath, BDT_PRI_RESTRI);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BdtPriRestriPath extends BdtPriRestri implements Path<BdtPriRestriRecord> {
+        public <O extends Record> BdtPriRestriPath(Table<O> path, ForeignKey<O, BdtPriRestriRecord> childPath, InverseForeignKey<O, BdtPriRestriRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BdtPriRestriPath(Name alias, Table<BdtPriRestriRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BdtPriRestriPath as(String alias) {
+            return new BdtPriRestriPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BdtPriRestriPath as(Name alias) {
+            return new BdtPriRestriPath(alias, this);
+        }
+
+        @Override
+        public BdtPriRestriPath as(Table<?> alias) {
+            return new BdtPriRestriPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -154,52 +190,67 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return Arrays.asList(Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK);
     }
 
-    private transient DtManifest _dtManifest;
-    private transient CdtAwdPriXpsTypeMap _cdtAwdPriXpsTypeMap;
-    private transient CodeListManifest _codeListManifest;
-    private transient AgencyIdListManifest _agencyIdListManifest;
+    private transient DtManifestPath _dtManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
      */
-    public DtManifest dtManifest() {
+    public DtManifestPath dtManifest() {
         if (_dtManifest == null)
-            _dtManifest = new DtManifest(this, Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK);
+            _dtManifest = new DtManifestPath(this, Keys.BDT_PRI_RESTRI_BDT_MANIFEST_ID_FK, null);
 
         return _dtManifest;
     }
+
+    private transient CdtAwdPriXpsTypeMapPath _cdtAwdPriXpsTypeMap;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.cdt_awd_pri_xps_type_map</code> table.
      */
-    public CdtAwdPriXpsTypeMap cdtAwdPriXpsTypeMap() {
+    public CdtAwdPriXpsTypeMapPath cdtAwdPriXpsTypeMap() {
         if (_cdtAwdPriXpsTypeMap == null)
-            _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMap(this, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK);
+            _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMapPath(this, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, null);
 
         return _cdtAwdPriXpsTypeMap;
     }
+
+    private transient CodeListManifestPath _codeListManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table.
      */
-    public CodeListManifest codeListManifest() {
+    public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
-            _codeListManifest = new CodeListManifest(this, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK);
+            _codeListManifest = new CodeListManifestPath(this, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifest;
     }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table.
      */
-    public AgencyIdListManifest agencyIdListManifest() {
+    public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
-            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK);
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
         return _agencyIdListManifest;
+    }
+
+    private transient BbiePath _bbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table
+     */
+    public BbiePath bbie() {
+        if (_bbie == null)
+            _bbie = new BbiePath(this, null, Keys.BBIE_BDT_PRI_RESTRI_ID_FK.getInverseKey());
+
+        return _bbie;
     }
 
     @Override
@@ -241,27 +292,87 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return new BdtPriRestri(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public BdtPriRestri where(Condition condition) {
+        return new BdtPriRestri(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BdtPriRestri where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BdtPriRestri where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BdtPriRestri where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BdtPriRestri where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BdtPriRestri where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BdtPriRestri where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BdtPriRestri where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BdtPriRestri whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BdtPriRestri whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }
