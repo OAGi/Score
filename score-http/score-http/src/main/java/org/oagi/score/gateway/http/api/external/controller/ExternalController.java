@@ -1,8 +1,10 @@
 package org.oagi.score.gateway.http.api.external.controller;
 
-import org.oagi.score.gateway.http.api.bie_management.data.BieList;
+import org.jooq.exception.IOException;
+import org.oagi.score.gateway.http.api.external.data.BieList;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
-import org.oagi.score.gateway.http.api.bie_management.service.BieService;
+import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
+import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.cc_management.data.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcListService;
 import org.oagi.score.gateway.http.api.external.service.ExternalService;
@@ -14,13 +16,15 @@ import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticatedPrincipal;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +37,6 @@ public class ExternalController {
 
     @Autowired
     private CcListService ccService;
-
 
     @RequestMapping(value = "/ext/core_component", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CcList> getCcList(
@@ -201,7 +204,7 @@ public class ExternalController {
     }
 
 
-/*
+
     @RequestMapping(value = "/ext/bie_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -268,6 +271,37 @@ public class ExternalController {
         request.setPageRequest(pageRequest);
         return service.getBieList(request);
     }
-    */
+
+
+    @RequestMapping(value = "/ext/bie/generate", method = RequestMethod.GET) 
+    public ResponseEntity<InputStreamResource> generate(
+                                                        @RequestParam(name="bizCtxIds", required=false) String bizCtxIds,
+                                                        @RequestParam(name="topLevelAsbiepId", required=true) BigInteger topLevelAsbiepId
+                                                        ) 
+                                                        throws IOException, FileNotFoundException {
+
+        Map<BigInteger,BigInteger> bizCtxMap = new HashMap<BigInteger,BigInteger>();
+        if (null != bizCtxIds) {                                  
+            for (String bizCtxIdStr : bizCtxIds.split(",")) {
+                BigInteger bizCtxId = new BigInteger(bizCtxIdStr);
+                bizCtxMap.put(topLevelAsbiepId,bizCtxId);
+            }
+        }
+
+        GenerateExpressionOption option = new GenerateExpressionOption();
+        option.setBizCtxIds(bizCtxMap);
+        option.setPackageOption("EACH");
+        option.setExpressionOption("XML");
+
+        BieGenerateExpressionResult bieGenerateExpressionResult = service.generate(topLevelAsbiepId, option);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bieGenerateExpressionResult.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType(bieGenerateExpressionResult.getContentType()))
+                .contentLength(bieGenerateExpressionResult.getFile().length())
+                .body(new InputStreamResource(new FileInputStream(bieGenerateExpressionResult.getFile())));
+    }
+    
+
 
 }

@@ -9,6 +9,8 @@ import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { HttpModule } from '@nestjs/axios';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthGuard } from './auth/auth.guard';
+import { BieController } from './bie/bie.controller';
+import { BieService } from './bie/bie.service';
 
 
 @Module({
@@ -33,11 +35,12 @@ import { AuthGuard } from './auth/auth.guard';
   controllers: [
     AppController,
     ComponentsController,
+    BieController
   ],
   providers: [
     AppService,
     ComponentsService,
-
+    BieService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
