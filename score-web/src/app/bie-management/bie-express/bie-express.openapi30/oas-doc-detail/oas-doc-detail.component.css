@@ -3,7 +3,6 @@
 }
 
 .mat-column-den {
-  width: 250px;
   font-size: 13px;
 }
 
@@ -16,7 +15,7 @@
 }
 
 .mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
-  width: 50px;
+  width: 66px;
 }
 
 .mat-column-messageBody {
@@ -24,15 +23,15 @@
 }
 
 .mat-column-resourceName {
-  width: 12%;
+  width: 15%;
 }
 
 .mat-column-operationId {
-  width: 12%;
+  width: 15%;
 }
 
 .mat-column-tagName {
-  width: 10%;
+  width: 12%;
 }
 
 .mat-column-tagName .tagName:not(:last-child)::after {
