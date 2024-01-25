@@ -7,7 +7,6 @@ import {
   OasDoc,
   simpleOasDoc
 } from '../domain/openapi-doc';
-import {SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {OpenAPIService} from '../domain/openapi.service';
@@ -17,11 +16,11 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {hashCode, initFilter, saveBranch} from 'src/app/common/utility';
+import {forkJoin} from 'rxjs';
+import {hashCode, saveBranch} from 'src/app/common/utility';
 import {saveAs} from 'file-saver';
 import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
-import {SimpleRelease, WorkingRelease} from '../../../../release-management/domain/release';
+import {WorkingRelease} from '../../../../release-management/domain/release';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
@@ -31,8 +30,6 @@ import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {WebPageInfoService} from '../../../../basis/basis.service';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {FormControl} from '@angular/forms';
-import {ReleaseService} from '../../../../release-management/domain/release.service';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -52,8 +49,8 @@ export class OasDocDetailComponent implements OnInit {
   disabled: boolean;
   displayedColumns = [
     {id: 'select', name: ''},
-    {id: 'den', name: 'DEN'},
     {id: 'branch', name: 'Branch'},
+    {id: 'den', name: 'DEN'},
     {id: 'remark', name: 'Remark'},
     {id: 'verb', name: 'Verb'},
     {id: 'arrayIndicator', name: 'Array Indicator'},
@@ -89,7 +86,9 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BieForOasDoc>(this.displayedColumns);
+    const localStorageKey = 'X-Score-Table[OasDocDetail]';
+    const value = JSON.parse(localStorage.getItem(localStorageKey)!);
+    this.table = new TableData<BieForOasDoc>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
     this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
 
     this.topLevelAsbiepIds = [];

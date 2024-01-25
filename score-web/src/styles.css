@@ -216,6 +216,10 @@ mat-multi-sort-table-settings mat-chip {
   min-height: 32px;
 }
 
+mat-multi-sort-table-settings .table-settings-menu {
+  margin: 8px 0 !important;
+}
+
 .mat-mdc-snack-bar-container {
   --mdc-snackbar-container-color: #fff;
   --mat-mdc-snack-bar-button-color: #333;

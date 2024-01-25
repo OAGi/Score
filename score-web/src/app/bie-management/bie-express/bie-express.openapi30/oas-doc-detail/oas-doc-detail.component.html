@@ -122,6 +122,14 @@
         <div class="row">
           <div class="col-12">
             <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!--
+              <button mat-stroked-button>
+                <div class="d-inline-flex align-items-center">
+                  <span class="p-1 f12">Edit columns</span>
+                  <mat-icon class="pl-1">menu</mat-icon>
+                </div>
+              </button>
+              -->
               <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
               <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
                 <div class="d-inline-flex align-items-center">
@@ -146,6 +154,13 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="branch">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"> Branch</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="den">
             <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"> DEN</th>
             <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
@@ -156,13 +171,6 @@
                 </a>
               </div>
               <div class="bie-guid">{{ element.guid }}</div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="branch">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"> Branch</th>
-            <td mat-cell *matCellDef="let element">
-              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
             </td>
           </ng-container>
 

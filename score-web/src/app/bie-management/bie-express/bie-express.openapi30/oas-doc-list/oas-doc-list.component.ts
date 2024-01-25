@@ -1,10 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {BieForOasDoc, OasDoc, OasDocListRequest} from '../domain/openapi-doc';
+import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
-import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -58,7 +56,9 @@ export class OasDocListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<OasDoc>(this.displayedColumns);
+    const localStorageKey = 'X-Score-Table[OasDocList]';
+    const value = JSON.parse(localStorage.getItem(localStorageKey)!);
+    this.table = new TableData<OasDoc>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
     this.table.dataSource = new MatMultiSortTableDataSource<OasDoc>(this.sort, false);
 
     this.request = new OasDocListRequest(this.route.snapshot.queryParamMap,
