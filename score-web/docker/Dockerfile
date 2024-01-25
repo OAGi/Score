@@ -11,7 +11,7 @@ RUN ["rm", "-rf", "/usr/share/nginx/html"]
 
 COPY score-web.conf.template /etc/nginx/conf.d/score-web.conf
 
-ADD score-web /usr/share/nginx/score-web
+ADD score-web/browser /usr/share/nginx/score-web
 ADD docs /usr/share/nginx/docs
 
 COPY score-web-entrypoint.sh /docker-entrypoint.d/score-web-entrypoint.sh
