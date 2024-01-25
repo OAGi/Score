@@ -91,8 +91,8 @@ export class BieListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.releases) {
-      params = params.set('releaseIds', this.releases.filter(e => e.releaseId.toString()).join(','));
+    if (this.releases && this.releases.length > 0) {
+      params = params.set('releaseIds', this.releases.map(e => e.releaseId.toString()).join(','));
     }
     if (this.excludePropertyTerms && this.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', this.excludePropertyTerms.join(','));
