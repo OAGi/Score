@@ -2502,7 +2502,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = ascc.intermediateAccNodes;
-    const usable = this._validState.indexOf(node.asccNode.state) > -1
+    const usable = this._validState.indexOf(parent.accNode.state) > -1
+      && this._validState.indexOf(node.asccNode.state) > -1
       && this._validState.indexOf(node.asccpNode.state) > -1
       && this._validState.indexOf(node.accNode.state) > -1;
     if (parent.derived || !usable) {
@@ -2535,7 +2536,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = bcc.intermediateAccNodes;
-    const usable = this._validState.indexOf(node.bccNode.state) > -1
+    const usable = this._validState.indexOf(parent.accNode.state) > -1
+      && this._validState.indexOf(node.bccNode.state) > -1
       && this._validState.indexOf(node.bccpNode.state) > -1
       && this._validState.indexOf(node.bdtNode.state) > -1;
     if (parent.derived || !usable) {
