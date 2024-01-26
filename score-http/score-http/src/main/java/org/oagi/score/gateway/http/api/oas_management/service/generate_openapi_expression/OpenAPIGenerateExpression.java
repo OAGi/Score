@@ -332,7 +332,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -345,7 +345,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -406,7 +406,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -419,7 +419,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -481,7 +481,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -494,7 +494,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -569,7 +569,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 //                    }
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -582,7 +582,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -667,7 +667,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -680,7 +680,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -770,7 +770,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -783,7 +783,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -885,7 +885,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -898,7 +898,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
@@ -931,7 +931,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
                     path.put("operationId", option.getOperationId());
                     if (option.getMessageBodyType().equals("Response")) {
-                        schemaName =((isArray) ? schemaName + "List" : schemaName);
+                        schemaName = ((isArray) ? schemaName + "List" : schemaName);
                         path.put("responses", ImmutableMap.<String, Object>builder()
                                 .put("200", ImmutableMap.<String, Object>builder()
                                         .put("description", "")
@@ -953,7 +953,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray){
+                        if (isArray) {
                             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                                     .put("type", "array")
                                     .put("items", ImmutableMap.<String, Object>builder()
@@ -966,7 +966,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                 fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                                 schemas.put(schemaName + "Entry", properties);
                             }
-                        }else{
+                        } else {
                             Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                             fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
                             schemas.put(schemaName, properties);
