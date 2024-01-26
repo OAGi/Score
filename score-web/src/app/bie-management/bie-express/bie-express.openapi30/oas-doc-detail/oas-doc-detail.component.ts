@@ -138,6 +138,12 @@ export class OasDocDetailComponent implements OnInit {
     this.isUpdating = false;
   }
 
+  getPath(commands?: any[]): string {
+    const urlTree = this.router.createUrlTree(commands);
+    const path = this.location.prepareExternalUrl(urlTree.toString());
+    return window.location.origin + path;
+  }
+
   loadBieListForOasDoc(isInit?: boolean) {
     this.loading = true;
 
