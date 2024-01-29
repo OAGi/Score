@@ -9,6 +9,7 @@ import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIExpressionFormat;
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpressionOption;
+import org.oagi.score.gateway.http.api.oas_management.data.Operation;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.oagi.score.gateway.http.api.oas_management.data.Operation.GET;
+import static org.oagi.score.gateway.http.api.oas_management.data.Operation.PATCH;
 import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
 import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.convertIdentifierToId;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -165,10 +168,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return replacer.apply(basedAsccp.getPropertyTerm());
     }
 
-    private List<Map<String, Object>> buildParameters(boolean isArray, boolean hasId) {
+    private List<Map<String, Object>> buildParameters(Operation verb, boolean isArray, boolean hasId) {
         List<Map<String, Object>> parameters = new ArrayList<>();
 
-        if (isArray) {
+        if (verb == GET && isArray) {
             parameters.add(ImmutableMap.<String, Object>builder()
                     .put("name", "sinceLastDateTime")
                     .put("in", "query")
@@ -545,7 +548,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         path.put("tags", Arrays.asList(option.getTagName()));
                     }
                     path.put("operationId", option.getOperationId());
-                    path.put("parameters", buildParameters(isArray, hasId));
+                    path.put("parameters", buildParameters(GET, isArray, hasId));
                     if (option.getMessageBodyType().equals("Response")) {
                         schemaName = ((isArray) ? schemaName + "List" : schemaName);
                         path.put("responses", ImmutableMap.<String, Object>builder()
@@ -805,7 +808,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         path.put("tags", Arrays.asList(option.getTagName()));
                     }
                     path.put("operationId", option.getOperationId());
-                    path.put("parameters", buildParameters(isArray, hasId));
+                    path.put("parameters", buildParameters(PATCH, isArray, hasId));
                     if (option.getMessageBodyType().equals("Request")) {
                         schemaName = ((isArray) ? schemaName + "List" : schemaName);
                         path.put("requestBody", ImmutableMap.<String, Object>builder()
