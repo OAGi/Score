@@ -602,7 +602,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         prefix = "query";
                     }
 
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
                     }
@@ -663,23 +664,53 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        if (option.isDuplicate()){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            } else {
+                                if (!schemas.containsKey(schemaName)) {
+                                    schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
                         }
                     }
                 }

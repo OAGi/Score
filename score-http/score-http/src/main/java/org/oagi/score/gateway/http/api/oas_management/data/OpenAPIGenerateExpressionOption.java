@@ -16,6 +16,7 @@ public class OpenAPIGenerateExpressionOption {
     private String resourceName;
     private String operationId;
     private String tagName;
+    private boolean duplicate;
     private Map<BigInteger, BigInteger> bizCtxIds = Collections.emptyMap();
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;

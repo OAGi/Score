@@ -88,6 +88,8 @@ public class OpenAPIGenerateService {
                 }
             }
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
+            boolean duplicate = isTopLevelAbiepDuplicate(topLevelAsbiepIds, option.getTopLevelAsbiepId());
+            option.setDuplicate(duplicate);
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }
 
@@ -98,6 +100,20 @@ public class OpenAPIGenerateService {
             throw new BieGenerateFailureException("I/O operation failure.", e);
         }
         return schemaExpressionFile;
+    }
+
+    private boolean isTopLevelAbiepDuplicate (List<BigInteger> topLevelAsbiepIds, BigInteger currentTopLevelAbiep){
+        int num = 0;
+        for (BigInteger id: topLevelAsbiepIds){
+            if (id.equals(currentTopLevelAbiep)) num++;
+            if (num > 1) break;
+        }
+        if (num> 1) {
+            return  true;
+        }
+        else {
+            return false;
+        }
     }
 
     private BieGenerateOpenApiExpression createBieGenerateOpenAPIExpression() {
