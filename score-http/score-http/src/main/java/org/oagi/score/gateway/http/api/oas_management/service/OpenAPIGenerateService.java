@@ -88,7 +88,7 @@ public class OpenAPIGenerateService {
                 }
             }
             TopLevelAsbiep topLevelAsbiep = topLevelAsbiepRepository.findById(option.getTopLevelAsbiepId());
-            boolean duplicate = isTopLevelAbiepDuplicate(topLevelAsbiepIds, option.getTopLevelAsbiepId());
+            boolean duplicate = isTopLevelAsbiepDuplicate(topLevelAsbiepIds, option.getTopLevelAsbiepId());
             option.setDuplicate(duplicate);
             generateExpression.generate(topLevelAsbiep, generationContext, option);
         }
@@ -102,7 +102,7 @@ public class OpenAPIGenerateService {
         return schemaExpressionFile;
     }
 
-    private boolean isTopLevelAbiepDuplicate (List<BigInteger> topLevelAsbiepIds, BigInteger currentTopLevelAbiep){
+    private boolean isTopLevelAsbiepDuplicate (List<BigInteger> topLevelAsbiepIds, BigInteger currentTopLevelAbiep){
         int num = 0;
         for (BigInteger id: topLevelAsbiepIds){
             if (id.equals(currentTopLevelAbiep)) num++;
