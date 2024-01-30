@@ -319,8 +319,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
-
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
 
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
@@ -360,25 +360,49 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(postTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed) {
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
+                            }
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
                             }
                         } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
-                        }
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
 
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPostTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
+                        }
                     }
                 }//end option.getOpenAPI30TemplateMap().containsKey(postTemplateKey)
 
@@ -390,7 +414,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
 
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
@@ -426,33 +451,52 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                                         .build())
                                 .build());
                     }
-//                    if (!schemas.containsKey(schemaName)) {
-//                        Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-//                        fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-//                        schemas.put(schemaName, properties);
-//                    }
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed) {
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
+                            }
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
                             }
                         } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
-                        }
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
 
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
+                        }
                     }
                 }//end option.getOpenAPI30TemplateMap().containsKey(putTemplateKey)
 
@@ -464,7 +508,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
                     }
@@ -503,25 +548,49 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
-                        }
 
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
+                        }
                     }
 
                 } // end option.getOpenAPI30TemplateMap().containsKey(patchTemplateKey)
@@ -533,7 +602,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     if (isDifferentForGetAndPost) {
                         prefix = "query";
                     }
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
                     }
@@ -572,24 +642,56 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(getTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            } else {
+                                if (!schemas.containsKey(schemaName)) {
+                                    schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForGetTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
                         }
+
                     }
                 }
 
@@ -664,7 +766,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (option.isDuplicate()){
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(postTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
                             String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
                             if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
@@ -727,9 +830,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     if (isDifferentForGetAndPut) {
                         prefix = "replace";
                     }
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
 
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    //boolean isSupressed = option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty();
                     // This will never be true?
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
@@ -791,24 +894,56 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            } else {
+                                if (!schemas.containsKey(schemaName)) {
+                                    schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPutTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
                         }
+
                     }
                 }
 
@@ -823,8 +958,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     if (isDifferentForGetAndPatch) {
                         prefix = "update";
                     }
-
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
                     }
@@ -887,24 +1022,56 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            } else {
+                                if (!schemas.containsKey(schemaName)) {
+                                    schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForPatchTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
                         }
+
                     }
                 }
 
@@ -916,8 +1083,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
-
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    String topLevelAbiepName = Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
+                    schemaName = prefix + topLevelAbiepName;
                     if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
                         option.getOpenAPI30TemplateMap().get(deleteTemplateKey).setSuppressRootProperty(true);
                     }
@@ -949,23 +1116,48 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
                     // Issue #1483
                     if (!schemas.containsKey(schemaName)) {
-                        if (isArray) {
-                            schemas.put(schemaName, ImmutableMap.<String, Object>builder()
-                                    .put("type", "array")
-                                    .put("items", ImmutableMap.<String, Object>builder()
-                                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
-                                            .build())
-                                    .build());
-
-                            if (!schemas.containsKey(schemaName + "Entry")) {
+                        boolean isSupressed = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isSuppressRootProperty();
+                        if (option.isDuplicate() && !isSupressed){
+                            String topLevelAbiepSchemaName = topLevelAbiepName + topLevelAsbiep.getTopLevelAsbiepId();
+                            if (!schemas.containsKey(topLevelAbiepSchemaName)) {
                                 Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
                                 fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                                schemas.put(schemaName + "Entry", properties);
+                                schemas.put(topLevelAbiepSchemaName, properties);
                             }
-                        } else {
-                            Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
-                            fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
-                            schemas.put(schemaName, properties);
+
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    schemas.put(schemaName + "Entry", ImmutableMap.<String, Object>builder()
+                                            .put("$ref", "#/components/schemas/" + topLevelAbiepSchemaName)
+                                            .build());
+                                }
+                            }
+                        } else{
+                            if (isArray) {
+                                schemas.put(schemaName, ImmutableMap.<String, Object>builder()
+                                        .put("type", "array")
+                                        .put("items", ImmutableMap.<String, Object>builder()
+                                                .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                                                .build())
+                                        .build());
+
+                                if (!schemas.containsKey(schemaName + "Entry")) {
+                                    Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                    fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                    schemas.put(schemaName + "Entry", properties);
+                                }
+                            } else {
+                                Map<String, Object> properties = makeProperties(typeAbie, topLevelAsbiep);
+                                fillPropertiesForDeleteTemplate(properties, schemas, asbiep, typeAbie, generationContext);
+                                schemas.put(schemaName, properties);
+                            }
                         }
                     }
                 }
