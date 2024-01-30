@@ -175,7 +175,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             parameters.add(ImmutableMap.<String, Object>builder()
                     .put("name", "sinceLastDateTime")
                     .put("in", "query")
-                    .put("description", "")
+                    .put("description", "Returns resources that have been updated since the last time the endpoint has been called")
                     .put("required", false)
                     .put("schema", ImmutableMap.<String, Object>builder()
                             .put("type", "string")
