@@ -1,7 +1,7 @@
 import {PageRequest} from '../../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode4Array, hashCode4String} from '../../../../common/utility';
+import {base64Decode, base64Encode, hashCode, hashCode4Array, hashCode4Object, hashCode4String} from '../../../../common/utility';
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
 import {ChangeListener} from '../../../domain/bie-flat-tree';
@@ -147,6 +147,7 @@ export class BieForOasDocListRequest {
   updaterLoginIds: string[] = [];
   page: PageRequest = new PageRequest();
   ownedByDeveloper: boolean = undefined;
+
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
@@ -328,20 +329,25 @@ export class BieForOasDoc {
       tagName: this.tagName
     };
   }
+
   get resourceName(): string {
     return this._resourceName;
   }
+
   set resourceName(value: string) {
     this._resourceName = value;
     this.listeners.forEach(e => e.onChange(this, 'resourceName', value));
   }
+
   get operationId(): string {
     return this._operationId;
   }
+
   set operationId(value: string) {
     this._operationId = value;
     this.listeners.forEach(e => e.onChange(this, 'operationId', value));
   }
+
   get tagName(): string {
     return this._tagName;
   }
@@ -353,6 +359,7 @@ export class BieForOasDoc {
   get verb(): string {
     return this._verb;
   }
+
   set verb(value: string) {
     this._verb = value;
   }
@@ -382,22 +389,20 @@ export class BieForOasDoc {
   }
 
   get hashCode(): number {
-    return ((this.verb) ? hashCode4String(this.verb) : 0) +
-      ((this.messageBody) ? hashCode4Array(this.messageBody) : 0) +
-      ((this.resourceName) ? hashCode4String(this.resourceName) : 0) +
-      ((this.operationId) ? hashCode4String(this.operationId) : 0) +
-      ((this.tagName) ? hashCode4String(this.tagName) : 0) +
-      ((this.arrayIndicator) ? 1231 : 1237) +
-      ((this.suppressRootIndicator) ? 1231 : 1237);
+    return hashCode4Array([this.oasDocId, this.topLevelAsbiepId, this.oasResourceId, this.oasOperationId,
+      this.verb, this.messageBody, this.resourceName, this.operationId, this.tagName,
+      this.arrayIndicator, this.suppressRootIndicator]);
   }
 
   reset(): void {
     this.$hashCode = this.hashCode;
   }
+
   get isChanged(): boolean {
     return this.$hashCode !== this.hashCode;
   }
 }
+
 export class AssignBieForOasDoc {
   oasRequest: boolean;
   oasDocId: number;
@@ -410,9 +415,11 @@ export class AssignBieForOasDoc {
   messageBody: string;
   tagName: string;
 }
+
 export class BieForOasDocUpdateRequest {
   oasDocId: number;
   bieForOasDocList: BieForOasDoc[];
+
   constructor() {
     this.bieForOasDocList = [];
   }
@@ -428,6 +435,7 @@ export class BieForOasDocUpdateRequest {
 export class BieForOasDocDeleteRequest {
   oasDocId: number;
   bieForOasDocList: BieForOasDoc[];
+
   constructor() {
     this.bieForOasDocList = [];
   }
@@ -439,11 +447,12 @@ export class BieForOasDocDeleteRequest {
     };
   }
 }
+
 export class ReusedBIEViolationCheck {
   errorMessages: string[];
 }
 
-export class OasTag{
+export class OasTag {
   oasTagId: number;
   guid: string;
   name: string;

@@ -222,10 +222,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             } else {
                 schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                         .put("type", "object")
-                        .put("required", Arrays.asList(schemaReference.getName()))
+                        .put("required", Arrays.asList(schemaReference.getPropertyName()))
                         .put("additionalProperties", false)
                         .put("properties", ImmutableMap.<String, Object>builder()
-                                .put(schemaReference.getName(), ImmutableMap.<String, Object>builder()
+                                .put(schemaReference.getPropertyName(), ImmutableMap.<String, Object>builder()
                                         .put("$ref", schemaReference.getPath())
                                         .build())
                                 .build())
@@ -1512,18 +1512,32 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private class SchemaReference {
 
-        private String name;
+        private String propertyName;
+        private String schemaName;
         private String path;
         private Map<String, Object> properties;
 
-        public SchemaReference(String name, String path, Map<String, Object> properties) {
-            this.name = name;
+        public SchemaReference(String propertyName, String schemaName, String path, Map<String, Object> properties) {
+            this.propertyName = propertyName;
+            this.schemaName = schemaName;
             this.path = path;
             this.properties = properties;
         }
 
-        public String getName() {
-            return name;
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public void setPropertyName(String propertyName) {
+            this.propertyName = propertyName;
+        }
+
+        public String getSchemaName() {
+            return schemaName;
+        }
+
+        public void setSchemaName(String schemaName) {
+            this.schemaName = schemaName;
         }
 
         public String getPath() {
@@ -1538,31 +1552,32 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
     private SchemaReference getReference(Map<String, Object> schemas, ASBIEP asbiep,
                                          GenerationContext generationContext) {
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
+        String propertyName = convertIdentifierToId(camelCase(asccp.getPropertyTerm()));
+        String schemaName = propertyName;
         Map<String, Object> properties;
-        if (!schemas.containsKey(name)) {
+        if (!schemas.containsKey(schemaName)) {
             TopLevelAsbiep refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.getOwnerTopLevelAsbiepId());
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
             properties = makeProperties(typeAbie, refTopLevelAsbiep);
             fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
             suppressRootProperty(properties);
-            schemas.put(name, properties);
+            schemas.put(schemaName, properties);
         } else {
-            properties = (Map<String, Object>) schemas.get(name);
+            properties = (Map<String, Object>) schemas.get(propertyName);
             // If it's duplicated
             if (!asbiep.getGuid().equals(properties.get("x-oagis-bie-guid"))) {
                 TopLevelAsbiep refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.getOwnerTopLevelAsbiepId());
-                name = name + refTopLevelAsbiep.getTopLevelAsbiepId();
+                schemaName = schemaName + refTopLevelAsbiep.getTopLevelAsbiepId();
                 ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
                 properties = makeProperties(typeAbie, refTopLevelAsbiep);
                 fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
                 suppressRootProperty(properties);
-                schemas.put(name, properties);
+                schemas.put(schemaName, properties);
             }
         }
 
-        String path = "#/components/schemas/" + name;
-        return new SchemaReference(name, path, properties);
+        String path = "#/components/schemas/" + schemaName;
+        return new SchemaReference(propertyName, schemaName, path, properties);
     }
 
     private String getReference(Map<String, Object> schemas, BBIE bbie, DT bdt,
