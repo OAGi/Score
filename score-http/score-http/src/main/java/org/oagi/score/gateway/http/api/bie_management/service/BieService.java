@@ -200,7 +200,6 @@ public class BieService {
 
         List<BieList> bieLists = result.getResult();
         bieLists.forEach(bieList -> {
-
             GetBusinessContextListRequest getBusinessContextListRequest =
                     new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
                             .withTopLevelAsbiepIdList(Arrays.asList(bieList.getTopLevelAsbiepId()))

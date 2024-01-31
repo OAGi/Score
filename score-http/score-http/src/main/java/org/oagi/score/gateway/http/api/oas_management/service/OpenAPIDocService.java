@@ -117,7 +117,6 @@ public class OpenAPIDocService {
 
         List<BieForOasDoc> bieForOasDocList = result.getResult();
         bieForOasDocList.forEach(bieForOasDoc -> {
-
             GetBusinessContextListRequest getBusinessContextListRequest =
                     new GetBusinessContextListRequest(authenticationService.asScoreUser(user))
                             .withTopLevelAsbiepIdList(Arrays.asList(bieForOasDoc.getTopLevelAsbiepId()))

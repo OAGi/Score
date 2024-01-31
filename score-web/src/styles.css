@@ -108,7 +108,6 @@ b {
 
 .mat-mdc-table {
   width: 100%;
-  table-layout: fixed !important;
 }
 
 .mat-mdc-table .mat-column-select {

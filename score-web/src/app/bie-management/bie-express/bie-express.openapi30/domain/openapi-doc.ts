@@ -5,6 +5,7 @@ import {base64Decode, base64Encode, hashCode4Array, hashCode4String} from '../..
 import {ScoreUser} from '../../../../authentication/domain/auth';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
 import {ChangeListener} from '../../../domain/bie-flat-tree';
+import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
 
 export class OasDocListRequest {
   filters: {
@@ -270,6 +271,7 @@ export class BieForOasDoc {
   lastUpdateTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
+  businessContexts: BusinessContext[] = [];
   private _resourceName: string;
   private _operationId: string;
   private _tagName: string;
@@ -308,6 +310,7 @@ export class BieForOasDoc {
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
+    this.businessContexts = obj && obj.businessContexts || [];
   }
 
   get json(): any {
