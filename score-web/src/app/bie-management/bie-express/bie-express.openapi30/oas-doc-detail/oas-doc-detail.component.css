@@ -23,15 +23,15 @@
 }
 
 .mat-column-resourceName {
-  width: 15%;
+  width: 18%;
 }
 
 .mat-column-operationId {
-  width: 15%;
+  width: 18%;
 }
 
 .mat-column-tagName {
-  width: 12%;
+  width: 10%;
 }
 
 .mat-column-tagName .tagName:not(:last-child)::after {
