@@ -360,11 +360,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
 
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
-                    }
-
                     boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(postTemplateKey).isSuppressRootProperty();
                     if (option.getTagName() != null && !existingPath.containsKey("tags")) {
                         existingPath.put("tags", Arrays.asList(option.getTagName()));
@@ -409,12 +408,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
-                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
 
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
-                    }
+                    schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
                     boolean isArray = option.getOpenAPI30TemplateMap().get(putTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty();
                     if (option.getTagName() != null && !existingPath.containsKey("tags")) {
                         existingPath.put("tags", Arrays.asList(option.getTagName()));
@@ -458,11 +457,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     } else if (option.getMessageBodyType().equals("Response")) {
                         prefix = "query";
                     }
+
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isSuppressRootProperty();
                     if (option.getTagName() != null && !existingPath.containsKey("tags")) {
                         existingPath.put("tags", Arrays.asList(option.getTagName()));
@@ -506,11 +506,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     if (isDifferentForGetAndPost) {
                         prefix = "query";
                     }
+
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(getTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(getTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(getTemplateKey).isSuppressRootProperty();
                     boolean hasId = pathName.contains("{id}");
                     path.put("summary", "");
@@ -557,10 +558,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
 
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(postTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(postTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(postTemplateKey).isSuppressRootProperty();
                     path.put("summary", "");
                     path.put("description", "");
@@ -633,11 +634,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
 
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    // This will never be true?
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(putTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(putTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(putTemplateKey).isSuppressRootProperty();
                     path.put("summary", "");
                     path.put("description", "");
@@ -709,10 +709,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
 
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(patchTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(patchTemplateKey).isSuppressRootProperty();
                     boolean hasId = pathName.contains("{id}");
                     path.put("summary", "");
@@ -783,10 +783,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     }
 
                     schemaName = prefix + Character.toUpperCase(bieName.charAt(0)) + bieName.substring(1);
-                    if (schemaName.toLowerCase().equals(bieName.toLowerCase())) {
-                        option.getOpenAPI30TemplateMap().get(deleteTemplateKey).setSuppressRootProperty(true);
-                    }
                     boolean isArray = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isArrayForJsonExpression();
+                    if (schemas.containsKey(((isArray) ? schemaName + "List" : schemaName))) {
+                        schemaName = schemaName + topLevelAsbiep.getTopLevelAsbiepId();
+                    }
                     boolean isSuppressRoot = option.getOpenAPI30TemplateMap().get(deleteTemplateKey).isSuppressRootProperty();
                     path.put("summary", "");
                     path.put("description", "");
