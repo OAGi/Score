@@ -6,10 +6,7 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record8;
-import org.jooq.Row8;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
@@ -20,7 +17,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory;
  * described in the CCTS are business process, industry, etc.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> implements Record8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> {
+public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -161,201 +158,6 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> im
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record8 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
-    }
-
-    @Override
-    public Row8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> valuesRow() {
-        return (Row8) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return CtxCategory.CTX_CATEGORY.CTX_CATEGORY_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return CtxCategory.CTX_CATEGORY.GUID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return CtxCategory.CTX_CATEGORY.NAME;
-    }
-
-    @Override
-    public Field<String> field4() {
-        return CtxCategory.CTX_CATEGORY.DESCRIPTION;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return CtxCategory.CTX_CATEGORY.CREATED_BY;
-    }
-
-    @Override
-    public Field<ULong> field6() {
-        return CtxCategory.CTX_CATEGORY.LAST_UPDATED_BY;
-    }
-
-    @Override
-    public Field<LocalDateTime> field7() {
-        return CtxCategory.CTX_CATEGORY.CREATION_TIMESTAMP;
-    }
-
-    @Override
-    public Field<LocalDateTime> field8() {
-        return CtxCategory.CTX_CATEGORY.LAST_UPDATE_TIMESTAMP;
-    }
-
-    @Override
-    public ULong component1() {
-        return getCtxCategoryId();
-    }
-
-    @Override
-    public String component2() {
-        return getGuid();
-    }
-
-    @Override
-    public String component3() {
-        return getName();
-    }
-
-    @Override
-    public String component4() {
-        return getDescription();
-    }
-
-    @Override
-    public ULong component5() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public ULong component6() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public LocalDateTime component7() {
-        return getCreationTimestamp();
-    }
-
-    @Override
-    public LocalDateTime component8() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public ULong value1() {
-        return getCtxCategoryId();
-    }
-
-    @Override
-    public String value2() {
-        return getGuid();
-    }
-
-    @Override
-    public String value3() {
-        return getName();
-    }
-
-    @Override
-    public String value4() {
-        return getDescription();
-    }
-
-    @Override
-    public ULong value5() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public ULong value6() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public LocalDateTime value7() {
-        return getCreationTimestamp();
-    }
-
-    @Override
-    public LocalDateTime value8() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public CtxCategoryRecord value1(ULong value) {
-        setCtxCategoryId(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value2(String value) {
-        setGuid(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value3(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value4(String value) {
-        setDescription(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value5(ULong value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value6(ULong value) {
-        setLastUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value7(LocalDateTime value) {
-        setCreationTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord value8(LocalDateTime value) {
-        setLastUpdateTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public CtxCategoryRecord values(ULong value1, String value2, String value3, String value4, ULong value5, ULong value6, LocalDateTime value7, LocalDateTime value8) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        value8(value8);
-        return this;
     }
 
     // -------------------------------------------------------------------------

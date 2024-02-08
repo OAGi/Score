@@ -6,20 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function21;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row21;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,14 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Acc.AccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Ascc.AsccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Asccp.AsccpPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc.BccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUserExtRevision.BieUserExtRevisionPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 
 
@@ -223,11 +235,11 @@ public class Acc extends TableImpl<AccRecord> {
     public final TableField<AccRecord, ULong> NEXT_ACC_ID = createField(DSL.name("next_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Acc(Name alias, Table<AccRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Acc(Name alias, Table<AccRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The ACC table holds information about complex data structured concepts. For example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC."), TableOptions.table());
+    private Acc(Name alias, Table<AccRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The ACC table holds information about complex data structured concepts. For example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -251,8 +263,35 @@ public class Acc extends TableImpl<AccRecord> {
         this(DSL.name("acc"), null);
     }
 
-    public <O extends Record> Acc(Table<O> child, ForeignKey<O, AccRecord> key) {
-        super(child, key, ACC);
+    public <O extends Record> Acc(Table<O> path, ForeignKey<O, AccRecord> childPath, InverseForeignKey<O, AccRecord> parentPath) {
+        super(path, childPath, parentPath, ACC);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AccPath extends Acc implements Path<AccRecord> {
+        public <O extends Record> AccPath(Table<O> path, ForeignKey<O, AccRecord> childPath, InverseForeignKey<O, AccRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AccPath(Name alias, Table<AccRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AccPath as(String alias) {
+            return new AccPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AccPath as(Name alias) {
+            return new AccPath(alias, this);
+        }
+
+        @Override
+        public AccPath as(Table<?> alias) {
+            return new AccPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -280,100 +319,184 @@ public class Acc extends TableImpl<AccRecord> {
         return Arrays.asList(Keys.ACC_BASED_ACC_ID_FK, Keys.ACC_NAMESPACE_ID_FK, Keys.ACC_CREATED_BY_FK, Keys.ACC_OWNER_USER_ID_FK, Keys.ACC_LAST_UPDATED_BY_FK, Keys.ACC_REPLACEMENT_ACC_ID_FK, Keys.ACC_PREV_ACC_ID_FK, Keys.ACC_NEXT_ACC_ID_FK);
     }
 
-    private transient Acc _accBasedAccIdFk;
-    private transient Namespace _namespace;
-    private transient AppUser _accCreatedByFk;
-    private transient AppUser _accOwnerUserIdFk;
-    private transient AppUser _accLastUpdatedByFk;
-    private transient Acc _accReplacementAccIdFk;
-    private transient Acc _accPrevAccIdFk;
-    private transient Acc _accNextAccIdFk;
+    private transient AccPath _accBasedAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>acc_based_acc_id_fk</code> key.
      */
-    public Acc accBasedAccIdFk() {
+    public AccPath accBasedAccIdFk() {
         if (_accBasedAccIdFk == null)
-            _accBasedAccIdFk = new Acc(this, Keys.ACC_BASED_ACC_ID_FK);
+            _accBasedAccIdFk = new AccPath(this, Keys.ACC_BASED_ACC_ID_FK, null);
 
         return _accBasedAccIdFk;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.ACC_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.ACC_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AppUserPath _accCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>acc_created_by_fk</code> key.
      */
-    public AppUser accCreatedByFk() {
+    public AppUserPath accCreatedByFk() {
         if (_accCreatedByFk == null)
-            _accCreatedByFk = new AppUser(this, Keys.ACC_CREATED_BY_FK);
+            _accCreatedByFk = new AppUserPath(this, Keys.ACC_CREATED_BY_FK, null);
 
         return _accCreatedByFk;
     }
+
+    private transient AppUserPath _accOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>acc_owner_user_id_fk</code> key.
      */
-    public AppUser accOwnerUserIdFk() {
+    public AppUserPath accOwnerUserIdFk() {
         if (_accOwnerUserIdFk == null)
-            _accOwnerUserIdFk = new AppUser(this, Keys.ACC_OWNER_USER_ID_FK);
+            _accOwnerUserIdFk = new AppUserPath(this, Keys.ACC_OWNER_USER_ID_FK, null);
 
         return _accOwnerUserIdFk;
     }
+
+    private transient AppUserPath _accLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>acc_last_updated_by_fk</code> key.
      */
-    public AppUser accLastUpdatedByFk() {
+    public AppUserPath accLastUpdatedByFk() {
         if (_accLastUpdatedByFk == null)
-            _accLastUpdatedByFk = new AppUser(this, Keys.ACC_LAST_UPDATED_BY_FK);
+            _accLastUpdatedByFk = new AppUserPath(this, Keys.ACC_LAST_UPDATED_BY_FK, null);
 
         return _accLastUpdatedByFk;
     }
+
+    private transient AccPath _accReplacementAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>acc_replacement_acc_id_fk</code> key.
      */
-    public Acc accReplacementAccIdFk() {
+    public AccPath accReplacementAccIdFk() {
         if (_accReplacementAccIdFk == null)
-            _accReplacementAccIdFk = new Acc(this, Keys.ACC_REPLACEMENT_ACC_ID_FK);
+            _accReplacementAccIdFk = new AccPath(this, Keys.ACC_REPLACEMENT_ACC_ID_FK, null);
 
         return _accReplacementAccIdFk;
     }
+
+    private transient AccPath _accPrevAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>acc_prev_acc_id_fk</code> key.
      */
-    public Acc accPrevAccIdFk() {
+    public AccPath accPrevAccIdFk() {
         if (_accPrevAccIdFk == null)
-            _accPrevAccIdFk = new Acc(this, Keys.ACC_PREV_ACC_ID_FK);
+            _accPrevAccIdFk = new AccPath(this, Keys.ACC_PREV_ACC_ID_FK, null);
 
         return _accPrevAccIdFk;
     }
+
+    private transient AccPath _accNextAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>acc_next_acc_id_fk</code> key.
      */
-    public Acc accNextAccIdFk() {
+    public AccPath accNextAccIdFk() {
         if (_accNextAccIdFk == null)
-            _accNextAccIdFk = new Acc(this, Keys.ACC_NEXT_ACC_ID_FK);
+            _accNextAccIdFk = new AccPath(this, Keys.ACC_NEXT_ACC_ID_FK, null);
 
         return _accNextAccIdFk;
+    }
+
+    private transient AccManifestPath _accManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc_manifest</code>
+     * table
+     */
+    public AccManifestPath accManifest() {
+        if (_accManifest == null)
+            _accManifest = new AccManifestPath(this, null, Keys.ACC_MANIFEST_ACC_ID_FK.getInverseKey());
+
+        return _accManifest;
+    }
+
+    private transient AsccpPath _asccp;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asccp</code> table
+     */
+    public AsccpPath asccp() {
+        if (_asccp == null)
+            _asccp = new AsccpPath(this, null, Keys.ASCCP_ROLE_OF_ACC_ID_FK.getInverseKey());
+
+        return _asccp;
+    }
+
+    private transient AsccPath _ascc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table
+     */
+    public AsccPath ascc() {
+        if (_ascc == null)
+            _ascc = new AsccPath(this, null, Keys.ASCC_FROM_ACC_ID_FK.getInverseKey());
+
+        return _ascc;
+    }
+
+    private transient BccPath _bcc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table
+     */
+    public BccPath bcc() {
+        if (_bcc == null)
+            _bcc = new BccPath(this, null, Keys.BCC_FROM_ACC_ID_FK.getInverseKey());
+
+        return _bcc;
+    }
+
+    private transient BieUserExtRevisionPath _bieUserExtRevisionExtAccIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_user_ext_revision</code> table, via the
+     * <code>bie_user_ext_revision_ext_acc_id_fk</code> key
+     */
+    public BieUserExtRevisionPath bieUserExtRevisionExtAccIdFk() {
+        if (_bieUserExtRevisionExtAccIdFk == null)
+            _bieUserExtRevisionExtAccIdFk = new BieUserExtRevisionPath(this, null, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK.getInverseKey());
+
+        return _bieUserExtRevisionExtAccIdFk;
+    }
+
+    private transient BieUserExtRevisionPath _bieUserExtRevisionUserExtAccIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_user_ext_revision</code> table, via the
+     * <code>bie_user_ext_revision_user_ext_acc_id_fk</code> key
+     */
+    public BieUserExtRevisionPath bieUserExtRevisionUserExtAccIdFk() {
+        if (_bieUserExtRevisionUserExtAccIdFk == null)
+            _bieUserExtRevisionUserExtAccIdFk = new BieUserExtRevisionPath(this, null, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK.getInverseKey());
+
+        return _bieUserExtRevisionUserExtAccIdFk;
     }
 
     @Override
@@ -415,27 +538,87 @@ public class Acc extends TableImpl<AccRecord> {
         return new Acc(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row21 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row21<ULong, String, String, String, String, String, ULong, String, Integer, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
-        return (Row21) super.fieldsRow();
+    public Acc where(Condition condition) {
+        return new Acc(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function21<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Acc where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function21<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Acc where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Acc where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Acc where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Acc where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Acc where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Acc where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Acc whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Acc whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

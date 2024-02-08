@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function13;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row13;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeList.CodeListPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxCategory.CtxCategoryPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CtxSchemeValue.CtxSchemeValuePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CtxSchemeRecord;
 
 
@@ -137,11 +145,11 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
     public final TableField<CtxSchemeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the scheme was last updated.");
 
     private CtxScheme(Name alias, Table<CtxSchemeRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CtxScheme(Name alias, Table<CtxSchemeRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents a context scheme (a classification scheme) for a context category."), TableOptions.table());
+    private CtxScheme(Name alias, Table<CtxSchemeRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table represents a context scheme (a classification scheme) for a context category."), TableOptions.table(), where);
     }
 
     /**
@@ -165,8 +173,35 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
         this(DSL.name("ctx_scheme"), null);
     }
 
-    public <O extends Record> CtxScheme(Table<O> child, ForeignKey<O, CtxSchemeRecord> key) {
-        super(child, key, CTX_SCHEME);
+    public <O extends Record> CtxScheme(Table<O> path, ForeignKey<O, CtxSchemeRecord> childPath, InverseForeignKey<O, CtxSchemeRecord> parentPath) {
+        super(path, childPath, parentPath, CTX_SCHEME);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CtxSchemePath extends CtxScheme implements Path<CtxSchemeRecord> {
+        public <O extends Record> CtxSchemePath(Table<O> path, ForeignKey<O, CtxSchemeRecord> childPath, InverseForeignKey<O, CtxSchemeRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CtxSchemePath(Name alias, Table<CtxSchemeRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CtxSchemePath as(String alias) {
+            return new CtxSchemePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CtxSchemePath as(Name alias) {
+            return new CtxSchemePath(alias, this);
+        }
+
+        @Override
+        public CtxSchemePath as(Table<?> alias) {
+            return new CtxSchemePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -194,51 +229,67 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
         return Arrays.asList(Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, Keys.CTX_SCHEME_CODE_LIST_ID_FK, Keys.CTX_SCHEME_CREATED_BY_FK, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
     }
 
-    private transient CtxCategory _ctxCategory;
-    private transient CodeList _codeList;
-    private transient AppUser _ctxSchemeCreatedByFk;
-    private transient AppUser _ctxSchemeLastUpdatedByFk;
+    private transient CtxCategoryPath _ctxCategory;
 
     /**
      * Get the implicit join path to the <code>oagi.ctx_category</code> table.
      */
-    public CtxCategory ctxCategory() {
+    public CtxCategoryPath ctxCategory() {
         if (_ctxCategory == null)
-            _ctxCategory = new CtxCategory(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK);
+            _ctxCategory = new CtxCategoryPath(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, null);
 
         return _ctxCategory;
     }
 
+    private transient CodeListPath _codeList;
+
     /**
      * Get the implicit join path to the <code>oagi.code_list</code> table.
      */
-    public CodeList codeList() {
+    public CodeListPath codeList() {
         if (_codeList == null)
-            _codeList = new CodeList(this, Keys.CTX_SCHEME_CODE_LIST_ID_FK);
+            _codeList = new CodeListPath(this, Keys.CTX_SCHEME_CODE_LIST_ID_FK, null);
 
         return _codeList;
     }
+
+    private transient AppUserPath _ctxSchemeCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>ctx_scheme_created_by_fk</code> key.
      */
-    public AppUser ctxSchemeCreatedByFk() {
+    public AppUserPath ctxSchemeCreatedByFk() {
         if (_ctxSchemeCreatedByFk == null)
-            _ctxSchemeCreatedByFk = new AppUser(this, Keys.CTX_SCHEME_CREATED_BY_FK);
+            _ctxSchemeCreatedByFk = new AppUserPath(this, Keys.CTX_SCHEME_CREATED_BY_FK, null);
 
         return _ctxSchemeCreatedByFk;
     }
+
+    private transient AppUserPath _ctxSchemeLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>ctx_scheme_last_updated_by_fk</code> key.
      */
-    public AppUser ctxSchemeLastUpdatedByFk() {
+    public AppUserPath ctxSchemeLastUpdatedByFk() {
         if (_ctxSchemeLastUpdatedByFk == null)
-            _ctxSchemeLastUpdatedByFk = new AppUser(this, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
+            _ctxSchemeLastUpdatedByFk = new AppUserPath(this, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK, null);
 
         return _ctxSchemeLastUpdatedByFk;
+    }
+
+    private transient CtxSchemeValuePath _ctxSchemeValue;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.ctx_scheme_value</code> table
+     */
+    public CtxSchemeValuePath ctxSchemeValue() {
+        if (_ctxSchemeValue == null)
+            _ctxSchemeValue = new CtxSchemeValuePath(this, null, Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK.getInverseKey());
+
+        return _ctxSchemeValue;
     }
 
     @Override
@@ -280,27 +331,87 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
         return new CtxScheme(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row13 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row13<ULong, String, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public CtxScheme where(Condition condition) {
+        return new CtxScheme(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function13<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CtxScheme where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CtxScheme where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxScheme where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxScheme where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxScheme where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxScheme where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxScheme where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxScheme whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxScheme whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

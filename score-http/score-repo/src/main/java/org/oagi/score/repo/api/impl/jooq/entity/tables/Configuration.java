@@ -5,19 +5,19 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Function4;
 import org.jooq.Identity;
 import org.jooq.Name;
-import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -77,11 +77,11 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The value of configuration property.");
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Configuration(Name alias, Table<ConfigurationRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table());
+    private Configuration(Name alias, Table<ConfigurationRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table(), where);
     }
 
     /**
@@ -103,10 +103,6 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
      */
     public Configuration() {
         this(DSL.name("configuration"), null);
-    }
-
-    public <O extends Record> Configuration(Table<O> child, ForeignKey<O, ConfigurationRecord> key) {
-        super(child, key, CONFIGURATION);
     }
 
     @Override
@@ -168,27 +164,87 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
         return new Configuration(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, String, String, String> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Configuration where(Condition condition) {
+        return new Configuration(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super String, ? super String, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Configuration where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super String, ? super String, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Configuration where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Configuration where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Configuration where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Configuration where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Configuration where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Configuration where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Configuration whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Configuration whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

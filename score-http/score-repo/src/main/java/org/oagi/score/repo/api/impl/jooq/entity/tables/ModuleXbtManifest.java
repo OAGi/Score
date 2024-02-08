@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleXbtManifestRecord;
 
 
@@ -103,11 +111,11 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
     public final TableField<ModuleXbtManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private ModuleXbtManifest(Name alias, Table<ModuleXbtManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private ModuleXbtManifest(Name alias, Table<ModuleXbtManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private ModuleXbtManifest(Name alias, Table<ModuleXbtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -131,8 +139,35 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
         this(DSL.name("module_xbt_manifest"), null);
     }
 
-    public <O extends Record> ModuleXbtManifest(Table<O> child, ForeignKey<O, ModuleXbtManifestRecord> key) {
-        super(child, key, MODULE_XBT_MANIFEST);
+    public <O extends Record> ModuleXbtManifest(Table<O> path, ForeignKey<O, ModuleXbtManifestRecord> childPath, InverseForeignKey<O, ModuleXbtManifestRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE_XBT_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModuleXbtManifestPath extends ModuleXbtManifest implements Path<ModuleXbtManifestRecord> {
+        public <O extends Record> ModuleXbtManifestPath(Table<O> path, ForeignKey<O, ModuleXbtManifestRecord> childPath, InverseForeignKey<O, ModuleXbtManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModuleXbtManifestPath(Name alias, Table<ModuleXbtManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModuleXbtManifestPath as(String alias) {
+            return new ModuleXbtManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModuleXbtManifestPath as(Name alias) {
+            return new ModuleXbtManifestPath(alias, this);
+        }
+
+        @Override
+        public ModuleXbtManifestPath as(Table<?> alias) {
+            return new ModuleXbtManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -155,61 +190,65 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
         return Arrays.asList(Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
-    private transient ModuleSetRelease _moduleSetRelease;
-    private transient XbtManifest _xbtManifest;
-    private transient Module _module;
-    private transient AppUser _moduleXbtManifestCreatedByFk;
-    private transient AppUser _moduleXbtManifestLastUpdatedByFk;
+    private transient ModuleSetReleasePath _moduleSetRelease;
 
     /**
      * Get the implicit join path to the <code>oagi.module_set_release</code>
      * table.
      */
-    public ModuleSetRelease moduleSetRelease() {
+    public ModuleSetReleasePath moduleSetRelease() {
         if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
 
         return _moduleSetRelease;
     }
 
+    private transient XbtManifestPath _xbtManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.xbt_manifest</code> table.
      */
-    public XbtManifest xbtManifest() {
+    public XbtManifestPath xbtManifest() {
         if (_xbtManifest == null)
-            _xbtManifest = new XbtManifest(this, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK);
+            _xbtManifest = new XbtManifestPath(this, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK, null);
 
         return _xbtManifest;
     }
 
+    private transient ModulePath _module;
+
     /**
      * Get the implicit join path to the <code>oagi.module</code> table.
      */
-    public Module module() {
+    public ModulePath module() {
         if (_module == null)
-            _module = new Module(this, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK);
+            _module = new ModulePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, null);
 
         return _module;
     }
+
+    private transient AppUserPath _moduleXbtManifestCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_xbt_manifest_created_by_fk</code> key.
      */
-    public AppUser moduleXbtManifestCreatedByFk() {
+    public AppUserPath moduleXbtManifestCreatedByFk() {
         if (_moduleXbtManifestCreatedByFk == null)
-            _moduleXbtManifestCreatedByFk = new AppUser(this, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK);
+            _moduleXbtManifestCreatedByFk = new AppUserPath(this, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK, null);
 
         return _moduleXbtManifestCreatedByFk;
     }
+
+    private transient AppUserPath _moduleXbtManifestLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_xbt_manifest_last_updated_by_fk</code> key.
      */
-    public AppUser moduleXbtManifestLastUpdatedByFk() {
+    public AppUserPath moduleXbtManifestLastUpdatedByFk() {
         if (_moduleXbtManifestLastUpdatedByFk == null)
-            _moduleXbtManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK);
+            _moduleXbtManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleXbtManifestLastUpdatedByFk;
     }
@@ -253,27 +292,87 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
         return new ModuleXbtManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public ModuleXbtManifest where(Condition condition) {
+        return new ModuleXbtManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public ModuleXbtManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public ModuleXbtManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleXbtManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleXbtManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleXbtManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleXbtManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleXbtManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleXbtManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleXbtManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

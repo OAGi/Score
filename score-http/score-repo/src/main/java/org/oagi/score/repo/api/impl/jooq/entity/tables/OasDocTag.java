@@ -6,18 +6,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasTag.OasTagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.OasDocTagRecord;
 
 
@@ -89,11 +96,11 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
     public final TableField<OasDocTagRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasDocTag(Name alias, Table<OasDocTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasDocTag(Name alias, Table<OasDocTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasDocTag(Name alias, Table<OasDocTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -117,8 +124,35 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
         this(DSL.name("oas_doc_tag"), null);
     }
 
-    public <O extends Record> OasDocTag(Table<O> child, ForeignKey<O, OasDocTagRecord> key) {
-        super(child, key, OAS_DOC_TAG);
+    public <O extends Record> OasDocTag(Table<O> path, ForeignKey<O, OasDocTagRecord> childPath, InverseForeignKey<O, OasDocTagRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_DOC_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasDocTagPath extends OasDocTag implements Path<OasDocTagRecord> {
+        public <O extends Record> OasDocTagPath(Table<O> path, ForeignKey<O, OasDocTagRecord> childPath, InverseForeignKey<O, OasDocTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasDocTagPath(Name alias, Table<OasDocTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasDocTagPath as(String alias) {
+            return new OasDocTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasDocTagPath as(Name alias) {
+            return new OasDocTagPath(alias, this);
+        }
+
+        @Override
+        public OasDocTagPath as(Table<?> alias) {
+            return new OasDocTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -136,49 +170,52 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
         return Arrays.asList(Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK, Keys.OAS_DOC_TAG_CREATED_BY_FK, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK);
     }
 
-    private transient OasDoc _oasDoc;
-    private transient OasTag _oasTag;
-    private transient AppUser _oasDocTagCreatedByFk;
-    private transient AppUser _oasDocTagLastUpdatedByFk;
+    private transient OasDocPath _oasDoc;
 
     /**
      * Get the implicit join path to the <code>oagi.oas_doc</code> table.
      */
-    public OasDoc oasDoc() {
+    public OasDocPath oasDoc() {
         if (_oasDoc == null)
-            _oasDoc = new OasDoc(this, Keys.OAS_DOC_TAG_OAS_DOC_ID_FK);
+            _oasDoc = new OasDocPath(this, Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, null);
 
         return _oasDoc;
     }
 
+    private transient OasTagPath _oasTag;
+
     /**
      * Get the implicit join path to the <code>oagi.oas_tag</code> table.
      */
-    public OasTag oasTag() {
+    public OasTagPath oasTag() {
         if (_oasTag == null)
-            _oasTag = new OasTag(this, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK);
+            _oasTag = new OasTagPath(this, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK, null);
 
         return _oasTag;
     }
+
+    private transient AppUserPath _oasDocTagCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_doc_tag_created_by_fk</code> key.
      */
-    public AppUser oasDocTagCreatedByFk() {
+    public AppUserPath oasDocTagCreatedByFk() {
         if (_oasDocTagCreatedByFk == null)
-            _oasDocTagCreatedByFk = new AppUser(this, Keys.OAS_DOC_TAG_CREATED_BY_FK);
+            _oasDocTagCreatedByFk = new AppUserPath(this, Keys.OAS_DOC_TAG_CREATED_BY_FK, null);
 
         return _oasDocTagCreatedByFk;
     }
+
+    private transient AppUserPath _oasDocTagLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_doc_tag_last_updated_by_fk</code> key.
      */
-    public AppUser oasDocTagLastUpdatedByFk() {
+    public AppUserPath oasDocTagLastUpdatedByFk() {
         if (_oasDocTagLastUpdatedByFk == null)
-            _oasDocTagLastUpdatedByFk = new AppUser(this, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK);
+            _oasDocTagLastUpdatedByFk = new AppUserPath(this, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK, null);
 
         return _oasDocTagLastUpdatedByFk;
     }
@@ -222,27 +259,87 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
         return new OasDocTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public OasDocTag where(Condition condition) {
+        return new OasDocTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasDocTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasDocTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasDocTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasDocTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasDocTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasDocTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasDocTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasDocTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasDocTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

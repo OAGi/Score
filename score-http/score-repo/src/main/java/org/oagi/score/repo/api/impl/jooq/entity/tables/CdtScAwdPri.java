@@ -5,19 +5,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtPri.CdtPriPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.CdtScAwdPriXpsTypeMap.CdtScAwdPriXpsTypeMapPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.CdtScAwdPriRecord;
 
 
@@ -81,11 +88,11 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
     public final TableField<CdtScAwdPriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false), this, "Indicating whether the primitive is the default primitive of the supplementary component.");
 
     private CdtScAwdPri(Name alias, Table<CdtScAwdPriRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CdtScAwdPri(Name alias, Table<CdtScAwdPriRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table capture the CDT primitives allowed for a particular SC of a CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends its base (such SC is not defined in the CCTS data type catalog specification)."), TableOptions.table());
+    private CdtScAwdPri(Name alias, Table<CdtScAwdPriRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table capture the CDT primitives allowed for a particular SC of a CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends its base (such SC is not defined in the CCTS data type catalog specification)."), TableOptions.table(), where);
     }
 
     /**
@@ -109,8 +116,35 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
         this(DSL.name("cdt_sc_awd_pri"), null);
     }
 
-    public <O extends Record> CdtScAwdPri(Table<O> child, ForeignKey<O, CdtScAwdPriRecord> key) {
-        super(child, key, CDT_SC_AWD_PRI);
+    public <O extends Record> CdtScAwdPri(Table<O> path, ForeignKey<O, CdtScAwdPriRecord> childPath, InverseForeignKey<O, CdtScAwdPriRecord> parentPath) {
+        super(path, childPath, parentPath, CDT_SC_AWD_PRI);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CdtScAwdPriPath extends CdtScAwdPri implements Path<CdtScAwdPriRecord> {
+        public <O extends Record> CdtScAwdPriPath(Table<O> path, ForeignKey<O, CdtScAwdPriRecord> childPath, InverseForeignKey<O, CdtScAwdPriRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CdtScAwdPriPath(Name alias, Table<CdtScAwdPriRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CdtScAwdPriPath as(String alias) {
+            return new CdtScAwdPriPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CdtScAwdPriPath as(Name alias) {
+            return new CdtScAwdPriPath(alias, this);
+        }
+
+        @Override
+        public CdtScAwdPriPath as(Table<?> alias) {
+            return new CdtScAwdPriPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -133,27 +167,41 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
         return Arrays.asList(Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK);
     }
 
-    private transient DtSc _dtSc;
-    private transient CdtPri _cdtPri;
+    private transient DtScPath _dtSc;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc</code> table.
      */
-    public DtSc dtSc() {
+    public DtScPath dtSc() {
         if (_dtSc == null)
-            _dtSc = new DtSc(this, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK);
+            _dtSc = new DtScPath(this, Keys.CDT_SC_AWD_PRI_CDT_SC_ID_FK, null);
 
         return _dtSc;
     }
 
+    private transient CdtPriPath _cdtPri;
+
     /**
      * Get the implicit join path to the <code>oagi.cdt_pri</code> table.
      */
-    public CdtPri cdtPri() {
+    public CdtPriPath cdtPri() {
         if (_cdtPri == null)
-            _cdtPri = new CdtPri(this, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK);
+            _cdtPri = new CdtPriPath(this, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK, null);
 
         return _cdtPri;
+    }
+
+    private transient CdtScAwdPriXpsTypeMapPath _cdtScAwdPriXpsTypeMap;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map</code> table
+     */
+    public CdtScAwdPriXpsTypeMapPath cdtScAwdPriXpsTypeMap() {
+        if (_cdtScAwdPriXpsTypeMap == null)
+            _cdtScAwdPriXpsTypeMap = new CdtScAwdPriXpsTypeMapPath(this, null, Keys.CDT_SC_AWD_PRI_XPS_TYPE_MAP_CDT_SC_AWD_PRI_ID_FK.getInverseKey());
+
+        return _cdtScAwdPriXpsTypeMap;
     }
 
     @Override
@@ -195,27 +243,87 @@ public class CdtScAwdPri extends TableImpl<CdtScAwdPriRecord> {
         return new CdtScAwdPri(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public CdtScAwdPri where(Condition condition) {
+        return new CdtScAwdPri(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CdtScAwdPri where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CdtScAwdPri where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtScAwdPri where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtScAwdPri where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtScAwdPri where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtScAwdPri where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtScAwdPri where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtScAwdPri whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtScAwdPri whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

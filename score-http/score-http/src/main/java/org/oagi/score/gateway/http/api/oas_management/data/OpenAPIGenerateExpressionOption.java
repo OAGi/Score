@@ -28,7 +28,7 @@ public class OpenAPIGenerateExpressionOption {
     private boolean openAPICodeGenerationFriendly;
     private String scheme;
     private String host;
-    private HashMap<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
+    private Map<String, OpenAPITemplateForVerbOption> openAPI30TemplateMap = new HashMap<>();
 
     public boolean isTwoTemplateOptionDifferent(String verb1, String verb2) {
 

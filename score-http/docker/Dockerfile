@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 tomcat:10.1.16-jdk21-temurin
+FROM --platform=linux/amd64 tomcat:10.1.18-jdk21-temurin
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
@@ -13,7 +13,7 @@ ENV REDIS_PORT 6379
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-COPY mariadb-java-client-3.3.1.jar /usr/local/tomcat/lib/mariadb-java-client-3.3.1.jar
+COPY mariadb-java-client-3.3.2.jar /usr/local/tomcat/lib/mariadb-java-client-3.3.2.jar
 
 RUN rm -rf /usr/local/tomcat/webapps/* && \
     chgrp -R 0 /usr/local/tomcat/ && \

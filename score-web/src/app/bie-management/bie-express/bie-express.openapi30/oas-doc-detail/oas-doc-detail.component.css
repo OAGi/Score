@@ -1,14 +1,13 @@
+.mat-column-branch {
+  width: 80px;
+}
+
 .mat-column-den {
-  width: 250px;
   font-size: 13px;
 }
 
-.mat-column-branch {
-  width: 100px
-}
-
 .mat-column-remark {
-  width: 250px;
+  width: 12%;
 }
 
 .mat-column-verb {
@@ -16,7 +15,7 @@
 }
 
 .mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
-  width: 50px;
+  width: 66px;
 }
 
 .mat-column-messageBody {
@@ -24,11 +23,11 @@
 }
 
 .mat-column-resourceName {
-  width: 250px;
+  width: 18%;
 }
 
 .mat-column-operationId {
-  width: 250px;
+  width: 18%;
 }
 
 .mat-column-tagName {

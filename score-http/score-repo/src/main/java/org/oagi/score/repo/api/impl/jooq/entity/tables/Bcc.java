@@ -6,15 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +35,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Acc.AccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc.BccPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccBizterm.BccBiztermPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccRecord;
 
 
@@ -234,11 +249,11 @@ public class Bcc extends TableImpl<BccRecord> {
     public final TableField<BccRecord, ULong> NEXT_BCC_ID = createField(DSL.name("next_bcc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Bcc(Name alias, Table<BccRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Bcc(Name alias, Table<BccRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. "), TableOptions.table());
+    private Bcc(Name alias, Table<BccRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. "), TableOptions.table(), where);
     }
 
     /**
@@ -262,8 +277,35 @@ public class Bcc extends TableImpl<BccRecord> {
         this(DSL.name("bcc"), null);
     }
 
-    public <O extends Record> Bcc(Table<O> child, ForeignKey<O, BccRecord> key) {
-        super(child, key, BCC);
+    public <O extends Record> Bcc(Table<O> path, ForeignKey<O, BccRecord> childPath, InverseForeignKey<O, BccRecord> parentPath) {
+        super(path, childPath, parentPath, BCC);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BccPath extends Bcc implements Path<BccRecord> {
+        public <O extends Record> BccPath(Table<O> path, ForeignKey<O, BccRecord> childPath, InverseForeignKey<O, BccRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BccPath(Name alias, Table<BccRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BccPath as(String alias) {
+            return new BccPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BccPath as(Name alias) {
+            return new BccPath(alias, this);
+        }
+
+        @Override
+        public BccPath as(Table<?> alias) {
+            return new BccPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -291,99 +333,132 @@ public class Bcc extends TableImpl<BccRecord> {
         return Arrays.asList(Keys.BCC_TO_BCCP_ID_FK, Keys.BCC_FROM_ACC_ID_FK, Keys.BCC_CREATED_BY_FK, Keys.BCC_OWNER_USER_ID_FK, Keys.BCC_LAST_UPDATED_BY_FK, Keys.BCC_REPLACEMENT_BCC_ID_FK, Keys.BCC_PREV_BCC_ID_FK, Keys.BCC_NEXT_BCC_ID_FK);
     }
 
-    private transient Bccp _bccp;
-    private transient Acc _acc;
-    private transient AppUser _bccCreatedByFk;
-    private transient AppUser _bccOwnerUserIdFk;
-    private transient AppUser _bccLastUpdatedByFk;
-    private transient Bcc _bccReplacementBccIdFk;
-    private transient Bcc _bccPrevBccIdFk;
-    private transient Bcc _bccNextBccIdFk;
+    private transient BccpPath _bccp;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp</code> table.
      */
-    public Bccp bccp() {
+    public BccpPath bccp() {
         if (_bccp == null)
-            _bccp = new Bccp(this, Keys.BCC_TO_BCCP_ID_FK);
+            _bccp = new BccpPath(this, Keys.BCC_TO_BCCP_ID_FK, null);
 
         return _bccp;
     }
 
+    private transient AccPath _acc;
+
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table.
      */
-    public Acc acc() {
+    public AccPath acc() {
         if (_acc == null)
-            _acc = new Acc(this, Keys.BCC_FROM_ACC_ID_FK);
+            _acc = new AccPath(this, Keys.BCC_FROM_ACC_ID_FK, null);
 
         return _acc;
     }
+
+    private transient AppUserPath _bccCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bcc_created_by_fk</code> key.
      */
-    public AppUser bccCreatedByFk() {
+    public AppUserPath bccCreatedByFk() {
         if (_bccCreatedByFk == null)
-            _bccCreatedByFk = new AppUser(this, Keys.BCC_CREATED_BY_FK);
+            _bccCreatedByFk = new AppUserPath(this, Keys.BCC_CREATED_BY_FK, null);
 
         return _bccCreatedByFk;
     }
+
+    private transient AppUserPath _bccOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bcc_owner_user_id_fk</code> key.
      */
-    public AppUser bccOwnerUserIdFk() {
+    public AppUserPath bccOwnerUserIdFk() {
         if (_bccOwnerUserIdFk == null)
-            _bccOwnerUserIdFk = new AppUser(this, Keys.BCC_OWNER_USER_ID_FK);
+            _bccOwnerUserIdFk = new AppUserPath(this, Keys.BCC_OWNER_USER_ID_FK, null);
 
         return _bccOwnerUserIdFk;
     }
+
+    private transient AppUserPath _bccLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bcc_last_updated_by_fk</code> key.
      */
-    public AppUser bccLastUpdatedByFk() {
+    public AppUserPath bccLastUpdatedByFk() {
         if (_bccLastUpdatedByFk == null)
-            _bccLastUpdatedByFk = new AppUser(this, Keys.BCC_LAST_UPDATED_BY_FK);
+            _bccLastUpdatedByFk = new AppUserPath(this, Keys.BCC_LAST_UPDATED_BY_FK, null);
 
         return _bccLastUpdatedByFk;
     }
+
+    private transient BccPath _bccReplacementBccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table, via the
      * <code>bcc_replacement_bcc_id_fk</code> key.
      */
-    public Bcc bccReplacementBccIdFk() {
+    public BccPath bccReplacementBccIdFk() {
         if (_bccReplacementBccIdFk == null)
-            _bccReplacementBccIdFk = new Bcc(this, Keys.BCC_REPLACEMENT_BCC_ID_FK);
+            _bccReplacementBccIdFk = new BccPath(this, Keys.BCC_REPLACEMENT_BCC_ID_FK, null);
 
         return _bccReplacementBccIdFk;
     }
+
+    private transient BccPath _bccPrevBccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table, via the
      * <code>bcc_prev_bcc_id_fk</code> key.
      */
-    public Bcc bccPrevBccIdFk() {
+    public BccPath bccPrevBccIdFk() {
         if (_bccPrevBccIdFk == null)
-            _bccPrevBccIdFk = new Bcc(this, Keys.BCC_PREV_BCC_ID_FK);
+            _bccPrevBccIdFk = new BccPath(this, Keys.BCC_PREV_BCC_ID_FK, null);
 
         return _bccPrevBccIdFk;
     }
+
+    private transient BccPath _bccNextBccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table, via the
      * <code>bcc_next_bcc_id_fk</code> key.
      */
-    public Bcc bccNextBccIdFk() {
+    public BccPath bccNextBccIdFk() {
         if (_bccNextBccIdFk == null)
-            _bccNextBccIdFk = new Bcc(this, Keys.BCC_NEXT_BCC_ID_FK);
+            _bccNextBccIdFk = new BccPath(this, Keys.BCC_NEXT_BCC_ID_FK, null);
 
         return _bccNextBccIdFk;
+    }
+
+    private transient BccBiztermPath _bccBizterm;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc_bizterm</code>
+     * table
+     */
+    public BccBiztermPath bccBizterm() {
+        if (_bccBizterm == null)
+            _bccBizterm = new BccBiztermPath(this, null, Keys.BCC_BIZTERM_BCC_FK.getInverseKey());
+
+        return _bccBizterm;
+    }
+
+    private transient BccManifestPath _bccManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc_manifest</code>
+     * table
+     */
+    public BccManifestPath bccManifest() {
+        if (_bccManifest == null)
+            _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_BCC_ID_FK.getInverseKey());
+
+        return _bccManifest;
     }
 
     @Override
@@ -423,5 +498,89 @@ public class Bcc extends TableImpl<BccRecord> {
     @Override
     public Bcc rename(Table<?> name) {
         return new Bcc(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc where(Condition condition) {
+        return new Bcc(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bcc where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bcc where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bcc where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bcc where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bcc whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -4,10 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record7;
-import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule;
@@ -20,7 +17,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule;
  * TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> implements Record7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> {
+public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -155,179 +152,6 @@ public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record7 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row7) super.fieldsRow();
-    }
-
-    @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> valuesRow() {
-        return (Row7) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return BieUsageRule.BIE_USAGE_RULE.BIE_USAGE_RULE_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return BieUsageRule.BIE_USAGE_RULE.ASSIGNED_USAGE_RULE_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return BieUsageRule.BIE_USAGE_RULE.TARGET_ABIE_ID;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return BieUsageRule.BIE_USAGE_RULE.TARGET_ASBIE_ID;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return BieUsageRule.BIE_USAGE_RULE.TARGET_ASBIEP_ID;
-    }
-
-    @Override
-    public Field<ULong> field6() {
-        return BieUsageRule.BIE_USAGE_RULE.TARGET_BBIE_ID;
-    }
-
-    @Override
-    public Field<ULong> field7() {
-        return BieUsageRule.BIE_USAGE_RULE.TARGET_BBIEP_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getBieUsageRuleId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getAssignedUsageRuleId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getTargetAbieId();
-    }
-
-    @Override
-    public ULong component4() {
-        return getTargetAsbieId();
-    }
-
-    @Override
-    public ULong component5() {
-        return getTargetAsbiepId();
-    }
-
-    @Override
-    public ULong component6() {
-        return getTargetBbieId();
-    }
-
-    @Override
-    public ULong component7() {
-        return getTargetBbiepId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getBieUsageRuleId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getAssignedUsageRuleId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getTargetAbieId();
-    }
-
-    @Override
-    public ULong value4() {
-        return getTargetAsbieId();
-    }
-
-    @Override
-    public ULong value5() {
-        return getTargetAsbiepId();
-    }
-
-    @Override
-    public ULong value6() {
-        return getTargetBbieId();
-    }
-
-    @Override
-    public ULong value7() {
-        return getTargetBbiepId();
-    }
-
-    @Override
-    public BieUsageRuleRecord value1(ULong value) {
-        setBieUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value2(ULong value) {
-        setAssignedUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value3(ULong value) {
-        setTargetAbieId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value4(ULong value) {
-        setTargetAsbieId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value5(ULong value) {
-        setTargetAsbiepId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value6(ULong value) {
-        setTargetBbieId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord value7(ULong value) {
-        setTargetBbiepId(value);
-        return this;
-    }
-
-    @Override
-    public BieUsageRuleRecord values(ULong value1, ULong value2, ULong value3, ULong value4, ULong value5, ULong value6, ULong value7) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        return this;
     }
 
     // -------------------------------------------------------------------------

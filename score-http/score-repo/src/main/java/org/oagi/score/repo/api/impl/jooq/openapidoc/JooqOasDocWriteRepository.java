@@ -15,6 +15,7 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -167,22 +168,9 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
                     ).fetchInto(ULong.class);
 
             if (!oasOperationIds.isEmpty()) {
-                List<ULong> oasResourceTagIds = dslContext().select(OAS_RESOURCE_TAG.OAS_TAG_ID)
-                        .from(OAS_RESOURCE_TAG)
-                        .where(
-                                oasOperationIds.size() == 1 ?
-                                        OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationIds.get(0)) :
-                                        OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIds)
-                        ).fetchInto(ULong.class);
-
-                if (!oasResourceTagIds.isEmpty()) {
-                    dslContext().deleteFrom(OAS_TAG)
-                            .where(
-                                    oasOperationIds.size() == 1 ?
-                                            OAS_TAG.OAS_TAG_ID.eq(oasResourceTagIds.get(0)) :
-                                            OAS_TAG.OAS_TAG_ID.in(oasResourceTagIds)
-                            ).execute();
-                }
+                deleteOasTagByOperationIdList(oasOperationIds);
+                deleteOasRequestByOperationIdList(oasOperationIds);
+                deleteOasResponseByOperationIdList(oasOperationIds);
 
                 dslContext().delete(OAS_OPERATION)
                         .where(
@@ -209,10 +197,95 @@ public class JooqOasDocWriteRepository extends JooqScoreRepository
                     )
                     .execute();
         } catch (Exception e) {
-            throw new ScoreDataAccessException("It's not possible to delete the used oas doc.");
+            throw new ScoreDataAccessException("It's not possible to delete the used oas doc.", e);
         }
 
         DeleteOasDocResponse response = new DeleteOasDocResponse(oasDocIdList);
         return response;
     }
+
+    private void deleteOasTagByOperationIdList(List<ULong> oasOperationIdList) {
+        List<ULong> oasTagIds = dslContext().select(OAS_RESOURCE_TAG.OAS_TAG_ID)
+                .from(OAS_RESOURCE_TAG)
+                .where(
+                        oasOperationIdList.size() == 1 ?
+                                OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationIdList.get(0)) :
+                                OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIdList)
+                ).fetchInto(ULong.class);
+
+        dslContext().deleteFrom(OAS_RESOURCE_TAG)
+                .where(
+                        oasOperationIdList.size() == 1 ?
+                                OAS_RESOURCE_TAG.OAS_OPERATION_ID.eq(oasOperationIdList.get(0)) :
+                                OAS_RESOURCE_TAG.OAS_OPERATION_ID.in(oasOperationIdList)
+                ).execute();
+
+        if (!oasTagIds.isEmpty()) {
+            dslContext().deleteFrom(OAS_TAG)
+                    .where(
+                            oasOperationIdList.size() == 1 ?
+                                    OAS_TAG.OAS_TAG_ID.eq(oasTagIds.get(0)) :
+                                    OAS_TAG.OAS_TAG_ID.in(oasTagIds)
+                    ).execute();
+        }
+    }
+
+    private void deleteOasRequestByOperationIdList(List<ULong> oasOperationIdList) {
+        List<ULong> oasRequestIds = dslContext().select(OAS_REQUEST.OAS_REQUEST_ID)
+                .from(OAS_REQUEST)
+                .where(
+                        oasOperationIdList.size() == 1 ?
+                                OAS_REQUEST.OAS_OPERATION_ID.eq(oasOperationIdList.get(0)) :
+                                OAS_REQUEST.OAS_OPERATION_ID.in(oasOperationIdList)
+                )
+                .fetchInto(ULong.class);
+
+        if (!oasRequestIds.isEmpty()) {
+            dslContext().deleteFrom(OAS_REQUEST_PARAMETER)
+                    .where(
+                            oasOperationIdList.size() == 1 ?
+                                    OAS_REQUEST_PARAMETER.OAS_REQUEST_ID.eq(oasRequestIds.get(0)) :
+                                    OAS_REQUEST_PARAMETER.OAS_REQUEST_ID.in(oasRequestIds)
+                    )
+                    .execute();
+
+            dslContext().deleteFrom(OAS_REQUEST)
+                    .where(
+                            oasOperationIdList.size() == 1 ?
+                                    OAS_REQUEST.OAS_REQUEST_ID.eq(oasRequestIds.get(0)) :
+                                    OAS_REQUEST.OAS_REQUEST_ID.in(oasRequestIds)
+                    )
+                    .execute();
+        }
+    }
+
+    private void deleteOasResponseByOperationIdList(List<ULong> oasOperationIdList) {
+        List<ULong> oasResponseIds = dslContext().select(OAS_RESPONSE.OAS_RESPONSE_ID)
+                .from(OAS_RESPONSE)
+                .where(
+                        oasOperationIdList.size() == 1 ?
+                                OAS_RESPONSE.OAS_OPERATION_ID.eq(oasOperationIdList.get(0)) :
+                                OAS_RESPONSE.OAS_OPERATION_ID.in(oasOperationIdList)
+                )
+                .fetchInto(ULong.class);
+
+        if (!oasResponseIds.isEmpty()) {
+            dslContext().deleteFrom(OAS_RESPONSE_HEADERS)
+                    .where(
+                            oasOperationIdList.size() == 1 ?
+                                    OAS_RESPONSE_HEADERS.OAS_RESPONSE_ID.eq(oasResponseIds.get(0)) :
+                                    OAS_RESPONSE_HEADERS.OAS_RESPONSE_ID.in(oasResponseIds)
+                    )
+                    .execute();
+
+            dslContext().deleteFrom(OAS_RESPONSE)
+                    .where(
+                            oasOperationIdList.size() == 1 ?
+                                    OAS_RESPONSE.OAS_RESPONSE_ID.eq(oasResponseIds.get(0)) :
+                                    OAS_RESPONSE.OAS_RESPONSE_ID.in(oasResponseIds)
+                    )
+                    .execute();
+        }
+    }
+
 }

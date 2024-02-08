@@ -6,18 +6,22 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function4;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row4;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag.TagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestTagRecord;
 
 
@@ -75,11 +82,11 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
     public final TableField<AsccpManifestTagRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was first created.");
 
     private AsccpManifestTag(Name alias, Table<AsccpManifestTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AsccpManifestTag(Name alias, Table<AsccpManifestTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private AsccpManifestTag(Name alias, Table<AsccpManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -103,8 +110,35 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
         this(DSL.name("asccp_manifest_tag"), null);
     }
 
-    public <O extends Record> AsccpManifestTag(Table<O> child, ForeignKey<O, AsccpManifestTagRecord> key) {
-        super(child, key, ASCCP_MANIFEST_TAG);
+    public <O extends Record> AsccpManifestTag(Table<O> path, ForeignKey<O, AsccpManifestTagRecord> childPath, InverseForeignKey<O, AsccpManifestTagRecord> parentPath) {
+        super(path, childPath, parentPath, ASCCP_MANIFEST_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsccpManifestTagPath extends AsccpManifestTag implements Path<AsccpManifestTagRecord> {
+        public <O extends Record> AsccpManifestTagPath(Table<O> path, ForeignKey<O, AsccpManifestTagRecord> childPath, InverseForeignKey<O, AsccpManifestTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsccpManifestTagPath(Name alias, Table<AsccpManifestTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsccpManifestTagPath as(String alias) {
+            return new AsccpManifestTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsccpManifestTagPath as(Name alias) {
+            return new AsccpManifestTagPath(alias, this);
+        }
+
+        @Override
+        public AsccpManifestTagPath as(Table<?> alias) {
+            return new AsccpManifestTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -122,36 +156,38 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
         return Arrays.asList(Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK);
     }
 
-    private transient AsccpManifest _asccpManifest;
-    private transient Tag _tag;
-    private transient AppUser _appUser;
+    private transient AsccpManifestPath _asccpManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
      */
-    public AsccpManifest asccpManifest() {
+    public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifest(this, Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK);
+            _asccpManifest = new AsccpManifestPath(this, Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
     }
 
+    private transient TagPath _tag;
+
     /**
      * Get the implicit join path to the <code>oagi.tag</code> table.
      */
-    public Tag tag() {
+    public TagPath tag() {
         if (_tag == null)
-            _tag = new Tag(this, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK);
+            _tag = new TagPath(this, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK, null);
 
         return _tag;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -195,27 +231,87 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
         return new AsccpManifestTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row4 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row4<ULong, ULong, ULong, LocalDateTime> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public AsccpManifestTag where(Condition condition) {
+        return new AsccpManifestTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AsccpManifestTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AsccpManifestTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccpManifestTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccpManifestTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccpManifestTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccpManifestTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccpManifestTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccpManifestTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccpManifestTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

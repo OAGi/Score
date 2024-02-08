@@ -4,18 +4,22 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
-import java.util.function.Function;
+import java.util.Collection;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function3;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +30,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule.DtUsageRulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression.UsageRuleExpressionPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.UsageRuleRecord;
 
 
@@ -73,11 +80,11 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     public final TableField<UsageRuleRecord, Integer> CONDITION_TYPE = createField(DSL.name("condition_type"), SQLDataType.INTEGER.nullable(false), this, "Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.");
 
     private UsageRule(Name alias, Table<UsageRuleRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private UsageRule(Name alias, Table<UsageRuleRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type."), TableOptions.table());
+    private UsageRule(Name alias, Table<UsageRuleRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type."), TableOptions.table(), where);
     }
 
     /**
@@ -101,8 +108,35 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
         this(DSL.name("usage_rule"), null);
     }
 
-    public <O extends Record> UsageRule(Table<O> child, ForeignKey<O, UsageRuleRecord> key) {
-        super(child, key, USAGE_RULE);
+    public <O extends Record> UsageRule(Table<O> path, ForeignKey<O, UsageRuleRecord> childPath, InverseForeignKey<O, UsageRuleRecord> parentPath) {
+        super(path, childPath, parentPath, USAGE_RULE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class UsageRulePath extends UsageRule implements Path<UsageRuleRecord> {
+        public <O extends Record> UsageRulePath(Table<O> path, ForeignKey<O, UsageRuleRecord> childPath, InverseForeignKey<O, UsageRuleRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private UsageRulePath(Name alias, Table<UsageRuleRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public UsageRulePath as(String alias) {
+            return new UsageRulePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public UsageRulePath as(Name alias) {
+            return new UsageRulePath(alias, this);
+        }
+
+        @Override
+        public UsageRulePath as(Table<?> alias) {
+            return new UsageRulePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -118,6 +152,45 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     @Override
     public UniqueKey<UsageRuleRecord> getPrimaryKey() {
         return Keys.KEY_USAGE_RULE_PRIMARY;
+    }
+
+    private transient BieUsageRulePath _bieUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_usage_rule</code> table
+     */
+    public BieUsageRulePath bieUsageRule() {
+        if (_bieUsageRule == null)
+            _bieUsageRule = new BieUsageRulePath(this, null, Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK.getInverseKey());
+
+        return _bieUsageRule;
+    }
+
+    private transient DtUsageRulePath _dtUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_usage_rule</code>
+     * table
+     */
+    public DtUsageRulePath dtUsageRule() {
+        if (_dtUsageRule == null)
+            _dtUsageRule = new DtUsageRulePath(this, null, Keys.DT_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK.getInverseKey());
+
+        return _dtUsageRule;
+    }
+
+    private transient UsageRuleExpressionPath _usageRuleExpression;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.usage_rule_expression</code> table
+     */
+    public UsageRuleExpressionPath usageRuleExpression() {
+        if (_usageRuleExpression == null)
+            _usageRuleExpression = new UsageRuleExpressionPath(this, null, Keys.USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK.getInverseKey());
+
+        return _usageRuleExpression;
     }
 
     @Override
@@ -159,27 +232,87 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
         return new UsageRule(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row3 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row3<ULong, String, Integer> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public UsageRule where(Condition condition) {
+        return new UsageRule(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function3<? super ULong, ? super String, ? super Integer, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public UsageRule where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super String, ? super Integer, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public UsageRule where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UsageRule where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UsageRule where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UsageRule where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UsageRule where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public UsageRule where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UsageRule whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public UsageRule whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

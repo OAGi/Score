@@ -1,26 +1,30 @@
 .mat-dialog-content {
+  max-height: max-content;
+}
+
+.mat-mdc-dialog-content {
+  max-height: 87vh !important;
 }
 
 .mat-column-state {
   width: 100px;
-  font-size: 13px;
 }
 
-.mat-column-den {
-  width: 300px;
-  font-size: 13px;
+.mat-column-branch {
+  width: 80px;
 }
 
 .mat-column-owner {
-  width: 100px;
+  width: 140px;
+  font-size: 13px;
 }
 
-.mat-column-version {
-  width: 100px;
+.mat-column-version, .mat-column-status {
+  width: 5%;
 }
 
 .mat-column-remark {
-  width: 300px;
+  width: 12%;
 }
 
 .mat-column-verb, .mat-column-messageBody {
@@ -28,7 +32,7 @@
 }
 
 .mat-column-arrayIndicator {
-  width: 100px;
+  width: 60px;
 }
 
 .mat-column-lastUpdateTimestamp {

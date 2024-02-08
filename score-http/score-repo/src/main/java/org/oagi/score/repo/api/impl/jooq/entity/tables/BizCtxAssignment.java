@@ -5,20 +5,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function3;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -30,6 +34,8 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx.BizCtxPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BizCtxAssignmentRecord;
 
 
@@ -71,11 +77,11 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
     public final TableField<BizCtxAssignmentRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private BizCtxAssignment(Name alias, Table<BizCtxAssignmentRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BizCtxAssignment(Name alias, Table<BizCtxAssignmentRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private BizCtxAssignment(Name alias, Table<BizCtxAssignmentRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -99,8 +105,35 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
         this(DSL.name("biz_ctx_assignment"), null);
     }
 
-    public <O extends Record> BizCtxAssignment(Table<O> child, ForeignKey<O, BizCtxAssignmentRecord> key) {
-        super(child, key, BIZ_CTX_ASSIGNMENT);
+    public <O extends Record> BizCtxAssignment(Table<O> path, ForeignKey<O, BizCtxAssignmentRecord> childPath, InverseForeignKey<O, BizCtxAssignmentRecord> parentPath) {
+        super(path, childPath, parentPath, BIZ_CTX_ASSIGNMENT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BizCtxAssignmentPath extends BizCtxAssignment implements Path<BizCtxAssignmentRecord> {
+        public <O extends Record> BizCtxAssignmentPath(Table<O> path, ForeignKey<O, BizCtxAssignmentRecord> childPath, InverseForeignKey<O, BizCtxAssignmentRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BizCtxAssignmentPath(Name alias, Table<BizCtxAssignmentRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BizCtxAssignmentPath as(String alias) {
+            return new BizCtxAssignmentPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BizCtxAssignmentPath as(Name alias) {
+            return new BizCtxAssignmentPath(alias, this);
+        }
+
+        @Override
+        public BizCtxAssignmentPath as(Table<?> alias) {
+            return new BizCtxAssignmentPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -133,26 +166,27 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
         return Arrays.asList(Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient BizCtx _bizCtx;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient BizCtxPath _bizCtx;
 
     /**
      * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
      */
-    public BizCtx bizCtx() {
+    public BizCtxPath bizCtx() {
         if (_bizCtx == null)
-            _bizCtx = new BizCtx(this, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK);
+            _bizCtx = new BizCtxPath(this, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK, null);
 
         return _bizCtx;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
     }
@@ -196,27 +230,87 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
         return new BizCtxAssignment(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row3 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public BizCtxAssignment where(Condition condition) {
+        return new BizCtxAssignment(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BizCtxAssignment where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BizCtxAssignment where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxAssignment where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxAssignment where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxAssignment where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxAssignment where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxAssignment where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxAssignment whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxAssignment whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

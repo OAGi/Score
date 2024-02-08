@@ -108,7 +108,6 @@ b {
 
 .mat-mdc-table {
   width: 100%;
-  table-layout: fixed !important;
 }
 
 .mat-mdc-table .mat-column-select {
@@ -214,6 +213,10 @@ mat-multi-sort-table-settings .mat-mdc-standard-chip:not(.mdc-evolution-chip--di
 
 mat-multi-sort-table-settings mat-chip {
   min-height: 32px;
+}
+
+mat-multi-sort-table-settings .table-settings-menu {
+  margin: 8px 0 !important;
 }
 
 .mat-mdc-snack-bar-container {

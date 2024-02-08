@@ -6,20 +6,24 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function14;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row14;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Indexes;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Abie.AbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbiepRecord;
 
 
@@ -158,11 +168,11 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     public final TableField<AsbiepRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private Asbiep(Name alias, Table<AsbiepRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Asbiep(Name alias, Table<AsbiepRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP."), TableOptions.table());
+    private Asbiep(Name alias, Table<AsbiepRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP."), TableOptions.table(), where);
     }
 
     /**
@@ -186,8 +196,35 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
         this(DSL.name("asbiep"), null);
     }
 
-    public <O extends Record> Asbiep(Table<O> child, ForeignKey<O, AsbiepRecord> key) {
-        super(child, key, ASBIEP);
+    public <O extends Record> Asbiep(Table<O> path, ForeignKey<O, AsbiepRecord> childPath, InverseForeignKey<O, AsbiepRecord> parentPath) {
+        super(path, childPath, parentPath, ASBIEP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsbiepPath extends Asbiep implements Path<AsbiepRecord> {
+        public <O extends Record> AsbiepPath(Table<O> path, ForeignKey<O, AsbiepRecord> childPath, InverseForeignKey<O, AsbiepRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsbiepPath(Name alias, Table<AsbiepRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsbiepPath as(String alias) {
+            return new AsbiepPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsbiepPath as(Name alias) {
+            return new AsbiepPath(alias, this);
+        }
+
+        @Override
+        public AsbiepPath as(Table<?> alias) {
+            return new AsbiepPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -215,63 +252,92 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
         return Arrays.asList(Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, Keys.ASBIEP_CREATED_BY_FK, Keys.ASBIEP_LAST_UPDATED_BY_FK, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient AsccpManifest _asccpManifest;
-    private transient Abie _abie;
-    private transient AppUser _asbiepCreatedByFk;
-    private transient AppUser _asbiepLastUpdatedByFk;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient AsccpManifestPath _asccpManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
      */
-    public AsccpManifest asccpManifest() {
+    public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifest(this, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK);
+            _asccpManifest = new AsccpManifestPath(this, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
     }
 
+    private transient AbiePath _abie;
+
     /**
      * Get the implicit join path to the <code>oagi.abie</code> table.
      */
-    public Abie abie() {
+    public AbiePath abie() {
         if (_abie == null)
-            _abie = new Abie(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK);
+            _abie = new AbiePath(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, null);
 
         return _abie;
     }
+
+    private transient AppUserPath _asbiepCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>asbiep_created_by_fk</code> key.
      */
-    public AppUser asbiepCreatedByFk() {
+    public AppUserPath asbiepCreatedByFk() {
         if (_asbiepCreatedByFk == null)
-            _asbiepCreatedByFk = new AppUser(this, Keys.ASBIEP_CREATED_BY_FK);
+            _asbiepCreatedByFk = new AppUserPath(this, Keys.ASBIEP_CREATED_BY_FK, null);
 
         return _asbiepCreatedByFk;
     }
+
+    private transient AppUserPath _asbiepLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>asbiep_last_updated_by_fk</code> key.
      */
-    public AppUser asbiepLastUpdatedByFk() {
+    public AppUserPath asbiepLastUpdatedByFk() {
         if (_asbiepLastUpdatedByFk == null)
-            _asbiepLastUpdatedByFk = new AppUser(this, Keys.ASBIEP_LAST_UPDATED_BY_FK);
+            _asbiepLastUpdatedByFk = new AppUserPath(this, Keys.ASBIEP_LAST_UPDATED_BY_FK, null);
 
         return _asbiepLastUpdatedByFk;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient AsbiePath _asbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table
+     */
+    public AsbiePath asbie() {
+        if (_asbie == null)
+            _asbie = new AsbiePath(this, null, Keys.ASBIE_TO_ASBIEP_ID_FK.getInverseKey());
+
+        return _asbie;
+    }
+
+    private transient BieUsageRulePath _bieUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_usage_rule</code> table
+     */
+    public BieUsageRulePath bieUsageRule() {
+        if (_bieUsageRule == null)
+            _bieUsageRule = new BieUsageRulePath(this, null, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK.getInverseKey());
+
+        return _bieUsageRule;
     }
 
     @Override
@@ -313,27 +379,87 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
         return new Asbiep(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row14 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row14<ULong, String, ULong, String, String, ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime, ULong> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Asbiep where(Condition condition) {
+        return new Asbiep(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function14<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Asbiep where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Asbiep where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asbiep where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asbiep where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asbiep where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asbiep where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asbiep where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asbiep whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asbiep whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

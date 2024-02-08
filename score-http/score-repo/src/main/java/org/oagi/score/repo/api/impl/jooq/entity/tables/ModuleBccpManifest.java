@@ -6,19 +6,23 @@ package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleBccpManifestRecord;
 
 
@@ -104,11 +112,11 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
     public final TableField<ModuleBccpManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private ModuleBccpManifest(Name alias, Table<ModuleBccpManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private ModuleBccpManifest(Name alias, Table<ModuleBccpManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private ModuleBccpManifest(Name alias, Table<ModuleBccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -132,8 +140,35 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         this(DSL.name("module_bccp_manifest"), null);
     }
 
-    public <O extends Record> ModuleBccpManifest(Table<O> child, ForeignKey<O, ModuleBccpManifestRecord> key) {
-        super(child, key, MODULE_BCCP_MANIFEST);
+    public <O extends Record> ModuleBccpManifest(Table<O> path, ForeignKey<O, ModuleBccpManifestRecord> childPath, InverseForeignKey<O, ModuleBccpManifestRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE_BCCP_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModuleBccpManifestPath extends ModuleBccpManifest implements Path<ModuleBccpManifestRecord> {
+        public <O extends Record> ModuleBccpManifestPath(Table<O> path, ForeignKey<O, ModuleBccpManifestRecord> childPath, InverseForeignKey<O, ModuleBccpManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModuleBccpManifestPath(Name alias, Table<ModuleBccpManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModuleBccpManifestPath as(String alias) {
+            return new ModuleBccpManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModuleBccpManifestPath as(Name alias) {
+            return new ModuleBccpManifestPath(alias, this);
+        }
+
+        @Override
+        public ModuleBccpManifestPath as(Table<?> alias) {
+            return new ModuleBccpManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -156,61 +191,65 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return Arrays.asList(Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
-    private transient ModuleSetRelease _moduleSetRelease;
-    private transient BccpManifest _bccpManifest;
-    private transient Module _module;
-    private transient AppUser _moduleBccpManifestCreatedByFk;
-    private transient AppUser _moduleBccpManifestLastUpdatedByFk;
+    private transient ModuleSetReleasePath _moduleSetRelease;
 
     /**
      * Get the implicit join path to the <code>oagi.module_set_release</code>
      * table.
      */
-    public ModuleSetRelease moduleSetRelease() {
+    public ModuleSetReleasePath moduleSetRelease() {
         if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
 
         return _moduleSetRelease;
     }
 
+    private transient BccpManifestPath _bccpManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table.
      */
-    public BccpManifest bccpManifest() {
+    public BccpManifestPath bccpManifest() {
         if (_bccpManifest == null)
-            _bccpManifest = new BccpManifest(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK);
+            _bccpManifest = new BccpManifestPath(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifest;
     }
 
+    private transient ModulePath _module;
+
     /**
      * Get the implicit join path to the <code>oagi.module</code> table.
      */
-    public Module module() {
+    public ModulePath module() {
         if (_module == null)
-            _module = new Module(this, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK);
+            _module = new ModulePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, null);
 
         return _module;
     }
+
+    private transient AppUserPath _moduleBccpManifestCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_bccp_manifest_created_by_fk</code> key.
      */
-    public AppUser moduleBccpManifestCreatedByFk() {
+    public AppUserPath moduleBccpManifestCreatedByFk() {
         if (_moduleBccpManifestCreatedByFk == null)
-            _moduleBccpManifestCreatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK);
+            _moduleBccpManifestCreatedByFk = new AppUserPath(this, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, null);
 
         return _moduleBccpManifestCreatedByFk;
     }
+
+    private transient AppUserPath _moduleBccpManifestLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_bccp_manifest_last_updated_by_fk</code> key.
      */
-    public AppUser moduleBccpManifestLastUpdatedByFk() {
+    public AppUserPath moduleBccpManifestLastUpdatedByFk() {
         if (_moduleBccpManifestLastUpdatedByFk == null)
-            _moduleBccpManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
+            _moduleBccpManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleBccpManifestLastUpdatedByFk;
     }
@@ -254,27 +293,87 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return new ModuleBccpManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public ModuleBccpManifest where(Condition condition) {
+        return new ModuleBccpManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public ModuleBccpManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public ModuleBccpManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleBccpManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleBccpManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleBccpManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleBccpManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleBccpManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleBccpManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleBccpManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }
