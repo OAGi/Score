@@ -27,6 +27,11 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      sentinel:
+        master: ${REDIS_SENTINEL_MASTER:}
+        nodes: ${REDIS_SENTINEL_NODES:}
+      cluster:
+        nodes: ${REDIS_CLUSTER_NODES:}
 
   main:
     allow-circular-references: true
