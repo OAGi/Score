@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.DSLContext;
 import org.jooq.Meta;
+import org.jooq.Record2;
 import org.jooq.RowCountQuery;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -38,6 +39,7 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         upsertSystemUser();
         issue1476();
+        issue1602();
         changeValueColumnInConfigurationTable(); // this is a temporal execution.
         insertDefaultBrandSVG();
         addDeprecationColumnsInTopLevelAsbiep();
@@ -64,6 +66,22 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
                 .set(APP_USER.APP_USER_ID, ULong.valueOf(SYSTEM_USER_ID))
                 .where(APP_USER.LOGIN_ID.eq(SYSTEM_USER_LOGIN_ID))
                 .execute();
+    }
+
+    private void issue1602() {
+        List<Record2<ULong, String>> xbtListIntegerUsed = dslContext.select(XBT.XBT_ID, XBT.AVRO_MAP)
+                .from(XBT)
+                .where(XBT.AVRO_MAP.like("%integer%"))
+                .fetch();
+
+        for (Record2<ULong, String> xbt : xbtListIntegerUsed) {
+            ULong xbtId = xbt.get(XBT.XBT_ID);
+            String avroMap = xbt.get(XBT.AVRO_MAP);
+            dslContext.update(XBT)
+                    .set(XBT.AVRO_MAP, avroMap.replaceAll("integer", "int"))
+                    .where(XBT.XBT_ID.eq(xbtId))
+                    .execute();
+        }
     }
 
     private void issue1476() {
