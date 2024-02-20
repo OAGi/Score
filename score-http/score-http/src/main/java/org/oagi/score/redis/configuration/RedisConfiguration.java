@@ -110,7 +110,7 @@ public class RedisConfiguration {
         RedisTemplate redisTemplate = new RedisTemplate();
 
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setEnableTransactionSupport(true);
+        redisTemplate.setEnableTransactionSupport(false);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
