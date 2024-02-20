@@ -26,8 +26,8 @@
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.8</aspectj.version>
         <lettuce.version>6.3.1.RELEASE</lettuce.version>
-        <redisson.version>3.26.0</redisson.version>
-        <netty.version>4.1.106.Final</netty.version>
+        <redisson.version>3.26.1</redisson.version>
+        <netty.version>4.1.107.Final</netty.version>
         <lombok.version>1.18.30</lombok.version>
         <mariadb-client.version>3.3.2</mariadb-client.version>
         <log4j.version>2.22.1</log4j.version>
