@@ -138,12 +138,12 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="propertyTerm">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
+        <ng-container matColumnDef="den">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
           <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
             <div class="den word-break-all">
               <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}">
-                <span>{{ element.propertyTerm }}</span>
+                <span>{{ element.den }}</span>
               </a>
             </div>
             <div class="bie-guid">{{ element.guid }}</div>

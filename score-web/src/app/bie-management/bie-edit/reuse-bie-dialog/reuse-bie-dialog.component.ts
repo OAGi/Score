@@ -27,7 +27,7 @@ import {WebPageInfoService} from '../../../basis/basis.service';
 export class ReuseBieDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'select', 'state', 'den', 'owner', 'businessContexts',
     'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
