@@ -1125,7 +1125,21 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
     @Override
     public void updateState(BieState state) {
-        repository.updateState(topLevelAsbiep.getTopLevelAsbiepId(), state);
+        Queue<TopLevelAsbiep> topLevelAsbiepQueue = new LinkedList<>();
+        topLevelAsbiepQueue.offer(topLevelAsbiep);
+
+        while (!topLevelAsbiepQueue.isEmpty()) {
+            TopLevelAsbiep topLevelAsbiep = topLevelAsbiepQueue.poll();
+            repository.updateState(topLevelAsbiep.getTopLevelAsbiepId(), state);
+
+            // Issue #1604
+            // Apply cascade state update to reused BIEs.
+            topLevelAsbiepQueue.addAll(
+                    repository.getReusedTopLevelAsbiepListByTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
+                            .stream().filter(e -> topLevelAsbiep.getOwnerUserId().equals(e.getOwnerUserId()))
+                            .collect(Collectors.toList())
+            );
+        }
     }
 
     @Override
