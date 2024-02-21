@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import org.jooq.*;
 import org.jooq.tools.StringUtils;
 import org.jooq.types.ULong;
+import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.info.data.SummaryBie;
@@ -351,6 +352,18 @@ public class BieRepository {
                 .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID))
                 .where(ASBIEP.ASBIEP_ID.eq(ULong.valueOf(asbiepId)))
                 .fetchOptionalInto(BieEditAbie.class).orElse(null);
+    }
+
+    public List<TopLevelAsbiep> getReusedTopLevelAsbiepListByTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        return dslContext.select(TOP_LEVEL_ASBIEP.fields())
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIEP).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID))
+                .join(ASBIE).on(ASBIEP.ASBIEP_ID.eq(ASBIE.TO_ASBIEP_ID))
+                .where(and(
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                ))
+                .fetchInto(TopLevelAsbiep.class);
     }
 
     public List<BieEditAsbie> getAsbieListByFromAbieId(BigInteger fromAbieId, BieEditNode node) {

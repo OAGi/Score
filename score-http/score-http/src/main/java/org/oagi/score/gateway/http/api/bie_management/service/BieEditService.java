@@ -209,16 +209,18 @@ public class BieEditService implements InitializingBean {
 
     private void ensureReusingRelationships(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
         // Issue #1010
+        ScoreUser requester = sessionService.asScoreUser(user);
         BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
         StringBuilder failureMessageBody = new StringBuilder();
 
         if (state == BieState.WIP) { // 'Move to WIP' Case.
             List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusingTopLevelAsbiepList =
-                    bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
+                    bieReadRepository.getReuseBieList(new GetReuseBieListRequest(requester)
                                     .withTopLevelAsbiepId(topLevelAsbiepId, true))
                             .getTopLevelAsbiepList();
 
             reusingTopLevelAsbiepList = reusingTopLevelAsbiepList.stream()
+                    .filter(e -> !requester.getUserId().equals(e.getOwner().getUserId()))
                     .filter(e -> e.getState().getLevel() > state.getLevel()).collect(Collectors.toList());
             if (!reusingTopLevelAsbiepList.isEmpty()) {
                 Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
@@ -251,6 +253,7 @@ public class BieEditService implements InitializingBean {
                             .getTopLevelAsbiepList();
 
             reusedTopLevelAsbiepList = reusedTopLevelAsbiepList.stream()
+                    .filter(e -> !requester.getUserId().equals(e.getOwner().getUserId()))
                     .filter(e -> e.getState().getLevel() < state.getLevel()).collect(Collectors.toList());
 
             if (!reusedTopLevelAsbiepList.isEmpty()) {
