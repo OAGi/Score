@@ -6,6 +6,7 @@ import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-account-detail',
@@ -22,6 +23,7 @@ export class AccountDetailComponent implements OnInit {
 
   constructor(private service: AccountListService,
               private auth: AuthService,
+              private confirmDialogService: ConfirmDialogService,
               private snackBar: MatSnackBar,
               private route: ActivatedRoute,
               private router: Router) {
@@ -42,6 +44,10 @@ export class AccountDetailComponent implements OnInit {
 
     this.newPassword = '';
     this.confirmPassword = '';
+  }
+
+  get isOAuth2User(): boolean {
+    return this.account && (!!this.account.appOauth2UserId && this.account.appOauth2UserId > 0);
   }
 
   hasMinLengthError(variable: string) {
@@ -105,5 +111,24 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
+  disassociateSSO() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Disassociate SSO?';
+    dialogConfig.data.content = ['Are you sure you want to disassociate SSO from this user?'];
+    dialogConfig.data.action = 'Disassociate';
 
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.service.delink(this.account).subscribe(_ => {
+          this.snackBar.open('Disassociated', '', {
+            duration: 3000,
+          });
+          this.router.navigateByUrl('/account');
+        });
+      });
+  }
 }

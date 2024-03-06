@@ -11,9 +11,9 @@ public class AppOauth2User {
     private long appOauth2UserId;
     private BigInteger appUserId;
     private String providerName;
+    private String sub;
     private String name;
     private String email;
-    private String sub;
     private String nickname;
     private String preferredUsername;
     private String phoneNumber;

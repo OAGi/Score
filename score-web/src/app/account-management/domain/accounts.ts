@@ -105,5 +105,12 @@ export class AccountList {
   developer: boolean;
   admin: boolean;
   appOauth2UserId: number;
+  providerName: string;
+  sub: string;
+  oidcName: string;
+  email: string;
+  nickname: string;
+  preferredUsername: string;
+  phoneNumber: string;
 }
 
