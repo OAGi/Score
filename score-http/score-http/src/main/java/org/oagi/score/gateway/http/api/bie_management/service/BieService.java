@@ -28,6 +28,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.ABIERepository;
 import org.oagi.score.repository.BizCtxRepository;
@@ -370,7 +371,7 @@ public class BieService {
 
     private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {
         ScoreUser requester = sessionService.asScoreUser(prinpical);
-        // Issue#1569
+        // Issue #1569
         // check to see if the BIE is referenced in an OpenAPI document
         Result<Record1<ULong>> resultForOasDocId = dslContext.select(OAS_DOC.OAS_DOC_ID)
                 .from(OAS_DOC)
@@ -407,7 +408,6 @@ public class BieService {
                         ))
                         .fetch();
 
-
         BigInteger requesterUserId = requester.getUserId();
         for (Record2<String, ULong> record : result) {
             BieState bieState = BieState.valueOf(record.value1());
@@ -415,7 +415,9 @@ public class BieService {
                 throw new DataAccessForbiddenException("Not allowed to delete the BIE in '" + bieState + "' state.");
             }
 
-            if (!requesterUserId.equals(record.value2().toBigInteger())) {
+            // Issue #1576
+            // Administrator can discard BIEs in any state.
+            if (!requester.hasRole(ScoreRole.ADMINISTRATOR) && !requesterUserId.equals(record.value2().toBigInteger())) {
                 throw new DataAccessForbiddenException("Only allowed to delete the BIE by the owner.");
             }
         }
@@ -496,12 +498,21 @@ public class BieService {
 
     @Transactional
     public void transferOwnership(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, String targetLoginId) {
-        long ownerAppUserId = dslContext.select(APP_USER.APP_USER_ID)
-                .from(APP_USER)
-                .where(APP_USER.LOGIN_ID.equalIgnoreCase(
-                        sessionService.getAppUserByUsername(user).getLoginId()
-                ))
-                .fetchOptionalInto(Long.class).orElse(0L);
+        AppUser requester = sessionService.getAppUserByUsername(user);
+        long ownerAppUserId;
+        // Issue #1576
+        // Even if the administrator does not own BIE, they can transfer ownership.
+        if (requester.isAdmin()) {
+            ownerAppUserId = dslContext.select(TOP_LEVEL_ASBIEP.OWNER_USER_ID)
+                    .from(TOP_LEVEL_ASBIEP)
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                    .fetchOptionalInto(Long.class).orElse(0L);
+        } else {
+            ownerAppUserId = dslContext.select(APP_USER.APP_USER_ID)
+                    .from(APP_USER)
+                    .where(APP_USER.LOGIN_ID.equalIgnoreCase(requester.getLoginId()))
+                    .fetchOptionalInto(Long.class).orElse(0L);
+        }
         if (ownerAppUserId == 0L) {
             throw new IllegalArgumentException("Not found an owner user.");
         }

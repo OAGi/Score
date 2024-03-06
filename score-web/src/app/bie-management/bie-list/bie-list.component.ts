@@ -124,6 +124,10 @@ export class BieListComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
+  }
+
   onPageChange(event: PageEvent) {
     this.loadBieList();
   }
@@ -247,7 +251,7 @@ export class BieListComponent implements OnInit {
       return false;
     }
 
-    return (element.owner === this.username || this.auth.isAdmin()) && element.state === 'Production';
+    return element.owner === this.username && element.state === 'Production';
   }
 
   discardAllSelected() {
@@ -285,33 +289,37 @@ export class BieListComponent implements OnInit {
   }
 
   openTransferDialog(bieList: BieList) {
-    if (!this.isEditable(bieList)) {
+    if (!this.isEditable(bieList) && !this.isAdmin) {
       return;
     }
 
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {roles: this.auth.getUserToken().roles};
-    if (this.auth.getUserToken().tenant.enabled) {
-      dialogConfig.data = {businesCtxIds: bieList.businessContexts.map(b => b.businessContextId)};
-    }
-    const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe((result: AccountList) => {
-      if (result) {
-        this.loading = true;
-        this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).subscribe(_ => {
-          this.snackBar.open('Transferred', '', {
-            duration: 3000,
-          });
-          this.selectionClear();
-          this.loadBieList();
-          this.loading = false;
-        }, error => {
-          this.loading = false;
-        });
+    this.accountService.getAccount(bieList.ownerUserId).subscribe(resp => {
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = window.innerWidth + 'px';
+      dialogConfig.data = {roles: [resp.developer ? 'developer' : 'end-user']};
+      if (this.userToken.tenant.enabled) {
+        dialogConfig.data = {businessCtxIds: bieList.businessContexts.map(b => b.businessContextId)};
       }
+      const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe((result: AccountList) => {
+        if (result) {
+          this.loading = true;
+          this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).subscribe(_ => {
+            this.snackBar.open('Transferred', '', {
+              duration: 3000,
+            });
+            this.selectionClear();
+            this.loadBieList();
+            this.loading = false;
+          }, error => {
+            this.loading = false;
+          });
+        }
+      });
     });
+
+
   }
 
   openFindReuseBieListDialog(bie: BieList) {
@@ -411,7 +419,7 @@ export class BieListComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
-    dialogConfig.data = {roles: this.auth.getUserToken().roles};
+    dialogConfig.data = {roles: this.userToken.roles};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {

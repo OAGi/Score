@@ -182,7 +182,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       })).subscribe(([ccGraph, usedBieList, refBieList, rootNode, bizCtxResp]) => {
       this.initRootNode(rootNode);
 
-      if (this.state === 'WIP' && this.access !== 'CanEdit') {
+      if (this.state === 'WIP' && (this.access !== 'CanEdit' && !this.auth.isAdmin())) {
         this.snackBar.open('Only the owner can access BIE in this state.', '', {
           duration: 3000
         });
@@ -555,6 +555,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   get isDeveloper() {
     const userToken = this.auth.getUserToken();
     return userToken.roles.includes('developer');
+  }
+
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   get isTenantEnabled(): boolean {
