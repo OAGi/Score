@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -21,8 +21,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
 
-        <mariadb-client.version>3.3.2</mariadb-client.version>
-        <jOOQ.version>3.19.3</jOOQ.version>
+        <mariadb-client.version>3.3.3</mariadb-client.version>
+        <jOOQ.version>3.19.5</jOOQ.version>
         <gson.version>2.10.1</gson.version>
         <snakeyaml.version>2.2</snakeyaml.version>
 
