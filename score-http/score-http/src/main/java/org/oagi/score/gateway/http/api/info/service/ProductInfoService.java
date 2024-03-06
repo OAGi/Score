@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisServerCommands;
+import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -20,7 +22,10 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductInfoService {
@@ -111,8 +116,28 @@ public class ProductInfoService {
 
         RedisConnection redisConnection = redisConnectionFactory.getConnection();
         try {
+            RedisServerCommands redisServerCommands = redisConnection.serverCommands();
             Properties redisInfo = redisConnection.info();
-            metadata.setProductVersion(redisInfo.getProperty("redis_version"));
+            Properties clusterProperties = redisServerCommands.info("cluster");
+
+            if (clusterProperties.entrySet().stream()
+                    .filter(e -> e.getKey().toString().contains("cluster_enabled"))
+                    .filter(e -> e.getValue().toString().equals("1"))
+                    .count() > 0) { // if cluster mode is enabled
+                Set<String> clusterNodeNames = redisInfo.keySet().stream().map(e -> {
+                    String key = e.toString();
+                    return key.substring(0, key.lastIndexOf('.'));
+                }).collect(Collectors.toSet());
+
+                metadata.setProductVersion(
+                        clusterNodeNames.stream().sorted()
+                                .map(e -> redisInfo.get(e + ".redis_version") + " (" + e + ")")
+                                .collect(Collectors.joining("; "))
+                );
+            } else {
+                metadata.setProductVersion(redisInfo.getProperty("redis_version"));
+            }
+
             return metadata;
         } finally {
             redisConnection.close();
