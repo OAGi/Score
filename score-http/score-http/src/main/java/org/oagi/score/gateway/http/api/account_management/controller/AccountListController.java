@@ -105,12 +105,21 @@ public class AccountListController {
         return service.hasTaken(body.getOrDefault("loginId", ""));
     }
 
-        @RequestMapping(value = "/account/{appUserId:[\\d]+}/delink", method = RequestMethod.POST,
+    @RequestMapping(value = "/account/{appUserId:[\\d]+}/delink", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity delinkUser(
-                @AuthenticationPrincipal AuthenticatedPrincipal user,
-                @PathVariable("appUserId") BigInteger appUserId) {
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("appUserId") BigInteger appUserId) {
         service.delinkOAuth2AppUser(user, appUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/account/{appUserId:[\\d]+}", method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity removeUser(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("appUserId") BigInteger appUserId) {
+        service.removeUser(user, appUserId);
         return ResponseEntity.noContent().build();
     }
 

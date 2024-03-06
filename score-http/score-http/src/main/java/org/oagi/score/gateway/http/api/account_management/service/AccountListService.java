@@ -228,6 +228,89 @@ public class AccountListService {
         if (appUser == null) {
             throw new AuthenticationCredentialsNotFoundException("An authentication information was not found.");
         }
+
+        ULong appUserId = ULong.valueOf(appUser.getAppUserId());
+        boolean hasData = (dslContext.selectCount()
+                .from(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(appUserId))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(ACC)
+                .where(or(
+                        ACC.OWNER_USER_ID.eq(appUserId),
+                        ACC.CREATED_BY.eq(appUserId),
+                        ACC.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(ASCC)
+                .where(or(
+                        ASCC.OWNER_USER_ID.eq(appUserId),
+                        ASCC.CREATED_BY.eq(appUserId),
+                        ASCC.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(BCC)
+                .where(or(
+                        BCC.OWNER_USER_ID.eq(appUserId),
+                        BCC.CREATED_BY.eq(appUserId),
+                        BCC.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(ASCCP)
+                .where(or(
+                        ASCCP.OWNER_USER_ID.eq(appUserId),
+                        ASCCP.CREATED_BY.eq(appUserId),
+                        ASCCP.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(BCCP)
+                .where(or(
+                        BCCP.OWNER_USER_ID.eq(appUserId),
+                        BCCP.CREATED_BY.eq(appUserId),
+                        BCCP.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(DT)
+                .where(or(
+                        DT.OWNER_USER_ID.eq(appUserId),
+                        DT.CREATED_BY.eq(appUserId),
+                        DT.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(CODE_LIST)
+                .where(or(
+                        CODE_LIST.OWNER_USER_ID.eq(appUserId),
+                        CODE_LIST.CREATED_BY.eq(appUserId),
+                        CODE_LIST.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(AGENCY_ID_LIST)
+                .where(or(
+                        AGENCY_ID_LIST.OWNER_USER_ID.eq(appUserId),
+                        AGENCY_ID_LIST.CREATED_BY.eq(appUserId),
+                        AGENCY_ID_LIST.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(CTX_CATEGORY)
+                .where(or(
+                        CTX_CATEGORY.CREATED_BY.eq(appUserId),
+                        CTX_CATEGORY.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(CTX_SCHEME)
+                .where(or(
+                        CTX_SCHEME.CREATED_BY.eq(appUserId),
+                        CTX_SCHEME.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) + dslContext.selectCount()
+                .from(BIZ_CTX)
+                .where(or(
+                        BIZ_CTX.CREATED_BY.eq(appUserId),
+                        BIZ_CTX.LAST_UPDATED_BY.eq(appUserId)
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0)
+        ) > 0;
+        appUser.setHasData(hasData);
+
         return appUser;
 
     }
@@ -293,6 +376,21 @@ public class AccountListService {
         dslContext.update(APP_OAUTH2_USER)
                 .setNull(APP_OAUTH2_USER.APP_USER_ID)
                 .where(APP_OAUTH2_USER.APP_USER_ID.eq(ULong.valueOf(appUserId)))
+                .execute();
+    }
+
+    @Transactional
+    public void removeUser(AuthenticatedPrincipal user, BigInteger appUserId) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        if (!requester.hasRole(ScoreRole.ADMINISTRATOR)) {
+            throw new AccessControlException(requester);
+        }
+
+        dslContext.deleteFrom(APP_OAUTH2_USER)
+                .where(APP_OAUTH2_USER.APP_USER_ID.eq(ULong.valueOf(appUserId)))
+                .execute();
+        dslContext.deleteFrom(APP_USER)
+                .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(appUserId)))
                 .execute();
     }
 

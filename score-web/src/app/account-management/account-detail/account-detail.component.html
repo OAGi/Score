@@ -131,6 +131,12 @@
         <button mat-raised-button color="accent" *ngIf="!!account && !account.enabled" (click)="setEnable(true)">
           Enable this account
         </button>
+        <button mat-raised-button style="color: #d1242f; font-weight: bold;"
+                *ngIf="!account.enabled && canRemove"
+                [matTooltip]="'The account can be removed if it has no data created or owned.'"
+                (click)="removeAccount()">
+          Remove this account
+        </button>
       </div>
     </div>
     <div class="col-6 actions-wrap" *ngIf="isOAuth2User">

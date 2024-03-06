@@ -15,7 +15,7 @@ public class AppUser {
     private boolean developer;
     private boolean admin;
     private boolean enabled;
-
+    private boolean hasData;
     private BigInteger appOauth2UserId;
     private String providerName;
     private String sub;

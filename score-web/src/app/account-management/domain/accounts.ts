@@ -102,6 +102,7 @@ export class AccountList {
   name: string;
   organization: string;
   enabled: boolean;
+  hasData: boolean;
   developer: boolean;
   admin: boolean;
   appOauth2UserId: number;

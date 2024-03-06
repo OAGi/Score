@@ -70,6 +70,10 @@ export class AccountDetailComponent implements OnInit {
     return this.auth.isAdmin();
   }
 
+  get canRemove(): boolean {
+    return !this.account.hasData;
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
     const charCode = $event.key?.toLowerCase();
@@ -125,6 +129,27 @@ export class AccountDetailComponent implements OnInit {
 
         this.service.delink(this.account).subscribe(_ => {
           this.snackBar.open('Disassociated', '', {
+            duration: 3000,
+          });
+          this.router.navigateByUrl('/account');
+        });
+      });
+  }
+
+  removeAccount() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove account?';
+    dialogConfig.data.content = ['The removed account cannot be recovered.', 'Are you sure you want to remove this account?'];
+    dialogConfig.data.action = 'Remove';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.service.remove(this.account).subscribe(_ => {
+          this.snackBar.open('Removed', '', {
             duration: 3000,
           });
           this.router.navigateByUrl('/account');

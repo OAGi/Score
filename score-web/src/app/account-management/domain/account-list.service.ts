@@ -125,4 +125,8 @@ export class AccountListService implements OnInit {
   delink(account: AccountList): Observable<any> {
     return this.http.post('/api/account/' + account.appUserId + '/delink', {});
   }
+
+  remove(account: AccountList): Observable<any> {
+    return this.http.delete('/api/account/' + account.appUserId, {});
+  }
 }
