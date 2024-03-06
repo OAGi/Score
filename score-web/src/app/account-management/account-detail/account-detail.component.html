@@ -12,10 +12,10 @@
         <mat-form-field>
           <mat-label>Login ID</mat-label>
           <input matInput required data-id="user.loginId"
-                 [(ngModel)]="account.loginId" disabled maxlength="255"/>
+                 [(ngModel)]="account.loginId" [disabled]="!isAdmin" maxlength="255"/>
         </mat-form-field>
 
-        <div class="col-6">
+        <div class="col-6 pb-3">
           <div class="checkbox">
             <mat-checkbox color="primary"
                           data-id="user.developer"

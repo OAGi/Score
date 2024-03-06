@@ -5,6 +5,7 @@ import {of} from 'rxjs';
 import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
+import {AuthService} from '../../authentication/auth.service';
 
 @Component({
   selector: 'score-account-detail',
@@ -20,6 +21,7 @@ export class AccountDetailComponent implements OnInit {
   loading: boolean;
 
   constructor(private service: AccountListService,
+              private auth: AuthService,
               private snackBar: MatSnackBar,
               private route: ActivatedRoute,
               private router: Router) {
@@ -56,6 +58,10 @@ export class AccountDetailComponent implements OnInit {
     } else {
       return ((this.hasMinLengthError(this.newPassword) || this.hasMinLengthError(this.confirmPassword)) || this.hasConfirmPasswordError());
     }
+  }
+
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   @HostListener('document:keydown', ['$event'])
