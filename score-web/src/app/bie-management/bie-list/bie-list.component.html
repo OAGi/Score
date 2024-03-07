@@ -222,7 +222,7 @@
               </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.owner !== username"
+              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!isAdmin && row.owner !== username"
                             (change)="$event ? toggle(row) : null"
                             [checked]="isSelected(row)">
               </mat-checkbox>
@@ -252,11 +252,11 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
             <td mat-cell *matCellDef="let element">
               <div class="den word-break-all">
-                <span *ngIf='element.access === "Prohibited"'
+                <span *ngIf='!isAdmin && element.access === "Prohibited"'
                       matTooltip="Only the owner can access BIE in this state.">{{ element.den }}</span>
-                <span *ngIf='element.access === "Unprepared"'
+                <span *ngIf='!isAdmin && element.access === "Unprepared"'
                       matTooltip="This profile BIE is in progress.">{{ element.den }}</span>
-                <a *ngIf="element.access !== 'Prohibited' && element.access !== 'Unprepared'"
+                <a *ngIf="isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')"
                    routerLink="{{ element.topLevelAsbiepId }}"
                    matTooltip="{{ element.den }}">
                   <span>{{ element.den }}</span>
@@ -290,7 +290,7 @@
             <td mat-cell *matCellDef="let element">
               <div class="d-flex">
                 <mat-icon class="pr-4 pointer align-self-center"
-                          *ngIf="isEditable(element)"
+                          *ngIf="isEditable(element) || isAdmin"
                           (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
               </div>
             </td>
@@ -374,15 +374,15 @@
         <span class="context-menu-item">Find Reuses</span>
       </button>
       <button mat-menu-item (click)="openTransferDialog(contextMenuItem)"
-              [disabled]="!isEditable(contextMenuItem)">
+              [disabled]="!isEditable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Transfer Ownership</span>
       </button>
       <button mat-menu-item (click)="deprecate(contextMenuItem)"
-              [disabled]="!isDeprecable(contextMenuItem)">
+              [disabled]="!isDeprecable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Deprecate</span>
       </button>
       <button mat-menu-item (click)="discard(contextMenuItem)"
-              [disabled]="!isEditable(contextMenuItem)">
+              [disabled]="!isEditable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Discard</span>
       </button>
     </mat-menu>

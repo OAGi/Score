@@ -23,6 +23,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -91,7 +92,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         this.state = topLevelAsbiep.getState();
         this.forceBieUpdate = true;
 
-        BigInteger userId = sessionService.userId(user);
+        AppUser appUser = sessionService.getAppUserByUsername(user);
+        BigInteger userId = appUser.getAppUserId();
         accessPrivilege = AccessPrivilege.Prohibited;
         switch (this.state) {
         case Initiating:
@@ -102,11 +104,11 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 if (topLevelAsbiep.getOwnerUserId().equals(userId)) {
                     accessPrivilege = AccessPrivilege.CanEdit;
                 } else {
-                    // Issue #1010
-                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId())) {
+                    // Issue #1010, #1576
+                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) || appUser.isAdmin()) {
                         accessPrivilege = AccessPrivilege.CanView;
                     } else {
-                        throw new DataAccessForbiddenException("'" + sessionService.getAppUserByUsername(user).getLoginId() +
+                        throw new DataAccessForbiddenException("'" + appUser.getLoginId() +
                                 "' doesn't have an access privilege.");
                     }
                 }
