@@ -5,6 +5,8 @@ import {of} from 'rxjs';
 import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
+import {AuthService} from '../../authentication/auth.service';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-account-detail',
@@ -20,6 +22,8 @@ export class AccountDetailComponent implements OnInit {
   loading: boolean;
 
   constructor(private service: AccountListService,
+              private auth: AuthService,
+              private confirmDialogService: ConfirmDialogService,
               private snackBar: MatSnackBar,
               private route: ActivatedRoute,
               private router: Router) {
@@ -42,6 +46,10 @@ export class AccountDetailComponent implements OnInit {
     this.confirmPassword = '';
   }
 
+  get isOAuth2User(): boolean {
+    return this.account && (!!this.account.appOauth2UserId && this.account.appOauth2UserId > 0);
+  }
+
   hasMinLengthError(variable: string) {
     return (variable.length < 5);
   }
@@ -56,6 +64,14 @@ export class AccountDetailComponent implements OnInit {
     } else {
       return ((this.hasMinLengthError(this.newPassword) || this.hasMinLengthError(this.confirmPassword)) || this.hasConfirmPasswordError());
     }
+  }
+
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
+  }
+
+  get canRemove(): boolean {
+    return !this.account.hasData;
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -99,5 +115,45 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
+  disassociateSSO() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Disassociate SSO?';
+    dialogConfig.data.content = ['Are you sure you want to disassociate SSO from this user?'];
+    dialogConfig.data.action = 'Disassociate';
 
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.service.delink(this.account).subscribe(_ => {
+          this.snackBar.open('Disassociated', '', {
+            duration: 3000,
+          });
+          this.router.navigateByUrl('/account');
+        });
+      });
+  }
+
+  removeAccount() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove account?';
+    dialogConfig.data.content = ['The removed account cannot be recovered.', 'Are you sure you want to remove this account?'];
+    dialogConfig.data.action = 'Remove';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.service.remove(this.account).subscribe(_ => {
+          this.snackBar.open('Removed', '', {
+            duration: 3000,
+          });
+          this.router.navigateByUrl('/account');
+        });
+      });
+  }
 }

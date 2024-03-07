@@ -121,4 +121,12 @@ export class AccountListService implements OnInit {
   transferOwnership(account: AccountList): Observable<any> {
     return this.http.post('/api/accounts/' + account.appUserId + '/transfer_ownership', {});
   }
+
+  delink(account: AccountList): Observable<any> {
+    return this.http.post('/api/account/' + account.appUserId + '/delink', {});
+  }
+
+  remove(account: AccountList): Observable<any> {
+    return this.http.delete('/api/account/' + account.appUserId, {});
+  }
 }
