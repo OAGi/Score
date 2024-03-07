@@ -159,6 +159,7 @@ export class BieList {
   bizCtxName: string;
   access: string;
   owner: string;
+  ownerUserId: number;
   version: string;
   status: string;
   bizTerm: string;

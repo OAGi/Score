@@ -75,22 +75,22 @@
                         <button mat-raised-button color="primary" (click)="updateDetails()"
                                 matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
                                 [matBadgeHidden]="sizeOfChanges === 0"
-                                *ngIf="state === 'WIP' && access === 'CanEdit'"
+                                *ngIf="state === 'WIP' && (access === 'CanEdit' || isAdmin)"
                                 [disabled]="updateDisabled">
                           Update
                         </button>
                         <button mat-raised-button color="accent" (click)="updateState('QA')"
-                                *ngIf="state === 'WIP' && access === 'CanEdit'"
+                                *ngIf="state === 'WIP' && (access === 'CanEdit' || isAdmin)"
                                 [disabled]="isUpdating || isChanged || !isValid">
                           Move to QA
                         </button>
                         <button mat-raised-button color="warn" (click)="updateState('WIP')"
-                                *ngIf="state === 'QA' && access === 'CanMove'"
+                                *ngIf="state === 'QA' && (access === 'CanMove' || isAdmin)"
                                 [disabled]="isUpdating">
                           Back to WIP
                         </button>
                         <button mat-raised-button color="accent" (click)="updateState('Production')"
-                                *ngIf="state === 'QA' && access === 'CanMove'"
+                                *ngIf="state === 'QA' && (access === 'CanMove' || isAdmin)"
                                 [disabled]="isUpdating">
                           Move to Production
                         </button>
