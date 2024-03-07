@@ -48,6 +48,7 @@ public class ScoreAuthenticationSuccessHandler
     @Override
     public void afterPropertiesSet() throws Exception {
         setUseReferer(true);
+        setDefaultTargetUrl("/");
     }
 
     @Override
@@ -99,6 +100,9 @@ public class ScoreAuthenticationSuccessHandler
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
         String targetUrl = super.determineTargetUrl(request, response);
+        if (targetUrl == null) {
+            targetUrl = getDefaultTargetUrl();
+        }
         if ("/".equals(targetUrl)) {
             if (authentication instanceof OAuth2AuthenticationToken) {
                 OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
