@@ -408,17 +408,19 @@ public class BieService {
                         ))
                         .fetch();
 
-        BigInteger requesterUserId = requester.getUserId();
-        for (Record2<String, ULong> record : result) {
-            BieState bieState = BieState.valueOf(record.value1());
-            if (bieState == BieState.Production) {
-                throw new DataAccessForbiddenException("Not allowed to delete the BIE in '" + bieState + "' state.");
-            }
+        // Issue #1576
+        // Administrator can discard BIEs in any state.
+        if (!requester.hasRole(ScoreRole.ADMINISTRATOR)) {
+            BigInteger requesterUserId = requester.getUserId();
+            for (Record2<String, ULong> record : result) {
+                BieState bieState = BieState.valueOf(record.value1());
+                if (bieState == BieState.Production) {
+                    throw new DataAccessForbiddenException("Not allowed to delete the BIE in '" + bieState + "' state.");
+                }
 
-            // Issue #1576
-            // Administrator can discard BIEs in any state.
-            if (!requester.hasRole(ScoreRole.ADMINISTRATOR) && !requesterUserId.equals(record.value2().toBigInteger())) {
-                throw new DataAccessForbiddenException("Only allowed to delete the BIE by the owner.");
+                if (!requesterUserId.equals(record.value2().toBigInteger())) {
+                    throw new DataAccessForbiddenException("Only allowed to delete the BIE by the owner.");
+                }
             }
         }
 
