@@ -4,18 +4,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession;
 import org.springframework.session.data.redis.config.annotation.web.http.RedisIndexedHttpSessionConfiguration;
 import org.springframework.session.web.http.CookieHttpSessionIdResolver;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
 @Configuration
-public class SessionConfiguration extends RedisIndexedHttpSessionConfiguration {
-
-    public SessionConfiguration() {
-        setConfigureRedisAction(ConfigureRedisAction.NO_OP);
-        setRedisNamespace("score:session");
-    }
+@EnableRedisIndexedHttpSession(redisNamespace = "score:session")
+public class SessionConfiguration {
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
@@ -24,7 +21,6 @@ public class SessionConfiguration extends RedisIndexedHttpSessionConfiguration {
         cookieSerializer.setDomainNamePattern("^([\\s\\S]+)$");
         cookieSerializer.setCookiePath("/");
         cookieSerializer.setUseHttpOnlyCookie(true);
-        cookieSerializer.setSameSite("Strict");
         httpSessionIdResolver.setCookieSerializer(cookieSerializer);
         return httpSessionIdResolver;
     }
