@@ -823,11 +823,14 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private Map<String, Object> makeProperties(ABIE typeAbie, TopLevelAsbiep topLevelAsbiep) {
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
+        ASCCP asccp = generationContext.findASCCP(asbiep.getBasedAsccpManifestId());
         Map<String, Object> properties = new LinkedHashMap();
         // Issue #1148
         properties.put("x-oagis-bie-guid", asbiep.getGuid());
         properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.getLastUpdateTimestamp()));
         properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.getVersion()) ? topLevelAsbiep.getVersion() : "");
+        // Issue #1603
+        properties.put("x-oagis-bie-den", asccp.getPropertyTerm());
         // Issue #1574
         Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
         properties.put("x-oagis-bie-uri", option.getScheme() + "://" + option.getHost() + "/profile_bie/" + topLevelAsbiep.getTopLevelAsbiepId().toString());
