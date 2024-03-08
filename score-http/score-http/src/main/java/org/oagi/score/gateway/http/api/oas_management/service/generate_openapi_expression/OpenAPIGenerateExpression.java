@@ -241,9 +241,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
             Release release = generationContext.findRelease(topLevelAsbiep.getReleaseId());
 
-            Map<String, Object> paths = new LinkedHashMap<>();
-            Map<String, Object> schemas = new LinkedHashMap<>();
-            Map<String, Object> securitySchemes = null;
+            Map<String, Object> paths;
+            Map<String, Object> schemas;
+            Map<String, Object> securitySchemes;
             if (root == null) {
                 root = new LinkedHashMap<>();
                 root.put("openapi", option.getOasDoc().getOpenAPIVersion());
@@ -300,6 +300,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                         .build();
 
                 root.put("paths", paths);
+
+                schemas = new LinkedHashMap<>();
                 root.put("components", ImmutableMap.<String, Object>builder()
                         .put("securitySchemes", securitySchemes)
                         .put("schemas", schemas)

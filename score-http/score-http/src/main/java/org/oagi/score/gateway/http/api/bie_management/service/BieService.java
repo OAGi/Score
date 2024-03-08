@@ -385,7 +385,7 @@ public class BieService {
                 List<BigInteger> topLevelAsbiepIdsInOasDoc = new ArrayList<>();
                 GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(requester);
                 getBieForOasDocRequest.setOasDocId(oasDocId);
-                GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieListForOasDoc(getBieForOasDocRequest);
+                GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(getBieForOasDocRequest);
                 List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
                 if (bieListForOasDoc != null) {
                     topLevelAsbiepIdsInOasDoc = bieListForOasDoc.stream().map(s -> s.getTopLevelAsbiepId()).collect(Collectors.toList());

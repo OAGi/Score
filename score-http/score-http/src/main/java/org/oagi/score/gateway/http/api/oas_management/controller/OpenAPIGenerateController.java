@@ -6,6 +6,7 @@ import org.oagi.score.gateway.http.api.oas_management.data.OpenAPIGenerateExpres
 import org.oagi.score.gateway.http.api.oas_management.data.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIGenerateService;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.service.authentication.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,12 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.oagi.score.common.util.ControllerHelper.getRequestHostname;
 import static org.oagi.score.common.util.ControllerHelper.getRequestScheme;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @RestController
 public class OpenAPIGenerateController {
@@ -43,12 +43,20 @@ public class OpenAPIGenerateController {
     @RequestMapping(value = "/oas_doc/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @PathVariable("id") BigInteger oasDocId,
+                                                        @RequestParam(name = "sortActives") String sortActives,
+                                                        @RequestParam(name = "sortDirections") String sortDirections,
                                                         HttpServletRequest httpServletRequest) throws IOException {
 
         GetBieForOasDocRequest request = new GetBieForOasDocRequest(authenticationService.asScoreUser(user));
+        request.setPageIndex(-1);
+        request.setPageSize(-1);
+        request.setSortActives(!hasLength(sortActives) ? Collections.emptyList() :
+                Arrays.asList(sortActives.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).collect(Collectors.toList()));
+        request.setSortDirections(!hasLength(sortDirections) ? Collections.emptyList() :
+                Arrays.asList(sortDirections.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).map(e -> SortDirection.valueOf(e.toUpperCase())).collect(Collectors.toList()));
 
         request.setOasDocId(oasDocId);
-        GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieListForOasDoc(request);
+        GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
         List<BigInteger> topLevelAsbiepIds = new ArrayList<>();
         List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
         Map<String, OpenAPIGenerateExpressionOption> params = new HashMap<>();

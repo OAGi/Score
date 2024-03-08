@@ -281,24 +281,6 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
         );
     }
 
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public GetBieForOasDocResponse getBieForOasDocList(GetBieForOasDocRequest request) throws ScoreDataAccessException {
-        SelectFinalStep finalStep = selectForRequest()
-                .where(getConditions(request))
-                .unionAll(selectForResponse()
-                        .where(getConditions(request)));
-
-        int length = dslContext().fetchCount(finalStep);
-
-        return new GetBieForOasDocResponse(
-                finalStep.fetch(mapper()),
-                request.getPageIndex(),
-                request.getPageSize(),
-                length
-        );
-
-    }
-
     @Override
     public GetAssignedOasTagResponse getAssignedOasTag(GetAssignedOasTagRequest request) throws ScoreDataAccessException {
         OasTagRecord oasTagRecord = null;

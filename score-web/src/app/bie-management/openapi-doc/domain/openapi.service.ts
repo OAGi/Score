@@ -11,7 +11,7 @@ import {
   ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
-import {PageResponse} from '../../../basis/basis';
+import {PageRequest, PageResponse} from '../../../basis/basis';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {base64Encode} from '../../../common/utility';
 
@@ -260,34 +260,13 @@ export class OpenAPIService {
     return this.http.post<any>('/api/oas_doc/' + request.oasDocId + '/bie_list/delete', request.json);
   }
 
-  generate(topLevelAsbiepIds: number[], option: BieExpressOption, oasDoc: OasDoc): Observable<HttpResponse<Blob>> {
+  generateOpenAPI(oasDocId: number, page: PageRequest): Observable<HttpResponse<Blob>> {
     let params: HttpParams = new HttpParams()
-      .set('topLevelAsbiepIds', topLevelAsbiepIds.join(','));
-    Object.getOwnPropertyNames(option).forEach(key => {
-      const value = option[key];
-      if (value) {
-        if (key === 'filenames') {
-          for (const topLevelAsbiepId of Object.keys(value)) {
-            params = params.set('filenames[' + topLevelAsbiepId + ']', value[topLevelAsbiepId]);
-          }
-        } else if (key === 'bizCtxIds') {
-          for (const topLevelAsbiepId of Object.keys(value)) {
-            params = params.set('bizCtxIds[' + topLevelAsbiepId + ']', Number(value[topLevelAsbiepId]));
-          }
-        } else {
-          params = params.set(key, option[key]);
-        }
-      }
-    });
-    return this.http.get('api/oas_doc/' + oasDoc.oasDocId + '/generate', {
-      params: new HttpParams().set('data', base64Encode(params.toString())),
-      observe: 'response',
-      responseType: 'blob'
-    });
-  }
+      .set('sortActives', page.sortActives.join(','))
+      .set('sortDirections', page.sortDirections.join(','));
 
-  generateOpenAPI(oasDocId: number): Observable<HttpResponse<Blob>> {
     return this.http.get('api/oas_doc/' + oasDocId + '/generate', {
+      params,
       observe: 'response',
       responseType: 'blob'
     });
