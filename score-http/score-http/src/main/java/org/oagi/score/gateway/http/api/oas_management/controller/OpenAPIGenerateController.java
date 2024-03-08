@@ -59,7 +59,7 @@ public class OpenAPIGenerateController {
         GetBieForOasDocResponse bieForOasDocTable = oasDocService.getBieForOasDoc(request);
         List<BigInteger> topLevelAsbiepIds = new ArrayList<>();
         List<BieForOasDoc> bieListForOasDoc = bieForOasDocTable.getResults();
-        Map<String, OpenAPIGenerateExpressionOption> params = new HashMap<>();
+        Map<String, OpenAPIGenerateExpressionOption> params = new LinkedHashMap<>();
         GetOasDocRequest getOasDocRequest = new GetOasDocRequest(authenticationService.asScoreUser(user));
         getOasDocRequest.setOasDocId(oasDocId);
         GetOasDocResponse getOasDocResponse = oasDocService.getOasDoc(getOasDocRequest);
