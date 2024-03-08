@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {OasDoc} from '../domain/openapi-doc';
-import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
-import {AccountListService} from '../../../../account-management/domain/account-list.service';
-import {AuthService} from '../../../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {FormControl, Validators} from '@angular/forms';
+import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-oas-doc-create',

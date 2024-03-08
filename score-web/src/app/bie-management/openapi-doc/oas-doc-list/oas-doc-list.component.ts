@@ -1,21 +1,21 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
 import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {AccountListService} from '../../../../account-management/domain/account-list.service';
 import {MatDialog} from '@angular/material/dialog';
-import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
-import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {PageRequest} from '../../../../basis/basis';
-import {initFilter} from '../../../../common/utility';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {PageRequest} from '../../../basis/basis';
+import {initFilter} from '../../../common/utility';
 
 @Component({
   selector: 'score-oas-doc-list',

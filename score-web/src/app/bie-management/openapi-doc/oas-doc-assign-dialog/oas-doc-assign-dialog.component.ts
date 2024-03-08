@@ -1,25 +1,25 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {SimpleRelease} from '../../../../release-management/domain/release';
 import {FormControl, Validators} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {AccountListService} from '../../../../account-management/domain/account-list.service';
-import {ReleaseService} from '../../../../release-management/domain/release.service';
-import {AuthService} from '../../../../authentication/auth.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {initFilter, loadBranch, saveBranch} from '../../../../common/utility';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {WebPageInfoService} from '../../../../basis/basis.service';
+import {SimpleRelease} from '../../../release-management/domain/release';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
+import {ReleaseService} from '../../../release-management/domain/release.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {WebPageInfoService} from '../../../basis/basis.service';
+import {PageRequest} from '../../../basis/basis';
+import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',

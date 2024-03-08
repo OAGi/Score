@@ -7,6 +7,7 @@ import {MaterialModule} from '../material.module';
 import {BieExpressModule} from './bie-express/bie-express.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
 import {BieListDialogComponent} from './bie-list-dialog/bie-list-dialog.component';
+import {BieDeprecateDialogComponent} from './bie-deprecate-dialog/bie-deprecate-dialog.component';
 
 import {BieListComponent} from './bie-list/bie-list.component';
 import {BieCreateBizCtxComponent} from './bie-create/bie-create-biz-ctx.component';
@@ -18,6 +19,7 @@ import {AuthService} from '../authentication/auth.service';
 import {BieListService} from './bie-list/domain/bie-list.service';
 import {BieCreateService} from './bie-create/domain/bie-create.service';
 import {BieCopyService} from './bie-copy/domain/bie-copy.service';
+import {OasDocModule} from './openapi-doc/oas-doc.module';
 import {ReleaseService} from '../release-management/domain/release.service';
 
 import {TranslateModule} from '@ngx-translate/core';
@@ -36,8 +38,6 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {BieExpressOpenapi30Module} from './bie-express/bie-express.openapi30/bie-express.openapi30.module';
-import {BieDeprecateDialogComponent} from "./bie-deprecate-dialog/bie-deprecate-dialog.component";
 
 const routes: Routes = [
   {
@@ -125,7 +125,7 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     BieExpressModule,
-    BieExpressOpenapi30Module,
+    OasDocModule,
     TransferOwnershipDialogModule,
     TranslateModule,
     CommonModule,

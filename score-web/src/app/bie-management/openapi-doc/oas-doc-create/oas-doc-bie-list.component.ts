@@ -1,29 +1,28 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
-import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
-import {Release} from '../../../bie-create/domain/bie-create-list';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {WorkingRelease} from '../../../../release-management/domain/release';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {OpenAPIService} from '../domain/openapi.service';
-import {ReleaseService} from '../../../../release-management/domain/release.service';
-import {AccountListService} from '../../../../account-management/domain/account-list.service';
-import {AuthService} from '../../../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {PageRequest, PageResponse} from '../../../../basis/basis';
-import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../../common/utility';
 import {finalize, switchMap} from 'rxjs/operators';
 import {HttpParams} from '@angular/common/http';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {WebPageInfoService} from '../../../../basis/basis.service';
-import {UserToken} from '../../../../authentication/domain/auth';
-import {BieList} from '../../../bie-list/domain/bie-list';
+import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
+import {Release} from '../../bie-create/domain/bie-create-list';
+import {WorkingRelease} from '../../../release-management/domain/release';
+import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
+import {ReleaseService} from '../../../release-management/domain/release.service';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {WebPageInfoService} from '../../../basis/basis.service';
+import {PageRequest, PageResponse} from '../../../basis/basis';
+import {base64Decode, initFilter, loadBranch, saveBranch} from '../../../common/utility';
+import {UserToken} from '../../../authentication/domain/auth';
 
 @Component({
   selector: 'score-oas-doc-bie-list',

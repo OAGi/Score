@@ -1,11 +1,11 @@
-import {PageRequest} from '../../../../basis/basis';
+import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode, hashCode4Array, hashCode4Object, hashCode4String} from '../../../../common/utility';
-import {ScoreUser} from '../../../../authentication/domain/auth';
 import {SimpleRelease} from 'src/app/release-management/domain/release';
-import {ChangeListener} from '../../../domain/bie-flat-tree';
-import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
+import {base64Decode, base64Encode, hashCode4Array} from '../../../common/utility';
+import {ScoreUser} from '../../../authentication/domain/auth';
+import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
+import {ChangeListener} from '../../domain/bie-flat-tree';
 
 export class OasDocListRequest {
   filters: {
@@ -114,7 +114,7 @@ export class OasDoc {
   bieList: BieForOasDoc[];
 }
 
-export interface simpleOasDoc {
+export interface SimpleOasDoc {
   oasDocId: number;
   guid: string;
   openAPIVersion: string;

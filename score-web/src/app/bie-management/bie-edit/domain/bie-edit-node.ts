@@ -10,7 +10,6 @@ import {
   ChangeListener
 } from '../../domain/bie-flat-tree';
 import {hashCode4String} from '../../../common/utility';
-import {BieForOasDoc} from '../../bie-express/bie-express.openapi30/domain/openapi-doc';
 
 export class BieEditNode {
   ccManifestId: number;

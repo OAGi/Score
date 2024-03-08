@@ -5,31 +5,31 @@ import {
   BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
-  simpleOasDoc
+  SimpleOasDoc
 } from '../domain/openapi-doc';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {BusinessContextService} from '../../../../context-management/business-context/domain/business-context.service';
 import {OpenAPIService} from '../domain/openapi.service';
-import {AccountListService} from '../../../../account-management/domain/account-list.service';
-import {AuthService} from '../../../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-dialog.service';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveBranch} from 'src/app/common/utility';
 import {saveAs} from 'file-saver';
-import {BusinessContext} from '../../../../context-management/business-context/domain/business-context';
-import {WorkingRelease} from '../../../../release-management/domain/release';
 import {SelectionModel} from '@angular/cdk/collections';
-import {PageRequest} from '../../../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
-import {BieExpressOption} from '../../domain/generate-expression';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {WebPageInfoService} from '../../../../basis/basis.service';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
+import {WorkingRelease} from '../../../release-management/domain/release';
+import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
+import {BieExpressOption} from '../../bie-express/domain/generate-expression';
+import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {WebPageInfoService} from '../../../basis/basis.service';
+import {PageRequest} from '../../../basis/basis';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -39,7 +39,7 @@ import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-mult
 export class OasDocDetailComponent implements OnInit {
 
   title = 'Edit OpenAPI Document';
-  oasDocs: simpleOasDoc[];
+  oasDocs: SimpleOasDoc[];
   oasDoc: OasDoc;
   workingRelease = WorkingRelease;
   businessContextIdList: number[] = [];

@@ -11,9 +11,9 @@ import {
   ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
-import {PageResponse} from '../../../../basis/basis';
-import {BieExpressOption} from '../../domain/generate-expression';
-import {base64Encode} from '../../../../common/utility';
+import {PageResponse} from '../../../basis/basis';
+import {BieExpressOption} from '../../bie-express/domain/generate-expression';
+import {base64Encode} from '../../../common/utility';
 
 @Injectable()
 export class OpenAPIService {
@@ -130,10 +130,12 @@ export class OpenAPIService {
       title: oasDoc.title
     });
   }
-  checkBIEReusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc, oasDoc: OasDoc): Observable<ReusedBIEViolationCheck>{
+
+  checkBIEReusedAcrossMultipleOperations(bieForOasDoc: BieForOasDoc, oasDoc: OasDoc): Observable<ReusedBIEViolationCheck> {
     return this.http.post<ReusedBIEViolationCheck>('/api/oas_doc/' + oasDoc.oasDocId + '/check_bie_reused_across_operations', bieForOasDoc.json);
   }
-  checkBIEReusedAcrossOperationsAfterUpdate(oasDoc: OasDoc): Observable<ReusedBIEViolationCheck>{
+
+  checkBIEReusedAcrossOperationsAfterUpdate(oasDoc: OasDoc): Observable<ReusedBIEViolationCheck> {
     return this.http.post<ReusedBIEViolationCheck>('/api/oas_doc/' + oasDoc.oasDocId + '/check_bie_reused_across_operations_after_update', {});
   }
 
@@ -253,7 +255,8 @@ export class OpenAPIService {
         messageBody: assignBieForOasDoc.messageBody
       });
   }
-  removeBieForOasDoc(request: BieForOasDocDeleteRequest): Observable<any>{
+
+  removeBieForOasDoc(request: BieForOasDocDeleteRequest): Observable<any> {
     return this.http.post<any>('/api/oas_doc/' + request.oasDocId + '/bie_list/delete', request.json);
   }
 
