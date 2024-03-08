@@ -29,7 +29,7 @@ import { BieService } from './bie/bie.service';
       }),
     ThrottlerModule.forRoot({
       ttl: 300,
-      limit: 1000,
+      limit: 500,
     }),
   ],
   controllers: [

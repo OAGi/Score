@@ -8,9 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('SCORE')
-    .setDescription('Score External Facing API')
+    .setTitle('connectCenter (Score) API')
+    .setDescription('RESTful API for accessing standards and profiled BIE information and schemas from connectCenter also known as Score')
     .setVersion(process.env.npm_package_version)
+    .addBearerAuth()
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
