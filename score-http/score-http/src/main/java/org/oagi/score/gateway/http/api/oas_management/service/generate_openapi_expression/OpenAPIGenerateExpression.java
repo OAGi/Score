@@ -906,9 +906,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         boolean isNillable = asbie.isNillable();
 
         boolean reused = !asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId());
-        // Issue #1603
-        // ignoring the ASCCPs that reused with in the BIEs
-        reused = false;
         if (reused) {
             SchemaReference ref = getReference(schemas, asbiep, generationContext);
             properties.put("$ref", ref.getPath());
