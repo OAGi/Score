@@ -113,7 +113,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
     @Test
     @DisplayName("TC_2_1_TA_4")
-    public void admin_user_cannot_update_login_ID_field_of_another_developer_account() {
+    public void admin_user_can_update_login_ID_field_of_another_developer_account() {
         // Create random developer via API
         AppUserObject appUser =
                 getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -123,7 +123,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         AdminMenu adminMenu = homePage.getAdminMenu();
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
-        assertFalse(editAccountPage.getLoginIDField().isEnabled());
+        assertTrue(editAccountPage.getLoginIDField().isEnabled());
     }
 
     @Test
@@ -175,7 +175,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
     @Test
     @DisplayName("TC_2_1_TA_7")
-    public void admin_user_cannot_update_login_ID_field_of_self() {
+    public void admin_user_can_update_login_ID_field_of_self() {
         // Create random admin via API
         AppUserObject appUser =
                 getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
@@ -185,7 +185,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         AdminMenu adminMenu = homePage.getAdminMenu();
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
-        assertFalse(editAccountPage.getLoginIDField().isEnabled());
+        assertTrue(editAccountPage.getLoginIDField().isEnabled());
     }
 
     @Test

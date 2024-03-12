@@ -22,7 +22,7 @@ An OAGIS developer cannot create a developer account with a duplicate login ID.
 An OAGIS developer cannot create a developer account that does not meet password rules.
 
 #### Test Assertion #2.1.4
-An OAGIS developer cannot update the log in ID of another developer account.
+An OAGIS developer can update the log in ID of another developer account.
 
 #### Test Assertion #2.1.5
 An OAGIS developer can update the password of another developer account with a new password that meets password rules.
@@ -31,7 +31,7 @@ An OAGIS developer can update the password of another developer account with a n
 An OAGIS developer cannot update the password of another developer account with a new password that does not meet password rules.
 
 #### Test Assertion #2.1.7
-An OAGIS developer cannot update the log in ID of his developer account with a new one.
+An OAGIS developer can update the log in ID of his developer account with a new one.
 
 #### Test Assertion #2.1.8
 An OAGIS developer can update the password of his developer account with a new password that meet password rules.
@@ -115,7 +115,7 @@ An OAGIS developer cannot create an end user account with a duplicate login ID.
 An OAGIS developer cannot create an end user account that does not meet password rules.
 
 #### Test Assertion #2.2.4
-An OAGIS developer cannot update the log in ID of an end user account with a new unique log in ID.
+An OAGIS developer can update the log in ID of an end user account with a new unique log in ID.
 
 #### Test Assertion #2.2.5
 An OAGIS developer can update the password of an end user account with a new password that meet password rules.

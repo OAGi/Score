@@ -110,7 +110,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
 
     @Test
     @DisplayName("TC_2_2_TA_4")
-    public void admin_user_cannot_update_login_ID_field_of_another_end_user_account() {
+    public void admin_user_can_update_login_ID_field_of_another_end_user_account() {
         // Create random end-user via API
         AppUserObject appUser =
                 getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -120,7 +120,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         AdminMenu adminMenu = homePage.getAdminMenu();
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
-        assertFalse(editAccountPage.getLoginIDField().isEnabled());
+        assertTrue(editAccountPage.getLoginIDField().isEnabled());
     }
 
     @Test
