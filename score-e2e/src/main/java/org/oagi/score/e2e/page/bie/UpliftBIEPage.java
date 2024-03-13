@@ -84,14 +84,14 @@ public interface UpliftBIEPage extends Page {
      *
      * @return the UI element of the 'Property Term' field
      */
-    WebElement getPropertyTermField();
+    WebElement getDenField();
 
     /**
-     * Set the 'Property Term' field with the given text.
+     * Set the 'DEN' field with the given text.
      *
-     * @param propertyTerm Property Term
+     * @param den DEN
      */
-    void setPropertyTerm(String propertyTerm);
+    void setDEN(String den);
 
     /**
      * Return the UI element of the 'Business Context' field.

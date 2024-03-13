@@ -7,8 +7,6 @@ import org.oagi.score.e2e.page.bie.UpliftBIEPage;
 import org.oagi.score.e2e.page.bie.UpliftBIEVerificationPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,8 +31,8 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+    private static final By DEN_FIELD_LOCATOR =
+            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Business Context\")]");
@@ -148,13 +146,13 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     }
 
     @Override
-    public WebElement getPropertyTermField() {
-        return visibilityOfElementLocated(getDriver(), PROPERTY_TERM_FIELD_LOCATOR);
+    public WebElement getDenField() {
+        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
     }
 
     @Override
-    public void setPropertyTerm(String propertyTerm) {
-        sendKeys(getPropertyTermField(), propertyTerm);
+    public void setDEN(String den) {
+        sendKeys(getDenField(), den);
     }
 
     @Override

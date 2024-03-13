@@ -93,7 +93,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prevRelease);
         upliftBIEPage.setTargetBranch(currRelease);
         upliftBIEPage.setState("Production");
-        upliftBIEPage.setPropertyTerm(preconditionsTa2912.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2912.topLevelASBIEP.getDen());
         upliftBIEPage.setOwner(usera.getLoginId());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
@@ -400,7 +400,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//td//*[contains(text(), \"" + topLevelASBIEP.getPropertyTerm() + "\")]//ancestor::tr[1]/td[1]/mat-checkbox/label/span[1]")).size());
     }
@@ -423,7 +423,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
-        upliftBIEPage.setPropertyTerm(preconditionsTa2914.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2914.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -514,7 +514,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -552,7 +552,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -672,7 +672,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -769,7 +769,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915dReusedChild.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915dReusedChild.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -783,7 +783,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915dReusedParent.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915dReusedParent.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -801,7 +801,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2915dReusedScenario.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2915dReusedScenario.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -982,7 +982,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2919_TOPBIEGETBOM.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2919_TOPBIEGETBOM.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1019,7 +1019,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
 
-        upliftBIEPage.setPropertyTerm(preconditionsTa2919_BIEPrimitiveDate.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2919_BIEPrimitiveDate.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1265,7 +1265,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1394,7 +1394,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2910BIEBOMDoubleNested.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2910BIEBOMDoubleNested.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1475,7 +1475,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2910JournalEntry.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2910JournalEntry.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1738,7 +1738,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
         WebElement td = upliftBIEPage.getColumnByName(tr, "select");
@@ -1898,7 +1898,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
         td = upliftBIEPage.getColumnByName(tr, "select");
@@ -2102,7 +2102,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-        upliftBIEPage.setPropertyTerm(preconditionsTa2912JournalEntry.topLevelASBIEP.getPropertyTerm());
+        upliftBIEPage.setDEN(preconditionsTa2912JournalEntry.topLevelASBIEP.getDen());
         upliftBIEPage.setState("QA");
         upliftBIEPage.hitSearchButton();
         WebElement tr = upliftBIEPage.getTableRecordAtIndex(1);
