@@ -13,7 +13,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.version>4.16.1</selenium.version>
+        <selenium.version>4.18.1</selenium.version>
         <junit.version>5.10.1</junit.version>
         <junit.platform.version>1.10.1</junit.platform.version>
         <slf4j.version>2.0.9</slf4j.version>
@@ -21,9 +21,9 @@
         <commons.lang3.version>3.14.0</commons.lang3.version>
         <commons.math3.version>3.6.1</commons.math3.version>
         <lombok.version>1.18.30</lombok.version>
-        <mariadb-client.version>3.3.1</mariadb-client.version>
+        <mariadb-client.version>3.3.3</mariadb-client.version>
         <hikariCP.version>5.1.0</hikariCP.version>
-        <jOOQ.version>3.18.7</jOOQ.version>
+        <jOOQ.version>3.19.6</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
     </properties>
 
