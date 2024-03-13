@@ -50,6 +50,10 @@ export class BieUpliftProfileBieComponent implements OnInit {
   releases: SimpleRelease[] = [];
   sourceRelease: SimpleRelease;
   targetRelease: SimpleRelease;
+  sourceReleaseListFilterCtrl: FormControl = new FormControl();
+  sourceReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  targetReleaseListFilterCtrl: FormControl = new FormControl();
+  targetReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
 
   get targetReleaseList(): SimpleRelease[] {
     const sourceRelease: SimpleRelease = this.request.releases[0];
@@ -115,6 +119,9 @@ export class BieUpliftProfileBieComponent implements OnInit {
       }
 
       this.loadBieList(true);
+
+      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, this.releases, (e) => e.releaseNum);
+      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
     });
 
     this.accountService.getAccountNames().subscribe(loginIds => {
@@ -139,6 +146,9 @@ export class BieUpliftProfileBieComponent implements OnInit {
     this.targetRelease = undefined;
     this.paginator.pageIndex = 0;
     this.loadBieList();
+
+    // Reset targetReleaseFilteredList using targetReleaseList
+    initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {

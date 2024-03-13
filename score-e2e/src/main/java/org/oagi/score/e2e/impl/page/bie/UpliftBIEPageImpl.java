@@ -76,13 +76,17 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
     public WebElement getSourceBranchSelectField() {
         return visibilityOfElementLocated(getDriver(), SOURCE_BRANCH_SELECT_FIELD_LOCATOR);
     }
+
     @Override
     public void setSourceBranch(String sourceBranch) {
-        click(getSourceBranchSelectField());
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[text() = \"" + sourceBranch + "\"]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            click(getSourceBranchSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), sourceBranch);
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[text() = \"" + sourceBranch + "\"]"));
+            click(getDriver(), optionField);
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -92,11 +96,14 @@ public class UpliftBIEPageImpl extends BasePageImpl implements UpliftBIEPage {
 
     @Override
     public void setTargetBranch(String targetBranch) {
-        click(getTargetBranchSelectField());
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[text() = \"" + targetBranch + "\"]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            click(getTargetBranchSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), targetBranch);
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[text() = \"" + targetBranch + "\"]"));
+            click(getDriver(), optionField);
+            escape(getDriver());
+        });
     }
 
     @Override

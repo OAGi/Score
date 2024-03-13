@@ -141,12 +141,14 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
 
     @Override
     public void setBranch(String branch) {
-        click(getBranchSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-        click(getDriver(), optionField);
-        escape(getDriver());
+        retry(() -> {
+            click(getBranchSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
+            WebElement optionField = visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+            click(getDriver(), optionField);
+            escape(getDriver());
+        });
     }
 
     @Override

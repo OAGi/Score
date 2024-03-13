@@ -22,7 +22,12 @@
                         {{ sourceRelease?.state | separate }}
                       </span>
                     </mat-select-trigger>
-                    <mat-option *ngFor="let release of releases" [value]="release">
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="sourceReleaseListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let release of sourceReleaseFilteredList | async" [value]="release">
                       <div class="d-flex">
                         <span class="release-num">{{ release.releaseNum }}</span>
                         <span class="f12 ml-auto pr-2 {{ release.state }}">
@@ -40,15 +45,20 @@
                     <mat-select-trigger class="d-flex">
                       <span>{{ targetRelease?.releaseNum }}</span>
                       <span class="f12 ml-auto pr-2 {{ targetRelease?.state }}">
-                              {{ targetRelease?.state | separate }}
-                            </span>
+                        {{ targetRelease?.state | separate }}
+                      </span>
                     </mat-select-trigger>
-                    <mat-option *ngFor="let release of targetReleaseList" [value]="release">
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="targetReleaseListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let release of targetReleaseFilteredList | async" [value]="release">
                       <div class="d-flex">
                         <span class="release-num">{{ release.releaseNum }}</span>
                         <span class="f12 ml-auto pr-2 {{ release.state }}">
-                                {{ release.state | separate }}
-                              </span>
+                          {{ release.state | separate }}
+                        </span>
                       </div>
                     </mat-option>
                   </mat-select>
