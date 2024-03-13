@@ -36,12 +36,8 @@
               <mat-form-field>
                 <mat-label>Deprecated</mat-label>
                 <mat-select [(ngModel)]="request.deprecated" multiple>
-                  <mat-option [value]="true">
-                    True
-                  </mat-option>
-                  <mat-option [value]="false">
-                    False
-                  </mat-option>
+                  <mat-option [value]="true">True</mat-option>
+                  <mat-option [value]="false">False</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -49,12 +45,8 @@
               <mat-form-field>
                 <mat-label>Commonly Used</mat-label>
                 <mat-select [(ngModel)]="request.commonlyUsed" multiple>
-                  <mat-option [value]="true">
-                    True
-                  </mat-option>
-                  <mat-option [value]="false">
-                    False
-                  </mat-option>
+                  <mat-option [value]="true">True</mat-option>
+                  <mat-option [value]="false">False</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -73,9 +65,8 @@
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async"
+                              [value]="loginId">{{ loginId }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -89,9 +80,8 @@
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                              [value]="loginId">{{ loginId }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -169,9 +159,7 @@
               <mat-form-field>
                 <mat-label>Tag</mat-label>
                 <mat-select [(ngModel)]="request.tags" multiple>
-                  <mat-option *ngFor="let tag of tags" [value]="tag.name">
-                    {{tag.name}}
-                  </mat-option>
+                  <mat-option *ngFor="let tag of tags" [value]="tag.name">{{ tag.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>

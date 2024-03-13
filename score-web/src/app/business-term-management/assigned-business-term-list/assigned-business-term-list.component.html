@@ -36,9 +36,7 @@
               <mat-form-field>
                 <mat-label>Type</mat-label>
                 <mat-select [(ngModel)]="request.filters.bieTypes" multiple>
-                  <mat-option *ngFor="let type of typeList" [value]="type">
-                    {{type}}
-                  </mat-option>
+                  <mat-option *ngFor="let type of typeList" [value]="type">{{ type }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -55,9 +53,8 @@
                                              [placeholderLabel]="'Search...'"
                                              [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                                [value]="loginId">{{ loginId }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>

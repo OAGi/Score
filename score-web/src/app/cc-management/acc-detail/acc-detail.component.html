@@ -511,9 +511,7 @@
                               <mat-option *ngFor="let componentType of componentTypes"
                                           [value]="componentType.value"
                                           [disabled]="!isValidAttributeGroup(componentType.value)"
-                                          [hidden]="!componentTypeAble(componentType.value)">
-                                {{ componentType.name }}
-                              </mat-option>
+                                          [hidden]="!componentTypeAble(componentType.value)">{{ componentType.name }}</mat-option>
                             </mat-select>
                           </mat-form-field>
                         </div>

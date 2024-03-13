@@ -44,9 +44,8 @@
                                              [placeholderLabel]="'Search...'"
                                              [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                                [value]="loginId">{{ loginId }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -250,9 +249,8 @@
                                              [placeholderLabel]="'Search...'"
                                              [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                                [value]="loginId">{{ loginId }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>

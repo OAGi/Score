@@ -34,12 +34,8 @@
             <mat-form-field>
               <mat-label>Deprecated</mat-label>
               <mat-select [(ngModel)]="request.deprecated" multiple>
-                <mat-option [value]="true">
-                  True
-                </mat-option>
-                <mat-option [value]="false">
-                  False
-                </mat-option>
+                <mat-option [value]="true">True</mat-option>
+                <mat-option [value]="false">False</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -47,18 +43,10 @@
             <mat-form-field>
               <mat-label>Type</mat-label>
               <mat-select [(ngModel)]="request.dtTypes" multiple>
-                <mat-option [value]="'Core'">
-                  Core
-                </mat-option>
-                <mat-option [value]="'Default'">
-                  Default
-                </mat-option>
-                <mat-option [value]="'Unqualified'">
-                  Unqualified
-                </mat-option>
-                <mat-option [value]="'Qualified'">
-                  Qualified
-                </mat-option>
+                <mat-option [value]="'Core'">Core</mat-option>
+                <mat-option [value]="'Default'">Default</mat-option>
+                <mat-option [value]="'Unqualified'">Unqualified</mat-option>
+                <mat-option [value]="'Qualified'">Qualified</mat-option>
               </mat-select>
             </mat-form-field>
           </div>

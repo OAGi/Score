@@ -42,9 +42,8 @@
                                                  [placeholderLabel]="'Search...'"
                                                  [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
                         </mat-option>
-                        <mat-option *ngFor="let loginId of numberOfCCsByUsers_usernameFilteredList | async" [value]="loginId">
-                          {{ loginId }}
-                        </mat-option>
+                        <mat-option *ngFor="let loginId of numberOfCCsByUsers_usernameFilteredList | async"
+                                    [value]="loginId">{{ loginId }}</mat-option>
                       </mat-select>
                     </mat-form-field>
                   </div>
@@ -208,9 +207,8 @@
                                        [placeholderLabel]="'Search...'"
                                        [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
               </mat-option>
-              <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
-                {{ release.releaseNum }}
-              </mat-option>
+              <mat-option *ngFor="let release of releaseFilteredList | async"
+                          [value]="release">{{ release.releaseNum }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -233,9 +231,8 @@
                                                  [placeholderLabel]="'Search...'"
                                                  [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
                         </mat-option>
-                        <mat-option *ngFor="let loginId of numberOfBiesByUsers_usernameFilteredList | async" [value]="loginId">
-                          {{ loginId }}
-                        </mat-option>
+                        <mat-option *ngFor="let loginId of numberOfBiesByUsers_usernameFilteredList | async"
+                                    [value]="loginId">{{ loginId }}</mat-option>
                       </mat-select>
                     </mat-form-field>
                   </div>

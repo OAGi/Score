@@ -20,15 +20,11 @@
                 <mat-label>State</mat-label>
                 <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
                             multiple>
-                  <mat-option *ngFor="let state of workingStateList" [value]="state">
-                    {{state}}
-                  </mat-option>
+                  <mat-option *ngFor="let state of workingStateList" [value]="state">{{ state }}</mat-option>
                 </mat-select>
                 <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
                             multiple>
-                  <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                    {{state}}
-                  </mat-option>
+                  <mat-option *ngFor="let state of releaseStateList" [value]="state">{{ state }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -36,12 +32,8 @@
               <mat-form-field>
                 <mat-label>Deprecated</mat-label>
                 <mat-select [(ngModel)]="request.deprecated" multiple>
-                  <mat-option [value]="true">
-                    True
-                  </mat-option>
-                  <mat-option [value]="false">
-                    False
-                  </mat-option>
+                  <mat-option [value]="true">True</mat-option>
+                  <mat-option [value]="false">False</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -59,9 +51,8 @@
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async"
+                              [value]="loginId">{{ loginId }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -75,9 +66,8 @@
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                              [value]="loginId">{{ loginId }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -154,9 +144,8 @@
               <mat-form-field>
                 <mat-label>Component Type</mat-label>
                 <mat-select [(ngModel)]="request.componentTypes" multiple>
-                  <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType.name">
-                    {{componentType.name}}
-                  </mat-option>
+                  <mat-option *ngFor="let componentType of componentTypeList"
+                              [value]="componentType.name">{{ componentType.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>

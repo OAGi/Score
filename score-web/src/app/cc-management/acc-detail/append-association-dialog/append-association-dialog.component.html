@@ -31,15 +31,11 @@
                 <mat-label>State</mat-label>
                 <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
                             multiple>
-                  <mat-option *ngFor="let state of workingStateList" [value]="state">
-                    {{state}}
-                  </mat-option>
+                  <mat-option *ngFor="let state of workingStateList" [value]="state">{{ state }}</mat-option>
                 </mat-select>
                 <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
                             multiple>
-                  <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                    {{state}}
-                  </mat-option>
+                  <mat-option *ngFor="let state of releaseStateList" [value]="state">{{ state }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -47,12 +43,8 @@
               <mat-form-field>
                 <mat-label>Deprecated</mat-label>
                 <mat-select [(ngModel)]="request.deprecated" multiple>
-                  <mat-option [value]="true">
-                    True
-                  </mat-option>
-                  <mat-option [value]="false">
-                    False
-                  </mat-option>
+                  <mat-option [value]="true">True</mat-option>
+                  <mat-option [value]="false">False</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -70,9 +62,8 @@
                                            [placeholderLabel]="'Search...'"
                                            [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                   </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async"
+                              [value]="loginId">{{ loginId }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>

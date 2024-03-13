@@ -476,9 +476,8 @@
                                                        [placeholderLabel]="'Search...'"
                                                        [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
                               </mat-option>
-                              <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
-                                {{ namespace.uri }}
-                              </mat-option>
+                              <mat-option *ngFor="let namespace of filteredNamespaceList | async"
+                                          [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
                             </mat-select>
                           </mat-form-field>
                           <mat-form-field *ngIf="selectedNode.level !== 0 || !isEditable() || hasRevision()">
