@@ -765,11 +765,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Failed to update BIE state"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        String snackBarMessage = getSnackBarMessage(getDriver());
+        assertEquals("Updated", snackBarMessage);
     }
 
     @Test
@@ -846,11 +843,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Failed to update BIE state"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        String snackBarMessage = getSnackBarMessage(getDriver());
+        assertEquals("Updated", snackBarMessage);
     }
 
     @Test
@@ -1068,12 +1062,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
 
-        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
-        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
-        assertTrue(snackBarMessage.contains("Failed to update BIE state"));
-        click(elementToBeClickable(getDriver(), By.xpath(
-                "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
-
+        String snackBarMessage = getSnackBarMessage(getDriver());
+        assertEquals("Updated", snackBarMessage);
     }
 
     @Test

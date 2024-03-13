@@ -46,10 +46,10 @@ The developer can view all the reuses of all BIE in the Reuse BIE Report page. W
 The developer cannot discard a reused BIE that he owned if it is used in another top-level BIE (the reusing BIE can be owned by a different developer).
 
 #### Test Assertion #25.1.10
-The developer cannot move a reusing BIE from WIP state to QA state if the reused BIE is in WIP state.
+The developer can move a reusing BIE from WIP state to QA state even if the reused BIE is in WIP state.
 
 #### Test Assertion #25.1.11
-The developer cannot move a reusing BIE from QA state to Production state if the reused BIE is in QA state.
+The developer can move a reusing BIE from QA state to Production state even if the reused BIE is in QA state.
 
 #### Test Assertion #25.1.12
 The developer can move a reusing BIE from WIP state to QA state if the reused BIE is in QA or Production state
@@ -58,7 +58,7 @@ The developer can move a reusing BIE from WIP state to QA state if the reused BI
 The developer can move a reusing BIE from QA state to Production state if the reused BIE is in Production state.
 
 #### Test Assertion #25.1.14
-The developer cannot move a reused BIE from QA state to WIP state if the reusing BIE is in QA state.
+The developer can move a reused BIE from QA state to WIP state even if the reusing BIE is in QA state.
 
 #### Test Assertion #25.1.15
 The developer can move a reused BIE from QA state to WIP state if the reusing BIE is in WIP state.
