@@ -229,7 +229,7 @@ password of another user. To do so,
    desired user account to update. Click the "Login ID" of the desired
    user.
 
-   1. Change the fields: Name, Organization, Password, and Admin
+   1. Change the fields: Login ID, Name, Organization, Password, and Admin
       checkbox as desired.
 
 4. Click the "Update" button.
