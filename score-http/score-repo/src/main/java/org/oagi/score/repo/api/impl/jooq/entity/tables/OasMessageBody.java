@@ -136,6 +136,8 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasMessageBodyPath extends OasMessageBody implements Path<OasMessageBodyRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasMessageBodyPath(Table<O> path, ForeignKey<O, OasMessageBodyRecord> childPath, InverseForeignKey<O, OasMessageBodyRecord> parentPath) {
             super(path, childPath, parentPath);
         }

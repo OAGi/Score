@@ -173,6 +173,8 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasOperationPath extends OasOperation implements Path<OasOperationRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasOperationPath(Table<O> path, ForeignKey<O, OasOperationRecord> childPath, InverseForeignKey<O, OasOperationRecord> parentPath) {
             super(path, childPath, parentPath);
         }

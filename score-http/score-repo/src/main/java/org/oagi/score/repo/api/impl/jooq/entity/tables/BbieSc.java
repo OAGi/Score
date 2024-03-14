@@ -306,6 +306,8 @@ public class BbieSc extends TableImpl<BbieScRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BbieScPath extends BbieSc implements Path<BbieScRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BbieScPath(Table<O> path, ForeignKey<O, BbieScRecord> childPath, InverseForeignKey<O, BbieScRecord> parentPath) {
             super(path, childPath, parentPath);
         }

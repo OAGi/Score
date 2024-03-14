@@ -168,6 +168,8 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleSetReleasePath extends ModuleSetRelease implements Path<ModuleSetReleaseRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleSetReleasePath(Table<O> path, ForeignKey<O, ModuleSetReleaseRecord> childPath, InverseForeignKey<O, ModuleSetReleaseRecord> parentPath) {
             super(path, childPath, parentPath);
         }

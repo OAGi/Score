@@ -218,6 +218,8 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CodeListValuePath extends CodeListValue implements Path<CodeListValueRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CodeListValuePath(Table<O> path, ForeignKey<O, CodeListValueRecord> childPath, InverseForeignKey<O, CodeListValueRecord> parentPath) {
             super(path, childPath, parentPath);
         }

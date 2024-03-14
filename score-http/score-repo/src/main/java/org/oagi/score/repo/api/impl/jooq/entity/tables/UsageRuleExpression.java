@@ -126,6 +126,8 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UsageRuleExpressionPath extends UsageRuleExpression implements Path<UsageRuleExpressionRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UsageRuleExpressionPath(Table<O> path, ForeignKey<O, UsageRuleExpressionRecord> childPath, InverseForeignKey<O, UsageRuleExpressionRecord> parentPath) {
             super(path, childPath, parentPath);
         }

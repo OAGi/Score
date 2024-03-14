@@ -267,6 +267,8 @@ public class Dt extends TableImpl<DtRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class DtPath extends Dt implements Path<DtRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> DtPath(Table<O> path, ForeignKey<O, DtRecord> childPath, InverseForeignKey<O, DtRecord> parentPath) {
             super(path, childPath, parentPath);
         }

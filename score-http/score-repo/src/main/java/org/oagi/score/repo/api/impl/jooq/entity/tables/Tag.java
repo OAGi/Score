@@ -154,6 +154,8 @@ public class Tag extends TableImpl<TagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class TagPath extends Tag implements Path<TagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> TagPath(Table<O> path, ForeignKey<O, TagRecord> childPath, InverseForeignKey<O, TagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

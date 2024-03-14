@@ -160,6 +160,8 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BccManifestPath extends BccManifest implements Path<BccManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BccManifestPath(Table<O> path, ForeignKey<O, BccManifestRecord> childPath, InverseForeignKey<O, BccManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

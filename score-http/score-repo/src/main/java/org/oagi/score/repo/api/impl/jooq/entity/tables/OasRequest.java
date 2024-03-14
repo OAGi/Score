@@ -181,6 +181,8 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasRequestPath extends OasRequest implements Path<OasRequestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasRequestPath(Table<O> path, ForeignKey<O, OasRequestRecord> childPath, InverseForeignKey<O, OasRequestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -328,6 +328,8 @@ public class Bbie extends TableImpl<BbieRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BbiePath extends Bbie implements Path<BbieRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BbiePath(Table<O> path, ForeignKey<O, BbieRecord> childPath, InverseForeignKey<O, BbieRecord> parentPath) {
             super(path, childPath, parentPath);
         }

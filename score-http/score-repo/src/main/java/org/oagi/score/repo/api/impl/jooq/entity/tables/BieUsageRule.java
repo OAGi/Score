@@ -150,6 +150,8 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BieUsageRulePath extends BieUsageRule implements Path<BieUsageRuleRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BieUsageRulePath(Table<O> path, ForeignKey<O, BieUsageRuleRecord> childPath, InverseForeignKey<O, BieUsageRuleRecord> parentPath) {
             super(path, childPath, parentPath);
         }

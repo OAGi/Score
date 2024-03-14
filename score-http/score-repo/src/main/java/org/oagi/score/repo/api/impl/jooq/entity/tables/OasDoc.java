@@ -206,6 +206,8 @@ public class OasDoc extends TableImpl<OasDocRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasDocPath extends OasDoc implements Path<OasDocRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasDocPath(Table<O> path, ForeignKey<O, OasDocRecord> childPath, InverseForeignKey<O, OasDocRecord> parentPath) {
             super(path, childPath, parentPath);
         }

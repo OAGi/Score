@@ -118,6 +118,8 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BccpManifestTagPath extends BccpManifestTag implements Path<BccpManifestTagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BccpManifestTagPath(Table<O> path, ForeignKey<O, BccpManifestTagRecord> childPath, InverseForeignKey<O, BccpManifestTagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

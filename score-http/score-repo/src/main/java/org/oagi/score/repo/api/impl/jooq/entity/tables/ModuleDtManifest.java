@@ -147,6 +147,8 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleDtManifestPath extends ModuleDtManifest implements Path<ModuleDtManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleDtManifestPath(Table<O> path, ForeignKey<O, ModuleDtManifestRecord> childPath, InverseForeignKey<O, ModuleDtManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

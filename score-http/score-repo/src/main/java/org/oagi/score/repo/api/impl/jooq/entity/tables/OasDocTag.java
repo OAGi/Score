@@ -132,6 +132,8 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasDocTagPath extends OasDocTag implements Path<OasDocTagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasDocTagPath(Table<O> path, ForeignKey<O, OasDocTagRecord> childPath, InverseForeignKey<O, OasDocTagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

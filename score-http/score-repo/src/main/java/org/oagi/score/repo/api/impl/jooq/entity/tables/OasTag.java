@@ -145,6 +145,8 @@ public class OasTag extends TableImpl<OasTagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasTagPath extends OasTag implements Path<OasTagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasTagPath(Table<O> path, ForeignKey<O, OasTagRecord> childPath, InverseForeignKey<O, OasTagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

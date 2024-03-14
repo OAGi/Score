@@ -113,6 +113,8 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BizCtxAssignmentPath extends BizCtxAssignment implements Path<BizCtxAssignmentRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BizCtxAssignmentPath(Table<O> path, ForeignKey<O, BizCtxAssignmentRecord> childPath, InverseForeignKey<O, BizCtxAssignmentRecord> parentPath) {
             super(path, childPath, parentPath);
         }

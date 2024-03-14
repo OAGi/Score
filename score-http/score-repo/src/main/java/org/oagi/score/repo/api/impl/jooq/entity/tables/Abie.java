@@ -220,6 +220,8 @@ public class Abie extends TableImpl<AbieRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AbiePath extends Abie implements Path<AbieRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AbiePath(Table<O> path, ForeignKey<O, AbieRecord> childPath, InverseForeignKey<O, AbieRecord> parentPath) {
             super(path, childPath, parentPath);
         }

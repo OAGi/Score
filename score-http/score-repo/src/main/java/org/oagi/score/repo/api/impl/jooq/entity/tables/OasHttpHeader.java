@@ -167,6 +167,8 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasHttpHeaderPath extends OasHttpHeader implements Path<OasHttpHeaderRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasHttpHeaderPath(Table<O> path, ForeignKey<O, OasHttpHeaderRecord> childPath, InverseForeignKey<O, OasHttpHeaderRecord> parentPath) {
             super(path, childPath, parentPath);
         }

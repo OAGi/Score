@@ -142,6 +142,8 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AsccBiztermPath extends AsccBizterm implements Path<AsccBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AsccBiztermPath(Table<O> path, ForeignKey<O, AsccBiztermRecord> childPath, InverseForeignKey<O, AsccBiztermRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -214,6 +214,8 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class TopLevelAsbiepPath extends TopLevelAsbiep implements Path<TopLevelAsbiepRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> TopLevelAsbiepPath(Table<O> path, ForeignKey<O, TopLevelAsbiepRecord> childPath, InverseForeignKey<O, TopLevelAsbiepRecord> parentPath) {
             super(path, childPath, parentPath);
         }

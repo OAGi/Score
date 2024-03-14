@@ -142,6 +142,8 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BccBiztermPath extends BccBizterm implements Path<BccBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BccBiztermPath(Table<O> path, ForeignKey<O, BccBiztermRecord> childPath, InverseForeignKey<O, BccBiztermRecord> parentPath) {
             super(path, childPath, parentPath);
         }

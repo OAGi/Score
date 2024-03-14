@@ -157,6 +157,8 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AppOauth2UserPath extends AppOauth2User implements Path<AppOauth2UserRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AppOauth2UserPath(Table<O> path, ForeignKey<O, AppOauth2UserRecord> childPath, InverseForeignKey<O, AppOauth2UserRecord> parentPath) {
             super(path, childPath, parentPath);
         }

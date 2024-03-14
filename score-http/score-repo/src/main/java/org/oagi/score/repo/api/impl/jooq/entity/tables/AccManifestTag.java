@@ -118,6 +118,8 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AccManifestTagPath extends AccManifestTag implements Path<AccManifestTagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AccManifestTagPath(Table<O> path, ForeignKey<O, AccManifestTagRecord> childPath, InverseForeignKey<O, AccManifestTagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

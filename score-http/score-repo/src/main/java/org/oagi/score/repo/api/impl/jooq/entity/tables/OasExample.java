@@ -155,6 +155,8 @@ public class OasExample extends TableImpl<OasExampleRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasExamplePath extends OasExample implements Path<OasExampleRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasExamplePath(Table<O> path, ForeignKey<O, OasExampleRecord> childPath, InverseForeignKey<O, OasExampleRecord> parentPath) {
             super(path, childPath, parentPath);
         }

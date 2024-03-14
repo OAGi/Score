@@ -155,6 +155,8 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BdtScPriRestriPath extends BdtScPriRestri implements Path<BdtScPriRestriRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BdtScPriRestriPath(Table<O> path, ForeignKey<O, BdtScPriRestriRecord> childPath, InverseForeignKey<O, BdtScPriRestriRecord> parentPath) {
             super(path, childPath, parentPath);
         }

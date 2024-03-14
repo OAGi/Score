@@ -250,6 +250,8 @@ public class DtSc extends TableImpl<DtScRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class DtScPath extends DtSc implements Path<DtScRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> DtScPath(Table<O> path, ForeignKey<O, DtScRecord> childPath, InverseForeignKey<O, DtScRecord> parentPath) {
             super(path, childPath, parentPath);
         }

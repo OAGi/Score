@@ -194,6 +194,8 @@ public class Xbt extends TableImpl<XbtRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class XbtPath extends Xbt implements Path<XbtRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> XbtPath(Table<O> path, ForeignKey<O, XbtRecord> childPath, InverseForeignKey<O, XbtRecord> parentPath) {
             super(path, childPath, parentPath);
         }

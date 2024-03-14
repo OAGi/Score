@@ -196,6 +196,8 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasParameterPath extends OasParameter implements Path<OasParameterRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasParameterPath(Table<O> path, ForeignKey<O, OasParameterRecord> childPath, InverseForeignKey<O, OasParameterRecord> parentPath) {
             super(path, childPath, parentPath);
         }

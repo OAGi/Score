@@ -103,6 +103,8 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class RefSpecPath extends RefSpec implements Path<RefSpecRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> RefSpecPath(Table<O> path, ForeignKey<O, RefSpecRecord> childPath, InverseForeignKey<O, RefSpecRecord> parentPath) {
             super(path, childPath, parentPath);
         }

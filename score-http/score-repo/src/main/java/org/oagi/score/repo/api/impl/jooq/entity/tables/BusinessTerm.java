@@ -163,6 +163,8 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BusinessTermPath extends BusinessTerm implements Path<BusinessTermRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BusinessTermPath(Table<O> path, ForeignKey<O, BusinessTermRecord> childPath, InverseForeignKey<O, BusinessTermRecord> parentPath) {
             super(path, childPath, parentPath);
         }

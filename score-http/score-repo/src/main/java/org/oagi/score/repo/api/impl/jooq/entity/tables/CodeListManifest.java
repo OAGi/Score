@@ -162,6 +162,8 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CodeListManifestPath extends CodeListManifest implements Path<CodeListManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CodeListManifestPath(Table<O> path, ForeignKey<O, CodeListManifestRecord> childPath, InverseForeignKey<O, CodeListManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -131,6 +131,8 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasResourceTagPath extends OasResourceTag implements Path<OasResourceTagRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasResourceTagPath(Table<O> path, ForeignKey<O, OasResourceTagRecord> childPath, InverseForeignKey<O, OasResourceTagRecord> parentPath) {
             super(path, childPath, parentPath);
         }

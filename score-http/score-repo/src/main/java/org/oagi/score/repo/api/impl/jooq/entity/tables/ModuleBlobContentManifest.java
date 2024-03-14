@@ -158,6 +158,8 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleBlobContentManifestPath extends ModuleBlobContentManifest implements Path<ModuleBlobContentManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleBlobContentManifestPath(Table<O> path, ForeignKey<O, ModuleBlobContentManifestRecord> childPath, InverseForeignKey<O, ModuleBlobContentManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

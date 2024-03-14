@@ -142,6 +142,8 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasMediaTypePath extends OasMediaType implements Path<OasMediaTypeRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasMediaTypePath(Table<O> path, ForeignKey<O, OasMediaTypeRecord> childPath, InverseForeignKey<O, OasMediaTypeRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -139,6 +139,8 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CdtAwdPriXpsTypeMapPath extends CdtAwdPriXpsTypeMap implements Path<CdtAwdPriXpsTypeMapRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CdtAwdPriXpsTypeMapPath(Table<O> path, ForeignKey<O, CdtAwdPriXpsTypeMapRecord> childPath, InverseForeignKey<O, CdtAwdPriXpsTypeMapRecord> parentPath) {
             super(path, childPath, parentPath);
         }

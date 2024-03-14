@@ -126,6 +126,8 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class DtUsageRulePath extends DtUsageRule implements Path<DtUsageRuleRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> DtUsageRulePath(Table<O> path, ForeignKey<O, DtUsageRuleRecord> childPath, InverseForeignKey<O, DtUsageRuleRecord> parentPath) {
             super(path, childPath, parentPath);
         }

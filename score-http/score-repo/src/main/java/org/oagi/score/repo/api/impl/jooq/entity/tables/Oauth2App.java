@@ -188,6 +188,8 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class Oauth2AppPath extends Oauth2App implements Path<Oauth2AppRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> Oauth2AppPath(Table<O> path, ForeignKey<O, Oauth2AppRecord> childPath, InverseForeignKey<O, Oauth2AppRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -112,6 +112,8 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UserTenantPath extends UserTenant implements Path<UserTenantRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UserTenantPath(Table<O> path, ForeignKey<O, UserTenantRecord> childPath, InverseForeignKey<O, UserTenantRecord> parentPath) {
             super(path, childPath, parentPath);
         }

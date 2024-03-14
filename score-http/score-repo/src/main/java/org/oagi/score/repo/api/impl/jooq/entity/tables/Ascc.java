@@ -250,6 +250,8 @@ public class Ascc extends TableImpl<AsccRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AsccPath extends Ascc implements Path<AsccRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AsccPath(Table<O> path, ForeignKey<O, AsccRecord> childPath, InverseForeignKey<O, AsccRecord> parentPath) {
             super(path, childPath, parentPath);
         }

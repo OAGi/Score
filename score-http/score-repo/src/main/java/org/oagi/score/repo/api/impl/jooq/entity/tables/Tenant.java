@@ -105,6 +105,8 @@ public class Tenant extends TableImpl<TenantRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class TenantPath extends Tenant implements Path<TenantRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> TenantPath(Table<O> path, ForeignKey<O, TenantRecord> childPath, InverseForeignKey<O, TenantRecord> parentPath) {
             super(path, childPath, parentPath);
         }

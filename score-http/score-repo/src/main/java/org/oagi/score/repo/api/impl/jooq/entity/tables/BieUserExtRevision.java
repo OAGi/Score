@@ -157,6 +157,8 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BieUserExtRevisionPath extends BieUserExtRevision implements Path<BieUserExtRevisionRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BieUserExtRevisionPath(Table<O> path, ForeignKey<O, BieUserExtRevisionRecord> childPath, InverseForeignKey<O, BieUserExtRevisionRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -168,6 +168,8 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class NamespacePath extends Namespace implements Path<NamespaceRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> NamespacePath(Table<O> path, ForeignKey<O, NamespaceRecord> childPath, InverseForeignKey<O, NamespaceRecord> parentPath) {
             super(path, childPath, parentPath);
         }

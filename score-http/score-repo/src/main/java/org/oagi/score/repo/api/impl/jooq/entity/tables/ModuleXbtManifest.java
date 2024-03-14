@@ -147,6 +147,8 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleXbtManifestPath extends ModuleXbtManifest implements Path<ModuleXbtManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleXbtManifestPath(Table<O> path, ForeignKey<O, ModuleXbtManifestRecord> childPath, InverseForeignKey<O, ModuleXbtManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -147,6 +147,8 @@ public class ModuleAccManifest extends TableImpl<ModuleAccManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleAccManifestPath extends ModuleAccManifest implements Path<ModuleAccManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleAccManifestPath(Table<O> path, ForeignKey<O, ModuleAccManifestRecord> childPath, InverseForeignKey<O, ModuleAccManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

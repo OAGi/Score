@@ -110,6 +110,8 @@ public class CdtScRefSpec extends TableImpl<CdtScRefSpecRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CdtScRefSpecPath extends CdtScRefSpec implements Path<CdtScRefSpecRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CdtScRefSpecPath(Table<O> path, ForeignKey<O, CdtScRefSpecRecord> childPath, InverseForeignKey<O, CdtScRefSpecRecord> parentPath) {
             super(path, childPath, parentPath);
         }

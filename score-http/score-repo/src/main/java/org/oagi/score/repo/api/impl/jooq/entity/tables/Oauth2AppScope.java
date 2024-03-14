@@ -109,6 +109,8 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class Oauth2AppScopePath extends Oauth2AppScope implements Path<Oauth2AppScopeRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> Oauth2AppScopePath(Table<O> path, ForeignKey<O, Oauth2AppScopeRecord> childPath, InverseForeignKey<O, Oauth2AppScopeRecord> parentPath) {
             super(path, childPath, parentPath);
         }

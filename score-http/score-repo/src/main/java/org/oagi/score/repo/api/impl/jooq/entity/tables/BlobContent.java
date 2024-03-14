@@ -105,6 +105,8 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BlobContentPath extends BlobContent implements Path<BlobContentRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BlobContentPath(Table<O> path, ForeignKey<O, BlobContentRecord> childPath, InverseForeignKey<O, BlobContentRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -140,6 +140,8 @@ public class Message extends TableImpl<MessageRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class MessagePath extends Message implements Path<MessageRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> MessagePath(Table<O> path, ForeignKey<O, MessageRecord> childPath, InverseForeignKey<O, MessageRecord> parentPath) {
             super(path, childPath, parentPath);
         }

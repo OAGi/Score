@@ -285,6 +285,8 @@ public class Bcc extends TableImpl<BccRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BccPath extends Bcc implements Path<BccRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BccPath(Table<O> path, ForeignKey<O, BccRecord> childPath, InverseForeignKey<O, BccRecord> parentPath) {
             super(path, childPath, parentPath);
         }

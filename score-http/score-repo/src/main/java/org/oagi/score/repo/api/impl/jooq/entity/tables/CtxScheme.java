@@ -181,6 +181,8 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CtxSchemePath extends CtxScheme implements Path<CtxSchemeRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CtxSchemePath(Table<O> path, ForeignKey<O, CtxSchemeRecord> childPath, InverseForeignKey<O, CtxSchemeRecord> parentPath) {
             super(path, childPath, parentPath);
         }

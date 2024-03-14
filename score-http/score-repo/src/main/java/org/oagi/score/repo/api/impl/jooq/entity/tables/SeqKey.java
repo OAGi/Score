@@ -129,6 +129,8 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class SeqKeyPath extends SeqKey implements Path<SeqKeyRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> SeqKeyPath(Table<O> path, ForeignKey<O, SeqKeyRecord> childPath, InverseForeignKey<O, SeqKeyRecord> parentPath) {
             super(path, childPath, parentPath);
         }

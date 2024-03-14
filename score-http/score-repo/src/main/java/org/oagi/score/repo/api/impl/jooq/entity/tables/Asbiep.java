@@ -204,6 +204,8 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AsbiepPath extends Asbiep implements Path<AsbiepRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AsbiepPath(Table<O> path, ForeignKey<O, AsbiepRecord> childPath, InverseForeignKey<O, AsbiepRecord> parentPath) {
             super(path, childPath, parentPath);
         }

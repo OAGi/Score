@@ -217,6 +217,8 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AgencyIdListValuePath extends AgencyIdListValue implements Path<AgencyIdListValueRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AgencyIdListValuePath(Table<O> path, ForeignKey<O, AgencyIdListValueRecord> childPath, InverseForeignKey<O, AgencyIdListValueRecord> parentPath) {
             super(path, childPath, parentPath);
         }

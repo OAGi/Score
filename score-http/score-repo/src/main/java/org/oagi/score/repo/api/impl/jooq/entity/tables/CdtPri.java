@@ -107,6 +107,8 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CdtPriPath extends CdtPri implements Path<CdtPriRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CdtPriPath(Table<O> path, ForeignKey<O, CdtPriRecord> childPath, InverseForeignKey<O, CdtPriRecord> parentPath) {
             super(path, childPath, parentPath);
         }

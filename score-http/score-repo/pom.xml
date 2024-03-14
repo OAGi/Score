@@ -18,7 +18,7 @@
 
         <lombok.version>1.18.30</lombok.version>
         <mariadb-client.version>3.3.3</mariadb-client.version>
-        <jOOQ.version>3.19.5</jOOQ.version>
+        <jOOQ.version>3.19.6</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <junit.version>4.13.2</junit.version>

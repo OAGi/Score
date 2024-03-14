@@ -155,6 +155,8 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BbieBiztermPath extends BbieBizterm implements Path<BbieBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BbieBiztermPath(Table<O> path, ForeignKey<O, BbieBiztermRecord> childPath, InverseForeignKey<O, BbieBiztermRecord> parentPath) {
             super(path, childPath, parentPath);
         }

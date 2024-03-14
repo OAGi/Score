@@ -271,6 +271,8 @@ public class Acc extends TableImpl<AccRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AccPath extends Acc implements Path<AccRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AccPath(Table<O> path, ForeignKey<O, AccRecord> childPath, InverseForeignKey<O, AccRecord> parentPath) {
             super(path, childPath, parentPath);
         }

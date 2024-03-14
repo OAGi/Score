@@ -160,6 +160,8 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AsccManifestPath extends AsccManifest implements Path<AsccManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AsccManifestPath(Table<O> path, ForeignKey<O, AsccManifestRecord> childPath, InverseForeignKey<O, AsccManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -203,6 +203,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AppUserPath extends AppUser implements Path<AppUserRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AppUserPath(Table<O> path, ForeignKey<O, AppUserRecord> childPath, InverseForeignKey<O, AppUserRecord> parentPath) {
             super(path, childPath, parentPath);
         }

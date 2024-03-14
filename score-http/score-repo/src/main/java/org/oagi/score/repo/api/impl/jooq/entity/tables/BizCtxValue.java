@@ -115,6 +115,8 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BizCtxValuePath extends BizCtxValue implements Path<BizCtxValueRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BizCtxValuePath(Table<O> path, ForeignKey<O, BizCtxValueRecord> childPath, InverseForeignKey<O, BizCtxValueRecord> parentPath) {
             super(path, childPath, parentPath);
         }

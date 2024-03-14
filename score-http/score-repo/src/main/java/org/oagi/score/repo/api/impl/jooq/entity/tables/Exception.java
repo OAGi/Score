@@ -133,6 +133,8 @@ public class Exception extends TableImpl<ExceptionRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ExceptionPath extends Exception implements Path<ExceptionRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ExceptionPath(Table<O> path, ForeignKey<O, ExceptionRecord> childPath, InverseForeignKey<O, ExceptionRecord> parentPath) {
             super(path, childPath, parentPath);
         }

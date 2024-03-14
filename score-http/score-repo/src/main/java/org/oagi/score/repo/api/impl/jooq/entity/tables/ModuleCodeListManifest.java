@@ -155,6 +155,8 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModuleCodeListManifestPath extends ModuleCodeListManifest implements Path<ModuleCodeListManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModuleCodeListManifestPath(Table<O> path, ForeignKey<O, ModuleCodeListManifestRecord> childPath, InverseForeignKey<O, ModuleCodeListManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -193,6 +193,8 @@ public class Bbiep extends TableImpl<BbiepRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class BbiepPath extends Bbiep implements Path<BbiepRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> BbiepPath(Table<O> path, ForeignKey<O, BbiepRecord> childPath, InverseForeignKey<O, BbiepRecord> parentPath) {
             super(path, childPath, parentPath);
         }

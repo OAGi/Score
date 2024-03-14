@@ -26,12 +26,12 @@
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.8</aspectj.version>
         <lettuce.version>6.3.1.RELEASE</lettuce.version>
-        <redisson.version>3.27.1</redisson.version>
+        <redisson.version>3.27.2</redisson.version>
         <netty.version>4.1.107.Final</netty.version>
         <lombok.version>1.18.30</lombok.version>
         <mariadb-client.version>3.3.3</mariadb-client.version>
         <log4j.version>2.23.0</log4j.version>
-        <jOOQ.version>3.19.5</jOOQ.version>
+        <jOOQ.version>3.19.6</jOOQ.version>
         <guava.version>33.0.0-jre</guava.version>
         <gson.version>2.10.1</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>

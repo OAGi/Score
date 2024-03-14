@@ -182,6 +182,8 @@ public class Release extends TableImpl<ReleaseRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ReleasePath extends Release implements Path<ReleaseRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ReleasePath(Table<O> path, ForeignKey<O, ReleaseRecord> childPath, InverseForeignKey<O, ReleaseRecord> parentPath) {
             super(path, childPath, parentPath);
         }

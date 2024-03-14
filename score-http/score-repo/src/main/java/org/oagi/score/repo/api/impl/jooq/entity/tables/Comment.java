@@ -143,6 +143,8 @@ public class Comment extends TableImpl<CommentRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CommentPath extends Comment implements Path<CommentRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CommentPath(Table<O> path, ForeignKey<O, CommentRecord> childPath, InverseForeignKey<O, CommentRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -147,6 +147,8 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class DtScManifestPath extends DtScManifest implements Path<DtScManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> DtScManifestPath(Table<O> path, ForeignKey<O, DtScManifestRecord> childPath, InverseForeignKey<O, DtScManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

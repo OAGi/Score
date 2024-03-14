@@ -153,6 +153,8 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AsbieBiztermPath extends AsbieBizterm implements Path<AsbieBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AsbieBiztermPath(Table<O> path, ForeignKey<O, AsbieBiztermRecord> childPath, InverseForeignKey<O, AsbieBiztermRecord> parentPath) {
             super(path, childPath, parentPath);
         }

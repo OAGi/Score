@@ -171,6 +171,8 @@ public class Log extends TableImpl<LogRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class LogPath extends Log implements Path<LogRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> LogPath(Table<O> path, ForeignKey<O, LogRecord> childPath, InverseForeignKey<O, LogRecord> parentPath) {
             super(path, childPath, parentPath);
         }
@@ -351,7 +353,7 @@ public class Log extends TableImpl<LogRecord> {
     @Override
     public List<Check<LogRecord>> getChecks() {
         return Arrays.asList(
-            Internal.createCheck(this, DSL.name("log_chk_1"), "json_valid(`snapshot`)", true)
+            Internal.createCheck(this, DSL.name("snapshot"), "json_valid(`snapshot`)", true)
         );
     }
 

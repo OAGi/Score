@@ -140,6 +140,8 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasExternalDocPath extends OasExternalDoc implements Path<OasExternalDocRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasExternalDocPath(Table<O> path, ForeignKey<O, OasExternalDocRecord> childPath, InverseForeignKey<O, OasExternalDocRecord> parentPath) {
             super(path, childPath, parentPath);
         }

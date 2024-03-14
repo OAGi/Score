@@ -160,6 +160,8 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AccManifestPath extends AccManifest implements Path<AccManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AccManifestPath(Table<O> path, ForeignKey<O, AccManifestRecord> childPath, InverseForeignKey<O, AccManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

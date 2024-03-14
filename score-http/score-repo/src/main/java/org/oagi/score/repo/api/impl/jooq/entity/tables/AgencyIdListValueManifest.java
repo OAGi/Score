@@ -154,6 +154,8 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class AgencyIdListValueManifestPath extends AgencyIdListValueManifest implements Path<AgencyIdListValueManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> AgencyIdListValueManifestPath(Table<O> path, ForeignKey<O, AgencyIdListValueManifestRecord> childPath, InverseForeignKey<O, AgencyIdListValueManifestRecord> parentPath) {
             super(path, childPath, parentPath);
         }

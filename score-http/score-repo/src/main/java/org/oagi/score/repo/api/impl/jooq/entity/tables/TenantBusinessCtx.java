@@ -112,6 +112,8 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class TenantBusinessCtxPath extends TenantBusinessCtx implements Path<TenantBusinessCtxRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> TenantBusinessCtxPath(Table<O> path, ForeignKey<O, TenantBusinessCtxRecord> childPath, InverseForeignKey<O, TenantBusinessCtxRecord> parentPath) {
             super(path, childPath, parentPath);
         }

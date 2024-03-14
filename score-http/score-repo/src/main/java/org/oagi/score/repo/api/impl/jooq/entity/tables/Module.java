@@ -191,6 +191,8 @@ public class Module extends TableImpl<ModuleRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class ModulePath extends Module implements Path<ModuleRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> ModulePath(Table<O> path, ForeignKey<O, ModuleRecord> childPath, InverseForeignKey<O, ModuleRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -179,6 +179,8 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class OasResponsePath extends OasResponse implements Path<OasResponseRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> OasResponsePath(Table<O> path, ForeignKey<O, OasResponseRecord> childPath, InverseForeignKey<O, OasResponseRecord> parentPath) {
             super(path, childPath, parentPath);
         }

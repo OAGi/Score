@@ -146,6 +146,8 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class CtxCategoryPath extends CtxCategory implements Path<CtxCategoryRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> CtxCategoryPath(Table<O> path, ForeignKey<O, CtxCategoryRecord> childPath, InverseForeignKey<O, CtxCategoryRecord> parentPath) {
             super(path, childPath, parentPath);
         }
