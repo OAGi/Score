@@ -21,9 +21,9 @@ echo "Building project..."
 rm -rf dist
 
 echo "Building docker image..."
-docker build --no-cache -f docker/Dockerfile --target runner -t oagi1docker/srt-external-api:3.2.1 .
+docker build --no-cache -f docker/Dockerfile --target runner -t oagi1docker/srt-external-api:3.2.2 .
 
 echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-external-api:3.2.1
+docker scout cves oagi1docker/srt-external-api:3.2.2
 
 echo "Done."
