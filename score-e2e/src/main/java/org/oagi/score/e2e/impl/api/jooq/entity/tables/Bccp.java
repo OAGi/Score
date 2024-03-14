@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function21;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row21;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BccpRecord;
 
 
@@ -214,11 +224,11 @@ public class Bccp extends TableImpl<BccpRecord> {
     public final TableField<BccpRecord, ULong> NEXT_BCCP_ID = createField(DSL.name("next_bccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Bccp(Name alias, Table<BccpRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Bccp(Name alias, Table<BccpRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC."), TableOptions.table());
+    private Bccp(Name alias, Table<BccpRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -242,8 +252,37 @@ public class Bccp extends TableImpl<BccpRecord> {
         this(DSL.name("bccp"), null);
     }
 
-    public <O extends Record> Bccp(Table<O> child, ForeignKey<O, BccpRecord> key) {
-        super(child, key, BCCP);
+    public <O extends Record> Bccp(Table<O> path, ForeignKey<O, BccpRecord> childPath, InverseForeignKey<O, BccpRecord> parentPath) {
+        super(path, childPath, parentPath, BCCP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BccpPath extends Bccp implements Path<BccpRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BccpPath(Table<O> path, ForeignKey<O, BccpRecord> childPath, InverseForeignKey<O, BccpRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BccpPath(Name alias, Table<BccpRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BccpPath as(String alias) {
+            return new BccpPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BccpPath as(Name alias) {
+            return new BccpPath(alias, this);
+        }
+
+        @Override
+        public BccpPath as(Table<?> alias) {
+            return new BccpPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -271,99 +310,131 @@ public class Bccp extends TableImpl<BccpRecord> {
         return Arrays.asList(Keys.BCCP_BDT_ID_FK, Keys.BCCP_NAMESPACE_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_ID_FK, Keys.BCCP_CREATED_BY_FK, Keys.BCCP_OWNER_USER_ID_FK, Keys.BCCP_LAST_UPDATED_BY_FK, Keys.BCCP_PREV_BCCP_ID_FK, Keys.BCCP_NEXT_BCCP_ID_FK);
     }
 
-    private transient Dt _dt;
-    private transient Namespace _namespace;
-    private transient Bccp _bccpReplacementBccpIdFk;
-    private transient AppUser _bccpCreatedByFk;
-    private transient AppUser _bccpOwnerUserIdFk;
-    private transient AppUser _bccpLastUpdatedByFk;
-    private transient Bccp _bccpPrevBccpIdFk;
-    private transient Bccp _bccpNextBccpIdFk;
+    private transient DtPath _dt;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table.
      */
-    public Dt dt() {
+    public DtPath dt() {
         if (_dt == null)
-            _dt = new Dt(this, Keys.BCCP_BDT_ID_FK);
+            _dt = new DtPath(this, Keys.BCCP_BDT_ID_FK, null);
 
         return _dt;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.BCCP_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.BCCP_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient BccpPath _bccpReplacementBccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp</code> table, via the
      * <code>bccp_replacement_bccp_id_fk</code> key.
      */
-    public Bccp bccpReplacementBccpIdFk() {
+    public BccpPath bccpReplacementBccpIdFk() {
         if (_bccpReplacementBccpIdFk == null)
-            _bccpReplacementBccpIdFk = new Bccp(this, Keys.BCCP_REPLACEMENT_BCCP_ID_FK);
+            _bccpReplacementBccpIdFk = new BccpPath(this, Keys.BCCP_REPLACEMENT_BCCP_ID_FK, null);
 
         return _bccpReplacementBccpIdFk;
     }
+
+    private transient AppUserPath _bccpCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bccp_created_by_fk</code> key.
      */
-    public AppUser bccpCreatedByFk() {
+    public AppUserPath bccpCreatedByFk() {
         if (_bccpCreatedByFk == null)
-            _bccpCreatedByFk = new AppUser(this, Keys.BCCP_CREATED_BY_FK);
+            _bccpCreatedByFk = new AppUserPath(this, Keys.BCCP_CREATED_BY_FK, null);
 
         return _bccpCreatedByFk;
     }
+
+    private transient AppUserPath _bccpOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bccp_owner_user_id_fk</code> key.
      */
-    public AppUser bccpOwnerUserIdFk() {
+    public AppUserPath bccpOwnerUserIdFk() {
         if (_bccpOwnerUserIdFk == null)
-            _bccpOwnerUserIdFk = new AppUser(this, Keys.BCCP_OWNER_USER_ID_FK);
+            _bccpOwnerUserIdFk = new AppUserPath(this, Keys.BCCP_OWNER_USER_ID_FK, null);
 
         return _bccpOwnerUserIdFk;
     }
+
+    private transient AppUserPath _bccpLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>bccp_last_updated_by_fk</code> key.
      */
-    public AppUser bccpLastUpdatedByFk() {
+    public AppUserPath bccpLastUpdatedByFk() {
         if (_bccpLastUpdatedByFk == null)
-            _bccpLastUpdatedByFk = new AppUser(this, Keys.BCCP_LAST_UPDATED_BY_FK);
+            _bccpLastUpdatedByFk = new AppUserPath(this, Keys.BCCP_LAST_UPDATED_BY_FK, null);
 
         return _bccpLastUpdatedByFk;
     }
+
+    private transient BccpPath _bccpPrevBccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp</code> table, via the
      * <code>bccp_prev_bccp_id_fk</code> key.
      */
-    public Bccp bccpPrevBccpIdFk() {
+    public BccpPath bccpPrevBccpIdFk() {
         if (_bccpPrevBccpIdFk == null)
-            _bccpPrevBccpIdFk = new Bccp(this, Keys.BCCP_PREV_BCCP_ID_FK);
+            _bccpPrevBccpIdFk = new BccpPath(this, Keys.BCCP_PREV_BCCP_ID_FK, null);
 
         return _bccpPrevBccpIdFk;
     }
+
+    private transient BccpPath _bccpNextBccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp</code> table, via the
      * <code>bccp_next_bccp_id_fk</code> key.
      */
-    public Bccp bccpNextBccpIdFk() {
+    public BccpPath bccpNextBccpIdFk() {
         if (_bccpNextBccpIdFk == null)
-            _bccpNextBccpIdFk = new Bccp(this, Keys.BCCP_NEXT_BCCP_ID_FK);
+            _bccpNextBccpIdFk = new BccpPath(this, Keys.BCCP_NEXT_BCCP_ID_FK, null);
 
         return _bccpNextBccpIdFk;
+    }
+
+    private transient BccpManifestPath _bccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
+     * table
+     */
+    public BccpManifestPath bccpManifest() {
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_BCCP_ID_FK.getInverseKey());
+
+        return _bccpManifest;
+    }
+
+    private transient BccPath _bcc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table
+     */
+    public BccPath bcc() {
+        if (_bcc == null)
+            _bcc = new BccPath(this, null, Keys.BCC_TO_BCCP_ID_FK.getInverseKey());
+
+        return _bcc;
     }
 
     @Override
@@ -405,27 +476,87 @@ public class Bccp extends TableImpl<BccpRecord> {
         return new Bccp(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row21 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row21<ULong, String, String, String, ULong, String, String, ULong, Byte, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, String, String, ULong, ULong> fieldsRow() {
-        return (Row21) super.fieldsRow();
+    public Bccp where(Condition condition) {
+        return new Bccp(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function21<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super String, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Bccp where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function21<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super String, ? super String, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Bccp where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bccp where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bccp where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bccp where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bccp where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Bccp where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bccp whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Bccp whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

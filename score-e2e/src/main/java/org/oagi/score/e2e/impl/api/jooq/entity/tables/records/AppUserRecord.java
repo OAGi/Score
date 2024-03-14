@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record8;
-import org.jooq.Row8;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
@@ -18,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
  * purposes.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements Record8<ULong, String, String, String, String, Byte, Byte, Byte> {
+public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -147,201 +144,6 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> implements
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record8 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row8<ULong, String, String, String, String, Byte, Byte, Byte> fieldsRow() {
-        return (Row8) super.fieldsRow();
-    }
-
-    @Override
-    public Row8<ULong, String, String, String, String, Byte, Byte, Byte> valuesRow() {
-        return (Row8) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return AppUser.APP_USER.APP_USER_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return AppUser.APP_USER.LOGIN_ID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return AppUser.APP_USER.PASSWORD;
-    }
-
-    @Override
-    public Field<String> field4() {
-        return AppUser.APP_USER.NAME;
-    }
-
-    @Override
-    public Field<String> field5() {
-        return AppUser.APP_USER.ORGANIZATION;
-    }
-
-    @Override
-    public Field<Byte> field6() {
-        return AppUser.APP_USER.IS_DEVELOPER;
-    }
-
-    @Override
-    public Field<Byte> field7() {
-        return AppUser.APP_USER.IS_ADMIN;
-    }
-
-    @Override
-    public Field<Byte> field8() {
-        return AppUser.APP_USER.IS_ENABLED;
-    }
-
-    @Override
-    public ULong component1() {
-        return getAppUserId();
-    }
-
-    @Override
-    public String component2() {
-        return getLoginId();
-    }
-
-    @Override
-    public String component3() {
-        return getPassword();
-    }
-
-    @Override
-    public String component4() {
-        return getName();
-    }
-
-    @Override
-    public String component5() {
-        return getOrganization();
-    }
-
-    @Override
-    public Byte component6() {
-        return getIsDeveloper();
-    }
-
-    @Override
-    public Byte component7() {
-        return getIsAdmin();
-    }
-
-    @Override
-    public Byte component8() {
-        return getIsEnabled();
-    }
-
-    @Override
-    public ULong value1() {
-        return getAppUserId();
-    }
-
-    @Override
-    public String value2() {
-        return getLoginId();
-    }
-
-    @Override
-    public String value3() {
-        return getPassword();
-    }
-
-    @Override
-    public String value4() {
-        return getName();
-    }
-
-    @Override
-    public String value5() {
-        return getOrganization();
-    }
-
-    @Override
-    public Byte value6() {
-        return getIsDeveloper();
-    }
-
-    @Override
-    public Byte value7() {
-        return getIsAdmin();
-    }
-
-    @Override
-    public Byte value8() {
-        return getIsEnabled();
-    }
-
-    @Override
-    public AppUserRecord value1(ULong value) {
-        setAppUserId(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value2(String value) {
-        setLoginId(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value3(String value) {
-        setPassword(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value4(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value5(String value) {
-        setOrganization(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value6(Byte value) {
-        setIsDeveloper(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value7(Byte value) {
-        setIsAdmin(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord value8(Byte value) {
-        setIsEnabled(value);
-        return this;
-    }
-
-    @Override
-    public AppUserRecord values(ULong value1, String value2, String value3, String value4, String value5, Byte value6, Byte value7, Byte value8) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        value8(value8);
-        return this;
     }
 
     // -------------------------------------------------------------------------

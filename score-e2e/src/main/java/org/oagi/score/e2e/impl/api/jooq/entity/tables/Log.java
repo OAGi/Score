@@ -6,21 +6,25 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 import org.jooq.Check;
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -34,6 +38,15 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.LogRecord;
 
 
@@ -122,11 +135,11 @@ public class Log extends TableImpl<LogRecord> {
     public final TableField<LogRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private Log(Name alias, Table<LogRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Log(Name alias, Table<LogRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Log(Name alias, Table<LogRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -150,8 +163,37 @@ public class Log extends TableImpl<LogRecord> {
         this(DSL.name("log"), null);
     }
 
-    public <O extends Record> Log(Table<O> child, ForeignKey<O, LogRecord> key) {
-        super(child, key, LOG);
+    public <O extends Record> Log(Table<O> path, ForeignKey<O, LogRecord> childPath, InverseForeignKey<O, LogRecord> parentPath) {
+        super(path, childPath, parentPath, LOG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class LogPath extends Log implements Path<LogRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> LogPath(Table<O> path, ForeignKey<O, LogRecord> childPath, InverseForeignKey<O, LogRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private LogPath(Name alias, Table<LogRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public LogPath as(String alias) {
+            return new LogPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public LogPath as(Name alias) {
+            return new LogPath(alias, this);
+        }
+
+        @Override
+        public LogPath as(Table<?> alias) {
+            return new LogPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -179,40 +221,133 @@ public class Log extends TableImpl<LogRecord> {
         return Arrays.asList(Keys.LOG_PREV_LOG_ID_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_CREATED_BY_FK);
     }
 
-    private transient Log _logPrevLogIdFk;
-    private transient Log _logNextLogIdFk;
-    private transient AppUser _appUser;
+    private transient LogPath _logPrevLogIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.log</code> table, via the
      * <code>log_prev_log_id_fk</code> key.
      */
-    public Log logPrevLogIdFk() {
+    public LogPath logPrevLogIdFk() {
         if (_logPrevLogIdFk == null)
-            _logPrevLogIdFk = new Log(this, Keys.LOG_PREV_LOG_ID_FK);
+            _logPrevLogIdFk = new LogPath(this, Keys.LOG_PREV_LOG_ID_FK, null);
 
         return _logPrevLogIdFk;
     }
+
+    private transient LogPath _logNextLogIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.log</code> table, via the
      * <code>log_next_log_id_fk</code> key.
      */
-    public Log logNextLogIdFk() {
+    public LogPath logNextLogIdFk() {
         if (_logNextLogIdFk == null)
-            _logNextLogIdFk = new Log(this, Keys.LOG_NEXT_LOG_ID_FK);
+            _logNextLogIdFk = new LogPath(this, Keys.LOG_NEXT_LOG_ID_FK, null);
 
         return _logNextLogIdFk;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.LOG_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.LOG_CREATED_BY_FK, null);
 
         return _appUser;
+    }
+
+    private transient AccManifestPath _accManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc_manifest</code>
+     * table
+     */
+    public AccManifestPath accManifest() {
+        if (_accManifest == null)
+            _accManifest = new AccManifestPath(this, null, Keys.ACC_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _accManifest;
+    }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_manifest</code> table
+     */
+    public AgencyIdListManifestPath agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, null, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _agencyIdListManifest;
+    }
+
+    private transient AsccpManifestPath _asccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
+     */
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _asccpManifest;
+    }
+
+    private transient BccpManifestPath _bccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
+     * table
+     */
+    public BccpManifestPath bccpManifest() {
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _bccpManifest;
+    }
+
+    private transient CodeListManifestPath _codeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_manifest</code> table
+     */
+    public CodeListManifestPath codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifestPath(this, null, Keys.CODE_LIST_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _codeListManifest;
+    }
+
+    private transient DtManifestPath _dtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_manifest</code>
+     * table
+     */
+    public DtManifestPath dtManifest() {
+        if (_dtManifest == null)
+            _dtManifest = new DtManifestPath(this, null, Keys.DT_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _dtManifest;
+    }
+
+    private transient XbtManifestPath _xbtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
+     * table
+     */
+    public XbtManifestPath xbtManifest() {
+        if (_xbtManifest == null)
+            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_LOG_ID_FK.getInverseKey());
+
+        return _xbtManifest;
     }
 
     @Override
@@ -261,27 +396,87 @@ public class Log extends TableImpl<LogRecord> {
         return new Log(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, String, UInteger, UInteger, String, String, String, ULong, ULong, ULong, LocalDateTime> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Log where(Condition condition) {
+        return new Log(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Log where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super UInteger, ? super UInteger, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Log where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Log where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Log where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Log where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Log where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Log where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Log whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Log whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

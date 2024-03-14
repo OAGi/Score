@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,7 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasMediaTypeRecord;
 
 
@@ -101,11 +106,11 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
     public final TableField<OasMediaTypeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasMediaType(Name alias, Table<OasMediaTypeRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasMediaType(Name alias, Table<OasMediaTypeRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasMediaType(Name alias, Table<OasMediaTypeRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -129,8 +134,37 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
         this(DSL.name("oas_media_type"), null);
     }
 
-    public <O extends Record> OasMediaType(Table<O> child, ForeignKey<O, OasMediaTypeRecord> key) {
-        super(child, key, OAS_MEDIA_TYPE);
+    public <O extends Record> OasMediaType(Table<O> path, ForeignKey<O, OasMediaTypeRecord> childPath, InverseForeignKey<O, OasMediaTypeRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_MEDIA_TYPE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasMediaTypePath extends OasMediaType implements Path<OasMediaTypeRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> OasMediaTypePath(Table<O> path, ForeignKey<O, OasMediaTypeRecord> childPath, InverseForeignKey<O, OasMediaTypeRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasMediaTypePath(Name alias, Table<OasMediaTypeRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasMediaTypePath as(String alias) {
+            return new OasMediaTypePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasMediaTypePath as(Name alias) {
+            return new OasMediaTypePath(alias, this);
+        }
+
+        @Override
+        public OasMediaTypePath as(Table<?> alias) {
+            return new OasMediaTypePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -153,39 +187,41 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
         return Arrays.asList(Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK, Keys.OAS_MEDIA_TYPE_CREATED_BY_FK, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _oasMediaTypeOwnerUserIdFk;
-    private transient AppUser _oasMediaTypeCreatedByFk;
-    private transient AppUser _oasMediaTypeLastUpdatedByFk;
+    private transient AppUserPath _oasMediaTypeOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_media_type_owner_user_id_fk</code> key.
      */
-    public AppUser oasMediaTypeOwnerUserIdFk() {
+    public AppUserPath oasMediaTypeOwnerUserIdFk() {
         if (_oasMediaTypeOwnerUserIdFk == null)
-            _oasMediaTypeOwnerUserIdFk = new AppUser(this, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK);
+            _oasMediaTypeOwnerUserIdFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK, null);
 
         return _oasMediaTypeOwnerUserIdFk;
     }
+
+    private transient AppUserPath _oasMediaTypeCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_media_type_created_by_fk</code> key.
      */
-    public AppUser oasMediaTypeCreatedByFk() {
+    public AppUserPath oasMediaTypeCreatedByFk() {
         if (_oasMediaTypeCreatedByFk == null)
-            _oasMediaTypeCreatedByFk = new AppUser(this, Keys.OAS_MEDIA_TYPE_CREATED_BY_FK);
+            _oasMediaTypeCreatedByFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_CREATED_BY_FK, null);
 
         return _oasMediaTypeCreatedByFk;
     }
+
+    private transient AppUserPath _oasMediaTypeLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_media_type_last_updated_by_fk</code> key.
      */
-    public AppUser oasMediaTypeLastUpdatedByFk() {
+    public AppUserPath oasMediaTypeLastUpdatedByFk() {
         if (_oasMediaTypeLastUpdatedByFk == null)
-            _oasMediaTypeLastUpdatedByFk = new AppUser(this, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK);
+            _oasMediaTypeLastUpdatedByFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK, null);
 
         return _oasMediaTypeLastUpdatedByFk;
     }
@@ -229,27 +265,87 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
         return new OasMediaType(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, String, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public OasMediaType where(Condition condition) {
+        return new OasMediaType(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasMediaType where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasMediaType where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMediaType where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMediaType where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMediaType where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMediaType where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMediaType where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMediaType whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMediaType whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

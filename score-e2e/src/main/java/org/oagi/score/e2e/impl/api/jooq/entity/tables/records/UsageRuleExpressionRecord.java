@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
-import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
@@ -19,7 +16,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
  * syntaxes can be unstructured, which works a description of the usage rule.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpressionRecord> implements Record4<ULong, Integer, String, ULong> {
+public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpressionRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -106,113 +103,6 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row4<ULong, Integer, String, ULong> fieldsRow() {
-        return (Row4) super.fieldsRow();
-    }
-
-    @Override
-    public Row4<ULong, Integer, String, ULong> valuesRow() {
-        return (Row4) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return UsageRuleExpression.USAGE_RULE_EXPRESSION.USAGE_RULE_EXPRESSION_ID;
-    }
-
-    @Override
-    public Field<Integer> field2() {
-        return UsageRuleExpression.USAGE_RULE_EXPRESSION.CONSTRAINT_TYPE;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return UsageRuleExpression.USAGE_RULE_EXPRESSION.CONSTRAINT_TEXT;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return UsageRuleExpression.USAGE_RULE_EXPRESSION.REPRESENTED_USAGE_RULE_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getUsageRuleExpressionId();
-    }
-
-    @Override
-    public Integer component2() {
-        return getConstraintType();
-    }
-
-    @Override
-    public String component3() {
-        return getConstraintText();
-    }
-
-    @Override
-    public ULong component4() {
-        return getRepresentedUsageRuleId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getUsageRuleExpressionId();
-    }
-
-    @Override
-    public Integer value2() {
-        return getConstraintType();
-    }
-
-    @Override
-    public String value3() {
-        return getConstraintText();
-    }
-
-    @Override
-    public ULong value4() {
-        return getRepresentedUsageRuleId();
-    }
-
-    @Override
-    public UsageRuleExpressionRecord value1(ULong value) {
-        setUsageRuleExpressionId(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleExpressionRecord value2(Integer value) {
-        setConstraintType(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleExpressionRecord value3(String value) {
-        setConstraintText(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleExpressionRecord value4(ULong value) {
-        setRepresentedUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleExpressionRecord values(ULong value1, Integer value2, String value3, ULong value4) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        return this;
     }
 
     // -------------------------------------------------------------------------

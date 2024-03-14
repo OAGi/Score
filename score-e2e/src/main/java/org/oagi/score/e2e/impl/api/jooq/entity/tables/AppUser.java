@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,72 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc.AccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifestTag.AccManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList.AgencyIdListPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppOauth2User.AppOauth2UserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep.AsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp.AsccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifestTag.AsccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc.BbieScPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList.CodeListPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue.CodeListValuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Comment.CommentPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxCategory.CtxCategoryPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme.CtxSchemePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Exception.ExceptionPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Message.MessagePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAccManifest.ModuleAccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAgencyIdListManifest.ModuleAgencyIdListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleAsccpManifest.ModuleAsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBccpManifest.ModuleBccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBlobContentManifest.ModuleBlobContentManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleCodeListManifest.ModuleCodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleDtManifest.ModuleDtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSet.ModuleSetPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocTag.OasDocTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExample.OasExamplePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDoc.OasExternalDocPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasExternalDocDoc.OasExternalDocDocPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasHttpHeader.OasHttpHeaderPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasMediaType.OasMediaTypePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasMessageBody.OasMessageBodyPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperation.OasOperationPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameter.OasParameterPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequestParameter.OasRequestParameterPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResource.OasResourcePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponse.OasResponsePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponseHeaders.OasResponseHeadersPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServer.OasServerPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasServerVariable.OasServerVariablePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag.OasTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag.TagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant.TenantPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant.UserTenantPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt.XbtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
 
 
@@ -97,11 +167,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
     public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "");
 
     private AppUser(Name alias, Table<AppUserRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AppUser(Name alias, Table<AppUserRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the user information for authentication and authorization purposes."), TableOptions.table());
+    private AppUser(Name alias, Table<AppUserRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table captures the user information for authentication and authorization purposes."), TableOptions.table(), where);
     }
 
     /**
@@ -125,8 +195,37 @@ public class AppUser extends TableImpl<AppUserRecord> {
         this(DSL.name("app_user"), null);
     }
 
-    public <O extends Record> AppUser(Table<O> child, ForeignKey<O, AppUserRecord> key) {
-        super(child, key, APP_USER);
+    public <O extends Record> AppUser(Table<O> path, ForeignKey<O, AppUserRecord> childPath, InverseForeignKey<O, AppUserRecord> parentPath) {
+        super(path, childPath, parentPath, APP_USER);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AppUserPath extends AppUser implements Path<AppUserRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AppUserPath(Table<O> path, ForeignKey<O, AppUserRecord> childPath, InverseForeignKey<O, AppUserRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AppUserPath(Name alias, Table<AppUserRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AppUserPath as(String alias) {
+            return new AppUserPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AppUserPath as(Name alias) {
+            return new AppUserPath(alias, this);
+        }
+
+        @Override
+        public AppUserPath as(Table<?> alias) {
+            return new AppUserPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -147,6 +246,1868 @@ public class AppUser extends TableImpl<AppUserRecord> {
     @Override
     public List<UniqueKey<AppUserRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.KEY_APP_USER_APP_USER_UK1);
+    }
+
+    private transient AbiePath _abieCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.abie</code> table,
+     * via the <code>abie_created_by_fk</code> key
+     */
+    public AbiePath abieCreatedByFk() {
+        if (_abieCreatedByFk == null)
+            _abieCreatedByFk = new AbiePath(this, null, Keys.ABIE_CREATED_BY_FK.getInverseKey());
+
+        return _abieCreatedByFk;
+    }
+
+    private transient AbiePath _abieLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.abie</code> table,
+     * via the <code>abie_last_updated_by_fk</code> key
+     */
+    public AbiePath abieLastUpdatedByFk() {
+        if (_abieLastUpdatedByFk == null)
+            _abieLastUpdatedByFk = new AbiePath(this, null, Keys.ABIE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _abieLastUpdatedByFk;
+    }
+
+    private transient AccPath _accCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
+     * via the <code>acc_created_by_fk</code> key
+     */
+    public AccPath accCreatedByFk() {
+        if (_accCreatedByFk == null)
+            _accCreatedByFk = new AccPath(this, null, Keys.ACC_CREATED_BY_FK.getInverseKey());
+
+        return _accCreatedByFk;
+    }
+
+    private transient AccPath _accLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
+     * via the <code>acc_last_updated_by_fk</code> key
+     */
+    public AccPath accLastUpdatedByFk() {
+        if (_accLastUpdatedByFk == null)
+            _accLastUpdatedByFk = new AccPath(this, null, Keys.ACC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _accLastUpdatedByFk;
+    }
+
+    private transient AccManifestTagPath _accManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.acc_manifest_tag</code> table
+     */
+    public AccManifestTagPath accManifestTag() {
+        if (_accManifestTag == null)
+            _accManifestTag = new AccManifestTagPath(this, null, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _accManifestTag;
+    }
+
+    private transient AccPath _accOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
+     * via the <code>acc_owner_user_id_fk</code> key
+     */
+    public AccPath accOwnerUserIdFk() {
+        if (_accOwnerUserIdFk == null)
+            _accOwnerUserIdFk = new AccPath(this, null, Keys.ACC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _accOwnerUserIdFk;
+    }
+
+    private transient AgencyIdListPath _agencyIdListCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list</code> table, via the
+     * <code>agency_id_list_created_by_fk</code> key
+     */
+    public AgencyIdListPath agencyIdListCreatedByFk() {
+        if (_agencyIdListCreatedByFk == null)
+            _agencyIdListCreatedByFk = new AgencyIdListPath(this, null, Keys.AGENCY_ID_LIST_CREATED_BY_FK.getInverseKey());
+
+        return _agencyIdListCreatedByFk;
+    }
+
+    private transient AgencyIdListPath _agencyIdListLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list</code> table, via the
+     * <code>agency_id_list_last_updated_by_fk</code> key
+     */
+    public AgencyIdListPath agencyIdListLastUpdatedByFk() {
+        if (_agencyIdListLastUpdatedByFk == null)
+            _agencyIdListLastUpdatedByFk = new AgencyIdListPath(this, null, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _agencyIdListLastUpdatedByFk;
+    }
+
+    private transient AgencyIdListPath _agencyIdListOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list</code> table, via the
+     * <code>agency_id_list_owner_user_id_fk</code> key
+     */
+    public AgencyIdListPath agencyIdListOwnerUserIdFk() {
+        if (_agencyIdListOwnerUserIdFk == null)
+            _agencyIdListOwnerUserIdFk = new AgencyIdListPath(this, null, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK.getInverseKey());
+
+        return _agencyIdListOwnerUserIdFk;
+    }
+
+    private transient AgencyIdListValuePath _agencyIdListValueCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value_created_by_fk</code> key
+     */
+    public AgencyIdListValuePath agencyIdListValueCreatedByFk() {
+        if (_agencyIdListValueCreatedByFk == null)
+            _agencyIdListValueCreatedByFk = new AgencyIdListValuePath(this, null, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK.getInverseKey());
+
+        return _agencyIdListValueCreatedByFk;
+    }
+
+    private transient AgencyIdListValuePath _agencyIdListValueLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value_last_updated_by_fk</code> key
+     */
+    public AgencyIdListValuePath agencyIdListValueLastUpdatedByFk() {
+        if (_agencyIdListValueLastUpdatedByFk == null)
+            _agencyIdListValueLastUpdatedByFk = new AgencyIdListValuePath(this, null, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _agencyIdListValueLastUpdatedByFk;
+    }
+
+    private transient AgencyIdListValuePath _agencyIdListValueOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value_owner_user_id_fk</code> key
+     */
+    public AgencyIdListValuePath agencyIdListValueOwnerUserIdFk() {
+        if (_agencyIdListValueOwnerUserIdFk == null)
+            _agencyIdListValueOwnerUserIdFk = new AgencyIdListValuePath(this, null, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _agencyIdListValueOwnerUserIdFk;
+    }
+
+    private transient AppOauth2UserPath _appOauth2User;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.app_oauth2_user</code> table
+     */
+    public AppOauth2UserPath appOauth2User() {
+        if (_appOauth2User == null)
+            _appOauth2User = new AppOauth2UserPath(this, null, Keys.APP_OAUTH2_USER_APP_USER_ID_FK.getInverseKey());
+
+        return _appOauth2User;
+    }
+
+    private transient AsbiepPath _asbiepCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table,
+     * via the <code>asbiep_created_by_fk</code> key
+     */
+    public AsbiepPath asbiepCreatedByFk() {
+        if (_asbiepCreatedByFk == null)
+            _asbiepCreatedByFk = new AsbiepPath(this, null, Keys.ASBIEP_CREATED_BY_FK.getInverseKey());
+
+        return _asbiepCreatedByFk;
+    }
+
+    private transient AsbiepPath _asbiepLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table,
+     * via the <code>asbiep_last_updated_by_fk</code> key
+     */
+    public AsbiepPath asbiepLastUpdatedByFk() {
+        if (_asbiepLastUpdatedByFk == null)
+            _asbiepLastUpdatedByFk = new AsbiepPath(this, null, Keys.ASBIEP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _asbiepLastUpdatedByFk;
+    }
+
+    private transient AsbiePath _asbieCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
+     * via the <code>asbie_created_by_fk</code> key
+     */
+    public AsbiePath asbieCreatedByFk() {
+        if (_asbieCreatedByFk == null)
+            _asbieCreatedByFk = new AsbiePath(this, null, Keys.ASBIE_CREATED_BY_FK.getInverseKey());
+
+        return _asbieCreatedByFk;
+    }
+
+    private transient AsbiePath _asbieLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
+     * via the <code>asbie_last_updated_by_fk</code> key
+     */
+    public AsbiePath asbieLastUpdatedByFk() {
+        if (_asbieLastUpdatedByFk == null)
+            _asbieLastUpdatedByFk = new AsbiePath(this, null, Keys.ASBIE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _asbieLastUpdatedByFk;
+    }
+
+    private transient AsccpPath _asccpCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
+     * via the <code>asccp_created_by_fk</code> key
+     */
+    public AsccpPath asccpCreatedByFk() {
+        if (_asccpCreatedByFk == null)
+            _asccpCreatedByFk = new AsccpPath(this, null, Keys.ASCCP_CREATED_BY_FK.getInverseKey());
+
+        return _asccpCreatedByFk;
+    }
+
+    private transient AsccpPath _asccpLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
+     * via the <code>asccp_last_updated_by_fk</code> key
+     */
+    public AsccpPath asccpLastUpdatedByFk() {
+        if (_asccpLastUpdatedByFk == null)
+            _asccpLastUpdatedByFk = new AsccpPath(this, null, Keys.ASCCP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _asccpLastUpdatedByFk;
+    }
+
+    private transient AsccpManifestTagPath _asccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest_tag</code> table
+     */
+    public AsccpManifestTagPath asccpManifestTag() {
+        if (_asccpManifestTag == null)
+            _asccpManifestTag = new AsccpManifestTagPath(this, null, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _asccpManifestTag;
+    }
+
+    private transient AsccpPath _asccpOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
+     * via the <code>asccp_owner_user_id_fk</code> key
+     */
+    public AsccpPath asccpOwnerUserIdFk() {
+        if (_asccpOwnerUserIdFk == null)
+            _asccpOwnerUserIdFk = new AsccpPath(this, null, Keys.ASCCP_OWNER_USER_ID_FK.getInverseKey());
+
+        return _asccpOwnerUserIdFk;
+    }
+
+    private transient AsccPath _asccCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_created_by_fk</code> key
+     */
+    public AsccPath asccCreatedByFk() {
+        if (_asccCreatedByFk == null)
+            _asccCreatedByFk = new AsccPath(this, null, Keys.ASCC_CREATED_BY_FK.getInverseKey());
+
+        return _asccCreatedByFk;
+    }
+
+    private transient AsccPath _asccLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_last_updated_by_fk</code> key
+     */
+    public AsccPath asccLastUpdatedByFk() {
+        if (_asccLastUpdatedByFk == null)
+            _asccLastUpdatedByFk = new AsccPath(this, null, Keys.ASCC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _asccLastUpdatedByFk;
+    }
+
+    private transient AsccPath _asccOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_owner_user_id_fk</code> key
+     */
+    public AsccPath asccOwnerUserIdFk() {
+        if (_asccOwnerUserIdFk == null)
+            _asccOwnerUserIdFk = new AsccPath(this, null, Keys.ASCC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _asccOwnerUserIdFk;
+    }
+
+    private transient BbiepPath _bbiepCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
+     * via the <code>bbiep_created_by_fk</code> key
+     */
+    public BbiepPath bbiepCreatedByFk() {
+        if (_bbiepCreatedByFk == null)
+            _bbiepCreatedByFk = new BbiepPath(this, null, Keys.BBIEP_CREATED_BY_FK.getInverseKey());
+
+        return _bbiepCreatedByFk;
+    }
+
+    private transient BbiepPath _bbiepLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
+     * via the <code>bbiep_last_updated_by_fk</code> key
+     */
+    public BbiepPath bbiepLastUpdatedByFk() {
+        if (_bbiepLastUpdatedByFk == null)
+            _bbiepLastUpdatedByFk = new BbiepPath(this, null, Keys.BBIEP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bbiepLastUpdatedByFk;
+    }
+
+    private transient BbiePath _bbieCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table,
+     * via the <code>bbie_created_by_fk</code> key
+     */
+    public BbiePath bbieCreatedByFk() {
+        if (_bbieCreatedByFk == null)
+            _bbieCreatedByFk = new BbiePath(this, null, Keys.BBIE_CREATED_BY_FK.getInverseKey());
+
+        return _bbieCreatedByFk;
+    }
+
+    private transient BbiePath _bbieLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table,
+     * via the <code>bbie_last_updated_by_fk</code> key
+     */
+    public BbiePath bbieLastUpdatedByFk() {
+        if (_bbieLastUpdatedByFk == null)
+            _bbieLastUpdatedByFk = new BbiePath(this, null, Keys.BBIE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bbieLastUpdatedByFk;
+    }
+
+    private transient BbieScPath _bbieScCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code>
+     * table, via the <code>bbie_sc_created_by_fk</code> key
+     */
+    public BbieScPath bbieScCreatedByFk() {
+        if (_bbieScCreatedByFk == null)
+            _bbieScCreatedByFk = new BbieScPath(this, null, Keys.BBIE_SC_CREATED_BY_FK.getInverseKey());
+
+        return _bbieScCreatedByFk;
+    }
+
+    private transient BbieScPath _bbieScLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code>
+     * table, via the <code>bbie_sc_last_updated_by_fk</code> key
+     */
+    public BbieScPath bbieScLastUpdatedByFk() {
+        if (_bbieScLastUpdatedByFk == null)
+            _bbieScLastUpdatedByFk = new BbieScPath(this, null, Keys.BBIE_SC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bbieScLastUpdatedByFk;
+    }
+
+    private transient BccpPath _bccpCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
+     * via the <code>bccp_created_by_fk</code> key
+     */
+    public BccpPath bccpCreatedByFk() {
+        if (_bccpCreatedByFk == null)
+            _bccpCreatedByFk = new BccpPath(this, null, Keys.BCCP_CREATED_BY_FK.getInverseKey());
+
+        return _bccpCreatedByFk;
+    }
+
+    private transient BccpPath _bccpLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
+     * via the <code>bccp_last_updated_by_fk</code> key
+     */
+    public BccpPath bccpLastUpdatedByFk() {
+        if (_bccpLastUpdatedByFk == null)
+            _bccpLastUpdatedByFk = new BccpPath(this, null, Keys.BCCP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bccpLastUpdatedByFk;
+    }
+
+    private transient BccpManifestTagPath _bccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bccp_manifest_tag</code> table
+     */
+    public BccpManifestTagPath bccpManifestTag() {
+        if (_bccpManifestTag == null)
+            _bccpManifestTag = new BccpManifestTagPath(this, null, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _bccpManifestTag;
+    }
+
+    private transient BccpPath _bccpOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
+     * via the <code>bccp_owner_user_id_fk</code> key
+     */
+    public BccpPath bccpOwnerUserIdFk() {
+        if (_bccpOwnerUserIdFk == null)
+            _bccpOwnerUserIdFk = new BccpPath(this, null, Keys.BCCP_OWNER_USER_ID_FK.getInverseKey());
+
+        return _bccpOwnerUserIdFk;
+    }
+
+    private transient BccPath _bccCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_created_by_fk</code> key
+     */
+    public BccPath bccCreatedByFk() {
+        if (_bccCreatedByFk == null)
+            _bccCreatedByFk = new BccPath(this, null, Keys.BCC_CREATED_BY_FK.getInverseKey());
+
+        return _bccCreatedByFk;
+    }
+
+    private transient BccPath _bccLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_last_updated_by_fk</code> key
+     */
+    public BccPath bccLastUpdatedByFk() {
+        if (_bccLastUpdatedByFk == null)
+            _bccLastUpdatedByFk = new BccPath(this, null, Keys.BCC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bccLastUpdatedByFk;
+    }
+
+    private transient BccPath _bccOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_owner_user_id_fk</code> key
+     */
+    public BccPath bccOwnerUserIdFk() {
+        if (_bccOwnerUserIdFk == null)
+            _bccOwnerUserIdFk = new BccPath(this, null, Keys.BCC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _bccOwnerUserIdFk;
+    }
+
+    private transient BizCtxPath _bizCtxCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.biz_ctx</code>
+     * table, via the <code>biz_ctx_created_by_fk</code> key
+     */
+    public BizCtxPath bizCtxCreatedByFk() {
+        if (_bizCtxCreatedByFk == null)
+            _bizCtxCreatedByFk = new BizCtxPath(this, null, Keys.BIZ_CTX_CREATED_BY_FK.getInverseKey());
+
+        return _bizCtxCreatedByFk;
+    }
+
+    private transient BizCtxPath _bizCtxLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.biz_ctx</code>
+     * table, via the <code>biz_ctx_last_updated_by_fk</code> key
+     */
+    public BizCtxPath bizCtxLastUpdatedByFk() {
+        if (_bizCtxLastUpdatedByFk == null)
+            _bizCtxLastUpdatedByFk = new BizCtxPath(this, null, Keys.BIZ_CTX_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bizCtxLastUpdatedByFk;
+    }
+
+    private transient CodeListPath _codeListCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.code_list</code>
+     * table, via the <code>code_list_created_by_fk</code> key
+     */
+    public CodeListPath codeListCreatedByFk() {
+        if (_codeListCreatedByFk == null)
+            _codeListCreatedByFk = new CodeListPath(this, null, Keys.CODE_LIST_CREATED_BY_FK.getInverseKey());
+
+        return _codeListCreatedByFk;
+    }
+
+    private transient CodeListPath _codeListLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.code_list</code>
+     * table, via the <code>code_list_last_updated_by_fk</code> key
+     */
+    public CodeListPath codeListLastUpdatedByFk() {
+        if (_codeListLastUpdatedByFk == null)
+            _codeListLastUpdatedByFk = new CodeListPath(this, null, Keys.CODE_LIST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _codeListLastUpdatedByFk;
+    }
+
+    private transient CodeListPath _codeListOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.code_list</code>
+     * table, via the <code>code_list_owner_user_id_fk</code> key
+     */
+    public CodeListPath codeListOwnerUserIdFk() {
+        if (_codeListOwnerUserIdFk == null)
+            _codeListOwnerUserIdFk = new CodeListPath(this, null, Keys.CODE_LIST_OWNER_USER_ID_FK.getInverseKey());
+
+        return _codeListOwnerUserIdFk;
+    }
+
+    private transient CodeListValuePath _codeListValueCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_value</code> table, via the
+     * <code>code_list_value_created_by_fk</code> key
+     */
+    public CodeListValuePath codeListValueCreatedByFk() {
+        if (_codeListValueCreatedByFk == null)
+            _codeListValueCreatedByFk = new CodeListValuePath(this, null, Keys.CODE_LIST_VALUE_CREATED_BY_FK.getInverseKey());
+
+        return _codeListValueCreatedByFk;
+    }
+
+    private transient CodeListValuePath _codeListValueLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_value</code> table, via the
+     * <code>code_list_value_last_updated_by_fk</code> key
+     */
+    public CodeListValuePath codeListValueLastUpdatedByFk() {
+        if (_codeListValueLastUpdatedByFk == null)
+            _codeListValueLastUpdatedByFk = new CodeListValuePath(this, null, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _codeListValueLastUpdatedByFk;
+    }
+
+    private transient CodeListValuePath _codeListValueOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_value</code> table, via the
+     * <code>code_list_value_owner_user_id_fk</code> key
+     */
+    public CodeListValuePath codeListValueOwnerUserIdFk() {
+        if (_codeListValueOwnerUserIdFk == null)
+            _codeListValueOwnerUserIdFk = new CodeListValuePath(this, null, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _codeListValueOwnerUserIdFk;
+    }
+
+    private transient CommentPath _comment;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.comment</code> table
+     */
+    public CommentPath comment() {
+        if (_comment == null)
+            _comment = new CommentPath(this, null, Keys.COMMENT_CREATED_BY_FK.getInverseKey());
+
+        return _comment;
+    }
+
+    private transient CtxCategoryPath _ctxCategoryCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ctx_category</code>
+     * table, via the <code>ctx_category_created_by_fk</code> key
+     */
+    public CtxCategoryPath ctxCategoryCreatedByFk() {
+        if (_ctxCategoryCreatedByFk == null)
+            _ctxCategoryCreatedByFk = new CtxCategoryPath(this, null, Keys.CTX_CATEGORY_CREATED_BY_FK.getInverseKey());
+
+        return _ctxCategoryCreatedByFk;
+    }
+
+    private transient CtxCategoryPath _ctxCategoryLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ctx_category</code>
+     * table, via the <code>ctx_category_last_updated_by_fk</code> key
+     */
+    public CtxCategoryPath ctxCategoryLastUpdatedByFk() {
+        if (_ctxCategoryLastUpdatedByFk == null)
+            _ctxCategoryLastUpdatedByFk = new CtxCategoryPath(this, null, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _ctxCategoryLastUpdatedByFk;
+    }
+
+    private transient CtxSchemePath _ctxSchemeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
+     * table, via the <code>ctx_scheme_created_by_fk</code> key
+     */
+    public CtxSchemePath ctxSchemeCreatedByFk() {
+        if (_ctxSchemeCreatedByFk == null)
+            _ctxSchemeCreatedByFk = new CtxSchemePath(this, null, Keys.CTX_SCHEME_CREATED_BY_FK.getInverseKey());
+
+        return _ctxSchemeCreatedByFk;
+    }
+
+    private transient CtxSchemePath _ctxSchemeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
+     * table, via the <code>ctx_scheme_last_updated_by_fk</code> key
+     */
+    public CtxSchemePath ctxSchemeLastUpdatedByFk() {
+        if (_ctxSchemeLastUpdatedByFk == null)
+            _ctxSchemeLastUpdatedByFk = new CtxSchemePath(this, null, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _ctxSchemeLastUpdatedByFk;
+    }
+
+    private transient DtPath _dtCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
+     * the <code>dt_created_by_fk</code> key
+     */
+    public DtPath dtCreatedByFk() {
+        if (_dtCreatedByFk == null)
+            _dtCreatedByFk = new DtPath(this, null, Keys.DT_CREATED_BY_FK.getInverseKey());
+
+        return _dtCreatedByFk;
+    }
+
+    private transient DtPath _dtLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
+     * the <code>dt_last_updated_by_fk</code> key
+     */
+    public DtPath dtLastUpdatedByFk() {
+        if (_dtLastUpdatedByFk == null)
+            _dtLastUpdatedByFk = new DtPath(this, null, Keys.DT_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _dtLastUpdatedByFk;
+    }
+
+    private transient DtManifestTagPath _dtManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.dt_manifest_tag</code> table
+     */
+    public DtManifestTagPath dtManifestTag() {
+        if (_dtManifestTag == null)
+            _dtManifestTag = new DtManifestTagPath(this, null, Keys.DT_MANIFEST_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _dtManifestTag;
+    }
+
+    private transient DtPath _dtOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
+     * the <code>dt_owner_user_id_fk</code> key
+     */
+    public DtPath dtOwnerUserIdFk() {
+        if (_dtOwnerUserIdFk == null)
+            _dtOwnerUserIdFk = new DtPath(this, null, Keys.DT_OWNER_USER_ID_FK.getInverseKey());
+
+        return _dtOwnerUserIdFk;
+    }
+
+    private transient DtScPath _dtScCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
+     * via the <code>dt_sc_created_by_fk</code> key
+     */
+    public DtScPath dtScCreatedByFk() {
+        if (_dtScCreatedByFk == null)
+            _dtScCreatedByFk = new DtScPath(this, null, Keys.DT_SC_CREATED_BY_FK.getInverseKey());
+
+        return _dtScCreatedByFk;
+    }
+
+    private transient DtScPath _dtScLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
+     * via the <code>dt_sc_last_updated_by_fk</code> key
+     */
+    public DtScPath dtScLastUpdatedByFk() {
+        if (_dtScLastUpdatedByFk == null)
+            _dtScLastUpdatedByFk = new DtScPath(this, null, Keys.DT_SC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _dtScLastUpdatedByFk;
+    }
+
+    private transient DtScPath _dtScOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
+     * via the <code>dt_sc_owner_user_id_fk</code> key
+     */
+    public DtScPath dtScOwnerUserIdFk() {
+        if (_dtScOwnerUserIdFk == null)
+            _dtScOwnerUserIdFk = new DtScPath(this, null, Keys.DT_SC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _dtScOwnerUserIdFk;
+    }
+
+    private transient ExceptionPath _exception;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.exception</code>
+     * table
+     */
+    public ExceptionPath exception() {
+        if (_exception == null)
+            _exception = new ExceptionPath(this, null, Keys.EXCEPTION_CREATED_BY_FK.getInverseKey());
+
+        return _exception;
+    }
+
+    private transient LogPath _log;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.log</code> table
+     */
+    public LogPath log() {
+        if (_log == null)
+            _log = new LogPath(this, null, Keys.LOG_CREATED_BY_FK.getInverseKey());
+
+        return _log;
+    }
+
+    private transient MessagePath _messageRecipientIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.message</code>
+     * table, via the <code>message_recipient_id_fk</code> key
+     */
+    public MessagePath messageRecipientIdFk() {
+        if (_messageRecipientIdFk == null)
+            _messageRecipientIdFk = new MessagePath(this, null, Keys.MESSAGE_RECIPIENT_ID_FK.getInverseKey());
+
+        return _messageRecipientIdFk;
+    }
+
+    private transient MessagePath _messageSenderIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.message</code>
+     * table, via the <code>message_sender_id_fk</code> key
+     */
+    public MessagePath messageSenderIdFk() {
+        if (_messageSenderIdFk == null)
+            _messageSenderIdFk = new MessagePath(this, null, Keys.MESSAGE_SENDER_ID_FK.getInverseKey());
+
+        return _messageSenderIdFk;
+    }
+
+    private transient ModuleAccManifestPath _moduleAccManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_acc_manifest</code> table, via the
+     * <code>module_acc_manifest_created_by_fk</code> key
+     */
+    public ModuleAccManifestPath moduleAccManifestCreatedByFk() {
+        if (_moduleAccManifestCreatedByFk == null)
+            _moduleAccManifestCreatedByFk = new ModuleAccManifestPath(this, null, Keys.MODULE_ACC_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleAccManifestCreatedByFk;
+    }
+
+    private transient ModuleAccManifestPath _moduleAccManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_acc_manifest</code> table, via the
+     * <code>module_acc_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleAccManifestPath moduleAccManifestLastUpdatedByFk() {
+        if (_moduleAccManifestLastUpdatedByFk == null)
+            _moduleAccManifestLastUpdatedByFk = new ModuleAccManifestPath(this, null, Keys.MODULE_ACC_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleAccManifestLastUpdatedByFk;
+    }
+
+    private transient ModuleAgencyIdListManifestPath _moduleAgencyIdListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_agency_id_list_manifest</code> table, via the
+     * <code>module_agency_id_list_manifest_created_by_fk</code> key
+     */
+    public ModuleAgencyIdListManifestPath moduleAgencyIdListManifestCreatedByFk() {
+        if (_moduleAgencyIdListManifestCreatedByFk == null)
+            _moduleAgencyIdListManifestCreatedByFk = new ModuleAgencyIdListManifestPath(this, null, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleAgencyIdListManifestCreatedByFk;
+    }
+
+    private transient ModuleAgencyIdListManifestPath _moduleAgencyIdListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_agency_id_list_manifest</code> table, via the
+     * <code>module_agency_id_list_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleAgencyIdListManifestPath moduleAgencyIdListManifestLastUpdatedByFk() {
+        if (_moduleAgencyIdListManifestLastUpdatedByFk == null)
+            _moduleAgencyIdListManifestLastUpdatedByFk = new ModuleAgencyIdListManifestPath(this, null, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleAgencyIdListManifestLastUpdatedByFk;
+    }
+
+    private transient ModuleAsccpManifestPath _moduleAsccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_asccp_manifest</code> table, via the
+     * <code>module_asccp_manifest_created_by_fk</code> key
+     */
+    public ModuleAsccpManifestPath moduleAsccpManifestCreatedByFk() {
+        if (_moduleAsccpManifestCreatedByFk == null)
+            _moduleAsccpManifestCreatedByFk = new ModuleAsccpManifestPath(this, null, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleAsccpManifestCreatedByFk;
+    }
+
+    private transient ModuleAsccpManifestPath _moduleAsccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_asccp_manifest</code> table, via the
+     * <code>module_asccp_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleAsccpManifestPath moduleAsccpManifestLastUpdatedByFk() {
+        if (_moduleAsccpManifestLastUpdatedByFk == null)
+            _moduleAsccpManifestLastUpdatedByFk = new ModuleAsccpManifestPath(this, null, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleAsccpManifestLastUpdatedByFk;
+    }
+
+    private transient ModuleBccpManifestPath _moduleBccpManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_bccp_manifest</code> table, via the
+     * <code>module_bccp_manifest_created_by_fk</code> key
+     */
+    public ModuleBccpManifestPath moduleBccpManifestCreatedByFk() {
+        if (_moduleBccpManifestCreatedByFk == null)
+            _moduleBccpManifestCreatedByFk = new ModuleBccpManifestPath(this, null, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleBccpManifestCreatedByFk;
+    }
+
+    private transient ModuleBccpManifestPath _moduleBccpManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_bccp_manifest</code> table, via the
+     * <code>module_bccp_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleBccpManifestPath moduleBccpManifestLastUpdatedByFk() {
+        if (_moduleBccpManifestLastUpdatedByFk == null)
+            _moduleBccpManifestLastUpdatedByFk = new ModuleBccpManifestPath(this, null, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleBccpManifestLastUpdatedByFk;
+    }
+
+    private transient ModuleBlobContentManifestPath _moduleBlobContentManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_blob_content_manifest</code> table, via the
+     * <code>module_blob_content_manifest_created_by_fk</code> key
+     */
+    public ModuleBlobContentManifestPath moduleBlobContentManifestCreatedByFk() {
+        if (_moduleBlobContentManifestCreatedByFk == null)
+            _moduleBlobContentManifestCreatedByFk = new ModuleBlobContentManifestPath(this, null, Keys.MODULE_BLOB_CONTENT_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleBlobContentManifestCreatedByFk;
+    }
+
+    private transient ModuleBlobContentManifestPath _moduleBlobContentManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_blob_content_manifest</code> table, via the
+     * <code>module_blob_content_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleBlobContentManifestPath moduleBlobContentManifestLastUpdatedByFk() {
+        if (_moduleBlobContentManifestLastUpdatedByFk == null)
+            _moduleBlobContentManifestLastUpdatedByFk = new ModuleBlobContentManifestPath(this, null, Keys.MODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleBlobContentManifestLastUpdatedByFk;
+    }
+
+    private transient ModuleCodeListManifestPath _moduleCodeListManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_code_list_manifest</code> table, via the
+     * <code>module_code_list_manifest_created_by_fk</code> key
+     */
+    public ModuleCodeListManifestPath moduleCodeListManifestCreatedByFk() {
+        if (_moduleCodeListManifestCreatedByFk == null)
+            _moduleCodeListManifestCreatedByFk = new ModuleCodeListManifestPath(this, null, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleCodeListManifestCreatedByFk;
+    }
+
+    private transient ModuleCodeListManifestPath _moduleCodeListManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_code_list_manifest</code> table, via the
+     * <code>module_code_list_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleCodeListManifestPath moduleCodeListManifestLastUpdatedByFk() {
+        if (_moduleCodeListManifestLastUpdatedByFk == null)
+            _moduleCodeListManifestLastUpdatedByFk = new ModuleCodeListManifestPath(this, null, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleCodeListManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _moduleCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module</code> table,
+     * via the <code>module_created_by_fk</code> key
+     */
+    public ModulePath moduleCreatedByFk() {
+        if (_moduleCreatedByFk == null)
+            _moduleCreatedByFk = new ModulePath(this, null, Keys.MODULE_CREATED_BY_FK.getInverseKey());
+
+        return _moduleCreatedByFk;
+    }
+
+    private transient ModuleDtManifestPath _moduleDtManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_dt_manifest</code> table, via the
+     * <code>module_dt_manifest_created_by_fk</code> key
+     */
+    public ModuleDtManifestPath moduleDtManifestCreatedByFk() {
+        if (_moduleDtManifestCreatedByFk == null)
+            _moduleDtManifestCreatedByFk = new ModuleDtManifestPath(this, null, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleDtManifestCreatedByFk;
+    }
+
+    private transient ModuleDtManifestPath _moduleDtManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_dt_manifest</code> table, via the
+     * <code>module_dt_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleDtManifestPath moduleDtManifestLastUpdatedByFk() {
+        if (_moduleDtManifestLastUpdatedByFk == null)
+            _moduleDtManifestLastUpdatedByFk = new ModuleDtManifestPath(this, null, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleDtManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _moduleLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module</code> table,
+     * via the <code>module_last_updated_by_fk</code> key
+     */
+    public ModulePath moduleLastUpdatedByFk() {
+        if (_moduleLastUpdatedByFk == null)
+            _moduleLastUpdatedByFk = new ModulePath(this, null, Keys.MODULE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleLastUpdatedByFk;
+    }
+
+    private transient ModulePath _moduleOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module</code> table,
+     * via the <code>module_owner_user_id_fk</code> key
+     */
+    public ModulePath moduleOwnerUserIdFk() {
+        if (_moduleOwnerUserIdFk == null)
+            _moduleOwnerUserIdFk = new ModulePath(this, null, Keys.MODULE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _moduleOwnerUserIdFk;
+    }
+
+    private transient ModuleSetPath _moduleSetCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module_set</code>
+     * table, via the <code>module_set_created_by_fk</code> key
+     */
+    public ModuleSetPath moduleSetCreatedByFk() {
+        if (_moduleSetCreatedByFk == null)
+            _moduleSetCreatedByFk = new ModuleSetPath(this, null, Keys.MODULE_SET_CREATED_BY_FK.getInverseKey());
+
+        return _moduleSetCreatedByFk;
+    }
+
+    private transient ModuleSetPath _moduleSetLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.module_set</code>
+     * table, via the <code>module_set_last_updated_by_fk</code> key
+     */
+    public ModuleSetPath moduleSetLastUpdatedByFk() {
+        if (_moduleSetLastUpdatedByFk == null)
+            _moduleSetLastUpdatedByFk = new ModuleSetPath(this, null, Keys.MODULE_SET_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleSetLastUpdatedByFk;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetReleaseAssignmentCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_set_release</code> table, via the
+     * <code>module_set_release_assignment_created_by_fk</code> key
+     */
+    public ModuleSetReleasePath moduleSetReleaseAssignmentCreatedByFk() {
+        if (_moduleSetReleaseAssignmentCreatedByFk == null)
+            _moduleSetReleaseAssignmentCreatedByFk = new ModuleSetReleasePath(this, null, Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK.getInverseKey());
+
+        return _moduleSetReleaseAssignmentCreatedByFk;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetReleaseAssignmentLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_set_release</code> table, via the
+     * <code>module_set_release_assignment_last_updated_by_fk</code> key
+     */
+    public ModuleSetReleasePath moduleSetReleaseAssignmentLastUpdatedByFk() {
+        if (_moduleSetReleaseAssignmentLastUpdatedByFk == null)
+            _moduleSetReleaseAssignmentLastUpdatedByFk = new ModuleSetReleasePath(this, null, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleSetReleaseAssignmentLastUpdatedByFk;
+    }
+
+    private transient ModuleXbtManifestPath _moduleXbtManifestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_xbt_manifest</code> table, via the
+     * <code>module_xbt_manifest_created_by_fk</code> key
+     */
+    public ModuleXbtManifestPath moduleXbtManifestCreatedByFk() {
+        if (_moduleXbtManifestCreatedByFk == null)
+            _moduleXbtManifestCreatedByFk = new ModuleXbtManifestPath(this, null, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK.getInverseKey());
+
+        return _moduleXbtManifestCreatedByFk;
+    }
+
+    private transient ModuleXbtManifestPath _moduleXbtManifestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_xbt_manifest</code> table, via the
+     * <code>module_xbt_manifest_last_updated_by_fk</code> key
+     */
+    public ModuleXbtManifestPath moduleXbtManifestLastUpdatedByFk() {
+        if (_moduleXbtManifestLastUpdatedByFk == null)
+            _moduleXbtManifestLastUpdatedByFk = new ModuleXbtManifestPath(this, null, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _moduleXbtManifestLastUpdatedByFk;
+    }
+
+    private transient NamespacePath _namespaceCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.namespace</code>
+     * table, via the <code>namespace_created_by_fk</code> key
+     */
+    public NamespacePath namespaceCreatedByFk() {
+        if (_namespaceCreatedByFk == null)
+            _namespaceCreatedByFk = new NamespacePath(this, null, Keys.NAMESPACE_CREATED_BY_FK.getInverseKey());
+
+        return _namespaceCreatedByFk;
+    }
+
+    private transient NamespacePath _namespaceLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.namespace</code>
+     * table, via the <code>namespace_last_updated_by_fk</code> key
+     */
+    public NamespacePath namespaceLastUpdatedByFk() {
+        if (_namespaceLastUpdatedByFk == null)
+            _namespaceLastUpdatedByFk = new NamespacePath(this, null, Keys.NAMESPACE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _namespaceLastUpdatedByFk;
+    }
+
+    private transient NamespacePath _namespaceOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.namespace</code>
+     * table, via the <code>namespace_owner_user_id_fk</code> key
+     */
+    public NamespacePath namespaceOwnerUserIdFk() {
+        if (_namespaceOwnerUserIdFk == null)
+            _namespaceOwnerUserIdFk = new NamespacePath(this, null, Keys.NAMESPACE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _namespaceOwnerUserIdFk;
+    }
+
+    private transient OasDocPath _oasDocCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
+     * table, via the <code>oas_doc_created_by_fk</code> key
+     */
+    public OasDocPath oasDocCreatedByFk() {
+        if (_oasDocCreatedByFk == null)
+            _oasDocCreatedByFk = new OasDocPath(this, null, Keys.OAS_DOC_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocCreatedByFk;
+    }
+
+    private transient OasDocPath _oasDocLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
+     * table, via the <code>oas_doc_last_updated_by_fk</code> key
+     */
+    public OasDocPath oasDocLastUpdatedByFk() {
+        if (_oasDocLastUpdatedByFk == null)
+            _oasDocLastUpdatedByFk = new OasDocPath(this, null, Keys.OAS_DOC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocLastUpdatedByFk;
+    }
+
+    private transient OasDocPath _oasDocOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
+     * table, via the <code>oas_doc_owner_user_id_fk</code> key
+     */
+    public OasDocPath oasDocOwnerUserIdFk() {
+        if (_oasDocOwnerUserIdFk == null)
+            _oasDocOwnerUserIdFk = new OasDocPath(this, null, Keys.OAS_DOC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _oasDocOwnerUserIdFk;
+    }
+
+    private transient OasDocTagPath _oasDocTagCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_doc_tag</code>
+     * table, via the <code>oas_doc_tag_created_by_fk</code> key
+     */
+    public OasDocTagPath oasDocTagCreatedByFk() {
+        if (_oasDocTagCreatedByFk == null)
+            _oasDocTagCreatedByFk = new OasDocTagPath(this, null, Keys.OAS_DOC_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocTagCreatedByFk;
+    }
+
+    private transient OasDocTagPath _oasDocTagLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_doc_tag</code>
+     * table, via the <code>oas_doc_tag_last_updated_by_fk</code> key
+     */
+    public OasDocTagPath oasDocTagLastUpdatedByFk() {
+        if (_oasDocTagLastUpdatedByFk == null)
+            _oasDocTagLastUpdatedByFk = new OasDocTagPath(this, null, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocTagLastUpdatedByFk;
+    }
+
+    private transient OasExamplePath _oasExampleCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_example</code>
+     * table, via the <code>oas_example_created_by_fk</code> key
+     */
+    public OasExamplePath oasExampleCreatedByFk() {
+        if (_oasExampleCreatedByFk == null)
+            _oasExampleCreatedByFk = new OasExamplePath(this, null, Keys.OAS_EXAMPLE_CREATED_BY_FK.getInverseKey());
+
+        return _oasExampleCreatedByFk;
+    }
+
+    private transient OasExamplePath _oasExampleLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_example</code>
+     * table, via the <code>oas_example_last_updated_by_fk</code> key
+     */
+    public OasExamplePath oasExampleLastUpdatedByFk() {
+        if (_oasExampleLastUpdatedByFk == null)
+            _oasExampleLastUpdatedByFk = new OasExamplePath(this, null, Keys.OAS_EXAMPLE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasExampleLastUpdatedByFk;
+    }
+
+    private transient OasExternalDocPath _oasExternalDocCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_external_doc</code> table, via the
+     * <code>oas_external_doc_created_by_fk</code> key
+     */
+    public OasExternalDocPath oasExternalDocCreatedByFk() {
+        if (_oasExternalDocCreatedByFk == null)
+            _oasExternalDocCreatedByFk = new OasExternalDocPath(this, null, Keys.OAS_EXTERNAL_DOC_CREATED_BY_FK.getInverseKey());
+
+        return _oasExternalDocCreatedByFk;
+    }
+
+    private transient OasExternalDocDocPath _oasExternalDocDocCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_external_doc_doc</code> table, via the
+     * <code>oas_external_doc_doc_created_by_fk</code> key
+     */
+    public OasExternalDocDocPath oasExternalDocDocCreatedByFk() {
+        if (_oasExternalDocDocCreatedByFk == null)
+            _oasExternalDocDocCreatedByFk = new OasExternalDocDocPath(this, null, Keys.OAS_EXTERNAL_DOC_DOC_CREATED_BY_FK.getInverseKey());
+
+        return _oasExternalDocDocCreatedByFk;
+    }
+
+    private transient OasExternalDocDocPath _oasExternalDocDocLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_external_doc_doc</code> table, via the
+     * <code>oas_external_doc_doc_last_updated_by_fk</code> key
+     */
+    public OasExternalDocDocPath oasExternalDocDocLastUpdatedByFk() {
+        if (_oasExternalDocDocLastUpdatedByFk == null)
+            _oasExternalDocDocLastUpdatedByFk = new OasExternalDocDocPath(this, null, Keys.OAS_EXTERNAL_DOC_DOC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasExternalDocDocLastUpdatedByFk;
+    }
+
+    private transient OasExternalDocPath _oasExternalDocLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_external_doc</code> table, via the
+     * <code>oas_external_doc_last_updated_by_fk</code> key
+     */
+    public OasExternalDocPath oasExternalDocLastUpdatedByFk() {
+        if (_oasExternalDocLastUpdatedByFk == null)
+            _oasExternalDocLastUpdatedByFk = new OasExternalDocPath(this, null, Keys.OAS_EXTERNAL_DOC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasExternalDocLastUpdatedByFk;
+    }
+
+    private transient OasHttpHeaderPath _oasHttpHeaderCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_http_header</code> table, via the
+     * <code>oas_http_header_created_by_fk</code> key
+     */
+    public OasHttpHeaderPath oasHttpHeaderCreatedByFk() {
+        if (_oasHttpHeaderCreatedByFk == null)
+            _oasHttpHeaderCreatedByFk = new OasHttpHeaderPath(this, null, Keys.OAS_HTTP_HEADER_CREATED_BY_FK.getInverseKey());
+
+        return _oasHttpHeaderCreatedByFk;
+    }
+
+    private transient OasHttpHeaderPath _oasHttpHeaderLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_http_header</code> table, via the
+     * <code>oas_http_header_last_updated_by_fk</code> key
+     */
+    public OasHttpHeaderPath oasHttpHeaderLastUpdatedByFk() {
+        if (_oasHttpHeaderLastUpdatedByFk == null)
+            _oasHttpHeaderLastUpdatedByFk = new OasHttpHeaderPath(this, null, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasHttpHeaderLastUpdatedByFk;
+    }
+
+    private transient OasHttpHeaderPath _oasHttpHeaderOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_http_header</code> table, via the
+     * <code>oas_http_header_owner_user_id_fk</code> key
+     */
+    public OasHttpHeaderPath oasHttpHeaderOwnerUserIdFk() {
+        if (_oasHttpHeaderOwnerUserIdFk == null)
+            _oasHttpHeaderOwnerUserIdFk = new OasHttpHeaderPath(this, null, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK.getInverseKey());
+
+        return _oasHttpHeaderOwnerUserIdFk;
+    }
+
+    private transient OasMediaTypePath _oasMediaTypeCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_media_type</code> table, via the
+     * <code>oas_media_type_created_by_fk</code> key
+     */
+    public OasMediaTypePath oasMediaTypeCreatedByFk() {
+        if (_oasMediaTypeCreatedByFk == null)
+            _oasMediaTypeCreatedByFk = new OasMediaTypePath(this, null, Keys.OAS_MEDIA_TYPE_CREATED_BY_FK.getInverseKey());
+
+        return _oasMediaTypeCreatedByFk;
+    }
+
+    private transient OasMediaTypePath _oasMediaTypeLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_media_type</code> table, via the
+     * <code>oas_media_type_last_updated_by_fk</code> key
+     */
+    public OasMediaTypePath oasMediaTypeLastUpdatedByFk() {
+        if (_oasMediaTypeLastUpdatedByFk == null)
+            _oasMediaTypeLastUpdatedByFk = new OasMediaTypePath(this, null, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasMediaTypeLastUpdatedByFk;
+    }
+
+    private transient OasMediaTypePath _oasMediaTypeOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_media_type</code> table, via the
+     * <code>oas_media_type_owner_user_id_fk</code> key
+     */
+    public OasMediaTypePath oasMediaTypeOwnerUserIdFk() {
+        if (_oasMediaTypeOwnerUserIdFk == null)
+            _oasMediaTypeOwnerUserIdFk = new OasMediaTypePath(this, null, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _oasMediaTypeOwnerUserIdFk;
+    }
+
+    private transient OasMessageBodyPath _oasMessageBodyCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_message_body</code> table, via the
+     * <code>oas_message_body_created_by_fk</code> key
+     */
+    public OasMessageBodyPath oasMessageBodyCreatedByFk() {
+        if (_oasMessageBodyCreatedByFk == null)
+            _oasMessageBodyCreatedByFk = new OasMessageBodyPath(this, null, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK.getInverseKey());
+
+        return _oasMessageBodyCreatedByFk;
+    }
+
+    private transient OasMessageBodyPath _oasMessageBodyLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_message_body</code> table, via the
+     * <code>oas_message_body_last_updated_by_fk</code> key
+     */
+    public OasMessageBodyPath oasMessageBodyLastUpdatedByFk() {
+        if (_oasMessageBodyLastUpdatedByFk == null)
+            _oasMessageBodyLastUpdatedByFk = new OasMessageBodyPath(this, null, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasMessageBodyLastUpdatedByFk;
+    }
+
+    private transient OasOperationPath _oasOperationCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_operation</code>
+     * table, via the <code>oas_operation_created_by_fk</code> key
+     */
+    public OasOperationPath oasOperationCreatedByFk() {
+        if (_oasOperationCreatedByFk == null)
+            _oasOperationCreatedByFk = new OasOperationPath(this, null, Keys.OAS_OPERATION_CREATED_BY_FK.getInverseKey());
+
+        return _oasOperationCreatedByFk;
+    }
+
+    private transient OasOperationPath _oasOperationLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_operation</code>
+     * table, via the <code>oas_operation_last_updated_by_fk</code> key
+     */
+    public OasOperationPath oasOperationLastUpdatedByFk() {
+        if (_oasOperationLastUpdatedByFk == null)
+            _oasOperationLastUpdatedByFk = new OasOperationPath(this, null, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasOperationLastUpdatedByFk;
+    }
+
+    private transient OasParameterPath _oasParameterCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_parameter</code>
+     * table, via the <code>oas_parameter_created_by_fk</code> key
+     */
+    public OasParameterPath oasParameterCreatedByFk() {
+        if (_oasParameterCreatedByFk == null)
+            _oasParameterCreatedByFk = new OasParameterPath(this, null, Keys.OAS_PARAMETER_CREATED_BY_FK.getInverseKey());
+
+        return _oasParameterCreatedByFk;
+    }
+
+    private transient OasParameterPath _oasParameterLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_parameter</code>
+     * table, via the <code>oas_parameter_last_updated_by_fk</code> key
+     */
+    public OasParameterPath oasParameterLastUpdatedByFk() {
+        if (_oasParameterLastUpdatedByFk == null)
+            _oasParameterLastUpdatedByFk = new OasParameterPath(this, null, Keys.OAS_PARAMETER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasParameterLastUpdatedByFk;
+    }
+
+    private transient OasParameterLinkPath _oasParameterLinkCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_parameter_link</code> table, via the
+     * <code>oas_parameter_link_created_by_fk</code> key
+     */
+    public OasParameterLinkPath oasParameterLinkCreatedByFk() {
+        if (_oasParameterLinkCreatedByFk == null)
+            _oasParameterLinkCreatedByFk = new OasParameterLinkPath(this, null, Keys.OAS_PARAMETER_LINK_CREATED_BY_FK.getInverseKey());
+
+        return _oasParameterLinkCreatedByFk;
+    }
+
+    private transient OasParameterLinkPath _oasParameterLinkLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_parameter_link</code> table, via the
+     * <code>oas_parameter_link_last_updated_by_fk</code> key
+     */
+    public OasParameterLinkPath oasParameterLinkLastUpdatedByFk() {
+        if (_oasParameterLinkLastUpdatedByFk == null)
+            _oasParameterLinkLastUpdatedByFk = new OasParameterLinkPath(this, null, Keys.OAS_PARAMETER_LINK_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasParameterLinkLastUpdatedByFk;
+    }
+
+    private transient OasRequestPath _oasRequestCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
+     * table, via the <code>oas_request_created_by_fk</code> key
+     */
+    public OasRequestPath oasRequestCreatedByFk() {
+        if (_oasRequestCreatedByFk == null)
+            _oasRequestCreatedByFk = new OasRequestPath(this, null, Keys.OAS_REQUEST_CREATED_BY_FK.getInverseKey());
+
+        return _oasRequestCreatedByFk;
+    }
+
+    private transient OasRequestPath _oasRequestLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
+     * table, via the <code>oas_request_last_updated_by_fk</code> key
+     */
+    public OasRequestPath oasRequestLastUpdatedByFk() {
+        if (_oasRequestLastUpdatedByFk == null)
+            _oasRequestLastUpdatedByFk = new OasRequestPath(this, null, Keys.OAS_REQUEST_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasRequestLastUpdatedByFk;
+    }
+
+    private transient OasRequestParameterPath _oasRequestParameterCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_request_parameter</code> table, via the
+     * <code>oas_request_parameter_created_by_fk</code> key
+     */
+    public OasRequestParameterPath oasRequestParameterCreatedByFk() {
+        if (_oasRequestParameterCreatedByFk == null)
+            _oasRequestParameterCreatedByFk = new OasRequestParameterPath(this, null, Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK.getInverseKey());
+
+        return _oasRequestParameterCreatedByFk;
+    }
+
+    private transient OasRequestParameterPath _oasRequestParameterLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_request_parameter</code> table, via the
+     * <code>oas_request_parameter_last_updated_by_fk</code> key
+     */
+    public OasRequestParameterPath oasRequestParameterLastUpdatedByFk() {
+        if (_oasRequestParameterLastUpdatedByFk == null)
+            _oasRequestParameterLastUpdatedByFk = new OasRequestParameterPath(this, null, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasRequestParameterLastUpdatedByFk;
+    }
+
+    private transient OasResourcePath _oasResourceCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_resource</code>
+     * table, via the <code>oas_resource_created_by_fk</code> key
+     */
+    public OasResourcePath oasResourceCreatedByFk() {
+        if (_oasResourceCreatedByFk == null)
+            _oasResourceCreatedByFk = new OasResourcePath(this, null, Keys.OAS_RESOURCE_CREATED_BY_FK.getInverseKey());
+
+        return _oasResourceCreatedByFk;
+    }
+
+    private transient OasResourcePath _oasResourceLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_resource</code>
+     * table, via the <code>oas_resource_last_updated_by_fk</code> key
+     */
+    public OasResourcePath oasResourceLastUpdatedByFk() {
+        if (_oasResourceLastUpdatedByFk == null)
+            _oasResourceLastUpdatedByFk = new OasResourcePath(this, null, Keys.OAS_RESOURCE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasResourceLastUpdatedByFk;
+    }
+
+    private transient OasResponsePath _oasResponseCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * table, via the <code>oas_response_created_by_fk</code> key
+     */
+    public OasResponsePath oasResponseCreatedByFk() {
+        if (_oasResponseCreatedByFk == null)
+            _oasResponseCreatedByFk = new OasResponsePath(this, null, Keys.OAS_RESPONSE_CREATED_BY_FK.getInverseKey());
+
+        return _oasResponseCreatedByFk;
+    }
+
+    private transient OasResponseHeadersPath _oasResponseHeadersCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_response_headers</code> table, via the
+     * <code>oas_response_headers_created_by_fk</code> key
+     */
+    public OasResponseHeadersPath oasResponseHeadersCreatedByFk() {
+        if (_oasResponseHeadersCreatedByFk == null)
+            _oasResponseHeadersCreatedByFk = new OasResponseHeadersPath(this, null, Keys.OAS_RESPONSE_HEADERS_CREATED_BY_FK.getInverseKey());
+
+        return _oasResponseHeadersCreatedByFk;
+    }
+
+    private transient OasResponseHeadersPath _oasResponseHeadersLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_response_headers</code> table, via the
+     * <code>oas_response_headers_last_updated_by_fk</code> key
+     */
+    public OasResponseHeadersPath oasResponseHeadersLastUpdatedByFk() {
+        if (_oasResponseHeadersLastUpdatedByFk == null)
+            _oasResponseHeadersLastUpdatedByFk = new OasResponseHeadersPath(this, null, Keys.OAS_RESPONSE_HEADERS_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasResponseHeadersLastUpdatedByFk;
+    }
+
+    private transient OasResponsePath _oasResponseLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * table, via the <code>oas_response_last_updated_by_fk</code> key
+     */
+    public OasResponsePath oasResponseLastUpdatedByFk() {
+        if (_oasResponseLastUpdatedByFk == null)
+            _oasResponseLastUpdatedByFk = new OasResponsePath(this, null, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasResponseLastUpdatedByFk;
+    }
+
+    private transient OasServerPath _oasServerCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
+     * table, via the <code>oas_server_created_by_fk</code> key
+     */
+    public OasServerPath oasServerCreatedByFk() {
+        if (_oasServerCreatedByFk == null)
+            _oasServerCreatedByFk = new OasServerPath(this, null, Keys.OAS_SERVER_CREATED_BY_FK.getInverseKey());
+
+        return _oasServerCreatedByFk;
+    }
+
+    private transient OasServerPath _oasServerLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
+     * table, via the <code>oas_server_last_updated_by_fk</code> key
+     */
+    public OasServerPath oasServerLastUpdatedByFk() {
+        if (_oasServerLastUpdatedByFk == null)
+            _oasServerLastUpdatedByFk = new OasServerPath(this, null, Keys.OAS_SERVER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasServerLastUpdatedByFk;
+    }
+
+    private transient OasServerPath _oasServerOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
+     * table, via the <code>oas_server_owner_user_id_fk</code> key
+     */
+    public OasServerPath oasServerOwnerUserIdFk() {
+        if (_oasServerOwnerUserIdFk == null)
+            _oasServerOwnerUserIdFk = new OasServerPath(this, null, Keys.OAS_SERVER_OWNER_USER_ID_FK.getInverseKey());
+
+        return _oasServerOwnerUserIdFk;
+    }
+
+    private transient OasServerVariablePath _oasServerVariableCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_server_variable</code> table, via the
+     * <code>oas_server_variable_created_by_fk</code> key
+     */
+    public OasServerVariablePath oasServerVariableCreatedByFk() {
+        if (_oasServerVariableCreatedByFk == null)
+            _oasServerVariableCreatedByFk = new OasServerVariablePath(this, null, Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK.getInverseKey());
+
+        return _oasServerVariableCreatedByFk;
+    }
+
+    private transient OasServerVariablePath _oasServerVariableLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_server_variable</code> table, via the
+     * <code>oas_server_variable_last_updated_by_fk</code> key
+     */
+    public OasServerVariablePath oasServerVariableLastUpdatedByFk() {
+        if (_oasServerVariableLastUpdatedByFk == null)
+            _oasServerVariableLastUpdatedByFk = new OasServerVariablePath(this, null, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasServerVariableLastUpdatedByFk;
+    }
+
+    private transient OasTagPath _oasTagCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_tag</code>
+     * table, via the <code>oas_tag_created_by_fk</code> key
+     */
+    public OasTagPath oasTagCreatedByFk() {
+        if (_oasTagCreatedByFk == null)
+            _oasTagCreatedByFk = new OasTagPath(this, null, Keys.OAS_TAG_CREATED_BY_FK.getInverseKey());
+
+        return _oasTagCreatedByFk;
+    }
+
+    private transient OasTagPath _oasTagLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_tag</code>
+     * table, via the <code>oas_tag_last_updated_by_fk</code> key
+     */
+    public OasTagPath oasTagLastUpdatedByFk() {
+        if (_oasTagLastUpdatedByFk == null)
+            _oasTagLastUpdatedByFk = new OasTagPath(this, null, Keys.OAS_TAG_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasTagLastUpdatedByFk;
+    }
+
+    private transient ReleasePath _releaseCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.release</code>
+     * table, via the <code>release_created_by_fk</code> key
+     */
+    public ReleasePath releaseCreatedByFk() {
+        if (_releaseCreatedByFk == null)
+            _releaseCreatedByFk = new ReleasePath(this, null, Keys.RELEASE_CREATED_BY_FK.getInverseKey());
+
+        return _releaseCreatedByFk;
+    }
+
+    private transient ReleasePath _releaseLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.release</code>
+     * table, via the <code>release_last_updated_by_fk</code> key
+     */
+    public ReleasePath releaseLastUpdatedByFk() {
+        if (_releaseLastUpdatedByFk == null)
+            _releaseLastUpdatedByFk = new ReleasePath(this, null, Keys.RELEASE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _releaseLastUpdatedByFk;
+    }
+
+    private transient TagPath _tagCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.tag</code> table,
+     * via the <code>tag_created_by_fk</code> key
+     */
+    public TagPath tagCreatedByFk() {
+        if (_tagCreatedByFk == null)
+            _tagCreatedByFk = new TagPath(this, null, Keys.TAG_CREATED_BY_FK.getInverseKey());
+
+        return _tagCreatedByFk;
+    }
+
+    private transient TagPath _tagLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.tag</code> table,
+     * via the <code>tag_last_updated_by_fk</code> key
+     */
+    public TagPath tagLastUpdatedByFk() {
+        if (_tagLastUpdatedByFk == null)
+            _tagLastUpdatedByFk = new TagPath(this, null, Keys.TAG_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _tagLastUpdatedByFk;
+    }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiepLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.top_level_asbiep</code> table, via the
+     * <code>top_level_asbiep_last_updated_by_fk</code> key
+     */
+    public TopLevelAsbiepPath topLevelAsbiepLastUpdatedByFk() {
+        if (_topLevelAsbiepLastUpdatedByFk == null)
+            _topLevelAsbiepLastUpdatedByFk = new TopLevelAsbiepPath(this, null, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _topLevelAsbiepLastUpdatedByFk;
+    }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiepOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.top_level_asbiep</code> table, via the
+     * <code>top_level_asbiep_owner_user_id_fk</code> key
+     */
+    public TopLevelAsbiepPath topLevelAsbiepOwnerUserIdFk() {
+        if (_topLevelAsbiepOwnerUserIdFk == null)
+            _topLevelAsbiepOwnerUserIdFk = new TopLevelAsbiepPath(this, null, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK.getInverseKey());
+
+        return _topLevelAsbiepOwnerUserIdFk;
+    }
+
+    private transient UserTenantPath _userTenant;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.user_tenant</code>
+     * table
+     */
+    public UserTenantPath userTenant() {
+        if (_userTenant == null)
+            _userTenant = new UserTenantPath(this, null, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK.getInverseKey());
+
+        return _userTenant;
+    }
+
+    private transient XbtPath _xbtCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
+     * via the <code>xbt_created_by_fk</code> key
+     */
+    public XbtPath xbtCreatedByFk() {
+        if (_xbtCreatedByFk == null)
+            _xbtCreatedByFk = new XbtPath(this, null, Keys.XBT_CREATED_BY_FK.getInverseKey());
+
+        return _xbtCreatedByFk;
+    }
+
+    private transient XbtPath _xbtLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
+     * via the <code>xbt_last_updated_by_fk</code> key
+     */
+    public XbtPath xbtLastUpdatedByFk() {
+        if (_xbtLastUpdatedByFk == null)
+            _xbtLastUpdatedByFk = new XbtPath(this, null, Keys.XBT_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _xbtLastUpdatedByFk;
+    }
+
+    private transient XbtPath _xbtOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
+     * via the <code>xbt_owner_user_id_fk</code> key
+     */
+    public XbtPath xbtOwnerUserIdFk() {
+        if (_xbtOwnerUserIdFk == null)
+            _xbtOwnerUserIdFk = new XbtPath(this, null, Keys.XBT_OWNER_USER_ID_FK.getInverseKey());
+
+        return _xbtOwnerUserIdFk;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.tenant</code>
+     * table
+     */
+    public TenantPath tenant() {
+        return userTenant().tenant();
     }
 
     @Override
@@ -188,27 +2149,87 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return new AppUser(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, String, String, String, String, Byte, Byte, Byte> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public AppUser where(Condition condition) {
+        return new AppUser(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super Byte, ? super Byte, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AppUser where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super Byte, ? super Byte, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AppUser where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AppUser where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AppUser where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AppUser where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AppUser where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AppUser where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AppUser whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AppUser whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

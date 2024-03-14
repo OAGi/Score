@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
@@ -18,7 +15,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue;
  * in the CTX_SCHEME table.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueRecord> implements Record5<ULong, String, String, String, ULong> {
+public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -111,135 +108,6 @@ public class CtxSchemeValueRecord extends UpdatableRecordImpl<CtxSchemeValueReco
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record5 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row5<ULong, String, String, String, ULong> fieldsRow() {
-        return (Row5) super.fieldsRow();
-    }
-
-    @Override
-    public Row5<ULong, String, String, String, ULong> valuesRow() {
-        return (Row5) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return CtxSchemeValue.CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return CtxSchemeValue.CTX_SCHEME_VALUE.GUID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return CtxSchemeValue.CTX_SCHEME_VALUE.VALUE;
-    }
-
-    @Override
-    public Field<String> field4() {
-        return CtxSchemeValue.CTX_SCHEME_VALUE.MEANING;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return CtxSchemeValue.CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID;
-    }
-
-    @Override
-    public ULong component1() {
-        return getCtxSchemeValueId();
-    }
-
-    @Override
-    public String component2() {
-        return getGuid();
-    }
-
-    @Override
-    public String component3() {
-        return getValue();
-    }
-
-    @Override
-    public String component4() {
-        return getMeaning();
-    }
-
-    @Override
-    public ULong component5() {
-        return getOwnerCtxSchemeId();
-    }
-
-    @Override
-    public ULong value1() {
-        return getCtxSchemeValueId();
-    }
-
-    @Override
-    public String value2() {
-        return getGuid();
-    }
-
-    @Override
-    public String value3() {
-        return getValue();
-    }
-
-    @Override
-    public String value4() {
-        return getMeaning();
-    }
-
-    @Override
-    public ULong value5() {
-        return getOwnerCtxSchemeId();
-    }
-
-    @Override
-    public CtxSchemeValueRecord value1(ULong value) {
-        setCtxSchemeValueId(value);
-        return this;
-    }
-
-    @Override
-    public CtxSchemeValueRecord value2(String value) {
-        setGuid(value);
-        return this;
-    }
-
-    @Override
-    public CtxSchemeValueRecord value3(String value) {
-        setValue(value);
-        return this;
-    }
-
-    @Override
-    public CtxSchemeValueRecord value4(String value) {
-        setMeaning(value);
-        return this;
-    }
-
-    @Override
-    public CtxSchemeValueRecord value5(ULong value) {
-        setOwnerCtxSchemeId(value);
-        return this;
-    }
-
-    @Override
-    public CtxSchemeValueRecord values(ULong value1, String value2, String value3, String value4, ULong value5) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        return this;
     }
 
     // -------------------------------------------------------------------------

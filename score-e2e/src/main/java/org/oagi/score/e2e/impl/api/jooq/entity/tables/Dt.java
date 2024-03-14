@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function22;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row22;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,15 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri.CdtAwdPriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtRefSpec.CdtRefSpecPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule.DtUsageRulePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtRecord;
 
 
@@ -218,11 +231,11 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, ULong> NEXT_DT_ID = createField(DSL.name("next_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Dt(Name alias, Table<DtRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Dt(Name alias, Table<DtRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column."), TableOptions.table());
+    private Dt(Name alias, Table<DtRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column."), TableOptions.table(), where);
     }
 
     /**
@@ -246,8 +259,37 @@ public class Dt extends TableImpl<DtRecord> {
         this(DSL.name("dt"), null);
     }
 
-    public <O extends Record> Dt(Table<O> child, ForeignKey<O, DtRecord> key) {
-        super(child, key, DT);
+    public <O extends Record> Dt(Table<O> path, ForeignKey<O, DtRecord> childPath, InverseForeignKey<O, DtRecord> parentPath) {
+        super(path, childPath, parentPath, DT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class DtPath extends Dt implements Path<DtRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> DtPath(Table<O> path, ForeignKey<O, DtRecord> childPath, InverseForeignKey<O, DtRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private DtPath(Name alias, Table<DtRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public DtPath as(String alias) {
+            return new DtPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public DtPath as(Name alias) {
+            return new DtPath(alias, this);
+        }
+
+        @Override
+        public DtPath as(Table<?> alias) {
+            return new DtPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -275,100 +317,183 @@ public class Dt extends TableImpl<DtRecord> {
         return Arrays.asList(Keys.DT_BASED_DT_ID_FK, Keys.DT_NAMESPACE_ID_FK, Keys.DT_CREATED_BY_FK, Keys.DT_LAST_UPDATED_BY_FK, Keys.DT_OWNER_USER_ID_FK, Keys.DT_REPLACEMENT_DT_ID_FK, Keys.DT_PREV_DT_ID_FK, Keys.DT_NEXT_DT_ID_FK);
     }
 
-    private transient Dt _dtBasedDtIdFk;
-    private transient Namespace _namespace;
-    private transient AppUser _dtCreatedByFk;
-    private transient AppUser _dtLastUpdatedByFk;
-    private transient AppUser _dtOwnerUserIdFk;
-    private transient Dt _dtReplacementDtIdFk;
-    private transient Dt _dtPrevDtIdFk;
-    private transient Dt _dtNextDtIdFk;
+    private transient DtPath _dtBasedDtIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table, via the
      * <code>dt_based_dt_id_fk</code> key.
      */
-    public Dt dtBasedDtIdFk() {
+    public DtPath dtBasedDtIdFk() {
         if (_dtBasedDtIdFk == null)
-            _dtBasedDtIdFk = new Dt(this, Keys.DT_BASED_DT_ID_FK);
+            _dtBasedDtIdFk = new DtPath(this, Keys.DT_BASED_DT_ID_FK, null);
 
         return _dtBasedDtIdFk;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.DT_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.DT_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AppUserPath _dtCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>dt_created_by_fk</code> key.
      */
-    public AppUser dtCreatedByFk() {
+    public AppUserPath dtCreatedByFk() {
         if (_dtCreatedByFk == null)
-            _dtCreatedByFk = new AppUser(this, Keys.DT_CREATED_BY_FK);
+            _dtCreatedByFk = new AppUserPath(this, Keys.DT_CREATED_BY_FK, null);
 
         return _dtCreatedByFk;
     }
+
+    private transient AppUserPath _dtLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>dt_last_updated_by_fk</code> key.
      */
-    public AppUser dtLastUpdatedByFk() {
+    public AppUserPath dtLastUpdatedByFk() {
         if (_dtLastUpdatedByFk == null)
-            _dtLastUpdatedByFk = new AppUser(this, Keys.DT_LAST_UPDATED_BY_FK);
+            _dtLastUpdatedByFk = new AppUserPath(this, Keys.DT_LAST_UPDATED_BY_FK, null);
 
         return _dtLastUpdatedByFk;
     }
+
+    private transient AppUserPath _dtOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>dt_owner_user_id_fk</code> key.
      */
-    public AppUser dtOwnerUserIdFk() {
+    public AppUserPath dtOwnerUserIdFk() {
         if (_dtOwnerUserIdFk == null)
-            _dtOwnerUserIdFk = new AppUser(this, Keys.DT_OWNER_USER_ID_FK);
+            _dtOwnerUserIdFk = new AppUserPath(this, Keys.DT_OWNER_USER_ID_FK, null);
 
         return _dtOwnerUserIdFk;
     }
+
+    private transient DtPath _dtReplacementDtIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table, via the
      * <code>dt_replacement_dt_id_fk</code> key.
      */
-    public Dt dtReplacementDtIdFk() {
+    public DtPath dtReplacementDtIdFk() {
         if (_dtReplacementDtIdFk == null)
-            _dtReplacementDtIdFk = new Dt(this, Keys.DT_REPLACEMENT_DT_ID_FK);
+            _dtReplacementDtIdFk = new DtPath(this, Keys.DT_REPLACEMENT_DT_ID_FK, null);
 
         return _dtReplacementDtIdFk;
     }
+
+    private transient DtPath _dtPrevDtIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table, via the
      * <code>dt_prev_dt_id_fk</code> key.
      */
-    public Dt dtPrevDtIdFk() {
+    public DtPath dtPrevDtIdFk() {
         if (_dtPrevDtIdFk == null)
-            _dtPrevDtIdFk = new Dt(this, Keys.DT_PREV_DT_ID_FK);
+            _dtPrevDtIdFk = new DtPath(this, Keys.DT_PREV_DT_ID_FK, null);
 
         return _dtPrevDtIdFk;
     }
+
+    private transient DtPath _dtNextDtIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table, via the
      * <code>dt_next_dt_id_fk</code> key.
      */
-    public Dt dtNextDtIdFk() {
+    public DtPath dtNextDtIdFk() {
         if (_dtNextDtIdFk == null)
-            _dtNextDtIdFk = new Dt(this, Keys.DT_NEXT_DT_ID_FK);
+            _dtNextDtIdFk = new DtPath(this, Keys.DT_NEXT_DT_ID_FK, null);
 
         return _dtNextDtIdFk;
+    }
+
+    private transient BccpPath _bccp;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp</code> table
+     */
+    public BccpPath bccp() {
+        if (_bccp == null)
+            _bccp = new BccpPath(this, null, Keys.BCCP_BDT_ID_FK.getInverseKey());
+
+        return _bccp;
+    }
+
+    private transient CdtAwdPriPath _cdtAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.cdt_awd_pri</code>
+     * table
+     */
+    public CdtAwdPriPath cdtAwdPri() {
+        if (_cdtAwdPri == null)
+            _cdtAwdPri = new CdtAwdPriPath(this, null, Keys.CDT_AWD_PRI_CDT_ID_FK.getInverseKey());
+
+        return _cdtAwdPri;
+    }
+
+    private transient CdtRefSpecPath _cdtRefSpec;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.cdt_ref_spec</code>
+     * table
+     */
+    public CdtRefSpecPath cdtRefSpec() {
+        if (_cdtRefSpec == null)
+            _cdtRefSpec = new CdtRefSpecPath(this, null, Keys.CDT_REF_SPEC_CDT_ID_FK.getInverseKey());
+
+        return _cdtRefSpec;
+    }
+
+    private transient DtManifestPath _dtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_manifest</code>
+     * table
+     */
+    public DtManifestPath dtManifest() {
+        if (_dtManifest == null)
+            _dtManifest = new DtManifestPath(this, null, Keys.DT_MANIFEST_DT_ID_FK.getInverseKey());
+
+        return _dtManifest;
+    }
+
+    private transient DtScPath _dtSc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table
+     */
+    public DtScPath dtSc() {
+        if (_dtSc == null)
+            _dtSc = new DtScPath(this, null, Keys.DT_SC_OWNER_DT_ID_FK.getInverseKey());
+
+        return _dtSc;
+    }
+
+    private transient DtUsageRulePath _dtUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_usage_rule</code>
+     * table
+     */
+    public DtUsageRulePath dtUsageRule() {
+        if (_dtUsageRule == null)
+            _dtUsageRule = new DtUsageRulePath(this, null, Keys.DT_USAGE_RULE_TARGET_DT_ID_FK.getInverseKey());
+
+        return _dtUsageRule;
     }
 
     @Override
@@ -410,27 +535,87 @@ public class Dt extends TableImpl<DtRecord> {
         return new Dt(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row22 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row22<ULong, String, String, String, String, String, ULong, String, String, ULong, String, String, Byte, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row22) super.fieldsRow();
+    public Dt where(Condition condition) {
+        return new Dt(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Dt where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Dt where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Dt where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Dt where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Dt where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Dt where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Dt where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Dt whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Dt whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

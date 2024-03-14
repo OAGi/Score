@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function10;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row10;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,17 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValueManifest.AgencyIdListValueManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieSc.BbieScPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri.BdtPriRestriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri.BdtScPriRestriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList.CodeListPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleCodeListManifest.ModuleCodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CodeListManifestRecord;
 
 
@@ -111,11 +126,11 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
     public final TableField<CodeListManifestRecord, ULong> NEXT_CODE_LIST_MANIFEST_ID = createField(DSL.name("next_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private CodeListManifest(Name alias, Table<CodeListManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CodeListManifest(Name alias, Table<CodeListManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private CodeListManifest(Name alias, Table<CodeListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -139,8 +154,37 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
         this(DSL.name("code_list_manifest"), null);
     }
 
-    public <O extends Record> CodeListManifest(Table<O> child, ForeignKey<O, CodeListManifestRecord> key) {
-        super(child, key, CODE_LIST_MANIFEST);
+    public <O extends Record> CodeListManifest(Table<O> path, ForeignKey<O, CodeListManifestRecord> childPath, InverseForeignKey<O, CodeListManifestRecord> parentPath) {
+        super(path, childPath, parentPath, CODE_LIST_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CodeListManifestPath extends CodeListManifest implements Path<CodeListManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CodeListManifestPath(Table<O> path, ForeignKey<O, CodeListManifestRecord> childPath, InverseForeignKey<O, CodeListManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CodeListManifestPath(Name alias, Table<CodeListManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CodeListManifestPath as(String alias) {
+            return new CodeListManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CodeListManifestPath as(Name alias) {
+            return new CodeListManifestPath(alias, this);
+        }
+
+        @Override
+        public CodeListManifestPath as(Table<?> alias) {
+            return new CodeListManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -163,102 +207,185 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
         return Arrays.asList(Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_LOG_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK);
     }
 
-    private transient Release _release;
-    private transient CodeList _codeList;
-    private transient CodeListManifest _codeListManifestBasedCodeListManifestIdFk;
-    private transient AgencyIdListValueManifest _agencyIdListValueManifest;
-    private transient Log _log;
-    private transient CodeListManifest _codeListReplacementCodeListManifestIdFk;
-    private transient CodeListManifest _codeListManifestPrevCodeListManifestIdFk;
-    private transient CodeListManifest _codeListManifestNextCodeListManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
 
+    private transient CodeListPath _codeList;
+
     /**
      * Get the implicit join path to the <code>oagi.code_list</code> table.
      */
-    public CodeList codeList() {
+    public CodeListPath codeList() {
         if (_codeList == null)
-            _codeList = new CodeList(this, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK);
+            _codeList = new CodeListPath(this, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK, null);
 
         return _codeList;
     }
+
+    private transient CodeListManifestPath _codeListManifestBasedCodeListManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table, via the
      * <code>code_list_manifest_based_code_list_manifest_id_fk</code> key.
      */
-    public CodeListManifest codeListManifestBasedCodeListManifestIdFk() {
+    public CodeListManifestPath codeListManifestBasedCodeListManifestIdFk() {
         if (_codeListManifestBasedCodeListManifestIdFk == null)
-            _codeListManifestBasedCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK);
+            _codeListManifestBasedCodeListManifestIdFk = new CodeListManifestPath(this, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifestBasedCodeListManifestIdFk;
     }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifest;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_value_manifest</code> table.
      */
-    public AgencyIdListValueManifest agencyIdListValueManifest() {
+    public AgencyIdListValueManifestPath agencyIdListValueManifest() {
         if (_agencyIdListValueManifest == null)
-            _agencyIdListValueManifest = new AgencyIdListValueManifest(this, Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK);
+            _agencyIdListValueManifest = new AgencyIdListValueManifestPath(this, Keys.CODE_LIST_AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, null);
 
         return _agencyIdListValueManifest;
     }
 
+    private transient LogPath _log;
+
     /**
      * Get the implicit join path to the <code>oagi.log</code> table.
      */
-    public Log log() {
+    public LogPath log() {
         if (_log == null)
-            _log = new Log(this, Keys.CODE_LIST_MANIFEST_LOG_ID_FK);
+            _log = new LogPath(this, Keys.CODE_LIST_MANIFEST_LOG_ID_FK, null);
 
         return _log;
     }
+
+    private transient CodeListManifestPath _codeListReplacementCodeListManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table, via the
      * <code>code_list_replacement_code_list_manifest_id_fk</code> key.
      */
-    public CodeListManifest codeListReplacementCodeListManifestIdFk() {
+    public CodeListManifestPath codeListReplacementCodeListManifestIdFk() {
         if (_codeListReplacementCodeListManifestIdFk == null)
-            _codeListReplacementCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK);
+            _codeListReplacementCodeListManifestIdFk = new CodeListManifestPath(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListReplacementCodeListManifestIdFk;
     }
+
+    private transient CodeListManifestPath _codeListManifestPrevCodeListManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table, via the
      * <code>code_list_manifest_prev_code_list_manifest_id_fk</code> key.
      */
-    public CodeListManifest codeListManifestPrevCodeListManifestIdFk() {
+    public CodeListManifestPath codeListManifestPrevCodeListManifestIdFk() {
         if (_codeListManifestPrevCodeListManifestIdFk == null)
-            _codeListManifestPrevCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK);
+            _codeListManifestPrevCodeListManifestIdFk = new CodeListManifestPath(this, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifestPrevCodeListManifestIdFk;
     }
+
+    private transient CodeListManifestPath _codeListManifestNextCodeListManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_manifest</code>
      * table, via the
      * <code>code_list_manifest_next_code_list_manifest_id_fk</code> key.
      */
-    public CodeListManifest codeListManifestNextCodeListManifestIdFk() {
+    public CodeListManifestPath codeListManifestNextCodeListManifestIdFk() {
         if (_codeListManifestNextCodeListManifestIdFk == null)
-            _codeListManifestNextCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK);
+            _codeListManifestNextCodeListManifestIdFk = new CodeListManifestPath(this, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifestNextCodeListManifestIdFk;
+    }
+
+    private transient BbiePath _bbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table
+     */
+    public BbiePath bbie() {
+        if (_bbie == null)
+            _bbie = new BbiePath(this, null, Keys.BBIE_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _bbie;
+    }
+
+    private transient BbieScPath _bbieSc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code> table
+     */
+    public BbieScPath bbieSc() {
+        if (_bbieSc == null)
+            _bbieSc = new BbieScPath(this, null, Keys.BBIE_SC_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _bbieSc;
+    }
+
+    private transient BdtPriRestriPath _bdtPriRestri;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bdt_pri_restri</code> table
+     */
+    public BdtPriRestriPath bdtPriRestri() {
+        if (_bdtPriRestri == null)
+            _bdtPriRestri = new BdtPriRestriPath(this, null, Keys.BDT_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _bdtPriRestri;
+    }
+
+    private transient BdtScPriRestriPath _bdtScPriRestri;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bdt_sc_pri_restri</code> table
+     */
+    public BdtScPriRestriPath bdtScPriRestri() {
+        if (_bdtScPriRestri == null)
+            _bdtScPriRestri = new BdtScPriRestriPath(this, null, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _bdtScPriRestri;
+    }
+
+    private transient CodeListValueManifestPath _codeListValueManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_value_manifest</code> table
+     */
+    public CodeListValueManifestPath codeListValueManifest() {
+        if (_codeListValueManifest == null)
+            _codeListValueManifest = new CodeListValueManifestPath(this, null, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _codeListValueManifest;
+    }
+
+    private transient ModuleCodeListManifestPath _moduleCodeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_code_list_manifest</code> table
+     */
+    public ModuleCodeListManifestPath moduleCodeListManifest() {
+        if (_moduleCodeListManifest == null)
+            _moduleCodeListManifest = new ModuleCodeListManifestPath(this, null, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK.getInverseKey());
+
+        return _moduleCodeListManifest;
     }
 
     @Override
@@ -300,27 +427,87 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
         return new CodeListManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row10 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row10<ULong, ULong, ULong, ULong, ULong, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public CodeListManifest where(Condition condition) {
+        return new CodeListManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CodeListManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CodeListManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CodeListManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CodeListManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CodeListManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CodeListManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CodeListManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CodeListManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CodeListManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

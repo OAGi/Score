@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsbieBizterm.AsbieBiztermPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BusinessTerm.BusinessTermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsccBiztermRecord;
 
 
@@ -99,11 +106,11 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     public final TableField<AsccBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the ascc_bizterm was last updated.");
 
     private AsccBizterm(Name alias, Table<AsccBiztermRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AsccBizterm(Name alias, Table<AsccBiztermRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The ascc_bizterm table stores information about the aggregation between the business term and ASCC. TODO: Placeholder, definition is missing."), TableOptions.table());
+    private AsccBizterm(Name alias, Table<AsccBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The ascc_bizterm table stores information about the aggregation between the business term and ASCC. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -127,8 +134,37 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
         this(DSL.name("ascc_bizterm"), null);
     }
 
-    public <O extends Record> AsccBizterm(Table<O> child, ForeignKey<O, AsccBiztermRecord> key) {
-        super(child, key, ASCC_BIZTERM);
+    public <O extends Record> AsccBizterm(Table<O> path, ForeignKey<O, AsccBiztermRecord> childPath, InverseForeignKey<O, AsccBiztermRecord> parentPath) {
+        super(path, childPath, parentPath, ASCC_BIZTERM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsccBiztermPath extends AsccBizterm implements Path<AsccBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AsccBiztermPath(Table<O> path, ForeignKey<O, AsccBiztermRecord> childPath, InverseForeignKey<O, AsccBiztermRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsccBiztermPath(Name alias, Table<AsccBiztermRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsccBiztermPath as(String alias) {
+            return new AsccBiztermPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsccBiztermPath as(Name alias) {
+            return new AsccBiztermPath(alias, this);
+        }
+
+        @Override
+        public AsccBiztermPath as(Table<?> alias) {
+            return new AsccBiztermPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -151,27 +187,41 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
         return Arrays.asList(Keys.ASCC_BIZTERM_BUSINESS_TERM_FK, Keys.ASCC_BIZTERM_ASCC_FK);
     }
 
-    private transient BusinessTerm _businessTerm;
-    private transient Ascc _ascc;
+    private transient BusinessTermPath _businessTerm;
 
     /**
      * Get the implicit join path to the <code>oagi.business_term</code> table.
      */
-    public BusinessTerm businessTerm() {
+    public BusinessTermPath businessTerm() {
         if (_businessTerm == null)
-            _businessTerm = new BusinessTerm(this, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK);
+            _businessTerm = new BusinessTermPath(this, Keys.ASCC_BIZTERM_BUSINESS_TERM_FK, null);
 
         return _businessTerm;
     }
 
+    private transient AsccPath _ascc;
+
     /**
      * Get the implicit join path to the <code>oagi.ascc</code> table.
      */
-    public Ascc ascc() {
+    public AsccPath ascc() {
         if (_ascc == null)
-            _ascc = new Ascc(this, Keys.ASCC_BIZTERM_ASCC_FK);
+            _ascc = new AsccPath(this, Keys.ASCC_BIZTERM_ASCC_FK, null);
 
         return _ascc;
+    }
+
+    private transient AsbieBiztermPath _asbieBizterm;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie_bizterm</code>
+     * table
+     */
+    public AsbieBiztermPath asbieBizterm() {
+        if (_asbieBizterm == null)
+            _asbieBizterm = new AsbieBiztermPath(this, null, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK.getInverseKey());
+
+        return _asbieBizterm;
     }
 
     @Override
@@ -213,27 +263,87 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
         return new AsccBizterm(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row7 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public AsccBizterm where(Condition condition) {
+        return new AsccBizterm(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AsccBizterm where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AsccBizterm where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccBizterm where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccBizterm where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccBizterm where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccBizterm where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsccBizterm where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccBizterm whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsccBizterm whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

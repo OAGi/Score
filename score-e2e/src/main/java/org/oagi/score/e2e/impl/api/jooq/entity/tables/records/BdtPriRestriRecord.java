@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record6;
-import org.jooq.Row6;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
@@ -23,7 +20,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
  * column among the three can have a value in a particular record.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> implements Record6<ULong, ULong, ULong, ULong, ULong, Byte> {
+public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -144,157 +141,6 @@ public class BdtPriRestriRecord extends UpdatableRecordImpl<BdtPriRestriRecord> 
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row6<ULong, ULong, ULong, ULong, ULong, Byte> fieldsRow() {
-        return (Row6) super.fieldsRow();
-    }
-
-    @Override
-    public Row6<ULong, ULong, ULong, ULong, ULong, Byte> valuesRow() {
-        return (Row6) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return BdtPriRestri.BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return BdtPriRestri.BDT_PRI_RESTRI.BDT_MANIFEST_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return BdtPriRestri.BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID;
-    }
-
-    @Override
-    public Field<ULong> field4() {
-        return BdtPriRestri.BDT_PRI_RESTRI.CODE_LIST_MANIFEST_ID;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return BdtPriRestri.BDT_PRI_RESTRI.AGENCY_ID_LIST_MANIFEST_ID;
-    }
-
-    @Override
-    public Field<Byte> field6() {
-        return BdtPriRestri.BDT_PRI_RESTRI.IS_DEFAULT;
-    }
-
-    @Override
-    public ULong component1() {
-        return getBdtPriRestriId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getBdtManifestId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getCdtAwdPriXpsTypeMapId();
-    }
-
-    @Override
-    public ULong component4() {
-        return getCodeListManifestId();
-    }
-
-    @Override
-    public ULong component5() {
-        return getAgencyIdListManifestId();
-    }
-
-    @Override
-    public Byte component6() {
-        return getIsDefault();
-    }
-
-    @Override
-    public ULong value1() {
-        return getBdtPriRestriId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getBdtManifestId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getCdtAwdPriXpsTypeMapId();
-    }
-
-    @Override
-    public ULong value4() {
-        return getCodeListManifestId();
-    }
-
-    @Override
-    public ULong value5() {
-        return getAgencyIdListManifestId();
-    }
-
-    @Override
-    public Byte value6() {
-        return getIsDefault();
-    }
-
-    @Override
-    public BdtPriRestriRecord value1(ULong value) {
-        setBdtPriRestriId(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord value2(ULong value) {
-        setBdtManifestId(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord value3(ULong value) {
-        setCdtAwdPriXpsTypeMapId(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord value4(ULong value) {
-        setCodeListManifestId(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord value5(ULong value) {
-        setAgencyIdListManifestId(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord value6(Byte value) {
-        setIsDefault(value);
-        return this;
-    }
-
-    @Override
-    public BdtPriRestriRecord values(ULong value1, ULong value2, ULong value3, ULong value4, ULong value5, Byte value6) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        return this;
     }
 
     // -------------------------------------------------------------------------

@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function17;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row17;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,11 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPriXpsTypeMap.CdtAwdPriXpsTypeMapPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPriXpsTypeMap.CdtScAwdPriXpsTypeMapPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt.XbtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.XbtRecord;
 
 
@@ -149,11 +158,11 @@ public class Xbt extends TableImpl<XbtRecord> {
     public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     private Xbt(Name alias, Table<XbtRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Xbt(Name alias, Table<XbtRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas."), TableOptions.table());
+    private Xbt(Name alias, Table<XbtRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas."), TableOptions.table(), where);
     }
 
     /**
@@ -177,8 +186,37 @@ public class Xbt extends TableImpl<XbtRecord> {
         this(DSL.name("xbt"), null);
     }
 
-    public <O extends Record> Xbt(Table<O> child, ForeignKey<O, XbtRecord> key) {
-        super(child, key, XBT);
+    public <O extends Record> Xbt(Table<O> path, ForeignKey<O, XbtRecord> childPath, InverseForeignKey<O, XbtRecord> parentPath) {
+        super(path, childPath, parentPath, XBT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class XbtPath extends Xbt implements Path<XbtRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> XbtPath(Table<O> path, ForeignKey<O, XbtRecord> childPath, InverseForeignKey<O, XbtRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private XbtPath(Name alias, Table<XbtRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public XbtPath as(String alias) {
+            return new XbtPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public XbtPath as(Name alias) {
+            return new XbtPath(alias, this);
+        }
+
+        @Override
+        public XbtPath as(Table<?> alias) {
+            return new XbtPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -206,52 +244,94 @@ public class Xbt extends TableImpl<XbtRecord> {
         return Arrays.asList(Keys.XBT_SUBTYPE_OF_XBT_ID_FK, Keys.XBT_CREATED_BY_FK, Keys.XBT_OWNER_USER_ID_FK, Keys.XBT_LAST_UPDATED_BY_FK);
     }
 
-    private transient Xbt _xbt;
-    private transient AppUser _xbtCreatedByFk;
-    private transient AppUser _xbtOwnerUserIdFk;
-    private transient AppUser _xbtLastUpdatedByFk;
+    private transient XbtPath _xbt;
 
     /**
      * Get the implicit join path to the <code>oagi.xbt</code> table.
      */
-    public Xbt xbt() {
+    public XbtPath xbt() {
         if (_xbt == null)
-            _xbt = new Xbt(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK);
+            _xbt = new XbtPath(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK, null);
 
         return _xbt;
     }
+
+    private transient AppUserPath _xbtCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>xbt_created_by_fk</code> key.
      */
-    public AppUser xbtCreatedByFk() {
+    public AppUserPath xbtCreatedByFk() {
         if (_xbtCreatedByFk == null)
-            _xbtCreatedByFk = new AppUser(this, Keys.XBT_CREATED_BY_FK);
+            _xbtCreatedByFk = new AppUserPath(this, Keys.XBT_CREATED_BY_FK, null);
 
         return _xbtCreatedByFk;
     }
+
+    private transient AppUserPath _xbtOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>xbt_owner_user_id_fk</code> key.
      */
-    public AppUser xbtOwnerUserIdFk() {
+    public AppUserPath xbtOwnerUserIdFk() {
         if (_xbtOwnerUserIdFk == null)
-            _xbtOwnerUserIdFk = new AppUser(this, Keys.XBT_OWNER_USER_ID_FK);
+            _xbtOwnerUserIdFk = new AppUserPath(this, Keys.XBT_OWNER_USER_ID_FK, null);
 
         return _xbtOwnerUserIdFk;
     }
+
+    private transient AppUserPath _xbtLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>xbt_last_updated_by_fk</code> key.
      */
-    public AppUser xbtLastUpdatedByFk() {
+    public AppUserPath xbtLastUpdatedByFk() {
         if (_xbtLastUpdatedByFk == null)
-            _xbtLastUpdatedByFk = new AppUser(this, Keys.XBT_LAST_UPDATED_BY_FK);
+            _xbtLastUpdatedByFk = new AppUserPath(this, Keys.XBT_LAST_UPDATED_BY_FK, null);
 
         return _xbtLastUpdatedByFk;
+    }
+
+    private transient CdtAwdPriXpsTypeMapPath _cdtAwdPriXpsTypeMap;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.cdt_awd_pri_xps_type_map</code> table
+     */
+    public CdtAwdPriXpsTypeMapPath cdtAwdPriXpsTypeMap() {
+        if (_cdtAwdPriXpsTypeMap == null)
+            _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMapPath(this, null, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK.getInverseKey());
+
+        return _cdtAwdPriXpsTypeMap;
+    }
+
+    private transient CdtScAwdPriXpsTypeMapPath _cdtScAwdPriXpsTypeMap;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.cdt_sc_awd_pri_xps_type_map</code> table
+     */
+    public CdtScAwdPriXpsTypeMapPath cdtScAwdPriXpsTypeMap() {
+        if (_cdtScAwdPriXpsTypeMap == null)
+            _cdtScAwdPriXpsTypeMap = new CdtScAwdPriXpsTypeMapPath(this, null, Keys.CDT_SC_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK.getInverseKey());
+
+        return _cdtScAwdPriXpsTypeMap;
+    }
+
+    private transient XbtManifestPath _xbtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
+     * table
+     */
+    public XbtManifestPath xbtManifest() {
+        if (_xbtManifest == null)
+            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_XBT_ID_FK.getInverseKey());
+
+        return _xbtManifest;
     }
 
     @Override
@@ -293,27 +373,87 @@ public class Xbt extends TableImpl<XbtRecord> {
         return new Xbt(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row17 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row17<ULong, String, String, String, String, String, String, ULong, String, String, Integer, ULong, ULong, ULong, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Xbt where(Condition condition) {
+        return new Xbt(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Xbt where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function17<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super String, ? super Integer, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Xbt where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Xbt where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Xbt where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Xbt where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Xbt where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Xbt where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Xbt whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Xbt whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

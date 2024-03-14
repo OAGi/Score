@@ -6,10 +6,7 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record13;
-import org.jooq.Row13;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
@@ -21,7 +18,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
  * be retrieved all at once speeding up the profile BOD transactions.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> {
+public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -196,12 +193,60 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     }
 
     /**
+     * Setter for <code>oagi.top_level_asbiep.is_deprecated</code>. Indicates
+     * whether the TOP_LEVEL_ASBIEP is deprecated.
+     */
+    public void setIsDeprecated(Byte value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.is_deprecated</code>. Indicates
+     * whether the TOP_LEVEL_ASBIEP is deprecated.
+     */
+    public Byte getIsDeprecated() {
+        return (Byte) get(10);
+    }
+
+    /**
+     * Setter for <code>oagi.top_level_asbiep.deprecated_reason</code>. The
+     * reason for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public void setDeprecatedReason(String value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.deprecated_reason</code>. The
+     * reason for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public String getDeprecatedReason() {
+        return (String) get(11);
+    }
+
+    /**
+     * Setter for <code>oagi.top_level_asbiep.deprecated_remark</code>. The
+     * remark for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public void setDeprecatedRemark(String value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oagi.top_level_asbiep.deprecated_remark</code>. The
+     * remark for the deprecation of the TOP_LEVEL_ASBIEP.
+     */
+    public String getDeprecatedRemark() {
+        return (String) get(12);
+    }
+
+    /**
      * Setter for <code>oagi.top_level_asbiep.source_top_level_asbiep_id</code>.
      * A foreign key referring to the source TOP_LEVEL_ASBIEP_ID which has
      * linked to this record.
      */
     public void setSourceTopLevelAsbiepId(ULong value) {
-        set(10, value);
+        set(13, value);
     }
 
     /**
@@ -210,7 +255,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * linked to this record.
      */
     public ULong getSourceTopLevelAsbiepId() {
-        return (ULong) get(10);
+        return (ULong) get(13);
     }
 
     /**
@@ -219,7 +264,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * 'Uplift'.)
      */
     public void setSourceAction(String value) {
-        set(11, value);
+        set(14, value);
     }
 
     /**
@@ -228,7 +273,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * 'Uplift'.)
      */
     public String getSourceAction() {
-        return (String) get(11);
+        return (String) get(14);
     }
 
     /**
@@ -236,7 +281,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * timestamp when a source reference had been made.
      */
     public void setSourceTimestamp(LocalDateTime value) {
-        set(12, value);
+        set(15, value);
     }
 
     /**
@@ -244,7 +289,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * timestamp when a source reference had been made.
      */
     public LocalDateTime getSourceTimestamp() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(15);
     }
 
     // -------------------------------------------------------------------------
@@ -254,311 +299,6 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record13 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
-    }
-
-    @Override
-    public Row13<ULong, ULong, ULong, LocalDateTime, ULong, ULong, String, String, String, Byte, ULong, String, LocalDateTime> valuesRow() {
-        return (Row13) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID;
-    }
-
-    @Override
-    public Field<ULong> field2() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.ASBIEP_ID;
-    }
-
-    @Override
-    public Field<ULong> field3() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.OWNER_USER_ID;
-    }
-
-    @Override
-    public Field<LocalDateTime> field4() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP;
-    }
-
-    @Override
-    public Field<ULong> field5() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.LAST_UPDATED_BY;
-    }
-
-    @Override
-    public Field<ULong> field6() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.RELEASE_ID;
-    }
-
-    @Override
-    public Field<String> field7() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.VERSION;
-    }
-
-    @Override
-    public Field<String> field8() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.STATUS;
-    }
-
-    @Override
-    public Field<String> field9() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.STATE;
-    }
-
-    @Override
-    public Field<Byte> field10() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.INVERSE_MODE;
-    }
-
-    @Override
-    public Field<ULong> field11() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID;
-    }
-
-    @Override
-    public Field<String> field12() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_ACTION;
-    }
-
-    @Override
-    public Field<LocalDateTime> field13() {
-        return TopLevelAsbiep.TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP;
-    }
-
-    @Override
-    public ULong component1() {
-        return getTopLevelAsbiepId();
-    }
-
-    @Override
-    public ULong component2() {
-        return getAsbiepId();
-    }
-
-    @Override
-    public ULong component3() {
-        return getOwnerUserId();
-    }
-
-    @Override
-    public LocalDateTime component4() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public ULong component5() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public ULong component6() {
-        return getReleaseId();
-    }
-
-    @Override
-    public String component7() {
-        return getVersion();
-    }
-
-    @Override
-    public String component8() {
-        return getStatus();
-    }
-
-    @Override
-    public String component9() {
-        return getState();
-    }
-
-    @Override
-    public Byte component10() {
-        return getInverseMode();
-    }
-
-    @Override
-    public ULong component11() {
-        return getSourceTopLevelAsbiepId();
-    }
-
-    @Override
-    public String component12() {
-        return getSourceAction();
-    }
-
-    @Override
-    public LocalDateTime component13() {
-        return getSourceTimestamp();
-    }
-
-    @Override
-    public ULong value1() {
-        return getTopLevelAsbiepId();
-    }
-
-    @Override
-    public ULong value2() {
-        return getAsbiepId();
-    }
-
-    @Override
-    public ULong value3() {
-        return getOwnerUserId();
-    }
-
-    @Override
-    public LocalDateTime value4() {
-        return getLastUpdateTimestamp();
-    }
-
-    @Override
-    public ULong value5() {
-        return getLastUpdatedBy();
-    }
-
-    @Override
-    public ULong value6() {
-        return getReleaseId();
-    }
-
-    @Override
-    public String value7() {
-        return getVersion();
-    }
-
-    @Override
-    public String value8() {
-        return getStatus();
-    }
-
-    @Override
-    public String value9() {
-        return getState();
-    }
-
-    @Override
-    public Byte value10() {
-        return getInverseMode();
-    }
-
-    @Override
-    public ULong value11() {
-        return getSourceTopLevelAsbiepId();
-    }
-
-    @Override
-    public String value12() {
-        return getSourceAction();
-    }
-
-    @Override
-    public LocalDateTime value13() {
-        return getSourceTimestamp();
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value1(ULong value) {
-        setTopLevelAsbiepId(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value2(ULong value) {
-        setAsbiepId(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value3(ULong value) {
-        setOwnerUserId(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value4(LocalDateTime value) {
-        setLastUpdateTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value5(ULong value) {
-        setLastUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value6(ULong value) {
-        setReleaseId(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value7(String value) {
-        setVersion(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value8(String value) {
-        setStatus(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value9(String value) {
-        setState(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value10(Byte value) {
-        setInverseMode(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value11(ULong value) {
-        setSourceTopLevelAsbiepId(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value12(String value) {
-        setSourceAction(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord value13(LocalDateTime value) {
-        setSourceTimestamp(value);
-        return this;
-    }
-
-    @Override
-    public TopLevelAsbiepRecord values(ULong value1, ULong value2, ULong value3, LocalDateTime value4, ULong value5, ULong value6, String value7, String value8, String value9, Byte value10, ULong value11, String value12, LocalDateTime value13) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        value8(value8);
-        value9(value9);
-        value10(value10);
-        value11(value11);
-        value12(value12);
-        value13(value13);
-        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -575,7 +315,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
     /**
      * Create a detached, initialised TopLevelAsbiepRecord
      */
-    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state, Byte inverseMode, ULong sourceTopLevelAsbiepId, String sourceAction, LocalDateTime sourceTimestamp) {
+    public TopLevelAsbiepRecord(ULong topLevelAsbiepId, ULong asbiepId, ULong ownerUserId, LocalDateTime lastUpdateTimestamp, ULong lastUpdatedBy, ULong releaseId, String version, String status, String state, Byte inverseMode, Byte isDeprecated, String deprecatedReason, String deprecatedRemark, ULong sourceTopLevelAsbiepId, String sourceAction, LocalDateTime sourceTimestamp) {
         super(TopLevelAsbiep.TOP_LEVEL_ASBIEP);
 
         setTopLevelAsbiepId(topLevelAsbiepId);
@@ -588,6 +328,9 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
         setStatus(status);
         setState(state);
         setInverseMode(inverseMode);
+        setIsDeprecated(isDeprecated);
+        setDeprecatedReason(deprecatedReason);
+        setDeprecatedRemark(deprecatedRemark);
         setSourceTopLevelAsbiepId(sourceTopLevelAsbiepId);
         setSourceAction(sourceAction);
         setSourceTimestamp(sourceTimestamp);

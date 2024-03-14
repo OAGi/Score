@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,13 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResource.OasResourcePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResourceTag.OasResourceTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponse.OasResponsePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag.OasTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasOperationRecord;
 
 
@@ -126,11 +137,11 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
     public final TableField<OasOperationRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasOperation(Name alias, Table<OasOperationRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasOperation(Name alias, Table<OasOperationRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasOperation(Name alias, Table<OasOperationRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -154,8 +165,37 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
         this(DSL.name("oas_operation"), null);
     }
 
-    public <O extends Record> OasOperation(Table<O> child, ForeignKey<O, OasOperationRecord> key) {
-        super(child, key, OAS_OPERATION);
+    public <O extends Record> OasOperation(Table<O> path, ForeignKey<O, OasOperationRecord> childPath, InverseForeignKey<O, OasOperationRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_OPERATION);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasOperationPath extends OasOperation implements Path<OasOperationRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> OasOperationPath(Table<O> path, ForeignKey<O, OasOperationRecord> childPath, InverseForeignKey<O, OasOperationRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasOperationPath(Name alias, Table<OasOperationRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasOperationPath as(String alias) {
+            return new OasOperationPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasOperationPath as(Name alias) {
+            return new OasOperationPath(alias, this);
+        }
+
+        @Override
+        public OasOperationPath as(Table<?> alias) {
+            return new OasOperationPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -178,40 +218,102 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
         return Arrays.asList(Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK, Keys.OAS_OPERATION_CREATED_BY_FK, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK);
     }
 
-    private transient OasResource _oasResource;
-    private transient AppUser _oasOperationCreatedByFk;
-    private transient AppUser _oasOperationLastUpdatedByFk;
+    private transient OasResourcePath _oasResource;
 
     /**
      * Get the implicit join path to the <code>oagi.oas_resource</code> table.
      */
-    public OasResource oasResource() {
+    public OasResourcePath oasResource() {
         if (_oasResource == null)
-            _oasResource = new OasResource(this, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK);
+            _oasResource = new OasResourcePath(this, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK, null);
 
         return _oasResource;
     }
+
+    private transient AppUserPath _oasOperationCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_operation_created_by_fk</code> key.
      */
-    public AppUser oasOperationCreatedByFk() {
+    public AppUserPath oasOperationCreatedByFk() {
         if (_oasOperationCreatedByFk == null)
-            _oasOperationCreatedByFk = new AppUser(this, Keys.OAS_OPERATION_CREATED_BY_FK);
+            _oasOperationCreatedByFk = new AppUserPath(this, Keys.OAS_OPERATION_CREATED_BY_FK, null);
 
         return _oasOperationCreatedByFk;
     }
+
+    private transient AppUserPath _oasOperationLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_operation_last_updated_by_fk</code> key.
      */
-    public AppUser oasOperationLastUpdatedByFk() {
+    public AppUserPath oasOperationLastUpdatedByFk() {
         if (_oasOperationLastUpdatedByFk == null)
-            _oasOperationLastUpdatedByFk = new AppUser(this, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK);
+            _oasOperationLastUpdatedByFk = new AppUserPath(this, Keys.OAS_OPERATION_LAST_UPDATED_BY_FK, null);
 
         return _oasOperationLastUpdatedByFk;
+    }
+
+    private transient OasParameterLinkPath _oasParameterLink;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_parameter_link</code> table
+     */
+    public OasParameterLinkPath oasParameterLink() {
+        if (_oasParameterLink == null)
+            _oasParameterLink = new OasParameterLinkPath(this, null, Keys.OAS_PARAMETER_LINK_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasParameterLink;
+    }
+
+    private transient OasRequestPath _oasRequest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
+     * table
+     */
+    public OasRequestPath oasRequest() {
+        if (_oasRequest == null)
+            _oasRequest = new OasRequestPath(this, null, Keys.OAS_REQUEST_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasRequest;
+    }
+
+    private transient OasResourceTagPath _oasResourceTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oas_resource_tag</code> table
+     */
+    public OasResourceTagPath oasResourceTag() {
+        if (_oasResourceTag == null)
+            _oasResourceTag = new OasResourceTagPath(this, null, Keys.OAS_RESOURCE_TAG_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasResourceTag;
+    }
+
+    private transient OasResponsePath _oasResponse;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * table
+     */
+    public OasResponsePath oasResponse() {
+        if (_oasResponse == null)
+            _oasResponse = new OasResponsePath(this, null, Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasResponse;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.oas_tag</code>
+     * table
+     */
+    public OasTagPath oasTag() {
+        return oasResourceTag().oasTag();
     }
 
     @Override
@@ -253,27 +355,87 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
         return new OasOperation(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, ULong, String, String, String, String, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public OasOperation where(Condition condition) {
+        return new OasOperation(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasOperation where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super ULong, ? super String, ? super String, ? super String, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasOperation where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasOperation where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasOperation where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasOperation where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasOperation where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasOperation where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasOperation whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasOperation whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

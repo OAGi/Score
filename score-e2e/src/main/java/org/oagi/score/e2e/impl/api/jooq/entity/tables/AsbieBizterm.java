@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm.AsccBiztermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsbieBiztermRecord;
 
 
@@ -111,11 +117,11 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     public final TableField<AsbieBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the asbie_bizterm was last updated.");
 
     private AsbieBizterm(Name alias, Table<AsbieBiztermRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AsbieBizterm(Name alias, Table<AsbieBiztermRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The asbie_bizterm table stores information about the aggregation between the ascc_bizterm and ASBIE. TODO: Placeholder, definition is missing."), TableOptions.table());
+    private AsbieBizterm(Name alias, Table<AsbieBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The asbie_bizterm table stores information about the aggregation between the ascc_bizterm and ASBIE. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -139,8 +145,37 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
         this(DSL.name("asbie_bizterm"), null);
     }
 
-    public <O extends Record> AsbieBizterm(Table<O> child, ForeignKey<O, AsbieBiztermRecord> key) {
-        super(child, key, ASBIE_BIZTERM);
+    public <O extends Record> AsbieBizterm(Table<O> path, ForeignKey<O, AsbieBiztermRecord> childPath, InverseForeignKey<O, AsbieBiztermRecord> parentPath) {
+        super(path, childPath, parentPath, ASBIE_BIZTERM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsbieBiztermPath extends AsbieBizterm implements Path<AsbieBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AsbieBiztermPath(Table<O> path, ForeignKey<O, AsbieBiztermRecord> childPath, InverseForeignKey<O, AsbieBiztermRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsbieBiztermPath(Name alias, Table<AsbieBiztermRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsbieBiztermPath as(String alias) {
+            return new AsbieBiztermPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsbieBiztermPath as(Name alias) {
+            return new AsbieBiztermPath(alias, this);
+        }
+
+        @Override
+        public AsbieBiztermPath as(Table<?> alias) {
+            return new AsbieBiztermPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -163,25 +198,26 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
         return Arrays.asList(Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK, Keys.ASBIE_BIZTERM_ASBIE_FK);
     }
 
-    private transient AsccBizterm _asccBizterm;
-    private transient Asbie _asbie;
+    private transient AsccBiztermPath _asccBizterm;
 
     /**
      * Get the implicit join path to the <code>oagi.ascc_bizterm</code> table.
      */
-    public AsccBizterm asccBizterm() {
+    public AsccBiztermPath asccBizterm() {
         if (_asccBizterm == null)
-            _asccBizterm = new AsccBizterm(this, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK);
+            _asccBizterm = new AsccBiztermPath(this, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK, null);
 
         return _asccBizterm;
     }
 
+    private transient AsbiePath _asbie;
+
     /**
      * Get the implicit join path to the <code>oagi.asbie</code> table.
      */
-    public Asbie asbie() {
+    public AsbiePath asbie() {
         if (_asbie == null)
-            _asbie = new Asbie(this, Keys.ASBIE_BIZTERM_ASBIE_FK);
+            _asbie = new AsbiePath(this, Keys.ASBIE_BIZTERM_ASBIE_FK, null);
 
         return _asbie;
     }
@@ -225,27 +261,87 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
         return new AsbieBizterm(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, ULong, ULong, Byte, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public AsbieBizterm where(Condition condition) {
+        return new AsbieBizterm(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AsbieBizterm where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AsbieBizterm where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsbieBizterm where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsbieBizterm where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsbieBizterm where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsbieBizterm where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AsbieBizterm where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsbieBizterm whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AsbieBizterm whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

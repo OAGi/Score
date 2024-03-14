@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtAwdPri.CdtAwdPriPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScAwdPri.CdtScAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CdtPriRecord;
 
 
@@ -65,11 +71,11 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     public final TableField<CdtPriRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).nullable(false), this, "Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.");
 
     private CdtPri(Name alias, Table<CdtPriRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CdtPri(Name alias, Table<CdtPriRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores the CDT primitives."), TableOptions.table());
+    private CdtPri(Name alias, Table<CdtPriRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table stores the CDT primitives."), TableOptions.table(), where);
     }
 
     /**
@@ -93,8 +99,37 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
         this(DSL.name("cdt_pri"), null);
     }
 
-    public <O extends Record> CdtPri(Table<O> child, ForeignKey<O, CdtPriRecord> key) {
-        super(child, key, CDT_PRI);
+    public <O extends Record> CdtPri(Table<O> path, ForeignKey<O, CdtPriRecord> childPath, InverseForeignKey<O, CdtPriRecord> parentPath) {
+        super(path, childPath, parentPath, CDT_PRI);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CdtPriPath extends CdtPri implements Path<CdtPriRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CdtPriPath(Table<O> path, ForeignKey<O, CdtPriRecord> childPath, InverseForeignKey<O, CdtPriRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CdtPriPath(Name alias, Table<CdtPriRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CdtPriPath as(String alias) {
+            return new CdtPriPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CdtPriPath as(Name alias) {
+            return new CdtPriPath(alias, this);
+        }
+
+        @Override
+        public CdtPriPath as(Table<?> alias) {
+            return new CdtPriPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -115,6 +150,32 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     @Override
     public List<UniqueKey<CdtPriRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.KEY_CDT_PRI_CDT_PRI_UK1);
+    }
+
+    private transient CdtAwdPriPath _cdtAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.cdt_awd_pri</code>
+     * table
+     */
+    public CdtAwdPriPath cdtAwdPri() {
+        if (_cdtAwdPri == null)
+            _cdtAwdPri = new CdtAwdPriPath(this, null, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
+
+        return _cdtAwdPri;
+    }
+
+    private transient CdtScAwdPriPath _cdtScAwdPri;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.cdt_sc_awd_pri</code> table
+     */
+    public CdtScAwdPriPath cdtScAwdPri() {
+        if (_cdtScAwdPri == null)
+            _cdtScAwdPri = new CdtScAwdPriPath(this, null, Keys.CDT_SC_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
+
+        return _cdtScAwdPri;
     }
 
     @Override
@@ -156,27 +217,87 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
         return new CdtPri(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row2 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row2<ULong, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public CdtPri where(Condition condition) {
+        return new CdtPri(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CdtPri where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CdtPri where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtPri where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtPri where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtPri where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtPri where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CdtPri where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtPri whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CdtPri whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

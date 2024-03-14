@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm.BbieBiztermPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BusinessTerm.BusinessTermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BccBiztermRecord;
 
 
@@ -99,11 +106,11 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     public final TableField<BccBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the bcc_bizterm was last updated.");
 
     private BccBizterm(Name alias, Table<BccBiztermRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BccBizterm(Name alias, Table<BccBiztermRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The bcc_bizterm table stores information about the aggregation between the business term and BCC. TODO: Placeholder, definition is missing."), TableOptions.table());
+    private BccBizterm(Name alias, Table<BccBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The bcc_bizterm table stores information about the aggregation between the business term and BCC. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -127,8 +134,37 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
         this(DSL.name("bcc_bizterm"), null);
     }
 
-    public <O extends Record> BccBizterm(Table<O> child, ForeignKey<O, BccBiztermRecord> key) {
-        super(child, key, BCC_BIZTERM);
+    public <O extends Record> BccBizterm(Table<O> path, ForeignKey<O, BccBiztermRecord> childPath, InverseForeignKey<O, BccBiztermRecord> parentPath) {
+        super(path, childPath, parentPath, BCC_BIZTERM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BccBiztermPath extends BccBizterm implements Path<BccBiztermRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BccBiztermPath(Table<O> path, ForeignKey<O, BccBiztermRecord> childPath, InverseForeignKey<O, BccBiztermRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BccBiztermPath(Name alias, Table<BccBiztermRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BccBiztermPath as(String alias) {
+            return new BccBiztermPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BccBiztermPath as(Name alias) {
+            return new BccBiztermPath(alias, this);
+        }
+
+        @Override
+        public BccBiztermPath as(Table<?> alias) {
+            return new BccBiztermPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -151,27 +187,41 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
         return Arrays.asList(Keys.BCC_BIZTERM_BUSINESS_TERM_FK, Keys.BCC_BIZTERM_BCC_FK);
     }
 
-    private transient BusinessTerm _businessTerm;
-    private transient Bcc _bcc;
+    private transient BusinessTermPath _businessTerm;
 
     /**
      * Get the implicit join path to the <code>oagi.business_term</code> table.
      */
-    public BusinessTerm businessTerm() {
+    public BusinessTermPath businessTerm() {
         if (_businessTerm == null)
-            _businessTerm = new BusinessTerm(this, Keys.BCC_BIZTERM_BUSINESS_TERM_FK);
+            _businessTerm = new BusinessTermPath(this, Keys.BCC_BIZTERM_BUSINESS_TERM_FK, null);
 
         return _businessTerm;
     }
 
+    private transient BccPath _bcc;
+
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table.
      */
-    public Bcc bcc() {
+    public BccPath bcc() {
         if (_bcc == null)
-            _bcc = new Bcc(this, Keys.BCC_BIZTERM_BCC_FK);
+            _bcc = new BccPath(this, Keys.BCC_BIZTERM_BCC_FK, null);
 
         return _bcc;
+    }
+
+    private transient BbieBiztermPath _bbieBizterm;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie_bizterm</code>
+     * table
+     */
+    public BbieBiztermPath bbieBizterm() {
+        if (_bbieBizterm == null)
+            _bbieBizterm = new BbieBiztermPath(this, null, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK.getInverseKey());
+
+        return _bbieBizterm;
     }
 
     @Override
@@ -213,27 +263,87 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
         return new BccBizterm(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row7 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public BccBizterm where(Condition condition) {
+        return new BccBizterm(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BccBizterm where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BccBizterm where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccBizterm where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccBizterm where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccBizterm where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccBizterm where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccBizterm where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccBizterm whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccBizterm whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

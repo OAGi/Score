@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,8 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Comment.CommentPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CommentRecord;
 
 
@@ -101,11 +107,11 @@ public class Comment extends TableImpl<CommentRecord> {
     public final TableField<CommentRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private Comment(Name alias, Table<CommentRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Comment(Name alias, Table<CommentRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Comment(Name alias, Table<CommentRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -129,8 +135,37 @@ public class Comment extends TableImpl<CommentRecord> {
         this(DSL.name("comment"), null);
     }
 
-    public <O extends Record> Comment(Table<O> child, ForeignKey<O, CommentRecord> key) {
-        super(child, key, COMMENT);
+    public <O extends Record> Comment(Table<O> path, ForeignKey<O, CommentRecord> childPath, InverseForeignKey<O, CommentRecord> parentPath) {
+        super(path, childPath, parentPath, COMMENT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CommentPath extends Comment implements Path<CommentRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CommentPath(Table<O> path, ForeignKey<O, CommentRecord> childPath, InverseForeignKey<O, CommentRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CommentPath(Name alias, Table<CommentRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CommentPath as(String alias) {
+            return new CommentPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CommentPath as(Name alias) {
+            return new CommentPath(alias, this);
+        }
+
+        @Override
+        public CommentPath as(Table<?> alias) {
+            return new CommentPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -158,25 +193,26 @@ public class Comment extends TableImpl<CommentRecord> {
         return Arrays.asList(Keys.COMMENT_PREV_COMMENT_ID_FK, Keys.COMMENT_CREATED_BY_FK);
     }
 
-    private transient Comment _comment;
-    private transient AppUser _appUser;
+    private transient CommentPath _comment;
 
     /**
      * Get the implicit join path to the <code>oagi.comment</code> table.
      */
-    public Comment comment() {
+    public CommentPath comment() {
         if (_comment == null)
-            _comment = new Comment(this, Keys.COMMENT_PREV_COMMENT_ID_FK);
+            _comment = new CommentPath(this, Keys.COMMENT_PREV_COMMENT_ID_FK, null);
 
         return _comment;
     }
 
+    private transient AppUserPath _appUser;
+
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.COMMENT_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.COMMENT_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -220,27 +256,87 @@ public class Comment extends TableImpl<CommentRecord> {
         return new Comment(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, String, String, Byte, Byte, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Comment where(Condition condition) {
+        return new Comment(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super String, ? super String, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Comment where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super String, ? super String, ? super Byte, ? super Byte, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Comment where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Comment where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Comment where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Comment where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Comment where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Comment where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Comment whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Comment whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

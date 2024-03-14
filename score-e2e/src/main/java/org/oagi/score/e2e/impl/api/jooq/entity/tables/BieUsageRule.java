@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,12 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep.AsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule.UsageRulePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUsageRuleRecord;
 
 
@@ -104,11 +114,11 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIEP_ID = createField(DSL.name("target_bbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.");
 
     private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID."), TableOptions.table());
+    private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID."), TableOptions.table(), where);
     }
 
     /**
@@ -132,8 +142,37 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         this(DSL.name("bie_usage_rule"), null);
     }
 
-    public <O extends Record> BieUsageRule(Table<O> child, ForeignKey<O, BieUsageRuleRecord> key) {
-        super(child, key, BIE_USAGE_RULE);
+    public <O extends Record> BieUsageRule(Table<O> path, ForeignKey<O, BieUsageRuleRecord> childPath, InverseForeignKey<O, BieUsageRuleRecord> parentPath) {
+        super(path, childPath, parentPath, BIE_USAGE_RULE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BieUsageRulePath extends BieUsageRule implements Path<BieUsageRuleRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BieUsageRulePath(Table<O> path, ForeignKey<O, BieUsageRuleRecord> childPath, InverseForeignKey<O, BieUsageRuleRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BieUsageRulePath(Name alias, Table<BieUsageRuleRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BieUsageRulePath as(String alias) {
+            return new BieUsageRulePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BieUsageRulePath as(Name alias) {
+            return new BieUsageRulePath(alias, this);
+        }
+
+        @Override
+        public BieUsageRulePath as(Table<?> alias) {
+            return new BieUsageRulePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -156,69 +195,74 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         return Arrays.asList(Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
     }
 
-    private transient UsageRule _usageRule;
-    private transient Abie _abie;
-    private transient Asbie _asbie;
-    private transient Asbiep _asbiep;
-    private transient Bbie _bbie;
-    private transient Bbiep _bbiep;
+    private transient UsageRulePath _usageRule;
 
     /**
      * Get the implicit join path to the <code>oagi.usage_rule</code> table.
      */
-    public UsageRule usageRule() {
+    public UsageRulePath usageRule() {
         if (_usageRule == null)
-            _usageRule = new UsageRule(this, Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK);
+            _usageRule = new UsageRulePath(this, Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, null);
 
         return _usageRule;
     }
 
+    private transient AbiePath _abie;
+
     /**
      * Get the implicit join path to the <code>oagi.abie</code> table.
      */
-    public Abie abie() {
+    public AbiePath abie() {
         if (_abie == null)
-            _abie = new Abie(this, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK);
+            _abie = new AbiePath(this, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK, null);
 
         return _abie;
     }
 
+    private transient AsbiePath _asbie;
+
     /**
      * Get the implicit join path to the <code>oagi.asbie</code> table.
      */
-    public Asbie asbie() {
+    public AsbiePath asbie() {
         if (_asbie == null)
-            _asbie = new Asbie(this, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK);
+            _asbie = new AsbiePath(this, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK, null);
 
         return _asbie;
     }
 
+    private transient AsbiepPath _asbiep;
+
     /**
      * Get the implicit join path to the <code>oagi.asbiep</code> table.
      */
-    public Asbiep asbiep() {
+    public AsbiepPath asbiep() {
         if (_asbiep == null)
-            _asbiep = new Asbiep(this, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK);
+            _asbiep = new AsbiepPath(this, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK, null);
 
         return _asbiep;
     }
 
+    private transient BbiePath _bbie;
+
     /**
      * Get the implicit join path to the <code>oagi.bbie</code> table.
      */
-    public Bbie bbie() {
+    public BbiePath bbie() {
         if (_bbie == null)
-            _bbie = new Bbie(this, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK);
+            _bbie = new BbiePath(this, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK, null);
 
         return _bbie;
     }
 
+    private transient BbiepPath _bbiep;
+
     /**
      * Get the implicit join path to the <code>oagi.bbiep</code> table.
      */
-    public Bbiep bbiep() {
+    public BbiepPath bbiep() {
         if (_bbiep == null)
-            _bbiep = new Bbiep(this, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
+            _bbiep = new BbiepPath(this, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK, null);
 
         return _bbiep;
     }
@@ -262,27 +306,87 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         return new BieUsageRule(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row7 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public BieUsageRule where(Condition condition) {
+        return new BieUsageRule(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BieUsageRule where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BieUsageRule where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUsageRule where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUsageRule where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUsageRule where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUsageRule where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUsageRule where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUsageRule whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUsageRule whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

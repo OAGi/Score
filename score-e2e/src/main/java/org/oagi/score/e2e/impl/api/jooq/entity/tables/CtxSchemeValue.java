@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function5;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row5;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue.BizCtxValuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme.CtxSchemePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxSchemeValueRecord;
 
 
@@ -85,11 +91,11 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
     public final TableField<CtxSchemeValueRecord, ULong> OWNER_CTX_SCHEME_ID = createField(DSL.name("owner_ctx_scheme_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CTX_SCHEME table. It identifies the context scheme, to which this scheme value belongs.");
 
     private CtxSchemeValue(Name alias, Table<CtxSchemeValueRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CtxSchemeValue(Name alias, Table<CtxSchemeValueRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores the context scheme values for a particular context scheme in the CTX_SCHEME table."), TableOptions.table());
+    private CtxSchemeValue(Name alias, Table<CtxSchemeValueRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table stores the context scheme values for a particular context scheme in the CTX_SCHEME table."), TableOptions.table(), where);
     }
 
     /**
@@ -113,8 +119,37 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
         this(DSL.name("ctx_scheme_value"), null);
     }
 
-    public <O extends Record> CtxSchemeValue(Table<O> child, ForeignKey<O, CtxSchemeValueRecord> key) {
-        super(child, key, CTX_SCHEME_VALUE);
+    public <O extends Record> CtxSchemeValue(Table<O> path, ForeignKey<O, CtxSchemeValueRecord> childPath, InverseForeignKey<O, CtxSchemeValueRecord> parentPath) {
+        super(path, childPath, parentPath, CTX_SCHEME_VALUE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CtxSchemeValuePath extends CtxSchemeValue implements Path<CtxSchemeValueRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CtxSchemeValuePath(Table<O> path, ForeignKey<O, CtxSchemeValueRecord> childPath, InverseForeignKey<O, CtxSchemeValueRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CtxSchemeValuePath(Name alias, Table<CtxSchemeValueRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CtxSchemeValuePath as(String alias) {
+            return new CtxSchemeValuePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CtxSchemeValuePath as(Name alias) {
+            return new CtxSchemeValuePath(alias, this);
+        }
+
+        @Override
+        public CtxSchemeValuePath as(Table<?> alias) {
+            return new CtxSchemeValuePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -142,16 +177,29 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
         return Arrays.asList(Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK);
     }
 
-    private transient CtxScheme _ctxScheme;
+    private transient CtxSchemePath _ctxScheme;
 
     /**
      * Get the implicit join path to the <code>oagi.ctx_scheme</code> table.
      */
-    public CtxScheme ctxScheme() {
+    public CtxSchemePath ctxScheme() {
         if (_ctxScheme == null)
-            _ctxScheme = new CtxScheme(this, Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK);
+            _ctxScheme = new CtxSchemePath(this, Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK, null);
 
         return _ctxScheme;
+    }
+
+    private transient BizCtxValuePath _bizCtxValue;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.biz_ctx_value</code>
+     * table
+     */
+    public BizCtxValuePath bizCtxValue() {
+        if (_bizCtxValue == null)
+            _bizCtxValue = new BizCtxValuePath(this, null, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK.getInverseKey());
+
+        return _bizCtxValue;
     }
 
     @Override
@@ -193,27 +241,87 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
         return new CtxSchemeValue(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row5 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row5<ULong, String, String, String, ULong> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public CtxSchemeValue where(Condition condition) {
+        return new CtxSchemeValue(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function5<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CtxSchemeValue where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CtxSchemeValue where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxSchemeValue where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxSchemeValue where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxSchemeValue where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxSchemeValue where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxSchemeValue where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxSchemeValue whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxSchemeValue whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

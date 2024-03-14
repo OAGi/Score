@@ -6,18 +6,22 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasParameter.OasParameterPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasRequestParameterRecord;
 
 
@@ -89,11 +96,11 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
     public final TableField<OasRequestParameterRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasRequestParameter(Name alias, Table<OasRequestParameterRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasRequestParameter(Name alias, Table<OasRequestParameterRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasRequestParameter(Name alias, Table<OasRequestParameterRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -117,8 +124,37 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
         this(DSL.name("oas_request_parameter"), null);
     }
 
-    public <O extends Record> OasRequestParameter(Table<O> child, ForeignKey<O, OasRequestParameterRecord> key) {
-        super(child, key, OAS_REQUEST_PARAMETER);
+    public <O extends Record> OasRequestParameter(Table<O> path, ForeignKey<O, OasRequestParameterRecord> childPath, InverseForeignKey<O, OasRequestParameterRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_REQUEST_PARAMETER);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasRequestParameterPath extends OasRequestParameter implements Path<OasRequestParameterRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> OasRequestParameterPath(Table<O> path, ForeignKey<O, OasRequestParameterRecord> childPath, InverseForeignKey<O, OasRequestParameterRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasRequestParameterPath(Name alias, Table<OasRequestParameterRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasRequestParameterPath as(String alias) {
+            return new OasRequestParameterPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasRequestParameterPath as(Name alias) {
+            return new OasRequestParameterPath(alias, this);
+        }
+
+        @Override
+        public OasRequestParameterPath as(Table<?> alias) {
+            return new OasRequestParameterPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -136,49 +172,52 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
         return Arrays.asList(Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK, Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK);
     }
 
-    private transient OasParameter _oasParameter;
-    private transient OasRequest _oasRequest;
-    private transient AppUser _oasRequestParameterCreatedByFk;
-    private transient AppUser _oasRequestParameterLastUpdatedByFk;
+    private transient OasParameterPath _oasParameter;
 
     /**
      * Get the implicit join path to the <code>oagi.oas_parameter</code> table.
      */
-    public OasParameter oasParameter() {
+    public OasParameterPath oasParameter() {
         if (_oasParameter == null)
-            _oasParameter = new OasParameter(this, Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK);
+            _oasParameter = new OasParameterPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, null);
 
         return _oasParameter;
     }
 
+    private transient OasRequestPath _oasRequest;
+
     /**
      * Get the implicit join path to the <code>oagi.oas_request</code> table.
      */
-    public OasRequest oasRequest() {
+    public OasRequestPath oasRequest() {
         if (_oasRequest == null)
-            _oasRequest = new OasRequest(this, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK);
+            _oasRequest = new OasRequestPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK, null);
 
         return _oasRequest;
     }
+
+    private transient AppUserPath _oasRequestParameterCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_request_parameter_created_by_fk</code> key.
      */
-    public AppUser oasRequestParameterCreatedByFk() {
+    public AppUserPath oasRequestParameterCreatedByFk() {
         if (_oasRequestParameterCreatedByFk == null)
-            _oasRequestParameterCreatedByFk = new AppUser(this, Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK);
+            _oasRequestParameterCreatedByFk = new AppUserPath(this, Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK, null);
 
         return _oasRequestParameterCreatedByFk;
     }
+
+    private transient AppUserPath _oasRequestParameterLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_request_parameter_last_updated_by_fk</code> key.
      */
-    public AppUser oasRequestParameterLastUpdatedByFk() {
+    public AppUserPath oasRequestParameterLastUpdatedByFk() {
         if (_oasRequestParameterLastUpdatedByFk == null)
-            _oasRequestParameterLastUpdatedByFk = new AppUser(this, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK);
+            _oasRequestParameterLastUpdatedByFk = new AppUserPath(this, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK, null);
 
         return _oasRequestParameterLastUpdatedByFk;
     }
@@ -222,27 +261,87 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
         return new OasRequestParameter(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public OasRequestParameter where(Condition condition) {
+        return new OasRequestParameter(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasRequestParameter where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasRequestParameter where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasRequestParameter where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasRequestParameter where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasRequestParameter where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasRequestParameter where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasRequestParameter where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasRequestParameter whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasRequestParameter whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

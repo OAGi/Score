@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function9;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row9;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,15 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifestTag.AccManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifestTag.AsccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TagRecord;
 
 
@@ -105,11 +118,11 @@ public class Tag extends TableImpl<TagRecord> {
     public final TableField<TagRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the tag was last updated.");
 
     private Tag(Name alias, Table<TagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Tag(Name alias, Table<TagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Tag(Name alias, Table<TagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -133,8 +146,37 @@ public class Tag extends TableImpl<TagRecord> {
         this(DSL.name("tag"), null);
     }
 
-    public <O extends Record> Tag(Table<O> child, ForeignKey<O, TagRecord> key) {
-        super(child, key, TAG);
+    public <O extends Record> Tag(Table<O> path, ForeignKey<O, TagRecord> childPath, InverseForeignKey<O, TagRecord> parentPath) {
+        super(path, childPath, parentPath, TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class TagPath extends Tag implements Path<TagRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> TagPath(Table<O> path, ForeignKey<O, TagRecord> childPath, InverseForeignKey<O, TagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private TagPath(Name alias, Table<TagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public TagPath as(String alias) {
+            return new TagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public TagPath as(Name alias) {
+            return new TagPath(alias, this);
+        }
+
+        @Override
+        public TagPath as(Table<?> alias) {
+            return new TagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -157,29 +199,114 @@ public class Tag extends TableImpl<TagRecord> {
         return Arrays.asList(Keys.TAG_CREATED_BY_FK, Keys.TAG_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _tagCreatedByFk;
-    private transient AppUser _tagLastUpdatedByFk;
+    private transient AppUserPath _tagCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>tag_created_by_fk</code> key.
      */
-    public AppUser tagCreatedByFk() {
+    public AppUserPath tagCreatedByFk() {
         if (_tagCreatedByFk == null)
-            _tagCreatedByFk = new AppUser(this, Keys.TAG_CREATED_BY_FK);
+            _tagCreatedByFk = new AppUserPath(this, Keys.TAG_CREATED_BY_FK, null);
 
         return _tagCreatedByFk;
     }
+
+    private transient AppUserPath _tagLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>tag_last_updated_by_fk</code> key.
      */
-    public AppUser tagLastUpdatedByFk() {
+    public AppUserPath tagLastUpdatedByFk() {
         if (_tagLastUpdatedByFk == null)
-            _tagLastUpdatedByFk = new AppUser(this, Keys.TAG_LAST_UPDATED_BY_FK);
+            _tagLastUpdatedByFk = new AppUserPath(this, Keys.TAG_LAST_UPDATED_BY_FK, null);
 
         return _tagLastUpdatedByFk;
+    }
+
+    private transient AccManifestTagPath _accManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.acc_manifest_tag</code> table
+     */
+    public AccManifestTagPath accManifestTag() {
+        if (_accManifestTag == null)
+            _accManifestTag = new AccManifestTagPath(this, null, Keys.ACC_MANIFEST_TAG_TAG_ID_FK.getInverseKey());
+
+        return _accManifestTag;
+    }
+
+    private transient AsccpManifestTagPath _asccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest_tag</code> table
+     */
+    public AsccpManifestTagPath asccpManifestTag() {
+        if (_asccpManifestTag == null)
+            _asccpManifestTag = new AsccpManifestTagPath(this, null, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK.getInverseKey());
+
+        return _asccpManifestTag;
+    }
+
+    private transient BccpManifestTagPath _bccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bccp_manifest_tag</code> table
+     */
+    public BccpManifestTagPath bccpManifestTag() {
+        if (_bccpManifestTag == null)
+            _bccpManifestTag = new BccpManifestTagPath(this, null, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK.getInverseKey());
+
+        return _bccpManifestTag;
+    }
+
+    private transient DtManifestTagPath _dtManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.dt_manifest_tag</code> table
+     */
+    public DtManifestTagPath dtManifestTag() {
+        if (_dtManifestTag == null)
+            _dtManifestTag = new DtManifestTagPath(this, null, Keys.DT_MANIFEST_TAG_TAG_ID_FK.getInverseKey());
+
+        return _dtManifestTag;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.acc_manifest</code> table
+     */
+    public AccManifestPath accManifest() {
+        return accManifestTag().accManifest();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
+     */
+    public AsccpManifestPath asccpManifest() {
+        return asccpManifestTag().asccpManifest();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.bccp_manifest</code> table
+     */
+    public BccpManifestPath bccpManifest() {
+        return bccpManifestTag().bccpManifest();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.dt_manifest</code> table
+     */
+    public DtManifestPath dtManifest() {
+        return dtManifestTag().dtManifest();
     }
 
     @Override
@@ -221,27 +348,87 @@ public class Tag extends TableImpl<TagRecord> {
         return new Tag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row9<ULong, String, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Tag where(Condition condition) {
+        return new Tag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function9<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Tag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Tag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

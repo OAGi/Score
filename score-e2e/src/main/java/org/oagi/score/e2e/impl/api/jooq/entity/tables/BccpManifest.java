@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function10;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row10;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,16 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBccpManifest.ModuleBccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag.TagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BccpManifestRecord;
 
 
@@ -107,11 +121,11 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
     public final TableField<BccpManifestRecord, ULong> NEXT_BCCP_MANIFEST_ID = createField(DSL.name("next_bccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private BccpManifest(Name alias, Table<BccpManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BccpManifest(Name alias, Table<BccpManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private BccpManifest(Name alias, Table<BccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -135,8 +149,37 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         this(DSL.name("bccp_manifest"), null);
     }
 
-    public <O extends Record> BccpManifest(Table<O> child, ForeignKey<O, BccpManifestRecord> key) {
-        super(child, key, BCCP_MANIFEST);
+    public <O extends Record> BccpManifest(Table<O> path, ForeignKey<O, BccpManifestRecord> childPath, InverseForeignKey<O, BccpManifestRecord> parentPath) {
+        super(path, childPath, parentPath, BCCP_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BccpManifestPath extends BccpManifest implements Path<BccpManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BccpManifestPath(Table<O> path, ForeignKey<O, BccpManifestRecord> childPath, InverseForeignKey<O, BccpManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BccpManifestPath(Name alias, Table<BccpManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BccpManifestPath as(String alias) {
+            return new BccpManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BccpManifestPath as(Name alias) {
+            return new BccpManifestPath(alias, this);
+        }
+
+        @Override
+        public BccpManifestPath as(Table<?> alias) {
+            return new BccpManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -159,85 +202,150 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return Arrays.asList(Keys.BCCP_MANIFEST_RELEASE_ID_FK, Keys.BCCP_MANIFEST_BCCP_ID_FK, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_LOG_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
     }
 
-    private transient Release _release;
-    private transient Bccp _bccp;
-    private transient DtManifest _dtManifest;
-    private transient Log _log;
-    private transient BccpManifest _bccpReplacementBccpManifestIdFk;
-    private transient BccpManifest _bccpManifestPrevBccpManifestIdFk;
-    private transient BccpManifest _bccpManifestNextBccpManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
 
+    private transient BccpPath _bccp;
+
     /**
      * Get the implicit join path to the <code>oagi.bccp</code> table.
      */
-    public Bccp bccp() {
+    public BccpPath bccp() {
         if (_bccp == null)
-            _bccp = new Bccp(this, Keys.BCCP_MANIFEST_BCCP_ID_FK);
+            _bccp = new BccpPath(this, Keys.BCCP_MANIFEST_BCCP_ID_FK, null);
 
         return _bccp;
     }
 
+    private transient DtManifestPath _dtManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
      */
-    public DtManifest dtManifest() {
+    public DtManifestPath dtManifest() {
         if (_dtManifest == null)
-            _dtManifest = new DtManifest(this, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK);
+            _dtManifest = new DtManifestPath(this, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK, null);
 
         return _dtManifest;
     }
 
+    private transient LogPath _log;
+
     /**
      * Get the implicit join path to the <code>oagi.log</code> table.
      */
-    public Log log() {
+    public LogPath log() {
         if (_log == null)
-            _log = new Log(this, Keys.BCCP_MANIFEST_LOG_ID_FK);
+            _log = new LogPath(this, Keys.BCCP_MANIFEST_LOG_ID_FK, null);
 
         return _log;
     }
+
+    private transient BccpManifestPath _bccpReplacementBccpManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table,
      * via the <code>bccp_replacement_bccp_manifest_id_fk</code> key.
      */
-    public BccpManifest bccpReplacementBccpManifestIdFk() {
+    public BccpManifestPath bccpReplacementBccpManifestIdFk() {
         if (_bccpReplacementBccpManifestIdFk == null)
-            _bccpReplacementBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK);
+            _bccpReplacementBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpReplacementBccpManifestIdFk;
     }
+
+    private transient BccpManifestPath _bccpManifestPrevBccpManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table,
      * via the <code>bccp_manifest_prev_bccp_manifest_id_fk</code> key.
      */
-    public BccpManifest bccpManifestPrevBccpManifestIdFk() {
+    public BccpManifestPath bccpManifestPrevBccpManifestIdFk() {
         if (_bccpManifestPrevBccpManifestIdFk == null)
-            _bccpManifestPrevBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK);
+            _bccpManifestPrevBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifestPrevBccpManifestIdFk;
     }
+
+    private transient BccpManifestPath _bccpManifestNextBccpManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table,
      * via the <code>bccp_manifest_next_bccp_manifest_id_fk</code> key.
      */
-    public BccpManifest bccpManifestNextBccpManifestIdFk() {
+    public BccpManifestPath bccpManifestNextBccpManifestIdFk() {
         if (_bccpManifestNextBccpManifestIdFk == null)
-            _bccpManifestNextBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
+            _bccpManifestNextBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifestNextBccpManifestIdFk;
+    }
+
+    private transient BbiepPath _bbiep;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table
+     */
+    public BbiepPath bbiep() {
+        if (_bbiep == null)
+            _bbiep = new BbiepPath(this, null, Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _bbiep;
+    }
+
+    private transient BccpManifestTagPath _bccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bccp_manifest_tag</code> table
+     */
+    public BccpManifestTagPath bccpManifestTag() {
+        if (_bccpManifestTag == null)
+            _bccpManifestTag = new BccpManifestTagPath(this, null, Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _bccpManifestTag;
+    }
+
+    private transient BccManifestPath _bccManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc_manifest</code>
+     * table
+     */
+    public BccManifestPath bccManifest() {
+        if (_bccManifest == null)
+            _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _bccManifest;
+    }
+
+    private transient ModuleBccpManifestPath _moduleBccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_bccp_manifest</code> table
+     */
+    public ModuleBccpManifestPath moduleBccpManifest() {
+        if (_moduleBccpManifest == null)
+            _moduleBccpManifest = new ModuleBccpManifestPath(this, null, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _moduleBccpManifest;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.tag</code>
+     * table
+     */
+    public TagPath tag() {
+        return bccpManifestTag().tag();
     }
 
     @Override
@@ -279,27 +387,87 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return new BccpManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row10 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row10<ULong, ULong, ULong, ULong, String, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public BccpManifest where(Condition condition) {
+        return new BccpManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BccpManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function10<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BccpManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BccpManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BccpManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

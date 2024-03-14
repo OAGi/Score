@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,9 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc.AccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BieUserExtRevisionRecord;
 
 
@@ -114,11 +121,11 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     public final TableField<BieUserExtRevisionRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private BieUserExtRevision(Name alias, Table<BieUserExtRevisionRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BieUserExtRevision(Name alias, Table<BieUserExtRevisionRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC."), TableOptions.table());
+    private BieUserExtRevision(Name alias, Table<BieUserExtRevisionRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -142,8 +149,37 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
         this(DSL.name("bie_user_ext_revision"), null);
     }
 
-    public <O extends Record> BieUserExtRevision(Table<O> child, ForeignKey<O, BieUserExtRevisionRecord> key) {
-        super(child, key, BIE_USER_EXT_REVISION);
+    public <O extends Record> BieUserExtRevision(Table<O> path, ForeignKey<O, BieUserExtRevisionRecord> childPath, InverseForeignKey<O, BieUserExtRevisionRecord> parentPath) {
+        super(path, childPath, parentPath, BIE_USER_EXT_REVISION);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BieUserExtRevisionPath extends BieUserExtRevision implements Path<BieUserExtRevisionRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BieUserExtRevisionPath(Table<O> path, ForeignKey<O, BieUserExtRevisionRecord> childPath, InverseForeignKey<O, BieUserExtRevisionRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BieUserExtRevisionPath(Name alias, Table<BieUserExtRevisionRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BieUserExtRevisionPath as(String alias) {
+            return new BieUserExtRevisionPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BieUserExtRevisionPath as(Name alias) {
+            return new BieUserExtRevisionPath(alias, this);
+        }
+
+        @Override
+        public BieUserExtRevisionPath as(Table<?> alias) {
+            return new BieUserExtRevisionPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -166,50 +202,53 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
         return Arrays.asList(Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient Abie _abie;
-    private transient Acc _bieUserExtRevisionExtAccIdFk;
-    private transient Acc _bieUserExtRevisionUserExtAccIdFk;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient AbiePath _abie;
 
     /**
      * Get the implicit join path to the <code>oagi.abie</code> table.
      */
-    public Abie abie() {
+    public AbiePath abie() {
         if (_abie == null)
-            _abie = new Abie(this, Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK);
+            _abie = new AbiePath(this, Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK, null);
 
         return _abie;
     }
+
+    private transient AccPath _bieUserExtRevisionExtAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>bie_user_ext_revision_ext_acc_id_fk</code> key.
      */
-    public Acc bieUserExtRevisionExtAccIdFk() {
+    public AccPath bieUserExtRevisionExtAccIdFk() {
         if (_bieUserExtRevisionExtAccIdFk == null)
-            _bieUserExtRevisionExtAccIdFk = new Acc(this, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK);
+            _bieUserExtRevisionExtAccIdFk = new AccPath(this, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK, null);
 
         return _bieUserExtRevisionExtAccIdFk;
     }
+
+    private transient AccPath _bieUserExtRevisionUserExtAccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table, via the
      * <code>bie_user_ext_revision_user_ext_acc_id_fk</code> key.
      */
-    public Acc bieUserExtRevisionUserExtAccIdFk() {
+    public AccPath bieUserExtRevisionUserExtAccIdFk() {
         if (_bieUserExtRevisionUserExtAccIdFk == null)
-            _bieUserExtRevisionUserExtAccIdFk = new Acc(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK);
+            _bieUserExtRevisionUserExtAccIdFk = new AccPath(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, null);
 
         return _bieUserExtRevisionUserExtAccIdFk;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
     }
@@ -253,27 +292,87 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
         return new BieUserExtRevision(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, Byte, ULong> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public BieUserExtRevision where(Condition condition) {
+        return new BieUserExtRevision(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BieUserExtRevision where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BieUserExtRevision where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUserExtRevision where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUserExtRevision where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUserExtRevision where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUserExtRevision where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BieUserExtRevision where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUserExtRevision whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BieUserExtRevision whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

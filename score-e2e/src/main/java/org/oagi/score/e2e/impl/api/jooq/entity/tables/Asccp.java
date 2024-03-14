@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function20;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row20;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,12 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc.AccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp.AsccpPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsccpRecord;
 
 
@@ -205,11 +215,11 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, ULong> NEXT_ASCCP_ID = createField(DSL.name("next_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private Asccp(Name alias, Table<AsccpRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Asccp(Name alias, Table<AsccpRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("An ASCCP specifies a role (or property) an ACC may play under another ACC."), TableOptions.table());
+    private Asccp(Name alias, Table<AsccpRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("An ASCCP specifies a role (or property) an ACC may play under another ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -233,8 +243,37 @@ public class Asccp extends TableImpl<AsccpRecord> {
         this(DSL.name("asccp"), null);
     }
 
-    public <O extends Record> Asccp(Table<O> child, ForeignKey<O, AsccpRecord> key) {
-        super(child, key, ASCCP);
+    public <O extends Record> Asccp(Table<O> path, ForeignKey<O, AsccpRecord> childPath, InverseForeignKey<O, AsccpRecord> parentPath) {
+        super(path, childPath, parentPath, ASCCP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AsccpPath extends Asccp implements Path<AsccpRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AsccpPath(Table<O> path, ForeignKey<O, AsccpRecord> childPath, InverseForeignKey<O, AsccpRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AsccpPath(Name alias, Table<AsccpRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AsccpPath as(String alias) {
+            return new AsccpPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AsccpPath as(Name alias) {
+            return new AsccpPath(alias, this);
+        }
+
+        @Override
+        public AsccpPath as(Table<?> alias) {
+            return new AsccpPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -262,99 +301,131 @@ public class Asccp extends TableImpl<AsccpRecord> {
         return Arrays.asList(Keys.ASCCP_ROLE_OF_ACC_ID_FK, Keys.ASCCP_CREATED_BY_FK, Keys.ASCCP_OWNER_USER_ID_FK, Keys.ASCCP_LAST_UPDATED_BY_FK, Keys.ASCCP_NAMESPACE_ID_FK, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK, Keys.ASCCP_PREV_ASCCP_ID_FK, Keys.ASCCP_NEXT_ASCCP_ID_FK);
     }
 
-    private transient Acc _acc;
-    private transient AppUser _asccpCreatedByFk;
-    private transient AppUser _asccpOwnerUserIdFk;
-    private transient AppUser _asccpLastUpdatedByFk;
-    private transient Namespace _namespace;
-    private transient Asccp _asccpReplacementAsccpIdFk;
-    private transient Asccp _asccpPrevAsccpIdFk;
-    private transient Asccp _asccpNextAsccpIdFk;
+    private transient AccPath _acc;
 
     /**
      * Get the implicit join path to the <code>oagi.acc</code> table.
      */
-    public Acc acc() {
+    public AccPath acc() {
         if (_acc == null)
-            _acc = new Acc(this, Keys.ASCCP_ROLE_OF_ACC_ID_FK);
+            _acc = new AccPath(this, Keys.ASCCP_ROLE_OF_ACC_ID_FK, null);
 
         return _acc;
     }
+
+    private transient AppUserPath _asccpCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>asccp_created_by_fk</code> key.
      */
-    public AppUser asccpCreatedByFk() {
+    public AppUserPath asccpCreatedByFk() {
         if (_asccpCreatedByFk == null)
-            _asccpCreatedByFk = new AppUser(this, Keys.ASCCP_CREATED_BY_FK);
+            _asccpCreatedByFk = new AppUserPath(this, Keys.ASCCP_CREATED_BY_FK, null);
 
         return _asccpCreatedByFk;
     }
+
+    private transient AppUserPath _asccpOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>asccp_owner_user_id_fk</code> key.
      */
-    public AppUser asccpOwnerUserIdFk() {
+    public AppUserPath asccpOwnerUserIdFk() {
         if (_asccpOwnerUserIdFk == null)
-            _asccpOwnerUserIdFk = new AppUser(this, Keys.ASCCP_OWNER_USER_ID_FK);
+            _asccpOwnerUserIdFk = new AppUserPath(this, Keys.ASCCP_OWNER_USER_ID_FK, null);
 
         return _asccpOwnerUserIdFk;
     }
+
+    private transient AppUserPath _asccpLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>asccp_last_updated_by_fk</code> key.
      */
-    public AppUser asccpLastUpdatedByFk() {
+    public AppUserPath asccpLastUpdatedByFk() {
         if (_asccpLastUpdatedByFk == null)
-            _asccpLastUpdatedByFk = new AppUser(this, Keys.ASCCP_LAST_UPDATED_BY_FK);
+            _asccpLastUpdatedByFk = new AppUserPath(this, Keys.ASCCP_LAST_UPDATED_BY_FK, null);
 
         return _asccpLastUpdatedByFk;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.ASCCP_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.ASCCP_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AsccpPath _asccpReplacementAsccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.asccp</code> table, via the
      * <code>asccp_replacement_asccp_id_fk</code> key.
      */
-    public Asccp asccpReplacementAsccpIdFk() {
+    public AsccpPath asccpReplacementAsccpIdFk() {
         if (_asccpReplacementAsccpIdFk == null)
-            _asccpReplacementAsccpIdFk = new Asccp(this, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK);
+            _asccpReplacementAsccpIdFk = new AsccpPath(this, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK, null);
 
         return _asccpReplacementAsccpIdFk;
     }
+
+    private transient AsccpPath _asccpPrevAsccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.asccp</code> table, via the
      * <code>asccp_prev_asccp_id_fk</code> key.
      */
-    public Asccp asccpPrevAsccpIdFk() {
+    public AsccpPath asccpPrevAsccpIdFk() {
         if (_asccpPrevAsccpIdFk == null)
-            _asccpPrevAsccpIdFk = new Asccp(this, Keys.ASCCP_PREV_ASCCP_ID_FK);
+            _asccpPrevAsccpIdFk = new AsccpPath(this, Keys.ASCCP_PREV_ASCCP_ID_FK, null);
 
         return _asccpPrevAsccpIdFk;
     }
+
+    private transient AsccpPath _asccpNextAsccpIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.asccp</code> table, via the
      * <code>asccp_next_asccp_id_fk</code> key.
      */
-    public Asccp asccpNextAsccpIdFk() {
+    public AsccpPath asccpNextAsccpIdFk() {
         if (_asccpNextAsccpIdFk == null)
-            _asccpNextAsccpIdFk = new Asccp(this, Keys.ASCCP_NEXT_ASCCP_ID_FK);
+            _asccpNextAsccpIdFk = new AsccpPath(this, Keys.ASCCP_NEXT_ASCCP_ID_FK, null);
 
         return _asccpNextAsccpIdFk;
+    }
+
+    private transient AsccpManifestPath _asccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
+     */
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_ASCCP_ID_FK.getInverseKey());
+
+        return _asccpManifest;
+    }
+
+    private transient AsccPath _ascc;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table
+     */
+    public AsccPath ascc() {
+        if (_ascc == null)
+            _ascc = new AsccPath(this, null, Keys.ASCC_TO_ASCCP_ID_FK.getInverseKey());
+
+        return _ascc;
     }
 
     @Override
@@ -396,27 +467,87 @@ public class Asccp extends TableImpl<AsccpRecord> {
         return new Asccp(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row20 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row20<ULong, String, String, String, String, String, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, ULong, Byte, Byte, ULong, Byte, ULong, ULong> fieldsRow() {
-        return (Row20) super.fieldsRow();
+    public Asccp where(Condition condition) {
+        return new Asccp(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function20<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Asccp where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function20<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super ULong, ? super Byte, ? super Byte, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Asccp where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asccp where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asccp where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asccp where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asccp where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Asccp where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asccp whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Asccp whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

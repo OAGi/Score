@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Module.ModulePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ModuleAsccpManifestRecord;
 
 
@@ -104,11 +112,11 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
     public final TableField<ModuleAsccpManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
     private ModuleAsccpManifest(Name alias, Table<ModuleAsccpManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private ModuleAsccpManifest(Name alias, Table<ModuleAsccpManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private ModuleAsccpManifest(Name alias, Table<ModuleAsccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -132,8 +140,37 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
         this(DSL.name("module_asccp_manifest"), null);
     }
 
-    public <O extends Record> ModuleAsccpManifest(Table<O> child, ForeignKey<O, ModuleAsccpManifestRecord> key) {
-        super(child, key, MODULE_ASCCP_MANIFEST);
+    public <O extends Record> ModuleAsccpManifest(Table<O> path, ForeignKey<O, ModuleAsccpManifestRecord> childPath, InverseForeignKey<O, ModuleAsccpManifestRecord> parentPath) {
+        super(path, childPath, parentPath, MODULE_ASCCP_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ModuleAsccpManifestPath extends ModuleAsccpManifest implements Path<ModuleAsccpManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> ModuleAsccpManifestPath(Table<O> path, ForeignKey<O, ModuleAsccpManifestRecord> childPath, InverseForeignKey<O, ModuleAsccpManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ModuleAsccpManifestPath(Name alias, Table<ModuleAsccpManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ModuleAsccpManifestPath as(String alias) {
+            return new ModuleAsccpManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ModuleAsccpManifestPath as(Name alias) {
+            return new ModuleAsccpManifestPath(alias, this);
+        }
+
+        @Override
+        public ModuleAsccpManifestPath as(Table<?> alias) {
+            return new ModuleAsccpManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -156,61 +193,65 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
         return Arrays.asList(Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
-    private transient ModuleSetRelease _moduleSetRelease;
-    private transient AsccpManifest _asccpManifest;
-    private transient Module _module;
-    private transient AppUser _moduleAsccpManifestCreatedByFk;
-    private transient AppUser _moduleAsccpManifestLastUpdatedByFk;
+    private transient ModuleSetReleasePath _moduleSetRelease;
 
     /**
      * Get the implicit join path to the <code>oagi.module_set_release</code>
      * table.
      */
-    public ModuleSetRelease moduleSetRelease() {
+    public ModuleSetReleasePath moduleSetRelease() {
         if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
 
         return _moduleSetRelease;
     }
 
+    private transient AsccpManifestPath _asccpManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
      */
-    public AsccpManifest asccpManifest() {
+    public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifest(this, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK);
+            _asccpManifest = new AsccpManifestPath(this, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
     }
 
+    private transient ModulePath _module;
+
     /**
      * Get the implicit join path to the <code>oagi.module</code> table.
      */
-    public Module module() {
+    public ModulePath module() {
         if (_module == null)
-            _module = new Module(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK);
+            _module = new ModulePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, null);
 
         return _module;
     }
+
+    private transient AppUserPath _moduleAsccpManifestCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_asccp_manifest_created_by_fk</code> key.
      */
-    public AppUser moduleAsccpManifestCreatedByFk() {
+    public AppUserPath moduleAsccpManifestCreatedByFk() {
         if (_moduleAsccpManifestCreatedByFk == null)
-            _moduleAsccpManifestCreatedByFk = new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK);
+            _moduleAsccpManifestCreatedByFk = new AppUserPath(this, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK, null);
 
         return _moduleAsccpManifestCreatedByFk;
     }
+
+    private transient AppUserPath _moduleAsccpManifestLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>module_asccp_manifest_last_updated_by_fk</code> key.
      */
-    public AppUser moduleAsccpManifestLastUpdatedByFk() {
+    public AppUserPath moduleAsccpManifestLastUpdatedByFk() {
         if (_moduleAsccpManifestLastUpdatedByFk == null)
-            _moduleAsccpManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
+            _moduleAsccpManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleAsccpManifestLastUpdatedByFk;
     }
@@ -254,27 +295,87 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
         return new ModuleAsccpManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, ULong, ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public ModuleAsccpManifest where(Condition condition) {
+        return new ModuleAsccpManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public ModuleAsccpManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public ModuleAsccpManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAsccpManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAsccpManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAsccpManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAsccpManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public ModuleAsccpManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAsccpManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public ModuleAsccpManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function3;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,7 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2App.Oauth2AppPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.Oauth2AppScopeRecord;
 
 
@@ -68,11 +73,11 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
     public final TableField<Oauth2AppScopeRecord, String> SCOPE = createField(DSL.name("scope"), SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     private Oauth2AppScope(Name alias, Table<Oauth2AppScopeRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Oauth2AppScope(Name alias, Table<Oauth2AppScopeRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Oauth2AppScope(Name alias, Table<Oauth2AppScopeRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -96,8 +101,37 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         this(DSL.name("oauth2_app_scope"), null);
     }
 
-    public <O extends Record> Oauth2AppScope(Table<O> child, ForeignKey<O, Oauth2AppScopeRecord> key) {
-        super(child, key, OAUTH2_APP_SCOPE);
+    public <O extends Record> Oauth2AppScope(Table<O> path, ForeignKey<O, Oauth2AppScopeRecord> childPath, InverseForeignKey<O, Oauth2AppScopeRecord> parentPath) {
+        super(path, childPath, parentPath, OAUTH2_APP_SCOPE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class Oauth2AppScopePath extends Oauth2AppScope implements Path<Oauth2AppScopeRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> Oauth2AppScopePath(Table<O> path, ForeignKey<O, Oauth2AppScopeRecord> childPath, InverseForeignKey<O, Oauth2AppScopeRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private Oauth2AppScopePath(Name alias, Table<Oauth2AppScopeRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public Oauth2AppScopePath as(String alias) {
+            return new Oauth2AppScopePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public Oauth2AppScopePath as(Name alias) {
+            return new Oauth2AppScopePath(alias, this);
+        }
+
+        @Override
+        public Oauth2AppScopePath as(Table<?> alias) {
+            return new Oauth2AppScopePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -120,14 +154,14 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         return Arrays.asList(Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
     }
 
-    private transient Oauth2App _oauth2App;
+    private transient Oauth2AppPath _oauth2App;
 
     /**
      * Get the implicit join path to the <code>oagi.oauth2_app</code> table.
      */
-    public Oauth2App oauth2App() {
+    public Oauth2AppPath oauth2App() {
         if (_oauth2App == null)
-            _oauth2App = new Oauth2App(this, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
+            _oauth2App = new Oauth2AppPath(this, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK, null);
 
         return _oauth2App;
     }
@@ -171,27 +205,87 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         return new Oauth2AppScope(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row3 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row3<ULong, ULong, String> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Oauth2AppScope where(Condition condition) {
+        return new Oauth2AppScope(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function3<? super ULong, ? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Oauth2AppScope where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Oauth2AppScope where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2AppScope where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2AppScope where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2AppScope where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2AppScope where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2AppScope where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2AppScope whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2AppScope whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function15;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row15;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,15 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep.AsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbie.BbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision.BieUserExtRevisionPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AbieRecord;
 
 
@@ -171,11 +184,11 @@ public class Abie extends TableImpl<AbieRecord> {
     public final TableField<AbieRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
     private Abie(Name alias, Table<AbieRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Abie(Name alias, Table<AbieRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE \"SEMANTIC_GROUP\", \"USER_EXTENSION_GROUP\", etc."), TableOptions.table());
+    private Abie(Name alias, Table<AbieRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE \"SEMANTIC_GROUP\", \"USER_EXTENSION_GROUP\", etc."), TableOptions.table(), where);
     }
 
     /**
@@ -199,8 +212,37 @@ public class Abie extends TableImpl<AbieRecord> {
         this(DSL.name("abie"), null);
     }
 
-    public <O extends Record> Abie(Table<O> child, ForeignKey<O, AbieRecord> key) {
-        super(child, key, ABIE);
+    public <O extends Record> Abie(Table<O> path, ForeignKey<O, AbieRecord> childPath, InverseForeignKey<O, AbieRecord> parentPath) {
+        super(path, childPath, parentPath, ABIE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AbiePath extends Abie implements Path<AbieRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AbiePath(Table<O> path, ForeignKey<O, AbieRecord> childPath, InverseForeignKey<O, AbieRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AbiePath(Name alias, Table<AbieRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AbiePath as(String alias) {
+            return new AbiePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AbiePath as(Name alias) {
+            return new AbiePath(alias, this);
+        }
+
+        @Override
+        public AbiePath as(Table<?> alias) {
+            return new AbiePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -228,63 +270,129 @@ public class Abie extends TableImpl<AbieRecord> {
         return Arrays.asList(Keys.ABIE_BASED_ACC_MANIFEST_ID_FK, Keys.ABIE_BIZ_CTX_ID_FK, Keys.ABIE_CREATED_BY_FK, Keys.ABIE_LAST_UPDATED_BY_FK, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
-    private transient AccManifest _accManifest;
-    private transient BizCtx _bizCtx;
-    private transient AppUser _abieCreatedByFk;
-    private transient AppUser _abieLastUpdatedByFk;
-    private transient TopLevelAsbiep _topLevelAsbiep;
+    private transient AccManifestPath _accManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
      */
-    public AccManifest accManifest() {
+    public AccManifestPath accManifest() {
         if (_accManifest == null)
-            _accManifest = new AccManifest(this, Keys.ABIE_BASED_ACC_MANIFEST_ID_FK);
+            _accManifest = new AccManifestPath(this, Keys.ABIE_BASED_ACC_MANIFEST_ID_FK, null);
 
         return _accManifest;
     }
 
+    private transient BizCtxPath _bizCtx;
+
     /**
      * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
      */
-    public BizCtx bizCtx() {
+    public BizCtxPath bizCtx() {
         if (_bizCtx == null)
-            _bizCtx = new BizCtx(this, Keys.ABIE_BIZ_CTX_ID_FK);
+            _bizCtx = new BizCtxPath(this, Keys.ABIE_BIZ_CTX_ID_FK, null);
 
         return _bizCtx;
     }
+
+    private transient AppUserPath _abieCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>abie_created_by_fk</code> key.
      */
-    public AppUser abieCreatedByFk() {
+    public AppUserPath abieCreatedByFk() {
         if (_abieCreatedByFk == null)
-            _abieCreatedByFk = new AppUser(this, Keys.ABIE_CREATED_BY_FK);
+            _abieCreatedByFk = new AppUserPath(this, Keys.ABIE_CREATED_BY_FK, null);
 
         return _abieCreatedByFk;
     }
+
+    private transient AppUserPath _abieLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>abie_last_updated_by_fk</code> key.
      */
-    public AppUser abieLastUpdatedByFk() {
+    public AppUserPath abieLastUpdatedByFk() {
         if (_abieLastUpdatedByFk == null)
-            _abieLastUpdatedByFk = new AppUser(this, Keys.ABIE_LAST_UPDATED_BY_FK);
+            _abieLastUpdatedByFk = new AppUserPath(this, Keys.ABIE_LAST_UPDATED_BY_FK, null);
 
         return _abieLastUpdatedByFk;
     }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient AsbiepPath _asbiep;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table
+     */
+    public AsbiepPath asbiep() {
+        if (_asbiep == null)
+            _asbiep = new AsbiepPath(this, null, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK.getInverseKey());
+
+        return _asbiep;
+    }
+
+    private transient AsbiePath _asbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table
+     */
+    public AsbiePath asbie() {
+        if (_asbie == null)
+            _asbie = new AsbiePath(this, null, Keys.ASBIE_FROM_ABIE_ID_FK.getInverseKey());
+
+        return _asbie;
+    }
+
+    private transient BbiePath _bbie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbie</code> table
+     */
+    public BbiePath bbie() {
+        if (_bbie == null)
+            _bbie = new BbiePath(this, null, Keys.BBIE_FROM_ABIE_ID_FK.getInverseKey());
+
+        return _bbie;
+    }
+
+    private transient BieUsageRulePath _bieUsageRule;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_usage_rule</code> table
+     */
+    public BieUsageRulePath bieUsageRule() {
+        if (_bieUsageRule == null)
+            _bieUsageRule = new BieUsageRulePath(this, null, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK.getInverseKey());
+
+        return _bieUsageRule;
+    }
+
+    private transient BieUserExtRevisionPath _bieUserExtRevision;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_user_ext_revision</code> table
+     */
+    public BieUserExtRevisionPath bieUserExtRevision() {
+        if (_bieUserExtRevision == null)
+            _bieUserExtRevision = new BieUserExtRevisionPath(this, null, Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK.getInverseKey());
+
+        return _bieUserExtRevision;
     }
 
     @Override
@@ -326,27 +434,87 @@ public class Abie extends TableImpl<AbieRecord> {
         return new Abie(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row15 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row15<ULong, String, ULong, String, String, ULong, String, ULong, ULong, LocalDateTime, LocalDateTime, Integer, String, String, ULong> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Abie where(Condition condition) {
+        return new Abie(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function15<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super String, ? super String, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Abie where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function15<? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super String, ? super String, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Abie where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Abie where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Abie where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Abie where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Abie where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Abie where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Abie whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Abie whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

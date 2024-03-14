@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ExceptionRecord;
 
 
@@ -92,11 +97,11 @@ public class Exception extends TableImpl<ExceptionRecord> {
     public final TableField<ExceptionRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the exception was created.");
 
     private Exception(Name alias, Table<ExceptionRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Exception(Name alias, Table<ExceptionRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Exception(Name alias, Table<ExceptionRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -120,8 +125,37 @@ public class Exception extends TableImpl<ExceptionRecord> {
         this(DSL.name("exception"), null);
     }
 
-    public <O extends Record> Exception(Table<O> child, ForeignKey<O, ExceptionRecord> key) {
-        super(child, key, EXCEPTION);
+    public <O extends Record> Exception(Table<O> path, ForeignKey<O, ExceptionRecord> childPath, InverseForeignKey<O, ExceptionRecord> parentPath) {
+        super(path, childPath, parentPath, EXCEPTION);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ExceptionPath extends Exception implements Path<ExceptionRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> ExceptionPath(Table<O> path, ForeignKey<O, ExceptionRecord> childPath, InverseForeignKey<O, ExceptionRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ExceptionPath(Name alias, Table<ExceptionRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ExceptionPath as(String alias) {
+            return new ExceptionPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ExceptionPath as(Name alias) {
+            return new ExceptionPath(alias, this);
+        }
+
+        @Override
+        public ExceptionPath as(Table<?> alias) {
+            return new ExceptionPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -149,14 +183,14 @@ public class Exception extends TableImpl<ExceptionRecord> {
         return Arrays.asList(Keys.EXCEPTION_CREATED_BY_FK);
     }
 
-    private transient AppUser _appUser;
+    private transient AppUserPath _appUser;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public AppUser appUser() {
+    public AppUserPath appUser() {
         if (_appUser == null)
-            _appUser = new AppUser(this, Keys.EXCEPTION_CREATED_BY_FK);
+            _appUser = new AppUserPath(this, Keys.EXCEPTION_CREATED_BY_FK, null);
 
         return _appUser;
     }
@@ -200,27 +234,87 @@ public class Exception extends TableImpl<ExceptionRecord> {
         return new Exception(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, String, String, byte[], ULong, LocalDateTime> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Exception where(Condition condition) {
+        return new Exception(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super String, ? super String, ? super byte[], ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Exception where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super String, ? super String, ? super byte[], ? super ULong, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Exception where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Exception where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Exception where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Exception where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Exception where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Exception where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Exception whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Exception whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

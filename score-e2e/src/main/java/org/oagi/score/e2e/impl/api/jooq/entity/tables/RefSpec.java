@@ -4,18 +4,22 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
+import java.util.Collection;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +30,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtRefSpec.CdtRefSpecPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtScRefSpec.CdtScRefSpecPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.RefSpecRecord;
 
 
@@ -61,11 +67,11 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
     public final TableField<RefSpecRecord, String> SPEC = createField(DSL.name("spec"), SQLDataType.VARCHAR(30).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
     private RefSpec(Name alias, Table<RefSpecRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private RefSpec(Name alias, Table<RefSpecRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private RefSpec(Name alias, Table<RefSpecRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -89,8 +95,37 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
         this(DSL.name("ref_spec"), null);
     }
 
-    public <O extends Record> RefSpec(Table<O> child, ForeignKey<O, RefSpecRecord> key) {
-        super(child, key, REF_SPEC);
+    public <O extends Record> RefSpec(Table<O> path, ForeignKey<O, RefSpecRecord> childPath, InverseForeignKey<O, RefSpecRecord> parentPath) {
+        super(path, childPath, parentPath, REF_SPEC);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class RefSpecPath extends RefSpec implements Path<RefSpecRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> RefSpecPath(Table<O> path, ForeignKey<O, RefSpecRecord> childPath, InverseForeignKey<O, RefSpecRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private RefSpecPath(Name alias, Table<RefSpecRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public RefSpecPath as(String alias) {
+            return new RefSpecPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public RefSpecPath as(Name alias) {
+            return new RefSpecPath(alias, this);
+        }
+
+        @Override
+        public RefSpecPath as(Table<?> alias) {
+            return new RefSpecPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -106,6 +141,32 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
     @Override
     public UniqueKey<RefSpecRecord> getPrimaryKey() {
         return Keys.KEY_REF_SPEC_PRIMARY;
+    }
+
+    private transient CdtRefSpecPath _cdtRefSpec;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.cdt_ref_spec</code>
+     * table
+     */
+    public CdtRefSpecPath cdtRefSpec() {
+        if (_cdtRefSpec == null)
+            _cdtRefSpec = new CdtRefSpecPath(this, null, Keys.CDT_REF_SPEC_REF_SPEC_ID_FK.getInverseKey());
+
+        return _cdtRefSpec;
+    }
+
+    private transient CdtScRefSpecPath _cdtScRefSpec;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.cdt_sc_ref_spec</code> table
+     */
+    public CdtScRefSpecPath cdtScRefSpec() {
+        if (_cdtScRefSpec == null)
+            _cdtScRefSpec = new CdtScRefSpecPath(this, null, Keys.CDT_SC_REF_SPEC_REF_SPEC_ID_FK.getInverseKey());
+
+        return _cdtScRefSpec;
     }
 
     @Override
@@ -147,27 +208,87 @@ public class RefSpec extends TableImpl<RefSpecRecord> {
         return new RefSpec(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row2 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row2<ULong, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public RefSpec where(Condition condition) {
+        return new RefSpec(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public RefSpec where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public RefSpec where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public RefSpec where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public RefSpec where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public RefSpec where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public RefSpec where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public RefSpec where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public RefSpec whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public RefSpec whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

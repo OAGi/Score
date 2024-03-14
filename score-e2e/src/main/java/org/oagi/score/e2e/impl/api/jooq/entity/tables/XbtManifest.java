@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,11 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log.LogPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt.XbtPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.XbtManifestRecord;
 
 
@@ -90,11 +99,11 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     public final TableField<XbtManifestRecord, ULong> NEXT_XBT_MANIFEST_ID = createField(DSL.name("next_xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private XbtManifest(Name alias, Table<XbtManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private XbtManifest(Name alias, Table<XbtManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private XbtManifest(Name alias, Table<XbtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -118,8 +127,37 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         this(DSL.name("xbt_manifest"), null);
     }
 
-    public <O extends Record> XbtManifest(Table<O> child, ForeignKey<O, XbtManifestRecord> key) {
-        super(child, key, XBT_MANIFEST);
+    public <O extends Record> XbtManifest(Table<O> path, ForeignKey<O, XbtManifestRecord> childPath, InverseForeignKey<O, XbtManifestRecord> parentPath) {
+        super(path, childPath, parentPath, XBT_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class XbtManifestPath extends XbtManifest implements Path<XbtManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> XbtManifestPath(Table<O> path, ForeignKey<O, XbtManifestRecord> childPath, InverseForeignKey<O, XbtManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private XbtManifestPath(Name alias, Table<XbtManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public XbtManifestPath as(String alias) {
+            return new XbtManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public XbtManifestPath as(Name alias) {
+            return new XbtManifestPath(alias, this);
+        }
+
+        @Override
+        public XbtManifestPath as(Table<?> alias) {
+            return new XbtManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -142,62 +180,79 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return Arrays.asList(Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
     }
 
-    private transient Release _release;
-    private transient Xbt _xbt;
-    private transient Log _log;
-    private transient XbtManifest _xbtManifestPrevXbtManifestIdFk;
-    private transient XbtManifest _xbtManifestNextXbtManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.XBT_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.XBT_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
 
+    private transient XbtPath _xbt;
+
     /**
      * Get the implicit join path to the <code>oagi.xbt</code> table.
      */
-    public Xbt xbt() {
+    public XbtPath xbt() {
         if (_xbt == null)
-            _xbt = new Xbt(this, Keys.XBT_MANIFEST_XBT_ID_FK);
+            _xbt = new XbtPath(this, Keys.XBT_MANIFEST_XBT_ID_FK, null);
 
         return _xbt;
     }
 
+    private transient LogPath _log;
+
     /**
      * Get the implicit join path to the <code>oagi.log</code> table.
      */
-    public Log log() {
+    public LogPath log() {
         if (_log == null)
-            _log = new Log(this, Keys.XBT_MANIFEST_LOG_ID_FK);
+            _log = new LogPath(this, Keys.XBT_MANIFEST_LOG_ID_FK, null);
 
         return _log;
     }
+
+    private transient XbtManifestPath _xbtManifestPrevXbtManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
      * via the <code>xbt_manifest_prev_xbt_manifest_id_fk</code> key.
      */
-    public XbtManifest xbtManifestPrevXbtManifestIdFk() {
+    public XbtManifestPath xbtManifestPrevXbtManifestIdFk() {
         if (_xbtManifestPrevXbtManifestIdFk == null)
-            _xbtManifestPrevXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK);
+            _xbtManifestPrevXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, null);
 
         return _xbtManifestPrevXbtManifestIdFk;
     }
+
+    private transient XbtManifestPath _xbtManifestNextXbtManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
      * via the <code>xbt_manifest_next_xbt_manifest_id_fk</code> key.
      */
-    public XbtManifest xbtManifestNextXbtManifestIdFk() {
+    public XbtManifestPath xbtManifestNextXbtManifestIdFk() {
         if (_xbtManifestNextXbtManifestIdFk == null)
-            _xbtManifestNextXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
+            _xbtManifestNextXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, null);
 
         return _xbtManifestNextXbtManifestIdFk;
+    }
+
+    private transient ModuleXbtManifestPath _moduleXbtManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_xbt_manifest</code> table
+     */
+    public ModuleXbtManifestPath moduleXbtManifest() {
+        if (_moduleXbtManifest == null)
+            _moduleXbtManifest = new ModuleXbtManifestPath(this, null, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _moduleXbtManifest;
     }
 
     @Override
@@ -239,27 +294,87 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return new XbtManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row7 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row7<ULong, ULong, ULong, Byte, ULong, ULong, ULong> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public XbtManifest where(Condition condition) {
+        return new XbtManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public XbtManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public XbtManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public XbtManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public XbtManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public XbtManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public XbtManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public XbtManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public XbtManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public XbtManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

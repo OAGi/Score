@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContent.BlobContentPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContentManifest.BlobContentManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleBlobContentManifest.ModuleBlobContentManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BlobContentManifestRecord;
 
 
@@ -87,11 +95,11 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
     public final TableField<BlobContentManifestRecord, ULong> NEXT_BLOB_CONTENT_MANIFEST_ID = createField(DSL.name("next_blob_content_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private BlobContentManifest(Name alias, Table<BlobContentManifestRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BlobContentManifest(Name alias, Table<BlobContentManifestRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private BlobContentManifest(Name alias, Table<BlobContentManifestRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -115,8 +123,37 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         this(DSL.name("blob_content_manifest"), null);
     }
 
-    public <O extends Record> BlobContentManifest(Table<O> child, ForeignKey<O, BlobContentManifestRecord> key) {
-        super(child, key, BLOB_CONTENT_MANIFEST);
+    public <O extends Record> BlobContentManifest(Table<O> path, ForeignKey<O, BlobContentManifestRecord> childPath, InverseForeignKey<O, BlobContentManifestRecord> parentPath) {
+        super(path, childPath, parentPath, BLOB_CONTENT_MANIFEST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BlobContentManifestPath extends BlobContentManifest implements Path<BlobContentManifestRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BlobContentManifestPath(Table<O> path, ForeignKey<O, BlobContentManifestRecord> childPath, InverseForeignKey<O, BlobContentManifestRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BlobContentManifestPath(Name alias, Table<BlobContentManifestRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BlobContentManifestPath as(String alias) {
+            return new BlobContentManifestPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BlobContentManifestPath as(Name alias) {
+            return new BlobContentManifestPath(alias, this);
+        }
+
+        @Override
+        public BlobContentManifestPath as(Table<?> alias) {
+            return new BlobContentManifestPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -139,53 +176,69 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         return Arrays.asList(Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
     }
 
-    private transient BlobContent _blobContent;
-    private transient Release _release;
-    private transient BlobContentManifest _blobContentManifestPrevBlobContentManifestIdFk;
-    private transient BlobContentManifest _blobContentManifestNextBlobContentManifestIdFk;
+    private transient BlobContentPath _blobContent;
 
     /**
      * Get the implicit join path to the <code>oagi.blob_content</code> table.
      */
-    public BlobContent blobContent() {
+    public BlobContentPath blobContent() {
         if (_blobContent == null)
-            _blobContent = new BlobContent(this, Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK);
+            _blobContent = new BlobContentPath(this, Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK, null);
 
         return _blobContent;
     }
 
+    private transient ReleasePath _release;
+
     /**
      * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public Release release() {
+    public ReleasePath release() {
         if (_release == null)
-            _release = new Release(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK);
+            _release = new ReleasePath(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, null);
 
         return _release;
     }
+
+    private transient BlobContentManifestPath _blobContentManifestPrevBlobContentManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.blob_content_manifest</code>
      * table, via the
      * <code>blob_content_manifest_prev_blob_content_manifest_id_fk</code> key.
      */
-    public BlobContentManifest blobContentManifestPrevBlobContentManifestIdFk() {
+    public BlobContentManifestPath blobContentManifestPrevBlobContentManifestIdFk() {
         if (_blobContentManifestPrevBlobContentManifestIdFk == null)
-            _blobContentManifestPrevBlobContentManifestIdFk = new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK);
+            _blobContentManifestPrevBlobContentManifestIdFk = new BlobContentManifestPath(this, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK, null);
 
         return _blobContentManifestPrevBlobContentManifestIdFk;
     }
+
+    private transient BlobContentManifestPath _blobContentManifestNextBlobContentManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.blob_content_manifest</code>
      * table, via the
      * <code>blob_content_manifest_next_blob_content_manifest_id_fk</code> key.
      */
-    public BlobContentManifest blobContentManifestNextBlobContentManifestIdFk() {
+    public BlobContentManifestPath blobContentManifestNextBlobContentManifestIdFk() {
         if (_blobContentManifestNextBlobContentManifestIdFk == null)
-            _blobContentManifestNextBlobContentManifestIdFk = new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
+            _blobContentManifestNextBlobContentManifestIdFk = new BlobContentManifestPath(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK, null);
 
         return _blobContentManifestNextBlobContentManifestIdFk;
+    }
+
+    private transient ModuleBlobContentManifestPath _moduleBlobContentManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_blob_content_manifest</code> table
+     */
+    public ModuleBlobContentManifestPath moduleBlobContentManifest() {
+        if (_moduleBlobContentManifest == null)
+            _moduleBlobContentManifest = new ModuleBlobContentManifestPath(this, null, Keys.MODULE_BLOB_CONTENT_MANIFEST_ACC_MANIFEST_ID_FK.getInverseKey());
+
+        return _moduleBlobContentManifest;
     }
 
     @Override
@@ -227,27 +280,87 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         return new BlobContentManifest(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, Byte, ULong, ULong> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public BlobContentManifest where(Condition condition) {
+        return new BlobContentManifest(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BlobContentManifest where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super Byte, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BlobContentManifest where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BlobContentManifest where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BlobContentManifest where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BlobContentManifest where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BlobContentManifest where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BlobContentManifest where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BlobContentManifest whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BlobContentManifest whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

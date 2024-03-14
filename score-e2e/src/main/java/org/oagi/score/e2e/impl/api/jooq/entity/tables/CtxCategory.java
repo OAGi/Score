@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function8;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row8;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme.CtxSchemePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.CtxCategoryRecord;
 
 
@@ -104,11 +110,11 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
     public final TableField<CtxCategoryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(6)"), SQLDataType.LOCALDATETIME)), this, "Timestamp when the context category was last updated.");
 
     private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the context category. Examples of context categories as described in the CCTS are business process, industry, etc."), TableOptions.table());
+    private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table captures the context category. Examples of context categories as described in the CCTS are business process, industry, etc."), TableOptions.table(), where);
     }
 
     /**
@@ -132,8 +138,37 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
         this(DSL.name("ctx_category"), null);
     }
 
-    public <O extends Record> CtxCategory(Table<O> child, ForeignKey<O, CtxCategoryRecord> key) {
-        super(child, key, CTX_CATEGORY);
+    public <O extends Record> CtxCategory(Table<O> path, ForeignKey<O, CtxCategoryRecord> childPath, InverseForeignKey<O, CtxCategoryRecord> parentPath) {
+        super(path, childPath, parentPath, CTX_CATEGORY);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CtxCategoryPath extends CtxCategory implements Path<CtxCategoryRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CtxCategoryPath(Table<O> path, ForeignKey<O, CtxCategoryRecord> childPath, InverseForeignKey<O, CtxCategoryRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CtxCategoryPath(Name alias, Table<CtxCategoryRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CtxCategoryPath as(String alias) {
+            return new CtxCategoryPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CtxCategoryPath as(Name alias) {
+            return new CtxCategoryPath(alias, this);
+        }
+
+        @Override
+        public CtxCategoryPath as(Table<?> alias) {
+            return new CtxCategoryPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -161,29 +196,43 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
         return Arrays.asList(Keys.CTX_CATEGORY_CREATED_BY_FK, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _ctxCategoryCreatedByFk;
-    private transient AppUser _ctxCategoryLastUpdatedByFk;
+    private transient AppUserPath _ctxCategoryCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>ctx_category_created_by_fk</code> key.
      */
-    public AppUser ctxCategoryCreatedByFk() {
+    public AppUserPath ctxCategoryCreatedByFk() {
         if (_ctxCategoryCreatedByFk == null)
-            _ctxCategoryCreatedByFk = new AppUser(this, Keys.CTX_CATEGORY_CREATED_BY_FK);
+            _ctxCategoryCreatedByFk = new AppUserPath(this, Keys.CTX_CATEGORY_CREATED_BY_FK, null);
 
         return _ctxCategoryCreatedByFk;
     }
+
+    private transient AppUserPath _ctxCategoryLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>ctx_category_last_updated_by_fk</code> key.
      */
-    public AppUser ctxCategoryLastUpdatedByFk() {
+    public AppUserPath ctxCategoryLastUpdatedByFk() {
         if (_ctxCategoryLastUpdatedByFk == null)
-            _ctxCategoryLastUpdatedByFk = new AppUser(this, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
+            _ctxCategoryLastUpdatedByFk = new AppUserPath(this, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK, null);
 
         return _ctxCategoryLastUpdatedByFk;
+    }
+
+    private transient CtxSchemePath _ctxScheme;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
+     * table
+     */
+    public CtxSchemePath ctxScheme() {
+        if (_ctxScheme == null)
+            _ctxScheme = new CtxSchemePath(this, null, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK.getInverseKey());
+
+        return _ctxScheme;
     }
 
     @Override
@@ -225,27 +274,87 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
         return new CtxCategory(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row8<ULong, String, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public CtxCategory where(Condition condition) {
+        return new CtxCategory(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function8<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public CtxCategory where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public CtxCategory where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxCategory where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxCategory where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxCategory where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxCategory where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public CtxCategory where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxCategory whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public CtxCategory whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

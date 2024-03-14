@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function22;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row22;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,11 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList.AgencyIdListPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListRecord;
 
 
@@ -209,11 +218,11 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
     public final TableField<AgencyIdListRecord, ULong> NEXT_AGENCY_ID_LIST_ID = createField(DSL.name("next_agency_id_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
     private AgencyIdList(Name alias, Table<AgencyIdListRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private AgencyIdList(Name alias, Table<AgencyIdListRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST table stores information about agency identification lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE."), TableOptions.table());
+    private AgencyIdList(Name alias, Table<AgencyIdListRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST table stores information about agency identification lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE."), TableOptions.table(), where);
     }
 
     /**
@@ -237,8 +246,37 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         this(DSL.name("agency_id_list"), null);
     }
 
-    public <O extends Record> AgencyIdList(Table<O> child, ForeignKey<O, AgencyIdListRecord> key) {
-        super(child, key, AGENCY_ID_LIST);
+    public <O extends Record> AgencyIdList(Table<O> path, ForeignKey<O, AgencyIdListRecord> childPath, InverseForeignKey<O, AgencyIdListRecord> parentPath) {
+        super(path, childPath, parentPath, AGENCY_ID_LIST);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class AgencyIdListPath extends AgencyIdList implements Path<AgencyIdListRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> AgencyIdListPath(Table<O> path, ForeignKey<O, AgencyIdListRecord> childPath, InverseForeignKey<O, AgencyIdListRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private AgencyIdListPath(Name alias, Table<AgencyIdListRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public AgencyIdListPath as(String alias) {
+            return new AgencyIdListPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public AgencyIdListPath as(Name alias) {
+            return new AgencyIdListPath(alias, this);
+        }
+
+        @Override
+        public AgencyIdListPath as(Table<?> alias) {
+            return new AgencyIdListPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -261,112 +299,133 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         return Arrays.asList(Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, Keys.AGENCY_ID_LIST_CREATED_BY_FK, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
     }
 
-    private transient AgencyIdListValue _agencyIdListValue;
-    private transient AgencyIdList _agencyIdListBasedAgencyIdListIdFk;
-    private transient Namespace _namespace;
-    private transient AppUser _agencyIdListCreatedByFk;
-    private transient AppUser _agencyIdListLastUpdatedByFk;
-    private transient AgencyIdList _agencyIdListReplacementAgencyIdListIdFk;
-    private transient AppUser _agencyIdListOwnerUserIdFk;
-    private transient AgencyIdList _agencyIdListPrevAgencyIdListIdFk;
-    private transient AgencyIdList _agencyIdListNextAgencyIdListIdFk;
+    private transient AgencyIdListValuePath _agencyIdListValue;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
      * table.
      */
-    public AgencyIdListValue agencyIdListValue() {
+    public AgencyIdListValuePath agencyIdListValue() {
         if (_agencyIdListValue == null)
-            _agencyIdListValue = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK);
+            _agencyIdListValue = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK, null);
 
         return _agencyIdListValue;
     }
+
+    private transient AgencyIdListPath _agencyIdListBasedAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
      * via the <code>agency_id_list_based_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdList agencyIdListBasedAgencyIdListIdFk() {
+    public AgencyIdListPath agencyIdListBasedAgencyIdListIdFk() {
         if (_agencyIdListBasedAgencyIdListIdFk == null)
-            _agencyIdListBasedAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK);
+            _agencyIdListBasedAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK, null);
 
         return _agencyIdListBasedAgencyIdListIdFk;
     }
 
+    private transient NamespacePath _namespace;
+
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AppUserPath _agencyIdListCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>agency_id_list_created_by_fk</code> key.
      */
-    public AppUser agencyIdListCreatedByFk() {
+    public AppUserPath agencyIdListCreatedByFk() {
         if (_agencyIdListCreatedByFk == null)
-            _agencyIdListCreatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_CREATED_BY_FK);
+            _agencyIdListCreatedByFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_CREATED_BY_FK, null);
 
         return _agencyIdListCreatedByFk;
     }
+
+    private transient AppUserPath _agencyIdListLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>agency_id_list_last_updated_by_fk</code> key.
      */
-    public AppUser agencyIdListLastUpdatedByFk() {
+    public AppUserPath agencyIdListLastUpdatedByFk() {
         if (_agencyIdListLastUpdatedByFk == null)
-            _agencyIdListLastUpdatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK);
+            _agencyIdListLastUpdatedByFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK, null);
 
         return _agencyIdListLastUpdatedByFk;
     }
+
+    private transient AgencyIdListPath _agencyIdListReplacementAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
      * via the <code>agency_id_list_replacement_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdList agencyIdListReplacementAgencyIdListIdFk() {
+    public AgencyIdListPath agencyIdListReplacementAgencyIdListIdFk() {
         if (_agencyIdListReplacementAgencyIdListIdFk == null)
-            _agencyIdListReplacementAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK);
+            _agencyIdListReplacementAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, null);
 
         return _agencyIdListReplacementAgencyIdListIdFk;
     }
+
+    private transient AppUserPath _agencyIdListOwnerUserIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>agency_id_list_owner_user_id_fk</code> key.
      */
-    public AppUser agencyIdListOwnerUserIdFk() {
+    public AppUserPath agencyIdListOwnerUserIdFk() {
         if (_agencyIdListOwnerUserIdFk == null)
-            _agencyIdListOwnerUserIdFk = new AppUser(this, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK);
+            _agencyIdListOwnerUserIdFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK, null);
 
         return _agencyIdListOwnerUserIdFk;
     }
+
+    private transient AgencyIdListPath _agencyIdListPrevAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
      * via the <code>agency_id_list_prev_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdList agencyIdListPrevAgencyIdListIdFk() {
+    public AgencyIdListPath agencyIdListPrevAgencyIdListIdFk() {
         if (_agencyIdListPrevAgencyIdListIdFk == null)
-            _agencyIdListPrevAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK);
+            _agencyIdListPrevAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK, null);
 
         return _agencyIdListPrevAgencyIdListIdFk;
     }
+
+    private transient AgencyIdListPath _agencyIdListNextAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
      * via the <code>agency_id_list_next_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdList agencyIdListNextAgencyIdListIdFk() {
+    public AgencyIdListPath agencyIdListNextAgencyIdListIdFk() {
         if (_agencyIdListNextAgencyIdListIdFk == null)
-            _agencyIdListNextAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
+            _agencyIdListNextAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK, null);
 
         return _agencyIdListNextAgencyIdListIdFk;
+    }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_manifest</code> table
+     */
+    public AgencyIdListManifestPath agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, null, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK.getInverseKey());
+
+        return _agencyIdListManifest;
     }
 
     @Override
@@ -408,27 +467,87 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         return new AgencyIdList(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row22 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row22<ULong, String, String, String, String, ULong, String, ULong, String, String, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String, Byte, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row22) super.fieldsRow();
+    public AgencyIdList where(Condition condition) {
+        return new AgencyIdList(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public AgencyIdList where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function22<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super String, ? super ULong, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? super Byte, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public AgencyIdList where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdList where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdList where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdList where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdList where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public AgencyIdList where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdList whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public AgencyIdList whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

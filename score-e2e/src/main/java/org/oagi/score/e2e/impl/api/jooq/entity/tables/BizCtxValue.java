@@ -5,19 +5,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function3;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row3;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxSchemeValue.CtxSchemeValuePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxValueRecord;
 
 
@@ -73,11 +79,11 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     public final TableField<BizCtxValueRecord, ULong> CTX_SCHEME_VALUE_ID = createField(DSL.name("ctx_scheme_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CTX_SCHEME_VALUE table.");
 
     private BizCtxValue(Name alias, Table<BizCtxValueRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BizCtxValue(Name alias, Table<BizCtxValueRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value."), TableOptions.table());
+    private BizCtxValue(Name alias, Table<BizCtxValueRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value."), TableOptions.table(), where);
     }
 
     /**
@@ -101,8 +107,37 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         this(DSL.name("biz_ctx_value"), null);
     }
 
-    public <O extends Record> BizCtxValue(Table<O> child, ForeignKey<O, BizCtxValueRecord> key) {
-        super(child, key, BIZ_CTX_VALUE);
+    public <O extends Record> BizCtxValue(Table<O> path, ForeignKey<O, BizCtxValueRecord> childPath, InverseForeignKey<O, BizCtxValueRecord> parentPath) {
+        super(path, childPath, parentPath, BIZ_CTX_VALUE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BizCtxValuePath extends BizCtxValue implements Path<BizCtxValueRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BizCtxValuePath(Table<O> path, ForeignKey<O, BizCtxValueRecord> childPath, InverseForeignKey<O, BizCtxValueRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BizCtxValuePath(Name alias, Table<BizCtxValueRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BizCtxValuePath as(String alias) {
+            return new BizCtxValuePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BizCtxValuePath as(Name alias) {
+            return new BizCtxValuePath(alias, this);
+        }
+
+        @Override
+        public BizCtxValuePath as(Table<?> alias) {
+            return new BizCtxValuePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -125,26 +160,27 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         return Arrays.asList(Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
     }
 
-    private transient BizCtx _bizCtx;
-    private transient CtxSchemeValue _ctxSchemeValue;
+    private transient BizCtxPath _bizCtx;
 
     /**
      * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
      */
-    public BizCtx bizCtx() {
+    public BizCtxPath bizCtx() {
         if (_bizCtx == null)
-            _bizCtx = new BizCtx(this, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK);
+            _bizCtx = new BizCtxPath(this, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, null);
 
         return _bizCtx;
     }
+
+    private transient CtxSchemeValuePath _ctxSchemeValue;
 
     /**
      * Get the implicit join path to the <code>oagi.ctx_scheme_value</code>
      * table.
      */
-    public CtxSchemeValue ctxSchemeValue() {
+    public CtxSchemeValuePath ctxSchemeValue() {
         if (_ctxSchemeValue == null)
-            _ctxSchemeValue = new CtxSchemeValue(this, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
+            _ctxSchemeValue = new CtxSchemeValuePath(this, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK, null);
 
         return _ctxSchemeValue;
     }
@@ -188,27 +224,87 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         return new BizCtxValue(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row3 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row3<ULong, ULong, ULong> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public BizCtxValue where(Condition condition) {
+        return new BizCtxValue(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BizCtxValue where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BizCtxValue where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxValue where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxValue where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxValue where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxValue where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtxValue where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxValue whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtxValue whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

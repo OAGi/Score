@@ -6,18 +6,22 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -28,6 +32,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperation.OasOperationPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasTag.OasTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasResourceTagRecord;
 
 
@@ -89,11 +95,11 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
     public final TableField<OasResourceTagRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasResourceTag(Name alias, Table<OasResourceTagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasResourceTag(Name alias, Table<OasResourceTagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasResourceTag(Name alias, Table<OasResourceTagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -117,8 +123,37 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
         this(DSL.name("oas_resource_tag"), null);
     }
 
-    public <O extends Record> OasResourceTag(Table<O> child, ForeignKey<O, OasResourceTagRecord> key) {
-        super(child, key, OAS_RESOURCE_TAG);
+    public <O extends Record> OasResourceTag(Table<O> path, ForeignKey<O, OasResourceTagRecord> childPath, InverseForeignKey<O, OasResourceTagRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_RESOURCE_TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasResourceTagPath extends OasResourceTag implements Path<OasResourceTagRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> OasResourceTagPath(Table<O> path, ForeignKey<O, OasResourceTagRecord> childPath, InverseForeignKey<O, OasResourceTagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasResourceTagPath(Name alias, Table<OasResourceTagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasResourceTagPath as(String alias) {
+            return new OasResourceTagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasResourceTagPath as(Name alias) {
+            return new OasResourceTagPath(alias, this);
+        }
+
+        @Override
+        public OasResourceTagPath as(Table<?> alias) {
+            return new OasResourceTagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -136,25 +171,26 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
         return Arrays.asList(Keys.OAS_RESOURCE_TAG_OAS_OPERATION_ID_FK, Keys.OAS_RESOURCE_TAG_OAS_TAG_ID_FK);
     }
 
-    private transient OasOperation _oasOperation;
-    private transient OasTag _oasTag;
+    private transient OasOperationPath _oasOperation;
 
     /**
      * Get the implicit join path to the <code>oagi.oas_operation</code> table.
      */
-    public OasOperation oasOperation() {
+    public OasOperationPath oasOperation() {
         if (_oasOperation == null)
-            _oasOperation = new OasOperation(this, Keys.OAS_RESOURCE_TAG_OAS_OPERATION_ID_FK);
+            _oasOperation = new OasOperationPath(this, Keys.OAS_RESOURCE_TAG_OAS_OPERATION_ID_FK, null);
 
         return _oasOperation;
     }
 
+    private transient OasTagPath _oasTag;
+
     /**
      * Get the implicit join path to the <code>oagi.oas_tag</code> table.
      */
-    public OasTag oasTag() {
+    public OasTagPath oasTag() {
         if (_oasTag == null)
-            _oasTag = new OasTag(this, Keys.OAS_RESOURCE_TAG_OAS_TAG_ID_FK);
+            _oasTag = new OasTagPath(this, Keys.OAS_RESOURCE_TAG_OAS_TAG_ID_FK, null);
 
         return _oasTag;
     }
@@ -198,27 +234,87 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
         return new OasResourceTag(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public OasResourceTag where(Condition condition) {
+        return new OasResourceTag(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasResourceTag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasResourceTag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasResourceTag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasResourceTag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasResourceTag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasResourceTag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasResourceTag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasResourceTag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasResourceTag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

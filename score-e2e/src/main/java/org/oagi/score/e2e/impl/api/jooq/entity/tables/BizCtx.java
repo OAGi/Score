@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,13 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxAssignment.BizCtxAssignmentPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtxValue.BizCtxValuePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant.TenantPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx.TenantBusinessCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxRecord;
 
 
@@ -98,11 +109,11 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     public final TableField<BizCtxRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the business context was last updated.");
 
     private BizCtx(Name alias, Table<BizCtxRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private BizCtx(Name alias, Table<BizCtxRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents a business context. A business context is a combination of one or more business context values."), TableOptions.table());
+    private BizCtx(Name alias, Table<BizCtxRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table represents a business context. A business context is a combination of one or more business context values."), TableOptions.table(), where);
     }
 
     /**
@@ -126,8 +137,37 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         this(DSL.name("biz_ctx"), null);
     }
 
-    public <O extends Record> BizCtx(Table<O> child, ForeignKey<O, BizCtxRecord> key) {
-        super(child, key, BIZ_CTX);
+    public <O extends Record> BizCtx(Table<O> path, ForeignKey<O, BizCtxRecord> childPath, InverseForeignKey<O, BizCtxRecord> parentPath) {
+        super(path, childPath, parentPath, BIZ_CTX);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class BizCtxPath extends BizCtx implements Path<BizCtxRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> BizCtxPath(Table<O> path, ForeignKey<O, BizCtxRecord> childPath, InverseForeignKey<O, BizCtxRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private BizCtxPath(Name alias, Table<BizCtxRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public BizCtxPath as(String alias) {
+            return new BizCtxPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public BizCtxPath as(Name alias) {
+            return new BizCtxPath(alias, this);
+        }
+
+        @Override
+        public BizCtxPath as(Table<?> alias) {
+            return new BizCtxPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -155,29 +195,97 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         return Arrays.asList(Keys.BIZ_CTX_CREATED_BY_FK, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
     }
 
-    private transient AppUser _bizCtxCreatedByFk;
-    private transient AppUser _bizCtxLastUpdatedByFk;
+    private transient AppUserPath _bizCtxCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>biz_ctx_created_by_fk</code> key.
      */
-    public AppUser bizCtxCreatedByFk() {
+    public AppUserPath bizCtxCreatedByFk() {
         if (_bizCtxCreatedByFk == null)
-            _bizCtxCreatedByFk = new AppUser(this, Keys.BIZ_CTX_CREATED_BY_FK);
+            _bizCtxCreatedByFk = new AppUserPath(this, Keys.BIZ_CTX_CREATED_BY_FK, null);
 
         return _bizCtxCreatedByFk;
     }
+
+    private transient AppUserPath _bizCtxLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>biz_ctx_last_updated_by_fk</code> key.
      */
-    public AppUser bizCtxLastUpdatedByFk() {
+    public AppUserPath bizCtxLastUpdatedByFk() {
         if (_bizCtxLastUpdatedByFk == null)
-            _bizCtxLastUpdatedByFk = new AppUser(this, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
+            _bizCtxLastUpdatedByFk = new AppUserPath(this, Keys.BIZ_CTX_LAST_UPDATED_BY_FK, null);
 
         return _bizCtxLastUpdatedByFk;
+    }
+
+    private transient AbiePath _abie;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.abie</code> table
+     */
+    public AbiePath abie() {
+        if (_abie == null)
+            _abie = new AbiePath(this, null, Keys.ABIE_BIZ_CTX_ID_FK.getInverseKey());
+
+        return _abie;
+    }
+
+    private transient BizCtxAssignmentPath _bizCtxAssignment;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.biz_ctx_assignment</code> table
+     */
+    public BizCtxAssignmentPath bizCtxAssignment() {
+        if (_bizCtxAssignment == null)
+            _bizCtxAssignment = new BizCtxAssignmentPath(this, null, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK.getInverseKey());
+
+        return _bizCtxAssignment;
+    }
+
+    private transient BizCtxValuePath _bizCtxValue;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.biz_ctx_value</code>
+     * table
+     */
+    public BizCtxValuePath bizCtxValue() {
+        if (_bizCtxValue == null)
+            _bizCtxValue = new BizCtxValuePath(this, null, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK.getInverseKey());
+
+        return _bizCtxValue;
+    }
+
+    private transient TenantBusinessCtxPath _tenantBusinessCtx;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.tenant_business_ctx</code> table
+     */
+    public TenantBusinessCtxPath tenantBusinessCtx() {
+        if (_tenantBusinessCtx == null)
+            _tenantBusinessCtx = new TenantBusinessCtxPath(this, null, Keys.ORGANIZATION_BUSINESS_CTX_BIZ_CTX_ID_FK.getInverseKey());
+
+        return _tenantBusinessCtx;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>oagi.top_level_asbiep</code> table
+     */
+    public TopLevelAsbiepPath topLevelAsbiep() {
+        return bizCtxAssignment().topLevelAsbiep();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.tenant</code>
+     * table
+     */
+    public TenantPath tenant() {
+        return tenantBusinessCtx().tenant();
     }
 
     @Override
@@ -219,27 +327,87 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         return new BizCtx(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row7 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row7<ULong, String, String, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public BizCtx where(Condition condition) {
+        return new BizCtx(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function7<? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public BizCtx where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super ULong, ? super String, ? super String, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public BizCtx where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtx where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtx where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtx where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtx where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public BizCtx where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtx whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public BizCtx whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

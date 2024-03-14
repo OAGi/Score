@@ -5,20 +5,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -30,6 +34,10 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest.AsccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey.SeqKeyPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.SeqKeyRecord;
 
 
@@ -85,11 +93,11 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
     public final TableField<SeqKeyRecord, ULong> NEXT_SEQ_KEY_ID = createField(DSL.name("next_seq_key_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
 
     private SeqKey(Name alias, Table<SeqKeyRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private SeqKey(Name alias, Table<SeqKeyRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private SeqKey(Name alias, Table<SeqKeyRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -113,8 +121,37 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         this(DSL.name("seq_key"), null);
     }
 
-    public <O extends Record> SeqKey(Table<O> child, ForeignKey<O, SeqKeyRecord> key) {
-        super(child, key, SEQ_KEY);
+    public <O extends Record> SeqKey(Table<O> path, ForeignKey<O, SeqKeyRecord> childPath, InverseForeignKey<O, SeqKeyRecord> parentPath) {
+        super(path, childPath, parentPath, SEQ_KEY);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class SeqKeyPath extends SeqKey implements Path<SeqKeyRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> SeqKeyPath(Table<O> path, ForeignKey<O, SeqKeyRecord> childPath, InverseForeignKey<O, SeqKeyRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private SeqKeyPath(Name alias, Table<SeqKeyRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public SeqKeyPath as(String alias) {
+            return new SeqKeyPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public SeqKeyPath as(Name alias) {
+            return new SeqKeyPath(alias, this);
+        }
+
+        @Override
+        public SeqKeyPath as(Table<?> alias) {
+            return new SeqKeyPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -142,60 +179,64 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return Arrays.asList(Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
     }
 
-    private transient AccManifest _accManifest;
-    private transient AsccManifest _asccManifest;
-    private transient BccManifest _bccManifest;
-    private transient SeqKey _seqKeyPrevSeqKeyIdFk;
-    private transient SeqKey _seqKeyNextSeqKeyIdFk;
+    private transient AccManifestPath _accManifest;
 
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
      */
-    public AccManifest accManifest() {
+    public AccManifestPath accManifest() {
         if (_accManifest == null)
-            _accManifest = new AccManifest(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK);
+            _accManifest = new AccManifestPath(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, null);
 
         return _accManifest;
     }
 
+    private transient AsccManifestPath _asccManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.ascc_manifest</code> table.
      */
-    public AsccManifest asccManifest() {
+    public AsccManifestPath asccManifest() {
         if (_asccManifest == null)
-            _asccManifest = new AsccManifest(this, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK);
+            _asccManifest = new AsccManifestPath(this, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, null);
 
         return _asccManifest;
     }
 
+    private transient BccManifestPath _bccManifest;
+
     /**
      * Get the implicit join path to the <code>oagi.bcc_manifest</code> table.
      */
-    public BccManifest bccManifest() {
+    public BccManifestPath bccManifest() {
         if (_bccManifest == null)
-            _bccManifest = new BccManifest(this, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK);
+            _bccManifest = new BccManifestPath(this, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, null);
 
         return _bccManifest;
     }
+
+    private transient SeqKeyPath _seqKeyPrevSeqKeyIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.seq_key</code> table, via
      * the <code>seq_key_prev_seq_key_id_fk</code> key.
      */
-    public SeqKey seqKeyPrevSeqKeyIdFk() {
+    public SeqKeyPath seqKeyPrevSeqKeyIdFk() {
         if (_seqKeyPrevSeqKeyIdFk == null)
-            _seqKeyPrevSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK);
+            _seqKeyPrevSeqKeyIdFk = new SeqKeyPath(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, null);
 
         return _seqKeyPrevSeqKeyIdFk;
     }
+
+    private transient SeqKeyPath _seqKeyNextSeqKeyIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.seq_key</code> table, via
      * the <code>seq_key_next_seq_key_id_fk</code> key.
      */
-    public SeqKey seqKeyNextSeqKeyIdFk() {
+    public SeqKeyPath seqKeyNextSeqKeyIdFk() {
         if (_seqKeyNextSeqKeyIdFk == null)
-            _seqKeyNextSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
+            _seqKeyNextSeqKeyIdFk = new SeqKeyPath(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK, null);
 
         return _seqKeyNextSeqKeyIdFk;
     }
@@ -239,27 +280,87 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return new SeqKey(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, ULong, ULong> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public SeqKey where(Condition condition) {
+        return new SeqKey(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public SeqKey where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super ULong, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public SeqKey where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public SeqKey where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public SeqKey where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public SeqKey where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public SeqKey where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public SeqKey where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public SeqKey whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public SeqKey whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

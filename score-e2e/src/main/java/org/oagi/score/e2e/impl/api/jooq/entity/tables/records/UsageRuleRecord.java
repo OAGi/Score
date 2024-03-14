@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
@@ -20,7 +17,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
  * a usage rule expression with the unstructured constraint type.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implements Record3<ULong, String, Integer> {
+public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,91 +78,6 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> implem
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row3<ULong, String, Integer> fieldsRow() {
-        return (Row3) super.fieldsRow();
-    }
-
-    @Override
-    public Row3<ULong, String, Integer> valuesRow() {
-        return (Row3) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return UsageRule.USAGE_RULE.USAGE_RULE_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return UsageRule.USAGE_RULE.NAME;
-    }
-
-    @Override
-    public Field<Integer> field3() {
-        return UsageRule.USAGE_RULE.CONDITION_TYPE;
-    }
-
-    @Override
-    public ULong component1() {
-        return getUsageRuleId();
-    }
-
-    @Override
-    public String component2() {
-        return getName();
-    }
-
-    @Override
-    public Integer component3() {
-        return getConditionType();
-    }
-
-    @Override
-    public ULong value1() {
-        return getUsageRuleId();
-    }
-
-    @Override
-    public String value2() {
-        return getName();
-    }
-
-    @Override
-    public Integer value3() {
-        return getConditionType();
-    }
-
-    @Override
-    public UsageRuleRecord value1(ULong value) {
-        setUsageRuleId(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleRecord value2(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleRecord value3(Integer value) {
-        setConditionType(value);
-        return this;
-    }
-
-    @Override
-    public UsageRuleRecord values(ULong value1, String value2, Integer value3) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        return this;
     }
 
     // -------------------------------------------------------------------------

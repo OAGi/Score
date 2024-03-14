@@ -4,18 +4,22 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
+import java.util.Collection;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function19;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row19;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +30,8 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppOauth2User.AppOauth2UserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Oauth2AppScope.Oauth2AppScopePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.Oauth2AppRecord;
 
 
@@ -146,11 +152,11 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     public final TableField<Oauth2AppRecord, Byte> IS_DISABLED = createField(DSL.name("is_disabled"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
 
     private Oauth2App(Name alias, Table<Oauth2AppRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Oauth2App(Name alias, Table<Oauth2AppRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Oauth2App(Name alias, Table<Oauth2AppRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -174,8 +180,37 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
         this(DSL.name("oauth2_app"), null);
     }
 
-    public <O extends Record> Oauth2App(Table<O> child, ForeignKey<O, Oauth2AppRecord> key) {
-        super(child, key, OAUTH2_APP);
+    public <O extends Record> Oauth2App(Table<O> path, ForeignKey<O, Oauth2AppRecord> childPath, InverseForeignKey<O, Oauth2AppRecord> parentPath) {
+        super(path, childPath, parentPath, OAUTH2_APP);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class Oauth2AppPath extends Oauth2App implements Path<Oauth2AppRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> Oauth2AppPath(Table<O> path, ForeignKey<O, Oauth2AppRecord> childPath, InverseForeignKey<O, Oauth2AppRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private Oauth2AppPath(Name alias, Table<Oauth2AppRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public Oauth2AppPath as(String alias) {
+            return new Oauth2AppPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public Oauth2AppPath as(Name alias) {
+            return new Oauth2AppPath(alias, this);
+        }
+
+        @Override
+        public Oauth2AppPath as(Table<?> alias) {
+            return new Oauth2AppPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -191,6 +226,32 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     @Override
     public UniqueKey<Oauth2AppRecord> getPrimaryKey() {
         return Keys.KEY_OAUTH2_APP_PRIMARY;
+    }
+
+    private transient AppOauth2UserPath _appOauth2User;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.app_oauth2_user</code> table
+     */
+    public AppOauth2UserPath appOauth2User() {
+        if (_appOauth2User == null)
+            _appOauth2User = new AppOauth2UserPath(this, null, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK.getInverseKey());
+
+        return _appOauth2User;
+    }
+
+    private transient Oauth2AppScopePath _oauth2AppScope;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.oauth2_app_scope</code> table
+     */
+    public Oauth2AppScopePath oauth2AppScope() {
+        if (_oauth2AppScope == null)
+            _oauth2AppScope = new Oauth2AppScopePath(this, null, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK.getInverseKey());
+
+        return _oauth2AppScope;
     }
 
     @Override
@@ -232,27 +293,87 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
         return new Oauth2App(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row19 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row19<ULong, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, String, Integer, Byte> fieldsRow() {
-        return (Row19) super.fieldsRow();
+    public Oauth2App where(Condition condition) {
+        return new Oauth2App(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function19<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? super Byte, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Oauth2App where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function19<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? super Byte, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Oauth2App where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2App where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2App where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2App where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2App where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Oauth2App where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2App whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Oauth2App whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

@@ -4,10 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables.records;
 
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
@@ -17,7 +14,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.CdtPri;
  * This table stores the CDT primitives.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements Record2<ULong, String> {
+public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,69 +57,6 @@ public class CdtPriRecord extends UpdatableRecordImpl<CdtPriRecord> implements R
     @Override
     public Record1<ULong> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record2 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row2<ULong, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
-    }
-
-    @Override
-    public Row2<ULong, String> valuesRow() {
-        return (Row2) super.valuesRow();
-    }
-
-    @Override
-    public Field<ULong> field1() {
-        return CdtPri.CDT_PRI.CDT_PRI_ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return CdtPri.CDT_PRI.NAME;
-    }
-
-    @Override
-    public ULong component1() {
-        return getCdtPriId();
-    }
-
-    @Override
-    public String component2() {
-        return getName();
-    }
-
-    @Override
-    public ULong value1() {
-        return getCdtPriId();
-    }
-
-    @Override
-    public String value2() {
-        return getName();
-    }
-
-    @Override
-    public CdtPriRecord value1(ULong value) {
-        setCdtPriId(value);
-        return this;
-    }
-
-    @Override
-    public CdtPriRecord value2(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public CdtPriRecord values(ULong value1, String value2) {
-        value1(value1);
-        value2(value2);
-        return this;
     }
 
     // -------------------------------------------------------------------------

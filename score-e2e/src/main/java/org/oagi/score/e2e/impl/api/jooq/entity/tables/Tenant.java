@@ -4,18 +4,22 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
-import java.util.function.Function;
+import java.util.Collection;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -26,6 +30,10 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx.TenantBusinessCtxPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant.UserTenantPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TenantRecord;
 
 
@@ -61,11 +69,11 @@ public class Tenant extends TableImpl<TenantRecord> {
     public final TableField<TenantRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of the tenant.");
 
     private Tenant(Name alias, Table<TenantRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Tenant(Name alias, Table<TenantRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("This table about the user tenant role."), TableOptions.table());
+    private Tenant(Name alias, Table<TenantRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("This table about the user tenant role."), TableOptions.table(), where);
     }
 
     /**
@@ -89,8 +97,37 @@ public class Tenant extends TableImpl<TenantRecord> {
         this(DSL.name("tenant"), null);
     }
 
-    public <O extends Record> Tenant(Table<O> child, ForeignKey<O, TenantRecord> key) {
-        super(child, key, TENANT);
+    public <O extends Record> Tenant(Table<O> path, ForeignKey<O, TenantRecord> childPath, InverseForeignKey<O, TenantRecord> parentPath) {
+        super(path, childPath, parentPath, TENANT);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class TenantPath extends Tenant implements Path<TenantRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> TenantPath(Table<O> path, ForeignKey<O, TenantRecord> childPath, InverseForeignKey<O, TenantRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private TenantPath(Name alias, Table<TenantRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public TenantPath as(String alias) {
+            return new TenantPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public TenantPath as(Name alias) {
+            return new TenantPath(alias, this);
+        }
+
+        @Override
+        public TenantPath as(Table<?> alias) {
+            return new TenantPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -106,6 +143,48 @@ public class Tenant extends TableImpl<TenantRecord> {
     @Override
     public UniqueKey<TenantRecord> getPrimaryKey() {
         return Keys.KEY_TENANT_PRIMARY;
+    }
+
+    private transient TenantBusinessCtxPath _tenantBusinessCtx;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.tenant_business_ctx</code> table
+     */
+    public TenantBusinessCtxPath tenantBusinessCtx() {
+        if (_tenantBusinessCtx == null)
+            _tenantBusinessCtx = new TenantBusinessCtxPath(this, null, Keys.TENANT_BUSINESS_CTX_TENANT_ID_FK.getInverseKey());
+
+        return _tenantBusinessCtx;
+    }
+
+    private transient UserTenantPath _userTenant;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.user_tenant</code>
+     * table
+     */
+    public UserTenantPath userTenant() {
+        if (_userTenant == null)
+            _userTenant = new UserTenantPath(this, null, Keys.USER_TENANT_TENANT_ID_FK.getInverseKey());
+
+        return _userTenant;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.biz_ctx</code>
+     * table
+     */
+    public BizCtxPath bizCtx() {
+        return tenantBusinessCtx().bizCtx();
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the <code>oagi.app_user</code>
+     * table
+     */
+    public AppUserPath appUser() {
+        return userTenant().appUser();
     }
 
     @Override
@@ -147,27 +226,87 @@ public class Tenant extends TableImpl<TenantRecord> {
         return new Tenant(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row2 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row2<ULong, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Tenant where(Condition condition) {
+        return new Tenant(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Tenant where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super ULong, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Tenant where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tenant where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tenant where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tenant where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tenant where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tenant where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tenant whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tenant whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

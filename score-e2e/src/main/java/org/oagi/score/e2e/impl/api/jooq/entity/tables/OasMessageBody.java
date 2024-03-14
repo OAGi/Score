@@ -6,20 +6,24 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function6;
 import org.jooq.Identity;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row6;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -31,6 +35,10 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasRequest.OasRequestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasResponse.OasResponsePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasMessageBodyRecord;
 
 
@@ -92,11 +100,11 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     public final TableField<OasMessageBodyRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
     private OasMessageBody(Name alias, Table<OasMessageBodyRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private OasMessageBody(Name alias, Table<OasMessageBodyRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private OasMessageBody(Name alias, Table<OasMessageBodyRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -120,8 +128,37 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
         this(DSL.name("oas_message_body"), null);
     }
 
-    public <O extends Record> OasMessageBody(Table<O> child, ForeignKey<O, OasMessageBodyRecord> key) {
-        super(child, key, OAS_MESSAGE_BODY);
+    public <O extends Record> OasMessageBody(Table<O> path, ForeignKey<O, OasMessageBodyRecord> childPath, InverseForeignKey<O, OasMessageBodyRecord> parentPath) {
+        super(path, childPath, parentPath, OAS_MESSAGE_BODY);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class OasMessageBodyPath extends OasMessageBody implements Path<OasMessageBodyRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> OasMessageBodyPath(Table<O> path, ForeignKey<O, OasMessageBodyRecord> childPath, InverseForeignKey<O, OasMessageBodyRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private OasMessageBodyPath(Name alias, Table<OasMessageBodyRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public OasMessageBodyPath as(String alias) {
+            return new OasMessageBodyPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public OasMessageBodyPath as(Name alias) {
+            return new OasMessageBodyPath(alias, this);
+        }
+
+        @Override
+        public OasMessageBodyPath as(Table<?> alias) {
+            return new OasMessageBodyPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -149,41 +186,69 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
         return Arrays.asList(Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
     }
 
-    private transient TopLevelAsbiep _topLevelAsbiep;
-    private transient AppUser _oasMessageBodyCreatedByFk;
-    private transient AppUser _oasMessageBodyLastUpdatedByFk;
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
      * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
      * table.
      */
-    public TopLevelAsbiep topLevelAsbiep() {
+    public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK);
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
     }
+
+    private transient AppUserPath _oasMessageBodyCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_message_body_created_by_fk</code> key.
      */
-    public AppUser oasMessageBodyCreatedByFk() {
+    public AppUserPath oasMessageBodyCreatedByFk() {
         if (_oasMessageBodyCreatedByFk == null)
-            _oasMessageBodyCreatedByFk = new AppUser(this, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK);
+            _oasMessageBodyCreatedByFk = new AppUserPath(this, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, null);
 
         return _oasMessageBodyCreatedByFk;
     }
+
+    private transient AppUserPath _oasMessageBodyLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>oas_message_body_last_updated_by_fk</code> key.
      */
-    public AppUser oasMessageBodyLastUpdatedByFk() {
+    public AppUserPath oasMessageBodyLastUpdatedByFk() {
         if (_oasMessageBodyLastUpdatedByFk == null)
-            _oasMessageBodyLastUpdatedByFk = new AppUser(this, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
+            _oasMessageBodyLastUpdatedByFk = new AppUserPath(this, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK, null);
 
         return _oasMessageBodyLastUpdatedByFk;
+    }
+
+    private transient OasRequestPath _oasRequest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
+     * table
+     */
+    public OasRequestPath oasRequest() {
+        if (_oasRequest == null)
+            _oasRequest = new OasRequestPath(this, null, Keys.OAS_REQUEST_OAS_MESSAGE_BODY_ID_FK.getInverseKey());
+
+        return _oasRequest;
+    }
+
+    private transient OasResponsePath _oasResponse;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * table
+     */
+    public OasResponsePath oasResponse() {
+        if (_oasResponse == null)
+            _oasResponse = new OasResponsePath(this, null, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK.getInverseKey());
+
+        return _oasResponse;
     }
 
     @Override
@@ -225,27 +290,87 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
         return new OasMessageBody(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row6<ULong, ULong, ULong, ULong, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public OasMessageBody where(Condition condition) {
+        return new OasMessageBody(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public OasMessageBody where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function6<? super ULong, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public OasMessageBody where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMessageBody where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMessageBody where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMessageBody where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMessageBody where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public OasMessageBody where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMessageBody whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public OasMessageBody whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

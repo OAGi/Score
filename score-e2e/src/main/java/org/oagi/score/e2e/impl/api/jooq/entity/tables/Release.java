@@ -6,19 +6,23 @@ package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function11;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row11;
+import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.SelectField;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -29,6 +33,23 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
 import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValueManifest.AgencyIdListValueManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest.AsccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccManifest.BccManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BlobContentManifest.BlobContentManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Namespace.NamespacePath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
 
 
@@ -125,11 +146,11 @@ public class Release extends TableImpl<ReleaseRecord> {
     public final TableField<ReleaseRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("'Initialized'"), SQLDataType.VARCHAR)), this, "This indicates the revision life cycle state of the Release.");
 
     private Release(Name alias, Table<ReleaseRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Release(Name alias, Table<ReleaseRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("The is table store the release information."), TableOptions.table());
+    private Release(Name alias, Table<ReleaseRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment("The is table store the release information."), TableOptions.table(), where);
     }
 
     /**
@@ -153,8 +174,37 @@ public class Release extends TableImpl<ReleaseRecord> {
         this(DSL.name("release"), null);
     }
 
-    public <O extends Record> Release(Table<O> child, ForeignKey<O, ReleaseRecord> key) {
-        super(child, key, RELEASE);
+    public <O extends Record> Release(Table<O> path, ForeignKey<O, ReleaseRecord> childPath, InverseForeignKey<O, ReleaseRecord> parentPath) {
+        super(path, childPath, parentPath, RELEASE);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class ReleasePath extends Release implements Path<ReleaseRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> ReleasePath(Table<O> path, ForeignKey<O, ReleaseRecord> childPath, InverseForeignKey<O, ReleaseRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ReleasePath(Name alias, Table<ReleaseRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ReleasePath as(String alias) {
+            return new ReleasePath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ReleasePath as(Name alias) {
+            return new ReleasePath(alias, this);
+        }
+
+        @Override
+        public ReleasePath as(Table<?> alias) {
+            return new ReleasePath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -177,40 +227,237 @@ public class Release extends TableImpl<ReleaseRecord> {
         return Arrays.asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
     }
 
-    private transient Namespace _namespace;
-    private transient AppUser _releaseCreatedByFk;
-    private transient AppUser _releaseLastUpdatedByFk;
+    private transient NamespacePath _namespace;
 
     /**
      * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public Namespace namespace() {
+    public NamespacePath namespace() {
         if (_namespace == null)
-            _namespace = new Namespace(this, Keys.RELEASE_NAMESPACE_ID_FK);
+            _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
 
         return _namespace;
     }
+
+    private transient AppUserPath _releaseCreatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>release_created_by_fk</code> key.
      */
-    public AppUser releaseCreatedByFk() {
+    public AppUserPath releaseCreatedByFk() {
         if (_releaseCreatedByFk == null)
-            _releaseCreatedByFk = new AppUser(this, Keys.RELEASE_CREATED_BY_FK);
+            _releaseCreatedByFk = new AppUserPath(this, Keys.RELEASE_CREATED_BY_FK, null);
 
         return _releaseCreatedByFk;
     }
+
+    private transient AppUserPath _releaseLastUpdatedByFk;
 
     /**
      * Get the implicit join path to the <code>oagi.app_user</code> table, via
      * the <code>release_last_updated_by_fk</code> key.
      */
-    public AppUser releaseLastUpdatedByFk() {
+    public AppUserPath releaseLastUpdatedByFk() {
         if (_releaseLastUpdatedByFk == null)
-            _releaseLastUpdatedByFk = new AppUser(this, Keys.RELEASE_LAST_UPDATED_BY_FK);
+            _releaseLastUpdatedByFk = new AppUserPath(this, Keys.RELEASE_LAST_UPDATED_BY_FK, null);
 
         return _releaseLastUpdatedByFk;
+    }
+
+    private transient AccManifestPath _accManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.acc_manifest</code>
+     * table
+     */
+    public AccManifestPath accManifest() {
+        if (_accManifest == null)
+            _accManifest = new AccManifestPath(this, null, Keys.ACC_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _accManifest;
+    }
+
+    private transient AgencyIdListManifestPath _agencyIdListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_manifest</code> table
+     */
+    public AgencyIdListManifestPath agencyIdListManifest() {
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifestPath(this, null, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _agencyIdListManifest;
+    }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.agency_id_list_value_manifest</code> table
+     */
+    public AgencyIdListValueManifestPath agencyIdListValueManifest() {
+        if (_agencyIdListValueManifest == null)
+            _agencyIdListValueManifest = new AgencyIdListValueManifestPath(this, null, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _agencyIdListValueManifest;
+    }
+
+    private transient AsccpManifestPath _asccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
+     */
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _asccpManifest;
+    }
+
+    private transient AsccManifestPath _asccManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc_manifest</code>
+     * table
+     */
+    public AsccManifestPath asccManifest() {
+        if (_asccManifest == null)
+            _asccManifest = new AsccManifestPath(this, null, Keys.ASCC_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _asccManifest;
+    }
+
+    private transient BccpManifestPath _bccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
+     * table
+     */
+    public BccpManifestPath bccpManifest() {
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _bccpManifest;
+    }
+
+    private transient BccManifestPath _bccManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc_manifest</code>
+     * table
+     */
+    public BccManifestPath bccManifest() {
+        if (_bccManifest == null)
+            _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _bccManifest;
+    }
+
+    private transient BlobContentManifestPath _blobContentManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.blob_content_manifest</code> table
+     */
+    public BlobContentManifestPath blobContentManifest() {
+        if (_blobContentManifest == null)
+            _blobContentManifest = new BlobContentManifestPath(this, null, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _blobContentManifest;
+    }
+
+    private transient CodeListManifestPath _codeListManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_manifest</code> table
+     */
+    public CodeListManifestPath codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifestPath(this, null, Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _codeListManifest;
+    }
+
+    private transient CodeListValueManifestPath _codeListValueManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.code_list_value_manifest</code> table
+     */
+    public CodeListValueManifestPath codeListValueManifest() {
+        if (_codeListValueManifest == null)
+            _codeListValueManifest = new CodeListValueManifestPath(this, null, Keys.CODE_LIST_VALUE_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _codeListValueManifest;
+    }
+
+    private transient DtManifestPath _dtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.dt_manifest</code>
+     * table
+     */
+    public DtManifestPath dtManifest() {
+        if (_dtManifest == null)
+            _dtManifest = new DtManifestPath(this, null, Keys.DT_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _dtManifest;
+    }
+
+    private transient DtScManifestPath _dtScManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.dt_sc_manifest</code> table
+     */
+    public DtScManifestPath dtScManifest() {
+        if (_dtScManifest == null)
+            _dtScManifest = new DtScManifestPath(this, null, Keys.DT_SC_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _dtScManifest;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.module_set_release</code> table
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, null, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK.getInverseKey());
+
+        return _moduleSetRelease;
+    }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.top_level_asbiep</code> table
+     */
+    public TopLevelAsbiepPath topLevelAsbiep() {
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, null, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK.getInverseKey());
+
+        return _topLevelAsbiep;
+    }
+
+    private transient XbtManifestPath _xbtManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
+     * table
+     */
+    public XbtManifestPath xbtManifest() {
+        if (_xbtManifest == null)
+            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _xbtManifest;
     }
 
     @Override
@@ -252,27 +499,87 @@ public class Release extends TableImpl<ReleaseRecord> {
         return new Release(name.getQualifiedName(), null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row11 type methods
-    // -------------------------------------------------------------------------
-
+    /**
+     * Create an inline derived table from this table
+     */
     @Override
-    public Row11<ULong, String, String, String, String, ULong, ULong, ULong, LocalDateTime, LocalDateTime, String> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Release where(Condition condition) {
+        return new Release(getQualifiedName(), aliased() ? this : null, null, condition);
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Function11<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
+    @Override
+    public Release where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
     }
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function11<? super ULong, ? super String, ? super String, ? super String, ? super String, ? super ULong, ? super ULong, ? super ULong, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
+    @Override
+    public Release where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Release where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Release where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Release where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Release where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Release where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Release whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Release whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }
