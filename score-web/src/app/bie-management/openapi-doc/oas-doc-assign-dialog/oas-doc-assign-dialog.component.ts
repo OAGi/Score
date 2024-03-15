@@ -160,7 +160,8 @@ export class OasDocAssignDialogComponent implements OnInit {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
     if (property === 'verbSelection') {
-      if (this.verbSelection[source] === 'GET' && this.messageBodySelection[source] === 'Request') {
+      if ((this.verbSelection[source] === 'GET' || this.verbSelection[source] === 'DELETE')
+        && this.messageBodySelection[source] === 'Request') {
         this.messageBodySelection[source] = 'Response';
       }
     }
