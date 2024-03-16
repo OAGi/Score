@@ -1,6 +1,6 @@
 {
   "name": "score-external-api",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "Externally facing API",
   "author": "Kenneth Burnett <kenneth.j.burnett@lmco.com>",
   "private": false,
