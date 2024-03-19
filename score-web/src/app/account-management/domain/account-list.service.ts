@@ -63,8 +63,8 @@ export class AccountListService implements OnInit {
     return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params});
   }
 
-  getAccount(appUserId: number): Observable<AccountList> {
-    return this.http.get<AccountList>('/api/account/' + appUserId);
+  getAccount(appUserIdOrUsername: number | string): Observable<AccountList> {
+    return this.http.get<AccountList>('/api/account/' + appUserIdOrUsername);
   }
 
   getAccountNames(): Observable<string[]> {

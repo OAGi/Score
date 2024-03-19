@@ -1,8 +1,10 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
+import org.oagi.score.gateway.http.api.account_management.data.AccountUpdateRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.account_management.service.AccountListService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -24,6 +26,9 @@ public class AccountListController {
 
     @Autowired
     private AccountListService service;
+
+    @Autowired
+    private SessionService sessionService;
 
     @RequestMapping(value = "/accounts_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,10 +84,36 @@ public class AccountListController {
         return service.getAccounts(user, request);
     }
 
-    @RequestMapping(value = "/account/{appUserId:[\\d]+}", method = RequestMethod.GET,
+    @RequestMapping(value = "/account/{appUserIdOrUsername}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppUser getAccount(@PathVariable("appUserId") long appUserId) {
-        return service.getAccountById(appUserId);
+    public AppUser getAccount(@PathVariable("appUserIdOrUsername") Object appUserIdOrUsername) {
+        try {
+            return service.getAccountById(new BigInteger(appUserIdOrUsername.toString()));
+        } catch (NumberFormatException e) {
+            return service.getAccountByUsername(appUserIdOrUsername.toString());
+        }
+    }
+
+    @RequestMapping(value = "/account", method = RequestMethod.POST)
+    public ResponseEntity update(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                 @RequestBody AccountUpdateRequest request) {
+        service.update(sessionService.asScoreUser(user), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/account/resend_email_validation_request", method = RequestMethod.POST)
+    public ResponseEntity resendEmailValidationRequest(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                       @RequestBody AccountUpdateRequest request) {
+        service.sendEmailValidationRequest(sessionService.asScoreUser(user), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/account/email_validation", method = RequestMethod.POST)
+    public ResponseEntity update(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                 @RequestBody Map<String, String> params) {
+        String q = params.get("q");
+        service.verifyEmailValidation(sessionService.asScoreUser(user), q);
+        return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/account", method = RequestMethod.PUT)

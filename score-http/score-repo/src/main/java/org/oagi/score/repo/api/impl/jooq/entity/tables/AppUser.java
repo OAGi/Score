@@ -4,6 +4,7 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -160,6 +161,12 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * the email value is verified or not.
      */
     public final TableField<AppUserRecord, Byte> EMAIL_VERIFIED = createField(DSL.name("email_verified"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The fact whether the email value is verified or not.");
+
+    /**
+     * The column <code>oagi.app_user.email_verified_timestamp</code>. The
+     * timestamp when the email address has verified.
+     */
+    public final TableField<AppUserRecord, LocalDateTime> EMAIL_VERIFIED_TIMESTAMP = createField(DSL.name("email_verified_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "The timestamp when the email address has verified.");
 
     /**
      * The column <code>oagi.app_user.is_developer</code>.

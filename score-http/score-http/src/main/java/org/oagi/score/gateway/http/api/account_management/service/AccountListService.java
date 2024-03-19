@@ -1,11 +1,19 @@
 package org.oagi.score.gateway.http.api.account_management.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.data.AccountListRequest;
+import org.oagi.score.gateway.http.api.account_management.data.AccountUpdateRequest;
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
+import org.oagi.score.gateway.http.api.account_management.data.EmailValidationInfo;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
+import org.oagi.score.gateway.http.api.mail.service.MailService;
 import org.oagi.score.gateway.http.api.tenant_management.service.TenantService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppOauth2UserRecord;
@@ -18,15 +26,21 @@ import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
+import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
@@ -36,6 +50,11 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 @Service
 @Transactional(readOnly = true)
 public class AccountListService {
+
+    private static long EMAIL_VALIDATION_EXPIRATION_TIME_IN_MINUTES = 10;
+
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     private SessionService sessionService;
@@ -193,7 +212,7 @@ public class AccountListService {
         return response;
     }
 
-    public AppUser getAccountById(long appUserId) {
+    public AppUser getAccountById(BigInteger appUserId) {
         return getAccount(APP_USER.APP_USER_ID.eq(ULong.valueOf(appUserId)));
     }
 
@@ -210,11 +229,13 @@ public class AccountListService {
                         APP_USER.IS_ADMIN.as("admin"),
                         APP_USER.IS_ENABLED.as("enabled"),
                         APP_USER.ORGANIZATION,
+                        APP_USER.EMAIL,
+                        APP_USER.EMAIL_VERIFIED,
                         APP_OAUTH2_USER.APP_OAUTH2_USER_ID,
                         OAUTH2_APP.PROVIDER_NAME,
                         APP_OAUTH2_USER.SUB,
                         APP_OAUTH2_USER.NAME.as("oidc_name"),
-                        APP_OAUTH2_USER.EMAIL,
+                        APP_OAUTH2_USER.EMAIL.as("oidc_email"),
                         APP_OAUTH2_USER.NICKNAME,
                         APP_OAUTH2_USER.PREFERRED_USERNAME,
                         APP_OAUTH2_USER.PHONE_NUMBER)
@@ -324,6 +345,115 @@ public class AccountListService {
     }
 
     @Transactional
+    public void update(ScoreUser requester, AccountUpdateRequest request) {
+        AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
+                .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
+                .fetchOne();
+        if (Objects.equals(request.getEmail(), appUserRecord.getEmail())) {
+            return;
+        }
+
+        dslContext.update(APP_USER)
+                .set(APP_USER.EMAIL, request.getEmail())
+                .set(APP_USER.EMAIL_VERIFIED, (byte) 0)
+                .setNull(APP_USER.EMAIL_VERIFIED_TIMESTAMP)
+                .where(APP_USER.APP_USER_ID.eq(appUserRecord.getAppUserId()))
+                .execute();
+
+        requester.setEmailAddress(request.getEmail());
+        requester.setEmailVerified(false);
+
+        sendEmailValidationRequest(requester, request);
+    }
+
+    @Transactional
+    public void sendEmailValidationRequest(ScoreUser requester, AccountUpdateRequest request) {
+        AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
+                .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
+                .fetchOne();
+
+        SendMailRequest sendMailRequest = new SendMailRequest();
+        sendMailRequest.setTemplateName("email-validation");
+        sendMailRequest.setRecipient(requester);
+        sendMailRequest.setParameters(request.getParameters());
+
+        EmailValidationInfo validationInfo = new EmailValidationInfo();
+        validationInfo.setAppUserId(appUserRecord.getAppUserId().toBigInteger());
+        validationInfo.setEmail(request.getEmail());
+        validationInfo.setTimestamp(new Date());
+
+        byte[] bytes;
+        try {
+            bytes = new ObjectMapper().writeValueAsBytes(validationInfo);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Failed to write an email validation info.", e);
+        }
+
+        BytesEncryptor encryptor = new AesBytesEncryptor(appUserRecord.getPassword(),
+                Hex.encodeHexString(appUserRecord.getLoginId().getBytes()));
+        byte[] encryptedObj = encryptor.encrypt(bytes);
+        String q = Base64.encodeBase64String(encryptedObj);
+
+        String emailValidationLink = (String) sendMailRequest.getParameters().get("email_validation_link");
+        sendMailRequest.getParameters().put("email_validation_link",
+                emailValidationLink + "?q=" + URLEncoder.encode(q, StandardCharsets.UTF_8));
+        mailService.sendMail(requester, sendMailRequest);
+    }
+
+    @Transactional
+    public void verifyEmailValidation(ScoreUser requester, String q) {
+        AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
+                .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
+                .fetchOne();
+
+        byte[] decryptedObj;
+        try {
+            BytesEncryptor encryptor = new AesBytesEncryptor(appUserRecord.getPassword(),
+                    Hex.encodeHexString(appUserRecord.getLoginId().getBytes()));
+            byte[] decQ = Base64.decodeBase64(q);
+            decryptedObj = encryptor.decrypt(decQ);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("The request does not seem to be intended for the current user or contains incorrect information.", e);
+        }
+
+        EmailValidationInfo emailValidationInfo;
+        try {
+            emailValidationInfo = new ObjectMapper().readValue(decryptedObj, EmailValidationInfo.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read an email validation info.", e);
+        }
+
+        if (!Objects.equals(emailValidationInfo.getAppUserId(), appUserRecord.getAppUserId().toBigInteger())) {
+            throw new IllegalArgumentException("This request is not for the current user.");
+        }
+
+        if (!Objects.equals(emailValidationInfo.getEmail(), appUserRecord.getEmail())) {
+            throw new IllegalArgumentException("This request contains an invalid email.");
+        }
+
+        Date now = new Date();
+        if (emailValidationInfo.getTimestamp().after(now)) {
+            throw new IllegalArgumentException("This request is invalid.");
+        }
+
+        long diff = now.getTime() - emailValidationInfo.getTimestamp().getTime();
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+        if (minutes > EMAIL_VALIDATION_EXPIRATION_TIME_IN_MINUTES) {
+            throw new IllegalArgumentException("This request has been expired.");
+        }
+
+        if ((byte) 1 == appUserRecord.getEmailVerified()) {
+            throw new IllegalArgumentException("The email address has already been verified.");
+        }
+
+        dslContext.update(APP_USER)
+                .set(APP_USER.EMAIL_VERIFIED, (byte) 1)
+                .set(APP_USER.EMAIL_VERIFIED_TIMESTAMP, LocalDateTime.now())
+                .where(APP_USER.APP_USER_ID.eq(appUserRecord.getAppUserId()))
+                .execute();
+    }
+
+    @Transactional
     public void insert(AuthenticatedPrincipal user, AppUser account) {
         org.oagi.score.service.common.data.AppUser appUser = sessionService.getAppUserByUsername(user);
         if (!appUser.isAdmin()) {
@@ -394,4 +524,30 @@ public class AccountListService {
                 .execute();
     }
 
+
+    public static void main(String[] args) {
+        AppUserRecord appUserRecord = new AppUserRecord();
+        appUserRecord.setAppUserId(ULong.valueOf(100000002));
+        appUserRecord.setLoginId("test2");
+        appUserRecord.setPassword("$2a$10$oarLmPPWgWAjpVuE73bdMuLq48Df1H94lTDtp4nMyJlvyjL7Br3f6");
+
+        EmailValidationInfo validationInfo = new EmailValidationInfo();
+        validationInfo.setAppUserId(appUserRecord.getAppUserId().toBigInteger());
+        validationInfo.setEmail("hakju.oh@gmail.com");
+        validationInfo.setTimestamp(new Date());
+
+        byte[] bytes;
+        try {
+            bytes = new ObjectMapper().writeValueAsBytes(validationInfo);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Failed to write an email validation info.", e);
+        }
+
+        BytesEncryptor encryptor = new AesBytesEncryptor(appUserRecord.getPassword(),
+                Hex.encodeHexString(appUserRecord.getLoginId().getBytes()));
+        byte[] encryptedObj = encryptor.encrypt(bytes);
+        String q = Base64.encodeBase64String(encryptedObj);
+
+        System.out.println(q);
+    }
 }

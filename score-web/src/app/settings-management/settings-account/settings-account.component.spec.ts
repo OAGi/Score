@@ -1,20 +1,20 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {SettingsPasswordComponent} from './settings-password.component';
+import {SettingsAccountComponent} from './settings-account.component';
 
 describe('SettingsProfileComponent', () => {
-  let component: SettingsPasswordComponent;
-  let fixture: ComponentFixture<SettingsPasswordComponent>;
+  let component: SettingsAccountComponent;
+  let fixture: ComponentFixture<SettingsAccountComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SettingsPasswordComponent]
+      declarations: [SettingsAccountComponent]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SettingsPasswordComponent);
+    fixture = TestBed.createComponent(SettingsAccountComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

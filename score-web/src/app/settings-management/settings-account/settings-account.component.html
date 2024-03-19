@@ -1,11 +1,51 @@
 <div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
   <div class="settings-layout">
-    <score-settings-menu active="Password"></score-settings-menu>
+    <score-settings-menu active="Account"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
+        <mat-card class="p-0">
+          <mat-toolbar class="bg-white">
+            <span class="title">Personal Info</span>
+            <span class="flex-11-auto"></span>
+          </mat-toolbar>
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              <mat-form-field>
+                <mat-label>Email Address</mat-label>
+                <input matInput [formControl]="emailFormControl"/>
+                <mat-error *ngIf="emailFormControl.hasError('email')">
+                  Please provide a valid email address
+                </mat-error>
+              </mat-form-field>
+              <div class="d-flex email-validation" *ngIf="emailVerified !== undefined">
+                <span class="verified" *ngIf="emailVerified">This email address has been verified.</span>
+                <span class="unverified" *ngIf="!emailVerified">This email address needs to be verified.</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-card>
+        <div class="row action-group m-0">
+          <div class="col-12 actions-wrap pl-0">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="updatePersonalInfo()"
+                      [disabled]="isPersonInfoFormDisabled()">
+                Update
+              </button>
+              <button mat-raised-button color="primary" (click)="resendEmailValidationRequest()"
+                      *ngIf="emailVerified !== undefined && !emailVerified">
+                Resend Validation Request
+              </button>
+            </div>
+          </div>
+        </div>
+
         <mat-card class="p-0" *ngIf="!hideChangePassword">
           <mat-toolbar class="bg-white">
-            <span class="title">{{ title }}</span>
+            <span class="title">Change password</span>
             <span class="flex-11-auto"></span>
           </mat-toolbar>
           <mat-card class="mb-2">
@@ -41,10 +81,10 @@
         </mat-card>
 
         <div class="row action-group m-0">
-          <div class="col-12 actions-wrap">
+          <div class="col-12 actions-wrap pl-0">
             <div class="actions">
-              <button mat-raised-button color="primary" (click)="update()"
-                      [disabled]="isDisabled()">
+              <button mat-raised-button color="primary" (click)="updatePassword()"
+                      [disabled]="isPasswordFormDisabled()">
                 Update
               </button>
             </div>

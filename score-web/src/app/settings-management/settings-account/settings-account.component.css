@@ -9,3 +9,15 @@
 .layout-main {
   grid-column: 2/span 2;
 }
+
+.email-validation {
+  font-size: 13px;
+}
+
+.verified {
+  color: #1a7f37;
+}
+
+.unverified {
+  color: #d1242f;
+}

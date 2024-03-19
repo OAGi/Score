@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationSettingsInfo} from './application-settings';
 import {WebPageInfo} from '../../../basis/about/domain/about';
@@ -18,6 +18,12 @@ export class SettingsApplicationSettingsService {
   update(applicationSettingsInfo: ApplicationSettingsInfo): Observable<any> {
     return this.http.post('/api/application/settings', {
       smtpSettingsInfo: applicationSettingsInfo.smtpSettingsInfo
+    });
+  }
+
+  validateEmail(q: string): Observable<any> {
+    return this.http.post('/api/account/email_validation', {
+      q
     });
   }
 

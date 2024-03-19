@@ -12,6 +12,8 @@ public class AppUser {
     private String password;
     private String name;
     private String organization;
+    private String email;
+    private boolean emailVerified;
     private boolean developer;
     private boolean admin;
     private boolean enabled;
@@ -20,7 +22,7 @@ public class AppUser {
     private String providerName;
     private String sub;
     private String oidcName;
-    private String email;
+    private String oidcEmail;
     private String nickname;
     private String preferredUsername;
     private String phoneNumber;

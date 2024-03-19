@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {SettingsPasswordService} from './domain/settings-password.service';
+import {SettingsAccountService} from './domain/settings-account.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AuthService} from '../../authentication/auth.service';
@@ -7,13 +7,17 @@ import {Router} from '@angular/router';
 import {AbstractControl, FormControl, ValidatorFn, Validators} from '@angular/forms';
 
 @Component({
-  selector: 'score-settings-password',
-  templateUrl: './settings-password.component.html',
-  styleUrls: ['./settings-password.component.css']
+  selector: 'score-settings-account',
+  templateUrl: './settings-account.component.html',
+  styleUrls: ['./settings-account.component.css']
 })
-export class SettingsPasswordComponent implements OnInit {
+export class SettingsAccountComponent implements OnInit {
 
-  title = 'Change password';
+  loading: boolean;
+
+  originalEmail: string;
+  emailFormControl: FormControl;
+  emailVerified: any = undefined;
 
   oldPasswordFormControl: FormControl;
   newPasswordFormControl: FormControl;
@@ -21,7 +25,7 @@ export class SettingsPasswordComponent implements OnInit {
 
   hideChangePassword: boolean;
 
-  constructor(private service: SettingsPasswordService,
+  constructor(private service: SettingsAccountService,
               private accountService: AccountListService,
               private snackBar: MatSnackBar,
               private auth: AuthService,
@@ -30,6 +34,14 @@ export class SettingsPasswordComponent implements OnInit {
 
   ngOnInit() {
     const token = this.auth.getUserToken();
+    this.accountService.getAccount(token.username).subscribe(resp => {
+      this.originalEmail = resp.email;
+      this.emailFormControl = new FormControl(resp.email, [Validators.email]);
+      if (!!resp.email) {
+        this.emailVerified = resp.emailVerified;
+      }
+    });
+
     this.hideChangePassword = token.authentication !== 'basic';
 
     this.oldPasswordFormControl = new FormControl('', [
@@ -42,6 +54,50 @@ export class SettingsPasswordComponent implements OnInit {
       Validators.required, Validators.minLength(5), Validators.maxLength(100),
       this.equals(this.newPasswordFormControl)
     ]);
+  }
+
+  isPersonInfoFormDisabled() {
+    return !this.emailFormControl.value || this.emailFormControl.invalid || (this.originalEmail === this.emailFormControl.value);
+  }
+
+  updatePersonalInfo() {
+    this.loading = true;
+
+    this.service.updatePersonalInfo({
+      email: this.emailFormControl.value
+    }, {
+      email_validation_link: window.location.href.replace('/settings/account', '/settings/email_validation')
+    }).subscribe(_ => {
+      if (this.emailFormControl.valid) {
+        this.emailVerified = false;
+      }
+      this.originalEmail = this.emailFormControl.value;
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+
+      this.loading = false;
+    }, error => {
+      this.loading = false;
+    });
+  }
+
+  resendEmailValidationRequest() {
+    this.loading = true;
+
+    this.service.resendEmailValidationRequest({
+      email: this.emailFormControl.value
+    }, {
+      email_validation_link: window.location.href.replace('/settings/account', '/settings/email_validation')
+    }).subscribe(_ => {
+      this.snackBar.open('Resent', '', {
+        duration: 3000,
+      });
+
+      this.loading = false;
+    }, error => {
+      this.loading = false;
+    });
   }
 
   equals(anotherControl: AbstractControl): ValidatorFn {
@@ -57,19 +113,18 @@ export class SettingsPasswordComponent implements OnInit {
     return (variable.length < 5);
   }
 
-  isDisabled() {
+  isPasswordFormDisabled() {
     return this.oldPasswordFormControl.invalid ||
       this.newPasswordFormControl.invalid ||
       this.confirmPasswordFormControl.invalid;
   }
 
-  update() {
+  updatePassword() {
     this.service.updatePassword(this.oldPasswordFormControl.value, this.newPasswordFormControl.value)
       .subscribe(_ => {
         this.snackBar.open('Updated', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/');
       });
   }
 

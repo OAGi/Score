@@ -99,13 +99,13 @@
 
     <button mat-button>
       <div>
-        <mat-icon class="notIcon" 
-                  (click)="navigateMessageListPage()" 
-                  matBadge="{{ notiCount }}" 
+        <mat-icon class="notIcon"
+                  (click)="navigateMessageListPage()"
+                  matBadge="{{ notiCount }}"
                   matBadgeColor="primary"
                   [matBadgeHidden]="notiCount <= 0"
                   matTooltip="You have {{ (!!notiCount && notiCount > 0) ? notiCount : 'no' }} unread notification{{ (!!notiCount && notiCount == 1) ? '' : 's' }}"
-                  matTooltipPosition="below" 
+                  matTooltipPosition="below"
                   matTooltipClass="notiTooltip">{{ notiMatIcon }}</mat-icon>
       </div>
     </button>
@@ -126,7 +126,7 @@
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="settings/password" *ngIf="roles.length > 0">Settings</button>
+        <button mat-menu-item routerLink="settings/account" *ngIf="roles.length > 0">Settings</button>
         <button mat-menu-item (click)="logout()">Logout</button>
       </ng-template>
     </mat-menu>

@@ -97,7 +97,7 @@ public class AccountController implements InitializingBean {
             AppOauth2User appOauth2User = pendingListService.getPendingBySub(sub);
 
             if (appOauth2User != null && appOauth2User.getAppUserId() != null) {
-                appUser = accountListService.getAccountById(appOauth2User.getAppUserId().longValue());
+                appUser = accountListService.getAccountById(appOauth2User.getAppUserId());
                 resp.put("username", appUser.getLoginId());
                 resp.put("authentication", "oauth2");
                 List<String> roles = new ArrayList();

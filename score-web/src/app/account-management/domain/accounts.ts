@@ -101,6 +101,8 @@ export class AccountList {
   password: string;
   name: string;
   organization: string;
+  email: string;
+  emailVerified: boolean;
   enabled: boolean;
   hasData: boolean;
   developer: boolean;
@@ -109,7 +111,7 @@ export class AccountList {
   providerName: string;
   sub: string;
   oidcName: string;
-  email: string;
+  oidcEmail: string;
   nickname: string;
   preferredUsername: string;
   phoneNumber: string;

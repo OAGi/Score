@@ -26,9 +26,6 @@ export class BieAcceptOwnershipTransferRequestComponent implements OnInit {
     const topLevelAsbiepId = Number(this.route.snapshot.queryParamMap.get('topLevelAsbiepId'));
     const targetLoginId = this.route.snapshot.queryParamMap.get('targetLoginId');
 
-    console.log(topLevelAsbiepId);
-    console.log(targetLoginId);
-
     this.service.transferOwnership(topLevelAsbiepId, targetLoginId).subscribe(_ => {
       this.snackBar.open('Transferred', '', {
         duration: 3000,
