@@ -91,6 +91,8 @@ public class SessionService {
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
                 APP_USER.ORGANIZATION,
+                APP_USER.EMAIL,
+                APP_USER.EMAIL_VERIFIED,
                 APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled")
@@ -105,6 +107,8 @@ public class SessionService {
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
                 APP_USER.ORGANIZATION,
+                APP_USER.EMAIL,
+                APP_USER.EMAIL_VERIFIED,
                 APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled")
@@ -124,6 +128,8 @@ public class SessionService {
                 APP_USER.LOGIN_ID,
                 APP_USER.NAME,
                 APP_USER.ORGANIZATION,
+                APP_USER.EMAIL,
+                APP_USER.EMAIL_VERIFIED,
                 APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.IS_ADMIN.as("admin"),
                 APP_USER.IS_ENABLED.as("enabled"))

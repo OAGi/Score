@@ -527,6 +527,16 @@ public class BieService {
             throw new IllegalArgumentException("Not found a target user.");
         }
 
+        if (dslContext.selectCount()
+                .from(TOP_LEVEL_ASBIEP)
+                .where(and(
+                        TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(ULong.valueOf(ownerAppUserId)),
+                        TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId))
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) == 0) {
+            throw new IllegalArgumentException("This BIE is not owned by the current user.");
+        }
+
         dslContext.update(TOP_LEVEL_ASBIEP)
                 .set(TOP_LEVEL_ASBIEP.OWNER_USER_ID, ULong.valueOf(targetAppUserId))
                 .where(and(

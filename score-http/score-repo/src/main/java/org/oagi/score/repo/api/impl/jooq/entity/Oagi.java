@@ -114,6 +114,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TextTemplate;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
@@ -776,6 +777,11 @@ public class Oagi extends SchemaImpl {
     public final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
 
     /**
+     * The table <code>oagi.text_template</code>.
+     */
+    public final TextTemplate TEXT_TEMPLATE = TextTemplate.TEXT_TEMPLATE;
+
+    /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and
      * the owner_top_level_asbiep_id column in all BIE tables allow all related
      * BIEs to be retrieved all at once speeding up the profile BOD
@@ -936,6 +942,7 @@ public class Oagi extends SchemaImpl {
             Tag.TAG,
             Tenant.TENANT,
             TenantBusinessCtx.TENANT_BUSINESS_CTX,
+            TextTemplate.TEXT_TEMPLATE,
             TopLevelAsbiep.TOP_LEVEL_ASBIEP,
             UsageRule.USAGE_RULE,
             UsageRuleExpression.USAGE_RULE_EXPRESSION,

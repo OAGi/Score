@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.CONFIGURATION;
 
-;
 
 @Repository
 public class ConfigurationRepository {
@@ -19,6 +18,13 @@ public class ConfigurationRepository {
                 .from(CONFIGURATION)
                 .where(CONFIGURATION.NAME.eq(paramConfigName))
                 .fetchOne(CONFIGURATION.VALUE);
+    }
+
+    public void updateConfiguration(String name, String value) {
+        dslContext.update(CONFIGURATION)
+                .set(CONFIGURATION.VALUE, value)
+                .where(CONFIGURATION.NAME.eq(name))
+                .execute();
     }
 
 }

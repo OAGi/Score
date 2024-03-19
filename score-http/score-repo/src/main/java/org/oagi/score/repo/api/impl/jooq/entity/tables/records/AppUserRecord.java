@@ -94,17 +94,47 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
     }
 
     /**
+     * Setter for <code>oagi.app_user.email</code>. Email address.
+     */
+    public void setEmail(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>oagi.app_user.email</code>. Email address.
+     */
+    public String getEmail() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>oagi.app_user.email_verified</code>. The fact whether
+     * the email value is verified or not.
+     */
+    public void setEmailVerified(Byte value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>oagi.app_user.email_verified</code>. The fact whether
+     * the email value is verified or not.
+     */
+    public Byte getEmailVerified() {
+        return (Byte) get(6);
+    }
+
+    /**
      * Setter for <code>oagi.app_user.is_developer</code>.
      */
     public void setIsDeveloper(Byte value) {
-        set(5, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>oagi.app_user.is_developer</code>.
      */
     public Byte getIsDeveloper() {
-        return (Byte) get(5);
+        return (Byte) get(7);
     }
 
     /**
@@ -112,7 +142,7 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
      * user has an admin role or not.
      */
     public void setIsAdmin(Byte value) {
-        set(6, value);
+        set(8, value);
     }
 
     /**
@@ -120,21 +150,21 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
      * user has an admin role or not.
      */
     public Byte getIsAdmin() {
-        return (Byte) get(6);
+        return (Byte) get(8);
     }
 
     /**
      * Setter for <code>oagi.app_user.is_enabled</code>.
      */
     public void setIsEnabled(Byte value) {
-        set(7, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>oagi.app_user.is_enabled</code>.
      */
     public Byte getIsEnabled() {
-        return (Byte) get(7);
+        return (Byte) get(9);
     }
 
     // -------------------------------------------------------------------------
@@ -160,7 +190,7 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
     /**
      * Create a detached, initialised AppUserRecord
      */
-    public AppUserRecord(ULong appUserId, String loginId, String password, String name, String organization, Byte isDeveloper, Byte isAdmin, Byte isEnabled) {
+    public AppUserRecord(ULong appUserId, String loginId, String password, String name, String organization, String email, Byte emailVerified, Byte isDeveloper, Byte isAdmin, Byte isEnabled) {
         super(AppUser.APP_USER);
 
         setAppUserId(appUserId);
@@ -168,6 +198,8 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
         setPassword(password);
         setName(name);
         setOrganization(organization);
+        setEmail(email);
+        setEmailVerified(emailVerified);
         setIsDeveloper(isDeveloper);
         setIsAdmin(isAdmin);
         setIsEnabled(isEnabled);

@@ -8,7 +8,7 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/h
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MARKED_OPTIONS, MarkdownModule, MarkedOptions} from 'ngx-markdown';
+import {MarkdownModule, MARKED_OPTIONS} from 'ngx-markdown';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {RxStompService, rxStompServiceFactory} from './common/score-rx-stomp';
 
@@ -33,6 +33,7 @@ import {BusinessTermManagementModule} from './business-term-management/business-
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
 import {SettingsManagementModule} from './settings-management/settings-management.module';
 import {WebPageInfoService} from './basis/basis.service';
+import {MailService} from './common/score-mail.service';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -96,6 +97,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatIconRegistry,
     AuthService,
     WebPageInfoService,
+    MailService,
     httpInterceptorsProviders,
     {
       provide: RxStompService,

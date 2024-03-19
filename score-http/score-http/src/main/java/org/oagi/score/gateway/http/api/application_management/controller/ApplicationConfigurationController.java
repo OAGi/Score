@@ -1,21 +1,38 @@
 package org.oagi.score.gateway.http.api.application_management.controller;
 
 import org.oagi.score.gateway.http.api.application_management.data.ApplicationConfigurationChangeRequest;
+import org.oagi.score.gateway.http.api.application_management.data.ApplicationSettingsInfo;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ApplicationConfigurationController {
 
     @Autowired
     private ApplicationConfigurationService service;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @RequestMapping(value = "/application/settings", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApplicationSettingsInfo getApplicationSettingsInfo(@AuthenticationPrincipal AuthenticatedPrincipal user) {
+        return service.getApplicationSettingsInfo(sessionService.asScoreUser(user));
+    }
+
+    @RequestMapping(value = "/application/settings", method = RequestMethod.POST)
+    public ResponseEntity updateApplicationSettingsInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                        @RequestBody ApplicationSettingsInfo applicationSettingsInfo) {
+
+        service.updateApplicationSettingsInfo(sessionService.asScoreUser(user), applicationSettingsInfo);
+        return ResponseEntity.noContent().build();
+    }
 
     @RequestMapping(value = "/application/{type}/enable", method = RequestMethod.POST)
     public ResponseEntity tenantEnable(@AuthenticationPrincipal AuthenticatedPrincipal user,

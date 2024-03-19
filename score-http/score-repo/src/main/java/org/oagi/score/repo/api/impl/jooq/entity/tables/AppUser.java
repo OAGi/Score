@@ -151,6 +151,17 @@ public class AppUser extends TableImpl<AppUserRecord> {
     public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The company the user represents.");
 
     /**
+     * The column <code>oagi.app_user.email</code>. Email address.
+     */
+    public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Email address.");
+
+    /**
+     * The column <code>oagi.app_user.email_verified</code>. The fact whether
+     * the email value is verified or not.
+     */
+    public final TableField<AppUserRecord, Byte> EMAIL_VERIFIED = createField(DSL.name("email_verified"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The fact whether the email value is verified or not.");
+
+    /**
      * The column <code>oagi.app_user.is_developer</code>.
      */
     public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "");

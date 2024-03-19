@@ -13,8 +13,14 @@ public final class ScoreUser implements Serializable {
 
     private String username;
 
+    private String emailAddress;
+
+    private boolean emailVerified;
+
     private Collection<ScoreRole> roles;
-    public ScoreUser(){}
+
+    public ScoreUser() {
+    }
 
     public ScoreUser(BigInteger userId, String username, ScoreRole role) {
         this(userId, username, Arrays.asList(role));
@@ -106,18 +112,37 @@ public final class ScoreUser implements Serializable {
         this.roles = roles;
     }
 
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ScoreUser scoreUser = (ScoreUser) o;
-        return Objects.equals(userId, scoreUser.userId) &&
+        return emailVerified == scoreUser.emailVerified &&
+                Objects.equals(userId, scoreUser.userId) &&
                 Objects.equals(username, scoreUser.username) &&
+                Objects.equals(emailAddress, scoreUser.emailAddress) &&
                 Objects.equals(roles, scoreUser.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, username, roles);
+        return Objects.hash(userId, username, emailAddress, emailVerified, roles);
     }
+
 }

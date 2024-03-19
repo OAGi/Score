@@ -12,6 +12,8 @@ public class AppUser {
     private String password;
     private String name;
     private String organization;
+    private String email;
+    private boolean emailVerified;
     private boolean developer;
     private boolean admin;
     private boolean enabled;

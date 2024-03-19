@@ -377,6 +377,10 @@
               [disabled]="!isEditable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Transfer Ownership</span>
       </button>
+      <button mat-menu-item (click)="requestOwnershipTransfer(contextMenuItem)"
+              *ngIf="!isEditable(contextMenuItem)">
+        <span class="context-menu-item">Request Ownership Transfer</span>
+      </button>
       <button mat-menu-item (click)="deprecate(contextMenuItem)"
               [disabled]="!isDeprecable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Deprecate</span>

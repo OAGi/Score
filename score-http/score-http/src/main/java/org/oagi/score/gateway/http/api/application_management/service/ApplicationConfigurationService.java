@@ -1,6 +1,8 @@
 package org.oagi.score.gateway.http.api.application_management.service;
 
 import org.oagi.score.gateway.http.api.application_management.data.ApplicationConfigurationChangeRequest;
+import org.oagi.score.gateway.http.api.application_management.data.ApplicationSettingsInfo;
+import org.oagi.score.gateway.http.api.application_management.data.SMTPSettingsInfo;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -89,6 +91,15 @@ public class ApplicationConfigurationService {
         return (value != null) ? value : defaultValue;
     }
 
+    public int getIntProperty(String key) {
+        return getIntProperty(key, 0);
+    }
+
+    public int getIntProperty(String key, int defaultValue) {
+        Integer value = Integer.valueOf(getProperty(key));
+        return (value != null) ? value : defaultValue;
+    }
+
     public String getProperty(String key) {
         return configRepo.getConfigurationValueByName(key);
     }
@@ -126,6 +137,45 @@ public class ApplicationConfigurationService {
                             .upsertConfiguration(scoreUser, key, keyValueMap.get(key));
                 }
             }
+        }
+    }
+
+    public ApplicationSettingsInfo getApplicationSettingsInfo(ScoreUser requester) {
+        ApplicationSettingsInfo applicationSettingsInfo = new ApplicationSettingsInfo();
+
+        SMTPSettingsInfo smtpSettingsInfo = new SMTPSettingsInfo();
+        smtpSettingsInfo.setHost(getProperty("score.mail.smtp.host"));
+        smtpSettingsInfo.setPort(getIntProperty("score.mail.smtp.port"));
+        smtpSettingsInfo.setAuth(getBooleanProperty("score.mail.smtp.auth"));
+        smtpSettingsInfo.setSslEnable(getBooleanProperty("score.mail.smtp.ssl.enable"));
+        smtpSettingsInfo.setStartTlsEnable(getBooleanProperty("score.mail.smtp.starttls.enable"));
+        smtpSettingsInfo.setAuthMethod(getProperty("score.mail.smtp.auth.method"));
+        smtpSettingsInfo.setAuthUsername(getProperty("score.mail.smtp.auth.username"));
+        smtpSettingsInfo.setAuthPassword(getProperty("score.mail.smtp.auth.password"));
+        applicationSettingsInfo.setSmtpSettingsInfo(smtpSettingsInfo);
+
+        return applicationSettingsInfo;
+    }
+
+    public void updateApplicationSettingsInfo(ScoreUser requester, ApplicationSettingsInfo applicationSettingsInfo) {
+        SMTPSettingsInfo smtpSettingsInfo = applicationSettingsInfo.getSmtpSettingsInfo();
+        if (smtpSettingsInfo != null) {
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.host", smtpSettingsInfo.getHost());
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.port", Integer.toString(smtpSettingsInfo.getPort()));
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.auth", (smtpSettingsInfo.isAuth()) ? "true" : "false");
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.ssl.enable", (smtpSettingsInfo.isSslEnable()) ? "true" : "false");
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.starttls.enable", (smtpSettingsInfo.isStartTlsEnable()) ? "true" : "false");
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.auth.method", smtpSettingsInfo.getAuthMethod());
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.auth.username", smtpSettingsInfo.getAuthUsername());
+            configRepo.updateConfiguration(
+                    "score.mail.smtp.auth.password", smtpSettingsInfo.getAuthPassword());
         }
     }
 }

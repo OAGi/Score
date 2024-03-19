@@ -6,6 +6,8 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {WebPageInfo} from '../../basis/about/domain/about';
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {forkJoin} from 'rxjs';
+import {ApplicationSettingsInfo} from './domain/application-settings';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -14,6 +16,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
 })
 export class SettingsApplicationSettingsComponent implements OnInit {
 
+  applicationSettingsInfo: ApplicationSettingsInfo;
   webPageInfo: WebPageInfo;
 
   title = 'Application settings';
@@ -29,8 +32,12 @@ export class SettingsApplicationSettingsComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    this.webPageInfoService.load().subscribe(resp => {
-      this.webPageInfo = new WebPageInfo(resp);
+    forkJoin([
+      this.settingsService.load(),
+      this.webPageInfoService.load()
+    ]).subscribe(([applicationSettingsInfoResp, webPageInfoResp]) => {
+      this.applicationSettingsInfo = applicationSettingsInfoResp;
+      this.webPageInfo = new WebPageInfo(webPageInfoResp);
 
       this.loading = false;
     }, error => {
@@ -172,6 +179,15 @@ export class SettingsApplicationSettingsComponent implements OnInit {
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
+    });
+  }
+
+  updateApplicationSettingsInfo() {
+    this.settingsService.update(this.applicationSettingsInfo).subscribe(_ => {
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+
     });
   }
 

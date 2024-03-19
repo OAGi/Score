@@ -29,6 +29,7 @@ import {UserToken} from '../../authentication/domain/auth';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {BieDeprecateDialogComponent} from "../bie-deprecate-dialog/bie-deprecate-dialog.component";
 import {BieEditService} from "../bie-edit/domain/bie-edit.service";
+import {MailService} from '../../common/score-mail.service';
 
 @Component({
   selector: 'score-bie-list',
@@ -70,6 +71,7 @@ export class BieListComponent implements OnInit {
               private bieEditService: BieEditService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
+              private mailService: MailService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
@@ -318,8 +320,25 @@ export class BieListComponent implements OnInit {
         }
       });
     });
+  }
 
-
+  requestOwnershipTransfer(bie: BieList) {
+    this.loading = true;
+    this.mailService.sendMail('bie-ownership-transfer-request', bie.ownerUserId, {
+      parameters: {
+        bie_link: window.location.href + '/' + bie.topLevelAsbiepId,
+        bie_name: bie.den,
+        topLevelAsbiepId: bie.topLevelAsbiepId,
+        targetLoginId: this.auth.getUserToken().username
+      }
+    }).subscribe(resp => {
+      this.loading = false;
+      this.snackBar.open('Request Sent', '', {
+        duration: 3000,
+      });
+    }, error => {
+      this.loading = false;
+    });
   }
 
   openFindReuseBieListDialog(bie: BieList) {

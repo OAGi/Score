@@ -38,6 +38,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {BieAcceptOwnershipTransferRequestComponent} from './bie-accept-ownership-transfer-request/bie-accept-ownership-transfer-request.component';
 
 const routes: Routes = [
   {
@@ -107,6 +108,11 @@ const routes: Routes = [
         path: ':id',
         children: [
           {
+            path: 'accept-ownership-transfer-request',
+            component: BieAcceptOwnershipTransferRequestComponent,
+            canActivate: [AuthService],
+          },
+          {
             path: '**',
             component: BieEditComponent,
             canActivate: [AuthService]
@@ -145,6 +151,7 @@ const routes: Routes = [
     BieListComponent,
     BieListDialogComponent,
     BieUpliftComponent,
+    BieAcceptOwnershipTransferRequestComponent,
     ReportDialogComponent,
     BieReportComponent,
     BieEditComponent,

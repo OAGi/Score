@@ -1,12 +1,24 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {ApplicationSettingsInfo} from './application-settings';
+import {WebPageInfo} from '../../../basis/about/domain/about';
 
 @Injectable()
 export class SettingsApplicationSettingsService {
 
   constructor(private http: HttpClient) {
 
+  }
+
+  load(): Observable<ApplicationSettingsInfo> {
+    return this.http.get<ApplicationSettingsInfo>('/api/application/settings');
+  }
+
+  update(applicationSettingsInfo: ApplicationSettingsInfo): Observable<any> {
+    return this.http.post('/api/application/settings', {
+      smtpSettingsInfo: applicationSettingsInfo.smtpSettingsInfo
+    });
   }
 
   updateTenantConfiguration(value: boolean): Observable<any> {

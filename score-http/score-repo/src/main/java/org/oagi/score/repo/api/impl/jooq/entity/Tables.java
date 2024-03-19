@@ -108,6 +108,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.SeqKey;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Tag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Tenant;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TenantBusinessCtx;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.TextTemplate;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.UsageRuleExpression;
@@ -761,6 +762,11 @@ public class Tables {
      * This table captures the tenant role and theirs business contexts.
      */
     public static final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
+
+    /**
+     * The table <code>oagi.text_template</code>.
+     */
+    public static final TextTemplate TEXT_TEMPLATE = TextTemplate.TEXT_TEMPLATE;
 
     /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and

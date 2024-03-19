@@ -34,6 +34,8 @@ public class JooqScoreUserReadRepository
         return dslContext().select(
                         APP_USER.APP_USER_ID,
                         APP_USER.LOGIN_ID,
+                        APP_USER.EMAIL,
+                        APP_USER.EMAIL_VERIFIED,
                         APP_USER.IS_DEVELOPER,
                         APP_USER.IS_ADMIN)
                 .from(APP_USER)
@@ -53,6 +55,8 @@ public class JooqScoreUserReadRepository
                     record.get(APP_USER.LOGIN_ID),
                     Arrays.asList(userRole)
             );
+            user.setEmailAddress(record.get(APP_USER.EMAIL));
+            user.setEmailVerified((byte) 1 == record.get(APP_USER.EMAIL_VERIFIED));
             return user;
         };
     }
