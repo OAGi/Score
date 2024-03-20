@@ -117,9 +117,11 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                         OAS_OPERATION.as("oas_operation").OAS_OPERATION_ID.as("oas_operation_id"),
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                         APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                         APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
                         APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_MESSAGE_BODY.CREATION_TIMESTAMP,
                         OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP)
@@ -180,11 +182,13 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
             bieForOasDoc.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             bieForOasDoc.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             bieForOasDoc.setCreationTimestamp(

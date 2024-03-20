@@ -34,6 +34,7 @@ public class JooqScoreUserReadRepository
         return dslContext().select(
                         APP_USER.APP_USER_ID,
                         APP_USER.LOGIN_ID,
+                        APP_USER.NAME,
                         APP_USER.EMAIL,
                         APP_USER.EMAIL_VERIFIED,
                         APP_USER.IS_DEVELOPER,
@@ -49,10 +50,12 @@ public class JooqScoreUserReadRepository
             ScoreUser user = (isAdmin) ? new ScoreUser(
                     record.get(APP_USER.APP_USER_ID).toBigInteger(),
                     record.get(APP_USER.LOGIN_ID),
+                    record.get(APP_USER.NAME),
                     Arrays.asList(userRole, ADMINISTRATOR)
             ) : new ScoreUser(
                     record.get(APP_USER.APP_USER_ID).toBigInteger(),
                     record.get(APP_USER.LOGIN_ID),
+                    record.get(APP_USER.NAME),
                     Arrays.asList(userRole)
             );
             user.setEmailAddress(record.get(APP_USER.EMAIL));

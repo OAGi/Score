@@ -68,12 +68,15 @@ public class JooqAgencyIdListReadRepository
                 MODULE.PATH,
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"))
                 .from(AGENCY_ID_LIST)
                 .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
@@ -117,16 +120,19 @@ public class JooqAgencyIdListReadRepository
             agencyIdList.setOwner(new ScoreUser(
                     e.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                     e.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                    e.get(APP_USER.as("owner").NAME.as("owner_name")),
                     (byte) 1 == e.get(APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer")) ? DEVELOPER : END_USER
             ));
             agencyIdList.setCreatedBy(new ScoreUser(
                     e.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     e.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    e.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == e.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             agencyIdList.setLastUpdatedBy(new ScoreUser(
                     e.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     e.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    e.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == e.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             agencyIdList.setDeprecated(e.get(AGENCY_ID_LIST.IS_DEPRECATED) == 1);

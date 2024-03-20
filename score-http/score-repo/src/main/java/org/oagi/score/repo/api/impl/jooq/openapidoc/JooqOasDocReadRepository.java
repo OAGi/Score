@@ -49,9 +49,11 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_DOC.LICENSE_URL,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                         APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                         APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
                         APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_DOC.CREATION_TIMESTAMP,
                         OAS_DOC.LAST_UPDATE_TIMESTAMP)
@@ -78,11 +80,13 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasDoc.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             oasDoc.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             oasDoc.setCreationTimestamp(
@@ -253,11 +257,13 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasOperation.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             oasOperation.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             oasOperation.setCreationTimestamp(
@@ -279,9 +285,11 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_OPERATION.DEPRECATED,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                         APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                         APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
                         APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_OPERATION.CREATION_TIMESTAMP,
                         OAS_OPERATION.LAST_UPDATE_TIMESTAMP)
@@ -321,9 +329,11 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_REQUEST.IS_CALLBACK,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                         APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                         APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
                         APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_REQUEST.CREATION_TIMESTAMP,
                         OAS_REQUEST.LAST_UPDATE_TIMESTAMP)
@@ -346,11 +356,13 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasRequest.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             oasRequest.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             oasRequest.setCreationTimestamp(
@@ -390,9 +402,11 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
                         OAS_RESPONSE.INCLUDE_CONFIRM_INDICATOR,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
                         APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                         APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                         APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
                         APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                         OAS_RESPONSE.CREATION_TIMESTAMP,
                         OAS_RESPONSE.LAST_UPDATE_TIMESTAMP)
@@ -414,11 +428,13 @@ public class JooqOasDocReadRepository extends JooqScoreRepository
             oasResponse.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             oasResponse.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             oasResponse.setCreationTimestamp(

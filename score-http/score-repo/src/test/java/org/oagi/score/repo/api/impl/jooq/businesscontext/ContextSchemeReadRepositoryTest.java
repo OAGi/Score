@@ -34,7 +34,7 @@ public class ContextSchemeReadRepositoryTest
     @BeforeAll
     void setUp() {
         repository = scoreRepositoryFactory().createContextSchemeReadRepository();
-        requester = new ScoreUser(BigInteger.ONE, "oagis", DEVELOPER);
+        requester = new ScoreUser(BigInteger.ONE, "oagis", "Open Applications Group Developer", DEVELOPER);
         contextCategoryId = createContextCategory();
 
         int cnt = 20;

@@ -42,9 +42,11 @@ public class JooqBusinessTermReadRepository
                 BUSINESS_TERM.EXTERNAL_REF_URI,
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 BUSINESS_TERM.CREATION_TIMESTAMP,
                 BUSINESS_TERM.LAST_UPDATE_TIMESTAMP)
@@ -66,11 +68,13 @@ public class JooqBusinessTermReadRepository
             businessTerm.setCreatedBy(new ScoreUser(
                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                     (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER
             ));
             businessTerm.setLastUpdatedBy(new ScoreUser(
                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                     (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER
             ));
             businessTerm.setCreationTimestamp(

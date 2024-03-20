@@ -30,7 +30,7 @@ public class ContextCategoryReadRepositoryTest
     @BeforeAll
     void setUp() {
         repository = scoreRepositoryFactory().createContextCategoryReadRepository();
-        requester = new ScoreUser(BigInteger.ONE, "oagis", DEVELOPER);
+        requester = new ScoreUser(BigInteger.ONE, "oagis", "Open Applications Group Developer", DEVELOPER);
 
         int cnt = 20;
         for (int i = 0; i < cnt; ++i) {

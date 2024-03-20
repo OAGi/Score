@@ -30,7 +30,7 @@ public class SeqKeyReadRepositoryTest
     @BeforeAll
     void setUp() {
         repository = scoreRepositoryFactory().createSeqKeyReadRepository();
-        requester = new ScoreUser(BigInteger.ONE, "oagis", DEVELOPER);
+        requester = new ScoreUser(BigInteger.ONE, "oagis", "Open Applications Group Developer", DEVELOPER);
     }
 
     @Test

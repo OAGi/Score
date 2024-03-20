@@ -13,6 +13,8 @@ public final class ScoreUser implements Serializable {
 
     private String username;
 
+    private String name;
+
     private String emailAddress;
 
     private boolean emailVerified;
@@ -22,13 +24,14 @@ public final class ScoreUser implements Serializable {
     public ScoreUser() {
     }
 
-    public ScoreUser(BigInteger userId, String username, ScoreRole role) {
-        this(userId, username, Arrays.asList(role));
+    public ScoreUser(BigInteger userId, String username, String name, ScoreRole role) {
+        this(userId, username, name, Arrays.asList(role));
     }
 
-    public ScoreUser(BigInteger userId, String username, Collection<ScoreRole> roles) {
+    public ScoreUser(BigInteger userId, String username, String name, Collection<ScoreRole> roles) {
         this.userId = userId;
         this.username = username;
+        this.name = name;
         this.roles = roles;
     }
 
@@ -110,6 +113,14 @@ public final class ScoreUser implements Serializable {
 
     public void setRoles(Collection<ScoreRole> roles) {
         this.roles = roles;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmailAddress() {

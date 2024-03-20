@@ -38,7 +38,7 @@ public class ContextSchemeServiceTest extends AbstractServiceTest {
 
     @BeforeAll
     void setUp() {
-        requester = new ScoreUser(BigInteger.ONE, "oagis", DEVELOPER);
+        requester = new ScoreUser(BigInteger.ONE, "oagis", "Open Applications Group Developer", DEVELOPER);
     }
 
     @Test

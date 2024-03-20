@@ -36,7 +36,7 @@ public class JooqMessageReadRepository
         Record message = dslContext().select(MESSAGE.RECIPIENT_ID,
                 MESSAGE.SUBJECT, MESSAGE.BODY, MESSAGE.BODY_CONTENT_TYPE,
                 MESSAGE.CREATION_TIMESTAMP, MESSAGE.IS_READ,
-                APP_USER.APP_USER_ID, APP_USER.LOGIN_ID, APP_USER.IS_DEVELOPER)
+                APP_USER.APP_USER_ID, APP_USER.LOGIN_ID, APP_USER.NAME, APP_USER.IS_DEVELOPER)
                 .from(MESSAGE)
                 .join(APP_USER).on(MESSAGE.SENDER_ID.eq(APP_USER.APP_USER_ID))
                 .where(MESSAGE.MESSAGE_ID.eq(ULong.valueOf(request.getMessageId())))
@@ -59,6 +59,7 @@ public class JooqMessageReadRepository
         return new GetMessageResponse(request.getMessageId(),
                 new ScoreUser(message.get(APP_USER.APP_USER_ID).toBigInteger(),
                         message.get(APP_USER.LOGIN_ID),
+                        message.get(APP_USER.NAME),
                         (byte) 1 == message.get(APP_USER.IS_DEVELOPER) ? DEVELOPER : END_USER),
                 message.get(MESSAGE.SUBJECT),
                 message.get(MESSAGE.BODY), message.get(MESSAGE.BODY_CONTENT_TYPE),
@@ -73,6 +74,7 @@ public class JooqMessageReadRepository
                 MESSAGE.IS_READ,
                 APP_USER.as("sender").APP_USER_ID.as("sender_user_id"),
                 APP_USER.as("sender").LOGIN_ID.as("sender_login_id"),
+                APP_USER.as("sender").NAME.as("sender_name"),
                 APP_USER.as("sender").IS_DEVELOPER.as("sender_is_developer"))
                 .from(MESSAGE)
                 .join(APP_USER.as("sender")).on(MESSAGE.SENDER_ID.eq(APP_USER.as("sender").APP_USER_ID))
@@ -88,6 +90,7 @@ public class JooqMessageReadRepository
             messageList.setSender(new ScoreUser(
                     record.get(APP_USER.as("sender").APP_USER_ID.as("sender_user_id")).toBigInteger(),
                     record.get(APP_USER.as("sender").LOGIN_ID.as("sender_login_id")),
+                    record.get(APP_USER.as("sender").NAME.as("sender_name")),
                     (byte) 1 == record.get(APP_USER.as("sender").IS_DEVELOPER.as("sender_is_developer")) ? DEVELOPER : END_USER
             ));
             messageList.setTimestamp(

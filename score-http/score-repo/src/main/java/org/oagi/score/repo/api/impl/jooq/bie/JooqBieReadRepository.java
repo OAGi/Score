@@ -39,14 +39,17 @@ public class JooqBieReadRepository
                 TOP_LEVEL_ASBIEP.VERSION,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 ASBIEP.CREATION_TIMESTAMP,
@@ -79,10 +82,12 @@ public class JooqBieReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     Arrays.asList(ownerRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     ownerRole));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -92,10 +97,12 @@ public class JooqBieReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     Arrays.asList(creatorRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     creatorRole));
 
             ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
@@ -105,10 +112,12 @@ public class JooqBieReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     Arrays.asList(updaterRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     updaterRole));
 
             topLevelAsbiep.setCreationTimestamp(

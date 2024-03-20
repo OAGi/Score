@@ -27,7 +27,7 @@ public class ContextCategoryWriteRepositoryTest
     @BeforeAll
     void setUp() {
         repository = scoreRepositoryFactory().createContextCategoryWriteRepository();
-        requester = new ScoreUser(BigInteger.ONE, "oagis", DEVELOPER);
+        requester = new ScoreUser(BigInteger.ONE, "oagis", "Open Applications Group Developer", DEVELOPER);
     }
 
     @Test

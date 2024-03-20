@@ -371,14 +371,17 @@ public class JooqCcReadRepository
                 ACC.NEXT_ACC_ID,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 ACC.CREATION_TIMESTAMP,
@@ -420,10 +423,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     Arrays.asList(ownerRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     ownerRole));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -433,10 +438,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     Arrays.asList(creatorRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     creatorRole));
 
             ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
@@ -446,10 +453,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     Arrays.asList(updaterRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     updaterRole));
 
             acc.setCreationTimestamp(
@@ -553,14 +562,17 @@ public class JooqCcReadRepository
                 ASCCP.NEXT_ASCCP_ID,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 ASCCP.CREATION_TIMESTAMP,
@@ -601,10 +613,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     Arrays.asList(ownerRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     ownerRole));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -614,10 +628,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     Arrays.asList(creatorRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     creatorRole));
 
             ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
@@ -627,10 +643,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     Arrays.asList(updaterRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     updaterRole));
 
             asccp.setCreationTimestamp(
@@ -659,14 +677,17 @@ public class JooqCcReadRepository
                 BCCP.NEXT_BCCP_ID,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 BCCP.CREATION_TIMESTAMP,
@@ -708,10 +729,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     Arrays.asList(ownerRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     ownerRole));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -721,10 +744,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     Arrays.asList(creatorRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     creatorRole));
 
             ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
@@ -734,10 +759,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     Arrays.asList(updaterRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     updaterRole));
 
             bccp.setCreationTimestamp(
@@ -767,14 +794,17 @@ public class JooqCcReadRepository
                 DT.NEXT_DT_ID,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
                 APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
                 APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
                 APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
                 APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
                 APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
                 APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
                 APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
                 APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
                 DT.CREATION_TIMESTAMP,
@@ -817,10 +847,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     Arrays.asList(ownerRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("owner").APP_USER_ID.as("owner_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("owner").LOGIN_ID.as("owner_login_id")),
+                                    record.get(APP_USER.as("owner").NAME.as("owner_name")),
                                     ownerRole));
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -830,10 +862,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     Arrays.asList(creatorRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("creator").APP_USER_ID.as("creator_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("creator").LOGIN_ID.as("creator_login_id")),
+                                    record.get(APP_USER.as("creator").NAME.as("creator_name")),
                                     creatorRole));
 
             ScoreRole updaterRole = (byte) 1 == record.get(APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer")) ? DEVELOPER : END_USER;
@@ -843,10 +877,12 @@ public class JooqCcReadRepository
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     Arrays.asList(updaterRole, ADMINISTRATOR)) :
                             new ScoreUser(
                                     record.get(APP_USER.as("updater").APP_USER_ID.as("updater_user_id")).toBigInteger(),
                                     record.get(APP_USER.as("updater").LOGIN_ID.as("updater_login_id")),
+                                    record.get(APP_USER.as("updater").NAME.as("updater_name")),
                                     updaterRole));
 
             dt.setCreationTimestamp(

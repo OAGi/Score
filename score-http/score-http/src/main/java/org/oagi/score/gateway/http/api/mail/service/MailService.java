@@ -1,8 +1,8 @@
 package org.oagi.score.gateway.http.api.mail.service;
 
+import jakarta.activation.DataHandler;
 import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.text.StringSubstitutor;
 import org.eclipse.angus.mail.util.MailConnectException;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -73,10 +74,10 @@ public class MailService {
         if (senderAddress == null) {
             throw new IllegalStateException("The user '" + requester.getUsername() + "' does not have a registered email address.");
         }
-        Message msg = new MimeMessage(session);
+        MimeMessage msg = new MimeMessage(session);
         try {
-            msg.setFrom(new InternetAddress(senderAddress, false));
-        } catch (MessagingException e) {
+            msg.setFrom(new InternetAddress(senderAddress, requester.getName(), "UTF-8"));
+        } catch (MessagingException | UnsupportedEncodingException e) {
             throw new IllegalStateException("Invalid sender address: " + senderAddress, e);
         }
 
@@ -86,14 +87,21 @@ public class MailService {
             throw new IllegalStateException("The user '" + recipient.getUsername() + "' does not have a registered email address.");
         }
         try {
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-        } catch (MessagingException | NullPointerException e) {
+            msg.setRecipients(Message.RecipientType.TO,
+                    new Address[]{
+                            new InternetAddress(recipientEmail, recipient.getName(), "UTF-8")
+                    });
+        } catch (MessagingException | UnsupportedEncodingException | NullPointerException e) {
             throw new IllegalArgumentException("Invalid recipient address: " + recipientEmail, e);
         }
         try {
             Map<String, Object> parameters = request.getParameters();
             parameters.put("sender", requester.getUsername());
+            parameters.put("senderName", requester.getName());
+            parameters.put("senderEmail", requester.getEmailAddress());
             parameters.put("recipient", recipient.getUsername());
+            parameters.put("recipientName", recipient.getName());
+            parameters.put("recipientEmail", recipient.getEmailAddress());
             setSubjectAndContent(msg, request.getTemplateName(), parameters);
         } catch (MessagingException e) {
             throw new IllegalArgumentException("Invalid content: " + e.getMessage(), e);
@@ -110,7 +118,7 @@ public class MailService {
         }
     }
 
-    private void setSubjectAndContent(Message message, String templateName, Map<String, Object> parameters) throws MessagingException {
+    private void setSubjectAndContent(MimeMessage message, String templateName, Map<String, Object> parameters) throws MessagingException {
         StringSubstitutor sub = new StringSubstitutor(parameters);
 
         TextTemplateRecord textTemplateRecord = dslContext.selectFrom(TEXT_TEMPLATE)
@@ -122,10 +130,16 @@ public class MailService {
         }
 
         message.setSubject(textTemplateRecord.getSubject());
-        message.setHeader("Content-Transfer-Encoding", "base64");
-        message.setContent(
-                Base64.encodeBase64String(sub.replace(textTemplateRecord.getTemplate()).getBytes()),
-                textTemplateRecord.getContentType());
+
+        String contentType = textTemplateRecord.getContentType();
+        String subtype = contentType.substring(contentType.indexOf("/") + 1);
+
+        PreencodedMimeBodyPart bodyPart = new PreencodedMimeBodyPart("base64");
+        bodyPart.setText(sub.replace(textTemplateRecord.getTemplate()), "utf-8", subtype);
+        MimeMultipart multipart = new MimeMultipart();
+        multipart.addBodyPart(bodyPart);
+        message.setContent(multipart);
+        message.saveChanges();
     }
 
 }
