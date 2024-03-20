@@ -519,10 +519,10 @@
                       <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.auth">Enable Auth</mat-checkbox>
                     </div>
                     <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
+                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
                     </div>
                     <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
+                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
                     </div>
                   </div>
                   <div class="row">
@@ -552,6 +552,9 @@
                     <div>
                       <button mat-raised-button color="primary" (click)="updateApplicationSettingsInfo()">
                         Update
+                      </button>
+                      <button mat-raised-button color="warn" (click)="testEmailSettings()">
+                        Test
                       </button>
                     </div>
                   </div>

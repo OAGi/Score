@@ -29,8 +29,12 @@ public class MailController {
                                    @RequestBody SendMailRequest sendMailRequest) {
 
         sendMailRequest.setTemplateName(templateName);
-        BigInteger recipientId = new BigInteger(recipient.toString());
-        sendMailRequest.setRecipient(sessionService.getScoreUserByUserId(recipientId));
+        try {
+            BigInteger recipientId = new BigInteger(recipient.toString());
+            sendMailRequest.setRecipient(sessionService.getScoreUserByUserId(recipientId));
+        } catch (NumberFormatException e) {
+            sendMailRequest.setRecipient(sessionService.getScoreUserByUsername(recipient.toString()));
+        }
 
         mailService.sendMail(sessionService.asScoreUser(requester), sendMailRequest);
 

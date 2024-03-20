@@ -161,6 +161,12 @@ public class SessionService {
         return repo.getScoreUser(request).getUser();
     }
 
+    public org.oagi.score.repo.api.user.model.ScoreUser getScoreUserByUsername(String username) {
+        ScoreUserReadRepository repo = scoreRepositoryFactory.createScoreUserReadRepository();
+        GetScoreUserRequest request = new GetScoreUserRequest().withUserName(username);
+        return repo.getScoreUser(request).getUser();
+    }
+
     public org.oagi.score.repo.api.user.model.ScoreUser getScoreSystemUser() {
         return getScoreUserByUserId(SYSTEM_USER_ID);
     }

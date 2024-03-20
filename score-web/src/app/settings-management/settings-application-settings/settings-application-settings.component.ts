@@ -8,6 +8,7 @@ import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser
 import {WebPageInfoService} from '../../basis/basis.service';
 import {forkJoin} from 'rxjs';
 import {ApplicationSettingsInfo} from './domain/application-settings';
+import {MailService} from '../../common/score-mail.service';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -25,6 +26,7 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   constructor(private auth: AuthService,
               private sanitizer: DomSanitizer,
               private settingsService: SettingsApplicationSettingsService,
+              private mailService: MailService,
               private confirmDialogService: ConfirmDialogService,
               private webPageInfoService: WebPageInfoService,
               private snackBar: MatSnackBar) {
@@ -187,7 +189,19 @@ export class SettingsApplicationSettingsComponent implements OnInit {
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
+    });
+  }
 
+  testEmailSettings() {
+    this.loading = true;
+
+    this.mailService.sendMail('test', this.auth.getUserToken().username, {}).subscribe(_ => {
+      this.snackBar.open('The test message has been sent.', '', {
+        duration: 3000,
+      });
+      this.loading = false;
+    }, error => {
+      this.loading = false;
     });
   }
 

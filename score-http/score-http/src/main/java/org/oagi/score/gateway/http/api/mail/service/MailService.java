@@ -3,7 +3,9 @@ package org.oagi.score.gateway.http.api.mail.service;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.text.StringSubstitutor;
+import org.eclipse.angus.mail.util.MailConnectException;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
@@ -94,17 +96,17 @@ public class MailService {
             parameters.put("recipient", recipient.getUsername());
             setSubjectAndContent(msg, request.getTemplateName(), parameters);
         } catch (MessagingException e) {
-            throw new IllegalArgumentException("Invalid content", e);
+            throw new IllegalArgumentException("Invalid content: " + e.getMessage(), e);
         }
         try {
             msg.setSentDate(new Date());
         } catch (MessagingException e) {
-            throw new IllegalStateException("Unexpected error during mail message creation", e);
+            throw new IllegalStateException("Unexpected error during mail message creation for the following reason: " + e.getMessage(), e);
         }
         try {
             Transport.send(msg);
         } catch (MessagingException e) {
-            throw new IllegalStateException("Unexpected error during mail sending", e);
+            throw new IllegalStateException("The email cannot be sent for the following reason: " + e.getMessage(), e);
         }
     }
 
@@ -120,8 +122,9 @@ public class MailService {
         }
 
         message.setSubject(textTemplateRecord.getSubject());
+        message.setHeader("Content-Transfer-Encoding", "base64");
         message.setContent(
-                sub.replace(textTemplateRecord.getTemplate()),
+                Base64.encodeBase64String(sub.replace(textTemplateRecord.getTemplate()).getBytes()),
                 textTemplateRecord.getContentType());
     }
 

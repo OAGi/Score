@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.application_management.service;
 import org.oagi.score.gateway.http.api.application_management.data.ApplicationConfigurationChangeRequest;
 import org.oagi.score.gateway.http.api.application_management.data.ApplicationSettingsInfo;
 import org.oagi.score.gateway.http.api.application_management.data.SMTPSettingsInfo;
+import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
+import org.oagi.score.gateway.http.api.mail.service.MailService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.impl.utils.StringUtils;
@@ -26,6 +28,9 @@ public class ApplicationConfigurationService {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     private ScoreRepositoryFactory scoreRepositoryFactory;
@@ -158,6 +163,10 @@ public class ApplicationConfigurationService {
     }
 
     public void updateApplicationSettingsInfo(ScoreUser requester, ApplicationSettingsInfo applicationSettingsInfo) {
+        if (!requester.hasRole(ScoreRole.ADMINISTRATOR)) {
+            throw new AccessControlException(requester);
+        }
+
         SMTPSettingsInfo smtpSettingsInfo = applicationSettingsInfo.getSmtpSettingsInfo();
         if (smtpSettingsInfo != null) {
             configRepo.updateConfiguration(

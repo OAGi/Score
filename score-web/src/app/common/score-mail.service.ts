@@ -11,7 +11,7 @@ export class MailService implements OnInit {
   ngOnInit() {
   }
 
-  sendMail(templateName: string, recipient: number, body: any): Observable<any> {
+  sendMail(templateName: string, recipient: number | string, body: any): Observable<any> {
     const params = new HttpParams()
       .set('recipient', recipient);
     return this.http.post<any>('/api/mail/' + templateName, body, {params});
