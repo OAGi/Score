@@ -62,6 +62,7 @@ public class BieService {
 
     @Autowired
     private BieEditService bieEditService;
+
     @Autowired
     private OpenAPIDocService oasDocService;
 

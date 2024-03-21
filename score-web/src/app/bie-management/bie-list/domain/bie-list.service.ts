@@ -82,6 +82,14 @@ export class BieListService {
     return this.http.get<PageResponse<BieList>>('/api/bie_list', {params});
   }
 
+  getBieListByTopLevelAsbiepId(topLevelAsbiepId: number): Observable<BieList> {
+    const request = new BieListRequest();
+    request.page.pageSize = 1;
+    request.topLevelAsbiepIds = [topLevelAsbiepId,];
+    return this.getBieListWithRequest(request)
+      .pipe(map(resp => (resp.length !== 0) ? resp.list[0] : undefined));
+  }
+
   findBizCtxFromAbieId(id): Observable<BusinessContext> {
     return this.http.get<BusinessContext>('/api/profile_bie/business_ctx_from_abie/' + id);
   }
@@ -106,10 +114,16 @@ export class BieListService {
     });
   }
 
-  transferOwnership(topLevelAsbiepIds: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepIds + '/transfer_ownership', {
+  transferOwnership(topLevelAsbiepIds: number, targetLoginId: string,
+                    sendNotification?: boolean, mailParameters?: any): Observable<any> {
+    let url = '/api/profile_bie/' + topLevelAsbiepIds + '/transfer_ownership';
+    if (sendNotification !== undefined) {
+      url += '?sendNotification=' + ((sendNotification) ? 'true' : 'false');
+    }
+    return this.http.post<any>(url, {
       topLevelAsbiepIds,
-      targetLoginId
+      targetLoginId,
+      parameters: mailParameters
     });
   }
 

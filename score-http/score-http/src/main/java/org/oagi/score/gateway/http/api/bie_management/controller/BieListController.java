@@ -1,12 +1,17 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
+import org.checkerframework.checker.units.qual.A;
 import org.oagi.score.data.BizCtx;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
 import org.oagi.score.gateway.http.api.business_term_management.data.AsbieListRecord;
 import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
+import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
+import org.oagi.score.gateway.http.api.mail.service.MailService;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businessterm.model.ConfirmAsbieBbieListRequest;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -28,6 +33,12 @@ public class BieListController {
 
     @Autowired
     private BieService bieService;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @Autowired
+    private MailService mailService;
 
     @RequestMapping(value = "/bie_list",
             method = RequestMethod.GET,
@@ -252,8 +263,9 @@ public class BieListController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @PathVariable("id") BigInteger topLevelAsbiepId,
-                                            @RequestBody Map<String, String> request) {
-        String targetLoginId = request.get("targetLoginId");
+                                            @RequestParam("sendNotification") Boolean sendNotification,
+                                            @RequestBody Map<String, Object> request) {
+        String targetLoginId = (String) request.get("targetLoginId");
         bieService.transferOwnership(user, topLevelAsbiepId, targetLoginId);
 
         BieEvent event = new BieEvent();
@@ -263,6 +275,14 @@ public class BieListController {
         event.addProperty("target", targetLoginId);
         event.addProperty("timestamp", LocalDateTime.now());
         bieService.fireBieEvent(event);
+
+        if (sendNotification != null && sendNotification) {
+            SendMailRequest sendMailRequest = new SendMailRequest();
+            sendMailRequest.setRecipient(sessionService.getScoreUserByUsername(targetLoginId));
+            sendMailRequest.setTemplateName("bie-ownership-transfer-acceptance");
+            sendMailRequest.setParameters((Map<String, Object>) request.get("parameters"));
+            mailService.sendMail(sessionService.asScoreUser(user), sendMailRequest);
+        }
 
         return ResponseEntity.noContent().build();
     }

@@ -223,9 +223,16 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.loading = false;
       return;
     }, err => {
-      this.snackBar.open('Something\'s wrong.', '', {
+      let errorMessage;
+      if (err.status === 403) {
+        errorMessage = 'You do not have access permission.';
+      } else {
+        errorMessage = 'Something\'s wrong.';
+      }
+      this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
+      this.router.navigateByUrl('/profile_bie');
     });
   }
 
