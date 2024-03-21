@@ -371,6 +371,9 @@ public class AccountListService {
         AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
                 .fetchOne();
+        AppOauth2UserRecord appOauth2UserRecord = dslContext.selectFrom(APP_OAUTH2_USER)
+                .where(APP_OAUTH2_USER.APP_USER_ID.eq(appUserRecord.getAppUserId()))
+                .fetchOptional().orElse(null);
 
         SendMailRequest sendMailRequest = new SendMailRequest();
         sendMailRequest.setTemplateName("email-validation");
@@ -389,7 +392,8 @@ public class AccountListService {
             throw new IllegalStateException("Failed to write an email validation info.", e);
         }
 
-        BytesEncryptor encryptor = new AesBytesEncryptor(appUserRecord.getPassword(),
+        BytesEncryptor encryptor = new AesBytesEncryptor(
+                (appOauth2UserRecord != null) ? appOauth2UserRecord.getSub() : appUserRecord.getPassword(),
                 Hex.encodeHexString(appUserRecord.getLoginId().getBytes()));
         byte[] encryptedObj = encryptor.encrypt(bytes);
         String q = Base64.encodeBase64String(encryptedObj);
@@ -405,10 +409,14 @@ public class AccountListService {
         AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
                 .fetchOne();
+        AppOauth2UserRecord appOauth2UserRecord = dslContext.selectFrom(APP_OAUTH2_USER)
+                .where(APP_OAUTH2_USER.APP_USER_ID.eq(appUserRecord.getAppUserId()))
+                .fetchOptional().orElse(null);
 
         byte[] decryptedObj;
         try {
-            BytesEncryptor encryptor = new AesBytesEncryptor(appUserRecord.getPassword(),
+            BytesEncryptor encryptor = new AesBytesEncryptor(
+                    (appOauth2UserRecord != null) ? appOauth2UserRecord.getSub() : appUserRecord.getPassword(),
                     Hex.encodeHexString(appUserRecord.getLoginId().getBytes()));
             byte[] decQ = Base64.decodeBase64(q);
             decryptedObj = encryptor.decrypt(decQ);
