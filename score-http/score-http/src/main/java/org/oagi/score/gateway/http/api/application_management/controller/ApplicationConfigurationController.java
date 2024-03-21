@@ -53,6 +53,10 @@ public class ApplicationConfigurationController {
                 request.setBieInverseModeEnabled(true);
                 break;
 
+            case "functions-requiring-email-transmission":
+                request.setFunctionsRequiringEmailTransmissionEnabled(true);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unregistered type: " + type);
         }
@@ -77,6 +81,10 @@ public class ApplicationConfigurationController {
 
             case "bie-inverse-mode":
                 request.setBieInverseModeEnabled(false);
+                break;
+
+            case "functions-requiring-email-transmission":
+                request.setFunctionsRequiringEmailTransmissionEnabled(false);
                 break;
 
             default:

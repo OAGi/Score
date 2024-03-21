@@ -15,6 +15,8 @@ public class ApplicationConfigurationChangeRequest {
 
     private Boolean bieInverseModeEnabled;
 
+    private Boolean functionsRequiringEmailTransmissionEnabled;
+
     // General
     private Map<String, String> keyValueMap = new HashMap<>();
 

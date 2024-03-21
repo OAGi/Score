@@ -12,6 +12,10 @@ export class BIEProperties {
   inverseMode: boolean;
 }
 
+export class FunctionsRequiringEmailTransmissionProperties {
+  enabled: boolean;
+}
+
 export class TenantProperties {
   enabled: boolean;
   roles: string[];
@@ -26,6 +30,7 @@ export class UserToken {
   tenant: TenantProperties;
   businessTerm: BusinessTermProperties;
   bie: BIEProperties;
+  functionsRequiringEmailTransmission: FunctionsRequiringEmailTransmissionProperties;
 
   constructor() {
     this.roles = ['', ];
@@ -42,6 +47,9 @@ export class UserToken {
 
     this.bie = new BIEProperties();
     this.bie.inverseMode = false;
+
+    this.functionsRequiringEmailTransmission = new FunctionsRequiringEmailTransmissionProperties();
+    this.functionsRequiringEmailTransmission.enabled = false;
   }
 }
 

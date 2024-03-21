@@ -12,7 +12,8 @@ VALUES ('score.mail.smtp.host', 'String', 'smtp.gmail.com'),
        ('score.mail.smtp.starttls.enable', 'Boolean', 'true'),
        ('score.mail.smtp.auth.method', 'String', 'Password'),
        ('score.mail.smtp.auth.username', 'String', ''),
-       ('score.mail.smtp.auth.password', 'String', '');
+       ('score.mail.smtp.auth.password', 'String', ''),
+       ('score.functions-requiring-email-transmission.enabled', 'Boolean', 'false');
 
 ALTER TABLE `app_user`
     ADD COLUMN `email` varchar(100) DEFAULT NULL COMMENT 'Email address.' AFTER `organization`,

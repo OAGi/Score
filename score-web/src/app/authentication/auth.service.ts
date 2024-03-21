@@ -14,7 +14,14 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTre
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {OAuth2AppInfo, UserToken} from './domain/auth';
+import {
+  BIEProperties,
+  BusinessTermProperties,
+  FunctionsRequiringEmailTransmissionProperties,
+  OAuth2AppInfo,
+  TenantProperties,
+  UserToken
+} from './domain/auth';
 import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 
@@ -92,6 +99,28 @@ export class AuthService implements OnInit, CanActivate {
     let value;
     try {
       value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
+
+      if (!value.tenant) {
+        value.tenant = new TenantProperties();
+        value.tenant.enabled = false;
+        value.tenant.roles = [];
+        this.storeUserInfo(value);
+      }
+      if (!value.businessTerm) {
+        value.businessTerm = new BusinessTermProperties();
+        value.businessTerm.enabled = false;
+        this.storeUserInfo(value);
+      }
+      if (!value.bie) {
+        value.bie = new BIEProperties();
+        value.bie.inverseMode = false;
+        this.storeUserInfo(value);
+      }
+      if (!value.functionsRequiringEmailTransmission) {
+        value.functionsRequiringEmailTransmission = new FunctionsRequiringEmailTransmissionProperties();
+        value.functionsRequiringEmailTransmission.enabled = false;
+        this.storeUserInfo(value);
+      }
     } catch (ignore) {
       value = new UserToken();
       this.storeUserInfo(value);

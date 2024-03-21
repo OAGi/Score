@@ -132,6 +132,10 @@ public class AccountController implements InitializingBean {
                 .put("inverseMode", configService.isBieInverseModeEnabled())
                 .build());
 
+        resp.put("functionsRequiringEmailTransmission", ImmutableMap.builder()
+                .put("enabled", configService.isFunctionsRequiringEmailTransmissionEnabled())
+                .build());
+
         return resp;
     }
 

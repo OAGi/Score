@@ -39,6 +39,10 @@ export class SettingsApplicationSettingsService {
     return this.updateBooleanConfiguration('bie-inverse-mode', value);
   }
 
+  updateFunctionsRequiringEmailTransmissionConfiguration(value: boolean): Observable<any> {
+    return this.updateBooleanConfiguration('functions-requiring-email-transmission', value);
+  }
+
   updateBooleanConfiguration(type: string, value: boolean): Observable<any> {
     return this.http.post('/api/application/' + type + '/' + (value ? 'enable' : 'disable'), {});
   }

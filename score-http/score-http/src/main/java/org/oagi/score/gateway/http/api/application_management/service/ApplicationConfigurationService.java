@@ -41,6 +41,9 @@ public class ApplicationConfigurationService {
 
     private static final String BIE_INVERSE_MODE_CONFIG_PARAM_NAME = "score.bie.inverse-mode";
 
+    private static final String FUNCTIONS_REQUIRING_EMAIL_TRANSMISSION_CONFIG_PARAM_NAME =
+            "score.functions-requiring-email-transmission.enabled";
+
     public static final String NAVBAR_BRAND_CONFIG_PARAM_NAME = "score.pages.navbar.brand";
 
     public static final String FAVICON_LINK_CONFIG_PARAM_NAME = "score.pages.favicon.link";
@@ -85,6 +88,10 @@ public class ApplicationConfigurationService {
 
     public boolean isBieInverseModeEnabled() {
         return getBooleanProperty(BIE_INVERSE_MODE_CONFIG_PARAM_NAME);
+    }
+
+    public boolean isFunctionsRequiringEmailTransmissionEnabled() {
+        return getBooleanProperty(FUNCTIONS_REQUIRING_EMAIL_TRANSMISSION_CONFIG_PARAM_NAME);
     }
 
     public boolean getBooleanProperty(String key) {
@@ -132,6 +139,13 @@ public class ApplicationConfigurationService {
         if (bieInverseModeEnabled != null) {
             scoreRepositoryFactory.createConfigurationWriteRepository()
                     .upsertBooleanConfiguration(scoreUser, BIE_INVERSE_MODE_CONFIG_PARAM_NAME, bieInverseModeEnabled);
+        }
+
+        Boolean functionsRequiringEmailTransmissionEnabled = request.getFunctionsRequiringEmailTransmissionEnabled();
+        if (functionsRequiringEmailTransmissionEnabled != null) {
+            scoreRepositoryFactory.createConfigurationWriteRepository()
+                    .upsertBooleanConfiguration(scoreUser, FUNCTIONS_REQUIRING_EMAIL_TRANSMISSION_CONFIG_PARAM_NAME,
+                            functionsRequiringEmailTransmissionEnabled);
         }
 
         Map<String, String> keyValueMap = request.getKeyValueMap();

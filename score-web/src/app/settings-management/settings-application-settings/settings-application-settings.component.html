@@ -16,53 +16,138 @@
             <mat-card-content class="mat-card-container">
               <div>
                 <div class="subhead">
-                  <h4 class="subhead-heading">Multi-tenant mode</h4>
+                  <h4 class="subhead-heading">Application Features</h4>
                 </div>
-                <div class="actions">
-                  <button mat-raised-button color="primary"
-                          (click)="updateTenantConfiguration(true)"
-                          [disabled]="isTenantEnabled">
-                    Enable
-                  </button>
-                  <button mat-raised-button color="warn"
-                          (click)="updateTenantConfiguration(false)"
-                          [disabled]="!isTenantEnabled">
-                    Disable
-                  </button>
+                <div class="row">
+                  <div class="col-md-4 col-sm-12" *ngIf="!isTenantEnabled">
+                    <mat-label>Multi-tenant mode</mat-label>
+                    <div class="actions">
+                      <button mat-raised-button color="primary"
+                              (click)="updateTenantConfiguration(true)"
+                              [disabled]="isTenantEnabled">
+                        Enable
+                      </button>
+                      <button mat-raised-button color="warn"
+                              (click)="updateTenantConfiguration(false)"
+                              [disabled]="!isTenantEnabled">
+                        Disable
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-4 col-sm-12" *ngIf="!isTenantEnabled">
+                    <mat-label>Business term function</mat-label>
+                    <div class="actions">
+                      <button mat-raised-button color="primary"
+                              (click)="updateBusinessTermConfiguration(true)"
+                              [disabled]="isBusinessTermEnabled">
+                        Enable
+                      </button>
+                      <button mat-raised-button color="warn"
+                              (click)="updateBusinessTermConfiguration(false)"
+                              [disabled]="!isBusinessTermEnabled">
+                        Disable
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-4 col-sm-12">
+                    <mat-label>BIE Inverse Mode</mat-label>
+                    <div class="actions">
+                      <button mat-raised-button color="primary"
+                              (click)="updateBIEInverseModeConfiguration(true)"
+                              [disabled]="isBIEInverseModeEnabled">
+                        Enable
+                      </button>
+                      <button mat-raised-button color="warn"
+                              (click)="updateBIEInverseModeConfiguration(false)"
+                              [disabled]="!isBIEInverseModeEnabled">
+                        Disable
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-sm-12">
+                    <mat-label>Functions requiring email transmission (e.g., ownership transfer requests)</mat-label>
+                    <div class="actions">
+                      <button mat-raised-button color="primary"
+                              (click)="updateFunctionsRequiringEmailTransmissionConfiguration(true)"
+                              [disabled]="isFunctionsRequiringEmailTransmissionEnabled">
+                        Enable
+                      </button>
+                      <button mat-raised-button color="warn"
+                              (click)="updateFunctionsRequiringEmailTransmissionConfiguration(false)"
+                              [disabled]="!isFunctionsRequiringEmailTransmissionEnabled">
+                        Disable
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="mt-4" *ngIf="!isTenantEnabled">
+              <div class="mt-4" *ngIf="!!applicationSettingsInfo">
                 <div class="subhead">
-                  <h4 class="subhead-heading">Business term function</h4>
+                  <h4 class="subhead-heading">SMTP settings</h4>
                 </div>
-                <div class="actions">
-                  <button mat-raised-button color="primary"
-                          (click)="updateBusinessTermConfiguration(true)"
-                          [disabled]="isBusinessTermEnabled">
-                    Enable
-                  </button>
-                  <button mat-raised-button color="warn"
-                          (click)="updateBusinessTermConfiguration(false)"
-                          [disabled]="!isBusinessTermEnabled">
-                    Disable
-                  </button>
-                </div>
-              </div>
-              <div class="mt-4">
-                <div class="subhead">
-                  <h4 class="subhead-heading">BIE Inverse Mode</h4>
-                </div>
-                <div class="actions">
-                  <button mat-raised-button color="primary"
-                          (click)="updateBIEInverseModeConfiguration(true)"
-                          [disabled]="isBIEInverseModeEnabled">
-                    Enable
-                  </button>
-                  <button mat-raised-button color="warn"
-                          (click)="updateBIEInverseModeConfiguration(false)"
-                          [disabled]="!isBIEInverseModeEnabled">
-                    Disable
-                  </button>
+                <div class="webpage-setting">
+                  <div class="row">
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Host</h5>
+                      </div>
+                      <input class="width-max"
+                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.host" />
+                    </div>
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Port</h5>
+                      </div>
+                      <input class="width-max"
+                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.port" />
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-3">
+                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.auth">Enable Auth</mat-checkbox>
+                    </div>
+                    <div class="col-3">
+                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
+                    </div>
+                    <div class="col-3">
+                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Auth Method</h5>
+                      </div>
+                      <input class="width-max"
+                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authMethod" />
+                    </div>
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Auth Username</h5>
+                      </div>
+                      <input class="width-max"
+                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authUsername" />
+                    </div>
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Auth Password</h5>
+                      </div>
+                      <input type="password" class="width-max"
+                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authPassword" />
+                    </div>
+                  </div>
+                  <div class="actions pt-4">
+                    <div>
+                      <button mat-raised-button color="primary" (click)="updateApplicationSettingsInfo()">
+                        Update
+                      </button>
+                      <button mat-raised-button color="warn" (click)="testEmailSettings()">
+                        Test
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="mt-4" *ngIf="!!webPageInfo">
@@ -489,73 +574,6 @@
                     <div class="pt-2 d-flex align-items-center info">
                       <mat-icon fontIcon="info"></mat-icon>
                       <mat-label class="pl-1">Some changes will take effect on users after they sign in again.</mat-label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4" *ngIf="!!applicationSettingsInfo">
-                <div class="subhead">
-                  <h4 class="subhead-heading">SMTP settings</h4>
-                </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Host</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.host" />
-                    </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Port</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.port" />
-                    </div>
-                  </div>
-                  <div class="row mt-2">
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.auth">Enable Auth</mat-checkbox>
-                    </div>
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.startTlsEnable">Enable STARTTLS</mat-checkbox>
-                    </div>
-                    <div class="col-3">
-                      <mat-checkbox [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.sslEnable">Enable SSL</mat-checkbox>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Method</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authMethod" />
-                    </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Username</h5>
-                      </div>
-                      <input class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authUsername" />
-                    </div>
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Auth Password</h5>
-                      </div>
-                      <input type="password" class="width-max"
-                             [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authPassword" />
-                    </div>
-                  </div>
-                  <div class="actions pt-4">
-                    <div>
-                      <button mat-raised-button color="primary" (click)="updateApplicationSettingsInfo()">
-                        Update
-                      </button>
-                      <button mat-raised-button color="warn" (click)="testEmailSettings()">
-                        Test
-                      </button>
                     </div>
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {forkJoin} from 'rxjs';
 import {ApplicationSettingsInfo} from './domain/application-settings';
 import {MailService} from '../../common/score-mail.service';
+import {FunctionsRequiringEmailTransmissionProperties} from '../../authentication/domain/auth';
 
 @Component({
   selector: 'score-settings-application-settings',
@@ -68,6 +69,11 @@ export class SettingsApplicationSettingsComponent implements OnInit {
   get isBIEInverseModeEnabled(): boolean {
     const userToken = this.auth.getUserToken();
     return userToken.bie.inverseMode;
+  }
+
+  get isFunctionsRequiringEmailTransmissionEnabled(): boolean {
+    const userToken = this.auth.getUserToken();
+    return userToken.functionsRequiringEmailTransmission.enabled;
   }
 
   updateTenantConfiguration(value: boolean) {
@@ -150,6 +156,35 @@ export class SettingsApplicationSettingsComponent implements OnInit {
           this.settingsService.updateBIEInverseModeConfiguration(value).subscribe(_ => {
             this.auth.reloadUserToken().subscribe(userToken => {
               if (userToken.bie.inverseMode === value) {
+                this.snackBar.open('Updated', '', {
+                  duration: 3000,
+                });
+              }
+            });
+          });
+        }
+      });
+  }
+
+  updateFunctionsRequiringEmailTransmissionConfiguration(value: boolean) {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    if (value) {
+      dialogConfig.data.header = 'Enable functions requiring email transmission?';
+      dialogConfig.data.content = ['Are you sure you want to enable functions requiring email transmission?',
+        'If SMTP settings are incorrect, these functions may not operate properly.'];
+      dialogConfig.data.action = 'Enable';
+    } else {
+      dialogConfig.data.header = 'Disable functions requiring email transmission?';
+      dialogConfig.data.content = ['Are you sure you want to disable functions requiring email transmission?'];
+      dialogConfig.data.action = 'Disable';
+    }
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.settingsService.updateFunctionsRequiringEmailTransmissionConfiguration(value).subscribe(_ => {
+            this.auth.reloadUserToken().subscribe(userToken => {
+              if (userToken.functionsRequiringEmailTransmission.enabled === value) {
                 this.snackBar.open('Updated', '', {
                   duration: 3000,
                 });
