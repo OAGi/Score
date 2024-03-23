@@ -1,0 +1,230 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button mat-raised-button class="ml-2" color="primary" (click)="update()"
+              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
+              [disabled]="!isChanged() || isDisabled(biePackage)">
+        Update
+      </button>
+      <button mat-raised-button class="ml-2" color="accent" (click)="updateState('QA')"
+              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)"
+              [disabled]="loading || isChanged()">
+        Move to QA
+      </button>
+      <button mat-raised-button class="ml-2" color="warn" (click)="updateState('WIP')"
+              *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
+              [disabled]="loading">
+        Back to WIP
+      </button>
+      <button mat-raised-button class="ml-2" color="accent" (click)="updateState('Production')"
+              *ngIf="biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)"
+              [disabled]="loading">
+        Move to Production
+      </button>
+      <button mat-raised-button class="ml-2" color="warn" (click)="discard()"
+              *ngIf="biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)">
+        Discard
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-3 pb-0">
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <div class="row" style="margin-bottom: -4px;">
+              <div class="col-12">
+                <mat-form-field>
+                  <mat-label>Package Version ID</mat-label>
+                  <input matInput required [(ngModel)]="biePackage.versionId" maxlength="100"
+                         [disabled]="biePackage.state !== 'WIP'"/>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: -4px;">
+              <div class="col-12">
+                <mat-form-field>
+                  <mat-label>Package Version Name</mat-label>
+                  <input matInput required [(ngModel)]="biePackage.versionName" maxlength="200"
+                         [disabled]="biePackage.state !== 'WIP'"/>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8 col-sm-12" style="padding-top: 4px;">
+            <mat-form-field>
+              <mat-label>Description</mat-label>
+              <textarea rows="4" cols="2000" matInput [(ngModel)]="biePackage.description"
+                        [disabled]="biePackage.state !== 'WIP'"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <mat-card class="pt-0">
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+    <mat-card-header class="align-items-baseline">
+      <mat-toolbar class="bg-white p-0" style="box-shadow: none;">
+        <span class="title">BIE List</span>
+        <div style="padding: 8px 12px 8px 24px;">
+          <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary"
+                  *ngIf="biePackage.state === 'WIP'">
+            <mat-icon>add</mat-icon>
+            Add
+          </button>
+          <button mat-raised-button class="mr-2" (click)="removeBieInBiePackage()"
+                  [hidden]="table.dataSource.data.length == 0"
+                  [disabled]="this.selection.selected.length == 0"
+                  *ngIf="biePackage.state === 'WIP'"
+                  color="warn">
+            <mat-icon>delete</mat-icon>
+            Remove
+          </button>
+        </div>
+      </mat-toolbar>
+    </mat-card-header>
+    <mat-card-content class="mat-card-container">
+      <div class="container-fluid p-2">
+        <div class="row">
+          <div class="col-12">
+            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+              <!--
+              <button mat-stroked-button>
+                <div class="d-inline-flex align-items-center">
+                  <span class="p-1 f12">Edit columns</span>
+                  <mat-icon class="pl-1">menu</mat-icon>
+                </div>
+              </button>
+              -->
+              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
+              <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+                <div class="d-inline-flex align-items-center">
+                  <span class="p-1 f12">{{ columnName }}</span>
+                  <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                </div>
+              </ng-template>
+            </mat-multi-sort-table-settings>
+          </div>
+        </div>
+      </div>
+      <div class="mat-elevation-z1">
+        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)"
+                            *ngIf="biePackage.state === 'WIP'">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="state"> State</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="bie-state {{ element.state }}"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
+              <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="branch">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"> Branch</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="den">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"> DEN</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <div class="den word-break-all">
+                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                   matTooltip="{{ element.den }}">
+                  <span>{{ element.den }}</span>
+                </a>
+              </div>
+              <div class="bie-guid">{{ element.guid }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="owner">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="owner"> Owner</th>
+            <td mat-cell *matCellDef="let element">
+              <span [matTooltip]="element.owner">{{ element.owner }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="businessContexts">
+            <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
+            <td mat-cell *matCellDef="let element">
+              <ng-container *ngFor="let businessContext of element.businessContexts">
+                <span class="businessContext">
+                  <a target="_blank" rel="noopener noreferrer"
+                     routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                    {{ businessContext.name }}</a>
+                </span>
+              </ng-container>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"> Version</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.version">{{ element.version }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="status"> Status</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.status">{{ element.status }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="bizTerm">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="bizTerm"> Business Term</th>
+            <td mat-cell *matCellDef="let element">
+              <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.remark }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdateTimestamp">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"> Updated on</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: table.displayedColumns; let entry" [ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

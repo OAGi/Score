@@ -1,0 +1,79 @@
+.mat-dialog-content {
+  max-height: max-content;
+}
+
+.mat-mdc-dialog-content {
+  max-height: 87vh !important;
+}
+
+.mat-column-state {
+  width: 100px;
+}
+
+.mat-column-branch {
+  width: 80px;
+}
+
+.mat-column-owner {
+  width: 140px;
+  font-size: 13px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 5%;
+}
+
+.mat-column-remark {
+  width: 12%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.mat-error {
+  font-size: 13px;
+}
+
+.highlight {
+  background: #42A948;
+}
+
+.header {
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+  padding-top: 8px;
+  height: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  padding: 0 24px;
+}

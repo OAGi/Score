@@ -40,6 +40,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Asbiep.AsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbie.BbiePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BbieSc.BbieScPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbiep.BbiepPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackageTopLevelAsbiep.BiePackageTopLevelAsbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUserExtRevision.BieUserExtRevisionPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtxAssignment.BizCtxAssignmentPath;
@@ -380,6 +381,19 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
             _bbieSc = new BbieScPath(this, null, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
 
         return _bbieSc;
+    }
+
+    private transient BiePackageTopLevelAsbiepPath _biePackageTopLevelAsbiep;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bie_package_top_level_asbiep</code> table
+     */
+    public BiePackageTopLevelAsbiepPath biePackageTopLevelAsbiep() {
+        if (_biePackageTopLevelAsbiep == null)
+            _biePackageTopLevelAsbiep = new BiePackageTopLevelAsbiepPath(this, null, Keys.BIE_PACKAGE_TOP_LEVEL_ASBIEP_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
+
+        return _biePackageTopLevelAsbiep;
     }
 
     private transient BieUserExtRevisionPath _bieUserExtRevision;

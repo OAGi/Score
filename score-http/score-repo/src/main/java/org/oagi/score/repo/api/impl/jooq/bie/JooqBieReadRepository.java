@@ -371,7 +371,7 @@ public class JooqBieReadRepository
 
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public GetBiePackageResponse getBiePackage(GetBiePackageRequest request) throws ScoreDataAccessException {
+    public GetBieSetResponse getBieSet(GetBieSetRequest request) throws ScoreDataAccessException {
         ScoreUser requester = request.getRequester();
         BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
 
@@ -385,13 +385,13 @@ public class JooqBieReadRepository
             }
         }
 
-        BiePackage biePackage = new BiePackage();
-        biePackage.setTopLevelAsbiep(topLevelAsbiep);
+        BieSet bieSet = new BieSet();
+        bieSet.setTopLevelAsbiep(topLevelAsbiep);
 
         if (topLevelAsbiep.getState() != BieState.Initiating) {
             List<Condition> conditions;
 
-            biePackage.setAbieList(selectAbie()
+            bieSet.setAbieList(selectAbie()
                             .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                             .fetch(mapperAbie())
             );
@@ -401,7 +401,7 @@ public class JooqBieReadRepository
             if (request.isUsed()) {
                 conditions.add(ASBIE.IS_USED.eq((byte) 1));
             }
-            biePackage.setAsbieList(selectAsbie()
+            bieSet.setAsbieList(selectAsbie()
                     .where(conditions)
                     .fetch(mapperAsbie())
             );
@@ -411,17 +411,17 @@ public class JooqBieReadRepository
             if (request.isUsed()) {
                 conditions.add(BBIE.IS_USED.eq((byte) 1));
             }
-            biePackage.setBbieList(selectBbie()
+            bieSet.setBbieList(selectBbie()
                     .where(conditions)
                     .fetch(mapperBbie())
             );
 
-            biePackage.setAsbiepList(selectAsbiep()
+            bieSet.setAsbiepList(selectAsbiep()
                     .where(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                     .fetch(mapperAsbiep())
             );
 
-            biePackage.setBbiepList(selectBbiep()
+            bieSet.setBbiepList(selectBbiep()
                     .where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                     .fetch(mapperBbiep())
             );
@@ -431,13 +431,13 @@ public class JooqBieReadRepository
             if (request.isUsed()) {
                 conditions.add(BBIE_SC.IS_USED.eq((byte) 1));
             }
-            biePackage.setBbieScList(selectBbieSc()
+            bieSet.setBbieScList(selectBbieSc()
                     .where(conditions)
                     .fetch(mapperBbieSc())
             );
         }
 
-        return new GetBiePackageResponse(biePackage);
+        return new GetBieSetResponse(bieSet);
     }
 
     @Override

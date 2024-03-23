@@ -1,0 +1,31 @@
+
+
+.mat-column-state {
+  width: 100px;
+}
+
+.mat-column-branch {
+  width: 80px;
+}
+
+.mat-column-owner {
+  width: 140px;
+  font-size: 13px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 5%;
+}
+
+.mat-column-remark {
+  width: 12%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}

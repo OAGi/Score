@@ -91,6 +91,7 @@
     "COPY": "Copy a Profiled Component, Noun, BOD",
     "UPLIFT": "Uplift a Profiled Component, Noun, BOD",
     "GENERATE": "Generate Expression for a Profiled Component, Noun, BOD",
+    "PACKAGE": "Manage Profiled Component, Noun, BOD Packages",
     "OPENAPIDOC": "Create OpenAPI Document for a Profiled Component, Noun, BOD"
   },
   "CC_NAV": {

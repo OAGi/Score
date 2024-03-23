@@ -95,6 +95,7 @@
     "COPY": "",
     "UPLIFT": "",
     "GENERATE": "",
+    "PACKAGE": "",
     "OPENAPIDOC":"",
     "REPORT": ""
   },

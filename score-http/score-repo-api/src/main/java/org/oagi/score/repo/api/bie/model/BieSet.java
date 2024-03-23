@@ -3,7 +3,7 @@ package org.oagi.score.repo.api.bie.model;
 import java.util.Collections;
 import java.util.List;
 
-public class BiePackage {
+public class BieSet {
 
     private TopLevelAsbiep topLevelAsbiep;
 

@@ -173,7 +173,7 @@ public class ExternalService {
                 .setUpdaterLoginIds(request.getUpdaterLoginIds())
                 .setUpdateDate(request.getUpdateStartDate(), request.getUpdateEndDate())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
-                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setSort(pageRequest.getSortActives(), pageRequest.getSortDirections())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchInto(BieList.class);
 

@@ -38,7 +38,10 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {BieAcceptOwnershipTransferRequestComponent} from './bie-accept-ownership-transfer-request/bie-accept-ownership-transfer-request.component';
+import {
+  BieAcceptOwnershipTransferRequestComponent
+} from './bie-accept-ownership-transfer-request/bie-accept-ownership-transfer-request.component';
+import {BiePackageModule} from './bie-package/bie-package.module';
 
 const routes: Routes = [
   {
@@ -131,6 +134,7 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     BieExpressModule,
+    BiePackageModule,
     OasDocModule,
     TransferOwnershipDialogModule,
     TranslateModule,

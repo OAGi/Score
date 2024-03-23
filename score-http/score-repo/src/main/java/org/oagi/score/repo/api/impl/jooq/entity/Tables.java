@@ -35,6 +35,8 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BdtScPriRestri;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackage;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BieUserExtRevision;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx;
@@ -337,6 +339,16 @@ public class Tables {
      * rather than the BDT_SC_PRI_RESTRI key.
      */
     public static final BdtScPriRestri BDT_SC_PRI_RESTRI = BdtScPriRestri.BDT_SC_PRI_RESTRI;
+
+    /**
+     * The table <code>oagi.bie_package</code>.
+     */
+    public static final BiePackage BIE_PACKAGE = BiePackage.BIE_PACKAGE;
+
+    /**
+     * The table <code>oagi.bie_package_top_level_asbiep</code>.
+     */
+    public static final BiePackageTopLevelAsbiep BIE_PACKAGE_TOP_LEVEL_ASBIEP = BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP;
 
     /**
      * This is an intersection table. Per CCTS, a usage rule may be reused. This

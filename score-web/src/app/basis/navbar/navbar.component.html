@@ -21,6 +21,9 @@
         <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}">
           Express BIE
         </button>
+        <button mat-menu-item routerLink="bie_package" title="{{'BIE_NAV.PACKAGE' | translate}}">
+          BIE Package
+        </button>
         <button *ngIf="!roles.includes('developer')" mat-menu-item routerLink="profile_bie/express/oas_doc" title="{{'BIE_NAV.OPENAPIDOC' | translate}}">
           OpenAPI Document
         </button>

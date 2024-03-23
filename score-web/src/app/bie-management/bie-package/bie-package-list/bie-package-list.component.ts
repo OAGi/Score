@@ -1,14 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
-import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {OpenAPIService} from '../domain/openapi.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
@@ -16,54 +14,68 @@ import {AccountListService} from '../../../account-management/domain/account-lis
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {PageRequest} from '../../../basis/basis';
 import {initFilter} from '../../../common/utility';
+import {BiePackage, BiePackageListRequest} from '../domain/bie-package';
+import {BiePackageService} from '../domain/bie-package.service';
+import {WebPageInfoService} from '../../../basis/basis.service';
+import {SimpleRelease} from '../../../release-management/domain/release';
+import {ReleaseService} from '../../../release-management/domain/release.service';
 
 @Component({
-  selector: 'score-oas-doc-list',
-  templateUrl: './oas-doc-list.component.html',
-  styleUrls: ['./oas-doc-list.component.css']
+  selector: 'score-bie-package-list',
+  templateUrl: './bie-package-list.component.html',
+  styleUrls: ['./bie-package-list.component.css']
 })
-export class OasDocListComponent implements OnInit {
+export class BiePackageListComponent implements OnInit {
 
-  title = 'OpenAPI Document';
+  title = 'BIE Package';
   displayedColumns = [
     {id: 'select', name: ''},
-    {id: 'title', name: 'Title'},
-    {id: 'openAPIVersion', name: 'OpenAPI Version'},
-    {id: 'version', name: 'Version'},
-    {id: 'licenseName', name: 'License Name'},
+    {id: 'state', name: 'State'},
+    {id: 'branch', name: 'Branch'},
+    {id: 'versionId', name: 'Package Version ID'},
+    {id: 'versionName', name: 'Package Version Name'},
+    {id: 'owner', name: 'Owner'},
     {id: 'description', name: 'Description'},
     {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp'},
   ];
-  table: TableData<OasDoc>;
+  table: TableData<BiePackage>;
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
+  releases: SimpleRelease[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
+  loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: OasDocListRequest;
+  states: string[] = ['WIP', 'QA', 'Production'];
+  request: BiePackageListRequest;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-  constructor(private openAPIService: OpenAPIService,
+  constructor(private biePackageService: BiePackageService,
               private accountService: AccountListService,
+              private releaseService: ReleaseService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
-    const localStorageKey = 'X-Score-Table[OasDocList]';
+    const localStorageKey = 'X-Score-Table[BiePackageList]';
     const value = JSON.parse(localStorage.getItem(localStorageKey)!);
-    this.table = new TableData<OasDoc>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
-    this.table.dataSource = new MatMultiSortTableDataSource<OasDoc>(this.sort, false);
+    this.table = new TableData<BiePackage>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
+    this.table.dataSource = new MatMultiSortTableDataSource<BiePackage>(this.sort, false);
 
-    this.request = new OasDocListRequest(this.route.snapshot.queryParamMap,
+    this.request = new BiePackageListRequest(this.route.snapshot.queryParamMap,
       new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
 
     this.paginator.pageIndex = this.request.page.pageIndex;
@@ -74,19 +86,26 @@ export class OasDocListComponent implements OnInit {
     this.table.sortDirs = this.request.page.sortDirections;
     this.table.sortObservable.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.loadOasDocList();
+      this.loadBiePackageList();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([loginIds, releases]) => {
       this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadOasDocList(true);
+      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+      this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
+      this.loadBiePackageList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
-    this.loadOasDocList();
+    this.loadBiePackageList();
   }
 
   onChange(property?: string, source?) {
@@ -116,20 +135,28 @@ export class OasDocListComponent implements OnInit {
     }
   }
 
-  loadOasDocList(isInit?: boolean) {
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    if (selectAllValue) {
+      this.request.releases = this.releases;
+    } else {
+      this.request.releases = [];
+    }
+  }
+
+  loadBiePackageList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.table.sortParams, this.table.sortDirs,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.openAPIService.getOasDocList(this.request).pipe(
+    this.biePackageService.getBiePackageList(this.request).pipe(
       finalize(() => {
         this.loading = false;
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list.map((elm: OasDoc) => {
+      this.table.dataSource.data = resp.list.map((elm: BiePackage) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
@@ -155,45 +182,51 @@ export class OasDocListComponent implements OnInit {
       this.table.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row: OasDoc) {
-    this.selection.select(row.oasDocId);
+  select(row: BiePackage) {
+    this.selection.select(row.biePackageId);
   }
 
-  toggle(row: OasDoc) {
+  toggle(row: BiePackage) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.oasDocId);
+      this.selection.deselect(row.biePackageId);
     } else {
       this.select(row);
     }
   }
 
-  isSelected(row: OasDoc) {
-    return this.selection.isSelected(row.oasDocId);
+  isSelected(row: BiePackage) {
+    return this.selection.isSelected(row.biePackageId);
+  }
+
+  create() {
+    this.biePackageService.create().subscribe(biePackageId => {
+      this.snackBar.open('Created', '', {
+        duration: 3000,
+      });
+
+      this.router.navigateByUrl('/bie_package/' + biePackageId);
+    });
   }
 
   discard() {
-    const oasDocIds = this.selection.selected;
+    const biePackageIds = this.selection.selected;
     const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Discard ' + (oasDocIds.length > 1 ? 'oas docs' : 'oas doc') + '?';
+    dialogConfig.data.header = 'Discard BIE Package' + (biePackageIds.length > 1 ? 's' : '') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected ' + (oasDocIds.length > 1 ? 'oas docs' : 'oas doc') + '?',
-      'The ' + (oasDocIds.length > 1 ? 'oas docs' : 'oas doc') + ' will be permanently removed.'
+      'Are you sure you want to discard selected BIE package' + (biePackageIds.length > 1 ? 's' : '') + '?',
+      'The BIE package' + (biePackageIds.length > 1 ? 's' : '') + ' will be permanently removed.'
     ];
     dialogConfig.data.action = 'Discard';
 
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.openAPIService.delete(...oasDocIds).subscribe(_ => {
+          this.biePackageService.delete(...biePackageIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
             this.selection.clear();
-            this.loadOasDocList();
-          }, err => {
-            this.snackBar.open('Discard\'s forbidden! The oas doc is used.', '', {
-              duration: 5000,
-            });
+            this.loadBiePackageList();
           });
         }
       });

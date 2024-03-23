@@ -1,5 +1,6 @@
 package org.oagi.score.service.common.data;
 
+import org.oagi.score.repo.api.bie.model.BiePackageState;
 import org.oagi.score.repo.api.bie.model.BieState;
 
 import java.math.BigInteger;
@@ -84,6 +85,30 @@ public enum AccessPrivilege {
                 break;
             case QA:
                 if (requester.getAppUserId().equals(bieOwnerId)) {
+                    accessPrivilege = CanMove;
+                } else {
+                    accessPrivilege = CanView;
+                }
+                break;
+            case Production:
+                accessPrivilege = CanView;
+                break;
+        }
+        return accessPrivilege;
+    }
+
+    public static AccessPrivilege toAccessPrivilege(AppUser requester, BigInteger biePackageOwnerId, BiePackageState biePackageState) {
+        AccessPrivilege accessPrivilege = Prohibited;
+        switch (biePackageState) {
+            case WIP:
+                if (requester.getAppUserId().equals(biePackageOwnerId)) {
+                    accessPrivilege = CanEdit;
+                } else {
+                    accessPrivilege = Prohibited;
+                }
+                break;
+            case QA:
+                if (requester.getAppUserId().equals(biePackageOwnerId)) {
                     accessPrivilege = CanMove;
                 } else {
                     accessPrivilege = CanView;

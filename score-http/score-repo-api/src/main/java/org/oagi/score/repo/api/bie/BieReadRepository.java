@@ -5,8 +5,8 @@ import org.oagi.score.repo.api.bie.model.*;
 
 public interface BieReadRepository {
 
-    GetBiePackageResponse getBiePackage(
-            GetBiePackageRequest request) throws ScoreDataAccessException;
+    GetBieSetResponse getBieSet(
+            GetBieSetRequest request) throws ScoreDataAccessException;
 
     GetReuseBieListResponse getReuseBieList(
             GetReuseBieListRequest request) throws ScoreDataAccessException;

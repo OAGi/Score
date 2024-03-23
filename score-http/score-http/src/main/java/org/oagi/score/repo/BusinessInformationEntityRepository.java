@@ -5,6 +5,7 @@ import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.helper.Utility.sha256;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
+import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.bie.model.BieState.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
@@ -679,57 +681,54 @@ public class BusinessInformationEntityRepository {
             return this;
         }
 
-        public SelectBieListArguments setSort(String field, String direction) {
-            if (StringUtils.hasLength(field)) {
-                SortField<?> sortField = null;
-                switch (field) {
+        public SelectBieListArguments setSort(List<String> fields, List<SortDirection> directions) {
+            for (int i = 0, len = directions.size(); i < len; ++i) {
+                String sortActive = fields.get(i);
+                SortDirection sortDirection = directions.get(i);
+
+                Field field;
+                switch (sortActive) {
                     case "state":
-                        if ("asc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.STATE.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.STATE.desc();
-                        }
-
+                        field = TOP_LEVEL_ASBIEP.STATE;
                         break;
-
+                    case "branch":
+                        field = RELEASE.RELEASE_NUM;
+                        break;
                     case "topLevelAsccpPropertyTerm":
-                        if ("asc".equals(direction)) {
-                            sortField = ASCCP.PROPERTY_TERM.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = ASCCP.PROPERTY_TERM.desc();
-                        }
-
+                        field = ASCCP.PROPERTY_TERM;
                         break;
-
                     case "den":
-                        if ("asc".equals(direction)) {
-                            sortField = ASCCP_MANIFEST.DEN.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = ASCCP_MANIFEST.DEN.desc();
-                        }
+                        field = ASCCP_MANIFEST.DEN;
                         break;
-
                     case "releaseNum":
-                        if ("asc".equals(direction)) {
-                            sortField = RELEASE.RELEASE_NUM.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = RELEASE.RELEASE_NUM.desc();
-                        }
-
+                        field = RELEASE.RELEASE_NUM;
                         break;
-
+                    case "owner":
+                        field = APP_USER.as("owner").LOGIN_ID;
+                        break;
+                    case "version":
+                        field = TOP_LEVEL_ASBIEP.VERSION;
+                        break;
+                    case "status":
+                        field = TOP_LEVEL_ASBIEP.STATUS;
+                        break;
+                    case "bizTerm":
+                        field = ASBIEP.BIZ_TERM;
+                        break;
+                    case "remark":
+                        field = ASBIEP.REMARK;
+                        break;
                     case "lastUpdateTimestamp":
-                        if ("asc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.desc();
-                        }
-
+                        field = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP;
                         break;
+                    default:
+                        continue;
                 }
 
-                if (sortField != null) {
-                    this.sortFields.add(0, sortField);
+                if (sortDirection == ASC) {
+                    sortFields.add(field.asc());
+                } else {
+                    sortFields.add(field.desc());
                 }
             }
 

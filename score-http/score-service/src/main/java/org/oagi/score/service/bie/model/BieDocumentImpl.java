@@ -29,23 +29,23 @@ public class BieDocumentImpl implements BieDocument {
 
     private CcDocument ccDocument;
 
-    BieDocumentImpl(BiePackage biePackage) {
-        this.topLevelAsbiep = biePackage.getTopLevelAsbiep();
-        this.abieMap = biePackage.getAbieList().stream()
+    BieDocumentImpl(BieSet bieSet) {
+        this.topLevelAsbiep = bieSet.getTopLevelAsbiep();
+        this.abieMap = bieSet.getAbieList().stream()
                 .collect(Collectors.toMap(Abie::getAbieId, Function.identity()));
-        this.asbieMap = biePackage.getAsbieList().stream()
+        this.asbieMap = bieSet.getAsbieList().stream()
                 .collect(Collectors.groupingBy(Asbie::getFromAbieId));
-        this.bbieMap = biePackage.getBbieList().stream()
+        this.bbieMap = bieSet.getBbieList().stream()
                 .collect(Collectors.groupingBy(Bbie::getFromAbieId));
-        this.bbieByIdMap = biePackage.getBbieList().stream()
+        this.bbieByIdMap = bieSet.getBbieList().stream()
                 .collect(Collectors.toMap(Bbie::getBbieId, Function.identity()));
-        this.asbiepMap = biePackage.getAsbiepList().stream()
+        this.asbiepMap = bieSet.getAsbiepList().stream()
                 .collect(Collectors.toMap(Asbiep::getAsbiepId, Function.identity()));
-        this.bbiepMap = biePackage.getBbiepList().stream()
+        this.bbiepMap = bieSet.getBbiepList().stream()
                 .collect(Collectors.toMap(Bbiep::getBbiepId, Function.identity()));
-        this.bbieScMap = biePackage.getBbieScList().stream()
+        this.bbieScMap = bieSet.getBbieScList().stream()
                 .collect(Collectors.groupingBy(BbieSc::getBbieId));
-        this.bbieScByIdMap = biePackage.getBbieScList().stream()
+        this.bbieScByIdMap = bieSet.getBbieScList().stream()
                 .collect(Collectors.toMap(BbieSc::getBbieScId, Function.identity()));
     }
 

@@ -5,12 +5,12 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.math.BigInteger;
 
-public class GetBiePackageRequest extends Request {
+public class GetBieSetRequest extends Request {
 
     private BigInteger topLevelAsbiepId;
     private boolean used;
 
-    public GetBiePackageRequest(ScoreUser requester) {
+    public GetBieSetRequest(ScoreUser requester) {
         super(requester);
     }
 
@@ -22,7 +22,7 @@ public class GetBiePackageRequest extends Request {
         this.topLevelAsbiepId = topLevelAsbiepId;
     }
 
-    public GetBiePackageRequest withTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+    public GetBieSetRequest withTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
         setTopLevelAsbiepId(topLevelAsbiepId);
         return this;
     }
@@ -35,7 +35,7 @@ public class GetBiePackageRequest extends Request {
         this.used = used;
     }
 
-    public GetBiePackageRequest withUsed(boolean used) {
+    public GetBieSetRequest withUsed(boolean used) {
         setUsed(used);
         return this;
     }

@@ -1,8 +1,8 @@
 package org.oagi.score.service.bie.model;
 
 import org.oagi.score.repo.api.bie.BieReadRepository;
-import org.oagi.score.repo.api.bie.model.BiePackage;
-import org.oagi.score.repo.api.bie.model.GetBiePackageRequest;
+import org.oagi.score.repo.api.bie.model.BieSet;
+import org.oagi.score.repo.api.bie.model.GetBieSetRequest;
 import org.oagi.score.repo.api.corecomponent.CcReadRepository;
 import org.oagi.score.repo.api.corecomponent.model.GetCcPackageRequest;
 import org.oagi.score.repo.api.user.model.ScoreUser;
@@ -41,13 +41,13 @@ public final class BieDocumentBuilder {
     }
 
     public BieDocument build() {
-        BiePackage biePackage = bieReadRepository
-                .getBiePackage(new GetBiePackageRequest(requester)
+        BieSet bieSet = bieReadRepository
+                .getBieSet(new GetBieSetRequest(requester)
                         .withTopLevelAsbiepId(topLevelAsbiepId)
                         .withUsed(used))
-                .getBiePackage();
+                .getBieSet();
 
-        BieDocumentImpl bieDocument = new BieDocumentImpl(biePackage);
+        BieDocumentImpl bieDocument = new BieDocumentImpl(bieSet);
         bieDocument.with(new CcDocumentImpl(ccReadRepository
                 .getCcPackage(new GetCcPackageRequest(requester)
                         .withAsccpManifestId(bieDocument.getRootAsbiep().getBasedAsccpManifestId()))

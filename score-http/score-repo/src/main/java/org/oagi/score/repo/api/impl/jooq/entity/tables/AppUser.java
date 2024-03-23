@@ -50,6 +50,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Bbiep.BbiepPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bcc.BccPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeList.CodeListPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValue.CodeListValuePath;
@@ -751,6 +752,45 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _bccOwnerUserIdFk = new BccPath(this, null, Keys.BCC_OWNER_USER_ID_FK.getInverseKey());
 
         return _bccOwnerUserIdFk;
+    }
+
+    private transient BiePackagePath _biePackageCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_created_by_fk</code> key
+     */
+    public BiePackagePath biePackageCreatedByFk() {
+        if (_biePackageCreatedByFk == null)
+            _biePackageCreatedByFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_CREATED_BY_FK.getInverseKey());
+
+        return _biePackageCreatedByFk;
+    }
+
+    private transient BiePackagePath _biePackageLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_last_updated_by_fk</code> key
+     */
+    public BiePackagePath biePackageLastUpdatedByFk() {
+        if (_biePackageLastUpdatedByFk == null)
+            _biePackageLastUpdatedByFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _biePackageLastUpdatedByFk;
+    }
+
+    private transient BiePackagePath _biePackageOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_owner_user_id_fk</code> key
+     */
+    public BiePackagePath biePackageOwnerUserIdFk() {
+        if (_biePackageOwnerUserIdFk == null)
+            _biePackageOwnerUserIdFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _biePackageOwnerUserIdFk;
     }
 
     private transient BizCtxPath _bizCtxCreatedByFk;

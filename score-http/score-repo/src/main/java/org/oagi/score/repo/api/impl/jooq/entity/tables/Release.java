@@ -41,6 +41,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccManifest.AsccManifest
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccManifest.BccManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BccpManifest.BccpManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BlobContentManifest.BlobContentManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
@@ -354,6 +355,19 @@ public class Release extends TableImpl<ReleaseRecord> {
             _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
         return _bccManifest;
+    }
+
+    private transient BiePackagePath _biePackage;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table
+     */
+    public BiePackagePath biePackage() {
+        if (_biePackage == null)
+            _biePackage = new BiePackagePath(this, null, Keys.BIE_PACKAGE_RELEASE_ID_FK.getInverseKey());
+
+        return _biePackage;
     }
 
     private transient BlobContentManifestPath _blobContentManifest;

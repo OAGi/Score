@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
-import org.checkerframework.checker.units.qual.A;
 import org.oagi.score.data.BizCtx;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
@@ -9,9 +8,9 @@ import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
 import org.oagi.score.gateway.http.api.mail.service.MailService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.businessterm.model.ConfirmAsbieBbieListRequest;
-import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
@@ -27,6 +26,8 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @RestController
 public class BieListController {
@@ -60,8 +61,10 @@ public class BieListController {
                                             @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
                                             @RequestParam(name = "releaseIds", required = false) String releaseIds,
-                                            @RequestParam(name = "sortActive") String sortActive,
-                                            @RequestParam(name = "sortDirection") String sortDirection,
+                                            @RequestParam(name = "sortActive", required = false) String sortActive, // Deprecated. Use 'sortActives' instead of 'sortActive'.
+                                            @RequestParam(name = "sortDirection", required = false) String sortDirection, // Deprecated. Use 'sortDirections' instead of 'sortDirection'.
+                                            @RequestParam(name = "sortActives", required = false) String sortActives,
+                                            @RequestParam(name = "sortDirections", required = false) String sortDirections,
                                             @RequestParam(name = "pageIndex") int pageIndex,
                                             @RequestParam(name = "pageSize") int pageSize) {
 
@@ -107,8 +110,19 @@ public class BieListController {
         }
 
         PageRequest pageRequest = new PageRequest();
-        pageRequest.setSortActive(sortActive);
-        pageRequest.setSortDirection(sortDirection);
+        if (hasLength(sortActive)) {
+            pageRequest.setSortActive(sortActive);
+        } else {
+            pageRequest.setSortActives(!hasLength(sortActives) ? Collections.emptyList() :
+                    Arrays.asList(sortActives.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).collect(Collectors.toList()));
+        }
+        if (hasLength(sortDirection)) {
+            pageRequest.setSortDirection(sortDirection);
+        } else {
+            pageRequest.setSortDirections(!hasLength(sortDirections) ? Collections.emptyList() :
+                    Arrays.asList(sortDirections.split(",")).stream().map(e -> e.trim()).filter(e -> hasLength(e)).map(e -> SortDirection.valueOf(e.toUpperCase())).collect(Collectors.toList()));
+        }
+
         pageRequest.setPageIndex(pageIndex);
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);

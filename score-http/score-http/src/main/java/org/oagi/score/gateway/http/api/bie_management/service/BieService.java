@@ -196,7 +196,7 @@ public class BieService {
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
                 .setTenantBusinessCtx(requester.isAdmin(), userTenantIds)
-                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setSort(pageRequest.getSortActives(), pageRequest.getSortDirections())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchInto(BieList.class);
 
@@ -244,7 +244,7 @@ public class BieService {
 
         PaginationResponse<BieList> result = bieRepository.selectBieLists()
                 .setIncludeTopLevelAsbiepIds(reusingTopLevelAsbiepIds)
-                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setSort(pageRequest.getSortActives(), pageRequest.getSortDirections())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchInto(BieList.class);
 
@@ -289,7 +289,7 @@ public class BieService {
                 .setAsccBccDen(request.getAsccBccDen())
                 .setAccess(ULong.valueOf(requester.getAppUserId()), request.getAccess())
                 .setOwnedByDeveloper(request.getOwnedByDeveloper())
-                .setSort(pageRequest.getSortActive(), pageRequest.getSortDirection())
+                .setSort(pageRequest.getSortActives(), pageRequest.getSortDirections())
                 .setOffset(pageRequest.getOffset(), pageRequest.getPageSize())
                 .fetchAsbieBbieInto(request.getTypes(), AsbieListRecord.class);
 
