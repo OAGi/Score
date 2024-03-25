@@ -120,9 +120,11 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void setBranch(String branch) {
         retry(() -> {
             click(getBranchSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
                     By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
-            click(optionField);
+            click(getDriver(), optionField);
+            escape(getDriver());
         });
     }
 
