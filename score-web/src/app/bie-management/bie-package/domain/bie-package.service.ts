@@ -27,6 +27,18 @@ export class BiePackageService {
     if (request.filters.description) {
       params = params.set('description', request.filters.description);
     }
+    if (request.filters.den) {
+      params = params.set('den', request.filters.den);
+    }
+    if (request.filters.businessTerm) {
+      params = params.set('businessTerm', request.filters.businessTerm);
+    }
+    if (request.filters.version) {
+      params = params.set('version', request.filters.version);
+    }
+    if (request.filters.remark) {
+      params = params.set('remark', request.filters.remark);
+    }
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }

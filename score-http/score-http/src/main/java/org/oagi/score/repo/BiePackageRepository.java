@@ -62,7 +62,48 @@ public class BiePackageRepository {
     }
 
     private SelectOnConditionStep<Record> getSelectOnConditionStep(BiePackageListRequest request) {
-        return dslContext.select(BIE_PACKAGE.BIE_PACKAGE_ID, BIE_PACKAGE.VERSION_ID, BIE_PACKAGE.VERSION_NAME, BIE_PACKAGE.DESCRIPTION, BIE_PACKAGE.RELEASE_ID, RELEASE.RELEASE_NUM, BIE_PACKAGE.STATE, APP_USER.as("creator").APP_USER_ID.as("creator_user_id"), APP_USER.as("creator").LOGIN_ID.as("creator_login_id"), APP_USER.as("creator").NAME.as("creator_name"), APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"), APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"), APP_USER.as("owner").APP_USER_ID.as("owner_user_id"), APP_USER.as("owner").LOGIN_ID.as("owner_login_id"), APP_USER.as("owner").NAME.as("owner_name"), APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"), APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"), APP_USER.as("updater").APP_USER_ID.as("updater_user_id"), APP_USER.as("updater").LOGIN_ID.as("updater_login_id"), APP_USER.as("updater").NAME.as("updater_name"), APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"), APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"), BIE_PACKAGE.CREATION_TIMESTAMP, BIE_PACKAGE.LAST_UPDATE_TIMESTAMP, BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID, BIE_PACKAGE.SOURCE_ACTION, BIE_PACKAGE.SOURCE_TIMESTAMP, BIE_PACKAGE.as("source").VERSION_ID, BIE_PACKAGE.as("source").VERSION_NAME).from(BIE_PACKAGE).join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID)).join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID)).join(APP_USER.as("updater")).on(BIE_PACKAGE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID)).leftJoin(RELEASE).on(BIE_PACKAGE.RELEASE_ID.eq(RELEASE.RELEASE_ID)).leftJoin(BIE_PACKAGE.as("source")).on(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.eq(BIE_PACKAGE.as("source").BIE_PACKAGE_ID));
+        return dslContext.selectDistinct(
+                BIE_PACKAGE.BIE_PACKAGE_ID,
+                BIE_PACKAGE.VERSION_ID,
+                BIE_PACKAGE.VERSION_NAME,
+                BIE_PACKAGE.DESCRIPTION,
+                BIE_PACKAGE.RELEASE_ID,
+                RELEASE.RELEASE_NUM,
+                BIE_PACKAGE.STATE,
+                APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                APP_USER.as("creator").NAME.as("creator_name"),
+                APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
+                APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
+                APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                APP_USER.as("owner").NAME.as("owner_name"),
+                APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
+                APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                APP_USER.as("updater").NAME.as("updater_name"),
+                APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
+                BIE_PACKAGE.CREATION_TIMESTAMP,
+                BIE_PACKAGE.LAST_UPDATE_TIMESTAMP,
+                BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID,
+                BIE_PACKAGE.SOURCE_ACTION,
+                BIE_PACKAGE.SOURCE_TIMESTAMP,
+                BIE_PACKAGE.as("source").VERSION_ID,
+                BIE_PACKAGE.as("source").VERSION_NAME)
+                .from(BIE_PACKAGE)
+                .join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
+                .join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
+                .join(APP_USER.as("updater")).on(BIE_PACKAGE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .leftJoin(RELEASE).on(BIE_PACKAGE.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .leftJoin(BIE_PACKAGE.as("source")).on(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.eq(BIE_PACKAGE.as("source").BIE_PACKAGE_ID))
+                .leftJoin(BIE_PACKAGE_TOP_LEVEL_ASBIEP).on(BIE_PACKAGE.BIE_PACKAGE_ID.eq(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID))
+                .leftJoin(TOP_LEVEL_ASBIEP).on(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .leftJoin(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID));
     }
 
     private List<Condition> makeConditions(BiePackageListRequest request) {
@@ -76,6 +117,18 @@ public class BiePackageRepository {
         }
         if (hasLength(request.getDescription())) {
             conditions.addAll(contains(request.getDescription(), BIE_PACKAGE.DESCRIPTION));
+        }
+        if (hasLength(request.getDen())) {
+            conditions.addAll(contains(request.getDen(), ASCCP_MANIFEST.DEN));
+        }
+        if (hasLength(request.getBusinessTerm())) {
+            conditions.addAll(contains(request.getBusinessTerm(), BIZ_CTX.NAME));
+        }
+        if (hasLength(request.getVersion())) {
+            conditions.addAll(contains(request.getVersion(), TOP_LEVEL_ASBIEP.VERSION));
+        }
+        if (hasLength(request.getRemark())) {
+            conditions.addAll(contains(request.getRemark(), ASBIEP.REMARK));
         }
         if (!request.getStates().isEmpty()) {
             conditions.add(BIE_PACKAGE.STATE.in(request.getStates().stream().map(e -> e.name()).collect(Collectors.toList())));

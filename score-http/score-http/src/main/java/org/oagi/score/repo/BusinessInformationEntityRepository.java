@@ -538,6 +538,20 @@ public class BusinessInformationEntityRepository {
             return this;
         }
 
+        public SelectBieListArguments setVersion(String version) {
+            if (StringUtils.hasLength(version)) {
+                conditions.addAll(contains(version, TOP_LEVEL_ASBIEP.VERSION));
+            }
+            return this;
+        }
+
+        public SelectBieListArguments setRemark(String remark) {
+            if (StringUtils.hasLength(remark)) {
+                conditions.addAll(contains(remark, ASBIEP.REMARK));
+            }
+            return this;
+        }
+
         public SelectBieListArguments setBusinessContext(String businessContext) {
             if (StringUtils.hasLength(businessContext)) {
                 conditions.addAll(contains(businessContext, BIZ_CTX.NAME));

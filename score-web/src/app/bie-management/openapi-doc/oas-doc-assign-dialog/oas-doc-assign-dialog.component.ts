@@ -8,7 +8,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {finalize} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, BieForOasDocListRequest, OasDoc} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
@@ -54,6 +54,9 @@ export class OasDocAssignDialogComponent implements OnInit {
   request: BieForOasDocListRequest;
   assignBieForOasDoc: AssignBieForOasDoc;
   assignBieForOasDocList: AssignBieForOasDoc[];
+
+  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
+  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -181,9 +184,11 @@ export class OasDocAssignDialogComponent implements OnInit {
   reset(type: string) {
     switch (type) {
       case 'startDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.start = null;
         break;
       case 'endDate':
+        this.dateStart.select(undefined);
         this.request.updatedDate.end = null;
         break;
     }

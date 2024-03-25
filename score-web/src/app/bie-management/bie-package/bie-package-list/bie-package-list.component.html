@@ -131,31 +131,73 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Version Name</mat-label>
+                <mat-label>Package Version Name</mat-label>
                 <input matInput [(ngModel)]="request.filters.versionName"
                        (ngModelChange)="onChange('filters.versionName', request.filters.versionName)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
-                       placeholder="Version Name">
+                       placeholder="Package Version Name">
               </mat-form-field>
             </div>
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Version ID</mat-label>
+                <mat-label>Package Version ID</mat-label>
                 <input matInput [(ngModel)]="request.filters.versionId"
                        (ngModelChange)="onChange('filters.versionId', request.filters.versionId)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
-                       placeholder="Version ID">
+                       placeholder="Package Version ID">
               </mat-form-field>
             </div>
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Description</mat-label>
+                <mat-label>Package Description</mat-label>
                 <input matInput [(ngModel)]="request.filters.description"
                        (ngModelChange)="onChange('filters.description', request.filters.description)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
-                       placeholder="Description">
+                       placeholder="Package Description">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>BIE DEN</mat-label>
+                <input matInput [(ngModel)]="request.filters.den"
+                       (ngModelChange)="onChange('filters.den', request.filters.den)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
+                       placeholder="DEN">
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>BIE Business Term</mat-label>
+                <input matInput [(ngModel)]="request.filters.businessTerm"
+                       (ngModelChange)="onChange('filters.businessTerm', request.filters.businessTerm)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
+                       placeholder="Business Term">
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>BIE Version</mat-label>
+                <input matInput [(ngModel)]="request.filters.version"
+                       (ngModelChange)="onChange('filters.version', request.filters.version)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
+                       placeholder="BIE Version">
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>BIE Remark</mat-label>
+                <input matInput [(ngModel)]="request.filters.remark"
+                       (ngModelChange)="onChange('filters.remark', request.filters.remark)"
+                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
+                       placeholder="BIE Remark">
               </mat-form-field>
             </div>
           </div>

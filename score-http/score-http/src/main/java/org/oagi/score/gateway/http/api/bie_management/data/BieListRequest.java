@@ -16,6 +16,8 @@ public class BieListRequest {
     private String den;
     private String propertyTerm;
     private String businessContext;
+    private String version;
+    private String remark;
     private BigInteger asccpManifestId;
     private BigInteger usageTopLevelAsbiepId;
     private AccessPrivilege access;

@@ -141,6 +141,20 @@ public class OasDocRepository {
             return this;
         }
 
+        public SelectBieForOasDocListArguments setVersion(String version) {
+            if (StringUtils.hasLength(version)) {
+                conditions.addAll(contains(version, TOP_LEVEL_ASBIEP.VERSION));
+            }
+            return this;
+        }
+
+        public SelectBieForOasDocListArguments setRemark(String remark) {
+            if (StringUtils.hasLength(remark)) {
+                conditions.addAll(contains(remark, ASBIEP.REMARK));
+            }
+            return this;
+        }
+
         public SelectBieForOasDocListArguments setAsccpManifestId(BigInteger asccpManifestId) {
             if (asccpManifestId != null && asccpManifestId.longValue() > 0L) {
                 conditions.add(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)));

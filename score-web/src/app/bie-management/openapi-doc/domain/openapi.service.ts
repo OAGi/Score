@@ -217,6 +217,12 @@ export class OpenAPIService {
     if (request.filters.businessContext) {
       params = params.set('businessContext', request.filters.businessContext);
     }
+    if (request.filters.version) {
+      params = params.set('version', request.filters.version);
+    }
+    if (request.filters.remark) {
+      params = params.set('remark', request.filters.remark);
+    }
     if (request.filters.asccpManifestId) {
       params = params.set('asccpManifestId', '' + request.filters.asccpManifestId);
     }

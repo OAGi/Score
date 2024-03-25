@@ -182,6 +182,8 @@ public class BieService {
         PaginationResponse<BieList> result = bieRepository.selectBieLists()
                 .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
+                .setVersion(request.getVersion())
+                .setRemark(request.getRemark())
                 .setBusinessContext(request.getBusinessContext())
                 .setAsccpManifestId(request.getAsccpManifestId())
                 .setExcludePropertyTerms(request.getExcludePropertyTerms())

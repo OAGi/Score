@@ -96,6 +96,8 @@ public class OpenAPIDocService {
                 .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
+                .setVersion(request.getVersion())
+                .setRemark(request.getRemark())
                 .setAsccpManifestId(request.getAsccpManifestId())
                 .setExcludePropertyTerms(request.getExcludePropertyTerms())
                 .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())

@@ -156,6 +156,8 @@ public class OpenAPIDocController {
             @RequestParam(name = "den", required = false) String den,
             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
             @RequestParam(name = "businessContext", required = false) String businessContext,
+            @RequestParam(name = "version", required = false) String version,
+            @RequestParam(name = "remark", required = false) String remark,
             @RequestParam(name = "asccpManifestId", required = false) BigInteger asccpManifestId,
             @RequestParam(name = "access", required = false) String access,
             @RequestParam(name = "states", required = false) String states,
@@ -176,6 +178,8 @@ public class OpenAPIDocController {
         request.setDen(den);
         request.setPropertyTerm(propertyTerm);
         request.setBusinessContext(businessContext);
+        request.setVersion(version);
+        request.setRemark(remark);
         request.setAsccpManifestId(asccpManifestId);
         request.setAccess(org.springframework.util.StringUtils.hasLength(access) ? AccessPrivilege.valueOf(access) : null);
         request.setStates(org.springframework.util.StringUtils.hasLength(states) ?

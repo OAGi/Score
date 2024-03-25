@@ -47,6 +47,10 @@ public class BiePackageController {
                                                       @RequestParam(name = "versionId", required = false) String versionId,
                                                       @RequestParam(name = "versionName", required = false) String versionName,
                                                       @RequestParam(name = "description", required = false) String description,
+                                                      @RequestParam(name = "den", required = false) String den,
+                                                      @RequestParam(name = "businessTerm", required = false) String businessTerm,
+                                                      @RequestParam(name = "version", required = false) String version,
+                                                      @RequestParam(name = "remark", required = false) String remark,
                                                       @RequestParam(name = "states", required = false) String states,
                                                       @RequestParam(name = "biePackageIds", required = false) String biePackageIds,
                                                       @RequestParam(name = "releaseIds", required = false) String releaseIds,
@@ -64,6 +68,10 @@ public class BiePackageController {
         request.setVersionId(versionId);
         request.setVersionName(versionName);
         request.setDescription(description);
+        request.setDen(den);
+        request.setBusinessTerm(businessTerm);
+        request.setVersion(version);
+        request.setRemark(remark);
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
                         .map(e -> BieState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());

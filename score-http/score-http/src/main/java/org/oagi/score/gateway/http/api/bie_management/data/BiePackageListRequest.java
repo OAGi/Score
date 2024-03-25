@@ -14,6 +14,10 @@ public class BiePackageListRequest extends PaginationRequest<BiePackage> {
     private String versionId;
     private String versionName;
     private String description;
+    private String den;
+    private String businessTerm;
+    private String version;
+    private String remark;
     private List<BieState> states = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();
@@ -48,6 +52,38 @@ public class BiePackageListRequest extends PaginationRequest<BiePackage> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDen() {
+        return den;
+    }
+
+    public void setDen(String den) {
+        this.den = den;
+    }
+
+    public String getBusinessTerm() {
+        return businessTerm;
+    }
+
+    public void setBusinessTerm(String businessTerm) {
+        this.businessTerm = businessTerm;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public List<BieState> getStates() {

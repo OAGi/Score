@@ -10,6 +10,8 @@ export class BieListRequest {
   filters: {
     propertyTerm: string;
     businessContext: string;
+    version: string;
+    remark: string;
     asccpManifestId: number;
     den: string;
   };
@@ -79,6 +81,8 @@ export class BieListRequest {
     this.filters = {
       propertyTerm: params.get('propertyTerm') || '',
       businessContext: params.get('businessContext') || '',
+      version: params.get('version') || '',
+      remark: params.get('remark') || '',
       asccpManifestId: Number(params.get('asccpManifestId')) || 0,
       den: params.get('den') || '',
     };
@@ -132,6 +136,12 @@ export class BieListRequest {
     }
     if (this.filters.businessContext && this.filters.businessContext.length > 0) {
       params = params.set('businessContext', '' + this.filters.businessContext);
+    }
+    if (this.filters.version && this.filters.version.length > 0) {
+      params = params.set('version', '' + this.filters.version);
+    }
+    if (this.filters.remark && this.filters.remark.length > 0) {
+      params = params.set('remark', '' + this.filters.remark);
     }
     if (this.filters.asccpManifestId) {
       params = params.set('asccpManifestId', this.filters.asccpManifestId.toString());

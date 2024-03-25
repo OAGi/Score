@@ -27,6 +27,11 @@ export class BiePackageListRequest {
     versionId: string;
     versionName: string;
     description: string;
+
+    den: string;
+    businessTerm: string;
+    version: string;
+    remark: string;
   };
   states: string[] = [];
   ownerLoginIds: string[] = [];
@@ -85,6 +90,11 @@ export class BiePackageListRequest {
       versionId: params.get('versionId') || '',
       versionName: params.get('versionName') || '',
       description: params.get('description') || '',
+
+      den: params.get('den') || '',
+      businessTerm: params.get('businessTerm') || '',
+      version: params.get('version') || '',
+      remark: params.get('remark') || '',
     };
   }
 
@@ -121,6 +131,18 @@ export class BiePackageListRequest {
     }
     if (this.filters.description) {
       params = params.set('description', '' + this.filters.description);
+    }
+    if (this.filters.den) {
+      params = params.set('den', '' + this.filters.den);
+    }
+    if (this.filters.businessTerm) {
+      params = params.set('businessTerm', '' + this.filters.businessTerm);
+    }
+    if (this.filters.version) {
+      params = params.set('version', '' + this.filters.version);
+    }
+    if (this.filters.remark) {
+      params = params.set('remark', '' + this.filters.remark);
     }
     return params;
   }
