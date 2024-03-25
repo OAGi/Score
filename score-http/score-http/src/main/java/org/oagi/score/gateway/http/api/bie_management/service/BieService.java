@@ -23,9 +23,8 @@ import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMessageBody;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.api.openapidoc.model.*;
 import org.oagi.score.repo.api.user.model.ScoreRole;
@@ -356,6 +355,41 @@ public class BieService {
         dslContext.deleteFrom(Tables.TOP_LEVEL_ASBIEP).where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
         dslContext.deleteFrom(Tables.BIZ_CTX_ASSIGNMENT).where(Tables.BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
 
+        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP).where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
+        List<ULong> oasMessageBodyIdList = dslContext.selectDistinct(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
+                .from(OAS_MESSAGE_BODY)
+                .where(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .fetchInto(ULong.class);
+        if (!oasMessageBodyIdList.isEmpty()) {
+            List<ULong> oasRequestIdList = dslContext.selectDistinct(OAS_REQUEST.OAS_REQUEST_ID)
+                    .from(OAS_REQUEST)
+                    .where(OAS_REQUEST.OAS_MESSAGE_BODY_ID.in(oasMessageBodyIdList))
+                    .fetchInto(ULong.class);
+            if (!oasRequestIdList.isEmpty()) {
+                dslContext.deleteFrom(OAS_REQUEST_PARAMETER)
+                        .where(OAS_REQUEST_PARAMETER.OAS_REQUEST_ID.in(oasRequestIdList))
+                        .execute();
+                dslContext.deleteFrom(OAS_REQUEST)
+                        .where(OAS_REQUEST.OAS_REQUEST_ID.in(oasRequestIdList))
+                        .execute();
+            }
+            List<ULong> oasResponseIdList = dslContext.selectDistinct(OAS_RESPONSE.OAS_RESPONSE_ID)
+                    .from(OAS_RESPONSE)
+                    .where(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.in(oasMessageBodyIdList))
+                    .fetchInto(ULong.class);
+            if (!oasResponseIdList.isEmpty()) {
+                dslContext.deleteFrom(OAS_RESPONSE_HEADERS)
+                        .where(OAS_RESPONSE_HEADERS.OAS_RESPONSE_ID.in(oasResponseIdList))
+                        .execute();
+                dslContext.deleteFrom(OAS_RESPONSE)
+                        .where(OAS_RESPONSE.OAS_RESPONSE_ID.in(oasResponseIdList))
+                        .execute();
+            }
+            dslContext.deleteFrom(OAS_MESSAGE_BODY)
+                    .where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.in(oasMessageBodyIdList))
+                    .execute();
+        }
+
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();
 
         List<ULong> topLevelAsbiepListThatHasThisAsSource = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
@@ -395,7 +429,7 @@ public class BieService {
                     if (topLevelAsbiepIdsInOasDoc != null) {
                         for (BigInteger topLevelAsbiepId : topLevelAsbiepIds) {
                             if (topLevelAsbiepIdsInOasDoc.contains(topLevelAsbiepId)) {
-                                throw new DataAccessForbiddenException("Cannot delete the BIE'" + topLevelAsbiepId + "' please remove the BIE from the OpenAPI document first.");
+                                throw new DataAccessForbiddenException("Cannot delete the BIE '" + topLevelAsbiepId + "'. please remove the BIE from the OpenAPI document first.");
                             }
                         }
                     }

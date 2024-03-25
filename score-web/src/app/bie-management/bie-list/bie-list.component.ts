@@ -204,7 +204,7 @@ export class BieListComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => row.owner === this.username).length;
+    const numRows = this.dataSource.data.filter(row => (this.isAdmin) || row.owner === this.username).length;
     return numSelected > 0 && numSelected === numRows;
   }
 
@@ -216,7 +216,7 @@ export class BieListComponent implements OnInit {
   }
 
   select(row: BieList) {
-    if (row.owner === this.username) {
+    if ((this.isAdmin) || row.owner === this.username) {
       this.selection.select(row);
     }
   }
