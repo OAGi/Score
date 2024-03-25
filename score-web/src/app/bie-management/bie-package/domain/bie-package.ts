@@ -14,7 +14,7 @@ export class BiePackage {
   releaseNum: string;
   state: string;
   access: string;
-  ownerUserId: string;
+  owner: ScoreUser;
   lastUpdateTimestamp: Date;
   creationTimestamp: Date;
   createdBy: ScoreUser;

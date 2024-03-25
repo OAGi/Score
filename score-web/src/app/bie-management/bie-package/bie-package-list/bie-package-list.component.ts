@@ -4,7 +4,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -19,6 +19,12 @@ import {BiePackageService} from '../domain/bie-package.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {SimpleRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {UserToken} from '../../../authentication/domain/auth';
+import {TransferOwnershipDialogComponent} from '../../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {AccountList} from '../../../account-management/domain/accounts';
+import {BieList} from '../../bie-list/domain/bie-list';
+import {MailService} from '../../../common/score-mail.service';
 
 @Component({
   selector: 'score-bie-package-list',
@@ -35,8 +41,10 @@ export class BiePackageListComponent implements OnInit {
     {id: 'versionName', name: 'Package Version Name'},
     {id: 'versionId', name: 'Package Version ID'},
     {id: 'owner', name: 'Owner'},
+    {id: 'transferOwnership', name: 'Transfer Ownership'},
     {id: 'description', name: 'Description'},
     {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp'},
+    {id: 'more', name: 'More'},
   ];
   table: TableData<BiePackage>;
   selection = new SelectionModel<number>(true, []);
@@ -52,6 +60,8 @@ export class BiePackageListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BiePackageListRequest;
+
+  contextMenuItem: BiePackage;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
@@ -60,6 +70,8 @@ export class BiePackageListComponent implements OnInit {
   constructor(private biePackageService: BiePackageService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
+              private mailService: MailService,
+              private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
               private location: Location,
@@ -102,6 +114,14 @@ export class BiePackageListComponent implements OnInit {
       this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
       this.loadBiePackageList(true);
     });
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   onPageChange(event: PageEvent) {
@@ -198,6 +218,13 @@ export class BiePackageListComponent implements OnInit {
     return this.selection.isSelected(row.biePackageId);
   }
 
+  isEditable(element: BiePackage): boolean {
+    if (!element) {
+      return false;
+    }
+    return element.access === 'CanEdit';
+  }
+
   create() {
     this.biePackageService.create().subscribe(biePackageId => {
       this.snackBar.open('Created', '', {
@@ -208,8 +235,12 @@ export class BiePackageListComponent implements OnInit {
     });
   }
 
-  discard() {
-    const biePackageIds = this.selection.selected;
+  discard(biePackage?: BiePackage) {
+    const biePackageIds = (!!biePackage) ? [biePackage.biePackageId,] : this.selection.selected;
+    this.openDialogBiePackageDiscard(biePackageIds);
+  }
+
+  openDialogBiePackageDiscard(biePackageIds: number[]) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard BIE Package' + (biePackageIds.length > 1 ? 's' : '') + '?';
     dialogConfig.data.content = [
@@ -230,5 +261,60 @@ export class BiePackageListComponent implements OnInit {
           });
         }
       });
+  }
+
+  openTransferDialog(biePackage: BiePackage, $event?) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    if (!this.isEditable(biePackage) && !this.isAdmin) {
+      return;
+    }
+
+    this.accountService.getAccount(biePackage.owner.userId).subscribe(resp => {
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = window.innerWidth + 'px';
+      dialogConfig.data = {roles: [resp.developer ? 'developer' : 'end-user']};
+      const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe((result: AccountList) => {
+        if (result) {
+          this.loading = true;
+          this.biePackageService.transferOwnership(biePackage.biePackageId, result.loginId).subscribe(_ => {
+            this.snackBar.open('Transferred', '', {
+              duration: 3000,
+            });
+            this.selection.clear();
+            this.loadBiePackageList();
+            this.loading = false;
+          }, error => {
+            this.loading = false;
+            throw error;
+          });
+        }
+      });
+    });
+  }
+
+  requestOwnershipTransfer(biePackage: BiePackage) {
+    this.loading = true;
+    this.mailService.sendMail('bie-package-ownership-transfer-request', biePackage.owner.userId, {
+      parameters: {
+        bie_package_link: window.location.href + '/' + biePackage.biePackageId,
+        bie_package_version_name: biePackage.versionName,
+        bie_package_version_id: biePackage.versionId,
+        biePackageId: biePackage.biePackageId,
+        targetLoginId: this.auth.getUserToken().username
+      }
+    }).subscribe(resp => {
+      this.loading = false;
+      this.snackBar.open('Request Sent', '', {
+        duration: 3000,
+      });
+    }, error => {
+      this.loading = false;
+    });
   }
 }

@@ -90,6 +90,18 @@ export class BiePackageService {
     }
   }
 
+  transferOwnership(biePackageId: number, targetLoginId: string,
+                    sendNotification?: boolean, mailParameters?: any): Observable<any> {
+    let url = '/api/bie_packages/' + biePackageId + '/transfer_ownership';
+    if (sendNotification !== undefined) {
+      url += '?sendNotification=' + ((sendNotification) ? 'true' : 'false');
+    }
+    return this.http.post<any>(url, {
+      targetLoginId,
+      parameters: mailParameters
+    });
+  }
+
   addBieToBiePackage(biePackageId: number, ...topLevelAsbiepIdList: number[]): Observable<any> {
     return this.http.post('/api/bie_packages/' + biePackageId + '/bie', {
       topLevelAsbiepIdList

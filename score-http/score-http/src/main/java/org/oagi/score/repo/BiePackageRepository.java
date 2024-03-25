@@ -278,29 +278,29 @@ public class BiePackageRepository {
 
     private SelectOnConditionStep<Record> getSelectOnConditionStep(BieListInBiePackageRequest request) {
         return dslContext.selectDistinct(
-                TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                TOP_LEVEL_ASBIEP.VERSION,
-                TOP_LEVEL_ASBIEP.STATUS,
-                ASBIEP.GUID,
-                ASCCP_MANIFEST.DEN,
-                ASCCP.PROPERTY_TERM,
-                RELEASE.RELEASE_NUM,
-                TOP_LEVEL_ASBIEP.OWNER_USER_ID,
-                APP_USER.as("owner").LOGIN_ID.as("owner"),
-                ASBIEP.BIZ_TERM,
-                ASBIEP.REMARK,
-                TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
-                TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
-                TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
-                TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
-                APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
-                TOP_LEVEL_ASBIEP.STATE,
-                TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID,
-                TOP_LEVEL_ASBIEP.SOURCE_ACTION,
-                TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP,
-                TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.as("source_release_id"),
-                ASCCP_MANIFEST.as("source_asccp_manifest").DEN.as("source_den"),
-                RELEASE.as("source_release").RELEASE_NUM.as("source_release_num"))
+                        TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                        TOP_LEVEL_ASBIEP.VERSION,
+                        TOP_LEVEL_ASBIEP.STATUS,
+                        ASBIEP.GUID,
+                        ASCCP_MANIFEST.DEN,
+                        ASCCP.PROPERTY_TERM,
+                        RELEASE.RELEASE_NUM,
+                        TOP_LEVEL_ASBIEP.OWNER_USER_ID,
+                        APP_USER.as("owner").LOGIN_ID.as("owner"),
+                        ASBIEP.BIZ_TERM,
+                        ASBIEP.REMARK,
+                        TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
+                        TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
+                        TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
+                        TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
+                        APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
+                        TOP_LEVEL_ASBIEP.STATE,
+                        TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID,
+                        TOP_LEVEL_ASBIEP.SOURCE_ACTION,
+                        TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP,
+                        TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.as("source_release_id"),
+                        ASCCP_MANIFEST.as("source_asccp_manifest").DEN.as("source_den"),
+                        RELEASE.as("source_release").RELEASE_NUM.as("source_release_num"))
                 .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
                 .join(TOP_LEVEL_ASBIEP).on(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .join(ASBIEP).on(and(
@@ -474,6 +474,47 @@ public class BiePackageRepository {
                     .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackage.getBiePackageId())))
                     .execute();
         }
+    }
+
+    public void transferOwnership(BieOwnershipTransferRequest request) {
+        ScoreUser requester = request.getRequester();
+        BigInteger ownerAppUserId;
+        // Issue #1576
+        // Even if the administrator does not own BIE, they can transfer ownership.
+        if (requester.hasRole(ADMINISTRATOR)) {
+            ownerAppUserId = dslContext.select(BIE_PACKAGE.OWNER_USER_ID)
+                    .from(BIE_PACKAGE)
+                    .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId())))
+                    .fetchOptionalInto(BigInteger.class).orElse(BigInteger.ZERO);
+        } else {
+            ownerAppUserId = requester.getUserId();
+        }
+        if (ownerAppUserId == null || ownerAppUserId.longValue() == 0L) {
+            throw new IllegalArgumentException("Not found an owner user.");
+        }
+
+        ScoreUser targetUser = request.getTargetUser();
+        if (targetUser == null) {
+            throw new IllegalArgumentException("Not found a target user.");
+        }
+
+        if (dslContext.selectCount()
+                .from(BIE_PACKAGE)
+                .where(and(
+                        BIE_PACKAGE.OWNER_USER_ID.eq(ULong.valueOf(ownerAppUserId)),
+                        BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId()))
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0) == 0) {
+            throw new IllegalArgumentException("This BIE package is not owned by the current user.");
+        }
+
+        dslContext.update(BIE_PACKAGE)
+                .set(BIE_PACKAGE.OWNER_USER_ID, ULong.valueOf(targetUser.getUserId()))
+                .where(and(
+                        BIE_PACKAGE.OWNER_USER_ID.eq(ULong.valueOf(ownerAppUserId)),
+                        BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId()))
+                ))
+                .execute();
     }
 
 }

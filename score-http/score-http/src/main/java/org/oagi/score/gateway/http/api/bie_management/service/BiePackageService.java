@@ -181,6 +181,10 @@ public class BiePackageService implements ApplicationContextAware {
         }
     }
 
+    public void transferOwnership(BieOwnershipTransferRequest request) {
+        repository.transferOwnership(request);
+    }
+
     @Transactional(readOnly = true)
     public PageResponse<BieList> getBieListInBiePackage(BieListInBiePackageRequest request) {
         PaginationResponse<BieList> result = repository.getBieListInBiePackage(request);

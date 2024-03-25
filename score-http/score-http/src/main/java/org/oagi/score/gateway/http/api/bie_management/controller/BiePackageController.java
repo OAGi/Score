@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.bie_management.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BiePackageService;
+import org.oagi.score.gateway.http.api.mail.data.SendMailRequest;
+import org.oagi.score.gateway.http.api.mail.service.MailService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.base.SortDirection;
@@ -21,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
@@ -37,6 +36,9 @@ public class BiePackageController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private MailService mailService;
 
     @RequestMapping(value = "/bie_packages",
             method = RequestMethod.GET,
@@ -145,6 +147,32 @@ public class BiePackageController {
         request.setRequester(sessionService.asScoreUser(user));
 
         service.deleteBiePackage(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/bie_packages/{id:[\\d]+}/transfer_ownership", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @PathVariable("id") BigInteger biePackageId,
+                                            @RequestParam(value = "sendNotification", required = false) Boolean sendNotification,
+                                            @RequestBody Map<String, Object> requestBody) {
+        String targetLoginId = (String) requestBody.get("targetLoginId");
+
+        BieOwnershipTransferRequest request = new BieOwnershipTransferRequest();
+        request.setRequester(sessionService.asScoreUser(user));
+        request.setTargetUser(sessionService.getScoreUserByUsername(targetLoginId));
+        request.setBiePackageId(biePackageId);
+
+        service.transferOwnership(request);
+
+        if (sendNotification != null && sendNotification) {
+            SendMailRequest sendMailRequest = new SendMailRequest();
+            sendMailRequest.setRecipient(sessionService.getScoreUserByUsername(targetLoginId));
+            sendMailRequest.setTemplateName("bie-package-ownership-transfer-acceptance");
+            sendMailRequest.setParameters((Map<String, Object>) requestBody.get("parameters"));
+            mailService.sendMail(sessionService.asScoreUser(user), sendMailRequest);
+        }
+
         return ResponseEntity.noContent().build();
     }
 

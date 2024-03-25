@@ -277,9 +277,9 @@ public class BieListController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @PathVariable("id") BigInteger topLevelAsbiepId,
-                                            @RequestParam("sendNotification") Boolean sendNotification,
-                                            @RequestBody Map<String, Object> request) {
-        String targetLoginId = (String) request.get("targetLoginId");
+                                            @RequestParam(value = "sendNotification", required = false) Boolean sendNotification,
+                                            @RequestBody Map<String, Object> requestBody) {
+        String targetLoginId = (String) requestBody.get("targetLoginId");
         bieService.transferOwnership(user, topLevelAsbiepId, targetLoginId);
 
         BieEvent event = new BieEvent();
@@ -294,7 +294,7 @@ public class BieListController {
             SendMailRequest sendMailRequest = new SendMailRequest();
             sendMailRequest.setRecipient(sessionService.getScoreUserByUsername(targetLoginId));
             sendMailRequest.setTemplateName("bie-ownership-transfer-acceptance");
-            sendMailRequest.setParameters((Map<String, Object>) request.get("parameters"));
+            sendMailRequest.setParameters((Map<String, Object>) requestBody.get("parameters"));
             mailService.sendMail(sessionService.asScoreUser(user), sendMailRequest);
         }
 

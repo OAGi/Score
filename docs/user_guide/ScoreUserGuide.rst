@@ -7377,7 +7377,7 @@ state.
 +-------------+----------------------------------------+----------------------------------------+
 | Role State  | Current Owner                          | Other Users                            |
 +=============+========================================+========================================+
-| WIP         | Restrict the BIE.                      | -                                      |
+| WIP         | Restrict the BIE.                      |                                        |
 |             |                                        |                                        |
 |             | Change its state to QA.                |                                        |
 |             |                                        |                                        |
@@ -8970,6 +8970,167 @@ Environment Code to a target node with Action code, the issue will be
 reported because the two codes are not compatible. The same logic
 applies to the agency ID list.
 
+Manage BIE Package
+------------------
+The BIE Package provides the functionality to manage multiple BIEs as a single package.
+Like BIEs, BIE Packages also have independent states of WIP, QA, and Production, with functional changes based on ownership.
+See `BIE States <#bie-states>`__ for more details.
+
+The table below summarizes the actions and authorizations in each BIE package state.
+
++-------------+----------------------------------------+----------------------------------------+
+| Role State  | Current Owner                          | Other Users                            |
++=============+========================================+========================================+
+| WIP         | Restrict the BIE Package.              |                                        |
+|             |                                        |                                        |
+|             | Change its state to QA.                |                                        |
+|             |                                        |                                        |
+|             | Express it.                            |                                        |
+|             |                                        |                                        |
+|             | Transfer ownership.                    |                                        |
+|             |                                        |                                        |
+|             | Discard it.                            |                                        |
++-------------+----------------------------------------+----------------------------------------+
+| QA          | View its details.                      | View its details.                      |
+|             |                                        |                                        |
+|             | Change its state back to WIP or        |                                        |
+|             | advance to Production.                 |                                        |
+|             |                                        |                                        |
+|             | Express it.                            | Express it.                            |
++-------------+----------------------------------------+----------------------------------------+
+| Production  | View its details.                      | View its details.                      |
+|             |                                        |                                        |
+|             | Express it.                            | Express it.                            |
++-------------+----------------------------------------+----------------------------------------+
+
+Create a BIE package
+~~~~~~~~~~~~~~~~~~~~
+To create a BIE package:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. On the returned "BIE Package" page, click "New BIE Package" button located at the top-right
+   of the page.
+
+Edit a BIE Package
+~~~~~~~~~~~~~~~~~~
+To edit a BIE package:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Use the *Package Version Name*, *Package Version ID*, or *Package Description* to find the desired BIE package.
+   Open its "Edit BIE Package" page by clicking the BIE package name in Package Version Name column. See
+   also `How to use the Search field in general <#how-to-use-the-search-field-in-general>`__.
+
+4. You can change the *Package Version Name*, *Package Version ID*, and *Package Description* fields.
+
+5. Click the "Update" button.
+
+
+Discard a BIE Package
+~~~~~~~~~~~~~~~~~~~~~
+
+There are two methods for discarding a BIE package. The first one is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to discard. Use the *Package Version Name*, *Package Version ID*, *Package Description*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE package.
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the checkbox on the desired
+   BIE package row in the table.
+
+4. Click "Discard" at the top-right of the page.
+
+5. A dialog is open where you can confirm or cancel the request.
+
+The second method is:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to discard. Use the *Package Version Name*, *Package Version ID*, *Package Description*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE package.
+   (see `How to use Search Filters <#how-to-use-search-filters>`__). Click on the ellipsis button on the desired
+   BIE package row in the table.
+
+4. Click the "Discard" button in the appeared context menu.
+
+5. A dialog is open where you can confirm or cancel the request.
+
+
+Add BIEs to BIE Package
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To add BIE to BIE Package:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to discard. Use the *Package Version Name*, *Package Version ID*, *Package Description*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE package.
+   (see `How to use Search Filters <#how-to-use-search-filters>`__).
+   Click on the package version name to open its "Edit BIE Package" page.
+
+4. Click "Add" button.
+
+5. On the newly-opened "Add BIE" page, Locate the desired top-level BIE. Use the *DEN*, *Business Context*, *Branch*, *Owner*, *Updater*,
+   *Updated start date*, or *Updated end date* search filters to help located the desired BIE. (see `How to use Search
+   Filters <#how-to-use-search-filters>`__). This page shows only the BIEs in the *Production* state.
+
+6. Select the desired BIE node.
+
+7. Click "Add" button.
+
+
+Remove BIEs from a BIE Package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To remove the BIEs from a BIE package
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to discard. Use the *Package Version Name*, *Package Version ID*, *Package Description*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE package.
+   (see `How to use Search Filters <#how-to-use-search-filters>`__).
+   Click on the package version name to open its "Edit BIE Package" page.
+
+4. In the BIE List, select the desired BIE node, and click the "Remove" button.
+
+
+Schema Expression Generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To generate a desired schema file:
+
+1. On the top menu of the page, click "BIE".
+
+2. Choose "BIE Package" from the drop-down list.
+
+3. Locate the BIE package you want to discard. Use the *Package Version Name*, *Package Version ID*, *Package Description*,
+   *Updater*, *Updated start date*, or *Updated end date* search filters to help locate the desired BIE package.
+   (see `How to use Search Filters <#how-to-use-search-filters>`__).
+   Click on the package version name to open its "Edit BIE Package" page.
+
+4. In the BIE List, select the desired BIE node if needed.
+   If you do not select any BIE from the list, it will generate schemas for all BIEs in the list.
+
+5. Choose the schema format, either *XML Schema* or *JSON Schema*.
+
+6. Click "Generate" button.
+
+The generated file will be saved to the local drive.
+
+
 Manage OpenAPI Document
 ------------------------
 OpenAPI document management functionality allows end users to generate and merge multiple OpenAPI YML files into
@@ -9019,7 +9180,7 @@ To edit an OpenAPI document:
    also `How to use the Search field in general <#how-to-use-the-search-field-in-general>`__. 
    
 4. You can change the *Title*, *Document Version*, *Terms of Service*, *Contact Name*, *Contact URL*, *Contact Email*
-   , *License Name*, *License URL* and *Description fields. 
+   , *License Name*, *License URL* and *Description* fields.
    
 5. Click the "Update" button. 
 
@@ -9082,7 +9243,7 @@ To add BIE to OpenAPI Document:
 
 7. Check the Array Indicator box if needed.
    
-8. Click "Add" button
+8. Click "Add" button.
 
 
 View/Edit BIE List of an OpenAPI Document
@@ -9102,9 +9263,10 @@ To view / edit all the BIEs currently assigned to an OpenAPI document:
 4. In the BIE List, select the desired BIE node, the *Resource Name*, *Operation ID*, *Tag Name* 
    columns can be modified. 
 
-5. Check / un-check the *Array Indicator* or *Suppress Root* option
+5. Check / un-check the *Array Indicator* or *Suppress Root* option.
 
-6. Click "Update" button 
+6. Click "Update" button.
+
    
 Remove BIEs from an OpenAPI Document
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
