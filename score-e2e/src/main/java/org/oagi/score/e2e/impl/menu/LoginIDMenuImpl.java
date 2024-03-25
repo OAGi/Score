@@ -3,11 +3,11 @@ package org.oagi.score.e2e.impl.menu;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.HomePageImpl;
 import org.oagi.score.e2e.impl.page.LoginPageImpl;
-import org.oagi.score.e2e.impl.page.SettingsPasswordPageImpl;
+import org.oagi.score.e2e.impl.page.SettingsAccountPageImpl;
 import org.oagi.score.e2e.menu.LoginIDMenu;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
-import org.oagi.score.e2e.page.SettingsPasswordPage;
+import org.oagi.score.e2e.page.SettingsAccountPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -131,11 +131,11 @@ public class LoginIDMenuImpl extends DelegateBasePageImpl implements LoginIDMenu
     }
 
     @Override
-    public SettingsPasswordPage openSettingsSubMenu() {
+    public SettingsAccountPage openSettingsSubMenu() {
         retry(() -> click(getSettingsSubMenu()));
-        SettingsPasswordPage settingsPasswordPage = new SettingsPasswordPageImpl(this);
-        assert settingsPasswordPage.isOpened();
-        return settingsPasswordPage;
+        SettingsAccountPage settingsAccountPage = new SettingsAccountPageImpl(this);
+        assert settingsAccountPage.isOpened();
+        return settingsAccountPage;
     }
 
     @Override

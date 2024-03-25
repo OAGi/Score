@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 /**
  * An interface of Settings page.
  */
-public interface SettingsPasswordPage extends Page {
+public interface SettingsAccountPage extends Page {
 
     /**
      * Return the UI element of 'Old Password' field.
@@ -51,9 +51,9 @@ public interface SettingsPasswordPage extends Page {
     void setConfirmNewPassword(String confirmNewPassword);
 
     /**
-     * Return the UI element of 'Update' button.
+     * Return the UI element of 'Update' button for the password.
      *
-     * @return the UI element of 'Update' button
+     * @return the UI element of 'Update' button for the password
      */
     WebElement getUpdateButton();
 
