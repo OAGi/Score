@@ -142,7 +142,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
         String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100);
+        String description = randomPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet("10.8.1");
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
@@ -238,7 +238,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
         String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        createModuleSetPage.setDescription(randomPrint(50, 100));
+        createModuleSetPage.setDescription(randomPrint(50, 100).trim());
         createModuleSetPage.hitCreateButton();
 
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getModuleSetByName(moduleSetName);
@@ -289,7 +289,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
         String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        createModuleSetReleasePage.setDescription(randomPrint(50, 100));
+        createModuleSetReleasePage.setDescription(randomPrint(50, 100).trim());
         createModuleSetReleasePage.setModuleSet(moduleSet.getName());
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
@@ -361,7 +361,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
 
         String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        createModuleSetPage.setDescription(randomPrint(50, 100));
+        createModuleSetPage.setDescription(randomPrint(50, 100).trim());
         createModuleSetPage.hitCreateButton();
 
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);

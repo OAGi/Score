@@ -857,7 +857,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String version = "version_" + randomAlphanumeric(5, 10);
         String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -899,7 +899,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String version = "version_" + randomAlphanumeric(5, 10);
         String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -1029,7 +1029,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String version = "version_" + randomAlphanumeric(5, 10);
         String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -1206,7 +1206,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String version = "version_" + randomAlphanumeric(5, 10);
         String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -1251,7 +1251,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         int cardinalityMin = nextInt(2, 5);
         int cardinalityMax = nextInt(5, 10);
         String remark = "remark_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMin(cardinalityMin);
@@ -1301,7 +1301,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String example = "example_" + randomAlphanumeric(5, 10);
         String fixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         bbiePanel.toggleUsed();
         bbiePanel.setCardinalityMin(cardinalityMin);
@@ -1356,7 +1356,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String remark = "remark_" + randomAlphanumeric(5, 10);
         String example = "example_" + randomAlphanumeric(5, 10);
         String fixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100);
+        String contextDefinition = randomPrint(50, 100).trim();
 
         bbieScPanel.toggleUsed();
         bbieScPanel.setCardinalityMin(cardinalityMin);
