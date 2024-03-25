@@ -248,8 +248,8 @@ public class BiePackageController {
     @RequestMapping(value = "/bie_packages/{id:[\\d]+}/generate", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @PathVariable("id") BigInteger biePackageId,
-                                                        @RequestParam(name = "topLevelAsbiepIdList") String topLevelAsbiepIdList,
-                                                        @RequestParam(name = "schemaExpression") String schemaExpression,
+                                                        @RequestParam(name = "topLevelAsbiepIdList", required = false) String topLevelAsbiepIdList,
+                                                        @RequestParam(name = "schemaExpression", required = false) String schemaExpression,
                                                         HttpServletRequest httpServletRequest) throws IOException {
 
         GenerateBiePackageRequest request = new GenerateBiePackageRequest(sessionService.asScoreUser(user));

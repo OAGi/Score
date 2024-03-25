@@ -240,15 +240,18 @@ export class BiePackageDetailComponent implements OnInit {
 
   generate() {
     const selectedBieLists = this.selection.selected;
+    let topLevelAsbiepIdList;
     if (selectedBieLists === undefined || selectedBieLists.length === 0) {
-      return;
+      topLevelAsbiepIdList = [];
+    } else {
+      topLevelAsbiepIdList = selectedBieLists.map(e => e.topLevelAsbiepId);
     }
 
     this.loading = true;
     this.biePackageService.generateBiePackage(
       this.biePackage.biePackageId, {
         schemaExpression: this.schemaExpression
-      }, ...selectedBieLists.map(e => e.topLevelAsbiepId)).subscribe(resp => {
+      }, ...topLevelAsbiepIdList).subscribe(resp => {
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
       saveAs(blob, this._getFilenameFromContentDisposition(resp));
 

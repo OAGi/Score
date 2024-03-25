@@ -5,6 +5,8 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 import java.util.List;
 
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
+
 public class GenerateBiePackageRequest {
 
     private ScoreUser requester;
@@ -13,7 +15,7 @@ public class GenerateBiePackageRequest {
 
     private List<BigInteger> topLevelAsbiepIdList;
 
-    private String schemaExpression;
+    private String schemaExpression = "XML";
 
     public GenerateBiePackageRequest() {
     }
@@ -43,7 +45,9 @@ public class GenerateBiePackageRequest {
     }
 
     public void setTopLevelAsbiepIdList(List<BigInteger> topLevelAsbiepIdList) {
-        this.topLevelAsbiepIdList = topLevelAsbiepIdList;
+        if (topLevelAsbiepIdList != null) {
+            this.topLevelAsbiepIdList = topLevelAsbiepIdList;
+        }
     }
 
     public String getSchemaExpression() {
@@ -51,6 +55,8 @@ public class GenerateBiePackageRequest {
     }
 
     public void setSchemaExpression(String schemaExpression) {
-        this.schemaExpression = schemaExpression;
+        if (hasLength(schemaExpression)) {
+            this.schemaExpression = schemaExpression;
+        }
     }
 }
