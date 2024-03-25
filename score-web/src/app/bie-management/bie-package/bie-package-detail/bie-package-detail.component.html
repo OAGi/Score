@@ -38,18 +38,18 @@
             <div class="row" style="margin-bottom: -4px;">
               <div class="col-12">
                 <mat-form-field>
-                  <mat-label>Package Version ID</mat-label>
-                  <input matInput required [(ngModel)]="biePackage.versionId" maxlength="100"
-                         [disabled]="biePackage.state !== 'WIP'"/>
+                  <mat-label>Package Version Name</mat-label>
+                  <input matInput required [(ngModel)]="biePackage.versionName" maxlength="200"
+                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
                 </mat-form-field>
               </div>
             </div>
             <div class="row" style="margin-bottom: -4px;">
               <div class="col-12">
                 <mat-form-field>
-                  <mat-label>Package Version Name</mat-label>
-                  <input matInput required [(ngModel)]="biePackage.versionName" maxlength="200"
-                         [disabled]="biePackage.state !== 'WIP'"/>
+                  <mat-label>Package Version ID</mat-label>
+                  <input matInput required [(ngModel)]="biePackage.versionId" maxlength="100"
+                         [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"/>
                 </mat-form-field>
               </div>
             </div>
@@ -58,7 +58,7 @@
             <mat-form-field>
               <mat-label>Description</mat-label>
               <textarea rows="4" cols="2000" matInput [(ngModel)]="biePackage.description"
-                        [disabled]="biePackage.state !== 'WIP'"></textarea>
+                        [disabled]="biePackage.state !== 'WIP' || biePackage.access !== 'CanEdit'"></textarea>
             </mat-form-field>
           </div>
         </div>
@@ -75,14 +75,14 @@
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
           <button mat-raised-button class="mr-2" (click)="openDialog($event)" color="primary"
-                  *ngIf="biePackage.state === 'WIP'">
+                  *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'">
             <mat-icon>add</mat-icon>
             Add
           </button>
           <button mat-raised-button class="mr-2" (click)="removeBieInBiePackage()"
                   [hidden]="table.dataSource.data.length == 0"
                   [disabled]="this.selection.selected.length == 0"
-                  *ngIf="biePackage.state === 'WIP'"
+                  *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'"
                   color="warn">
             <mat-icon>delete</mat-icon>
             Remove
@@ -123,7 +123,7 @@
               <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? toggle(row) : null"
                             [checked]="isSelected(row)"
-                            *ngIf="biePackage.state === 'WIP'">
+                            *ngIf="biePackage.state === 'WIP' && biePackage.access === 'CanEdit'">
               </mat-checkbox>
             </td>
           </ng-container>

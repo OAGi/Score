@@ -131,21 +131,21 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Version ID</mat-label>
-                <input matInput [(ngModel)]="request.filters.versionId"
-                       (ngModelChange)="onChange('filters.versionId', request.filters.versionId)"
+                <mat-label>Version Name</mat-label>
+                <input matInput [(ngModel)]="request.filters.versionName"
+                       (ngModelChange)="onChange('filters.versionName', request.filters.versionName)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
-                       placeholder="Title">
+                       placeholder="Version Name">
               </mat-form-field>
             </div>
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Version Name</mat-label>
-                <input matInput [(ngModel)]="request.filters.versionName"
-                       (ngModelChange)="onChange('filters.versionName', request.filters.versionName)"
+                <mat-label>Version ID</mat-label>
+                <input matInput [(ngModel)]="request.filters.versionId"
+                       (ngModelChange)="onChange('filters.versionId', request.filters.versionId)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadBiePackageList();"
-                       placeholder="Description">
+                       placeholder="Version ID">
               </mat-form-field>
             </div>
 
@@ -230,20 +230,20 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="versionId">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="versionId"> Package Version ID</th>
-            <td mat-cell *matCellDef="let element">
-              <a routerLink="{{ element.biePackageId }}">
-                <div class="ellipsis">{{ element.versionId }}</div>
-              </a>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="versionName">
             <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="versionName"> Package Version Name</th>
             <td mat-cell *matCellDef="let element">
               <a routerLink="{{ element.biePackageId }}">
                 <div class="ellipsis">{{ element.versionName }}</div>
+              </a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="versionId">
+            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="versionId"> Package Version ID</th>
+            <td mat-cell *matCellDef="let element">
+              <a routerLink="{{ element.biePackageId }}">
+                <div class="ellipsis">{{ element.versionId }}</div>
               </a>
             </td>
           </ng-container>
