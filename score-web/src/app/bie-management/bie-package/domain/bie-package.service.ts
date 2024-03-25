@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PageResponse} from '../../../basis/basis';
 import {BieListInBiePackageRequest, BiePackage, BiePackageListRequest} from './bie-package';
@@ -104,5 +104,23 @@ export class BiePackageService {
         body: {topLevelAsbiepIdList}
       });
     }
+  }
+
+  generateBiePackage(biePackageId: number, options: {}, ...topLevelAsbiepIdList: number[]): Observable<HttpResponse<Blob>> {
+    let params: HttpParams = new HttpParams();
+    if (topLevelAsbiepIdList && topLevelAsbiepIdList.length > 0) {
+      params = params.set('topLevelAsbiepIdList', topLevelAsbiepIdList.map(e => e.toString()).join(','));
+    }
+    if (!!options) {
+      Object.entries(options).forEach(([key, value]) => {
+        params = params.set(key, options[key]);
+      });
+    }
+
+    return this.http.get('/api/bie_packages/' + biePackageId + '/generate', {
+      params,
+      observe: 'response',
+      responseType: 'blob'
+    });
   }
 }

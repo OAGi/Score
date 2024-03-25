@@ -6,6 +6,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
+import org.oagi.score.gateway.http.api.bie_management.data.BiePackage;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.gateway.http.api.namespace_management.data.NamespaceList;
@@ -128,6 +129,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             ABIE abie = generationContext.queryTargetABIE(asbiep);
             Element rootSeqNode = generateABIE(abie, rootElementNode);
             generateBIEs(abie, rootSeqNode);
+            if (this.option.getBiePackage() != null) { // Issue #1615
+                attachBiePackageAttributes(rootSeqNode.getParentElement(), topLevelAsbiep, this.option.getBiePackage());
+            }
             if (rootSeqNode.getChildren().isEmpty()) {
                 rootSeqNode.detach();
             }
@@ -198,6 +202,27 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private Element setProcessedElement(AgencyIdList agencyIdList, Element element) {
         processedElements.put(key(agencyIdList), element);
         return element;
+    }
+
+    private void attachBiePackageAttributes(Element node, TopLevelAsbiep topLevelAsbiep, BiePackage biePackage) {
+        addAttribute(node, "packageVersionName", true, biePackage.getVersionName(), "token");
+        addAttribute(node, "packageVersionID", true, biePackage.getVersionId(), "token");
+        addAttribute(node, "packageDescription", true, biePackage.getDescription(), "token");
+        addAttribute(node, "versionID", true, topLevelAsbiep.getVersion(), "normalizedString");
+    }
+
+    private void addAttribute(Element node, String name, boolean isRequired, String fixedValue, String type) {
+        List<Element> attributes = node.getChildren("attribute", XSD_NAMESPACE);
+        if (attributes.stream().filter(e -> name.equals(e.getAttribute("name").getValue())).count() != 0) {
+            return;
+        }
+
+        Element attr = newElement("attribute");
+        attr.setAttribute("name", name);
+        attr.setAttribute("fixed", StringUtils.hasLength(fixedValue) ? fixedValue : "");
+        attr.setAttribute("use", (isRequired) ? "required" : "optional");
+        attr.setAttribute("type", XSD_NAMESPACE.getPrefix() + ":" + type);
+        node.addContent(attr);
     }
 
     private void setDefinition(Element node, String contextDefinition) {

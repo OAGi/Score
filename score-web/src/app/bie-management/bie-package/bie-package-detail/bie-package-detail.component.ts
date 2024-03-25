@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from 'src/app/common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
 import {finalize} from 'rxjs/operators';
+import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
@@ -29,6 +30,7 @@ export class BiePackageDetailComponent implements OnInit {
 
   title = 'Edit BIE Package';
   biePackage: BiePackage = new BiePackage();
+  schemaExpression = 'XML';
   hashCode;
   disabled: boolean;
   displayedColumns = [
@@ -234,6 +236,33 @@ export class BiePackageDetailComponent implements OnInit {
 
       this.loadBieListInBiePackage();
     });
+  }
+
+  generate() {
+    const selectedBieLists = this.selection.selected;
+    if (selectedBieLists === undefined || selectedBieLists.length === 0) {
+      return;
+    }
+
+    this.loading = true;
+    this.biePackageService.generateBiePackage(
+      this.biePackage.biePackageId, {
+        schemaExpression: this.schemaExpression
+      }, ...selectedBieLists.map(e => e.topLevelAsbiepId)).subscribe(resp => {
+      const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
+      saveAs(blob, this._getFilenameFromContentDisposition(resp));
+
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+      throw err;
+    });
+  }
+
+  _getFilenameFromContentDisposition(resp) {
+    const contentDisposition = resp.headers.get('Content-Disposition') || '';
+    const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+    return (matches[1] || 'untitled').replace(/\"/gi, '').trim();
   }
 
   isChanged(): boolean {

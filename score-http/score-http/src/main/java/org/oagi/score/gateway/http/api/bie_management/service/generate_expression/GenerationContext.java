@@ -140,6 +140,7 @@ public class GenerationContext implements InitializingBean {
     private Map<BigInteger, BdtScPriRestri> findBdtScPriRestriMap;
     private Map<BigInteger, CdtScAwdPriXpsTypeMap> findCdtScAwdPriXpsTypeMapMap;
     private Map<BigInteger, List<Xbt>> findXbtMap;
+    private Map<String, List<Xbt>> findXbtByNameMap;
     private Map<BigInteger, CodeList> findCodeListMap;
     private Map<BigInteger, List<CodeListValue>> findCodeListValueByCodeListManifestIdMap;
     private Map<BigInteger, ACC> findACCMap;
@@ -252,6 +253,8 @@ public class GenerationContext implements InitializingBean {
         findXbtMap = xbtList.stream()
                 .filter(e -> releaseIds.contains(e.getReleaseId()))
                 .collect(Collectors.groupingBy(e -> e.getXbtId()));
+        findXbtByNameMap = xbtList.stream()
+                .collect(Collectors.groupingBy(e -> e.getName()));
 
         List<CodeList> codeLists = codeListRepository.findAllByReleaseIds(releaseIds);
         findCodeListMap = codeLists.stream()
@@ -397,6 +400,16 @@ public class GenerationContext implements InitializingBean {
     public Xbt findXbt(BigInteger xbtId) {
         if (xbtId != null && xbtId.longValue() > 0L) {
             List<Xbt> xbtList = findXbtMap.get(xbtId);
+            if (xbtList != null && !xbtList.isEmpty()) {
+                return xbtList.get(0);
+            }
+        }
+        return null;
+    }
+
+    public Xbt findXbtByName(String name) {
+        if (name != null) {
+            List<Xbt> xbtList = findXbtByNameMap.get(name);
             if (xbtList != null && !xbtList.isEmpty()) {
                 return xbtList.get(0);
             }

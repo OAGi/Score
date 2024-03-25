@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
+
 @Data
 public class PageRequest {
 
@@ -31,8 +33,13 @@ public class PageRequest {
     }
 
     public void setSortDirection(String sortDirection) {
-        if (sortDirection != null && !"undefined".equals(sortDirection)) {
-            setSortDirections(Arrays.asList(SortDirection.valueOf(sortDirection.toUpperCase())));
+        if (!hasLength(sortDirection)) {
+            return;
+        }
+        if ("ASC".equalsIgnoreCase(sortDirection)) {
+            setSortDirections(Arrays.asList(SortDirection.ASC));
+        } else if ("DESC".equalsIgnoreCase(sortDirection)) {
+            setSortDirections(Arrays.asList(SortDirection.DESC));
         }
     }
 

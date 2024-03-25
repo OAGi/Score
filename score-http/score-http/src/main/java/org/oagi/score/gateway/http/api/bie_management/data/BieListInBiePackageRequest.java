@@ -20,4 +20,9 @@ public class BieListInBiePackageRequest extends PaginationRequest<BieList> {
     public void setBiePackageId(BigInteger biePackageId) {
         this.biePackageId = biePackageId;
     }
+
+    public BieListInBiePackageRequest withBiePackageId(BigInteger biePackageId) {
+        setBiePackageId(biePackageId);
+        return this;
+    }
 }

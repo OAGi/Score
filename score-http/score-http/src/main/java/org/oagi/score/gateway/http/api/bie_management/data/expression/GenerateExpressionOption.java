@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.data.expression;
 
 import lombok.Data;
+import org.oagi.score.gateway.http.api.bie_management.data.BiePackage;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -22,6 +23,8 @@ public class GenerateExpressionOption {
 
     private String expressionOption;
     private String packageOption;
+    // Issue #1615
+    private BiePackage biePackage;
 
     private boolean includeBusinessContextInFilename;
     private boolean includeVersionInFilename;

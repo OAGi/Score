@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BiePackageService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -8,6 +9,8 @@ import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -15,6 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -204,4 +209,25 @@ public class BiePackageController {
         return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(value = "/bie_packages/{id:[\\d]+}/generate", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                        @PathVariable("id") BigInteger biePackageId,
+                                                        @RequestParam(name = "topLevelAsbiepIdList") String topLevelAsbiepIdList,
+                                                        @RequestParam(name = "schemaExpression") String schemaExpression,
+                                                        HttpServletRequest httpServletRequest) throws IOException {
+
+        GenerateBiePackageRequest request = new GenerateBiePackageRequest(sessionService.asScoreUser(user));
+        request.setBiePackageId(biePackageId);
+        request.setTopLevelAsbiepIdList(!StringUtils.hasLength(topLevelAsbiepIdList) ? Collections.emptyList() :
+                Arrays.asList(topLevelAsbiepIdList.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
+        request.setSchemaExpression(schemaExpression);
+
+        GenerateBiePackageResponse response = service.generate(request);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType(response.getContentType()))
+                .contentLength(response.getFile().length())
+                .body(new InputStreamResource(new FileInputStream(response.getFile())));
+    }
 }

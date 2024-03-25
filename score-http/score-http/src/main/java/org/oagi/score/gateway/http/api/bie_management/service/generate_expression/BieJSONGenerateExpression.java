@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
 import org.oagi.score.common.util.OagisComponentType;
 import org.oagi.score.data.*;
+import org.oagi.score.gateway.http.api.bie_management.data.BiePackage;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -134,7 +136,8 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 fillProperties(root, definitions, paginationResponseTopLevelAsbiep, false, generationContext);
             }
 
-            fillProperties(root, definitions, asbiep, typeAbie, generationContext);
+            fillProperties(root, definitions, topLevelAsbiep, asbiep, typeAbie,
+                    option.isArrayForJsonExpression(), this.option.getBiePackage(), generationContext);
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
@@ -147,7 +150,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         ASBIEP asbiep = generationContext.findASBIEP(topLevelAsbiep.getAsbiepId(), topLevelAsbiep);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        fillProperties(parent, definitions, asbiep, typeAbie, isArray, generationContext);
+        fillProperties(parent, definitions, topLevelAsbiep, asbiep, typeAbie, isArray, null, generationContext);
     }
 
     private void suppressRootProperty(Map<String, Object> parent, boolean isArray) {
@@ -278,14 +281,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
     private void fillProperties(Map<String, Object> parent,
                                 Map<String, Object> definitions,
-                                ASBIEP asbiep, ABIE abie,
-                                GenerationContext generationContext) {
-        fillProperties(parent, definitions, asbiep, abie, option.isArrayForJsonExpression(), generationContext);
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> definitions,
+                                TopLevelAsbiep topLevelAsbiep,
                                 ASBIEP asbiep, ABIE abie, boolean isArray,
+                                BiePackage biePackage,
                                 GenerationContext generationContext) {
 
         ASCCP asccp = generationContext.queryBasedASCCP(asbiep);
@@ -317,6 +315,10 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
 
         fillProperties(properties, definitions, abie, generationContext);
 
+        if (biePackage != null) { // Issue #1615
+            attachBiePackageAttributes(properties, definitions, topLevelAsbiep, biePackage);
+        }
+
         if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
             properties.remove("required");
         }
@@ -337,6 +339,54 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         }
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
+    }
+
+    private void attachBiePackageAttributes(Map<String, Object> properties, Map<String, Object> definitions,
+                                            TopLevelAsbiep topLevelAsbiep, BiePackage biePackage) {
+
+        Map<String, Object> newProps = new LinkedHashMap<>();
+        List<String> requiredAttrs = new ArrayList<>();
+        if (addAttribute(newProps, definitions, "packageVersionName", biePackage.getVersionName(), "string")) {
+            requiredAttrs.add("packageVersionName");
+        }
+        if (addAttribute(newProps, definitions, "packageVersionId", biePackage.getVersionId(), "string")) {
+            requiredAttrs.add("packageVersionId");
+        }
+        if (addAttribute(newProps, definitions, "packageDescription", biePackage.getDescription(), "string")) {
+            requiredAttrs.add("packageDescription");
+        }
+        if (addAttribute(newProps, definitions, "versionId", topLevelAsbiep.getVersion(), "normalized string")) {
+            requiredAttrs.add("versionId");
+        }
+
+        if (properties.get("required") != null) {
+            requiredAttrs.addAll((List<String>) properties.get("required"));
+        }
+        properties.put("required", requiredAttrs);
+
+        Map<String, Object> objProps = (Map<String, Object>) properties.get("properties");
+        if (objProps != null) {
+            newProps.putAll(objProps);
+        }
+        properties.put("properties", newProps);
+    }
+
+    private boolean addAttribute(Map<String, Object> properties, Map<String, Object> definitions,
+                                 String name, String value, String type) {
+        if (properties.get(name) != null) {
+            return false;
+        }
+
+        Xbt xbt = generationContext.findXbtByName(type);
+        String ref = fillDefinitions(definitions, xbt);
+
+        Map<String, Object> attrProps = new LinkedHashMap<>();
+        attrProps.put("allOf", Arrays.asList(Map.of("$ref", ref)));
+        attrProps.put("enum", Arrays.asList(hasLength(value) ? value : ""));
+
+        properties.put(name, attrProps);
+
+        return true;
     }
 
     private Map<String, Object> toProperties(Xbt xbt) {

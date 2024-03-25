@@ -87,6 +87,14 @@
             <mat-icon>delete</mat-icon>
             Remove
           </button>
+          <button mat-raised-button color="primary" (click)="generate()"
+                  [hidden]="table.dataSource.data.length == 0">
+            Generate
+          </button>
+          <mat-radio-group class="ml-2" aria-label="Expression" [(ngModel)]="schemaExpression">
+            <mat-radio-button value="XML">XML Schema</mat-radio-button>
+            <mat-radio-button value="JSON">JSON Schema</mat-radio-button>
+          </mat-radio-group>
         </div>
       </mat-toolbar>
     </mat-card-header>

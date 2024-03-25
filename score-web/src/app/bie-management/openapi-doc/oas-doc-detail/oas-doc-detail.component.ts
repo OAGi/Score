@@ -438,6 +438,7 @@ export class OasDocDetailComponent implements OnInit {
       this.loading = false;
     }, err => {
       this.loading = false;
+      throw err;
     });
   }
 
