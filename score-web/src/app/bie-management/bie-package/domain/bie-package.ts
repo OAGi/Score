@@ -19,6 +19,12 @@ export class BiePackage {
   creationTimestamp: Date;
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
+
+  sourceBiePackageId: number;
+  sourceBiePackageVersionName: string;
+  sourceBiePackageVersionId: string;
+  sourceAction: string;
+  sourceTimestamp: Date;
 }
 
 export class BiePackageListRequest {
@@ -147,8 +153,13 @@ export class BiePackageListRequest {
     return params;
   }
 
-  toQuery(): string {
-    const params = this.toParams();
+  toQuery(extras?): string {
+    let params = this.toParams();
+    if (extras) {
+      Object.keys(extras).forEach(key => {
+        params = params.set(key.toString(), extras[key]);
+      });
+    }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }

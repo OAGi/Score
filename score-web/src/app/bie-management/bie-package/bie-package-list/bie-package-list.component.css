@@ -96,3 +96,8 @@ mat-toolbar > .mat-icon-button {
 .mat-column-more {
   width: 40px;
 }
+
+.bie-package-source {
+  font-size: 11px !important;
+  color: #767676 !important;
+}

@@ -114,6 +114,12 @@ export class BiePackageService {
     });
   }
 
+  copy(biePackageId: number): Observable<any> {
+    return this.http.put<any>('/api/bie_packages/copy', {
+      biePackageIdList: [biePackageId]
+    });
+  }
+
   addBieToBiePackage(biePackageId: number, ...topLevelAsbiepIdList: number[]): Observable<any> {
     return this.http.post('/api/bie_packages/' + biePackageId + '/bie', {
       topLevelAsbiepIdList

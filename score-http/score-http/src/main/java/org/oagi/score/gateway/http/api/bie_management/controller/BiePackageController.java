@@ -184,6 +184,18 @@ public class BiePackageController {
         return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(value = "/bie_packages/copy", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity copy(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                               @RequestBody CopyBiePackageRequest request) {
+
+        request.setRequester(sessionService.asScoreUser(user));
+
+        service.copy(request);
+        return ResponseEntity.accepted().build();
+    }
+
+
     @RequestMapping(value = "/bie_packages/{id:\\d+}/bie_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

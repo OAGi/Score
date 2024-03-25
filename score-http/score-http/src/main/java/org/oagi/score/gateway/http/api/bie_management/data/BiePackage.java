@@ -43,8 +43,8 @@ public class BiePackage {
 
     private Date sourceTimestamp;
 
-    private String sourceBiePackageVersionId;
-
     private String sourceBiePackageVersionName;
+
+    private String sourceBiePackageVersionId;
 
 }

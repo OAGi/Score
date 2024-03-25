@@ -38,7 +38,8 @@ public class BiePackageRepository {
     private DSLContext dslContext;
 
     public PaginationResponse<BiePackage> getBiePackageList(BiePackageListRequest request) {
-        SelectConditionStep<Record> conditionStep = getSelectOnConditionStep(request).where(makeConditions(request));
+        SelectConditionStep<Record> conditionStep = getSelectOnConditionStep(request)
+                .where(makeConditions(request));
 
         int pageCount = dslContext.fetchCount(conditionStep);
 
@@ -90,8 +91,8 @@ public class BiePackageRepository {
                 BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID,
                 BIE_PACKAGE.SOURCE_ACTION,
                 BIE_PACKAGE.SOURCE_TIMESTAMP,
-                BIE_PACKAGE.as("source").VERSION_ID,
-                BIE_PACKAGE.as("source").VERSION_NAME)
+                BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name"),
+                BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id"))
                 .from(BIE_PACKAGE)
                 .join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
@@ -236,8 +237,8 @@ public class BiePackageRepository {
         if (sourceTimestamp != null) {
             biePackage.setSourceTimestamp(Date.from(sourceTimestamp.atZone(ZoneId.systemDefault()).toInstant()));
         }
-        biePackage.setSourceBiePackageVersionId(record.get(BIE_PACKAGE.as("source").VERSION_ID));
-        biePackage.setSourceBiePackageVersionName(record.get(BIE_PACKAGE.as("source").VERSION_NAME));
+        biePackage.setSourceBiePackageVersionName(record.get(BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name")));
+        biePackage.setSourceBiePackageVersionId(record.get(BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id")));
 
         return biePackage;
     }
@@ -299,9 +300,20 @@ public class BiePackageRepository {
             return;
         }
 
-        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP).where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.in(biePackageIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))).execute();
+        dslContext.update(BIE_PACKAGE)
+                .setNull(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID)
+                .setNull(BIE_PACKAGE.SOURCE_ACTION)
+                .setNull(BIE_PACKAGE.SOURCE_TIMESTAMP)
+                .where(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.in(
+                        biePackageIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))).execute();
 
-        dslContext.deleteFrom(BIE_PACKAGE).where(BIE_PACKAGE.BIE_PACKAGE_ID.in(biePackageIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))).execute();
+        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.in(
+                        biePackageIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))).execute();
+
+        dslContext.deleteFrom(BIE_PACKAGE)
+                .where(BIE_PACKAGE.BIE_PACKAGE_ID.in(
+                        biePackageIdList.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))).execute();
     }
 
     public PaginationResponse<BieList> getBieListInBiePackage(BieListInBiePackageRequest request) {
@@ -568,6 +580,47 @@ public class BiePackageRepository {
                         BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId()))
                 ))
                 .execute();
+    }
+
+    public void copy(ScoreUser requester, BigInteger biePackageId) {
+
+        BiePackageRecord biePackageRecord = dslContext.selectFrom(BIE_PACKAGE)
+                .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackageId)))
+                .fetchOne();
+
+        List<BiePackageTopLevelAsbiepRecord> biePackageTopLevelAsbiepRecords = dslContext.selectFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(biePackageRecord.getBiePackageId()))
+                .fetch();
+
+        BiePackageRecord copiedBiePackageRecord = biePackageRecord.copy();
+        copiedBiePackageRecord.setBiePackageId(null);
+        copiedBiePackageRecord.setState(BiePackageState.WIP.name());
+        ULong requesterUserId = ULong.valueOf(requester.getUserId());
+        copiedBiePackageRecord.setOwnerUserId(requesterUserId);
+        copiedBiePackageRecord.setCreatedBy(requesterUserId);
+        copiedBiePackageRecord.setLastUpdatedBy(requesterUserId);
+        LocalDateTime now = LocalDateTime.now();
+        copiedBiePackageRecord.setCreationTimestamp(now);
+        copiedBiePackageRecord.setLastUpdateTimestamp(now);
+        copiedBiePackageRecord.setSourceBiePackageId(biePackageRecord.getBiePackageId());
+        copiedBiePackageRecord.setSourceAction("Copy");
+        copiedBiePackageRecord.setSourceTimestamp(now);
+        copiedBiePackageRecord.setBiePackageId(
+                dslContext.insertInto(BIE_PACKAGE)
+                        .set(copiedBiePackageRecord)
+                        .returning(BIE_PACKAGE.BIE_PACKAGE_ID)
+                        .fetchOne().getBiePackageId());
+
+        for (BiePackageTopLevelAsbiepRecord biePackageTopLevelAsbiepRecord : biePackageTopLevelAsbiepRecords) {
+            BiePackageTopLevelAsbiepRecord copiedBiePackageTopLevelAsbiepRecord = biePackageTopLevelAsbiepRecord.copy();
+            copiedBiePackageTopLevelAsbiepRecord.setBiePackageTopLevelAsbiepId(null);
+            copiedBiePackageTopLevelAsbiepRecord.setBiePackageId(copiedBiePackageRecord.getBiePackageId());
+            copiedBiePackageTopLevelAsbiepRecord.setBiePackageTopLevelAsbiepId(
+                    dslContext.insertInto(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                            .set(copiedBiePackageTopLevelAsbiepRecord)
+                            .returning(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_TOP_LEVEL_ASBIEP_ID)
+                            .fetchOne().getBiePackageTopLevelAsbiepId());
+        }
     }
 
 }

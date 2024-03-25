@@ -17,7 +17,7 @@ import {initFilter} from '../../../common/utility';
 import {BiePackage, BiePackageListRequest} from '../domain/bie-package';
 import {BiePackageService} from '../domain/bie-package.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {SimpleRelease} from '../../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {UserToken} from '../../../authentication/domain/auth';
@@ -178,6 +178,9 @@ export class BiePackageListComponent implements OnInit {
       this.paginator.length = resp.length;
       this.table.dataSource.data = resp.list.map((elm: BiePackage) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        if (!!elm.sourceTimestamp) {
+          elm.sourceTimestamp = new Date(elm.sourceTimestamp);
+        }
         return elm;
       });
       if (!isInit) {
@@ -315,6 +318,38 @@ export class BiePackageListComponent implements OnInit {
       });
     }, error => {
       this.loading = false;
+      throw error;
     });
+  }
+
+  copy(biePackage: BiePackage) {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Copy BIE Package?';
+    dialogConfig.data.content = [
+      'Are you sure you want to copy this BIE package?'
+    ];
+    dialogConfig.data.action = 'Copy';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.loading = true;
+          this.biePackageService.copy(biePackage.biePackageId).subscribe(_ => {
+            this.snackBar.open('Copied', '', {
+              duration: 3000,
+            });
+            this.selection.clear();
+            this.loadBiePackageList();
+            this.loading = false;
+          }, error => {
+            this.loading = false;
+            throw error;
+          });
+        }
+      });
+  }
+
+  uplift(biePackage: BiePackage) {
+
   }
 }
