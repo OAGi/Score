@@ -1321,6 +1321,14 @@ public class BieUpliftingService {
     @Transactional
     public UpliftBieResponse upliftBie(UpliftBieRequest request) {
         BigInteger targetAsccpManifestId = request.getTargetAsccpManifestId();
+        if (targetAsccpManifestId == null) {
+            targetAsccpManifestId = scoreRepositoryFactory.createCcReadRepository()
+                    .findNextAsccpManifest(new FindNextAsccpManifestRequest(request.getRequester())
+                            .withTopLevelAsbiepId(request.getTopLevelAsbiepId())
+                            .withNextReleaseId(request.getTargetReleaseId()))
+                    .getNextAsccpManifestId();
+        }
+
         BieDocument sourceBieDocument = bieReadService.getBieDocument(request.getRequester(), request.getTopLevelAsbiepId());
         CcDocument targetCcDocument = new CcDocumentImpl(scoreRepositoryFactory.createCcReadRepository()
                 .getCcPackage(new GetCcPackageRequest(request.getRequester())

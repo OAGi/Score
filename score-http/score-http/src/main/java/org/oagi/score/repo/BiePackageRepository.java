@@ -13,6 +13,7 @@ import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -64,35 +65,35 @@ public class BiePackageRepository {
 
     private SelectOnConditionStep<Record> getSelectOnConditionStep(BiePackageListRequest request) {
         return dslContext.selectDistinct(
-                BIE_PACKAGE.BIE_PACKAGE_ID,
-                BIE_PACKAGE.VERSION_ID,
-                BIE_PACKAGE.VERSION_NAME,
-                BIE_PACKAGE.DESCRIPTION,
-                BIE_PACKAGE.RELEASE_ID,
-                RELEASE.RELEASE_NUM,
-                BIE_PACKAGE.STATE,
-                APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
-                APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
-                APP_USER.as("creator").NAME.as("creator_name"),
-                APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
-                APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
-                APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
-                APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
-                APP_USER.as("owner").NAME.as("owner_name"),
-                APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
-                APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
-                APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
-                APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
-                APP_USER.as("updater").NAME.as("updater_name"),
-                APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
-                APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
-                BIE_PACKAGE.CREATION_TIMESTAMP,
-                BIE_PACKAGE.LAST_UPDATE_TIMESTAMP,
-                BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID,
-                BIE_PACKAGE.SOURCE_ACTION,
-                BIE_PACKAGE.SOURCE_TIMESTAMP,
-                BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name"),
-                BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id"))
+                        BIE_PACKAGE.BIE_PACKAGE_ID,
+                        BIE_PACKAGE.VERSION_ID,
+                        BIE_PACKAGE.VERSION_NAME,
+                        BIE_PACKAGE.DESCRIPTION,
+                        BIE_PACKAGE.RELEASE_ID,
+                        RELEASE.RELEASE_NUM,
+                        BIE_PACKAGE.STATE,
+                        APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
+                        APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
+                        APP_USER.as("creator").NAME.as("creator_name"),
+                        APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer"),
+                        APP_USER.as("creator").IS_ADMIN.as("creator_is_admin"),
+                        APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
+                        APP_USER.as("owner").LOGIN_ID.as("owner_login_id"),
+                        APP_USER.as("owner").NAME.as("owner_name"),
+                        APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                        APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
+                        APP_USER.as("updater").APP_USER_ID.as("updater_user_id"),
+                        APP_USER.as("updater").LOGIN_ID.as("updater_login_id"),
+                        APP_USER.as("updater").NAME.as("updater_name"),
+                        APP_USER.as("updater").IS_DEVELOPER.as("updater_is_developer"),
+                        APP_USER.as("updater").IS_ADMIN.as("updater_is_admin"),
+                        BIE_PACKAGE.CREATION_TIMESTAMP,
+                        BIE_PACKAGE.LAST_UPDATE_TIMESTAMP,
+                        BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID,
+                        BIE_PACKAGE.SOURCE_ACTION,
+                        BIE_PACKAGE.SOURCE_TIMESTAMP,
+                        BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name"),
+                        BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id"))
                 .from(BIE_PACKAGE)
                 .join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
@@ -318,7 +319,7 @@ public class BiePackageRepository {
 
     public PaginationResponse<BieList> getBieListInBiePackage(BieListInBiePackageRequest request) {
         SelectConditionStep<Record> conditionStep = getSelectOnConditionStep(request)
-                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId())));
+                .where(makeConditions(request));
 
         int pageCount = dslContext.fetchCount(conditionStep);
 
@@ -385,6 +386,38 @@ public class BiePackageRepository {
                 .leftJoin(ASBIEP.as("source_asbiep")).on(TOP_LEVEL_ASBIEP.as("source").ASBIEP_ID.eq(ASBIEP.as("source_asbiep").ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST.as("source_asccp_manifest")).on(ASBIEP.as("source_asbiep").BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("source_asccp_manifest").ASCCP_MANIFEST_ID))
                 .leftJoin(ASCCP.as("source_asccp")).on(ASCCP_MANIFEST.as("source_asccp_manifest").ASCCP_ID.eq(ASCCP.as("source_asccp").ASCCP_ID));
+    }
+
+    private List<Condition> makeConditions(BieListInBiePackageRequest request) {
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(ULong.valueOf(request.getBiePackageId())));
+        if (StringUtils.hasLength(request.getDen())) {
+            conditions.addAll(contains(request.getDen(), ASCCP_MANIFEST.DEN));
+        }
+        if (StringUtils.hasLength(request.getBusinessContext())) {
+            conditions.addAll(contains(request.getBusinessContext(), BIZ_CTX.NAME));
+        }
+        if (StringUtils.hasLength(request.getVersion())) {
+            conditions.addAll(contains(request.getVersion(), TOP_LEVEL_ASBIEP.VERSION));
+        }
+        if (StringUtils.hasLength(request.getRemark())) {
+            conditions.addAll(contains(request.getRemark(), ASBIEP.REMARK));
+        }
+        if (!request.getOwnerLoginIds().isEmpty()) {
+            conditions.add(APP_USER.as("owner").LOGIN_ID.in(request.getOwnerLoginIds()));
+        }
+        if (!request.getUpdaterLoginIds().isEmpty()) {
+            conditions.add(APP_USER.as("updater").LOGIN_ID.in(request.getUpdaterLoginIds()));
+        }
+        if (request.getUpdateStartDate() != null) {
+            conditions.add(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.greaterOrEqual(
+                    new Timestamp(request.getUpdateStartDate().getTime()).toLocalDateTime()));
+        }
+        if (request.getUpdateEndDate() != null) {
+            conditions.add(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.lessThan(
+                    new Timestamp(request.getUpdateEndDate().getTime()).toLocalDateTime()));
+        }
+        return conditions;
     }
 
     private List<SortField<?>> getSortFields(BieListInBiePackageRequest request) {
@@ -582,7 +615,7 @@ public class BiePackageRepository {
                 .execute();
     }
 
-    public void copy(ScoreUser requester, BigInteger biePackageId) {
+    public void copyBiePackage(ScoreUser requester, BigInteger biePackageId) {
 
         BiePackageRecord biePackageRecord = dslContext.selectFrom(BIE_PACKAGE)
                 .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackageId)))
@@ -621,6 +654,44 @@ public class BiePackageRepository {
                             .returning(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_TOP_LEVEL_ASBIEP_ID)
                             .fetchOne().getBiePackageTopLevelAsbiepId());
         }
+    }
+
+    public InitUpliftBiePackageResponse initUpliftBiePackage(
+            ScoreUser requester, BigInteger biePackageId, BigInteger targetReleaseId) {
+
+        BiePackageRecord biePackageRecord = dslContext.selectFrom(BIE_PACKAGE)
+                .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackageId)))
+                .fetchOne();
+
+        List<BigInteger> targetTopLevelAsbiepIdList =
+                dslContext.select(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                        .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                        .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(biePackageRecord.getBiePackageId()))
+                        .fetchInto(BigInteger.class);
+
+        BiePackageRecord upliftedBiePackageRecord = biePackageRecord.copy();
+        upliftedBiePackageRecord.setBiePackageId(null);
+        upliftedBiePackageRecord.setReleaseId(ULong.valueOf(targetReleaseId));
+        upliftedBiePackageRecord.setState(BiePackageState.Initiating.name());
+        ULong requesterUserId = ULong.valueOf(requester.getUserId());
+        upliftedBiePackageRecord.setOwnerUserId(requesterUserId);
+        upliftedBiePackageRecord.setCreatedBy(requesterUserId);
+        upliftedBiePackageRecord.setLastUpdatedBy(requesterUserId);
+        LocalDateTime now = LocalDateTime.now();
+        upliftedBiePackageRecord.setCreationTimestamp(now);
+        upliftedBiePackageRecord.setLastUpdateTimestamp(now);
+        upliftedBiePackageRecord.setSourceBiePackageId(biePackageRecord.getBiePackageId());
+        upliftedBiePackageRecord.setSourceAction("Uplift");
+        upliftedBiePackageRecord.setSourceTimestamp(now);
+        upliftedBiePackageRecord.setBiePackageId(
+                dslContext.insertInto(BIE_PACKAGE)
+                        .set(upliftedBiePackageRecord)
+                        .returning(BIE_PACKAGE.BIE_PACKAGE_ID)
+                        .fetchOne().getBiePackageId());
+
+        return new InitUpliftBiePackageResponse(
+                upliftedBiePackageRecord.getBiePackageId().toBigInteger(),
+                targetTopLevelAsbiepIdList);
     }
 
 }

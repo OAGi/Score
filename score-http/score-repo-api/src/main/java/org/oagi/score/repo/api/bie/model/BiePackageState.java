@@ -2,6 +2,7 @@ package org.oagi.score.repo.api.bie.model;
 
 public enum BiePackageState {
 
+    Initiating(0),
     WIP(1),
     QA(2),
     Production(3);

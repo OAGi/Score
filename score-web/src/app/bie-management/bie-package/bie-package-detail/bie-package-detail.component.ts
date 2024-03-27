@@ -55,8 +55,6 @@ export class BiePackageDetailComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private biePackageService: BiePackageService,
-              private bieListService: BieListService,
-              private accountService: AccountListService,
               private auth: AuthService,
               private location: Location,
               private router: Router,
@@ -73,7 +71,7 @@ export class BiePackageDetailComponent implements OnInit {
     this.table = new TableData<BieList>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
     this.table.dataSource = new MatMultiSortTableDataSource<BieList>(this.sort, false);
 
-    // Init BIE list table for OasDoc
+    // Init BIE list table for BIE package
     this.request = new BieListInBiePackageRequest(this.route.snapshot.queryParamMap,
       new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
     this.paginator.pageIndex = this.request.page.pageIndex;

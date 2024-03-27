@@ -9,6 +9,8 @@ public class FindNextAsccpManifestRequest extends Request {
 
     private BigInteger asccpManifestId;
 
+    private BigInteger topLevelAsbiepId;
+
     private BigInteger nextReleaseId;
 
     public FindNextAsccpManifestRequest(ScoreUser requester) {
@@ -25,6 +27,19 @@ public class FindNextAsccpManifestRequest extends Request {
 
     public FindNextAsccpManifestRequest withAsccpManifestId(BigInteger asccpManifestId) {
         setAsccpManifestId(asccpManifestId);
+        return this;
+    }
+
+    public BigInteger getTopLevelAsbiepId() {
+        return topLevelAsbiepId;
+    }
+
+    public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        this.topLevelAsbiepId = topLevelAsbiepId;
+    }
+
+    public FindNextAsccpManifestRequest withTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        setTopLevelAsbiepId(topLevelAsbiepId);
         return this;
     }
 

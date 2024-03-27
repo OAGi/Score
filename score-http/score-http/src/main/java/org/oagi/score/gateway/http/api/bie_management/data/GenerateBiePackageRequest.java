@@ -21,7 +21,7 @@ public class GenerateBiePackageRequest {
     }
 
     public GenerateBiePackageRequest(ScoreUser requester) {
-        this.requester = requester;
+        setRequester(requester);
     }
 
     public ScoreUser getRequester() {

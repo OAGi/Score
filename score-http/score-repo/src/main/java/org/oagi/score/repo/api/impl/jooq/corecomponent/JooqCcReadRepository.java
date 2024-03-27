@@ -1090,6 +1090,14 @@ public class JooqCcReadRepository
             FindNextAsccpManifestRequest request) throws ScoreDataAccessException {
         BigInteger asccpManifestId = request.getAsccpManifestId();
         if (asccpManifestId == null) {
+            BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
+            asccpManifestId = dslContext().select(ASBIEP.BASED_ASCCP_MANIFEST_ID)
+                    .from(TOP_LEVEL_ASBIEP)
+                    .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                    .fetchOptionalInto(BigInteger.class).orElse(null);
+        }
+        if (asccpManifestId == null) {
             throw new ScoreDataAccessException(new IllegalArgumentException());
         }
         BigInteger nextReleaseId = request.getNextReleaseId();

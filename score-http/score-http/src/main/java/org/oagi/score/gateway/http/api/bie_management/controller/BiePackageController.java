@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
 import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -201,6 +202,14 @@ public class BiePackageController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieList> getBieListInBiePackage(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @PathVariable("id") BigInteger biePackageId,
+                                                        @RequestParam(name = "den", required = false) String den,
+                                                        @RequestParam(name = "businessContext", required = false) String businessContext,
+                                                        @RequestParam(name = "version", required = false) String version,
+                                                        @RequestParam(name = "remark", required = false) String remark,
+                                                        @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
+                                                        @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
+                                                        @RequestParam(name = "updateStart", required = false) String updateStart,
+                                                        @RequestParam(name = "updateEnd", required = false) String updateEnd,
                                                         @RequestParam(name = "sortActives") String sortActives,
                                                         @RequestParam(name = "sortDirections") String sortDirections,
                                                         @RequestParam(name = "pageIndex") int pageIndex,
@@ -208,6 +217,25 @@ public class BiePackageController {
 
         BieListInBiePackageRequest request = new BieListInBiePackageRequest(sessionService.asScoreUser(user));
         request.setBiePackageId(biePackageId);
+
+        request.setDen(den);
+        request.setBusinessContext(businessContext);
+        request.setVersion(version);
+        request.setRemark(remark);
+        request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
+                Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+        request.setUpdaterLoginIds(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
+                Arrays.asList(updaterLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
+
+        if (StringUtils.hasLength(updateStart)) {
+            request.setUpdateStartDate(new Date(Long.valueOf(updateStart)));
+        }
+        if (StringUtils.hasLength(updateEnd)) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(Long.valueOf(updateEnd));
+            calendar.add(Calendar.DATE, 1);
+            request.setUpdateEndDate(calendar.getTime());
+        }
 
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
@@ -277,5 +305,16 @@ public class BiePackageController {
                 .contentType(MediaType.parseMediaType(response.getContentType()))
                 .contentLength(response.getFile().length())
                 .body(new InputStreamResource(new FileInputStream(response.getFile())));
+    }
+
+    @RequestMapping(value = "/bie_packages/{id:\\d+}/uplifting", method = RequestMethod.POST)
+    public ResponseEntity upliftBiePackage(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                           @PathVariable("id") BigInteger biePackageId,
+                                           @RequestBody UpliftBiePackageRequest request) throws ScoreDataAccessException {
+        request.setRequester(sessionService.asScoreUser(user));
+        request.setBiePackageId(biePackageId);
+
+        service.upliftBiePackage(request);
+        return ResponseEntity.noContent().build();
     }
 }

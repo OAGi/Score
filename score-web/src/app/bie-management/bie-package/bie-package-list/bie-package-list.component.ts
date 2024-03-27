@@ -17,14 +17,14 @@ import {initFilter} from '../../../common/utility';
 import {BiePackage, BiePackageListRequest} from '../domain/bie-package';
 import {BiePackageService} from '../domain/bie-package.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {SimpleRelease, WorkingRelease} from '../../../release-management/domain/release';
+import {SimpleRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {TransferOwnershipDialogComponent} from '../../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../../account-management/domain/accounts';
-import {BieList} from '../../bie-list/domain/bie-list';
 import {MailService} from '../../../common/score-mail.service';
+import {BiePackageUpliftDialogComponent} from '../bie-package-uplift-dialog/bie-package-uplift-dialog.component';
 
 @Component({
   selector: 'score-bie-package-list',
@@ -350,6 +350,28 @@ export class BiePackageListComponent implements OnInit {
   }
 
   uplift(biePackage: BiePackage) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {biePackageId: biePackage.biePackageId};
+    const dialogRef = this.dialog.open(BiePackageUpliftDialogComponent, dialogConfig);
 
+    dialogRef.afterClosed().subscribe((targetReleaseId: number) => {
+      if (targetReleaseId) {
+        this.loading = true;
+
+        this.biePackageService.createUpliftBiePackage(biePackage.biePackageId, targetReleaseId).subscribe(_ => {
+          this.snackBar.open('The uplift process has begun. This process may take a few minutes.', '', {
+            duration: 3000,
+          });
+
+          this.selection.clear();
+          this.loadBiePackageList();
+          this.loading = false;
+        }, error => {
+          this.loading = false;
+          throw error;
+        });
+      }
+    });
   }
 }

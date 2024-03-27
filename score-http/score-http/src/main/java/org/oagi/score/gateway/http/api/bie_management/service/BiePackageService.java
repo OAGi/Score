@@ -6,7 +6,10 @@ import org.oagi.score.gateway.http.api.application_management.service.Applicatio
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.event.BieCopyRequestEvent;
+import org.oagi.score.gateway.http.event.BiePackageUpliftRequestEvent;
 import org.oagi.score.gateway.http.helper.Zip;
+import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repo.BiePackageRepository;
 import org.oagi.score.repo.PaginationResponse;
 import org.oagi.score.repo.api.bie.model.BiePackageState;
@@ -15,19 +18,30 @@ import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRespo
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
+import org.oagi.score.service.bie.BieUpliftingService;
+import org.oagi.score.service.bie.UpliftBieRequest;
+import org.oagi.score.service.bie.UpliftBieResponse;
 import org.oagi.score.service.businesscontext.BusinessContextService;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageResponse;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +51,9 @@ import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @Service
 @Transactional
-public class BiePackageService implements ApplicationContextAware {
+public class BiePackageService implements ApplicationContextAware, InitializingBean {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private BiePackageRepository repository;
@@ -58,11 +74,33 @@ public class BiePackageService implements ApplicationContextAware {
     private TopLevelAsbiepRepository topLevelAsbiepRepository;
 
     @Autowired
+    private BieUpliftingService upliftingService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Autowired
+    private EventListenerContainer eventListenerContainer;
+
+    private final String INTERESTED_EVENT_NAME = "biePackageUpliftRequestEvent";
+
+    @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private BieUpliftingService bieUpliftingService;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        eventListenerContainer.addMessageListener(this, "onEventReceived",
+                new ChannelTopic(INTERESTED_EVENT_NAME));
     }
 
     @Transactional(readOnly = true)
@@ -187,7 +225,7 @@ public class BiePackageService implements ApplicationContextAware {
 
     public void copy(CopyBiePackageRequest request) {
         for (BigInteger biePackageId : request.getBiePackageIdList()) {
-            repository.copy(request.getRequester(), biePackageId);
+            repository.copyBiePackage(request.getRequester(), biePackageId);
         }
     }
 
@@ -296,6 +334,64 @@ public class BiePackageService implements ApplicationContextAware {
 
         response.setContentType(contentType);
         return response;
+    }
+
+    public void upliftBiePackage(UpliftBiePackageRequest request) {
+        InitUpliftBiePackageResponse response =
+                repository.initUpliftBiePackage(request.getRequester(), request.getBiePackageId(), request.getTargetReleaseId());
+
+        BiePackageUpliftRequestEvent biePackageUpliftRequestEvent = new BiePackageUpliftRequestEvent(
+                request.getRequester().getUserId(),
+                request.getTargetReleaseId(),
+                response.getUpliftedBiePackageId(),
+                response.getSourceTopLevelAsbiepIdList());
+
+        /*
+         * Message Publishing
+         */
+        redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, biePackageUpliftRequestEvent);
+    }
+
+    /**
+     * This method is invoked by 'biePackageUpliftRequestEvent' channel subscriber.
+     *
+     * @param biePackageUpliftRequestEvent
+     */
+    @Transactional
+    public void onEventReceived(BiePackageUpliftRequestEvent biePackageUpliftRequestEvent) {
+        RLock lock = redissonClient.getLock("BiePackageUpliftRequestEvent:" + biePackageUpliftRequestEvent.hashCode());
+        if (!lock.tryLock()) {
+            return;
+        }
+        try {
+            logger.debug("Received BiePackageUpliftRequestEvent: " + biePackageUpliftRequestEvent);
+            ScoreUser requester = sessionService.getScoreUserByUserId(biePackageUpliftRequestEvent.getRequestUserId());
+
+            List<BigInteger> sourceTopLevelAsbiepIdList = biePackageUpliftRequestEvent.getSourceTopLevelAsbiepIdList();
+            List<BigInteger> targetTopLevelAsbiepIdList = new ArrayList<>();
+            for (BigInteger topLevelAsbiepId : sourceTopLevelAsbiepIdList) {
+                UpliftBieRequest upliftBieRequest = new UpliftBieRequest();
+                upliftBieRequest.setRequester(requester);
+                upliftBieRequest.setTopLevelAsbiepId(topLevelAsbiepId);
+                upliftBieRequest.setTargetReleaseId(biePackageUpliftRequestEvent.getTargetReleaseId());
+                UpliftBieResponse upliftBieResponse = bieUpliftingService.upliftBie(upliftBieRequest);
+                targetTopLevelAsbiepIdList.add(upliftBieResponse.getTopLevelAsbiepId());
+            }
+
+            UpdateBiePackageRequest updateBiePackageRequest = new UpdateBiePackageRequest();
+            updateBiePackageRequest.setRequester(requester);
+            updateBiePackageRequest.setBiePackageId(biePackageUpliftRequestEvent.getUpliftedBiePackageId());
+            updateBiePackageRequest.setState(BiePackageState.WIP);
+            updateBiePackageState(updateBiePackageRequest);
+
+            AddBieToBiePackageRequest addBieToBiePackageRequest = new AddBieToBiePackageRequest();
+            addBieToBiePackageRequest.setRequester(requester);
+            addBieToBiePackageRequest.setBiePackageId(biePackageUpliftRequestEvent.getUpliftedBiePackageId());
+            addBieToBiePackageRequest.setTopLevelAsbiepIdList(targetTopLevelAsbiepIdList);
+            addBieToBiePackage(addBieToBiePackageRequest);
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

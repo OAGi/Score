@@ -11,6 +11,7 @@ import {BiePackageListComponent} from './bie-package-list/bie-package-list.compo
 import {BiePackageService} from './domain/bie-package.service';
 import {BiePackageDetailComponent} from './bie-package-detail/bie-package-detail.component';
 import {BiePackageAddBieDialogComponent} from './bie-package-add-bie-dialog/bie-package-add-bie-dialog.component';
+import {BiePackageUpliftDialogComponent} from './bie-package-uplift-dialog/bie-package-uplift-dialog.component';
 
 
 const routes: Routes = [
@@ -40,7 +41,8 @@ const routes: Routes = [
   declarations: [
     BiePackageListComponent,
     BiePackageDetailComponent,
-    BiePackageAddBieDialogComponent
+    BiePackageAddBieDialogComponent,
+    BiePackageUpliftDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),
@@ -56,6 +58,7 @@ const routes: Routes = [
     BiePackageListComponent,
     BiePackageDetailComponent,
     BiePackageAddBieDialogComponent,
+    BiePackageUpliftDialogComponent,
     RouterModule,
   ],
   providers: [

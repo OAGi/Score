@@ -17,6 +17,9 @@ public class UpliftBieRequest {
 
     private BigInteger targetAsccpManifestId;
 
+    // If `targetAsccpManifestId` does not exist, the logic will use `targetReleaseId` to find it.
+    private BigInteger targetReleaseId;
+
     private List<BieUpliftingMapping> customMappingTable = Collections.emptyList();
 
 }

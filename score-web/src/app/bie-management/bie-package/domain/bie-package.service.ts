@@ -66,6 +66,30 @@ export class BiePackageService {
       .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+    if (request.ownerLoginIds.length > 0) {
+      params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
+    }
+    if (request.updaterLoginIds.length > 0) {
+      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    }
+    if (request.updatedDate.start) {
+      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    }
+    if (request.updatedDate.end) {
+      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    }
+    if (request.filters.den) {
+      params = params.set('den', request.filters.den);
+    }
+    if (request.filters.businessContext) {
+      params = params.set('businessContext', request.filters.businessContext);
+    }
+    if (request.filters.version) {
+      params = params.set('version', request.filters.version);
+    }
+    if (request.filters.remark) {
+      params = params.set('remark', request.filters.remark);
+    }
 
     return this.http.get<PageResponse<BieList>>('/api/bie_packages/' + request.biePackageId + '/bie_list', {params});
   }
@@ -151,6 +175,12 @@ export class BiePackageService {
       params,
       observe: 'response',
       responseType: 'blob'
+    });
+  }
+
+  createUpliftBiePackage(biePackageId: number, targetReleaseId: number): Observable<any> {
+    return this.http.post<any>('/api/bie_packages/' + biePackageId + '/uplifting', {
+      targetReleaseId
     });
   }
 }

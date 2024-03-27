@@ -355,7 +355,7 @@ public class BieService {
         dslContext.deleteFrom(Tables.TOP_LEVEL_ASBIEP).where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
         dslContext.deleteFrom(Tables.BIZ_CTX_ASSIGNMENT).where(Tables.BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
 
-        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP).where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
+        // Issue #1492
         List<ULong> oasMessageBodyIdList = dslContext.selectDistinct(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID)
                 .from(OAS_MESSAGE_BODY)
                 .where(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
@@ -388,6 +388,27 @@ public class BieService {
             dslContext.deleteFrom(OAS_MESSAGE_BODY)
                     .where(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID.in(oasMessageBodyIdList))
                     .execute();
+        }
+
+        // Issue #1615
+        List<ULong> biePackageIdList = dslContext.select(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID)
+                .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .fetchInto(ULong.class);
+
+        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP).where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
+        for (ULong biePackageId : biePackageIdList) {
+            // If the all assigned BIEs in the BIE package are deleted by this operation,
+            // the release ID in the BIE package also must be reset.
+            if (dslContext.selectCount()
+                    .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                    .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(biePackageId))
+                    .fetchOptionalInto(Integer.class).orElse(0) == 0) {
+                dslContext.update(BIE_PACKAGE)
+                        .setNull(BIE_PACKAGE.RELEASE_ID)
+                        .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(biePackageId))
+                        .execute();
+            }
         }
 
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();

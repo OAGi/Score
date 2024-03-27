@@ -169,6 +169,18 @@ export class BiePackageListRequest {
 export class BieListInBiePackageRequest {
 
   biePackageId: number;
+  filters: {
+    den: string;
+    businessContext: string;
+    version: string;
+    remark: string;
+  };
+  ownerLoginIds: string[] = [];
+  updaterLoginIds: string[] = [];
+  updatedDate: {
+    start: Date,
+    end: Date,
+  };
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
@@ -194,6 +206,19 @@ export class BieListInBiePackageRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
+
+    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
+    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updatedDate = {
+      start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
+      end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
+    };
+    this.filters = {
+      den: params.get('den') || '',
+      businessContext: params.get('businessContext') || '',
+      version: params.get('version') || '',
+      remark: params.get('remark') || '',
+    };
   }
 
   toParams(): HttpParams {
@@ -204,6 +229,31 @@ export class BieListInBiePackageRequest {
       .set('pageSize', '' + this.page.pageSize);
 
     params = params.set('biePackageId', this.biePackageId);
+
+    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
+      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    }
+    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
+      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    }
+    if (this.updatedDate.start) {
+      params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
+    }
+    if (this.updatedDate.end) {
+      params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
+    if (this.filters.den && this.filters.den.length > 0) {
+      params = params.set('den', '' + this.filters.den);
+    }
+    if (this.filters.businessContext && this.filters.businessContext.length > 0) {
+      params = params.set('businessContext', '' + this.filters.businessContext);
+    }
+    if (this.filters.version && this.filters.version.length > 0) {
+      params = params.set('version', '' + this.filters.version);
+    }
+    if (this.filters.remark && this.filters.remark.length > 0) {
+      params = params.set('remark', '' + this.filters.remark);
+    }
 
     return params;
   }
