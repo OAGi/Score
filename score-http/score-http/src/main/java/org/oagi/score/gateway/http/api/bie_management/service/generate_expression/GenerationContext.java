@@ -8,7 +8,6 @@ import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repo.component.asbiep.AsbiepReadRepository;
 import org.oagi.score.repo.component.namespace.NamespaceReadRepository;
 import org.oagi.score.repo.component.release.ReleaseRepository;
-import org.oagi.score.repo.component.top_level_asbiep.TopLevelAsbiepReadRepository;
 import org.oagi.score.repository.*;
 import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.service.corecomponent.seqkey.SeqKeyHandler;
@@ -121,7 +120,7 @@ public class GenerationContext implements InitializingBean {
     private UserRepository userRepository;
 
     @Autowired
-    private TopLevelAsbiepReadRepository topLevelAsbiepReadRepository;
+    private TopLevelAsbiepRepository topLevelAsbiepRepository;
 
     @Autowired
     private ReleaseRepository releaseRepository;
@@ -210,7 +209,7 @@ public class GenerationContext implements InitializingBean {
     private Set<TopLevelAsbiep> findRefTopLevelAsbieps(Set<TopLevelAsbiep> topLevelAsbiepSet) {
         Set<TopLevelAsbiep> refTopLevelAsbiepSet = new HashSet();
         refTopLevelAsbiepSet.addAll(
-                topLevelAsbiepReadRepository.findRefTopLevelAsbieps(
+                topLevelAsbiepRepository.findRefTopLevelAsbieps(
                         topLevelAsbiepSet.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toSet())
                 )
         );

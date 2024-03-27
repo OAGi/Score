@@ -784,8 +784,11 @@ public class BieUpliftingService {
                                 if (asbiep == null) {
                                     String path = asbie.getAsbie().getPath();
                                     BieUpliftingMapping mapping = customMappingTable.getTargetAsccMappingByTargetPath(path);
-                                    asbie.setRefTopLevelAsbiepId(mapping.getRefTopLevelAsbiepId());
-
+                                    if (mapping != null) {
+                                        asbie.setRefTopLevelAsbiepId(mapping.getRefTopLevelAsbiepId());
+                                    } else {
+                                        return null;
+                                    }
                                 } else {
                                     if (asbiep.getRoleOfAbie() == null) {
                                         AsccpManifest targetAsccpManifest =
@@ -802,6 +805,7 @@ public class BieUpliftingService {
 
                                 return asbie;
                             })
+                            .filter(e -> e != null)
                             .collect(Collectors.toList()));
             createBieRequest.setBbieList(
                     Stream.concat(toBbiepToBbieMap.values().stream(),

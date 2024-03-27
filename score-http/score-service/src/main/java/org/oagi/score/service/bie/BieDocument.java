@@ -6,6 +6,7 @@ import org.oagi.score.service.corecomponent.CcDocument;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface BieDocument {
 
@@ -28,5 +29,7 @@ public interface BieDocument {
     CcDocument getCcDocument();
 
     void accept(BieVisitor visitor);
+
+    Map<Asbie, Asbiep> getRefAsbieMap();
 
 }

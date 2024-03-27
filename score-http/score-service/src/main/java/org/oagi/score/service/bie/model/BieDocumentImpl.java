@@ -190,6 +190,20 @@ public class BieDocumentImpl implements BieDocument {
         visitor.visitEnd(topLevelAsbiep, context);
     }
 
+    @Override
+    public Map<Asbie, Asbiep> getRefAsbieMap() {
+        Map<Asbie, Asbiep> refAsbieMap = new LinkedHashMap<>();
+        for (List<Asbie> asbieList : asbieMap.values()) {
+            for (Asbie asbie : asbieList) {
+                Asbiep asbiep = getAsbiep(asbie);
+                if (!asbie.getOwnerTopLevelAsbiepId().equals(asbiep.getOwnerTopLevelAsbiepId())) {
+                    refAsbieMap.put(asbie, asbiep);
+                }
+            }
+        }
+        return refAsbieMap;
+    }
+
     private void accept(BieVisitor visitor, Asbiep asbiep, BieVisitContext context) {
         visitor.visitAsbiep(asbiep, context);
         accept(visitor, getAbie(asbiep), context);

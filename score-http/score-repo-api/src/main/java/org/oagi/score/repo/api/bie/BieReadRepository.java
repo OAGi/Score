@@ -14,4 +14,7 @@ public interface BieReadRepository {
     GetAssignedBusinessContextResponse getAssignedBusinessContext(
             GetAssignedBusinessContextRequest request) throws ScoreDataAccessException;
 
+    GetUpliftedBieListResponse getUpliftedBieList(
+            GetUpliftedBieListRequest request) throws ScoreDataAccessException;
+
 }

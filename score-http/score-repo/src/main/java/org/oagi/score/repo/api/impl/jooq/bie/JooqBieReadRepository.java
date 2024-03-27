@@ -491,4 +491,18 @@ public class JooqBieReadRepository
         return new GetAssignedBusinessContextResponse(bizCtxIds);
     }
 
+    @Override
+    public GetUpliftedBieListResponse getUpliftedBieList(
+            GetUpliftedBieListRequest request) throws ScoreDataAccessException {
+
+        BigInteger topLevelAsbiepId = request.getTopLevelAsbiepId();
+        List<TopLevelAsbiep> topLevelAsbiepList = selectTopLevelAsbiep()
+                .where(and(
+                        TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
+                        TOP_LEVEL_ASBIEP.SOURCE_ACTION.eq("Uplift")
+                ))
+                .fetch(mapperTopLevelAsbiep());
+        return new GetUpliftedBieListResponse(topLevelAsbiepList);
+    }
+
 }
