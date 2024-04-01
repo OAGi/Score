@@ -169,7 +169,7 @@ public class BiePackageRepository {
                     field = BIE_PACKAGE.STATE;
                     break;
                 case "branch":
-                    field = RELEASE.RELEASE_NUM;
+                    field = field("release_num_list");
                     break;
                 case "versionid":
                     field = BIE_PACKAGE.VERSION_ID;
