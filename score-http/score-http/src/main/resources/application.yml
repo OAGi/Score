@@ -10,7 +10,7 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_DATABASE:oagi}?useSSL=false
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_DATABASE:oagi}?useSSL=false&allowMultiQueries=true
     username: ${DB_USERNAME:oagi}
     password: ${DB_PASSWORD:oagi}
 

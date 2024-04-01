@@ -155,6 +155,10 @@ export class BiePackageListComponent implements OnInit {
     }
   }
 
+  releaseNums(elm: BiePackage): string[] {
+    return (!!elm.releases && elm.releases.length > 0) ? elm.releases.map(e => e.releaseNum) : [];
+  }
+
   toggleAllForReleaseFilter(selectAllValue: boolean) {
     if (selectAllValue) {
       this.request.releases = this.releases;

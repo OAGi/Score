@@ -396,20 +396,9 @@ public class BieService {
                 .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
                 .fetchInto(ULong.class);
 
-        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP).where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)).execute();
-        for (ULong biePackageId : biePackageIdList) {
-            // If the all assigned BIEs in the BIE package are deleted by this operation,
-            // the release ID in the BIE package also must be reset.
-            if (dslContext.selectCount()
-                    .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
-                    .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(biePackageId))
-                    .fetchOptionalInto(Integer.class).orElse(0) == 0) {
-                dslContext.update(BIE_PACKAGE)
-                        .setNull(BIE_PACKAGE.RELEASE_ID)
-                        .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(biePackageId))
-                        .execute();
-            }
-        }
+        dslContext.deleteFrom(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .execute();
 
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();
 

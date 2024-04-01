@@ -290,6 +290,14 @@ export class SeparatePipe implements PipeTransform {
   }
 }
 
+@Pipe({name: 'join', pure: true})
+export class JoinPipe implements PipeTransform {
+
+  transform(input: Array<any>, sep = ','): string {
+    return input.join(sep);
+  }
+}
+
 @Pipe({
   name: 'sort'
 })

@@ -36,7 +36,6 @@ import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.BiePackageTopLevelAsbiep.BiePackageTopLevelAsbiepPath;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BiePackageRecord;
 
 
@@ -90,13 +89,6 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
      * description value.
      */
     public final TableField<BiePackageRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A text field used for containing a short description of the release package.  All BIEs released as part of the same CDM package should have the same package description value.");
-
-    /**
-     * The column <code>oagi.bie_package.release_id</code>. Foreign key to the
-     * RELEASE table. It identifies the release, for which this BIE package is
-     * associated.
-     */
-    public final TableField<BiePackageRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the RELEASE table. It identifies the release, for which this BIE package is associated.");
 
     /**
      * The column <code>oagi.bie_package.state</code>. WIP, QA, Production. This
@@ -236,19 +228,7 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
 
     @Override
     public List<ForeignKey<BiePackageRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BIE_PACKAGE_RELEASE_ID_FK, Keys.BIE_PACKAGE_OWNER_USER_ID_FK, Keys.BIE_PACKAGE_CREATED_BY_FK, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK, Keys.BIE_PACKAGE_SOURCE_BIE_PACKAGE_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.BIE_PACKAGE_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.BIE_PACKAGE_OWNER_USER_ID_FK, Keys.BIE_PACKAGE_CREATED_BY_FK, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK, Keys.BIE_PACKAGE_SOURCE_BIE_PACKAGE_ID_FK);
     }
 
     private transient AppUserPath _biePackageOwnerUserIdFk;

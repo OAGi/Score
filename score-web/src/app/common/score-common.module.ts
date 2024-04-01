@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {
   ArraySortPipe,
   DateAgoPipe,
-  HighlightSearch,
+  HighlightSearch, JoinPipe,
   PastTensePipe,
   SeparatePipe,
   TruncatePipe,
@@ -24,6 +24,7 @@ import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-action
     DateAgoPipe,
     UndefinedPipe,
     SeparatePipe,
+    JoinPipe,
     ArraySortPipe,
     TruncatePipe,
     PastTensePipe
@@ -43,6 +44,7 @@ import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-action
     DateAgoPipe,
     UndefinedPipe,
     SeparatePipe,
+    JoinPipe,
     ArraySortPipe,
     TruncatePipe,
     PastTensePipe,

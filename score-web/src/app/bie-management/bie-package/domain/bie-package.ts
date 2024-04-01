@@ -10,8 +10,7 @@ export class BiePackage {
   versionId: string;
   versionName: string;
   description: string;
-  releaseId: number;
-  releaseNum: string;
+  releases: SimpleRelease[];
   state: string;
   access: string;
   owner: ScoreUser;

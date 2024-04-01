@@ -51,7 +51,6 @@ CREATE TABLE `bie_package`
     `version_id`            varchar(100) NOT NULL COMMENT 'A text field used for containing the release package version ID value (ex: CDM_1.1.0). All BIEs released as part of the same CDM package should have the same package version value.',
     `version_name`          varchar(200) NOT NULL COMMENT 'A text field used for containing the release package version name value (ex: 2024 Common Data Model Package Release). All BIEs released as part of the same CDM package should have the same package version value.',
     `description`           longtext    DEFAULT NULL COMMENT 'A text field used for containing a short description of the release package.  All BIEs released as part of the same CDM package should have the same package description value.',
-    `release_id`            bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the RELEASE table. It identifies the release, for which this BIE package is associated.',
     `state`                 varchar(20) DEFAULT 'WIP' COMMENT 'WIP, QA, Production. This the revision life cycle state of the BIE package.',
     `owner_user_id`         bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the BIE package. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the BIE package. The creator of the BIE package is also its owner by default.',
@@ -62,7 +61,6 @@ CREATE TABLE `bie_package`
     `source_action`         varchar(20) DEFAULT NULL COMMENT 'An action that had used to create a reference from the source (e.g., ''Copy'' or ''Uplift''.)',
     `source_timestamp`      datetime(6) DEFAULT NULL COMMENT 'A timestamp when a source reference had been made.',
     PRIMARY KEY (`bie_package_id`),
-    KEY                     `bie_package_release_id_fk` (`release_id`),
     KEY                     `bie_package_source_bie_package_id_fk` (`source_bie_package_id`),
     KEY                     `bie_package_owner_user_id_fk` (`owner_user_id`),
     KEY                     `bie_package_created_by_fk` (`created_by`),
@@ -70,7 +68,6 @@ CREATE TABLE `bie_package`
     CONSTRAINT `bie_package_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `bie_package_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `bie_package_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
-    CONSTRAINT `bie_package_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
     CONSTRAINT `bie_package_source_bie_package_id_fk` FOREIGN KEY (`source_bie_package_id`) REFERENCES `bie_package` (`bie_package_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

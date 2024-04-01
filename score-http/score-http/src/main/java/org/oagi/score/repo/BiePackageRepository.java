@@ -4,6 +4,7 @@ import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.*;
+import org.oagi.score.gateway.http.api.release_management.data.SimpleRelease;
 import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BiePackageState;
 import org.oagi.score.repo.api.bie.model.BieState;
@@ -19,13 +20,10 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
@@ -39,8 +37,9 @@ public class BiePackageRepository {
     private DSLContext dslContext;
 
     public PaginationResponse<BiePackage> getBiePackageList(BiePackageListRequest request) {
-        SelectConditionStep<Record> conditionStep = getSelectOnConditionStep(request)
-                .where(makeConditions(request));
+        SelectHavingStep<Record> conditionStep = getSelectOnConditionStep(request)
+                .where(makeConditions(request))
+                .groupBy(BIE_PACKAGE.BIE_PACKAGE_ID);
 
         int pageCount = dslContext.fetchCount(conditionStep);
 
@@ -69,8 +68,8 @@ public class BiePackageRepository {
                         BIE_PACKAGE.VERSION_ID,
                         BIE_PACKAGE.VERSION_NAME,
                         BIE_PACKAGE.DESCRIPTION,
-                        BIE_PACKAGE.RELEASE_ID,
-                        RELEASE.RELEASE_NUM,
+                        groupConcatDistinct(RELEASE.RELEASE_ID).as("release_id_list"),
+                        groupConcatDistinct(RELEASE.RELEASE_NUM).as("release_num_list"),
                         BIE_PACKAGE.STATE,
                         APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                         APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
@@ -98,10 +97,10 @@ public class BiePackageRepository {
                 .join(APP_USER.as("owner")).on(BIE_PACKAGE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("creator")).on(BIE_PACKAGE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(BIE_PACKAGE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
-                .leftJoin(RELEASE).on(BIE_PACKAGE.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .leftJoin(BIE_PACKAGE.as("source")).on(BIE_PACKAGE.SOURCE_BIE_PACKAGE_ID.eq(BIE_PACKAGE.as("source").BIE_PACKAGE_ID))
                 .leftJoin(BIE_PACKAGE_TOP_LEVEL_ASBIEP).on(BIE_PACKAGE.BIE_PACKAGE_ID.eq(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID))
                 .leftJoin(TOP_LEVEL_ASBIEP).on(BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .leftJoin(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .leftJoin(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
@@ -207,11 +206,20 @@ public class BiePackageRepository {
         biePackage.setVersionId(record.get(BIE_PACKAGE.VERSION_ID));
         biePackage.setVersionName(record.get(BIE_PACKAGE.VERSION_NAME));
         biePackage.setDescription(record.get(BIE_PACKAGE.DESCRIPTION));
-        ULong releaseId = record.get(BIE_PACKAGE.RELEASE_ID);
-        if (releaseId != null) {
-            biePackage.setReleaseId(releaseId.toBigInteger());
+        String releaseIdListStr = record.get(field("release_id_list"), String.class);
+        List<String> releaseIdList = hasLength(releaseIdListStr) ? Arrays.asList(releaseIdListStr.split(",")) : Collections.emptyList();
+        String releaseNumListStr = record.get(field("release_num_list"), String.class);
+        List<String> releaseNumList = hasLength(releaseNumListStr) ? Arrays.asList(releaseNumListStr.split(",")) : Collections.emptyList();
+        if (!releaseIdList.isEmpty() && !releaseIdList.isEmpty() && releaseIdList.size() == releaseNumList.size()) {
+            List<SimpleRelease> releases = new ArrayList<>();
+            for (int i = 0, len = releaseIdList.size(); i < len; ++i) {
+                SimpleRelease release = new SimpleRelease();
+                release.setReleaseId(new BigInteger(releaseIdList.get(i)));
+                release.setReleaseNum(releaseNumList.get(i));
+                releases.add(release);
+            }
+            biePackage.setReleases(releases);
         }
-        biePackage.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
         biePackage.setState(BiePackageState.valueOf(record.get(BIE_PACKAGE.STATE)));
 
         ScoreRole ownerRole = (byte) 1 == record.get(APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer")) ? DEVELOPER : END_USER;
@@ -238,8 +246,10 @@ public class BiePackageRepository {
         if (sourceTimestamp != null) {
             biePackage.setSourceTimestamp(Date.from(sourceTimestamp.atZone(ZoneId.systemDefault()).toInstant()));
         }
-        biePackage.setSourceBiePackageVersionName(record.get(BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name")));
-        biePackage.setSourceBiePackageVersionId(record.get(BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id")));
+        biePackage.setSourceBiePackageVersionName(
+                record.get(BIE_PACKAGE.as("source").VERSION_NAME.as("source_bie_package_version_name")));
+        biePackage.setSourceBiePackageVersionId(
+                record.get(BIE_PACKAGE.as("source").VERSION_ID.as("source_bie_package_version_id")));
 
         return biePackage;
     }
@@ -259,7 +269,10 @@ public class BiePackageRepository {
         biePackageRecord.setCreationTimestamp(timestamp);
         biePackageRecord.setLastUpdateTimestamp(timestamp);
 
-        return dslContext.insertInto(BIE_PACKAGE).set(biePackageRecord).returning(BIE_PACKAGE.BIE_PACKAGE_ID).fetchOne().getBiePackageId().toBigInteger();
+        return dslContext.insertInto(BIE_PACKAGE)
+                .set(biePackageRecord)
+                .returning(BIE_PACKAGE.BIE_PACKAGE_ID)
+                .fetchOne().getBiePackageId().toBigInteger();
     }
 
     public void updateBiePackage(UpdateBiePackageRequest request) {
@@ -508,29 +521,11 @@ public class BiePackageRepository {
             return;
         }
 
-        BigInteger releaseId = biePackage.getReleaseId();
-
         for (BigInteger topLevelAsbiepId : topLevelAsbiepIdList) {
             BigInteger topLevelAsbiepReleaseId = dslContext.select(TOP_LEVEL_ASBIEP.RELEASE_ID)
                     .from(TOP_LEVEL_ASBIEP)
                     .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                     .fetchOneInto(BigInteger.class);
-            if (releaseId != null) {
-                if (!releaseId.equals(topLevelAsbiepReleaseId)) {
-                    String topLevelAsbiepReleaseNum = dslContext.select(RELEASE.RELEASE_NUM)
-                            .from(RELEASE)
-                            .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(topLevelAsbiepReleaseId)))
-                            .fetchOneInto(String.class);
-                    throw new IllegalArgumentException("This BIE package does not allow the " + topLevelAsbiepReleaseNum + " release.");
-                }
-            } else {
-                dslContext.update(BIE_PACKAGE)
-                        .set(BIE_PACKAGE.RELEASE_ID, ULong.valueOf(topLevelAsbiepReleaseId))
-                        .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackage.getBiePackageId())))
-                        .execute();
-
-                releaseId = topLevelAsbiepReleaseId;
-            }
 
             BiePackageTopLevelAsbiepRecord record = new BiePackageTopLevelAsbiepRecord();
             record.setBiePackageId(ULong.valueOf(biePackage.getBiePackageId()));
@@ -561,17 +556,6 @@ public class BiePackageRepository {
                         )
                 ))
                 .execute();
-
-        if (dslContext.selectCount()
-                .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
-                .where(BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackage.getBiePackageId())))
-                .fetchOneInto(Integer.class) == 0) {
-
-            dslContext.update(BIE_PACKAGE)
-                    .setNull(BIE_PACKAGE.RELEASE_ID)
-                    .where(BIE_PACKAGE.BIE_PACKAGE_ID.eq(ULong.valueOf(biePackage.getBiePackageId())))
-                    .execute();
-        }
     }
 
     public void transferOwnership(BieOwnershipTransferRequest request) {
@@ -671,7 +655,6 @@ public class BiePackageRepository {
 
         BiePackageRecord upliftedBiePackageRecord = biePackageRecord.copy();
         upliftedBiePackageRecord.setBiePackageId(null);
-        upliftedBiePackageRecord.setReleaseId(ULong.valueOf(targetReleaseId));
         upliftedBiePackageRecord.setState(BiePackageState.Initiating.name());
         ULong requesterUserId = ULong.valueOf(requester.getUserId());
         upliftedBiePackageRecord.setOwnerUserId(requesterUserId);

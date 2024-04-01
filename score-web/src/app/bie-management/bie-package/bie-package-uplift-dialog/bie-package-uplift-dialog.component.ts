@@ -129,10 +129,6 @@ export class BiePackageUpliftDialogComponent implements OnInit {
         this.releases = this.releases.filter(e => e.releaseId === this.data.releaseId);
       }
 
-      if (!!this.biePackage.releaseId) {
-        this.sourceRelease = this.releases.filter(e => e.releaseId === this.biePackage.releaseId)[0];
-      }
-
       this.loadBieListInBiePackage();
 
       initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, ((this.sourceRelease) ? [this.sourceRelease] : []), (e) => e.releaseNum);

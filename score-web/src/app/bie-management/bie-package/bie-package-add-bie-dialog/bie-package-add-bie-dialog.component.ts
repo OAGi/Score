@@ -105,9 +105,6 @@ export class BiePackageAddBieDialogComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
-      if (!!this.data.releaseId) {
-        this.releases = this.releases.filter(e => e.releaseId === this.data.releaseId);
-      }
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 1) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');

@@ -268,7 +268,9 @@
           <ng-container matColumnDef="branch">
             <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"> Branch</th>
             <td mat-cell *matCellDef="let element">
-              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+              <div class="d-flex">
+                <span>{{ releaseNums(element) | join: ', ' }}</span>
+              </div>
             </td>
           </ng-container>
 
