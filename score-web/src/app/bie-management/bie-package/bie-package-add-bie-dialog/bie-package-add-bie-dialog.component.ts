@@ -217,7 +217,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.table.dataSource.data.filter(row => row.owner === this.username).length;
+    const numRows = this.table.dataSource.data.length;
     return numSelected > 0 && numSelected === numRows;
   }
 
@@ -229,9 +229,7 @@ export class BiePackageAddBieDialogComponent implements OnInit {
   }
 
   select(row: BieList) {
-    if (row.owner === this.username) {
-      this.selection.select(row);
-    }
+    this.selection.select(row);
   }
 
   toggle(row: BieList) {

@@ -130,9 +130,6 @@ export class BiePackageUpliftDialogComponent implements OnInit {
       }
 
       this.loadBieListInBiePackage();
-
-      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, ((this.sourceRelease) ? [this.sourceRelease] : []), (e) => e.releaseNum);
-      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
     }, error => {
       this.loading = false;
       let errorMessage;
@@ -187,9 +184,22 @@ export class BiePackageUpliftDialogComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+
+      const releaseNums = new Set(resp.list.map(e => e.releaseNum));
+      const sourceReleases = this.releases.filter(e => releaseNums.has(e.releaseNum));
+      if (sourceReleases.length === 1) {
+        this.setSourceRelease(sourceReleases[0]);
+      }
     }, error => {
       this.table.dataSource.data = [];
     });
+  }
+
+  setSourceRelease(sourceRelease: SimpleRelease) {
+    this.sourceRelease = sourceRelease;
+
+    initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, ((this.sourceRelease) ? [this.sourceRelease] : []), (e) => e.releaseNum);
+    initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
   }
 
   onPageChange(event: PageEvent) {
