@@ -331,10 +331,9 @@
                                 [matChipInputAddOnBlur]="addOnBlur">
                             </mat-chip-grid>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBusinessContext($event)">
-                              <mat-option *ngFor="let businessContext of filteredBusinessContexts | async"
-                                          [value]="businessContext">
-                                {{ businessContext.name }}
-                              </mat-option>
+                              @for (businessContext of filteredBusinessContexts | async; track businessContext) {
+                                <mat-option [value]="businessContext">{{ businessContext.name }}</mat-option>
+                              }
                             </mat-autocomplete>
                           </mat-form-field>
                         </div>

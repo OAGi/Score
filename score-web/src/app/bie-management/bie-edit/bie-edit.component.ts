@@ -172,14 +172,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.topLevelAsbiepId = parseInt(params.get('id'), 10);
+
+        const businessContextRequest = new BusinessContextListRequest();
+        if (this.isTenantEnabled) {
+          businessContextRequest.filters.isBieEditing = true;
+        }
+        businessContextRequest.page = new PageRequest('name', 'asc', -1, -1);
+
         return forkJoin([
           this.service.getGraphNode(this.topLevelAsbiepId),
           this.service.getUsedBieList(this.topLevelAsbiepId),
           this.service.getRefBieList(this.topLevelAsbiepId),
           this.service.getRootNode(this.topLevelAsbiepId),
-          this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(this.topLevelAsbiepId)
+          this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(this.topLevelAsbiepId),
+          this.bizCtxService.getBusinessContextList(businessContextRequest)
         ]);
-      })).subscribe(([ccGraph, usedBieList, refBieList, rootNode, bizCtxResp]) => {
+      })).subscribe(([ccGraph, usedBieList, refBieList, rootNode,
+                       bizCtxResp, allBizCtxResp]) => {
       this.initRootNode(rootNode);
 
       if (this.state === 'WIP' && (this.access !== 'CanEdit' && !this.auth.isAdmin())) {
@@ -190,6 +199,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         return;
       }
 
+      this.allBusinessContexts = allBizCtxResp.list;
       this.businessContextCtrl = new FormControl({
         disabled: false
       });
@@ -198,7 +208,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.filteredBusinessContexts = this.businessContextCtrl.valueChanges.pipe(
         startWith(null),
         map((value: string | BusinessContext | null) => value ? this._filter(value) : this._filter()));
-      this._loadAllBusinessContexts();
 
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
@@ -2020,18 +2029,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       node = this.selectedNode;
     }
     return node.detail as BieEditBbieScNodeDetail;
-  }
-
-  _loadAllBusinessContexts() {
-    const request = new BusinessContextListRequest();
-    if (this.isTenantEnabled) {
-      request.filters.isBieEditing = true;
-    }
-    request.page = new PageRequest('name', 'asc', -1, -1);
-    this.bizCtxService.getBusinessContextList(request)
-      .subscribe(resp => {
-        this.allBusinessContexts = resp.list;
-      });
   }
 
   get isBusinessContextRemovable(): boolean {
