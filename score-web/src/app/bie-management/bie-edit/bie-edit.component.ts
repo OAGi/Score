@@ -191,7 +191,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
 
       this.businessContextCtrl = new FormControl({
-        disabled: !this.canEdit
+        disabled: false
       });
       this.businessContexts = bizCtxResp.list;
       this.businessContextUpdating = false;
@@ -2065,6 +2065,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         });
       }, err => {
         this.businessContextUpdating = false;
+        throw err;
       });
   }
 
