@@ -416,10 +416,12 @@ public class AsccWriteRepository {
                         .execute();
             }
 
-            moreStep.set(ASCC.LAST_UPDATED_BY, userId)
-                    .set(ASCC.LAST_UPDATE_TIMESTAMP, timestamp)
-                    .where(ASCC.ASCC_ID.eq(asccRecord.getAsccId()))
-                    .execute();
+            if (moreStep != null) {
+                moreStep.set(ASCC.LAST_UPDATED_BY, userId)
+                        .set(ASCC.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .where(ASCC.ASCC_ID.eq(asccRecord.getAsccId()))
+                        .execute();
+            }
 
             asccRecord = dslContext.selectFrom(ASCC)
                     .where(ASCC.ASCC_ID.eq(asccManifestRecord.getAsccId()))

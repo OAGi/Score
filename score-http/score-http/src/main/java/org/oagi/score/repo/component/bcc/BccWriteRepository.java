@@ -428,11 +428,12 @@ public class BccWriteRepository {
                         .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestRecord.getBccManifestId()))
                         .execute();
             }
-
-            moreStep.set(BCC.LAST_UPDATED_BY, userId)
-                    .set(BCC.LAST_UPDATE_TIMESTAMP, timestamp)
-                    .where(BCC.BCC_ID.eq(bccRecord.getBccId()))
-                    .execute();
+            if (moreStep != null) {
+                moreStep.set(BCC.LAST_UPDATED_BY, userId)
+                        .set(BCC.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .where(BCC.BCC_ID.eq(bccRecord.getBccId()))
+                        .execute();
+            }
 
             bccRecord = dslContext.selectFrom(BCC)
                     .where(BCC.BCC_ID.eq(bccManifestRecord.getBccId()))
