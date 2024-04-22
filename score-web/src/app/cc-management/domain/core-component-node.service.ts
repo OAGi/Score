@@ -19,7 +19,7 @@ import {
   CcNodeUpdateResponse,
   CcRevisionResponse,
   CcSeqUpdateRequest,
-  Comment
+  Comment, VerifyAppendAssociationResponse
 } from './core-component-node';
 import {base64Encode} from '../../common/utility';
 import {map} from 'rxjs/operators';
@@ -166,6 +166,16 @@ export class CcNodeService {
     return new HttpParams().set('data', data);
   }
 
+  verifyAppendAssociation(accManifestId: number,
+                          manifestId: number, type: string): Observable<VerifyAppendAssociationResponse> {
+    const body = {
+      asccpManifestId: (type === 'ASCCP') ? manifestId : undefined,
+      bccpManifestId: (type === 'BCCP') ? manifestId : undefined
+    };
+
+    return this.http.post<VerifyAppendAssociationResponse>('/api/core_component/acc/' + accManifestId + '/verify_append', body);
+  }
+
   appendAssociation(releaseId: number, accManifestId: number,
                     manifestId: number, type: string, attribute: boolean,
                     pos: number): Observable<any> | undefined {
@@ -178,6 +188,14 @@ export class CcNodeService {
     };
 
     return this.http.post('/api/core_component/acc/' + accManifestId + '/append', body);
+  }
+
+  verifySetBasedAcc(accManifestId: number, basedAccManifestId: number): Observable<VerifyAppendAssociationResponse> {
+    const body = {
+      basedAccManifestId
+    };
+
+    return this.http.post<VerifyAppendAssociationResponse>('/api/core_component/acc/' + accManifestId + '/verify_append', body);
   }
 
   setBasedAcc(accManifestId: number, basedAccManifestId: number): Observable<any> {
@@ -238,6 +256,14 @@ export class CcNodeService {
   updateState(type: string, manifestId: number, state: string): Observable<CcNodeUpdateResponse> {
     const url = '/api/core_component/' + type.toLowerCase() + '/' + manifestId + '/state';
     return this.http.post<CcNodeUpdateResponse>(url, {state: state});
+  }
+
+  verifyCreateExtensionComponent(accManifestId: number): Observable<VerifyAppendAssociationResponse> {
+    const body = {
+      propertyTerm: 'Extension'
+    };
+
+    return this.http.post<VerifyAppendAssociationResponse>('/api/core_component/acc/' + accManifestId + '/verify_append', body);
   }
 
   createExtensionComponent(manifestId: number): Observable<CcNodeUpdateResponse> {

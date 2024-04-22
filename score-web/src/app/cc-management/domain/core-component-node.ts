@@ -2623,3 +2623,8 @@ export class CcSeqUpdateRequest {
 export class BodCreateResponse {
   manifestIdList: number[];
 }
+
+export class VerifyAppendAssociationResponse {
+  warn: boolean;
+  message: string;
+}

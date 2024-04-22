@@ -49,6 +49,13 @@ public class AsccReadRepository {
                 .fetchOptionalInto(AsccManifestRecord.class).orElse(null);
     }
 
+    public List<AsccManifestRecord> getAsccManifestListByAccManifestId(BigInteger accManifestId) {
+        return dslContext.select(ASCC_MANIFEST.fields())
+                .from(ASCC_MANIFEST)
+                .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ULong.valueOf(accManifestId)))
+                .fetchInto(AsccManifestRecord.class);
+    }
+
     public AsccManifestRecord getUserExtensionAsccManifestByAsccpManifestId(BigInteger asccpManifestId) {
         return dslContext.select(ASCC_MANIFEST.fields())
                 .from(ASCC_MANIFEST)

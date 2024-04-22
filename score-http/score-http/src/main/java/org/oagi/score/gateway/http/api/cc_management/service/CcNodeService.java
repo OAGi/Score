@@ -14,6 +14,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventHandler;
 import org.oagi.score.repo.CoreComponentRepository;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repo.component.acc.*;
 import org.oagi.score.repo.component.ascc.*;
 import org.oagi.score.repo.component.asccp.*;
@@ -69,6 +70,9 @@ public class CcNodeService extends EventHandler {
 
     @Autowired
     private BccpWriteRepository bccpWriteRepository;
+
+    @Autowired
+    private BccpReadRepository bccpReadRepository;
 
     @Autowired
     private DtWriteRepository dtWriteRepository;
@@ -904,6 +908,33 @@ public class CcNodeService extends EventHandler {
     }
 
     @Transactional
+    public CcVerifyAppendResponse verifyAppendAsccp(ScoreUser requester,
+                                                    BigInteger accManifestId, BigInteger asccpManifestId) {
+
+        AsccpManifestRecord asccpManifestRecord = asccpReadRepository.getAsccpManifestById(asccpManifestId);
+        AccRecord roleOfAccRecord = accReadRepository.getAccByManifestId(asccpManifestRecord.getRoleOfAccManifestId().toBigInteger());
+        if (OagisComponentType.valueOf(roleOfAccRecord.getOagisComponentType()).isGroup()) {
+            return verifySetBasedAcc(requester, asccpManifestRecord.getRoleOfAccManifestId().toBigInteger(), accManifestId);
+        } else {
+            String propertyTerm = asccpReadRepository.getAsccpByManifestId(asccpManifestId).getPropertyTerm();
+            return hasSamePropertyTerm(requester, accManifestId, propertyTerm);
+        }
+    }
+
+    @Transactional
+    public CcVerifyAppendResponse hasSamePropertyTerm(ScoreUser requester, BigInteger accManifestId, String propertyTerm) {
+        CcVerifyAppendResponse response = new CcVerifyAppendResponse();
+
+        if (accReadRepository.hasSamePropertyTerm(accManifestId, propertyTerm)) {
+            response.setWarn(true);
+            response.setMessage("There is a duplicate property term '" + propertyTerm + "' " +
+                    "that could cause an ambiguous content model depending on the expression.");
+        }
+
+        return response;
+    }
+
+    @Transactional
     public BigInteger appendBccp(AuthenticatedPrincipal user, BigInteger releaseId,
                                  BigInteger accManifestId, BigInteger bccpManifestId,
                                  int pos) {
@@ -924,6 +955,14 @@ public class CcNodeService extends EventHandler {
         CreateBccRepositoryResponse response = bccWriteRepository.createBcc(request);
         fireEvent(new CreatedBccEvent());
         return response.getBccManifestId();
+    }
+
+    @Transactional
+    public CcVerifyAppendResponse verifyAppendBccp(ScoreUser requester,
+                                                   BigInteger accManifestId, BigInteger bccpManifestId) {
+
+        String propertyTerm = bccpReadRepository.getBccpByManifestId(bccpManifestId).getPropertyTerm();
+        return hasSamePropertyTerm(requester, accManifestId, propertyTerm);
     }
 
     @Transactional
@@ -976,6 +1015,43 @@ public class CcNodeService extends EventHandler {
             return bdtScNodeDetail.getBdtScPriRestriList();
         }
         return repository.getDefaultPrimitiveValues(representationTerm);
+    }
+
+    @Transactional
+    public CcVerifyAppendResponse verifySetBasedAcc(ScoreUser requester,
+                                                    BigInteger accManifestId, BigInteger basedAccManifestId) {
+
+        CcVerifyAppendResponse response;
+        for (AsccManifestRecord asccManifestRecord : asccReadRepository.getAsccManifestListByAccManifestId(accManifestId)) {
+            AsccpManifestRecord asccpManifestRecord = asccpReadRepository.getAsccpManifestById(asccManifestRecord.getToAsccpManifestId().toBigInteger());
+            AccRecord roleOfAccRecord = accReadRepository.getAccByManifestId(asccpManifestRecord.getRoleOfAccManifestId().toBigInteger());
+            if (OagisComponentType.valueOf(roleOfAccRecord.getOagisComponentType()).isGroup()) {
+                response = verifySetBasedAcc(requester, asccpManifestRecord.getRoleOfAccManifestId().toBigInteger(), basedAccManifestId);
+                if (response.isWarn()) {
+                    return response;
+                }
+            } else {
+                String propertyTerm = asccpReadRepository.getAsccpByManifestId(asccManifestRecord.getToAsccpManifestId().toBigInteger()).getPropertyTerm();
+                response = hasSamePropertyTerm(requester, basedAccManifestId, propertyTerm);
+                if (response.isWarn()) {
+                    return response;
+                }
+            }
+        }
+        for (BccManifestRecord bccManifestRecord : bccReadRepository.getBccManifestListByAccManifestId(accManifestId)) {
+            String propertyTerm = bccpReadRepository.getBccpByManifestId(bccManifestRecord.getToBccpManifestId().toBigInteger()).getPropertyTerm();
+            response = hasSamePropertyTerm(requester, basedAccManifestId, propertyTerm);
+            if (response.isWarn()) {
+                return response;
+            }
+        }
+
+        AccManifestRecord basedAccManifestRecord = accReadRepository.getAccManifest(basedAccManifestId);
+        if (basedAccManifestRecord.getBasedAccManifestId() != null) {
+            return verifySetBasedAcc(requester, accManifestId, basedAccManifestRecord.getBasedAccManifestId().toBigInteger());
+        }
+
+        return new CcVerifyAppendResponse();
     }
 
     @Transactional

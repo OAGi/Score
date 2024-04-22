@@ -52,6 +52,13 @@ public class BccReadRepository {
                 .fetchOptionalInto(BccManifestRecord.class).orElse(null);
     }
 
+    public List<BccManifestRecord> getBccManifestListByAccManifestId(BigInteger accManifestId) {
+        return dslContext.select(BCC_MANIFEST.fields())
+                .from(BCC_MANIFEST)
+                .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ULong.valueOf(accManifestId)))
+                .fetchInto(BccManifestRecord.class);
+    }
+
     public CcRefactorValidationResponse validateBccRefactoring(AppUser user, BigInteger bccManifestId, BigInteger accManifestId) {
 
         BccManifestRecord bccManifestRecord = dslContext.selectFrom(BccManifest.BCC_MANIFEST)

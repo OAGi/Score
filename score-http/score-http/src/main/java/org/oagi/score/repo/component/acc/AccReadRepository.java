@@ -1,6 +1,8 @@
 package org.oagi.score.repo.component.acc;
 
 import org.jooq.DSLContext;
+import org.jooq.Record2;
+import org.jooq.Record4;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.cc_management.data.CcACCType;
 import org.oagi.score.gateway.http.api.cc_management.data.CcList;
@@ -9,7 +11,9 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetReleaseRecord;
+import org.oagi.score.repo.api.impl.utils.StringUtils;
 import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -63,17 +67,20 @@ public class AccReadRepository {
             defaultModuleSetReleaseId = defaultModuleSetRelease.getModuleSetReleaseId();
         }
 
-        List<AccManifestRecord> accManifestRecordList = dslContext.selectFrom(ACC_MANIFEST).where(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))).fetch();
+        List<AccManifestRecord> accManifestRecordList = dslContext.selectFrom(ACC_MANIFEST)
+                .where(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))).fetch();
 
-        AccManifestRecord accManifestRecord = accManifestRecordList.stream().filter(e -> e.getAccManifestId().equals(ULong.valueOf(accManifestId))).findFirst().orElse(null);
+        AccManifestRecord accManifestRecord = accManifestRecordList.stream()
+                .filter(e -> e.getAccManifestId().equals(ULong.valueOf(accManifestId)))
+                .findFirst().orElse(null);
 
         if (accManifestRecord == null) {
-            throw new IllegalArgumentException("Can not found CoreComponent.");
+            throw new IllegalArgumentException("The ACC manifest record with ID " + accManifestId + " could not be found.");
         }
 
         List<ULong> accManifestIdList = new ArrayList<>();
 
-        while(accManifestRecord.getBasedAccManifestId() != null) {
+        while (accManifestRecord.getBasedAccManifestId() != null) {
             ULong cur = accManifestRecord.getBasedAccManifestId();
             accManifestIdList.add(cur);
             accManifestRecord = accManifestRecordList.stream().filter(e -> e.getAccManifestId().equals(cur)).findFirst().orElse(null);
@@ -83,7 +90,6 @@ public class AccReadRepository {
 
         AppUser appUserOwner = APP_USER.as("owner");
         AppUser appUserUpdater = APP_USER.as("updater");
-
 
         return dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID,
                 ACC.ACC_ID,
@@ -139,4 +145,53 @@ public class AccReadRepository {
                     return  ccList;
                 });
     }
+
+    public boolean hasSamePropertyTerm(BigInteger accManifestId, String propertyTerm) {
+
+        AccManifestRecord accManifestRecord = getAccManifest(accManifestId);
+        if (accManifestRecord == null) {
+            throw new IllegalArgumentException("The ACC manifest record with ID " + accManifestId + " could not be found.");
+        }
+
+        for (Record4<ULong, String, ULong, Integer> asccpRecord : dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP.PROPERTY_TERM,
+                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC.OAGIS_COMPONENT_TYPE)
+                .from(ASCC_MANIFEST)
+                .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
+                .fetch()) {
+
+            if (OagisComponentType.valueOf(asccpRecord.get(ACC.OAGIS_COMPONENT_TYPE)).isGroup()) {
+                if (hasSamePropertyTerm(asccpRecord.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger(), propertyTerm)) {
+                    return true;
+                }
+            } else {
+                String asccpPropertyTerm = asccpRecord.get(ASCCP.PROPERTY_TERM);
+                if (StringUtils.equals(propertyTerm, asccpPropertyTerm)) {
+                    return true;
+                }
+            }
+        }
+
+        for (Record2<ULong, String> bccpRecord : dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP.PROPERTY_TERM)
+                .from(BCC_MANIFEST)
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestRecord.getAccManifestId()))
+                .fetch()) {
+            String bccpPropertyTerm = bccpRecord.get(BCCP.PROPERTY_TERM);
+            if (StringUtils.equals(propertyTerm, bccpPropertyTerm)) {
+                return true;
+            }
+        }
+
+        if (accManifestRecord.getBasedAccManifestId() != null) {
+            return hasSamePropertyTerm(accManifestRecord.getBasedAccManifestId().toBigInteger(), propertyTerm);
+        }
+
+        return false;
+    }
+
 }

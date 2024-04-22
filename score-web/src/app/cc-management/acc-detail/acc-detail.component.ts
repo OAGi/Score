@@ -692,18 +692,43 @@ export class AccDetailComponent implements OnInit {
         return;
       }
 
-      this.isUpdating = true;
-      this.service.appendAssociation(
-        this.rootNode.releaseId,
+      this.service.verifyAppendAssociation(
         this.rootNode.manifestId,
-        association.manifestId,
-        association.type,
-        (this.asAccDetail(this.rootNode).oagisComponentType === AttributeGroup.value) ? true : false,
-        pos !== -1 && this.hasBasedAcc ? pos - 1 : pos).subscribe(_ => {
-        this.reload((pos === -1) ? 'Appended' : 'Inserted');
-      }, err => {
-        this.isUpdating = false;
+        association.manifestId, association.type).subscribe(verifyRes => {
+          if (verifyRes.warn) {
+            const dialogConfig = this.confirmDialogService.newConfig();
+            dialogConfig.data.header = ((pos === -1) ? 'Append' : 'Insert') + ' association';
+            dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
+            dialogConfig.data.action = 'Proceed anyway';
+
+            this.confirmDialogService.open(dialogConfig).afterClosed()
+              .subscribe(result => {
+                if (!result) {
+                  this.isUpdating = false;
+                  return;
+                }
+
+                this._doAppendAssociation(association, pos);
+              });
+          } else {
+            this._doAppendAssociation(association, pos);
+          }
       });
+    });
+  }
+
+  _doAppendAssociation(association: CcList, pos: number) {
+    this.isUpdating = true;
+    this.service.appendAssociation(
+      this.rootNode.releaseId,
+      this.rootNode.manifestId,
+      association.manifestId,
+      association.type,
+      (this.asAccDetail(this.rootNode).oagisComponentType === AttributeGroup.value) ? true : false,
+      pos !== -1 && this.hasBasedAcc ? pos - 1 : pos).subscribe(_ => {
+      this.reload((pos === -1) ? 'Appended' : 'Inserted');
+    }, err => {
+      this.isUpdating = false;
     });
   }
 
@@ -782,41 +807,92 @@ export class AccDetailComponent implements OnInit {
       }
 
       this.isUpdating = true;
-      this.service.setBasedAcc(this.rootNode.manifestId, basedAccManifestId).subscribe(_ => {
-        this.hasBasedAcc = true;
-        this.reload('Updated');
-        if (!this.dataSource.isExpanded(this.dataSource.data[0])) {
-          this.dataSource.expand(this.dataSource.data[0]);
+      this.service.verifySetBasedAcc(
+        this.rootNode.manifestId, basedAccManifestId).subscribe(verifyRes => {
+        if (verifyRes.warn) {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = 'Set Based ACC';
+          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
+          dialogConfig.data.action = 'Proceed anyway';
+
+          this.confirmDialogService.open(dialogConfig).afterClosed()
+            .subscribe(result => {
+              if (!result) {
+                this.isUpdating = false;
+                return;
+              }
+
+              this._doSetBasedAcc(basedAccManifestId);
+            });
+        } else {
+          this._doSetBasedAcc(basedAccManifestId);
         }
-        this.isUpdating = false;
-      }, err => {
-        this.isUpdating = false;
       });
+    });
+  }
+
+  _doSetBasedAcc(basedAccManifestId: number) {
+    this.service.setBasedAcc(this.rootNode.manifestId, basedAccManifestId).subscribe(_ => {
+      this.hasBasedAcc = true;
+      this.reload('Updated');
+      if (!this.dataSource.isExpanded(this.dataSource.data[0])) {
+        this.dataSource.expand(this.dataSource.data[0]);
+      }
+      this.isUpdating = false;
+    }, err => {
+      this.isUpdating = false;
     });
   }
 
   createExtensionComponent() {
     this.isUpdating = true;
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Create Extension Component';
-    dialogConfig.data.content = ['Are you sure you want to create Extension Component?'];
-    dialogConfig.data.action = 'Create';
 
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .pipe(
-        finalize(() => {
-          this.isUpdating = false;
-        })
-      )
-      .subscribe(result => {
-        if (!result) {
-          return;
-        }
-        this.service.createExtensionComponent(this.rootNode.manifestId)
-          .subscribe(resp => {
-            this.reload('Extension component created');
-          }, err => {
+    this.service.verifyCreateExtensionComponent(
+      this.rootNode.manifestId).subscribe(verifyRes => {
+      if (verifyRes.warn) {
+        const dialogConfig = this.confirmDialogService.newConfig();
+        dialogConfig.data.header = 'Create Extension Component';
+        dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
+        dialogConfig.data.action = 'Proceed anyway';
+
+        this.confirmDialogService.open(dialogConfig).afterClosed()
+          .subscribe(result => {
+            if (!result) {
+              this.isUpdating = false;
+              return;
+            }
+
+            this._doCreateExtensionComponent();
           });
+      } else {
+        const dialogConfig = this.confirmDialogService.newConfig();
+        dialogConfig.data.header = 'Create Extension Component';
+        dialogConfig.data.content = ['Are you sure you want to create Extension Component?'];
+        dialogConfig.data.action = 'Create';
+
+        this.confirmDialogService.open(dialogConfig).afterClosed()
+          .subscribe(result => {
+            if (!result) {
+              this.isUpdating = false;
+              return;
+            }
+
+            this._doCreateExtensionComponent();
+          });
+      }
+    }, err => {
+      this.isUpdating = false;
+      throw err;
+    });
+  }
+
+  _doCreateExtensionComponent() {
+    this.isUpdating = true;
+    this.service.createExtensionComponent(this.rootNode.manifestId)
+      .subscribe(resp => {
+        this.reload('Extension component created');
+      }, err => {
+        this.isUpdating = false;
       });
   }
 
