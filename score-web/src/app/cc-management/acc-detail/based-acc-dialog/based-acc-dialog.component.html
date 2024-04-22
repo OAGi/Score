@@ -114,6 +114,7 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
+                <mat-label>DEN</mat-label>
                 <input matInput [(ngModel)]="request.filters.den"
                        (ngModelChange)="onChange('filters.den', request.filters.den)"
                        (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
