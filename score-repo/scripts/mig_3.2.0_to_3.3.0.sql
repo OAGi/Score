@@ -4,6 +4,8 @@
 -- Author: Hakju Oh <hakju.oh@nist.gov>              --
 -- ----------------------------------------------------
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 INSERT INTO `configuration` (`name`, `type`, `value`)
 VALUES ('score.mail.smtp.host', 'String', 'smtp.gmail.com'),
        ('score.mail.smtp.port', 'Integer', '587'),
@@ -86,7 +88,7 @@ CREATE TABLE `bie_package_top_level_asbiep`
     CONSTRAINT `bie_package_top_level_asbiep_top_level_asbiep_id_fk` FOREIGN KEY (`top_level_asbiep_id`) REFERENCES `top_level_asbiep` (`top_level_asbiep_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+SET FOREIGN_KEY_CHECKS = 1;
 
 
 
