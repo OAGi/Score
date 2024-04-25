@@ -45,6 +45,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private Map<Operation, GeneratorForOperation> generatorForOperationMap = new HashMap<>();
+    private Map<TopLevelAsbiep, String> schemaNameMap = new HashMap<>();
     private ObjectMapper mapper;
     private ObjectMapper expressionMapper;
 
@@ -232,15 +233,26 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
 
     private String getSchemaName(TopLevelAsbiep topLevelAsbiep, OpenAPIGenerateExpressionOption option,
                                  Map<String, Object> schemas, Operation verb, boolean isArray) {
+        if (schemaNameMap.containsKey(topLevelAsbiep)) {
+            String schemaName = schemaNameMap.get(topLevelAsbiep);
+            if (schemaName.contains("List") && !isArray) {
+                return schemaName + "Entry";
+            } else if (!schemaName.contains("List") && isArray) {
+                throw new IllegalArgumentException("Other records exist that are not set as an Array.");
+            } else {
+                return schemaName;
+            }
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append(getBieName(topLevelAsbiep));
-        if (schemas.containsKey(sb + (isArray ? "List" : ""))) {
+        if (schemaNameMap.values().contains(sb + (isArray ? "List" : ""))) {
             sb.append(option.getMessageBodyType());
         }
         if (isArray) {
             sb.append("List");
         }
-        if (schemas.containsKey(sb.toString())) {
+        if (schemaNameMap.values().contains(sb.toString())) {
             switch (verb) {
                 case GET:
                     sb.append("Read");
@@ -259,7 +271,10 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     break;
             }
         }
-        return sb.toString();
+
+        String schemaName = sb.toString();
+        schemaNameMap.put(topLevelAsbiep, schemaName);
+        return schemaName;
     }
 
     private interface GeneratorForOperation {

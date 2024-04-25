@@ -101,7 +101,6 @@ public class OpenAPIGenerateService {
     }
 
     private BieGenerateOpenApiExpression createBieGenerateOpenAPIExpression() {
-
         BieGenerateOpenApiExpression generateExpression;
         generateExpression = applicationContext.getBean(OpenAPIGenerateExpression.class);
         return generateExpression;
