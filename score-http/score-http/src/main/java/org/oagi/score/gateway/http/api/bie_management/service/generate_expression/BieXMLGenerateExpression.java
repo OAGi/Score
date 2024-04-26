@@ -28,6 +28,7 @@ import java.util.*;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.hasAnyValuesInFacets;
 import static org.oagi.score.gateway.http.helper.Utility.toZuluTimeString;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
@@ -129,12 +130,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             ABIE abie = generationContext.queryTargetABIE(asbiep);
             Element rootSeqNode = generateABIE(abie, rootElementNode);
             generateBIEs(abie, rootSeqNode);
-            if (this.option.getBiePackage() != null) { // Issue #1615
-                attachBiePackageAttributes(rootSeqNode.getParentElement(), topLevelAsbiep, this.option.getBiePackage());
-            }
             if (rootSeqNode.getChildren().isEmpty()) {
                 rootSeqNode.detach();
             }
+            // Issue #1615 & #1617
+            attachBiePackageAttributes(rootElementNode, topLevelAsbiep, this.option.getBiePackage());
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
@@ -205,24 +205,44 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private void attachBiePackageAttributes(Element node, TopLevelAsbiep topLevelAsbiep, BiePackage biePackage) {
-        addAttribute(node, "packageVersionName", true, biePackage.getVersionName(), "token");
-        addAttribute(node, "packageVersionID", true, biePackage.getVersionId(), "token");
-        addAttribute(node, "packageDescription", true, biePackage.getDescription(), "token");
-        addAttribute(node, "versionID", true, topLevelAsbiep.getVersion(), "normalizedString");
-    }
-
-    private void addAttribute(Element node, String name, boolean isRequired, String fixedValue, String type) {
-        List<Element> attributes = node.getChildren("attribute", XSD_NAMESPACE);
-        if (attributes.stream().filter(e -> name.equals(e.getAttribute("name").getValue())).count() != 0) {
-            return;
+        List<Element> appinfoList = new ArrayList<>();
+        if (biePackage != null) {
+            if (hasLength(biePackage.getVersionName())) {
+                appinfoList.add(makeAppInfo("Package Version Name", true, biePackage.getVersionName(), "token"));
+            }
+            if (hasLength(biePackage.getVersionId())) {
+                appinfoList.add(makeAppInfo("Package Version ID", true, biePackage.getVersionId(), "token"));
+            }
+            if (hasLength(biePackage.getDescription())) {
+                appinfoList.add(makeAppInfo("Package Description", true, biePackage.getDescription(), "token"));
+            }
+        }
+        if (hasLength(topLevelAsbiep.getVersion())) {
+            appinfoList.add(makeAppInfo("Version ID", true, topLevelAsbiep.getVersion(), "normalizedString"));
         }
 
-        Element attr = newElement("attribute");
-        attr.setAttribute("name", name);
-        attr.setAttribute("fixed", StringUtils.hasLength(fixedValue) ? fixedValue : "");
-        attr.setAttribute("use", (isRequired) ? "required" : "optional");
-        attr.setAttribute("type", XSD_NAMESPACE.getPrefix() + ":" + type);
-        node.addContent(attr);
+        if (!appinfoList.isEmpty()) {
+            Element annotation = newElement("annotation");
+            node.addContent(0, annotation);
+
+            Element documentation = newElement("documentation");
+            if (biePackage != null) {
+                documentation.setText("Below are 'appinfo' elements containing BIE package information in beta format.");
+            } else {
+                documentation.setText("Below is the 'appinfo' element containing BIE version information in beta format.");
+            }
+            annotation.addContent(documentation);
+
+            for (Element appinfo : appinfoList) {
+                annotation.addContent(appinfo);
+            }
+        }
+    }
+
+    private Element makeAppInfo(String name, boolean isRequired, String fixedValue, String type) {
+        Element appinfo = newElement("appinfo");
+        appinfo.setText(name + " = " + fixedValue);
+        return appinfo;
     }
 
     private void setDefinition(Element node, String contextDefinition) {

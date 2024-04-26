@@ -314,10 +314,13 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         properties.put("additionalProperties", false);
 
         fillProperties(properties, definitions, abie, generationContext);
-
+        // The following comment will be unpacked after
+        // the architecture committee has reached a conclusion on how to express BIE Package Metadata.
+        /*
         if (biePackage != null) { // Issue #1615
             attachBiePackageAttributes(properties, definitions, topLevelAsbiep, biePackage);
         }
+        */
 
         if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
             properties.remove("required");
