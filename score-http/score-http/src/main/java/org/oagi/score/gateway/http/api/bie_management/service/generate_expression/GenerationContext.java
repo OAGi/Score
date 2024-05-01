@@ -31,6 +31,7 @@ public class GenerationContext implements InitializingBean {
 
     private final List<TopLevelAsbiep> topLevelAsbieps;
     private Map<BigInteger, TopLevelAsbiep> topLevelAsbiepMap;
+    private Set<TopLevelAsbiep> refTopLevelAsbiepSet;
 
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
@@ -198,7 +199,8 @@ public class GenerationContext implements InitializingBean {
 
         Set<TopLevelAsbiep> topLevelAsbiepSet = new HashSet();
         topLevelAsbiepSet.addAll(topLevelAsbieps);
-        topLevelAsbiepSet.addAll(findRefTopLevelAsbieps(topLevelAsbiepSet));
+        refTopLevelAsbiepSet = findRefTopLevelAsbieps(topLevelAsbiepSet);
+        topLevelAsbiepSet.addAll(refTopLevelAsbiepSet);
 
         this.topLevelAsbiepMap = topLevelAsbiepSet.stream()
                 .collect(Collectors.toMap(TopLevelAsbiep::getTopLevelAsbiepId, Function.identity()));
@@ -219,6 +221,10 @@ public class GenerationContext implements InitializingBean {
         }
 
         return refTopLevelAsbiepSet;
+    }
+
+    public Set<TopLevelAsbiep> getRefTopLevelAsbiepSet() {
+        return (refTopLevelAsbiepSet != null) ? refTopLevelAsbiepSet : Collections.emptySet();
     }
 
     private void init(Collection<BigInteger> topLevelAsbiepIds, Collection<BigInteger> releaseIds) {

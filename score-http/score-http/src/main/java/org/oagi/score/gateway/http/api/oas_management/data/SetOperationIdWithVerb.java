@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.data;
 
-import static org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.Helper.camelCase;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
 
 public class SetOperationIdWithVerb {
     private String verb;

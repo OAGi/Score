@@ -25,6 +25,7 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.openapidoc.model.GetAssignedOasTagResponse.EMPTY_INSTANCE;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
 
@@ -298,7 +299,7 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     .where(OAS_RESOURCE_TAG.as("req_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
                     .fetchOptional().orElse(null);
             if (req_oasResourceTagRecord == null) {
-                return null;
+                return EMPTY_INSTANCE;
             } else {
                 ULong oasTagId = req_oasResourceTagRecord.getOasTagId();
                 oasTagRecord = dslContext().selectFrom(OAS_TAG.as("req_oas_tag"))
@@ -310,14 +311,15 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     .where(OAS_RESOURCE_TAG.as("res_oas_resource_tag").OAS_OPERATION_ID.eq(ULong.valueOf(request.getOasOperationId())))
                     .fetchOptional().orElse(null);
             if (res_oasResourceTagRecord == null) {
-                return null;
+                return EMPTY_INSTANCE;
             } else {
                 ULong oasTagId = res_oasResourceTagRecord.getOasTagId();
                 oasTagRecord = dslContext().selectFrom(OAS_TAG.as("res_oas_tag"))
                         .where(OAS_TAG.as("res_oas_tag").OAS_TAG_ID.eq(oasTagId)).fetchOptional().orElse(null);
             }
-
-        } else throw new ScoreDataAccessException("Wrong MessageBody Type: " + request.getMessageBodyType());
+        } else {
+            throw new ScoreDataAccessException("Wrong MessageBody Type: " + request.getMessageBodyType());
+        }
 
         GetAssignedOasTagResponse response;
         if (oasTagRecord != null) {
@@ -330,8 +332,9 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                     null);
             response = new GetAssignedOasTagResponse(oasTag);
         } else {
-            return null;
+            return EMPTY_INSTANCE;
         }
+
         return response;
     }
 }

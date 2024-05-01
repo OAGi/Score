@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.camelCase;
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.toName;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component
