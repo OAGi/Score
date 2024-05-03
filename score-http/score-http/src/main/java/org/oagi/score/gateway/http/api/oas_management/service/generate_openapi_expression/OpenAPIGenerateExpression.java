@@ -165,14 +165,31 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         }
 
         if (isArray) {
+            String itemRefSchemaName;
+            // Issue #1603
+            // If the schema name ends with 'List' without any additional options,
+            // it means that there is only one BIE with the corresponding Property Term.
+            // In this case, 'Entry' is not appended at the end.
+            if (schemaName.endsWith("List")) {
+                itemRefSchemaName = schemaName.substring(0, schemaName.indexOf("List"));
+                if (schemas.containsKey(itemRefSchemaName)) {
+                    Map<String, Object> properties = (Map<String, Object>) schemas.get(itemRefSchemaName);
+                    // If it's duplicated
+                    if (!asbiep.getGuid().equals(properties.get("x-oagis-bie-guid"))) {
+                        itemRefSchemaName = schemaName + "Entry";
+                    }
+                }
+            } else {
+                itemRefSchemaName = schemaName + "Entry";
+            }
             schemas.put(schemaName, ImmutableMap.<String, Object>builder()
                     .put("type", "array")
                     .put("items", ImmutableMap.<String, Object>builder()
-                            .put("$ref", "#/components/schemas/" + schemaName + "Entry")
+                            .put("$ref", "#/components/schemas/" + itemRefSchemaName)
                             .build())
                     .build());
 
-            fillPropertiesForTemplate(schemaName + "Entry", asbiep, false, isSuppressRoot);
+            fillPropertiesForTemplate(itemRefSchemaName, asbiep, false, isSuppressRoot);
         } else {
             getReference(asbiep, schemaName, isSuppressRoot);
         }
