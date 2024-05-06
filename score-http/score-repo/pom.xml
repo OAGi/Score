@@ -16,16 +16,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
 
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <mariadb-client.version>3.3.3</mariadb-client.version>
-        <jOOQ.version>3.19.6</jOOQ.version>
+        <jOOQ.version>3.19.8</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <junit.version>4.13.2</junit.version>
-        <junit.platform.version>1.10.1</junit.platform.version>
-        <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <junit.platform.version>1.10.2</junit.platform.version>
+        <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <commons-lang.version>3.14.0</commons-lang.version>
-        <org.springframework.version>6.1.4</org.springframework.version>
+        <org.springframework.version>6.1.6</org.springframework.version>
         <gson.version>2.10.1</gson.version>
     </properties>
 
