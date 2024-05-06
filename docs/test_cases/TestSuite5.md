@@ -949,10 +949,10 @@ The developer can assign multiple business contexts to a BIE during the BIE crea
 The developer can assign multiple business contexts to a BIE in the WIP state he owns via updating it (via View/Edit BIE page).
 
 #### Test Assertion #5.5.37
-The developer cannot assign multiple business contexts to a BIE not the WIP state.
+The developer can assign multiple business contexts to a BIE not the WIP state.
 
 #### Test Assertion #5.5.38
-The developer cannot assign multiple business contexts to a BIE in not the WIP state and he does not own via updating it (via View/Edit BIE page).
+The developer can assign multiple business contexts to a BIE in not the WIP state and he does not own via updating it (via View/Edit BIE page).
 
 #### Test Assertion #5.5.39
 The developer cannot assign the same business context more than one times in a BIE.

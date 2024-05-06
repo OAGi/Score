@@ -3210,12 +3210,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_5_5_TA_37")
-    public void developer_cannot_assign_multiple_business_contexts_to_BIE_not_WIP_state() {
+    public void developer_can_assign_multiple_business_contexts_to_BIE_not_WIP_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
         String releaseNum = "10.8.5";
         List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer),
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
         );
@@ -3236,17 +3237,33 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP_QA);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_QA = editBIEPage.getTopLevelASBIEPPanel();
-        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1)));
+        topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        String businessContextTexts = topLevelASBIEPPanel_QA.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.subList(0, businessContexts.size() - 1).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
 
         editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP_Production);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_Production = editBIEPage.getTopLevelASBIEPPanel();
-        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(1)));
+        topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(2));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        businessContextTexts = topLevelASBIEPPanel_Production.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(Arrays.asList(businessContexts.get(0), businessContexts.get(2)).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
     }
 
     @Test
     @DisplayName("TC_5_5_TA_38")
-    public void developer_cannot_assign_multiple_business_contexts_to_BIE_in_not_WIP_state_and_he_does_not_own_via_updating_it() {
+    public void developer_can_assign_multiple_business_contexts_to_BIE_in_not_WIP_state_and_he_does_not_own_via_updating_it() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -3255,6 +3272,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         String releaseNum = "10.8.5";
         List<BusinessContextObject> businessContexts = Arrays.asList(
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser),
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser),
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser)
         );
@@ -3275,12 +3293,28 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP_QA);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_QA = editBIEPage.getTopLevelASBIEPPanel();
-        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1)));
+        topLevelASBIEPPanel_QA.addBusinessContext(businessContexts.get(1));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        String businessContextTexts = topLevelASBIEPPanel_QA.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(businessContexts.subList(0, businessContexts.size() - 1).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
 
         editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu()
                 .openEditBIEPage(topLevelASBIEP_Production);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel_Production = editBIEPage.getTopLevelASBIEPPanel();
-        assertThrows(TimeoutException.class, () -> topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(1)));
+        topLevelASBIEPPanel_Production.addBusinessContext(businessContexts.get(2));
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+
+        businessContextTexts = topLevelASBIEPPanel_Production.getBusinessContextList().stream()
+                .map(e -> getText(e).replaceAll("cancel", "").trim())
+                .collect(Collectors.joining(","));
+        assertEquals(Arrays.asList(businessContexts.get(0), businessContexts.get(2)).stream()
+                        .map(BusinessContextObject::getName).collect(Collectors.joining(",")),
+                businessContextTexts);
     }
 
     @Test
