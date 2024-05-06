@@ -4,6 +4,7 @@
 package org.oagi.score.e2e.impl.api.jooq.entity.tables;
 
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bbiep.BbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag.BccpManifestTagPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage.BiePackagePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList.CodeListPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue.CodeListValuePath;
@@ -149,6 +151,23 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * represents.
      */
     public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The company the user represents.");
+
+    /**
+     * The column <code>oagi.app_user.email</code>. Email address.
+     */
+    public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Email address.");
+
+    /**
+     * The column <code>oagi.app_user.email_verified</code>. The fact whether
+     * the email value is verified or not.
+     */
+    public final TableField<AppUserRecord, Byte> EMAIL_VERIFIED = createField(DSL.name("email_verified"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The fact whether the email value is verified or not.");
+
+    /**
+     * The column <code>oagi.app_user.email_verified_timestamp</code>. The
+     * timestamp when the email address has verified.
+     */
+    public final TableField<AppUserRecord, LocalDateTime> EMAIL_VERIFIED_TIMESTAMP = createField(DSL.name("email_verified_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "The timestamp when the email address has verified.");
 
     /**
      * The column <code>oagi.app_user.is_developer</code>.
@@ -733,6 +752,45 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _bccOwnerUserIdFk = new BccPath(this, null, Keys.BCC_OWNER_USER_ID_FK.getInverseKey());
 
         return _bccOwnerUserIdFk;
+    }
+
+    private transient BiePackagePath _biePackageCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_created_by_fk</code> key
+     */
+    public BiePackagePath biePackageCreatedByFk() {
+        if (_biePackageCreatedByFk == null)
+            _biePackageCreatedByFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_CREATED_BY_FK.getInverseKey());
+
+        return _biePackageCreatedByFk;
+    }
+
+    private transient BiePackagePath _biePackageLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_last_updated_by_fk</code> key
+     */
+    public BiePackagePath biePackageLastUpdatedByFk() {
+        if (_biePackageLastUpdatedByFk == null)
+            _biePackageLastUpdatedByFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _biePackageLastUpdatedByFk;
+    }
+
+    private transient BiePackagePath _biePackageOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
+     * table, via the <code>bie_package_owner_user_id_fk</code> key
+     */
+    public BiePackagePath biePackageOwnerUserIdFk() {
+        if (_biePackageOwnerUserIdFk == null)
+            _biePackageOwnerUserIdFk = new BiePackagePath(this, null, Keys.BIE_PACKAGE_OWNER_USER_ID_FK.getInverseKey());
+
+        return _biePackageOwnerUserIdFk;
     }
 
     private transient BizCtxPath _bizCtxCreatedByFk;

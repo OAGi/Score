@@ -35,6 +35,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx;
@@ -108,6 +110,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TextTemplate;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
@@ -336,6 +339,16 @@ public class Tables {
      * rather than the BDT_SC_PRI_RESTRI key.
      */
     public static final BdtScPriRestri BDT_SC_PRI_RESTRI = BdtScPriRestri.BDT_SC_PRI_RESTRI;
+
+    /**
+     * The table <code>oagi.bie_package</code>.
+     */
+    public static final BiePackage BIE_PACKAGE = BiePackage.BIE_PACKAGE;
+
+    /**
+     * The table <code>oagi.bie_package_top_level_asbiep</code>.
+     */
+    public static final BiePackageTopLevelAsbiep BIE_PACKAGE_TOP_LEVEL_ASBIEP = BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP;
 
     /**
      * This is an intersection table. Per CCTS, a usage rule may be reused. This
@@ -761,6 +774,11 @@ public class Tables {
      * This table captures the tenant role and theirs business contexts.
      */
     public static final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
+
+    /**
+     * The table <code>oagi.text_template</code>.
+     */
+    public static final TextTemplate TEXT_TEMPLATE = TextTemplate.TEXT_TEMPLATE;
 
     /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and

@@ -41,6 +41,8 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BccpManifestTag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtPriRestri;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BdtScPriRestri;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackage;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.BiePackageTopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BieUserExtRevision;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx;
@@ -114,6 +116,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.SeqKey;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tag;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TenantBusinessCtx;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.TextTemplate;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
@@ -349,6 +352,16 @@ public class Oagi extends SchemaImpl {
      * rather than the BDT_SC_PRI_RESTRI key.
      */
     public final BdtScPriRestri BDT_SC_PRI_RESTRI = BdtScPriRestri.BDT_SC_PRI_RESTRI;
+
+    /**
+     * The table <code>oagi.bie_package</code>.
+     */
+    public final BiePackage BIE_PACKAGE = BiePackage.BIE_PACKAGE;
+
+    /**
+     * The table <code>oagi.bie_package_top_level_asbiep</code>.
+     */
+    public final BiePackageTopLevelAsbiep BIE_PACKAGE_TOP_LEVEL_ASBIEP = BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP;
 
     /**
      * This is an intersection table. Per CCTS, a usage rule may be reused. This
@@ -776,6 +789,11 @@ public class Oagi extends SchemaImpl {
     public final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
 
     /**
+     * The table <code>oagi.text_template</code>.
+     */
+    public final TextTemplate TEXT_TEMPLATE = TextTemplate.TEXT_TEMPLATE;
+
+    /**
      * This table indexes the ASBIEP which is a top-level ASBIEP. This table and
      * the owner_top_level_asbiep_id column in all BIE tables allow all related
      * BIEs to be retrieved all at once speeding up the profile BOD
@@ -863,6 +881,8 @@ public class Oagi extends SchemaImpl {
             BccpManifestTag.BCCP_MANIFEST_TAG,
             BdtPriRestri.BDT_PRI_RESTRI,
             BdtScPriRestri.BDT_SC_PRI_RESTRI,
+            BiePackage.BIE_PACKAGE,
+            BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP,
             BieUsageRule.BIE_USAGE_RULE,
             BieUserExtRevision.BIE_USER_EXT_REVISION,
             BizCtx.BIZ_CTX,
@@ -936,6 +956,7 @@ public class Oagi extends SchemaImpl {
             Tag.TAG,
             Tenant.TENANT,
             TenantBusinessCtx.TENANT_BUSINESS_CTX,
+            TextTemplate.TEXT_TEMPLATE,
             TopLevelAsbiep.TOP_LEVEL_ASBIEP,
             UsageRule.USAGE_RULE,
             UsageRuleExpression.USAGE_RULE_EXPRESSION,
