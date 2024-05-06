@@ -55,8 +55,8 @@ standards particularly the Core Components (CCs). Standard Development
 Organizations (SDOs) may wish to also standardize BIEs, in which case
 the developer role should be used to manage those BIEs as well. For
 detailed differences between developer and end user CCs or BIEs, it is
-important to read `Developer Vs. end user core
-components <#developer-vs-end-user-core-components>`__,
+important to read `Developer vs. End User Core
+Components <#developer-vs-end-user-core-components>`__,
 `Standard/Developer Core Component
 Management <#standard-developer-core-component-management>`__, and `End
 user core component management <#end-user-core-component-management>`__,
@@ -822,8 +822,8 @@ be reviewed or put into a release. CCs can be viewed and used by others
 even while it is still being developed. A mechanism was designed so that
 references between CCs cannot become invalid. That is deleted CCs can be
 restored by another user. More details about CC life-cycle states are
-described in the `Developer Vs. end user core
-components <#developer-vs-end-user-core-components>`__ section and
+described in the `Developer vs. End User Core
+Components <#developer-vs-end-user-core-components>`__ section and
 other specific CC management sections.
 
 Score also supports the release concept, just like the traditional way
@@ -867,7 +867,7 @@ when CCs are put into a release. Any developer can put any CC in the
 `Candidate state <#cc-states>`__ into a release and then manage their
 release states.
 
-Developer Vs. end user core components 
+Developer vs. End User Core Components
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Core components (CCs) can be created and managed by either Score
@@ -5954,8 +5954,8 @@ User Core Component.
 
 As the name implied, End User Code List and End User Core Component are
 those created and owned by the end user. There are also Developer Code
-List and Developer Core Component – see `Developer Vs. end user core
-components <#developer-vs-end-user-core-components>`__. Developer Core
+List and Developer Core Component – see `Developer vs. End User Core
+Components <#developer-vs-end-user-core-components>`__. Developer Core
 Components (that includes Developer Code Lists) have a different set of
 states than End User Core Components and End User Code List (parallel to
 the Developer Core Components (DCC), let us also include End User Code
@@ -9124,9 +9124,7 @@ To generate a desired schema file:
 4. In the BIE List, select the desired BIE node if needed.
    If you do not select any BIE from the list, it will generate schemas for all BIEs in the list.
 
-5. Choose the schema format, either *XML Schema* or *JSON Schema*.
-
-6. Click "Generate" button.
+5. Click "Generate" button.
 
 The generated file will be saved to the local drive.
 
