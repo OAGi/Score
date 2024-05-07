@@ -69,7 +69,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
         upliftBIEPage.setSourceBranch(currRelease);
-        assertThrows(TimeoutException.class, () -> upliftBIEPage.setTargetBranch(prevRelease));
+        assertThrows(WebDriverException.class, () -> upliftBIEPage.setTargetBranch(prevRelease));
     }
 
     @Test

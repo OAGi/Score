@@ -70,10 +70,12 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     public void setModuleSet(String name) {
         retry(() -> {
             click(getModuleSetSelectField());
+            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), name);
             WebElement optionField = elementToBeClickable(getDriver(),
                     By.xpath("//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]"));
             click(optionField);
             waitFor(ofMillis(500L));
+            escape(getDriver());
         });
     }
 

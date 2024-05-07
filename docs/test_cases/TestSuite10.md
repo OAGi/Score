@@ -428,7 +428,7 @@ The base ACC is owned by another developer regardless of the state
 The developer cannot refactor an BCCP to base ACC if the latter already contains this BCCP either directly on indirectly in its hierarchy. When the developer selects the base ACC, he should be able to validate the choice. This means that Score should display all ACCs with some issues, namely the ACCs that contain the refactoring BCCP already of the base ACC that contain the BCCP. If the developer  refactors the BCCP to the selected base ACC, the BCCPs that exists in the hierarchy are deleted and the new BCCP is moved to the base ACC.
 
 #### Test Assertion #10.4.23
-The developer cannot refactor an BCCP to base ACC if the BCCP already exists as a property in a group ACC which exists under the base ACC.
+The developer can refactor a BCCP to the base ACC if the BCCP already exists as a property in a group ACC, which exists under the base ACC, after receiving a warning message to proceed.
 
 #### Test Assertion #10.4.24
 The developer can cancel the revision of the Editing ACC. Doing so, Score restores the association to the refactored BCCP.

@@ -271,9 +271,9 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
         accPanel = accViewEditPage.getACCPanel(accNode);
         click(accPanel.getComponentTypeSelectField());
         waitFor(ofMillis(1000L));
-        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Base (Abstract) \"]//ancestor::mat-option")).size());
-        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Semantic Group \"]//ancestor::mat-option")).size());
-        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\" Semantics \"]//ancestor::mat-option")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\"Base (Abstract)\"]//ancestor::mat-option")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\"Semantic Group\"]//ancestor::mat-option")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//mat-option//span[.=\"Semantics\"]//ancestor::mat-option")).size());
         escape(getDriver());
     }
 
