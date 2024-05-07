@@ -43,6 +43,7 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
         changeValueColumnInConfigurationTable(); // this is a temporal execution.
         insertDefaultBrandSVG();
         addDeprecationColumnsInTopLevelAsbiep();
+        cleanOrphanSourceTopLevelAsbiep();
     }
 
     private void upsertSystemUser() {
@@ -153,6 +154,26 @@ public class FixDatabaseRecordInitializer implements InitializingBean {
         boolean hasDeprecatedRemark = hasColumnExistInTopLevelAsbiep("deprecated_remark");
         if (!hasDeprecatedRemark) {
             dslContext.execute("ALTER TABLE `top_level_asbiep` ADD COLUMN `deprecated_remark` text DEFAULT NULL COMMENT 'The remark for the deprecation of the TOP_LEVEL_ASBIEP.' AFTER `deprecated_reason`");
+        }
+    }
+
+    private void cleanOrphanSourceTopLevelAsbiep() {
+        for (Record2<ULong, ULong> record : dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                        TOP_LEVEL_ASBIEP.as("source").TOP_LEVEL_ASBIEP_ID.as("source_top_level_asbiep_id"))
+                .from(TOP_LEVEL_ASBIEP)
+                .leftJoin(TOP_LEVEL_ASBIEP.as("source"))
+                .on(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("source").TOP_LEVEL_ASBIEP_ID))
+                .where(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.isNotNull())
+                .fetch()) {
+            ULong sourceTopLevelAsbiepId = record.get(TOP_LEVEL_ASBIEP.as("source").TOP_LEVEL_ASBIEP_ID.as("source_top_level_asbiep_id"));
+            if (sourceTopLevelAsbiepId == null) {
+                dslContext.update(TOP_LEVEL_ASBIEP)
+                        .setNull(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID)
+                        .setNull(TOP_LEVEL_ASBIEP.SOURCE_ACTION)
+                        .setNull(TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP)
+                        .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)))
+                        .execute();
+            }
         }
     }
 

@@ -283,7 +283,7 @@
               <div class="bie-guid">
                 <span>{{ element.guid }}</span>
               </div>
-              <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId">
+              <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId && !!element.sourceReleaseId">
                 <span>Source:</span>
                 <a target="_blank" rel="noopener noreferrer"
                    href="/profile_bie?{{ request.toQuery({

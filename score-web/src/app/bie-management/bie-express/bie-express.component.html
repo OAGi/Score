@@ -221,15 +221,17 @@
                   </a>
                 </div>
                 <div class="bie-guid">{{ element.guid }}</div>
-                <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId">
+                <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId && !!element.sourceReleaseId">
+                  <span>Source:</span>
                   <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
                       den: element.sourceDen,
                       releaseIds: element.sourceReleaseId,
                       topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
-                    {{ element.sourceAction | pastTense }} from {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                    <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
+                      {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                    </span>
                   </a>
-                  at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
                 </div>
               </td>
             </ng-container>
