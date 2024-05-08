@@ -363,11 +363,18 @@ public class AccountListService {
         requester.setEmailAddress(request.getEmail());
         requester.setEmailVerified(false);
 
-        sendEmailValidationRequest(requester, request);
+        try {
+            sendEmailValidationRequest(requester, request);
+        } catch (IllegalStateException ignore) {
+        }
     }
 
     @Transactional
     public void sendEmailValidationRequest(ScoreUser requester, AccountUpdateRequest request) {
+        if (!configService.isFunctionsRequiringEmailTransmissionEnabled()) {
+            throw new IllegalStateException("The 'Functions requiring email transmission' feature is disabled. Please check the 'Application Settings'.");
+        }
+
         AppUserRecord appUserRecord = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.APP_USER_ID.eq(ULong.valueOf(requester.getUserId())))
                 .fetchOne();
