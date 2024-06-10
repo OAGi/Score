@@ -5,13 +5,13 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$score-web-primary: mat.define-palette(mat.$blue-grey-palette);
-$score-web-accent: mat.define-palette(mat.$amber-palette);
+$score-web-primary: mat.m2-define-palette(mat.$m2-blue-grey-palette);
+$score-web-accent: mat.m2-define-palette(mat.$m2-amber-palette);
 
 // The warn palette is optional (defaults to red).
-$score-web-warn: mat.define-palette(mat.$deep-orange-palette);
+$score-web-warn: mat.m2-define-palette(mat.$m2-deep-orange-palette);
 
-$score-default-typography-level: mat.define-typography-level(
+$score-default-typography-level: mat.m2-define-typography-level(
   $font-family: 'Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif',
   $font-weight: 400,
   $font-size: 14px,
@@ -19,7 +19,7 @@ $score-default-typography-level: mat.define-typography-level(
   $letter-spacing: normal
 );
 
-$score-typography: mat.define-typography-config(
+$score-typography: mat.m2-define-typography-config(
   $headline-1: $score-default-typography-level,
   $headline-2: $score-default-typography-level,
   $headline-3: $score-default-typography-level,
@@ -34,7 +34,7 @@ $score-typography: mat.define-typography-config(
 );
 
 // Create the theme object (a Sass map containing all of the palettes).
-$score-web-theme: mat.define-light-theme((
+$score-web-theme: mat.m2-define-light-theme((
   color: (
     primary: $score-web-primary,
     accent: $score-web-accent,
