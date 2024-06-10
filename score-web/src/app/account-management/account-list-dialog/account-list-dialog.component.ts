@@ -46,7 +46,7 @@ export class AccountListDialogComponent implements OnInit {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('name', 'asc', 0, 10));
     this.request.filters.excludeSSO = true;
-    this.request.filters.roles = ['end-user', ];
+    this.request.filters.roles = ['developer', 'end-user'];
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

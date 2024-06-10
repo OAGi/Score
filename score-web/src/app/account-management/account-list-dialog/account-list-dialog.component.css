@@ -1,3 +1,11 @@
+.mat-dialog-content {
+  max-height: max-content;
+}
+
+.mat-mdc-dialog-content {
+  max-height: none !important;
+}
+
 .header {
   border-bottom: 1px solid transparent;
   box-sizing: border-box;
