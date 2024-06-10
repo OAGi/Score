@@ -136,7 +136,10 @@ public class OasDocRepository {
 
         public SelectBieForOasDocListArguments setBusinessContext(String businessContext) {
             if (StringUtils.hasLength(businessContext)) {
-                conditions.addAll(contains(businessContext, BIZ_CTX.NAME));
+                conditions.add(or(Arrays.asList(businessContext.split(",")).stream().map(e -> e.trim())
+                        .filter(e -> StringUtils.hasLength(e))
+                        .map(e -> and(contains(e, BIZ_CTX.NAME)))
+                        .collect(Collectors.toList())));
             }
             return this;
         }

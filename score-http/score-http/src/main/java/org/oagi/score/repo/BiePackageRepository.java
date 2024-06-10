@@ -408,7 +408,10 @@ public class BiePackageRepository {
             conditions.addAll(contains(request.getDen(), ASCCP_MANIFEST.DEN));
         }
         if (StringUtils.hasLength(request.getBusinessContext())) {
-            conditions.addAll(contains(request.getBusinessContext(), BIZ_CTX.NAME));
+            conditions.add(or(Arrays.asList(request.getBusinessContext().split(",")).stream().map(e -> e.trim())
+                    .filter(e -> StringUtils.hasLength(e))
+                    .map(e -> and(contains(e, BIZ_CTX.NAME)))
+                    .collect(Collectors.toList())));
         }
         if (StringUtils.hasLength(request.getVersion())) {
             conditions.addAll(contains(request.getVersion(), TOP_LEVEL_ASBIEP.VERSION));

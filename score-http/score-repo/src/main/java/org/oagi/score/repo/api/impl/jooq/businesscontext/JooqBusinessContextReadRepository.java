@@ -17,6 +17,8 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
@@ -191,7 +193,10 @@ public class JooqBusinessContextReadRepository
             }
         }
         if (StringUtils.hasLength(request.getName())) {
-            conditions.addAll(contains(request.getName(), BIZ_CTX.NAME));
+            conditions.add(or(Arrays.asList(request.getName().split(",")).stream().map(e -> e.trim())
+                    .filter(e -> StringUtils.hasLength(e))
+                    .map(e -> and(contains(e, BIZ_CTX.NAME)))
+                    .collect(Collectors.toList())));
         }
         if (!request.getUpdaterUsernameList().isEmpty()) {
             conditions.add(APP_USER.as("updater").LOGIN_ID.in(

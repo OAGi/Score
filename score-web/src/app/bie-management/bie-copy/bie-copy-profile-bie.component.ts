@@ -118,6 +118,8 @@ export class BieCopyProfileBieComponent implements OnInit {
 
       this.bizCtxIds = resp.list.map(e => e.businessContextId);
       this.bizCtxList = resp.list;
+      // Issue #1625
+      this.request.filters.businessContext = this.bizCtxList.map(e => e.name).join(', ');
 
       this.loadBieList(true);
     }, err => {
