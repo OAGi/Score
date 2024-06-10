@@ -42,6 +42,19 @@
             </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
+                <mat-label>Role</mat-label>
+                <mat-select [(ngModel)]="request.filters.roles" multiple>
+                  <mat-option [value]="'developer'">
+                    Developer
+                  </mat-option>
+                  <mat-option [value]="'end-user'">
+                    End-User
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
                 <mat-label>Status</mat-label>
                 <mat-select [(ngModel)]="request.filters.status" multiple>
                   <mat-option [value]="'enable'">
@@ -89,7 +102,7 @@
           <ng-container matColumnDef="loginId">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Login ID</th>
             <td mat-cell *matCellDef="let element">
-              <a routerLink="{{ element.appUserId }}"> {{ element.loginId }} </a>
+              {{ element.loginId }}
             </td>
           </ng-container>
 
