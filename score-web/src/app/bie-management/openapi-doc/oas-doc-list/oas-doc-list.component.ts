@@ -58,9 +58,7 @@ export class OasDocListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const localStorageKey = 'X-Score-Table[OasDocList]';
-    const value = JSON.parse(localStorage.getItem(localStorageKey)!);
-    this.table = new TableData<OasDoc>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
+    this.table = new TableData<OasDoc>(this.displayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<OasDoc>(this.sort, false);
 
     this.request = new OasDocListRequest(this.route.snapshot.queryParamMap,

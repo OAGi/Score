@@ -19,6 +19,7 @@ import org.oagi.score.service.common.data.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -30,8 +31,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.oagi.score.repo.api.base.SortDirection.ASC;
-import static org.oagi.score.repo.api.base.SortDirection.DESC;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @RestController
@@ -417,7 +416,7 @@ public class OpenAPIDocController {
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @RequestBody BieForOasDoc selectedBieForOasDoc,
             @PathVariable("id") BigInteger oasDocId) {
-        //Retrieve all current assigned bie list for this given oasDocId
+        // Retrieve all current assigned bie list for this given oasDocId
         ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
         ReusedBIEViolationCheckResponse response = new ReusedBIEViolationCheckResponse();
         List<String> errorMessages = new ArrayList<>();
@@ -427,56 +426,28 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)) {
-                    ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
-                    Set<String> messageBodySet = new HashSet<String>();
-                    messageBodySet.add(bieForOasDoc.getMessageBody());
-                    reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
-                    reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
-                } else {
-                    ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
-                    String verb = bieForOasDoc.getVerb();
-                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)) {
-                        Set<String> messageBodySet = new HashSet<String>();
-                        messageBodySet.add(bieForOasDoc.getMessageBody());
-                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())) {
-                        Set<String> messageBodySet = reusedBIERecord.getReusedOperations().get(verb);
-                        messageBodySet.add(bieForOasDoc.getMessageBody());
-                    }
 
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)) {
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())) {
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    }
-                }
+                reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
+                        .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));
+                reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
+                        .putResourcePath(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
             }
         }
 
         // Check reusedBIE across multiple operations
         // use the table in issue #1519 for violation check
-        ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedBieForOasDoc.getTopLevelAsbiepId());
-        if (reusedBIERecord != null) {
-            String selectedVerb = selectedBieForOasDoc.getVerb();
-            if (selectedVerb.equals("GET")) {
-                if (selectedBieForOasDoc.getMessageBody().equals("Request")) {
-                    errorMessages.add("requestBody rarely used for GET operation.");
-                }
-            } else {
-                Set<String> existingMessageBodySet = reusedBIERecord.getReusedOperations().get(selectedVerb);
-                if (existingMessageBodySet != null && existingMessageBodySet.size() > 0) {
-                    if (selectedBieForOasDoc.getMessageBody().equals("Response")) {
-                        if (existingMessageBodySet.contains("Response")) {
-                            errorMessages.add("There is an existing responseBody for the operation " + selectedVerb
-                                    + " for the same BIE.");
-                        }
-                    }
-
-                }
+        ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIE(selectedBieForOasDoc.getTopLevelAsbiepId());
+        String selectedVerb = selectedBieForOasDoc.getVerb();
+        if (selectedVerb.equals("GET") && "Request".equals(selectedBieForOasDoc.getMessageBody())) {
+            errorMessages.add("A request body rarely used for GET operation.");
+        } else {
+            if (reusedBIERecord.hasReusedOperations(selectedVerb,
+                    Pair.of(selectedBieForOasDoc.getMessageBody(), selectedBieForOasDoc.getOperationId()))) {
+                errorMessages.add("There is an existing " + selectedBieForOasDoc.getMessageBody().toLowerCase() +
+                        " message body for the operation " + selectedVerb + " '" + selectedBieForOasDoc.getOperationId() + "' for the same BIE.");
             }
         }
+
         response.setErrorMessages(errorMessages);
         return response;
     }
@@ -486,7 +457,7 @@ public class OpenAPIDocController {
     public ReusedBIEViolationCheckResponse checkBIEReusedAcrossOperationsAfterUpdate(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
             @PathVariable("id") BigInteger oasDocId) {
-        //Retrieve all current assigned bie list for this given oasDocId
+        // Retrieve all current assigned bie list for this given oasDocId
         ReusedBIEViolationCheck reusedBIEViolationCheck = new ReusedBIEViolationCheck(oasDocId);
         ReusedBIEViolationCheckResponse response = new ReusedBIEViolationCheckResponse();
         List<String> errorMessages = new ArrayList<>();
@@ -496,33 +467,14 @@ public class OpenAPIDocController {
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
                 BigInteger selectedTopLevelAsbiepId = bieForOasDoc.getTopLevelAsbiepId();
-                if (!reusedBIEViolationCheck.getReusedBIEMap().containsKey(selectedTopLevelAsbiepId)) {
-                    ReusedBIERecord reusedBIERecord = new ReusedBIERecord(selectedTopLevelAsbiepId);
-                    Set<String> messageBodySet = new HashSet<String>();
-                    messageBodySet.add(bieForOasDoc.getMessageBody());
-                    reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    reusedBIERecord.getReusedResourcePath().put(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
-                    reusedBIEViolationCheck.getReusedBIEMap().put(selectedTopLevelAsbiepId, reusedBIERecord);
-                } else {
-                    ReusedBIERecord reusedBIERecord = reusedBIEViolationCheck.getReusedBIEMap().get(selectedTopLevelAsbiepId);
-                    String verb = bieForOasDoc.getVerb();
-                    if (!reusedBIERecord.getReusedOperations().containsKey(verb)) {
-                        Set<String> messageBodySet = new HashSet<String>();
-                        messageBodySet.add(bieForOasDoc.getMessageBody());
-                        reusedBIERecord.getReusedOperations().put(bieForOasDoc.getVerb(), messageBodySet);
-                    } else if (!reusedBIERecord.getReusedOperations().get(verb).contains(bieForOasDoc.getMessageBody())) {
-                        Set<String> messageBodySet = reusedBIERecord.getReusedOperations().get(verb);
-                        messageBodySet.add(bieForOasDoc.getMessageBody());
-                    }
 
-                    if (!reusedBIERecord.getReusedResourcePath().containsKey(verb)) {
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    } else if (!reusedBIERecord.getReusedResourcePath().get(verb).contains(bieForOasDoc.getResourceName())) {
-                        reusedBIERecord.getReusedResourcePath().put(verb, bieForOasDoc.getResourceName());
-                    }
-                }
+                reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
+                        .putOperation(bieForOasDoc.getVerb(), Pair.of(bieForOasDoc.getMessageBody(), bieForOasDoc.getOperationId()));
+                reusedBIEViolationCheck.getReusedBIE(selectedTopLevelAsbiepId)
+                        .putResourcePath(bieForOasDoc.getVerb(), bieForOasDoc.getResourceName());
             }
         }
+
         response.setErrorMessages(errorMessages);
         return response;
     }
@@ -530,18 +482,26 @@ public class OpenAPIDocController {
     private class ReusedBIEViolationCheck {
 
         private BigInteger oasDocId;
-        private HashMap<BigInteger, ReusedBIERecord> reusedBIEMap = new HashMap<>();
+        private Map<BigInteger, ReusedBIERecord> reusedBIEMap = new HashMap<>();
 
         public ReusedBIEViolationCheck(BigInteger oasDocId) {
             this.oasDocId = oasDocId;
         }
 
-        public HashMap<BigInteger, ReusedBIERecord> getReusedBIEMap() {
+        public Map<BigInteger, ReusedBIERecord> getReusedBIEMap() {
             return reusedBIEMap;
         }
 
-        public void setReusedBIEMap(HashMap<BigInteger, ReusedBIERecord> reusedBIEMap) {
+        public void setReusedBIEMap(Map<BigInteger, ReusedBIERecord> reusedBIEMap) {
             this.reusedBIEMap = reusedBIEMap;
+        }
+
+        public ReusedBIERecord getReusedBIE(BigInteger topLevelAsbiepId) {
+            if (!reusedBIEMap.containsKey(topLevelAsbiepId)) {
+                ReusedBIERecord reusedBIERecord = new ReusedBIERecord(topLevelAsbiepId);
+                reusedBIEMap.put(topLevelAsbiepId, reusedBIERecord);
+            }
+            return reusedBIEMap.get(topLevelAsbiepId);
         }
 
         public BigInteger getOasDocId() {
@@ -555,8 +515,8 @@ public class OpenAPIDocController {
 
     private class ReusedBIERecord {
         private BigInteger topLevelAsbiepId;
-        private HashMap<String, Set<String>> reusedOperations = new HashMap<>();
-        private HashMap<String, String> reusedResourcePath = new HashMap<>();
+        private Map<String, Set<Pair<String, String>>> reusedOperations = new HashMap<>();
+        private Map<String, Set<String>> reusedResourcePath = new HashMap<>();
 
         public ReusedBIERecord(BigInteger topLevelAsbiepId) {
             this.topLevelAsbiepId = topLevelAsbiepId;
@@ -570,20 +530,59 @@ public class OpenAPIDocController {
             this.topLevelAsbiepId = topLevelAsbiepId;
         }
 
-        public HashMap<String, Set<String>> getReusedOperations() {
+        public Map<String, Set<Pair<String, String>>> getReusedOperations() {
             return reusedOperations;
         }
 
-        public void setReusedOperations(HashMap<String, Set<String>> reusedOperations) {
+        public void setReusedOperations(Map<String, Set<Pair<String, String>>> reusedOperations) {
             this.reusedOperations = reusedOperations;
         }
 
-        public HashMap<String, String> getReusedResourcePath() {
+        /**
+         * Adds the specified operation to this set.
+         * More formally, adds the specified verb {@code verb} to this set
+         * if the set contains no element {@code operation}.
+         *
+         * @param verb verb to be added to this set
+         * @param operation resource path
+         * @return {@code true} if this set did not already contain the specified operation
+         */
+        public boolean putOperation(String verb, Pair<String, String> operation) {
+            if (!this.reusedOperations.containsKey(verb)) {
+                this.reusedOperations.put(verb, new HashSet<>());
+            }
+            return this.reusedOperations.get(verb).add(operation);
+        }
+
+        public boolean hasReusedOperations(String verb, Pair<String, String> operation) {
+            if (!this.reusedOperations.containsKey(verb)) {
+                return false;
+            }
+            return this.reusedOperations.get(verb).contains(operation);
+        }
+
+        public Map<String, Set<String>> getReusedResourcePath() {
             return reusedResourcePath;
         }
 
-        public void setReusedResourcePath(HashMap<String, String> reusedResourcePath) {
+        public void setReusedResourcePath(Map<String, Set<String>> reusedResourcePath) {
             this.reusedResourcePath = reusedResourcePath;
+        }
+
+        /**
+         * Adds the specified resource path to this set.
+         * More formally, adds the specified verb {@code verb} to this set
+         * if the set contains no element {@code resourcePath}.
+         *
+         * @param verb verb to be added to this set
+         * @param resourcePath resource path
+         * @return {@code true} if this set did not already contain the specified resource path
+         */
+        public boolean putResourcePath(String verb, String resourcePath) {
+            if (!this.reusedResourcePath.containsKey(verb)) {
+                this.reusedResourcePath.put(verb, new HashSet<>());
+            }
+            return this.reusedResourcePath.get(verb).add(resourcePath);
         }
     }
 

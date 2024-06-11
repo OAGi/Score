@@ -66,9 +66,7 @@ export class BiePackageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const localStorageKey = 'X-Score-Table[BiePackageDetail]';
-    const value = JSON.parse(localStorage.getItem(localStorageKey)!);
-    this.table = new TableData<BieList>((value) ? value._columns : this.displayedColumns, {localStorageKey: localStorageKey});
+    this.table = new TableData<BieList>(this.displayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BieList>(this.sort, false);
 
     // Init BIE list table for BIE package
