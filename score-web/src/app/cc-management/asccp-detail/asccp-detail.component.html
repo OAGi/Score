@@ -369,22 +369,22 @@
                             <input matInput [(ngModel)]="asAccDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asAccDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asAccDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().sinceManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <a [routerLink]="['/core_component/acc/' + asAccDetail().sinceManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asAccDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asAccDetail().sinceReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asAccDetail().lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asAccDetail().lastChangedManifestId > 0"
+                             (click)="openInNewTab('/core_component/acc/' + asAccDetail().lastChangedManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <a [routerLink]="['/core_component/acc/' + asAccDetail().lastChangedManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asAccDetail().lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asAccDetail().lastChangedReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -506,10 +506,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asAccDetail().definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asAccDetail().definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asAccDetail().definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -630,10 +637,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asAsccpDetail().ascc.definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asAsccpDetail().ascc.definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asAsccpDetail().ascc.definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -658,22 +672,22 @@
                             <input matInput [(ngModel)]="asAsccpDetail().asccp.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asAsccpDetail().asccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asAsccpDetail().asccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.sinceManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <a [routerLink]="['/core_component/asccp/' + asAsccpDetail().asccp.sinceManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asAsccpDetail().asccp.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.sinceReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asAsccpDetail().asccp.lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asAsccpDetail().asccp.lastChangedManifestId > 0"
+                             (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.lastChangedManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <a [routerLink]="['/core_component/asccp/' + asAsccpDetail().asccp.lastChangedManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChangedReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -807,10 +821,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asAsccpDetail().asccp.definition"
-                                      [disabled]="!isEditable()"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asAsccpDetail().asccp.definition"
+                                        [readonly]="!isEditable()"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asAsccpDetail().asccp.definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -981,10 +1002,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBccpDetail().bcc.definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBccpDetail().bcc.definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBccpDetail().bcc.definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -1009,22 +1037,22 @@
                             <input matInput [(ngModel)]="asBccpDetail().bccp.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBccpDetail().bccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asBccpDetail().bccp.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.sinceManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <a [routerLink]="['/core_component/bccp/' + asBccpDetail().bccp.sinceManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBccpDetail().bccp.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.sinceReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBccpDetail().bccp.lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asBccpDetail().bccp.lastChangedManifestId > 0"
+                             (click)="openInNewTab('/core_component/bccp/' + asBccpDetail().bccp.lastChangedManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <a [routerLink]="['/core_component/bccp/' + asBccpDetail().bccp.lastChangedManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBccpDetail().bccp.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.lastChangedReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1166,10 +1194,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBccpDetail().bccp.definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBccpDetail().bccp.definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBccpDetail().bccp.definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -1194,22 +1229,22 @@
                             <input matInput [(ngModel)]="asBccpDetail().bdt.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBccpDetail().bdt.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asBccpDetail().bdt.lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/dt/' + asBccpDetail().bdt.sinceManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <a [routerLink]="['/core_component/dt/' + asBccpDetail().bdt.sinceManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBccpDetail().bdt.sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.sinceReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBccpDetail().bdt.lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asBccpDetail().bdt.lastChangedManifestId > 0"
+                             (click)="openInNewTab('/core_component/dt/' + asBccpDetail().bdt.lastChangedManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <a [routerLink]="['/core_component/dt/' + asBccpDetail().bdt.lastChangedManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBccpDetail().bdt.lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.lastChangedReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1302,10 +1337,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBccpDetail().bdt.definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBccpDetail().bdt.definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBccpDetail().bdt.definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -1449,10 +1491,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBdtScDetail().definition"
-                                      [disabled]="true"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBdtScDetail().definition"
+                                        [readonly]="true"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBdtScDetail().definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>

@@ -297,7 +297,7 @@ export class AccDetailComponent implements OnInit {
     const queryPath = url.substring(0, idIdx + manifestId.length) + '/' + node.queryPath;
 
     this.clipboard.copy(queryPath);
-    this.snackBar.open('Link copied', '', {
+    this.snackBar.open('Copied to clipboard', '', {
       duration: 3000
     });
   }
@@ -539,6 +539,17 @@ export class AccDetailComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  openInNewTab(url: string) {
+    window.open(url, '_blank');
+  }
+
+  copyToClipboard(text: string) {
+    this.clipboard.copy((!!text) ? text : ' ');
+    this.snackBar.open('Copied to clipboard', '', {
+      duration: 3000
+    });
   }
 
   _updateDetails(details: CcFlatNode[]) {

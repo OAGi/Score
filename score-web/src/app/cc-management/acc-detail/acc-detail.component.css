@@ -240,3 +240,19 @@ button:focus, button:active:focus, button.active:focus {
 .mat-tree-node span.tag {
   height: 20px;
 }
+
+.textarea-container {
+  position: relative;
+}
+
+.textarea-container textarea {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.textarea-container button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

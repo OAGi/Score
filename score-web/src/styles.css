@@ -1199,3 +1199,23 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
 .notiTooltip .mdc-tooltip__surface {
   max-width: unset !important;
 }
+
+.mdc-text-field--filled.mdc-text-field--disabled .mdc-floating-label, .mdc-text-field--filled.mdc-text-field--disabled .mdc-floating-label--float-above {
+  color: inherit !important;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label, .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label--float-above {
+  color: inherit !important;
+}
+
+.mdc-text-field--filled.mdc-text-field--disabled .mdc-text-field__input {
+  color: inherit !important;
+}
+
+.mat-mdc-checkbox.mat-mdc-checkbox-disabled label {
+  color: inherit !important;
+}
+
+.mat-mdc-select-disabled {
+  color: inherit !important;
+}

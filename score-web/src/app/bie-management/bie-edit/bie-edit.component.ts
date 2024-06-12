@@ -421,6 +421,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     window.open('/profile_bie/' + node.topLevelAsbiepId, '_blank');
   }
 
+  copyToClipboard(text: string) {
+    this.clipboard.copy((!!text) ? text : ' ');
+    this.snackBar.open('Copied to clipboard', '', {
+      duration: 3000
+    });
+  }
+
   get state(): string {
     return this.rootNode && this.rootNode.topLevelAsbiepState || '';
   }
@@ -620,7 +627,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const queryPath = url.substring(0, idIdx + topLevelAsbiepId.length) + '/' + node.queryPath;
 
     this.clipboard.copy(queryPath);
-    this.snackBar.open('Link copied', '', {
+    this.snackBar.open('Copied to clipboard', '', {
       duration: 3000
     });
   }

@@ -385,22 +385,22 @@
                             <input matInput [(ngModel)]="asBdtDetail().releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="{{ asBdtDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}">
+                        <div class="{{ asBdtDetail().lastChangedManifestId > 0 ? 'col-1' : 'col-2' }}"
+                             (click)="openInNewTab('/core_component/dt/' + asBdtDetail().sinceManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Since</mat-label>
-                            <a [routerLink]="['/core_component/dt/' + asBdtDetail().sinceManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBdtDetail().sinceReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBdtDetail().sinceReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
-                        <div class="col-1" *ngIf="asBdtDetail().lastChangedManifestId > 0">
+                        <div class="col-1" *ngIf="asBdtDetail().lastChangedManifestId > 0"
+                             (click)="openInNewTab('/core_component/dt/' + asBdtDetail().lastChangedManifestId)"
+                             style="cursor: pointer;">
                           <mat-form-field>
                             <mat-label>Last Changed</mat-label>
-                            <a [routerLink]="['/core_component/dt/' + asBdtDetail().lastChangedManifestId]"
-                               target="_blank" rel="noopener noreferrer">
-                              <input matInput [(ngModel)]="asBdtDetail().lastChangedReleaseNum" [disabled]="true" style="cursor: pointer;">
-                            </a>
+                            <input matInput [(ngModel)]="asBdtDetail().lastChangedReleaseNum" [disabled]="true"
+                                   style="pointer-events: none;">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -656,10 +656,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBdtDetail().definition"
-                                      [disabled]="!isEditable()"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBdtDetail().definition"
+                                        [readonly]="!isEditable()"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBdtDetail().definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -668,10 +675,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Content Component Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Content Component Definition"
-                                      [(ngModel)]="asBdtDetail().contentComponentDefinition"
-                                      [disabled]="!isEditable()"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Content Component Definition"
+                                        [(ngModel)]="asBdtDetail().contentComponentDefinition"
+                                        [readonly]="!isEditable()"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBdtDetail().contentComponentDefinition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
@@ -1002,10 +1016,17 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>Definition</mat-label>
-                            <textarea matInput rows="6" cols="30"
-                                      placeholder="Definition"
-                                      [(ngModel)]="asBdtScDetail().definition"
-                                      [disabled]="!isEditable()"></textarea>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6" cols="30"
+                                        placeholder="Definition"
+                                        [(ngModel)]="asBdtScDetail().definition"
+                                        [readonly]="!isEditable()"></textarea>
+                              <button mat-icon-button mat-small-icon-button
+                                      (click)="copyToClipboard(asBdtScDetail().definition)"
+                                      matTooltip="Copy to Clipboard">
+                                <mat-icon>content_copy</mat-icon>
+                              </button>
+                            </div>
                           </mat-form-field>
                         </div>
                       </div>
