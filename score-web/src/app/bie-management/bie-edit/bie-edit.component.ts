@@ -421,9 +421,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     window.open('/profile_bie/' + node.topLevelAsbiepId, '_blank');
   }
 
-  copyToClipboard(text: string) {
-    this.clipboard.copy((!!text) ? text : ' ');
-    this.snackBar.open('Copied to clipboard', '', {
+  copyToDefinition(sourceStr: string, targetObj: object) {
+    targetObj['definition'] = sourceStr;
+    this.snackBar.open('Copied to definition', '', {
       duration: 3000
     });
   }

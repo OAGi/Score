@@ -512,9 +512,10 @@
                                         [(ngModel)]="asAccDetail().definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAccDetail().definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asAccDetail().definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -643,9 +644,10 @@
                                         [(ngModel)]="asAsccpDetail().ascc.definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsccpDetail().ascc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asAsccpDetail().ascc.definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -827,9 +829,10 @@
                                         [(ngModel)]="asAsccpDetail().asccp.definition"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsccpDetail().asccp.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
+                                      (click)="copyToDefinition(asAsccpDetail().asccp.definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1008,9 +1011,10 @@
                                         [(ngModel)]="asBccpDetail().bcc.definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBccpDetail().bcc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBccpDetail().bcc.definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1200,9 +1204,10 @@
                                         [(ngModel)]="asBccpDetail().bccp.definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBccpDetail().bccp.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBccpDetail().bccp.definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1343,9 +1348,10 @@
                                         [(ngModel)]="asBccpDetail().bdt.definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBccpDetail().bdt.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBccpDetail().bdt.definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1497,9 +1503,10 @@
                                         [(ngModel)]="asBdtScDetail().definition"
                                         [readonly]="true"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBdtScDetail().definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBdtScDetail().definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>

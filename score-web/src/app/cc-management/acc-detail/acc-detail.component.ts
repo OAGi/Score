@@ -545,9 +545,9 @@ export class AccDetailComponent implements OnInit {
     window.open(url, '_blank');
   }
 
-  copyToClipboard(text: string) {
-    this.clipboard.copy((!!text) ? text : ' ');
-    this.snackBar.open('Copied to clipboard', '', {
+  copyToDefinition(text: string) {
+    this.asAccDetail(this.rootNode).definition = text;
+    this.snackBar.open('Copied to definition', '', {
       duration: 3000
     });
   }

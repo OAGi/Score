@@ -559,9 +559,9 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     window.open(url, '_blank');
   }
 
-  copyToClipboard(text: string) {
-    this.clipboard.copy((!!text) ? text : ' ');
-    this.snackBar.open('Copied to clipboard', '', {
+  copyToDefinition(text: string) {
+    this.asBdtDetail(this.rootNode).definition = text;
+    this.snackBar.open('Copied to definition', '', {
       duration: 3000
     });
   }

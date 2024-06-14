@@ -406,11 +406,6 @@
                                         [(ngModel)]="asAbieDetail().asbiep.definition"
                                         [readonly]="!isEditable(selectedNode)">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAbieDetail().asbiep.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
-                              </button>
                             </div>
                           </mat-form-field>
                         </div>
@@ -424,10 +419,10 @@
                                         placeholder="Component Definition" [readonly]="true"
                                         value="{{ asAbieDetail().asccp.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAbieDetail().asccp.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asAbieDetail().asccp.definition, asAbieDetail().asbiep)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -442,10 +437,10 @@
                                         placeholder="Type Definition" [readonly]="true"
                                         value="{{ asAbieDetail().acc.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAbieDetail().acc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asAbieDetail().acc.definition, asAbieDetail().asbiep)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -597,11 +592,6 @@
                                         [(ngModel)]="asAsbiepDetail().asbie.definition"
                                         [readonly]="!isEditable(selectedNode)">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsbiepDetail().asbie.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
-                              </button>
                             </div>
                           </mat-form-field>
                         </div>
@@ -709,10 +699,10 @@
                                       placeholder="Context Definition"
                                       [value]="reusedNodeDetail.asbiep.definition"
                                       [readonly]="true"></textarea>
-                            <button mat-icon-button mat-small-icon-button
-                                    (click)="copyToClipboard(reusedNodeDetail.asbiep.definition)"
-                                    matTooltip="Copy to Clipboard">
-                              <mat-icon>content_copy</mat-icon>
+                            <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                    (click)="copyToDefinition(reusedNodeDetail.asbiep.definition, asAsbiepDetail().asbie)"
+                                    matTooltip="Copy to Context Definition">
+                              <mat-icon>content_paste</mat-icon>
                             </button>
                           </div>
                         </mat-form-field>
@@ -727,10 +717,10 @@
                                         placeholder="Association Definition" [readonly]="true"
                                         value="{{ asAsbiepDetail().ascc.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsbiepDetail().ascc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asAsbiepDetail().ascc.definition, asAsbiepDetail().asbie)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -746,10 +736,10 @@
                                         placeholder="Component Definition" [readonly]="true"
                                         value="{{ asAsbiepDetail().asccp.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsbiepDetail().asccp.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asAsbiepDetail().asccp.definition, asAsbiepDetail().asbie)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -765,10 +755,10 @@
                                         placeholder="Type Definition" [readonly]="true"
                                         value="{{ asAsbiepDetail().acc.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asAsbiepDetail().acc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asAsbiepDetail().acc.definition, asAsbiepDetail().asbie)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1133,11 +1123,6 @@
                                         [(ngModel)]="asBbiepDetail().bbie.definition"
                                         [readonly]="!isEditable(selectedNode)">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBbiepDetail().bbie.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
-                              </button>
                             </div>
                           </mat-form-field>
                         </div>
@@ -1152,10 +1137,10 @@
                                         placeholder="Association Definition" [readonly]="true"
                                         value="{{ asBbiepDetail().bcc.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBbiepDetail().bcc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asBbiepDetail().bcc.definition, asBbiepDetail().bbie)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1171,10 +1156,10 @@
                                         placeholder="Component Definition" [readonly]="true"
                                         value="{{ asBbiepDetail().bccp.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBbiepDetail().bccp.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asBbiepDetail().bccp.definition, asBbiepDetail().bbie)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1521,11 +1506,6 @@
                                         [(ngModel)]="asBbieScDetail().bbieSc.definition"
                                         [readonly]="!isEditable(selectedNode)">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBbieScDetail().bbieSc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
-                              </button>
                             </div>
                           </mat-form-field>
                         </div>
@@ -1540,10 +1520,10 @@
                                         placeholder="Component Definition" [readonly]="true"
                                         value="{{ asBbieScDetail().bdtSc.definition || ' ' }}">
                               </textarea>
-                              <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBbieScDetail().bdtSc.definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                              <button mat-icon-button mat-small-icon-button *ngIf="used(selectedNode)"
+                                      (click)="copyToDefinition(asBbieScDetail().bdtSc.definition, asBbieScDetail().bbieSc)"
+                                      matTooltip="Copy to Context Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>

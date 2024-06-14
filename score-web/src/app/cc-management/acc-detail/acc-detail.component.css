@@ -249,6 +249,7 @@ button:focus, button:active:focus, button.active:focus {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  padding-right: 26px;
 }
 
 .textarea-container button {

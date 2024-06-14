@@ -439,9 +439,9 @@ export class BccpDetailComponent implements OnInit {
     window.open(url, '_blank');
   }
 
-  copyToClipboard(text: string) {
-    this.clipboard.copy((!!text) ? text : ' ');
-    this.snackBar.open('Copied to clipboard', '', {
+  copyToDefinition(text: string) {
+    this.asBccpDetail(this.rootNode).bccp.definition = text;
+    this.snackBar.open('Copied to definition', '', {
       duration: 3000
     });
   }

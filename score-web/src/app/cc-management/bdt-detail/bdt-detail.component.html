@@ -662,9 +662,10 @@
                                         [(ngModel)]="asBdtDetail().definition"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBdtDetail().definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
+                                      (click)="copyToDefinition(asBdtDetail().definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -681,9 +682,10 @@
                                         [(ngModel)]="asBdtDetail().contentComponentDefinition"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBdtDetail().contentComponentDefinition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBdtDetail().contentComponentDefinition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
@@ -1022,9 +1024,10 @@
                                         [(ngModel)]="asBdtScDetail().definition"
                                         [readonly]="!isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
-                                      (click)="copyToClipboard(asBdtScDetail().definition)"
-                                      matTooltip="Copy to Clipboard">
-                                <mat-icon>content_copy</mat-icon>
+                                      *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
+                                      (click)="copyToDefinition(asBdtScDetail().definition)"
+                                      matTooltip="Copy to Definition">
+                                <mat-icon>content_paste</mat-icon>
                               </button>
                             </div>
                           </mat-form-field>
