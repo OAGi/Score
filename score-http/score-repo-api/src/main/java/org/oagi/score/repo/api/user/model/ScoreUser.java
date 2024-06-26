@@ -144,16 +144,11 @@ public final class ScoreUser implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ScoreUser scoreUser = (ScoreUser) o;
-        return emailVerified == scoreUser.emailVerified &&
-                Objects.equals(userId, scoreUser.userId) &&
-                Objects.equals(username, scoreUser.username) &&
-                Objects.equals(emailAddress, scoreUser.emailAddress) &&
-                Objects.equals(roles, scoreUser.roles);
+        return Objects.equals(userId, scoreUser.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, username, emailAddress, emailVerified, roles);
+        return Objects.hashCode(userId);
     }
-
 }
