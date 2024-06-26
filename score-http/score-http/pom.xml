@@ -38,6 +38,7 @@
         <commons-io.version>2.16.1</commons-io.version>
         <commons-lang.version>3.14.0</commons-lang.version>
         <commons-text.version>1.12.0</commons-text.version>
+        <commons-compress.version>1.26.2</commons-compress.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.2.5</poi.version>
         <snakeyaml.version>2.2</snakeyaml.version>
@@ -210,10 +211,29 @@
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
         </dependency>
+        <!--
+        The 'poi-ooxml:5.2.5' module has a dependency on the 'commons-compress:1.25.0' module,
+        which has been reported to have the following vulnerabilities: CVE-2024-26308, CVE-2024-25710.
+        -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--
+        The 'commons-compress:1.26.2' dependency will be discarded
+        after the 'poi-ooxml:5.2.5' module updates to fix reported vulnerabilities.
+        -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
         </dependency>
 
         <dependency>
