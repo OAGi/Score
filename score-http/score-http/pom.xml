@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -26,21 +26,20 @@
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.8</aspectj.version>
         <lettuce.version>6.3.2.RELEASE</lettuce.version>
-        <redisson.version>3.31.0</redisson.version>
-        <netty.version>4.1.110.Final</netty.version>
-        <lombok.version>1.18.32</lombok.version>
+        <redisson.version>3.32.0</redisson.version>
+        <netty.version>4.1.111.Final</netty.version>
+        <lombok.version>1.18.34</lombok.version>
         <mariadb-client.version>3.4.0</mariadb-client.version>
         <log4j.version>2.23.1</log4j.version>
-        <jOOQ.version>3.19.9</jOOQ.version>
+        <jOOQ.version>3.19.10</jOOQ.version>
         <guava.version>33.2.1-jre</guava.version>
         <gson.version>2.11.0</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
         <commons-io.version>2.16.1</commons-io.version>
         <commons-lang.version>3.14.0</commons-lang.version>
         <commons-text.version>1.12.0</commons-text.version>
-        <commons-compress.version>1.26.2</commons-compress.version>
         <fastods.version>0.8.1</fastods.version>
-        <poi.version>5.2.5</poi.version>
+        <poi.version>5.3.0</poi.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <saxon.version>10.6</saxon.version>
     </properties>
@@ -211,29 +210,10 @@
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
         </dependency>
-        <!--
-        The 'poi-ooxml:5.2.5' module has a dependency on the 'commons-compress:1.25.0' module,
-        which has been reported to have the following vulnerabilities: CVE-2024-26308, CVE-2024-25710.
-        -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!--
-        The 'commons-compress:1.26.2' dependency will be discarded
-        after the 'poi-ooxml:5.2.5' module updates to fix reported vulnerabilities.
-        -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>${commons-compress.version}</version>
         </dependency>
 
         <dependency>

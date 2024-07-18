@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,7 +22,7 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <mariadb-client.version>3.4.0</mariadb-client.version>
-        <jOOQ.version>3.19.9</jOOQ.version>
+        <jOOQ.version>3.19.10</jOOQ.version>
         <gson.version>2.11.0</gson.version>
         <snakeyaml.version>2.2</snakeyaml.version>
 
