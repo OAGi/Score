@@ -223,6 +223,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         if (!appinfoList.isEmpty()) {
+            Element prevAnnotation = node.getChild("annotation", XSD_NAMESPACE);
+            if (prevAnnotation != null) {
+                prevAnnotation.detach();
+            }
+
             Element annotation = newElement("annotation");
             node.addContent(0, annotation);
 
@@ -236,6 +241,13 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
             for (Element appinfo : appinfoList) {
                 annotation.addContent(appinfo);
+            }
+
+            if (prevAnnotation != null) {
+                for (Element child : prevAnnotation.getChildren()) {
+                    child.detach();
+                    annotation.addContent(child);
+                }
             }
         }
     }
