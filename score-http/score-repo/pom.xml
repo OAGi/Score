@@ -17,7 +17,7 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <lombok.version>1.18.34</lombok.version>
-        <mariadb-client.version>3.4.0</mariadb-client.version>
+        <mariadb-client.version>3.4.1</mariadb-client.version>
         <jOOQ.version>3.19.10</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
