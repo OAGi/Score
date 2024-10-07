@@ -11,6 +11,8 @@ import {SettingsApplicationSettingsComponent} from './settings-application-setti
 import {SettingsApplicationSettingsService} from './settings-application-settings/domain/settings-application-settings.service';
 import {MarkdownModule} from 'ngx-markdown';
 import {EmailValidationComponent} from './email-validation/email-validation.component';
+import {SettingsPreferencesComponent} from './settings-preferences/settings-preferences.component';
+import {SettingsPreferencesService} from './settings-preferences/domain/settings-preferences.service';
 
 const routes: Routes = [
   {
@@ -22,6 +24,11 @@ const routes: Routes = [
     path: 'settings/email_validation',
     component: EmailValidationComponent,
     canActivate: [CanActivateUser],
+  },
+  {
+    path: 'settings/preferences',
+    component: SettingsPreferencesComponent,
+    canActivate: [CanActivateUser]
   },
   {
     path: 'settings/application_settings',
@@ -42,11 +49,13 @@ const routes: Routes = [
   declarations: [
     SettingsMenuComponent,
     SettingsAccountComponent,
+    SettingsPreferencesComponent,
     SettingsApplicationSettingsComponent,
     EmailValidationComponent
   ],
   providers: [
     SettingsAccountService,
+    SettingsPreferencesService,
     SettingsApplicationSettingsService
   ]
 })

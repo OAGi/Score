@@ -191,9 +191,8 @@
                                     (click)="copyLink(node, $event)">
                             link
                           </mat-icon>
-                          <mat-icon [style.visibility]="dataSource.isExpandable(node) ? '' : 'hidden'"
-                                    class="context-menu-icon"
-                                    [matMenuTriggerFor]="contextMenu"
+                          <mat-icon class="context-menu-icon"
+                                    [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
                                     [matMenuTriggerData]="{'menuId': 'contextMenu'}"
                                     (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
                           </mat-icon>
@@ -203,7 +202,17 @@
                   </cdk-virtual-scroll-viewport>
 
                   <!-- Context Menu Area -->
+                  <mat-menu class="context-menu" #contextMenuForLeaf="matMenu">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                  </mat-menu>
+
                   <mat-menu class="context-menu" #contextMenu="matMenu">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                    <mat-divider></mat-divider>
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
                       <span class="context-menu-item">Expand 2</span>
                     </button>

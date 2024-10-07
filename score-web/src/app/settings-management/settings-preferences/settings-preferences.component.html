@@ -1,0 +1,46 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="settings-layout">
+    <score-settings-menu active="Preferences"></score-settings-menu>
+    <div class="layout-main">
+      <div class="context-section">
+        <mat-card class="p-0">
+          <mat-toolbar class="bg-white">
+            <span class="title">{{ title }}</span>
+            <span class="flex-11-auto"></span>
+          </mat-toolbar>
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              <div>
+                <div class="subhead">
+                  <h4 class="subhead-heading">Tree Features</h4>
+                </div>
+                <div class="webpage-setting">
+                  <div class="row">
+                    <div class="col-3">
+                      <div class="subsubhead">
+                        <h5 class="subsubhead-heading">Path Delimiter</h5>
+                      </div>
+                      <input class="width-max"
+                             [(ngModel)]="preferencesInfo.treeFeaturesInfo.delimiter" />
+                    </div>
+                  </div>
+                  <div class="actions pt-4">
+                    <div>
+                      <button mat-raised-button color="primary" (click)="updatePreferences()">
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

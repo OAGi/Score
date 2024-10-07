@@ -2,12 +2,21 @@
   <div class="pr-md-3 pr-0">
     <mat-list>
       <h5 class="ml-2 mb-2">General</h5>
-      <a class="vertical-allign" mat-list-item class="nav-item {{ active === 'Password' ? 'active' : '' }}"
+      <a class="vertical-align" mat-list-item class="nav-item {{ active === 'Password' ? 'active' : '' }}"
         routerLink="/settings/account">
         <div class="d-flex">
           <mat-icon mat-list-icon class="mat-icon">lock</mat-icon>
-          <div mat-line class="mat-line">
-            <span style="padding-left: 10px;">Account</span>
+          <div mat-line class="mat-line" style="padding-left: 10px;">
+            <span>Account</span>
+          </div>
+        </div>
+      </a>
+      <a class="vertical-align" mat-list-item class="nav-item {{ active === 'Preferences' ? 'active' : '' }}"
+         routerLink="/settings/preferences">
+        <div class="d-flex">
+          <mat-icon mat-list-icon class="mat-icon">edit</mat-icon>
+          <div mat-line class="mat-line" style="padding-left: 10px;">
+            <span>Preferences</span>
           </div>
         </div>
       </a>
@@ -15,8 +24,8 @@
         routerLink="/settings/application_settings" [disabled]="!isAdmin">
         <div class="d-flex">
           <mat-icon mat-list-icon>developer_mode</mat-icon>
-          <div mat-line>
-            <span style="padding-left: 10px;">Application settings</span>
+          <div mat-line style="padding-left: 10px;">
+            <span>Application settings</span>
             <div class="admin-only" *ngIf="!isAdmin">Admin only</div>
           </div>
         </div>

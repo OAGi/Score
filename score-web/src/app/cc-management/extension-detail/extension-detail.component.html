@@ -269,6 +269,10 @@
                   </cdk-virtual-scroll-viewport>
 
                   <mat-menu class="context-menu" #contextMenu="matMenu">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                    <mat-divider></mat-divider>
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
                       <span class="context-menu-item">Expand 2</span>
                     </button>

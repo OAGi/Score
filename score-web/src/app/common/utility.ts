@@ -130,6 +130,27 @@ export function saveBooleanProperty(userToken: UserToken, key: string, value: bo
   localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
 }
 
+export function loadProperty(userToken: UserToken, key: string, defaultValue: string): string {
+  if (!userToken || !key) {
+    return defaultValue;
+  }
+
+  const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
+  try {
+    return JSON.parse(atob(localStorage.getItem(itemKey))).value;
+  } catch (ignore) {
+    return defaultValue;
+  }
+}
+
+export function saveProperty(userToken: UserToken, key: string, value: string) {
+  if (!userToken || !key) {
+    return;
+  }
+  const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
+  localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
+}
+
 export function loadBranch(userToken: UserToken, type: string): number | undefined {
   if (!userToken || !type) {
     return undefined;

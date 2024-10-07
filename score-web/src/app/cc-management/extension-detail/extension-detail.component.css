@@ -31,7 +31,7 @@
 
 .mat-tree-node > span {
   cursor: pointer;
-  padding-right: 0px !important;
+  padding-right: 2px !important;
   margin-right: 10px;
 }
 
