@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {NamespaceDetailComponent} from './namespace-detail.component';
 
@@ -6,7 +6,7 @@ describe('NamespaceDetailComponent', () => {
   let component: NamespaceDetailComponent;
   let fixture: ComponentFixture<NamespaceDetailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [NamespaceDetailComponent]
     })

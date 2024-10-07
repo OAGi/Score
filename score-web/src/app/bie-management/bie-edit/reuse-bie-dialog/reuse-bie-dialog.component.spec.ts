@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ReuseBieDialogComponent} from './reuse-bie-dialog.component';
 
@@ -6,7 +6,7 @@ describe('MetaHeaderDialogComponent', () => {
   let component: ReuseBieDialogComponent;
   let fixture: ComponentFixture<ReuseBieDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ReuseBieDialogComponent]
     })

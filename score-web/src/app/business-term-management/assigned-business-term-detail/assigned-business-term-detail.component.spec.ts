@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AssignedBusinessTermDetailComponent} from './assigned-business-term-detail.component';
 
@@ -6,7 +6,7 @@ describe('AssignedBusinessTermDetailComponent', () => {
   let component: AssignedBusinessTermDetailComponent;
   let fixture: ComponentFixture<AssignedBusinessTermDetailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AssignedBusinessTermDetailComponent]
     })

@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AccountListDialogComponent} from './account-list-dialog.component';
 
@@ -6,7 +6,7 @@ describe('AccountListDialogComponent', () => {
   let component: AccountListDialogComponent;
   let fixture: ComponentFixture<AccountListDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AccountListDialogComponent]
     })

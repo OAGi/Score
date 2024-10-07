@@ -6,7 +6,7 @@ describe('CodeListUpliftComponent', () => {
   let component: CodeListUpliftComponent;
   let fixture: ComponentFixture<CodeListUpliftComponent>;
 
-  beforeEach(async () => {
+  beforeEach(fakeAsync () => {
     await TestBed.configureTestingModule({
       declarations: [ CodeListUpliftComponent ]
     })

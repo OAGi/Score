@@ -6,7 +6,7 @@ describe('OasDocAssignDialogComponent', () => {
   let component: OasDocAssignDialogComponent;
   let fixture: ComponentFixture<OasDocAssignDialogComponent>;
 
-  beforeEach(async () => {
+  beforeEach(fakeAsync () => {
     await TestBed.configureTestingModule({
       declarations: [ OasDocAssignDialogComponent ]
     })

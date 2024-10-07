@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {CodelistListDialogComponent} from './codelist-list-dialog.component';
 
@@ -6,7 +6,7 @@ describe('CodelistListDialogComponent', () => {
   let component: CodelistListDialogComponent;
   let fixture: ComponentFixture<CodelistListDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CodelistListDialogComponent]
     })

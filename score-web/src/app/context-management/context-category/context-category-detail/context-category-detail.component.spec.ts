@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ContextCategoryDetailComponent} from './context-category-detail.component';
 
@@ -6,7 +6,7 @@ describe('ContextCategoryDetailComponent', () => {
   let component: ContextCategoryDetailComponent;
   let fixture: ComponentFixture<ContextCategoryDetailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ContextCategoryDetailComponent]
     })

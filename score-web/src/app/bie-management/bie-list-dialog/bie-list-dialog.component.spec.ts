@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {BieListDialogComponent} from './bie-list-dialog.component';
 
@@ -6,7 +6,7 @@ describe('BusinessContextValueDialogComponent', () => {
   let component: BieListDialogComponent;
   let fixture: ComponentFixture<BieListDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [BieListDialogComponent]
     })

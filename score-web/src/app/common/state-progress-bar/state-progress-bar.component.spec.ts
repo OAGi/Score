@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {StateProgressBarComponent} from './state-progress-bar.component';
 
@@ -6,7 +6,7 @@ describe('StateProgressBarComponent', () => {
   let component: StateProgressBarComponent;
   let fixture: ComponentFixture<StateProgressBarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ StateProgressBarComponent ]
     })

@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {BasedAccDialogComponent} from './based-acc-dialog.component';
 
@@ -6,7 +6,7 @@ describe('BasedAccDialogComponent', () => {
   let component: BasedAccDialogComponent;
   let fixture: ComponentFixture<BasedAccDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [BasedAccDialogComponent]
     })

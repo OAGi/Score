@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {BieCreateBizCtxComponent} from './bie-create-biz-ctx.component';
 
@@ -6,7 +6,7 @@ describe('BieCopyBizCtxComponent', () => {
   let component: BieCreateBizCtxComponent;
   let fixture: ComponentFixture<BieCreateBizCtxComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [BieCreateBizCtxComponent]
     })

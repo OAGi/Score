@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {MetaHeaderDialogComponent} from './meta-header-dialog.component';
 
@@ -6,7 +6,7 @@ describe('MetaHeaderDialogComponent', () => {
   let component: MetaHeaderDialogComponent;
   let fixture: ComponentFixture<MetaHeaderDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MetaHeaderDialogComponent]
     })

@@ -6,7 +6,7 @@ describe('MessageViewComponent', () => {
   let component: MessageViewComponent;
   let fixture: ComponentFixture<MessageViewComponent>;
 
-  beforeEach(async () => {
+  beforeEach(fakeAsync () => {
     await TestBed.configureTestingModule({
       declarations: [ MessageViewComponent ]
     })

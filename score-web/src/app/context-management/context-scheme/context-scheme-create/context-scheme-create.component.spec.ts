@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ContextSchemeCreateComponent} from './context-scheme-create.component';
 
@@ -6,7 +6,7 @@ describe('ContextSchemeCreateComponent', () => {
   let component: ContextSchemeCreateComponent;
   let fixture: ComponentFixture<ContextSchemeCreateComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ContextSchemeCreateComponent]
     })
