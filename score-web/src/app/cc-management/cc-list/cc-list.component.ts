@@ -72,6 +72,11 @@ export class CcListComponent implements OnInit {
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
   loading = false;
+  showAdvancedSearch = false;
+
+  toggleAdvancedSearch(): void {
+    this.showAdvancedSearch = !this.showAdvancedSearch;
+  }
 
   isElasticsearchOn = false;
 

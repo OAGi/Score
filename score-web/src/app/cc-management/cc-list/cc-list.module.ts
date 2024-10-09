@@ -16,6 +16,7 @@ import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TagService} from '../../tag-management/domain/tag.service';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 
 const routes: Routes = [
   {
@@ -34,6 +35,7 @@ const routes: Routes = [
     CommonModule,
     TranslateModule,
     ScoreCommonModule,
+    SearchBarModule,
     FontAwesomeModule
   ],
   declarations: [

@@ -1,0 +1,51 @@
+.search-box {
+  margin-bottom: 1rem;
+  padding: 8px;
+}
+
+.search-box .main-search .mat-mdc-form-field-infix {
+  padding-top: 10px !important;
+}
+
+.search-box .main-search .mdc-notched-outline {
+  display: none;
+}
+
+.search-box .advanced-search {
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  padding-left: 3rem;
+  border-top: 1px solid;
+  border-top-color: rgba(0, 0, 0, 0.12);
+}
+
+.search-box .main-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box .main-search mat-form-field {
+  flex: 1;
+}
+
+.main-search mat-form-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.search-box .main-search button {
+  white-space: nowrap;
+}
+
+.search-box .mat-mdc-card-header-text {
+  margin: 0 8px;
+}
+
+.search-box .mat-card-container {
+  margin: 0 8px;
+}
+
+.search-box .mat-mdc-card-actions {
+  margin: 0 8px;
+  padding: 8px 0 !important;
+}

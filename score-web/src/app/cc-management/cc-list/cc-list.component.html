@@ -93,250 +93,239 @@
   </mat-menu>
 
   <mat-card class="pt-3">
-    <mat-card class="search-box">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Branch</mat-label>
-                <mat-select [(ngModel)]="request.release"
-                            (ngModelChange)="onChange('branch', request.release);
+    <score-search-bar [(model)]="request.filters.den"
+                      (modelChange)="onChange('filters.den', request.filters.den)"
+                      (search)="this.paginator.pageIndex = 0; this.loadCcList();">
+      <div advancedSearchContent>
+        <mat-card-content class="mat-card-container">
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Branch</mat-label>
+                  <mat-select [(ngModel)]="request.release"
+                              (ngModelChange)="onChange('branch', request.release);
                                             this.paginator.pageIndex = 0; this.loadCcList();">
-                  <mat-select-trigger class="d-flex">
-                    <span>{{ request.release.releaseNum }}</span>
-                    <span class="f12 ml-auto pr-2 {{request.release.state}}"
-                          *ngIf="request.release.releaseNum !== workingRelease.releaseNum">
+                    <mat-select-trigger class="d-flex">
+                      <span>{{ request.release.releaseNum }}</span>
+                      <span class="f12 ml-auto pr-2 {{request.release.state}}"
+                            *ngIf="request.release.releaseNum !== workingRelease.releaseNum">
                       {{ request.release.state | separate }}
                     </span>
-                  </mat-select-trigger>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
-                    <div class="d-flex">
-                      <span class="release-num">{{release.releaseNum}}</span>
-                      <span class="f12 ml-auto pr-2 {{release.state}}"
-                            *ngIf="release.releaseNum !== workingRelease.releaseNum">
+                    </mat-select-trigger>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+                      <div class="d-flex">
+                        <span class="release-num">{{release.releaseNum}}</span>
+                        <span class="f12 ml-auto pr-2 {{release.state}}"
+                              *ngIf="release.releaseNum !== workingRelease.releaseNum">
                         {{ release.state | separate }}
                       </span>
+                      </div>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Type</mat-label>
+                  <mat-select [(ngModel)]="request.types" class="text-uppercase" multiple>
+                    <mat-option *ngFor="let type of typeList" [value]="type">
+                      <span class="text-uppercase">{{ type }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>State</mat-label>
+                  <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
+                              floatLabel="never" multiple>
+                    <mat-option *ngFor="let state of workingStateList" [value]="state">
+                      <span>{{ state | separate }}</span>
+                    </mat-option>
+                  </mat-select>
+                  <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
+                              floatLabel="never" multiple>
+                    <mat-option *ngFor="let state of releaseStateList" [value]="state">
+                      <span>{{ state | separate }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Deprecated</mat-label>
+                  <mat-select [(ngModel)]="request.deprecated" multiple>
+                    <mat-option [value]="true">True</mat-option>
+                    <mat-option [value]="false">False</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>New</mat-label>
+                  <mat-select [(ngModel)]="request.newComponent" multiple>
+                    <mat-option [value]="true">True</mat-option>
+                    <mat-option [value]="false">False</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Owner</mat-label>
+                  <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                      <span>{{ loginId }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Updater</mat-label>
+                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                      <span>{{ loginId }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Updated start date</mat-label>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
                     </div>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Type</mat-label>
-                <mat-select [(ngModel)]="request.types" class="text-uppercase" multiple>
-                  <mat-option *ngFor="let type of typeList" [value]="type">
-                    <span class="text-uppercase">{{ type }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>State</mat-label>
-                <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
-                            floatLabel="never" multiple>
-                  <mat-option *ngFor="let state of workingStateList" [value]="state">
-                    <span>{{ state | separate }}</span>
-                  </mat-option>
-                </mat-select>
-                <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
-                            floatLabel="never" multiple>
-                  <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                    <span>{{ state | separate }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Deprecated</mat-label>
-                <mat-select [(ngModel)]="request.deprecated" multiple>
-                  <mat-option [value]="true">True</mat-option>
-                  <mat-option [value]="false">False</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>New</mat-label>
-                <mat-select [(ngModel)]="request.newComponent" multiple>
-                  <mat-option [value]="true">True</mat-option>
-                  <mat-option [value]="false">False</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-        </div>
-
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Owner</mat-label>
-                <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    <span>{{ loginId }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    <span>{{ loginId }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated start date</mat-label>
-                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end"
-                       (dateInput)="onDateEvent('startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated end date</mat-label>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start"
-                       (dateInput)="onDateEvent('endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Updated end date</mat-label>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Namespace</mat-label>
-                <mat-select [(ngModel)]="request.namespaces" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
-                    <span>{{ namespace.uri }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Namespace</mat-label>
+                  <mat-select [(ngModel)]="request.namespaces" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+                      <span>{{ namespace.uri }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>{{ 'CORE_COMPONENT_LIST.DEN' | translate }}</mat-label>
-                <input matInput [(ngModel)]="request.filters.den"
-                       (ngModelChange)="onChange('filters.den', request.filters.den)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
-                       placeholder="{{ 'CORE_COMPONENT_LIST.DEN' | translate }}">
-              </mat-form-field>
-            </div>
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Definition</mat-label>
+                  <input matInput [(ngModel)]="request.filters.definition"
+                         (ngModelChange)="onChange('filters.definition', request.filters.definition)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
+                         placeholder="Definition">
+                </mat-form-field>
+              </div>
 
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Definition</mat-label>
-                <input matInput [(ngModel)]="request.filters.definition"
-                       (ngModelChange)="onChange('filters.definition', request.filters.definition)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
-                       placeholder="Definition">
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}</mat-label>
-                <input matInput [(ngModel)]="request.filters.module"
-                       (ngModelChange)="onChange('filters.module', request.filters.module)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
-                       placeholder="{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Component Type</mat-label>
-                <mat-select [(ngModel)]="request.componentTypes" multiple>
-                  <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType">
-                    {{componentType.name}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Tag</mat-label>
-                <mat-select [(ngModel)]="request.tags" multiple>
-                  <mat-option *ngFor="let tag of tags" [value]="tag.name">
-                    {{tag.name}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}</mat-label>
+                  <input matInput [(ngModel)]="request.filters.module"
+                         (ngModelChange)="onChange('filters.module', request.filters.module)"
+                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
+                         placeholder="{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Component Type</mat-label>
+                  <mat-select [(ngModel)]="request.componentTypes" multiple>
+                    <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType">
+                      {{componentType.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Tag</mat-label>
+                  <mat-select [(ngModel)]="request.tags" multiple>
+                    <mat-option *ngFor="let tag of tags" [value]="tag.name">
+                      {{tag.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <div class="row d-flex">
-          <div class="col-md-2 col-sm-12" *ngIf="isElasticsearchOn">
-            <mat-slide-toggle [(ngModel)]="request.fuzzySearch"
-                              (ngModelChange)="onChange('fuzzySearch', request.fuzzySearch)">Fuzzy Search</mat-slide-toggle>
+
+          <div class="container-fluid" style="padding: 0;" *ngIf="isElasticsearchOn">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-slide-toggle [(ngModel)]="request.fuzzySearch"
+                                  (ngModelChange)="onChange('fuzzySearch', request.fuzzySearch)">Fuzzy Search</mat-slide-toggle>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3 col-sm-12 pb-md-0 pb-3">
-            <button mat-raised-button color="primary" type="submit" (click)="this.paginator.pageIndex = 0; this.loadCcList();">
-              <mat-icon>search</mat-icon>
-              <span class="ml-2">Search</span>
-            </button>
-          </div>
-        </div>
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+      </div>
+    </score-search-bar>
 
     <mat-card-content class="mat-card-container">
       <div class="loading-container" *ngIf="loading">
