@@ -6,7 +6,7 @@
         routerLink="/settings/account">
         <div class="d-flex">
           <mat-icon mat-list-icon class="mat-icon">lock</mat-icon>
-          <div mat-line class="mat-line" style="padding-left: 10px;">
+          <div mat-line class="mat-line" style="padding-left: 10px; align-content: center;">
             <span>Account</span>
           </div>
         </div>
@@ -15,7 +15,7 @@
          routerLink="/settings/preferences">
         <div class="d-flex">
           <mat-icon mat-list-icon class="mat-icon">edit</mat-icon>
-          <div mat-line class="mat-line" style="padding-left: 10px;">
+          <div mat-line class="mat-line" style="padding-left: 10px; align-content: center;">
             <span>Preferences</span>
           </div>
         </div>
@@ -24,7 +24,7 @@
         routerLink="/settings/application_settings" [disabled]="!isAdmin">
         <div class="d-flex">
           <mat-icon mat-list-icon>developer_mode</mat-icon>
-          <div mat-line style="padding-left: 10px;">
+          <div mat-line style="padding-left: 10px; align-content: center;">
             <span>Application settings</span>
             <div class="admin-only" *ngIf="!isAdmin">Admin only</div>
           </div>
