@@ -61,10 +61,10 @@ public class CcListController {
             @RequestParam(name = "excludes", required = false) String excludes,
             @RequestParam(name = "isBIEUsable", required = false) String isBIEUsable,
             @RequestParam(name = "commonlyUsed", required = false) String commonlyUsed,
-            @RequestParam(name = "sortActive") String sortActive,
-            @RequestParam(name = "sortDirection") String sortDirection,
-            @RequestParam(name = "pageIndex") int pageIndex,
-            @RequestParam(name = "pageSize") int pageSize) {
+            @RequestParam(name = "sortActive", required = false) String sortActive,
+            @RequestParam(name = "sortDirection", required = false) String sortDirection,
+            @RequestParam(name = "pageIndex", required = false, defaultValue = "0") int pageIndex,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
 
         CcListRequest request = new CcListRequest();
 

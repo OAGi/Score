@@ -53,11 +53,22 @@ export class CcListService {
   }
 
   getCcList(request: CcListRequest): Observable<PageResponse<CcList>> {
-    let params = new HttpParams().set('releaseId', '' + request.release.releaseId)
-      .set('sortActive', request.page.sortActive)
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
+    let params = new HttpParams();
+    if (request.release.releaseId) {
+      params = params.set('releaseId', '' + request.release.releaseId);
+    }
+    if (request.page.sortActive) {
+      params = params.set('sortActive', request.page.sortActive);
+    }
+    if (request.page.sortDirection) {
+      params = params.set('sortDirection', request.page.sortDirection);
+    }
+    if (request.page.pageIndex >= 0) {
+      params = params.set('pageIndex', request.page.pageIndex);
+    }
+    if (request.page.pageSize > 0) {
+      params = params.set('pageSize', request.page.pageSize);
+    }
 
     if (request.filters.den) {
       params = params.set('den', request.filters.den);

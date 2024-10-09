@@ -4,7 +4,8 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AuthService} from '../../authentication/auth.service';
 import {Router} from '@angular/router';
-import {AbstractControl, FormControl, ValidatorFn, Validators} from '@angular/forms';
+import {AbstractControl, FormControl, NgForm, ValidatorFn, Validators} from '@angular/forms';
+import {UserToken} from '../../authentication/domain/auth';
 
 @Component({
   selector: 'score-settings-account',
@@ -16,12 +17,12 @@ export class SettingsAccountComponent implements OnInit {
   loading: boolean;
 
   originalEmail: string;
-  emailFormControl: FormControl;
+  emailFormControl: FormControl = new FormControl();
   emailVerified: any = undefined;
 
-  oldPasswordFormControl: FormControl;
-  newPasswordFormControl: FormControl;
-  confirmPasswordFormControl: FormControl;
+  oldPasswordFormControl: FormControl = new FormControl();
+  newPasswordFormControl: FormControl = new FormControl();
+  confirmPasswordFormControl: FormControl = new FormControl();
 
   hideChangePassword: boolean;
 
@@ -32,8 +33,12 @@ export class SettingsAccountComponent implements OnInit {
               private router: Router) {
   }
 
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
   ngOnInit() {
-    const token = this.auth.getUserToken();
+    const token = this.userToken;
     this.accountService.getAccount(token.username).subscribe(resp => {
       this.originalEmail = resp.email;
       this.emailFormControl = new FormControl(resp.email, [Validators.email]);
@@ -119,7 +124,12 @@ export class SettingsAccountComponent implements OnInit {
       this.confirmPasswordFormControl.invalid;
   }
 
-  updatePassword() {
+  updatePassword(form: NgForm) {
+    if (!form.valid) {
+      this.snackBar.open('Password form is invalid.', '', {
+        duration: 3000,
+      });
+    }
     this.service.updatePassword(this.oldPasswordFormControl.value, this.newPasswordFormControl.value)
       .subscribe(_ => {
         this.snackBar.open('Updated', '', {

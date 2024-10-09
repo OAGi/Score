@@ -94,8 +94,8 @@
 
   <mat-card class="pt-3">
     <score-search-bar [(model)]="request.filters.den"
-                      (modelChange)="onChange('filters.den', request.filters.den)"
-                      (search)="this.paginator.pageIndex = 0; this.loadCcList();">
+                      (modelChange)="onChange('filters.den', request.filters.den);"
+                      (search)="onSearch();">
       <div advancedSearchContent>
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -104,8 +104,7 @@
                 <mat-form-field>
                   <mat-label>Branch</mat-label>
                   <mat-select [(ngModel)]="request.release"
-                              (ngModelChange)="onChange('branch', request.release);
-                                            this.paginator.pageIndex = 0; this.loadCcList();">
+                              (ngModelChange)="onChange('branch', request.release); onSearch();">
                     <mat-select-trigger class="d-flex">
                       <span>{{ request.release.releaseNum }}</span>
                       <span class="f12 ml-auto pr-2 {{request.release.state}}"
@@ -278,7 +277,7 @@
                   <mat-label>Definition</mat-label>
                   <input matInput [(ngModel)]="request.filters.definition"
                          (ngModelChange)="onChange('filters.definition', request.filters.definition)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
+                         (keyup.enter)="onSearch();"
                          placeholder="Definition">
                 </mat-form-field>
               </div>
@@ -288,7 +287,7 @@
                   <mat-label>{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}</mat-label>
                   <input matInput [(ngModel)]="request.filters.module"
                          (ngModelChange)="onChange('filters.module', request.filters.module)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadCcList();"
+                         (keyup.enter)="onSearch();"
                          placeholder="{{ 'CORE_COMPONENT_LIST.MODULE' | translate }}">
                 </mat-form-field>
               </div>

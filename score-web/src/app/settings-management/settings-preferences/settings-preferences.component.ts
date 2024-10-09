@@ -36,6 +36,13 @@ export class SettingsPreferencesComponent implements OnInit {
     });
   }
 
+  toggleSelection(column: {
+    name: string,
+    selected: boolean
+  }) {
+    column.selected = !column.selected;
+  }
+
   updatePreferences() {
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
       this.snackBar.open('Updated', '', {

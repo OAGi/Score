@@ -41,6 +41,8 @@ import {saveAs} from 'file-saver';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 
 @Component({
   selector: 'score-cc-list',
@@ -65,9 +67,65 @@ export class CcListComponent implements OnInit {
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'valueDomain', 'sixDigitId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columnsOfCoreComponentPage = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columnsOfCoreComponentPage) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Value Domain':
+          if (column.selected) {
+            displayedColumns.push('valueDomain');
+          }
+          break;
+        case 'Six Hexadecimal ID':
+          if (column.selected) {
+            displayedColumns.push('sixDigitId');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+            displayedColumns.push('transferOwnership');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
@@ -90,6 +148,7 @@ export class CcListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
   tags: Tag[] = [];
+  preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
@@ -111,6 +170,7 @@ export class CcListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -146,8 +206,7 @@ export class CcListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCcList();
+      this.onSearch();
     });
 
     this.loading = true;
@@ -156,8 +215,9 @@ export class CcListComponent implements OnInit {
       this.accountService.getAccountNames(),
       this.namespaceService.getSimpleNamespaces(),
       this.aboutService.getProductInfo(),
-      this.tagService.getTags()
-    ]).subscribe(([releases, loginIds, namespaces, productInfos, tags]) => {
+      this.tagService.getTags(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, loginIds, namespaces, productInfos, tags, preferencesInfo]) => {
       for (const productInfo of productInfos) {
         if (productInfo.productName === 'Elasticsearch' && productInfo.productVersion !== '0.0.0.0') {
           this.isElasticsearchOn = true;
@@ -184,6 +244,7 @@ export class CcListComponent implements OnInit {
       }
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
 
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -195,6 +256,11 @@ export class CcListComponent implements OnInit {
     }, error => {
       this.loading = false;
     });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCcList();
   }
 
   loadCcList(isInit?: boolean) {
@@ -243,16 +309,22 @@ export class CcListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
+        this.request.page.sortActive = '';
+        this.request.page.sortDirection = '';
         this.sort.active = '';
         this.sort.direction = '';
       } else {
+        this.request.page.sortActive = 'lastUpdateTimestamp';
+        this.request.page.sortDirection = 'desc';
         this.sort.active = 'lastUpdateTimestamp';
         this.sort.direction = 'desc';
       }
@@ -425,7 +497,7 @@ export class CcListComponent implements OnInit {
 
           this.loading = false;
         }, error => {
-            this.loading = false;
+          this.loading = false;
         });
       });
   }

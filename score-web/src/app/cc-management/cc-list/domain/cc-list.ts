@@ -47,10 +47,16 @@ export class CcListRequest {
     this.release = new SimpleRelease();
     this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
+    if (this.page.sortActive === 'undefined') {
+      this.page.sortActive = '';
+    }
     if (this.page.sortActive !== '' && !this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
     }
     this.page.sortDirection = params.get('sortDirection');
+    if (this.page.sortDirection === 'undefined') {
+      this.page.sortDirection = '';
+    }
     if (this.page.sortDirection !== '' && !this.page.sortDirection) {
       this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
     }
