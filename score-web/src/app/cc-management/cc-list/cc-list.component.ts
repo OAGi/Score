@@ -67,6 +67,18 @@ export class CcListComponent implements OnInit {
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
 
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
     if (!this.preferencesInfo) {

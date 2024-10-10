@@ -1,0 +1,21 @@
+<div cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+  <button mat-raised-button (click)="toggleOverlay()" type="button">
+    <div class="d-flex align-items-center justify-content-between" style="width: 120px;">
+        <span>Columns</span>
+      <mat-icon>{{ overlayVisible ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+    </div>
+  </button>
+
+  <ng-template cdkConnectedOverlay
+                [cdkConnectedOverlayOrigin]="trigger"
+                [cdkConnectedOverlayOpen]="overlayVisible">
+    <div class="column-selector overlay-spacing" cdkDropList (cdkDropListDropped)="drop($event)">
+      <div class="column" *ngFor="let column of columns" cdkDrag>
+        <mat-checkbox [(ngModel)]="column.selected" (change)="toggleColumnSelection()">
+          {{ column.name }}
+        </mat-checkbox>
+        <span class="drag-handle">☰</span>
+      </div>
+    </div>
+  </ng-template>
+</div>
