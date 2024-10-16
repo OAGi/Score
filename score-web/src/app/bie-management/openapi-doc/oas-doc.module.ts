@@ -13,6 +13,8 @@ import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 
 const routes: Routes = [
@@ -76,7 +78,9 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     ScoreCommonModule,
-    MatMultiSortModule
+    MatMultiSortModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   exports: [
     OasDocCreateComponent,

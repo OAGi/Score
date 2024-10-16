@@ -1528,8 +1528,6 @@ export class AccDetailComponent implements OnInit {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

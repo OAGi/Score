@@ -1,5 +1,5 @@
 import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
-import {hashCode4String, loadProperty, sha256} from '../../common/utility';
+import {hashCode4String, sha256} from '../../common/utility';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';

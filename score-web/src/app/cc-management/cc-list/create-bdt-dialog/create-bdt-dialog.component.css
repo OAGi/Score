@@ -161,15 +161,11 @@ tr.element-row:not(.expanded-row):active {
   outline: none;
 }
 
-.content {
-  max-height: 80vh !important;
-}
-
 .actions {
   bottom: 0;
   left: 0;
   overflow: visible;
   width: 100%;
   opacity: 1;
-  padding: 0 24px;
+  padding: 16px;
 }

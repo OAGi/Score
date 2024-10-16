@@ -8,7 +8,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -18,6 +18,8 @@ import {initFilter} from '../../../common/utility';
 import {ModuleSet, ModuleSetListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
 
 @Component({
   selector: 'score-module-set-list',
@@ -28,7 +30,56 @@ export class ModuleSetListComponent implements OnInit {
 
   title = 'Module Set';
 
-  displayedColumns: string[];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfModuleSetPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'Name':
+            if (column.selected) {
+              displayedColumns.push('name');
+            }
+            break;
+          case 'Description':
+            if (column.selected) {
+              displayedColumns.push('description');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+
+    if (this.roles.includes('developer')) {
+      displayedColumns.push('more');
+    }
+
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<ModuleSet>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -39,6 +90,7 @@ export class ModuleSetListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ModuleSetListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: ModuleSet;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -51,14 +103,10 @@ export class ModuleSetListComponent implements OnInit {
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
-    this.displayedColumns = (this.roles.includes('developer')) ? [
-      'name', 'description', 'lastUpdateTimestamp', 'more'
-    ] : [
-      'name', 'description', 'lastUpdateTimestamp'
-    ];
   }
 
   ngOnInit() {
@@ -72,17 +120,21 @@ export class ModuleSetListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadModuleSetList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadModuleSetList(true);
+      this.loadModuleSetList(true);
+    });
   }
 
   get userToken(): UserToken {
@@ -122,6 +174,11 @@ export class ModuleSetListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
+    this.loadModuleSetList();
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
     this.loadModuleSetList();
   }
 

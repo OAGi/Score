@@ -20,6 +20,9 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../authentication/auth.service';
 
 
 @Component({
@@ -31,10 +34,44 @@ export class AssignBusinessTermBtComponent implements OnInit {
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
 
-  displayedColumns: string[] = [
-    'select', 'businessTerm', 'definition', 'externalReferenceUri', 'externalReferenceId',
-    'lastUpdateTimestamp'
-  ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('businessTerm');
+            }
+            break;
+          case 'External Reference URI':
+            if (column.selected) {
+              displayedColumns.push('externalReferenceUri');
+            }
+            break;
+          case 'External Reference ID':
+            if (column.selected) {
+              displayedColumns.push('externalReferenceId');
+            }
+            break;
+          case 'Definition':
+            if (column.selected) {
+              displayedColumns.push('definition');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BusinessTerm>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -45,6 +82,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessTermListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -55,8 +93,10 @@ export class AssignBusinessTermBtComponent implements OnInit {
               private accountService: AccountListService,
               private bieService: BieEditService,
               private bieListService: BieListService,
+              private auth: AuthService,
               private location: Location,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private router: Router,
               private route: ActivatedRoute,
               private snackBar: MatSnackBar) {
@@ -73,13 +113,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBusinessTermList();
-    });
-
-    this.accountService.getAccountNames().subscribe(loginIds => {
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      this.onSearch();
     });
 
     this.route.queryParamMap.pipe(
@@ -95,8 +129,17 @@ export class AssignBusinessTermBtComponent implements OnInit {
           bie.bieType = bieTypes[index];
           return bie;
         });
-        return this.bieListService.confirmAsbieBbieListByIdAndType(bies);
-      })).subscribe((resp: PageResponse<AsbieBbieList>) => {
+        return forkJoin([
+          this.bieListService.confirmAsbieBbieListByIdAndType(bies),
+          this.accountService.getAccountNames(),
+          this.preferencesService.load(this.auth.getUserToken())
+        ]);
+      })).subscribe(([resp, loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loginIdList.push(...loginIds);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
       if (resp === null) {
         this.router.navigateByUrl('/business_term_management/assign_business_term/create');
       } else {
@@ -154,6 +197,11 @@ export class AssignBusinessTermBtComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBusinessTermList();
   }
 
   loadBusinessTermList(isInit?: boolean) {

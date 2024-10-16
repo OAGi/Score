@@ -20,6 +20,8 @@ import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 
 @Component({
   selector: 'score-release-list',
@@ -30,9 +32,56 @@ export class ReleaseListComponent implements OnInit {
 
   title = 'Release';
 
-  displayedColumns: string[] = [
-    'select', 'releaseNum', 'state', 'creationTimestamp', 'lastUpdateTimestamp', 'more'
-  ];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfReleasePage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Release':
+          if (column.selected) {
+            displayedColumns.push('releaseNum');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Created On':
+          if (column.selected) {
+            displayedColumns.push('creationTimestamp');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<ReleaseList>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -44,6 +93,7 @@ export class ReleaseListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Initialized', 'Draft', 'Published'];
   request: ReleaseListRequest;
+  preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
@@ -62,6 +112,7 @@ export class ReleaseListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -79,14 +130,16 @@ export class ReleaseListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadReleases();
+      this.onSearch();
     });
 
     forkJoin([
       this.namespaceService.getSimpleNamespaces(),
-      this.accountService.getAccountNames()
-    ]).subscribe(([namespaces, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([namespaces, loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
 
@@ -145,6 +198,11 @@ export class ReleaseListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadReleases();
   }
 
   loadReleases(isInit?: boolean) {

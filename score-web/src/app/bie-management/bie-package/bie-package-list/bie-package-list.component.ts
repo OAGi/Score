@@ -25,6 +25,8 @@ import {TransferOwnershipDialogComponent} from '../../../common/transfer-ownersh
 import {AccountList} from '../../../account-management/domain/accounts';
 import {MailService} from '../../../common/score-mail.service';
 import {BiePackageUpliftDialogComponent} from '../bie-package-uplift-dialog/bie-package-uplift-dialog.component';
+import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-bie-package-list',
@@ -34,18 +36,99 @@ import {BiePackageUpliftDialogComponent} from '../bie-package-uplift-dialog/bie-
 export class BiePackageListComponent implements OnInit {
 
   title = 'BIE Package';
-  displayedColumns = [
-    {id: 'select', name: ''},
-    {id: 'state', name: 'State'},
-    {id: 'branch', name: 'Branch'},
-    {id: 'versionName', name: 'Package Version Name'},
-    {id: 'versionId', name: 'Package Version ID'},
-    {id: 'owner', name: 'Owner'},
-    {id: 'transferOwnership', name: 'Transfer Ownership'},
-    {id: 'description', name: 'Description'},
-    {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp'},
-    {id: 'more', name: 'More'},
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+
+    let columns = [];
+    for (const tableColumn of this.table.columns) {
+      for (const updatedColumn of updatedColumns) {
+        if (tableColumn.name === updatedColumn.name) {
+          tableColumn.isActive = updatedColumn.selected;
+        }
+      }
+      columns.push(tableColumn);
+    }
+
+    this.table.columns = columns;
+    this.table.displayedColumns = this.displayedColumns;
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfBiePackagePage);
+  }
+
+  defaultDisplayedColumns = [
+    {id: 'select', name: '', isActive: true},
+    {id: 'state', name: 'State', isActive: true},
+    {id: 'branch', name: 'Branch', isActive: true},
+    {id: 'versionName', name: 'Package Version Name', isActive: true},
+    {id: 'versionId', name: 'Package Version ID', isActive: true},
+    {id: 'owner', name: 'Owner', isActive: true},
+    {id: 'transferOwnership', name: 'Transfer Ownership', isActive: true},
+    {id: 'description', name: 'Description', isActive: true},
+    {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp', isActive: true},
+    {id: 'more', name: 'More', isActive: true},
   ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'Package Version Name':
+            if (column.selected) {
+              displayedColumns.push('versionName');
+            }
+            break;
+          case 'Package Version ID':
+            if (column.selected) {
+              displayedColumns.push('versionId');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+              displayedColumns.push('transferOwnership');
+            }
+            break;
+          case 'Description':
+            if (column.selected) {
+              displayedColumns.push('description');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   table: TableData<BiePackage>;
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -60,6 +143,7 @@ export class BiePackageListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BiePackageListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: BiePackage;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -74,6 +158,7 @@ export class BiePackageListComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -82,7 +167,7 @@ export class BiePackageListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BiePackage>(this.displayedColumns, {});
+    this.table = new TableData<BiePackage>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BiePackage>(this.sort, false);
 
     this.request = new BiePackageListRequest(this.route.snapshot.queryParamMap,
@@ -95,14 +180,17 @@ export class BiePackageListComponent implements OnInit {
     this.table.sortParams = this.request.page.sortActives;
     this.table.sortDirs = this.request.page.sortDirections;
     this.table.sortObservable.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBiePackageList();
+      this.onSearch();
     });
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+      this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage);
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -163,6 +251,11 @@ export class BiePackageListComponent implements OnInit {
     } else {
       this.request.releases = [];
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBiePackageList();
   }
 
   loadBiePackageList(isInit?: boolean) {

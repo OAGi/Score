@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output, ViewEncapsulation} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
-import {MatCheckboxChange} from '@angular/material/checkbox';
 
 @Component({
   selector: 'score-column-selector',
@@ -12,7 +11,8 @@ export class ColumnSelectorComponent {
   @Input() columns: { name: string; selected: boolean }[] = [];
   @Output() columnsChange = new EventEmitter<{ name: string; selected: boolean }[]>();
 
-  // Control the overlay visibility
+  @Output() onReset = new EventEmitter<void>();
+
   overlayVisible = false;
 
   toggleColumnSelection() {
@@ -26,5 +26,13 @@ export class ColumnSelectorComponent {
 
   toggleOverlay() {
     this.overlayVisible = !this.overlayVisible;
+  }
+
+  closeOverlay() {
+    this.overlayVisible = false;
+  }
+
+  onResetButtonClick() {
+    this.onReset.emit();
   }
 }

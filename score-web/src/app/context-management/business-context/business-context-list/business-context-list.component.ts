@@ -10,12 +10,15 @@ import {AccountListService} from '../../../account-management/domain/account-lis
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
 
 @Component({
   selector: 'score-business-context',
@@ -25,9 +28,47 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 export class BusinessContextListComponent implements OnInit {
 
   title = 'Business Context';
-  displayedColumns: string[] = [
-    'select', 'name', 'lastUpdateTimestamp'
-  ];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfBusinessContextPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BusinessContext>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -36,6 +77,7 @@ export class BusinessContextListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -44,7 +86,9 @@ export class BusinessContextListComponent implements OnInit {
 
   constructor(private service: BusinessContextService,
               private accountService: AccountListService,
+              private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -62,16 +106,20 @@ export class BusinessContextListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBusinessContextList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadBusinessContextList(true);
+      this.loadBusinessContextList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -103,6 +151,11 @@ export class BusinessContextListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBusinessContextList();
   }
 
   loadBusinessContextList(isInit?: boolean) {

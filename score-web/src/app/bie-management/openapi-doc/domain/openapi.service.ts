@@ -12,8 +12,6 @@ import {
 } from './openapi-doc';
 import {Observable} from 'rxjs';
 import {PageRequest, PageResponse} from '../../../basis/basis';
-import {BieExpressOption} from '../../bie-express/domain/generate-expression';
-import {base64Encode} from '../../../common/utility';
 
 @Injectable()
 export class OpenAPIService {

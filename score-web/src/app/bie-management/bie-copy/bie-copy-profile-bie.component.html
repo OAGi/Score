@@ -1,27 +1,19 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white d-flex flex-column align-items-start">
-      <span class="title">{{ "BIE_COPY.TITLE" | translate }}</span>
+      <span class="title">{{ "BIE_COPY.TITLE" | translate }} with {{ businessContextNames }}</span>
       <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
     </mat-toolbar>
   </div>
 
-  <div>
-    <mat-card style="box-shadow: none;">
-      <mat-card class="search-box">
+  <mat-card class="pt-3">
+    <score-search-bar [(model)]="request.filters.den"
+                      (modelChange)="onChange('filters.den', request.filters.den);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Selected Business Contexts</mat-label>
-                  <mat-select [(ngModel)]="bizCtxIds" multiple required>
-                    <mat-option *ngFor="let bizCtx of bizCtxList" [value]="bizCtx.businessContextId" [disabled]="true">
-                      {{ bizCtx.name }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>Branch</mat-label>
@@ -29,8 +21,8 @@
                     <mat-select-trigger class="d-flex">
                       <span>{{ ((request.releases?.length || 0) > 0) ? request.releases[0].releaseNum : '' }}</span>
                       <span *ngIf="(request.releases?.length || 0) > 1" class="ml-2 additional-selection">
-                        (+{{ (request.releases?.length || 0) - 1 }} {{ request.releases?.length === 2 ? 'other' : 'others' }})
-                      </span>
+                (+{{ (request.releases?.length || 0) - 1 }} {{ request.releases?.length === 2 ? 'other' : 'others' }})
+              </span>
                       <span class="f12 ml-auto pr-2 {{ request.releases?.[0].state }}" *ngIf="(request.releases?.length || 0) === 1">
                         {{ request.releases?.[0].state | separate }}
                       </span>
@@ -46,8 +38,8 @@
                       <div class="d-flex">
                         <span class="pl-2 release-num">{{ release.releaseNum }}</span>
                         <span class="f12 ml-auto pr-2 {{ release.state }}">
-                          {{ release.state | separate }}
-                        </span>
+                  {{ release.state | separate }}
+                </span>
                       </div>
                     </mat-option>
                   </mat-select>
@@ -154,19 +146,10 @@
               <div class="row">
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
-                    <mat-label>DEN</mat-label>
-                    <input matInput [(ngModel)]="request.filters.den"
-                           (ngModelChange)="onChange('filters.den', request.filters.den)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                           placeholder="DEN">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
                     <mat-label>Business Context</mat-label>
                     <input matInput [(ngModel)]="request.filters.businessContext"
                            (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
+                           (keyup.enter)="onSearch();"
                            placeholder="Business Context">
                   </mat-form-field>
                 </div>
@@ -175,7 +158,7 @@
                     <mat-label>Version</mat-label>
                     <input matInput [(ngModel)]="request.filters.version"
                            (ngModelChange)="onChange('filters.version', request.filters.version)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
+                           (keyup.enter)="onSearch();"
                            placeholder="Version">
                   </mat-form-field>
                 </div>
@@ -184,7 +167,7 @@
                     <mat-label>Remark</mat-label>
                     <input matInput [(ngModel)]="request.filters.remark"
                            (ngModelChange)="onChange('filters.remark', request.filters.remark)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
+                           (keyup.enter)="onSearch();"
                            placeholder="Remark">
                   </mat-form-field>
                 </div>
@@ -192,23 +175,16 @@
             </div>
           </div>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.paginator.pageIndex = 0; this.loadBieList();">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+      </div>
+    </score-search-bar>
 
-      <mat-card-content class="mat-card-container">
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
 
-        <!-- BIE Table -->
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
-
-        <div class="mat-elevation-z1">
+      <div class="table-container">
+        <div class="mat-elevation-z1 table-wrapper">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                  [dataSource]="dataSource">
@@ -334,10 +310,9 @@
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
         </div>
-
-      </mat-card-content>
-    </mat-card>
-  </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

@@ -4,20 +4,19 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {
-  BusinessContext,
-  BusinessContextListRequest
-} from '../../context-management/business-context/domain/business-context';
+import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-bie-create',
@@ -28,9 +27,33 @@ export class BieCreateBizCtxComponent implements OnInit {
   title = 'Create BIE';
   subtitle = 'Select Business Contexts';
 
-  displayedColumns: string[] = [
-    'select', 'name', 'tenant', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'Name':
+            if (column.selected) {
+              displayedColumns.push('name');
+
+              if (this.isTenantEnabled) {
+                displayedColumns.push('tenant');
+              }
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BusinessContext>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -39,6 +62,7 @@ export class BieCreateBizCtxComponent implements OnInit {
   updaterUsernameListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterUsernameList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -47,7 +71,8 @@ export class BieCreateBizCtxComponent implements OnInit {
 
   constructor(private bizCtxService: BusinessContextService,
               private accountService: AccountListService,
-              private authService: AuthService,
+              private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -64,16 +89,20 @@ export class BieCreateBizCtxComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBusinessContextList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterUsernameListFilterCtrl, this.filteredUpdaterUsernameList, this.loginIdList);
-    });
 
-    this.loadBusinessContextList(true);
+      this.loadBusinessContextList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -105,6 +134,11 @@ export class BieCreateBizCtxComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBusinessContextList();
   }
 
   loadBusinessContextList(isInit?: boolean) {
@@ -172,7 +206,7 @@ export class BieCreateBizCtxComponent implements OnInit {
   }
 
   get isTenantEnabled(): boolean {
-    const userToken = this.authService.getUserToken();
+    const userToken = this.auth.getUserToken();
     return userToken.tenant.enabled;
   }
 

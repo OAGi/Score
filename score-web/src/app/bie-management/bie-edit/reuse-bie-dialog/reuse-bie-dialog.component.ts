@@ -11,13 +11,15 @@ import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {SimpleRelease} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -26,10 +28,63 @@ import {WebPageInfoService} from '../../../basis/basis.service';
 })
 export class ReuseBieDialogComponent implements OnInit {
 
-  displayedColumns: string[] = [
-    'select', 'state', 'den', 'owner', 'businessContexts',
-    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
@@ -40,6 +95,7 @@ export class ReuseBieDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -50,6 +106,7 @@ export class ReuseBieDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<ReuseBieDialogComponent>,
     private bieListService: BieListService,
     private accountService: AccountListService,
+    private preferencesService: SettingsPreferencesService,
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
@@ -62,6 +119,7 @@ export class ReuseBieDialogComponent implements OnInit {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.asccpManifestId = this.data.asccpManifestId;
+    this.request.filters.den = this.data.den;
     const release = new SimpleRelease();
     release.releaseId = this.data.releaseId;
     this.request.releases = [release, ];
@@ -77,17 +135,21 @@ export class ReuseBieDialogComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadBieList(true);
+      this.loadBieList(true);
+    });
   }
 
   get isDeveloper() {
@@ -100,7 +162,9 @@ export class ReuseBieDialogComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
@@ -128,6 +192,11 @@ export class ReuseBieDialogComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
   }
 
   loadBieList(isInit?: boolean) {

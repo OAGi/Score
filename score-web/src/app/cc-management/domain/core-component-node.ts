@@ -1,7 +1,7 @@
 import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
-import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String, toCamelCase, } from '../../common/utility';
+import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String,} from '../../common/utility';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {ShortTag} from '../../tag-management/domain/tag';
 

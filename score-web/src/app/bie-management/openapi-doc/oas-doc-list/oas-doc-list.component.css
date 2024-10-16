@@ -10,8 +10,8 @@
   width: 10%;
 }
 
-.mat-column-title {
-  width: 20%;
+.mat-column-description {
+  width: 45%;
 }
 
 .mat-column-lastUpdateTimestamp {

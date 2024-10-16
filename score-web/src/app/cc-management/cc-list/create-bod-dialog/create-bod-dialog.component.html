@@ -1,446 +1,454 @@
-<div class="row action-group m-0">
-  <div class="col-6 title-wrap p-0">
-    <span class="title">Select Verb to {{this.action}} BOD</span>
-  </div>
-  <div class="col-6 title-wrap p-0">
-    <span class="title">Select Noun to {{this.action}} BOD</span>
+<div class="d-block">
+  <div class="content">
+    <div class="row">
+      <div class="col-6">
+        <div class="header d-flex align-items-center pb-0" mat-dialog-title>
+          <div class="row action-group m-0">
+            <div class="title-wrap">
+              <span class="title">Select Verb to {{this.action}} BOD</span>
+            </div>
+          </div>
+        </div>
+        <mat-card style="box-shadow: none;">
+          <score-search-bar [(model)]="verbRequest.filters.den"
+                            (modelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
+                            (search)="onSearch('verb');">
+            <div advancedSearchContent style="padding-left: 3rem;">
+              <mat-card-content class="mat-card-container">
+                <div class="container-fluid" style="padding: 0;">
+                  <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>State</mat-label>
+                        <mat-select *ngIf="verbRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="verbRequest.states"
+                                    floatLabel="never" multiple>
+                          <mat-option *ngFor="let state of workingStateList" [value]="state">
+                            <span>{{ state | separate }}</span>
+                          </mat-option>
+                        </mat-select>
+                        <mat-select *ngIf="verbRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="verbRequest.states"
+                                    floatLabel="never" multiple>
+                          <mat-option *ngFor="let state of releaseStateList" [value]="state">
+                            <span>{{ state | separate }}</span>
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>Definition</mat-label>
+                        <input matInput [(ngModel)]="verbRequest.filters.definition"
+                               (ngModelChange)="onChange('verb', 'filters.definition', verbRequest.filters.definition)"
+                               (keyup.enter)="onSearch('verb');"
+                               placeholder="Definition">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="verbRequest.filters.module"
+                               (ngModelChange)="onChange('verb', 'filters.module', verbRequest.filters.module)"
+                               (keyup.enter)="onSearch('verb');"
+                               placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="container-fluid" style="padding: 0;">
+                  <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>Updater</mat-label>
+                        <mat-select [(ngModel)]="verbRequest.updaterLoginIds" multiple>
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                          </mat-option>
+                          <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                                      [value]="loginId">{{ loginId }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>Updated start date</mat-label>
+                        <input matInput [matDatepicker]="verbDateStart" placeholder="Updated start date"
+                               [max]="verbRequest.updatedDate.end" [value]="verbRequest.updatedDate.start"
+                               (dateInput)="onDateEvent('verbStartDate', $event)">
+                        <mat-datepicker-toggle matSuffix [for]="verbDateStart"></mat-datepicker-toggle>
+                        <mat-datepicker #verbDateStart></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="reset('verbStartDate')">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>Updated end date</mat-label>
+                        <input matInput [matDatepicker]="verbDateEnd" placeholder="Updated end date"
+                               [min]="verbRequest.updatedDate.start" [value]="verbRequest.updatedDate.end"
+                               (dateInput)="onDateEvent('verbEndDate', $event)">
+                        <mat-datepicker-toggle matSuffix [for]="verbDateEnd"></mat-datepicker-toggle>
+                        <mat-datepicker #verbDateEnd></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="reset('verbEndDate')">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </div>
+          </score-search-bar>
+
+          <mat-card-content class="mat-card-container">
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner [diameter]="40"></mat-spinner>
+            </div>
+
+            <div class="table-container">
+              <div class="mat-elevation-z1 table-wrapper">
+                <table mat-table multiTemplateDataRows
+                       #verbSort="matSort"
+                       matSort [matSortActive]="verbSort.active" [matSortDirection]="verbSort.direction" [matSortStart]="'desc'"
+                       [dataSource]="verbDataSource">
+
+                  <!-- Checkbox Column -->
+                  <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-checkbox (click)="masterToggle('verb', $event)"
+                                    [checked]="verbSelection.selected.length === verbPaginator.length"
+                                    [indeterminate]="!(verbSelection.selected.length === verbPaginator.length) && verbSelection.hasValue()">
+                      </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                      <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? toggle(row, 'verb') : null"
+                                    [checked]="isSelected(row, 'verb')"
+                                    matTooltip="CC is already selected."
+                                    [matTooltipDisabled]="data.currentRoleOfAccId !== row.id"
+                                    [disabled]="data.currentRoleOfAccId === row.id">
+                      </mat-checkbox>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="state">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                    <td mat-cell *matCellDef="let element">
+                      <span class="cc-state {{ element.state }}"
+                            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                            'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+                      <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="den">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="den word-break-all">
+                        <a routerLink="{{ 'core_component/asccp/' + element.manifestId }}"
+                           target="_blank" rel="noopener noreferrer"
+                           matTooltip="{{ element.den }}">
+                          <span>{{ element.den }}</span>
+                        </a>
+                        <div class="tag-list">
+                          <span class="tag ml-2" *ngFor="let tag of element.tagList"
+                                [style.background-color]="tag.backgroundColor"
+                                [style.color]="tag.textColor">{{ tag.name }}</span>
+                        </div>
+                      </div>
+                      <div class="description" [innerHTML]="element.module"></div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="lastUpdateTimestamp">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                      <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                      <div class="element-detail"
+                           *ngIf="element.definitionSource && element.definition"
+                           [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                        <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
+                          <mat-card style="margin-bottom: 12px;">
+                            <mat-card-header *ngIf="element.definitionSource !== null"
+                                             style="background-color: #f5f5f5; margin-bottom: 12px;">
+                              <mat-card-subtitle
+                                style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content>
+                              <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
+                                 *ngIf="element.definition !== null"></p>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
+                      [class.expanded-row]="expandedElement === element"
+                      (click)="expandedElement = expandedElement === element ? null : element; toggle(element, 'verb');"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+                      (click)="toggle(row, 'verb');"></tr>
+                </table>
+                <mat-paginator #verbPaginator
+                               [pageSizeOptions]="[10, 25, 50]"
+                               (page)="onPageChange($event, 'verb')"
+                               showFirstLastButtons></mat-paginator>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-6">
+        <div class="header d-flex align-items-center pb-0" mat-dialog-title>
+          <div class="row action-group m-0">
+            <div class="title-wrap">
+              <span class="title">Select Noun to {{this.action}} BOD</span>
+            </div>
+          </div>
+        </div>
+        <mat-card style="box-shadow: none;">
+          <score-search-bar [(model)]="nounRequest.filters.den"
+                            (modelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
+                            (search)="onSearch('noun');">
+            <div advancedSearchContent style="padding-left: 3rem;">
+              <mat-card-content class="mat-card-container">
+                <div class="container-fluid" style="padding: 0;">
+                  <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>State</mat-label>
+                        <mat-select *ngIf="nounRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="nounRequest.states"
+                                    floatLabel="never" multiple>
+                          <mat-option *ngFor="let state of workingStateList" [value]="state">
+                            <span>{{ state | separate }}</span>
+                          </mat-option>
+                        </mat-select>
+                        <mat-select *ngIf="nounRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="nounRequest.states"
+                                    floatLabel="never" multiple>
+                          <mat-option *ngFor="let state of releaseStateList" [value]="state">
+                            <span>{{ state | separate }}</span>
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>Definition</mat-label>
+                        <input matInput [(ngModel)]="nounRequest.filters.definition"
+                               (ngModelChange)="onChange('noun', 'filters.definition', nounRequest.filters.definition)"
+                               (keyup.enter)="onSearch('noun');"
+                               placeholder="Definition">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="nounRequest.filters.module"
+                               (ngModelChange)="onChange('noun', 'filters.module', nounRequest.filters.module)"
+                               (keyup.enter)="onSearch('noun');"
+                               placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="container-fluid" style="padding: 0;">
+                  <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>Updater</mat-label>
+                        <mat-select [(ngModel)]="nounRequest.updaterLoginIds" multiple>
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                          </mat-option>
+                          <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
+                                      [value]="loginId">{{ loginId }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>Updated start date</mat-label>
+                        <input matInput [matDatepicker]="nounDateStart" placeholder="Updated start date"
+                               [max]="nounRequest.updatedDate.end" [value]="nounRequest.updatedDate.start"
+                               (dateInput)="onDateEvent('nounStartDate', $event)">
+                        <mat-datepicker-toggle matSuffix [for]="nounDateStart"></mat-datepicker-toggle>
+                        <mat-datepicker #nounDateStart></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="reset('nounStartDate')">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>Updated end date</mat-label>
+                        <input matInput [matDatepicker]="nounDateEnd" placeholder="Updated end date"
+                               [min]="nounRequest.updatedDate.start" [value]="nounRequest.updatedDate.end"
+                               (dateInput)="onDateEvent('nounEndDate', $event)">
+                        <mat-datepicker-toggle matSuffix [for]="nounDateEnd"></mat-datepicker-toggle>
+                        <mat-datepicker #nounDateEnd></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="reset('nounEndDate')">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </div>
+          </score-search-bar>
+
+          <mat-card-content class="mat-card-container">
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner [diameter]="40"></mat-spinner>
+            </div>
+
+            <div class="table-container">
+              <div class="mat-elevation-z1 table-wrapper">
+                <table mat-table multiTemplateDataRows
+                       #nounSort="matSort"
+                       matSort [matSortActive]="nounSort.active" [matSortDirection]="nounSort.direction" [matSortStart]="'desc'"
+                       [dataSource]="nounDataSource">
+
+                  <!-- Checkbox Column -->
+                  <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-checkbox (click)="masterToggle('noun', $event)"
+                                    [checked]="nounSelection.selected.length === nounPaginator.length"
+                                    [indeterminate]="!(nounSelection.selected.length === nounPaginator.length) && nounSelection.hasValue()">
+                      </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                      <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? toggle(row, 'noun') : null"
+                                    [checked]="isSelected(row, 'noun')"
+                                    matTooltip="CC is already selected."
+                                    [matTooltipDisabled]="data.currentRoleOfAccId !== row.id"
+                                    [disabled]="data.currentRoleOfAccId === row.id">
+                      </mat-checkbox>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="state">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                    <td mat-cell *matCellDef="let element">
+              <span class="cc-state {{ element.state }}"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+                      <span *ngIf="element.deprecated" class="cc-state Deprecated"
+                            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="den">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="den word-break-all">
+                        <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
+                           target="_blank" rel="noopener noreferrer"
+                           matTooltip="{{ element.den }}">
+                          <span>{{ element.den }}</span>
+                        </a>
+                        <div class="tag-list">
+                  <span class="tag ml-2" *ngFor="let tag of element.tagList"
+                        [style.background-color]="tag.backgroundColor"
+                        [style.color]="tag.textColor">{{ tag.name }}</span>
+                        </div>
+                      </div>
+                      <div class="description" [innerHTML]="element.module"></div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="lastUpdateTimestamp">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                      <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                      <div class="element-detail"
+                           *ngIf="element.definitionSource && element.definition"
+                           [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                        <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
+                          <mat-card style="margin-bottom: 12px;">
+                            <mat-card-header *ngIf="element.definitionSource !== null"
+                                             style="background-color: #f5f5f5; margin-bottom: 12px;">
+                              <mat-card-subtitle
+                                style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content>
+                              <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
+                                 *ngIf="element.definition !== null"></p>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
+                      [class.expanded-row]="expandedElement === element"
+                      (click)="expandedElement = expandedElement === element ? null : element; toggle(element, 'noun');"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+                      (click)="toggle(row, 'noun');"></tr>
+                </table>
+
+                <mat-paginator #nounPaginator
+                               [pageSizeOptions]="[10, 25, 50]"
+                               (page)="onPageChange($event, 'noun')"
+                               showFirstLastButtons></mat-paginator>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
   </div>
 </div>
 
-<mat-dialog-content class="pt-2 pb-2 mat-card-container">
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
-  </div>
-
-  <div class="row">
-    <div class="col-6">
-      <mat-card class="search-box" *ngIf="!loading">
-        <mat-card-content class="mat-card-container">
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <mat-label>State</mat-label>
-                  <mat-select *ngIf="verbRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="verbRequest.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of workingStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
-                  <mat-select *ngIf="verbRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="verbRequest.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="verbRequest.updaterLoginIds" multiple>
-                    <mat-option>
-                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                    </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
-                                [value]="loginId">{{ loginId }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <div class="col-md-3 col-sm-12 d-flex">
-                <mat-form-field>
-                  <mat-label>Updated start date</mat-label>
-                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="verbRequest.updatedDate.end" [value]="verbRequest.updatedDate.start"
-                         (dateInput)="onDateEvent('startDate', $event)">
-                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                  <mat-datepicker #dateStart></mat-datepicker>
-                </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                  <div class="mat-form-field-flex">
-                    <div class="mat-form-field-infix">
-                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 col-sm-12 d-flex">
-                <mat-form-field>
-                  <mat-label>Updated end date</mat-label>
-                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="verbRequest.updatedDate.start" [value]="verbRequest.updatedDate.end"
-                         (dateInput)="onDateEvent('endDate', $event)">
-                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                  <mat-datepicker #dateEnd></mat-datepicker>
-                </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                  <div class="mat-form-field-flex">
-                    <div class="mat-form-field-infix">
-                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <input matInput [(ngModel)]="verbRequest.filters.den"
-                         (ngModelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
-                         (keyup.enter)="this.verbPaginator.pageIndex = 0; this.loadCcList('verb');"
-                         placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
-                </mat-form-field>
-              </div>
-
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <input matInput [(ngModel)]="verbRequest.filters.module"
-                         (ngModelChange)="onChange('verb', 'filters.module', verbRequest.filters.module)"
-                         (keyup.enter)="this.verbPaginator.pageIndex = 0; this.loadCcList('verb');"
-                         placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.verbPaginator.pageIndex = 0; this.loadCcList('verb');">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
-      <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               #verbSort="matSort"
-               matSort [matSortActive]="verbSort.active" [matSortDirection]="verbSort.direction" [matSortStart]="'desc'"
-               [dataSource]="verbDataSource">
-
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (click)="masterToggle('verb', $event)"
-                            [checked]="verbSelection.selected.length === verbPaginator.length"
-                            [indeterminate]="!(verbSelection.selected.length === verbPaginator.length) && verbSelection.hasValue()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? toggle(row, 'verb') : null"
-                            [checked]="isSelected(row, 'verb')"
-                            matTooltip="CC is already selected."
-                            [matTooltipDisabled]="data.currentRoleOfAccId !== row.id"
-                            [disabled]="data.currentRoleOfAccId === row.id">
-              </mat-checkbox>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="cc-state {{ element.state }}"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-              <span *ngIf="element.deprecated" class="cc-state Deprecated"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="den word-break-all">
-                <a routerLink="{{ 'core_component/asccp/' + element.manifestId }}"
-                   target="_blank" rel="noopener noreferrer"
-                   matTooltip="{{ element.den }}">
-                  <span>{{ element.den }}</span>
-                </a>
-                <div class="tag-list">
-                  <span class="tag ml-2" *ngFor="let tag of element.tagList"
-                        [style.background-color]="tag.backgroundColor"
-                        [style.color]="tag.textColor">{{ tag.name }}</span>
-                </div>
-              </div>
-              <div class="description" [innerHTML]="element.module"></div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="expandedDetail">
-            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-              <div class="element-detail"
-                   *ngIf="element.definitionSource && element.definition"
-                   [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
-                  <mat-card style="margin-bottom: 12px;">
-                    <mat-card-header *ngIf="element.definitionSource !== null"
-                                     style="background-color: #f5f5f5; margin-bottom: 12px;">
-                      <mat-card-subtitle
-                        style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                      <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
-                         *ngIf="element.definition !== null"></p>
-                    </mat-card-content>
-                  </mat-card>
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
-              [class.expanded-row]="expandedElement === element"
-              (click)="expandedElement = expandedElement === element ? null : element; toggle(element, 'verb');"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-              (click)="toggle(row, 'verb');"></tr>
-        </table>
-        <mat-paginator #verbPaginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event, 'verb')"
-          showFirstLastButtons></mat-paginator>
-      </div>
-    </div>
-
-    <div class="col-6">
-      <mat-card class="search-box" *ngIf="!loading">
-        <mat-card-content class="mat-card-container">
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <mat-label>State</mat-label>
-                  <mat-select *ngIf="nounRequest.release.releaseId === workingRelease.releaseId" [(ngModel)]="nounRequest.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of workingStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
-                  <mat-select *ngIf="nounRequest.release.releaseId !== workingRelease.releaseId" [(ngModel)]="nounRequest.states"
-                              floatLabel="never" multiple>
-                    <mat-option *ngFor="let state of releaseStateList" [value]="state">
-                      <span>{{ state | separate }}</span>
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Updater</mat-label>
-                  <mat-select [(ngModel)]="nounRequest.updaterLoginIds" multiple>
-                    <mat-option>
-                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                    </mat-option>
-                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async"
-                                [value]="loginId">{{ loginId }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <div class="col-md-3 col-sm-12 d-flex">
-                <mat-form-field>
-                  <mat-label>Updated start date</mat-label>
-                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                         [max]="nounRequest.updatedDate.end" [value]="nounRequest.updatedDate.start"
-                         (dateInput)="onDateEvent('startDate', $event)">
-                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                  <mat-datepicker #dateStart></mat-datepicker>
-                </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                  <div class="mat-form-field-flex">
-                    <div class="mat-form-field-infix">
-                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 col-sm-12 d-flex">
-                <mat-form-field>
-                  <mat-label>Updated end date</mat-label>
-                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                         [min]="nounRequest.updatedDate.start" [value]="nounRequest.updatedDate.end"
-                         (dateInput)="onDateEvent('endDate', $event)">
-                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                  <mat-datepicker #dateEnd></mat-datepicker>
-                </mat-form-field>
-                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                  <div class="mat-form-field-flex">
-                    <div class="mat-form-field-infix">
-                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <input matInput [(ngModel)]="nounRequest.filters.den"
-                         (ngModelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
-                         (keyup.enter)="this.nounPaginator.pageIndex = 0; this.loadCcList('noun');"
-                         placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
-                </mat-form-field>
-              </div>
-
-              <div class="col-md-3 col-sm-12">
-                <mat-form-field>
-                  <input matInput [(ngModel)]="nounRequest.filters.module"
-                         (ngModelChange)="onChange('noun', 'filters.module', nounRequest.filters.module)"
-                         (keyup.enter)="this.nounPaginator.pageIndex = 0; this.loadCcList('noun');"
-                         placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.nounPaginator.pageIndex = 0; this.loadCcList('noun');">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
-
-      <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               #nounSort="matSort"
-               matSort [matSortActive]="nounSort.active" [matSortDirection]="nounSort.direction" [matSortStart]="'desc'"
-               [dataSource]="nounDataSource">
-
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (click)="masterToggle('noun', $event)"
-                            [checked]="nounSelection.selected.length === nounPaginator.length"
-                            [indeterminate]="!(nounSelection.selected.length === nounPaginator.length) && nounSelection.hasValue()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? toggle(row, 'noun') : null"
-                            [checked]="isSelected(row, 'noun')"
-                            matTooltip="CC is already selected."
-                            [matTooltipDisabled]="data.currentRoleOfAccId !== row.id"
-                            [disabled]="data.currentRoleOfAccId === row.id">
-              </mat-checkbox>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="cc-state {{ element.state }}"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-              <span *ngIf="element.deprecated" class="cc-state Deprecated"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="den word-break-all">
-                <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
-                   target="_blank" rel="noopener noreferrer"
-                   matTooltip="{{ element.den }}">
-                  <span>{{ element.den }}</span>
-                </a>
-                <div class="tag-list">
-                  <span class="tag ml-2" *ngFor="let tag of element.tagList"
-                        [style.background-color]="tag.backgroundColor"
-                        [style.color]="tag.textColor">{{ tag.name }}</span>
-                </div>
-              </div>
-              <div class="description" [innerHTML]="element.module"></div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="expandedDetail">
-            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-              <div class="element-detail"
-                   *ngIf="element.definitionSource && element.definition"
-                   [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
-                  <mat-card style="margin-bottom: 12px;">
-                    <mat-card-header *ngIf="element.definitionSource !== null"
-                                     style="background-color: #f5f5f5; margin-bottom: 12px;">
-                      <mat-card-subtitle
-                        style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                      <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
-                         *ngIf="element.definition !== null"></p>
-                    </mat-card-content>
-                  </mat-card>
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
-              [class.expanded-row]="expandedElement === element"
-              (click)="expandedElement = expandedElement === element ? null : element; toggle(element, 'noun');"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
-              (click)="toggle(row, 'noun');"></tr>
-        </table>
-
-        <mat-paginator #nounPaginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event, 'noun')"
-          showFirstLastButtons></mat-paginator>
-      </div>
-    </div>
-  </div>
-
-</mat-dialog-content>
-
-<div class="row action-group m-0">
-  <div class="col-12 actions-wrap p-0">
-    <div class="actions">
-      <button mat-raised-button color="warn" (click)="onNoClick()">
-        Cancel
-      </button>
-      <button mat-raised-button color="primary"
-              *ngIf="action === 'create'"
-              [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
-              (click)="onClick()">
-        <span *ngIf="BODName === ''">Create</span>
-        <span *ngIf="BODName !== ''">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
-      </button>
-    </div>
-  </div>
+<div class="actions ml-auto" mat-dialog-actions>
+  <button mat-raised-button color="warn" (click)="onNoClick()">
+    Cancel
+  </button>
+  <button mat-raised-button color="primary"
+          *ngIf="action === 'create'"
+          [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
+          (click)="onClick()">
+    <span *ngIf="BODName === ''">Create</span>
+    <span *ngIf="BODName !== ''">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
+  </button>
 </div>

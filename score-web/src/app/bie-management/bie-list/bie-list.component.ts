@@ -15,9 +15,7 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -27,9 +25,11 @@ import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {BieDeprecateDialogComponent} from "../bie-deprecate-dialog/bie-deprecate-dialog.component";
-import {BieEditService} from "../bie-edit/domain/bie-edit.service";
+import {BieDeprecateDialogComponent} from '../bie-deprecate-dialog/bie-deprecate-dialog.component';
+import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {MailService} from '../../common/score-mail.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-bie-list',
@@ -40,11 +40,87 @@ export class BieListComponent implements OnInit {
 
   title = 'BIE';
 
-  displayedColumns: string[] = [
-    'select', 'state', 'branch', 'den', 'owner',
-    'transferOwnership', 'businessContexts', 'version',
-    'status', 'bizTerm', 'remark', 'lastUpdateTimestamp', 'more'
-  ];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfBiePage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+              displayedColumns.push('transferOwnership');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    displayedColumns.push('more');
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(true, [],
     true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
@@ -60,6 +136,7 @@ export class BieListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: BieList;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -76,6 +153,7 @@ export class BieListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -93,14 +171,16 @@ export class BieListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.onSearch();
     });
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -138,7 +218,9 @@ export class BieListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
@@ -174,6 +256,11 @@ export class BieListComponent implements OnInit {
     } else {
       this.request.releases = [];
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
   }
 
   loadBieList(isInit?: boolean) {

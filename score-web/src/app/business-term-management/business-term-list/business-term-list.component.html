@@ -17,181 +17,182 @@
   </div>
 
   <mat-card class="pt-3">
-    <mat-card class="search-box">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated start date</mat-label>
-                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end"
-                       (dateInput)="onDateEvent('startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated end date</mat-label>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start"
-                       (dateInput)="onDateEvent('endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+    <score-search-bar [(model)]="request.filters.businessTerm"
+                      (modelChange)="onChange('filters.businessTerm', request.filters.businessTerm);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
+        <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
-                  <mat-label>Term</mat-label>
-                  <input matInput [(ngModel)]="request.filters.businessTerm"
-                         (ngModelChange)="onChange('filters.businessTerm', request.filters.businessTerm)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
-                         placeholder="Term">
+                  <mat-label>Updater</mat-label>
+                  <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                      {{loginId}}
+                    </mat-option>
+                  </mat-select>
                 </mat-form-field>
               </div>
-              <div class="col-md-2 col-sm-12">
+
+              <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
-                  <mat-label>External Reference URI</mat-label>
-                  <input matInput [(ngModel)]="request.filters.externalReferenceUri"
-                         (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
-                         placeholder="External Reference URI">
+                  <mat-label>Updated start date</mat-label>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-2 col-sm-12">
+
+              <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
-                  <mat-label>External Reference ID</mat-label>
-                  <input matInput [(ngModel)]="request.filters.externalReferenceId"
-                         (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
-                         placeholder="External Reference ID">
+                  <mat-label>Updated end date</mat-label>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
                 </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="container-fluid" style="padding: 0;">
+              <div class="row">
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>External Reference URI</mat-label>
+                    <input matInput [(ngModel)]="request.filters.externalReferenceUri"
+                           (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
+                           (keyup.enter)="this.onSearch();"
+                           placeholder="External Reference URI">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>External Reference ID</mat-label>
+                    <input matInput [(ngModel)]="request.filters.externalReferenceId"
+                           (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
+                           (keyup.enter)="this.onSearch();"
+                           placeholder="External Reference ID">
+                  </mat-form-field>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.loadBusinessTermList();">
-          <mat-icon>search</mat-icon>
-          <span class="ml-2">Search</span>
-        </button>
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+      </div>
+    </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
 
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.used"
-                            matTooltip="It is currently in use by another component."
-                            [matTooltipDisabled]="!row.used"
-                            (change)="$event ? toggle(row) : null"
-                            [checked]="isSelected(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container>
+      <div class="table-container">
+        <div class="score-column-container">
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
+        </div>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table multiTemplateDataRows
+                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                 [dataSource]="dataSource">
 
-          <ng-container matColumnDef="businessTerm">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Term</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="businessTerm word-break-all">
-                <a routerLink="{{ element.businessTermId }}">
-                  <span>{{ element.businessTerm }}</span>
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                              [checked]="selection.hasValue() && isAllSelected()"
+                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.used"
+                              matTooltip="It is currently in use by another component."
+                              [matTooltipDisabled]="!row.used"
+                              (change)="$event ? toggle(row) : null"
+                              [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="businessTerm">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Term</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="businessTerm word-break-all">
+                  <a routerLink="{{ element.businessTermId }}">
+                    <span>{{ element.businessTerm }}</span>
+                  </a>
+                </div>
+                <div class="description">{{ element.guid }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="externalReferenceUri">
+              <th mat-header-cell *matHeaderCellDef> External Reference URI</th>
+              <td mat-cell *matCellDef="let element">
+                <a target="_blank" rel="noopener noreferrer"
+                   href="{{ element.externalReferenceUri }}">
+                  <span class="word-break-all">{{ element.externalReferenceUri }}</span>
                 </a>
-              </div>
-              <div class="description">{{ element.guid }}</div>
-            </td>
-          </ng-container>
+            </ng-container>
 
-          <ng-container matColumnDef="externalReferenceUri">
-            <th mat-header-cell *matHeaderCellDef> External Reference URI</th>
-            <td mat-cell *matCellDef="let element">
-              <a target="_blank" rel="noopener noreferrer"
-                 href="{{ element.externalReferenceUri }}">
-                <span class="word-break-all">{{ element.externalReferenceUri }}</span>
-              </a>
-          </ng-container>
+            <ng-container matColumnDef="externalReferenceId">
+              <th mat-header-cell *matHeaderCellDef> External Reference ID</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.externalReferenceId }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="externalReferenceId">
-            <th mat-header-cell *matHeaderCellDef> External Reference ID</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="word-break-all">{{ element.externalReferenceId }}</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="definition">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.definition }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="definition">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.definition }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="lastUpdateTimestamp">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
-            </td>
-          </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="toggle(row)"></tr>
+          </table>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-              (click)="toggle(row)"></tr>
-        </table>
-
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

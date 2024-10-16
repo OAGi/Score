@@ -30,6 +30,8 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-code-list-list',
@@ -51,10 +53,87 @@ export class CodeListListComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
-  ];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfCodeListPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('codeListName');
+          }
+          break;
+        case 'Based Code List':
+          if (column.selected) {
+            displayedColumns.push('basedCodeListName');
+          }
+          break;
+        case 'Agency ID':
+          if (column.selected) {
+            displayedColumns.push('agencyId');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('versionId');
+          }
+          break;
+        case 'Extensible':
+          if (column.selected) {
+            displayedColumns.push('extensible');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+            displayedColumns.push('transferOwnership');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<CodeListForList>(true, [],
     true, (a, b) => a.codeListManifestId === b.codeListManifestId);
@@ -71,6 +150,7 @@ export class CodeListListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
+  preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
@@ -88,6 +168,7 @@ export class CodeListListComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -106,16 +187,16 @@ export class CodeListListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCodeList();
+      this.onSearch();
     });
 
     this.releases = [];
     forkJoin([
       this.releaseService.getSimpleReleases(['Published', 'Draft']),
       this.namespaceService.getSimpleNamespaces(),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, namespaces, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
       this.releases.push(...releases);
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
@@ -130,6 +211,8 @@ export class CodeListListComponent implements OnInit {
           this.request.release = this.releases[0];
         }
       }
+
+      this.preferencesInfo = preferencesInfo;
 
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -183,6 +266,11 @@ export class CodeListListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCodeList();
   }
 
   loadCodeList(isInit?: boolean) {

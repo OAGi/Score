@@ -57,7 +57,7 @@ import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
-import {FormControl} from "@angular/forms";
+import {FormControl} from '@angular/forms';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -963,8 +963,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

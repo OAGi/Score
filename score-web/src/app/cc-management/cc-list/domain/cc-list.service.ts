@@ -2,18 +2,7 @@ import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {
-  Acc,
-  Ascc,
-  Asccp,
-  Bcc,
-  Bccp,
-  CcChangeResponse,
-  CcList,
-  CcListRequest,
-  SummaryCcExtInfo,
-  SummaryCcInfo
-} from './cc-list';
+import {Acc, Ascc, Asccp, Bcc, Bccp, CcChangeResponse, CcList, CcListRequest, SummaryCcExtInfo, SummaryCcInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
 import {CcDtNodeDetail, OagisComponentType, XbtForList} from '../../domain/core-component-node';

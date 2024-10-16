@@ -105,5 +105,5 @@ tr.element-row:not(.expanded-row):active {
   overflow: visible;
   width: 100%;
   opacity: 1;
-  padding: 0 24px;
+  padding: 16px;
 }

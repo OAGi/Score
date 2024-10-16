@@ -65,10 +65,6 @@ tr.element-row:not(.expanded-row):active {
   width: 110px;
 }
 
-.mat-column-revision {
-  width: 70px;
-}
-
 .mat-column-release {
   width: 70px;
 }
@@ -97,6 +93,10 @@ tr.element-row:not(.expanded-row):active {
   width: 100px;
 }
 
+.mat-column-branch {
+  width: 80px;
+}
+
 .mat-column-owner {
   width: 140px;
   font-size: 13px;
@@ -104,10 +104,6 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-column-lastUpdateTimestamp {
   width: 160px;
-}
-
-.mat-column-more {
-  width: 40px;
 }
 
 .den {

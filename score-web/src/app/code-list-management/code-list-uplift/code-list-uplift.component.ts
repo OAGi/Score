@@ -24,6 +24,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-code-list-uplift',
@@ -44,10 +46,69 @@ export class CodeListUpliftComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'extensible', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('codeListName');
+          }
+          break;
+        case 'Based Code List':
+          if (column.selected) {
+            displayedColumns.push('basedCodeListName');
+          }
+          break;
+        case 'Agency ID':
+          if (column.selected) {
+            displayedColumns.push('agencyId');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('versionId');
+          }
+          break;
+        case 'Extensible':
+          if (column.selected) {
+            displayedColumns.push('extensible');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<CodeListForList>(false, []);
   expandedElement: CodeListForList | null;
@@ -70,6 +131,7 @@ export class CodeListUpliftComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: CodeListForList;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -83,6 +145,7 @@ export class CodeListUpliftComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -110,15 +173,17 @@ export class CodeListUpliftComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCodeList();
+      this.onSearch();
     });
 
     this.releases = [];
     forkJoin([
       this.releaseService.getSimpleReleases(['Published']),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.releases.push(...releases.filter(e => e.releaseNum !== 'Working'));
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
@@ -138,6 +203,11 @@ export class CodeListUpliftComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.loadCodeList(true);
+
+      const targetReleaseList = this.targetReleaseList;
+      if (targetReleaseList.length > 0) {
+        this.targetRelease = targetReleaseList[0];
+      }
     });
   }
 
@@ -157,6 +227,11 @@ export class CodeListUpliftComponent implements OnInit {
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
+
+      const targetReleaseList = this.targetReleaseList;
+      if (targetReleaseList.length > 0) {
+        this.targetRelease = targetReleaseList[0];
+      }
     }
   }
 
@@ -182,6 +257,11 @@ export class CodeListUpliftComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCodeList();
   }
 
   loadCodeList(isInit?: boolean) {

@@ -16,29 +16,6 @@
             <mat-card-content class="mat-card-container">
               <div>
                 <div class="subhead">
-                  <h4 class="subhead-heading">Table Column Settings</h4>
-                </div>
-                <div class="webpage-setting">
-                  <div class="row">
-                    <div class="col-3">
-                      <div class="subsubhead">
-                        <h5 class="subsubhead-heading">Core Component Page</h5>
-                      </div>
-                      <mat-selection-list #coreComponentPage>
-                        <mat-list-option
-                          *ngFor="let column of preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage"
-                          [value]="column.name"
-                          [selected]="column.selected"
-                          (click)="toggleSelection(column)">
-                          {{ column.name }}
-                        </mat-list-option>
-                      </mat-selection-list>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4">
-                <div class="subhead">
                   <h4 class="subhead-heading">Tree View Settings</h4>
                 </div>
                 <div class="webpage-setting">

@@ -1,4 +1,4 @@
-import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {BieCopyProfileBieComponent} from './bie-copy-profile-bie.component';
 

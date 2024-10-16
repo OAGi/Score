@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {of} from 'rxjs';
+import {forkJoin, of} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {AccountList, AccountListRequest} from '../domain/accounts';
@@ -12,6 +12,8 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {PageRequest} from '../../basis/basis';
 import {TenantList} from '../domain/tenants';
 import {finalize, switchMap} from 'rxjs/operators';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-tenant-user-detail',
@@ -21,18 +23,56 @@ import {finalize, switchMap} from 'rxjs/operators';
 
 export class TenantUserDetailComponent implements OnInit {
 
-  title = ' - Users Management';
+  title = 'Users Management';
   loading = false;
   tenantInfo: TenantList;
   tenantId: any;
-  displayedColumns: string[] = [
-    'loginId', 'role', 'name', 'organization', 'status', 'manage'
-  ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Login ID':
+          if (column.selected) {
+            displayedColumns.push('loginId');
+          }
+          break;
+        case 'Role':
+          if (column.selected) {
+            displayedColumns.push('role');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Organization':
+          if (column.selected) {
+            displayedColumns.push('organization');
+          }
+          break;
+        case 'Status':
+          if (column.selected) {
+            displayedColumns.push('status');
+          }
+          break;
+      }
+    }
+    displayedColumns.push('manage');
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<AccountList>();
 
   addUserToTenant = false;
 
   request: AccountListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: AccountList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -41,6 +81,7 @@ export class TenantUserDetailComponent implements OnInit {
   constructor(private auth: AuthService,
               private service: TenantListService,
               private accountService: AccountListService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -57,10 +98,8 @@ export class TenantUserDetailComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadAccounts();
+      this.onSearch();
     });
-    this.loading = true;
 
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => of(Number(params.get('id'))))
@@ -68,11 +107,23 @@ export class TenantUserDetailComponent implements OnInit {
       this.loading = true;
       this.tenantId = t;
       this.request.filters.tenantId = t;
-      this.getTenantInfo(t);
+
+      forkJoin([
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
+
+        this.getTenantInfo();
+      });
     });
   }
 
-  getTenantInfo(tenantId: number) {
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.getTenantInfo();
+  }
+
+  getTenantInfo() {
     this.loading = true;
 
     this.service.getTenantInfo(this.tenantId).pipe(
@@ -80,7 +131,7 @@ export class TenantUserDetailComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.title = resp.name + this.title;
+      this.tenantInfo = resp;
       this.loadAccounts(true);
     }, error => {
       this.dataSource.data = [];

@@ -9,6 +9,9 @@ import {TenantList, TenantListRequest} from '../domain/tenants';
 import {TenantListService} from '../domain/tenant-list.service';
 import {PageRequest} from '../../basis/basis';
 import {finalize} from 'rxjs/operators';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-tenant-list',
@@ -20,10 +23,56 @@ export class TenantListComponent implements OnInit {
 
   title = 'Tenant Roles';
   loading = false;
-  displayedColumns: string[] = ['Tenant name', 'Users', 'Business Contexts'];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfTenantPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfTenantPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfTenantPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfTenantPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Tenant Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Users':
+          if (column.selected) {
+            displayedColumns.push('users');
+          }
+          break;
+        case 'Business Contexts':
+          if (column.selected) {
+            displayedColumns.push('businessContexts');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<TenantList>();
 
   request: TenantListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: TenantList;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -31,6 +80,7 @@ export class TenantListComponent implements OnInit {
 
   constructor(private auth: AuthService,
               private service: TenantListService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -48,17 +98,27 @@ export class TenantListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadTenantList();
+      this.onSearch();
     });
 
-    this.loadTenantList(true);
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loadTenantList(true);
+    });
   }
 
   onChange(property?: string, source?) {
   }
 
   onPageChange(event: PageEvent) {
+    this.loadTenantList();
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
     this.loadTenantList();
   }
 

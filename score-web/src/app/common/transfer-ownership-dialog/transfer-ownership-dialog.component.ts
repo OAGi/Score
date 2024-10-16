@@ -8,6 +8,9 @@ import {AccountList, AccountListRequest} from '../../account-management/domain/a
 import {PageRequest} from '../../basis/basis';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AuthService} from '../../authentication/auth.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-transfer-ownership-dialog',
@@ -17,22 +20,55 @@ import {AuthService} from '../../authentication/auth.service';
 export class TransferOwnershipDialogComponent implements OnInit {
 
   loading = false;
-  displayedColumns: string[] = [
-    'select', 'loginId', 'name', 'organization', 'developer'
-  ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Login ID':
+          if (column.selected) {
+            displayedColumns.push('loginId');
+          }
+          break;
+        case 'Role':
+          if (column.selected) {
+            displayedColumns.push('role');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Organization':
+          if (column.selected) {
+            displayedColumns.push('organization');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<AccountList>();
   selection = new SelectionModel<AccountList>(false, []);
 
   loginIdList: string[] = [];
   request: AccountListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(
     public dialogRef: MatDialogRef<TransferOwnershipDialogComponent>,
+    private auth: AuthService,
     private accountService: AccountListService,
-    private authService: AuthService,
+    private preferencesService: SettingsPreferencesService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
@@ -50,11 +86,16 @@ export class TransferOwnershipDialogComponent implements OnInit {
     this.sort.active = 'name';
     this.sort.direction = 'asc';
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadAccounts();
+      this.onSearch();
     });
 
-    this.loadAccounts(true);
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loadAccounts(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -64,13 +105,18 @@ export class TransferOwnershipDialogComponent implements OnInit {
   onChange(property?: string, source?) {
   }
 
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadAccounts();
+  }
+
   loadAccounts(isInit?: boolean) {
     this.loading = true;
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    if (this.authService.getUserToken().tenant.enabled) {
+    if (this.auth.getUserToken().tenant.enabled) {
       this.request.filters.businessCtxIds = this.data.businessCtxIds;
     }
 

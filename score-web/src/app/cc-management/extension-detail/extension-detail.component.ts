@@ -24,7 +24,7 @@ import {
   Base,
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail, CcBdtPriRestri,
+  CcBccpNodeDetail,
   CcBdtScNodeDetail,
   CcId,
   CcNodeDetail,
@@ -43,9 +43,7 @@ import {
   UserExtensionGroup
 } from '../domain/core-component-node';
 import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
-import {
-  AppendAssociationDialogComponent
-} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
@@ -1274,8 +1272,6 @@ export class ExtensionDetailComponent implements OnInit {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

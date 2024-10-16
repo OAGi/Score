@@ -120,6 +120,14 @@ b {
   white-space: nowrap;
 }
 
+.f10 {
+  font-size: 10px !important;
+}
+
+.f11 {
+  font-size: 11px !important;
+}
+
 .f12 {
   font-size: 12px !important;
 }
@@ -969,9 +977,6 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
 }
 
 .table-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   position: relative;
 }
 
@@ -979,6 +984,7 @@ span.context-menu-item.disabled, span.context-menu-item[disabled] {
   display: flex;
   flex-shrink: 0;
   align-self: flex-end;
+  flex-flow: row-reverse;
 }
 
 .table-wrapper {

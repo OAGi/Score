@@ -12,6 +12,9 @@ import {finalize} from 'rxjs/operators';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-transfer-ownership-list',
@@ -21,14 +24,68 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class TransferOwnershipListComponent implements OnInit {
 
   title = 'Transfer Ownership';
-  displayedColumns: string[] = [
-    'select', 'loginId', 'role', 'name', 'organization', 'status'
-  ];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfAccountPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Login ID':
+          if (column.selected) {
+            displayedColumns.push('loginId');
+          }
+          break;
+        case 'Role':
+          if (column.selected) {
+            displayedColumns.push('role');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Organization':
+          if (column.selected) {
+            displayedColumns.push('organization');
+          }
+          break;
+        case 'Status':
+          if (column.selected) {
+            displayedColumns.push('status');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   selection = new SelectionModel<AccountList>(false, []);
   dataSource = new MatTableDataSource<AccountList>();
   loading = false;
 
   request: AccountListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -36,6 +93,7 @@ export class TransferOwnershipListComponent implements OnInit {
   constructor(private auth: AuthService,
               private service: AccountListService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private snackBar: MatSnackBar,
               private location: Location,
               private router: Router,
@@ -53,11 +111,16 @@ export class TransferOwnershipListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadAccounts();
+      this.onSearch();
     });
 
-    this.loadAccounts(true);
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loadAccounts(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -65,6 +128,11 @@ export class TransferOwnershipListComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadAccounts();
   }
 
   loadAccounts(isInit?: boolean) {

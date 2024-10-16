@@ -8,7 +8,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -18,6 +18,8 @@ import {initFilter} from '../../../common/utility';
 import {ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
+import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-module-set-release-list',
@@ -27,7 +29,61 @@ import {UserToken} from '../../../authentication/domain/auth';
 export class ModuleSetReleaseListComponent implements OnInit {
   title = 'Module Set Release';
 
-  displayedColumns: string[];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfModuleSetReleasePage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'Name':
+            if (column.selected) {
+              displayedColumns.push('name');
+            }
+            break;
+          case 'Release Num':
+            if (column.selected) {
+              displayedColumns.push('release');
+            }
+            break;
+          case 'Default':
+            if (column.selected) {
+              displayedColumns.push('default');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+
+    if (this.roles.includes('developer')) {
+      displayedColumns.push('more');
+    }
+
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<ModuleSetRelease>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -38,6 +94,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ModuleSetReleaseListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: ModuleSetRelease;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -50,14 +107,10 @@ export class ModuleSetReleaseListComponent implements OnInit {
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
-    this.displayedColumns = (this.roles.includes('developer')) ? [
-      'name', 'release', 'default', 'lastUpdateTimestamp', 'more'
-    ] : [
-      'name', 'release', 'default', 'lastUpdateTimestamp'
-    ];
   }
 
   ngOnInit(): void {
@@ -71,17 +124,21 @@ export class ModuleSetReleaseListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadModuleSetReleaseList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadModuleSetReleaseList(true);
+      this.loadModuleSetReleaseList(true);
+    });
   }
 
   get userToken(): UserToken {
@@ -121,6 +178,11 @@ export class ModuleSetReleaseListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
+    this.loadModuleSetReleaseList();
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
     this.loadModuleSetReleaseList();
   }
 

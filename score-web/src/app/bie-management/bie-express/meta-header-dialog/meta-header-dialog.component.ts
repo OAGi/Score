@@ -11,12 +11,15 @@ import {PageRequest} from '../../../basis/basis';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
 
 @Component({
   selector: 'score-meta-header-dialog',
@@ -25,10 +28,68 @@ import {WebPageInfoService} from '../../../basis/basis.service';
 })
 export class MetaHeaderDialogComponent implements OnInit {
 
-  displayedColumns: string[] = [
-    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
-    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
@@ -40,6 +101,7 @@ export class MetaHeaderDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
   release: SimpleRelease;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -51,6 +113,8 @@ export class MetaHeaderDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<MetaHeaderDialogComponent>,
     private bieListService: BieListService,
     private accountService: AccountListService,
+    private auth: AuthService,
+    private preferencesService: SettingsPreferencesService,
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
@@ -73,17 +137,21 @@ export class MetaHeaderDialogComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadBieList(true);
+      this.loadBieList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -115,6 +183,11 @@ export class MetaHeaderDialogComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
   }
 
   loadBieList(isInit?: boolean) {

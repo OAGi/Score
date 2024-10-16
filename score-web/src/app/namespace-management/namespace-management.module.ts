@@ -8,6 +8,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
+import {SearchBarModule} from '../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -38,7 +40,9 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule
+    CommonModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   declarations: [
     NamespaceListComponent,

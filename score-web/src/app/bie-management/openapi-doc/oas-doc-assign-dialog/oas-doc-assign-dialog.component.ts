@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
@@ -20,6 +20,8 @@ import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
 import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -29,12 +31,63 @@ import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 export class OasDocAssignDialogComponent implements OnInit {
 
   title = 'Add BIE';
-  subtitle = 'Selected Top-Level ABIEs';
+  subtitle = 'Selected Top-Level ASBIEPs';
 
-  displayedColumns: string[] = [
-    'select', 'state', 'branch', 'den', 'owner', 'businessContexts', 'version', 'status', 'remark',
-    'verb', 'messageBody', 'arrayIndicator'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+        }
+      }
+    }
+    displayedColumns.push('verb');
+    displayedColumns.push('messageBody');
+    displayedColumns.push('arrayIndicator');
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
@@ -54,6 +107,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   request: BieForOasDocListRequest;
   assignBieForOasDoc: AssignBieForOasDoc;
   assignBieForOasDocList: AssignBieForOasDoc[];
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -71,6 +125,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     public webPageInfo: WebPageInfoService,
+    private preferencesService: SettingsPreferencesService,
     public dialogRef: MatDialogRef<OasDocAssignDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -91,14 +146,16 @@ export class OasDocAssignDialogComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.selectBieForOasDocList();
+      this.onSearch();
     });
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -118,6 +175,12 @@ export class OasDocAssignDialogComponent implements OnInit {
 
       this.selectBieForOasDocList(true);
     });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.selection.clear();
+    this.selectBieForOasDocList();
   }
 
   selectBieForOasDocList(isInit?: boolean) {

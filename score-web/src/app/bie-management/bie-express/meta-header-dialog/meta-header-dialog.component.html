@@ -7,265 +7,269 @@
       </button>
     </div>
   </div>
-  <div class="content" mat-dialog-content>
-    <mat-card class="search-box">
+  <div class="content">
+    <mat-card style="box-shadow: none;">
+      <score-search-bar [(model)]="request.filters.den" [disabled]="true"
+                        (search)="onSearch();">
+        <div branchSelector class="d-flex" style="width: 8rem; padding: 0 0.5rem 0 1rem;">
+          <mat-form-field appearance="outline">
+            <mat-label>Branch</mat-label>
+            <input matInput [disabled]="true" [value]="request.releases[0].releaseNum"/>
+          </mat-form-field>
+          <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
+        </div>
+        <div advancedSearchContent style="padding-left: 11.5rem;">
+          <mat-card-content class="mat-card-container">
+            <div class="container-fluid" style="padding: 0;">
+              <div class="row">
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>State</mat-label>
+                    <mat-select [(ngModel)]="request.states" multiple>
+                      <mat-option *ngFor="let state of states" [value]="state">
+                        {{state}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>Business Context</mat-label>
+                    <input matInput [(ngModel)]="request.filters.businessContext"
+                           (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                           (keyup.enter)="onSearch();"
+                           placeholder="Business Context">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>Version</mat-label>
+                    <input matInput [(ngModel)]="request.filters.version"
+                           (ngModelChange)="onChange('filters.version', request.filters.version)"
+                           (keyup.enter)="onSearch();"
+                           placeholder="Version">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>Remark</mat-label>
+                    <input matInput [(ngModel)]="request.filters.remark"
+                           (ngModelChange)="onChange('filters.remark', request.filters.remark)"
+                           (keyup.enter)="onSearch();"
+                           placeholder="Remark">
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+            <div class="container-fluid" style="padding: 0;">
+              <div class="row">
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>Owner</mat-label>
+                    <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                      <mat-option>
+                        <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                               [placeholderLabel]="'Search...'"
+                                               [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                      </mat-option>
+                      <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                        {{loginId}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <mat-form-field>
+                    <mat-label>Updater</mat-label>
+                    <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                      <mat-option>
+                        <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                               [placeholderLabel]="'Search...'"
+                                               [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                      </mat-option>
+                      <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                        {{loginId}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-2 col-sm-12 d-flex">
+                  <mat-form-field>
+                    <mat-label>Updated start date</mat-label>
+                    <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                           [max]="request.updatedDate.end"
+                           (dateInput)="onDateEvent('startDate', $event)">
+                    <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                    <mat-datepicker #dateStart></mat-datepicker>
+                  </mat-form-field>
+                  <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                    <div class="mat-form-field-flex">
+                      <div class="mat-form-field-infix">
+                        <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12 d-flex">
+                  <mat-form-field>
+                    <mat-label>Updated end date</mat-label>
+                    <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                           [min]="request.updatedDate.start"
+                           (dateInput)="onDateEvent('endDate', $event)">
+                    <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                    <mat-datepicker #dateEnd></mat-datepicker>
+                  </mat-form-field>
+                  <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                    <div class="mat-form-field-flex">
+                      <div class="mat-form-field-infix">
+                        <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </div>
+      </score-search-bar>
+
       <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Branch</mat-label>
-                <input matInput [disabled]="true" [value]="request.releases[0].releaseNum"/>
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>State</mat-label>
-                <mat-select [(ngModel)]="request.states" multiple>
-                  <mat-option *ngFor="let state of states" [value]="state">
-                    {{state}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
+        <div class="loading-container" *ngIf="loading">
+          <mat-spinner [diameter]="40"></mat-spinner>
         </div>
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Owner</mat-label>
-                <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated start date</mat-label>
-                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end"
-                       (dateInput)="onDateEvent('startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated end date</mat-label>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start"
-                       (dateInput)="onDateEvent('endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Business Context</mat-label>
-                  <input matInput [(ngModel)]="request.filters.businessContext"
-                         (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                         placeholder="Business Context">
-                </mat-form-field>
-              </div>
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Version</mat-label>
-                  <input matInput [(ngModel)]="request.filters.version"
-                         (ngModelChange)="onChange('filters.version', request.filters.version)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                         placeholder="Version">
-                </mat-form-field>
-              </div>
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Remark</mat-label>
-                  <input matInput [(ngModel)]="request.filters.remark"
-                         (ngModelChange)="onChange('filters.remark', request.filters.remark)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                         placeholder="Remark">
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.loadBieList();">
-          <mat-icon>search</mat-icon>
-          <span class="ml-2">Search</span>
-        </button>
-      </mat-card-actions>
-    </mat-card>
 
-    <div class="mat-elevation-z1">
-      <table mat-table
-             matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-             [dataSource]="dataSource">
+        <div class="table-container">
+          <div class="mat-elevation-z1 table-wrapper">
+            <table mat-table
+                   matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                   [dataSource]="dataSource">
 
-        <!-- Checkbox Column -->
-        <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()"
-                          (change)="$event ? toggle(row) : null"
-                          [checked]="isSelected(row)">
-            </mat-checkbox>
-          </td>
-        </ng-container>
+              <!-- Checkbox Column -->
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row">
+                  <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? toggle(row) : null"
+                                [checked]="isSelected(row)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="state">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
-          <td mat-cell *matCellDef="let element">
+              <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                <td mat-cell *matCellDef="let element">
             <span class="bie-state {{ element.state }}"
                   [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
                   'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-            <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
-                  [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                  <span *ngIf="element.deprecated" class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                       'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          </td>
-        </ng-container>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="branch">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch</th>
-          <td mat-cell *matCellDef="let element">
-            <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="branch">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch</th>
+                <td mat-cell *matCellDef="let element">
+                  <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="den">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
-          <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
-            <div class="den word-break-all">
-              <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                 matTooltip="{{ element.den }}">
-                <span>{{ element.den }}</span>
-              </a>
-            </div>
-            <div class="bie-guid">{{ element.guid }}</div>
-            <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId && !!element.sourceReleaseId">
-              <span>Source:</span>
-              <a target="_blank" rel="noopener noreferrer"
-                 href="/profile_bie?{{ request.toQuery({
+              <ng-container matColumnDef="den">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+                  <div class="den word-break-all">
+                    <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                       matTooltip="{{ element.den }}">
+                      <span>{{ element.den }}</span>
+                    </a>
+                  </div>
+                  <div class="bie-guid">{{ element.guid }}</div>
+                  <div class="bie-source" *ngIf="!!element.sourceTopLevelAsbiepId && !!element.sourceReleaseId">
+                    <span>Source:</span>
+                    <a target="_blank" rel="noopener noreferrer"
+                       href="/profile_bie?{{ request.toQuery({
                       den: element.sourceDen,
                       releaseIds: element.sourceReleaseId,
                       topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
                 <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
                   {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
                 </span>
-              </a>
-            </div>
-          </td>
-        </ng-container>
+                    </a>
+                  </div>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="owner">
-          <th mat-header-cell *matHeaderCellDef> Owner</th>
-          <td mat-cell *matCellDef="let element">
-            <span [matTooltip]="element.owner">{{ element.owner }}</span>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="owner">
+                <th mat-header-cell *matHeaderCellDef> Owner</th>
+                <td mat-cell *matCellDef="let element">
+                  <span [matTooltip]="element.owner">{{ element.owner }}</span>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="businessContexts">
-          <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
-          <td mat-cell *matCellDef="let element">
-            <ng-container *ngFor="let businessContext of element.businessContexts">
+              <ng-container matColumnDef="businessContexts">
+                <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
+                <td mat-cell *matCellDef="let element">
+                  <ng-container *ngFor="let businessContext of element.businessContexts">
               <span class="businessContext">
                 <a target="_blank" rel="noopener noreferrer"
                    routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
                   {{ businessContext.name }}</a>
               </span>
-            </ng-container>
-          </td>
-        </ng-container>
+                  </ng-container>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="version">
-          <th mat-header-cell *matHeaderCellDef> Version</th>
-          <td mat-cell *matCellDef="let element">
-            <div [matTooltip]="element.version">{{ element.version }}</div>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="version">
+                <th mat-header-cell *matHeaderCellDef> Version</th>
+                <td mat-cell *matCellDef="let element">
+                  <div [matTooltip]="element.version">{{ element.version }}</div>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status</th>
-          <td mat-cell *matCellDef="let element">
-            <div [matTooltip]="element.status">{{ element.status }}</div>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef> Status</th>
+                <td mat-cell *matCellDef="let element">
+                  <div [matTooltip]="element.status">{{ element.status }}</div>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="bizTerm">
-          <th mat-header-cell *matHeaderCellDef> Business Term</th>
-          <td mat-cell *matCellDef="let element">
-            <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="bizTerm">
+                <th mat-header-cell *matHeaderCellDef> Business Term</th>
+                <td mat-cell *matCellDef="let element">
+                  <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="remark">
-          <th mat-header-cell *matHeaderCellDef> Remark</th>
-          <td mat-cell *matCellDef="let element">
-            <div>{{ element.remark }}</div>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="remark">
+                <th mat-header-cell *matHeaderCellDef> Remark</th>
+                <td mat-cell *matCellDef="let element">
+                  <div>{{ element.remark }}</div>
+                </td>
+              </ng-container>
 
-        <ng-container matColumnDef="lastUpdateTimestamp">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
-          <td mat-cell *matCellDef="let element">
-            <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-            <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
-          </td>
-        </ng-container>
+              <ng-container matColumnDef="lastUpdateTimestamp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                <td mat-cell *matCellDef="let element">
+                  <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>
+                </td>
+              </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            (click)="toggle(row)"></tr>
-      </table>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                  (click)="toggle(row)"></tr>
+            </table>
 
-      <mat-paginator
-        [pageSizeOptions]="[10, 25, 50]"
-        (page)="onPageChange($event)"
-        showFirstLastButtons></mat-paginator>
-    </div>
+            <mat-paginator
+              [pageSizeOptions]="[10, 25, 50]"
+              (page)="onPageChange($event)"
+              showFirstLastButtons></mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
+
   <div class="actions ml-auto" mat-dialog-actions>
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>

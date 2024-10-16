@@ -13,11 +13,14 @@ import {AccountListService} from '../../../account-management/domain/account-lis
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Base, OagisComponentType, Semantics} from '../../domain/core-component-node';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
 
 @Component({
   selector: 'score-based-acc-dialog',
@@ -38,9 +41,54 @@ export class BasedAccDialogComponent implements OnInit {
   componentTypeList: OagisComponentType[] = [Base, Semantics];
   workingRelease = WorkingRelease;
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
   selection = new SelectionModel<CcList>(false, []);
@@ -53,6 +101,7 @@ export class BasedAccDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  preferencesInfo: PreferencesInfo;
   action: string;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -61,11 +110,13 @@ export class BasedAccDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
+              private auth: AuthService,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private confirmDialogService: ConfirmDialogService) {
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
@@ -85,17 +136,27 @@ export class BasedAccDialogComponent implements OnInit {
     this.sort.active = 'lastUpdateTimestamp';
     this.sort.direction = 'desc';
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCcList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    this.loading = true;
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadCcList(true);
+      this.loadCcList(true);
+    });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCcList();
   }
 
   loadCcList(isInit?: boolean) {
@@ -158,16 +219,22 @@ export class BasedAccDialogComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
+        this.request.page.sortActive = '';
+        this.request.page.sortDirection = '';
         this.sort.active = '';
         this.sort.direction = '';
       } else {
+        this.request.page.sortActive = 'lastUpdateTimestamp';
+        this.request.page.sortDirection = 'desc';
         this.sort.active = 'lastUpdateTimestamp';
         this.sort.direction = 'desc';
       }

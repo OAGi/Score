@@ -27,6 +27,8 @@ import {AuthService} from '../../authentication/auth.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -50,9 +52,54 @@ export class BieCreateAsccpComponent implements OnInit {
   releaseId: number;
   releases: Release[] = [];
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   stateList = ['Published', 'Production'];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
@@ -68,6 +115,7 @@ export class BieCreateAsccpComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
   tags: Tag[] = [];
+  preferencesInfo: PreferencesInfo;
 
   workingRelease = WorkingRelease;
 
@@ -85,6 +133,7 @@ export class BieCreateAsccpComponent implements OnInit {
               private service: BieCreateService,
               private tagService: TagService,
               private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -107,8 +156,7 @@ export class BieCreateAsccpComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadData();
+      this.onSearch();
     });
 
     // Init releases
@@ -118,13 +166,15 @@ export class BieCreateAsccpComponent implements OnInit {
     forkJoin([
       this.accountService.getAccountNames(),
       this.releaseService.getSimpleReleases(),
-      this.tagService.getTags()
-    ]).subscribe(([loginIds, releases, tags]) => {
+      this.tagService.getTags(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, tags, preferencesInfo]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
@@ -166,6 +216,14 @@ export class BieCreateAsccpComponent implements OnInit {
     });
   }
 
+  get businessContextNames(): string {
+    if (!this.businessContextList) {
+      return '';
+    } else {
+      return this.businessContextList.map(e => e.name).join(', ');
+    }
+  }
+
   onPageChange(event: PageEvent) {
     this.loadData();
   }
@@ -198,10 +256,17 @@ export class BieCreateAsccpComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadData();
   }
 
   loadData(isInit?: boolean) {

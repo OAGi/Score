@@ -10,6 +10,9 @@ import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {PendingListService} from '../domain/pending-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-pending-list',
@@ -19,19 +22,69 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 export class PendingListComponent implements OnInit {
 
   title = 'Pending Account';
-  displayedColumns: string[] = [
-    'preferredUsername', 'email', 'providerName', 'creationTimestamp'
-  ];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfPendingAccountPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Preferred Username':
+          if (column.selected) {
+            displayedColumns.push('preferredUsername');
+          }
+          break;
+        case 'Email':
+          if (column.selected) {
+            displayedColumns.push('email');
+          }
+          break;
+        case 'Provider':
+          if (column.selected) {
+            displayedColumns.push('providerName');
+          }
+          break;
+        case 'Created On':
+          if (column.selected) {
+            displayedColumns.push('creationTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<PendingAccount>();
   loading = false;
 
   request: PendingListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private auth: AuthService,
               private service: PendingListService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -48,11 +101,16 @@ export class PendingListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadPendingList();
+      this.onSearch();
     });
 
-    this.loadPendingList(true);
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loadPendingList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -82,6 +140,11 @@ export class PendingListComponent implements OnInit {
         this.request.createdDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadPendingList();
   }
 
   loadPendingList(isInit?: boolean) {

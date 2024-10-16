@@ -7,9 +7,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../../account-management/domain/accounts';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {NamespaceList, NamespaceListRequest} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {PageRequest} from '../../basis/basis';
@@ -17,11 +15,13 @@ import {initFilter} from '../../common/utility';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {Location} from '@angular/common';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AuthService} from '../../authentication/auth.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-namespace-list',
@@ -32,9 +32,67 @@ export class NamespaceListComponent implements OnInit {
 
   title = 'Namespace';
 
-  displayedColumns: string[] = [
-    'uri', 'prefix', 'owner', 'transferOwnership', 'std', 'description', 'lastUpdateTimestamp', 'more'
-  ];
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfNamespacePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfNamespacePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfNamespacePage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfNamespacePage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'URI':
+          if (column.selected) {
+            displayedColumns.push('uri');
+          }
+          break;
+        case 'Prefix':
+          if (column.selected) {
+            displayedColumns.push('prefix');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+            displayedColumns.push('transferOwnership');
+          }
+          break;
+        case 'Standard':
+          if (column.selected) {
+            displayedColumns.push('std');
+          }
+          break;
+        case 'Description':
+          if (column.selected) {
+            displayedColumns.push('description');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<NamespaceList>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -45,6 +103,7 @@ export class NamespaceListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: NamespaceListRequest;
+  preferencesInfo: PreferencesInfo;
 
   contextMenuItem: NamespaceList;
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -57,6 +116,7 @@ export class NamespaceListComponent implements OnInit {
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -74,17 +134,21 @@ export class NamespaceListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadNamespaceList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadNamespaceList(true);
+      this.loadNamespaceList(true);
+    });
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -112,6 +176,11 @@ export class NamespaceListComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadNamespaceList();
   }
 
   loadNamespaceList(isInit?: boolean) {

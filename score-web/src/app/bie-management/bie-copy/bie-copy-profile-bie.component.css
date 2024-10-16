@@ -60,3 +60,9 @@ tr.element-row:not(.expanded-row):active {
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }
+
+.branch-selector-container {
+  margin-bottom: 1rem;
+  padding-left: 4rem;
+  padding-bottom: 0;
+}

@@ -24,6 +24,8 @@ import {TenantUserDetailComponent} from './tenant-user-detail/tenant-user-detail
 import {TenantCreateComponent} from './tenant-create/tenant-create.component';
 import {UpdateTenantComponent} from './tenant-update/tenant-update.component';
 import {TransferOwnershipListComponent} from './take-ownership-list/transfer-ownership-list.component';
+import {SearchBarModule} from '../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 
 
 const routes: Routes = [
@@ -90,7 +92,9 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule
+    CommonModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   declarations: [
     AccountListComponent,

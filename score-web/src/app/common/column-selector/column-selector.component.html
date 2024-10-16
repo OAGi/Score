@@ -1,20 +1,34 @@
 <div cdkOverlayOrigin #trigger="cdkOverlayOrigin">
   <button mat-raised-button (click)="toggleOverlay()" type="button">
-    <div class="d-flex align-items-center justify-content-between" style="width: 120px;">
-        <span>Columns</span>
+    <div class="d-flex align-items-center justify-content-between" style="width: 100px;">
+      <span class="f12">Columns</span>
       <mat-icon>{{ overlayVisible ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
     </div>
   </button>
 
   <ng-template cdkConnectedOverlay
-                [cdkConnectedOverlayOrigin]="trigger"
-                [cdkConnectedOverlayOpen]="overlayVisible">
+               [cdkConnectedOverlayOrigin]="trigger"
+               [cdkConnectedOverlayOpen]="overlayVisible"
+               [cdkConnectedOverlayHasBackdrop]="true"
+               [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+               [cdkConnectedOverlayViewportMargin]="8"
+               (backdropClick)="closeOverlay()">
     <div class="column-selector overlay-spacing" cdkDropList (cdkDropListDropped)="drop($event)">
       <div class="column" *ngFor="let column of columns" cdkDrag>
         <mat-checkbox [(ngModel)]="column.selected" (change)="toggleColumnSelection()">
-          {{ column.name }}
+          <span class="f12">{{ column.name }}</span>
         </mat-checkbox>
-        <span class="drag-handle">☰</span>
+        <mat-icon class="drag-handle mr-2"
+                  cdkDragHandle>drag_handle
+        </mat-icon>
+      </div>
+
+      <mat-divider *ngIf="onReset.observed"/>
+
+      <div class="d-flex justify-content-end mt-2" *ngIf="onReset.observed">
+        <button mat-stroked-button (click)="onResetButtonClick()">
+          <span class="f12">Reset</span>
+        </button>
       </div>
     </div>
   </ng-template>

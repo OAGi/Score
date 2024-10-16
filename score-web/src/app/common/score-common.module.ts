@@ -2,7 +2,8 @@ import {NgModule} from '@angular/core';
 import {
   ArraySortPipe,
   DateAgoPipe,
-  HighlightSearch, JoinPipe,
+  HighlightSearch,
+  JoinPipe,
   PastTensePipe,
   SeparatePipe,
   TruncatePipe,

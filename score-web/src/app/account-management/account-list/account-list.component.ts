@@ -9,6 +9,10 @@ import {AuthService} from '../../authentication/auth.service';
 import {PageRequest} from '../../basis/basis';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'score-account-list',
@@ -18,19 +22,74 @@ import {finalize} from 'rxjs/operators';
 export class AccountListComponent implements OnInit {
 
   title = 'Accounts';
-  displayedColumns: string[] = [
-    'loginId', 'role', 'name', 'organization', 'status'
-  ];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfAccountPage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Login ID':
+          if (column.selected) {
+            displayedColumns.push('loginId');
+          }
+          break;
+        case 'Role':
+          if (column.selected) {
+            displayedColumns.push('role');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Organization':
+          if (column.selected) {
+            displayedColumns.push('organization');
+          }
+          break;
+        case 'Status':
+          if (column.selected) {
+            displayedColumns.push('status');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<AccountList>();
   loading = false;
 
   request: AccountListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private auth: AuthService,
               private service: AccountListService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute) {
@@ -47,11 +106,16 @@ export class AccountListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadAccounts();
+      this.onSearch();
     });
 
-    this.loadAccounts(true);
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
+      this.loadAccounts(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -59,6 +123,11 @@ export class AccountListComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadAccounts();
   }
 
   loadAccounts(isInit?: boolean) {

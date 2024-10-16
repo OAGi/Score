@@ -1,12 +1,10 @@
+.mat-column-name {
+}
+
 .mat-column-description {
-  width: 50%;
+  min-width: 55%;
 }
 
 .mat-column-lastUpdateTimestamp {
   width: 160px;
-}
-
-.description {
-  font-size: 12px !important;
-  color: #767676 !important;
 }

@@ -36,6 +36,9 @@ export class MessageService {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+    if (request.filters.subject) {
+      params = params.set('subject', request.filters.subject);
+    }
     if (request.senderUsernameList.length > 0) {
       params = params.set('senderUsernameList', request.senderUsernameList.join(','));
     }

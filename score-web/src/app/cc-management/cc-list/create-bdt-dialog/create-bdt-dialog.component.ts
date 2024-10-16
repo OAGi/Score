@@ -19,6 +19,9 @@ import {WorkingRelease} from '../../../release-management/domain/release';
 import {TagService} from '../../../tag-management/domain/tag.service';
 import {Tag} from '../../../tag-management/domain/tag';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {AuthService} from '../../../authentication/auth.service';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-create-bccp-dialog',
@@ -37,9 +40,64 @@ export class CreateBdtDialogComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'valueDomain', 'sixDigitId', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Value Domain':
+          if (column.selected) {
+            displayedColumns.push('valueDomain');
+          }
+          break;
+        case 'Six Hexadecimal ID':
+          if (column.selected) {
+            displayedColumns.push('sixDigitId');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
   selection = new SelectionModel<CcList>(false, []);
@@ -51,6 +109,7 @@ export class CreateBdtDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   tags: Tag[] = [];
+  preferencesInfo: PreferencesInfo;
   request: CcListRequest;
   action: string;
 
@@ -64,12 +123,14 @@ export class CreateBdtDialogComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(public dialogRef: MatDialogRef<CcListComponent>,
+              private auth: AuthService,
               private ccListService: CcListService,
               private accountService: AccountListService,
               private tagService: TagService,
               public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private confirmDialogService: ConfirmDialogService) {
+              private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
@@ -89,23 +150,29 @@ export class CreateBdtDialogComponent implements OnInit {
     this.sort.active = 'lastUpdateTimestamp';
     this.sort.direction = 'desc';
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCcList();
+      this.onSearch();
     });
 
     this.loading = true;
     forkJoin([
       this.accountService.getAccountNames(),
-      this.tagService.getTags()
-    ]).subscribe(([loginIds, tags]) => {
+      this.tagService.getTags(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, tags, preferencesInfo]) => {
+      this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.tags = tags;
-
       this.loadCcList(true);
     });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCcList();
   }
 
   loadCcList(isInit?: boolean) {
@@ -167,16 +234,22 @@ export class CreateBdtDialogComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
+        this.request.page.sortActive = '';
+        this.request.page.sortDirection = '';
         this.sort.active = '';
         this.sort.direction = '';
       } else {
+        this.request.page.sortActive = 'lastUpdateTimestamp';
+        this.request.page.sortDirection = 'desc';
         this.sort.active = 'lastUpdateTimestamp';
         this.sort.direction = 'desc';
       }

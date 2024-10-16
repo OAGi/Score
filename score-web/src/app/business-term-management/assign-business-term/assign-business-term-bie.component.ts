@@ -22,6 +22,8 @@ import {BieListService} from '../../bie-management/bie-list/domain/bie-list.serv
 import {UserToken} from '../../authentication/domain/auth';
 import {BusinessTermService} from '../domain/business-term.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-bie-create-bie',
@@ -40,10 +42,69 @@ export class AssignBusinessTermBieComponent implements OnInit {
   title = 'Assign Business Term';
   subtitle = 'Select BIE';
 
-  displayedColumns: string[] = [
-    'select', 'state', 'den', 'topLevelAsccpPropertyTerm', 'owner', 'businessContexts', 'version',
-    'type', 'status', 'remark', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+              displayedColumns.push('type');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<AsbieBbieList>();
   selection = new SelectionModel<AsbieBbieList>(true, []);
   loading = false;
@@ -59,6 +120,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   typeList: string[] = ['BBIE', 'ASBIE'];
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -70,6 +132,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
               private releaseService: ReleaseService,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              private preferencesService: SettingsPreferencesService,
               private auth: AuthService,
               private location: Location,
               private router: Router,
@@ -89,14 +152,16 @@ export class AssignBusinessTermBieComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.onSearch();
     });
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -106,6 +171,7 @@ export class AssignBusinessTermBieComponent implements OnInit {
       if (this.releases.length > 0) {
         this.request.releases = this.releases;
       }
+
       this.loadBieList(true);
     });
   }
@@ -122,6 +188,10 @@ export class AssignBusinessTermBieComponent implements OnInit {
 
   get userToken(): UserToken {
     return this.auth.getUserToken();
+  }
+
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   onPageChange(event: PageEvent) {
@@ -156,6 +226,11 @@ export class AssignBusinessTermBieComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
   }
 
   loadBieList(isInit?: boolean) {

@@ -13,10 +13,13 @@ import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {CcListComponent} from '../cc-list.component';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
 
 @Component({
   selector: 'score-create-asccp-dialog',
@@ -35,9 +38,34 @@ export class CreateBodDialogComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'den', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   nounDataSource = new MatTableDataSource<CcList>();
   verbDataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
@@ -52,6 +80,7 @@ export class CreateBodDialogComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   verbRequest: CcListRequest;
   nounRequest: CcListRequest;
+  preferencesInfo: PreferencesInfo;
   action: string;
 
   workingRelease = WorkingRelease;
@@ -62,11 +91,13 @@ export class CreateBodDialogComponent implements OnInit {
   @ViewChild('nounPaginator', {static: true}) nounPaginator: MatPaginator;
 
   constructor(public dialogRef: MatDialogRef<CcListComponent>,
+              private auth: AuthService,
               private ccListService: CcListService,
               private accountService: AccountListService,
               public webPageInfo: WebPageInfoService,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private confirmDialogService: ConfirmDialogService) {
+              private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
@@ -91,25 +122,37 @@ export class CreateBodDialogComponent implements OnInit {
     this.verbSort.active = '';
     this.verbSort.direction = '';
     this.verbSort.sortChange.subscribe(() => {
-      this.verbPaginator.pageIndex = 0;
-      this.loadCcList('verb');
+      this.onSearch('verb');
     });
 
     this.nounSort.active = 'lastUpdateTimestamp';
     this.nounSort.direction = 'desc';
     this.nounSort.sortChange.subscribe(() => {
-      this.nounPaginator.pageIndex = 0;
-      this.loadCcList('noun');
+      this.onSearch('noun');
     });
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadCcList('verb');
-    this.loadCcList('noun');
+      this.loadCcList('verb');
+      this.loadCcList('noun');
+    });
+  }
+
+  onSearch(type: string) {
+    if (type === 'verb') {
+      this.verbPaginator.pageIndex = 0;
+    } else if (type === 'noun') {
+      this.nounPaginator.pageIndex = 0;
+    }
+
+    this.loadCcList(type);
   }
 
   loadCcList(type: string) {
@@ -200,10 +243,16 @@ export class CreateBodDialogComponent implements OnInit {
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
     switch (type) {
-      case 'startDate':
+      case 'verbStartDate':
+        this.verbRequest.updatedDate.start = new Date(event.value);
+        break;
+      case 'verbEndDate':
+        this.verbRequest.updatedDate.end = new Date(event.value);
+        break;
+      case 'nounStartDate':
         this.nounRequest.updatedDate.start = new Date(event.value);
         break;
-      case 'endDate':
+      case 'nounEndDate':
         this.nounRequest.updatedDate.end = new Date(event.value);
         break;
     }
@@ -211,10 +260,16 @@ export class CreateBodDialogComponent implements OnInit {
 
   reset(type: string) {
     switch (type) {
-      case 'startDate':
+      case 'verbStartDate':
+        this.verbRequest.updatedDate.start = null;
+        break;
+      case 'verbEndDate':
+        this.verbRequest.updatedDate.end = null;
+        break;
+      case 'nounStartDate':
         this.nounRequest.updatedDate.start = null;
         break;
-      case 'endDate':
+      case 'nounEndDate':
         this.nounRequest.updatedDate.end = null;
         break;
     }
@@ -222,31 +277,43 @@ export class CreateBodDialogComponent implements OnInit {
 
   onChange(type: string, property?: string, source?) {
     if (type === 'verb') {
-      if (property === 'filters.den') {
+      if (property === 'filters.den' && !!source) {
+        this.verbRequest.page.sortActive = '';
+        this.verbRequest.page.sortDirection = '';
         this.verbSort.active = '';
         this.verbSort.direction = '';
       }
 
       if (property === 'fuzzySearch') {
         if (this.verbRequest.fuzzySearch) {
+          this.verbRequest.page.sortActive = '';
+          this.verbRequest.page.sortDirection = '';
           this.verbSort.active = '';
           this.verbSort.direction = '';
         } else {
+          this.verbRequest.page.sortActive = 'lastUpdateTimestamp';
+          this.verbRequest.page.sortDirection = 'desc';
           this.verbSort.active = 'lastUpdateTimestamp';
           this.verbSort.direction = 'desc';
         }
       }
     } else if (type === 'noun') {
-      if (property === 'filters.den') {
+      if (property === 'filters.den' && !!source) {
+        this.nounRequest.page.sortActive = '';
+        this.nounRequest.page.sortDirection = '';
         this.nounSort.active = '';
         this.nounSort.direction = '';
       }
 
       if (property === 'fuzzySearch') {
         if (this.nounRequest.fuzzySearch) {
+          this.nounRequest.page.sortActive = '';
+          this.nounRequest.page.sortDirection = '';
           this.nounSort.active = '';
           this.nounSort.direction = '';
         } else {
+          this.nounRequest.page.sortActive = 'lastUpdateTimestamp';
+          this.nounRequest.page.sortDirection = 'desc';
           this.nounSort.active = 'lastUpdateTimestamp';
           this.nounSort.direction = 'desc';
         }

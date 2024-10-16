@@ -14,6 +14,8 @@ import {
   BusinessContextValueDialogComponent
 } from './business-context-value-dialog/business-context-value-dialog.component';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -45,7 +47,9 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
-    CommonModule
+    CommonModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   declarations: [
     BusinessContextListComponent,

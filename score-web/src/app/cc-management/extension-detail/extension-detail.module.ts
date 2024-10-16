@@ -7,9 +7,6 @@ import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
 import {TranslateModule} from '@ngx-translate/core';
-import {
-  AppendAssociationDialogComponent
-} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {AngularSplitModule} from 'angular-split';
 import {ExtensionDetailComponent} from './extension-detail.component';

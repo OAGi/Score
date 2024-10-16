@@ -11,12 +11,15 @@ import {PageRequest} from '../../../basis/basis';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
 
 @Component({
   selector: 'score-context-scheme',
@@ -26,10 +29,67 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 export class ContextSchemeListComponent implements OnInit {
 
   title = 'Context Scheme';
-  displayedColumns: string[] = [
-    'select', 'schemeName', 'contextCategoryName', 'schemeId', 'schemeAgencyId',
-    'schemeVersionId', 'lastUpdateTimestamp'
-  ];
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfContextSchemePage);
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('schemeName');
+          }
+          break;
+        case 'Context Category':
+          if (column.selected) {
+            displayedColumns.push('contextCategoryName');
+          }
+          break;
+        case 'Scheme ID':
+          if (column.selected) {
+            displayedColumns.push('schemeId');
+          }
+          break;
+        case 'Agency ID':
+          if (column.selected) {
+            displayedColumns.push('schemeAgencyId');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('schemeVersionId');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<ContextScheme>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -38,6 +98,7 @@ export class ContextSchemeListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ContextSchemeListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -46,8 +107,9 @@ export class ContextSchemeListComponent implements OnInit {
 
   constructor(private service: ContextSchemeService,
               private accountService: AccountListService,
-              private dialog: MatDialog,
+              private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -65,16 +127,20 @@ export class ContextSchemeListComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadContextSchemeList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadContextSchemeList(true);
+      this.loadContextSchemeList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -106,6 +172,11 @@ export class ContextSchemeListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadContextSchemeList();
   }
 
   loadContextSchemeList(isInit?: boolean) {

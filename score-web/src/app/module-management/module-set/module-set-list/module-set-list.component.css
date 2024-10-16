@@ -40,15 +40,6 @@ tr.element-row:not(.expanded-row):active {
   margin-bottom: 0;
 }
 
-.mat-column-prefix {
-  width: 90px;
-}
-
-.mat-column-owner {
-  width: 140px;
-  font-size: 13px;
-}
-
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }

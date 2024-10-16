@@ -74,6 +74,7 @@ public class CoreComponentGraphContext implements GraphContext {
         private ULong asccpManifestId;
         private ULong roleOfAccManifestId;
         private String propertyTerm;
+        private String den;
         private String state;
         private String guid;
         private Byte isDeprecated;
@@ -88,6 +89,7 @@ public class CoreComponentGraphContext implements GraphContext {
         private ULong bdtManifestId;
         private String propertyTerm;
         private String representationTerm;
+        private String den;
         private String state;
         private String guid;
         private Byte isDeprecated;
@@ -101,6 +103,7 @@ public class CoreComponentGraphContext implements GraphContext {
         private ULong asccManifestId;
         private ULong fromAccManifestId;
         private ULong toAsccpManifestId;
+        private String den;
         private int cardinalityMin;
         private int cardinalityMax;
         private String state;
@@ -119,6 +122,7 @@ public class CoreComponentGraphContext implements GraphContext {
         private ULong bccManifestId;
         private ULong fromAccManifestId;
         private ULong toBccpManifestId;
+        private String den;
         private int cardinalityMin;
         private int cardinalityMax;
         private BCCEntityType entityType;
@@ -201,7 +205,7 @@ public class CoreComponentGraphContext implements GraphContext {
 
         List<AsccpManifest> asccpManifestList =
                 dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID,
-                        ASCCP.PROPERTY_TERM, ASCCP.STATE, ASCCP.GUID, ASCCP.IS_DEPRECATED,
+                        ASCCP.PROPERTY_TERM, ASCCP_MANIFEST.DEN, ASCCP.STATE, ASCCP.GUID, ASCCP.IS_DEPRECATED,
                         ASCCP_MANIFEST.RELEASE_ID, ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID)
                         .from(ASCCP_MANIFEST)
                         .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
@@ -210,6 +214,7 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID),
                                 record.get(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID),
                                 record.get(ASCCP.PROPERTY_TERM),
+                                record.get(ASCCP_MANIFEST.DEN),
                                 record.get(ASCCP.STATE),
                                 record.get(ASCCP.GUID),
                                 record.get(ASCCP.IS_DEPRECATED),
@@ -231,7 +236,8 @@ public class CoreComponentGraphContext implements GraphContext {
 
         List<BccpManifest> bccpManifestList =
                 dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BDT_MANIFEST_ID,
-                                BCCP.PROPERTY_TERM, BCCP.REPRESENTATION_TERM, BCCP.STATE, BCCP.GUID, BCCP.IS_DEPRECATED,
+                                BCCP.PROPERTY_TERM, BCCP.REPRESENTATION_TERM, BCCP_MANIFEST.DEN,
+                                BCCP.STATE, BCCP.GUID, BCCP.IS_DEPRECATED,
                                 BCCP_MANIFEST.RELEASE_ID, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
                         .from(BCCP_MANIFEST)
                         .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
@@ -241,6 +247,7 @@ public class CoreComponentGraphContext implements GraphContext {
                                 record.get(BCCP_MANIFEST.BDT_MANIFEST_ID),
                                 record.get(BCCP.PROPERTY_TERM),
                                 record.get(BCCP.REPRESENTATION_TERM),
+                                record.get(BCCP_MANIFEST.DEN),
                                 record.get(BCCP.STATE),
                                 record.get(BCCP.GUID),
                                 record.get(BCCP.IS_DEPRECATED),
@@ -265,6 +272,7 @@ public class CoreComponentGraphContext implements GraphContext {
                         ASCC_MANIFEST.ASCC_MANIFEST_ID,
                         ASCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                         ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID,
+                        ASCC_MANIFEST.DEN,
                         ASCC.CARDINALITY_MIN, ASCC.CARDINALITY_MAX,
                         SEQ_KEY.SEQ_KEY_ID, SEQ_KEY.PREV_SEQ_KEY_ID, SEQ_KEY.NEXT_SEQ_KEY_ID,
                         ASCC.STATE, ASCC.IS_DEPRECATED, ASCC_MANIFEST.RELEASE_ID, ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
@@ -281,6 +289,7 @@ public class CoreComponentGraphContext implements GraphContext {
                                     record.get(ASCC_MANIFEST.ASCC_MANIFEST_ID),
                                     record.get(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID),
                                     record.get(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID),
+                                    record.get(ASCC_MANIFEST.DEN),
                                     record.get(ASCC.CARDINALITY_MIN),
                                     record.get(ASCC.CARDINALITY_MAX),
                                     record.get(ASCC.STATE),
@@ -308,6 +317,7 @@ public class CoreComponentGraphContext implements GraphContext {
                         BCC_MANIFEST.BCC_MANIFEST_ID,
                         BCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                         BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
+                        BCC_MANIFEST.DEN,
                         BCC.CARDINALITY_MIN, BCC.CARDINALITY_MAX, BCC.ENTITY_TYPE,
                         SEQ_KEY.SEQ_KEY_ID, SEQ_KEY.PREV_SEQ_KEY_ID, SEQ_KEY.NEXT_SEQ_KEY_ID,
                         BCC.STATE, BCC.IS_DEPRECATED, BCC_MANIFEST.RELEASE_ID, BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
@@ -324,6 +334,7 @@ public class CoreComponentGraphContext implements GraphContext {
                                     record.get(BCC_MANIFEST.BCC_MANIFEST_ID),
                                     record.get(BCC_MANIFEST.FROM_ACC_MANIFEST_ID),
                                     record.get(BCC_MANIFEST.TO_BCCP_MANIFEST_ID),
+                                    record.get(BCC_MANIFEST.DEN),
                                     record.get(BCC.CARDINALITY_MIN),
                                     record.get(BCC.CARDINALITY_MAX),
                                     BCCEntityType.valueOf(record.get(BCC.ENTITY_TYPE)),
@@ -591,7 +602,7 @@ public class CoreComponentGraphContext implements GraphContext {
                 .where(ASCCP.ASCCP_ID.eq(record.getAsccpId()))
                 .fetchOne();
         return toNode(new AsccpManifest(record.getAsccpManifestId(), record.getRoleOfAccManifestId(),
-                res.get(ASCCP.PROPERTY_TERM), res.get(ASCCP.STATE), res.get(ASCCP.GUID), res.get(ASCCP.IS_DEPRECATED),
+                res.get(ASCCP.PROPERTY_TERM), record.getDen(), res.get(ASCCP.STATE), res.get(ASCCP.GUID), res.get(ASCCP.IS_DEPRECATED),
                 record.getReleaseId(), record.getPrevAsccpManifestId()));
     }
 
@@ -602,7 +613,7 @@ public class CoreComponentGraphContext implements GraphContext {
                         .where(BCCP.BCCP_ID.eq(record.getBccpId()))
                         .fetchOne();
         return toNode(new BccpManifest(record.getBccpManifestId(), record.getBdtManifestId(),
-                res.get(BCCP.PROPERTY_TERM), res.get(BCCP.REPRESENTATION_TERM), res.get(BCCP.STATE),
+                res.get(BCCP.PROPERTY_TERM), record.getDen(), res.get(BCCP.REPRESENTATION_TERM), res.get(BCCP.STATE),
                 res.get(BCCP.GUID), res.get(BCCP.IS_DEPRECATED), record.getReleaseId(), record.getPrevBccpManifestId()));
     }
 
@@ -671,6 +682,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("deprecated", asccpManifest.getIsDeprecated() == 1);
         node.put("guid", asccpManifest.getGuid());
         node.put("propertyTerm", asccpManifest.getPropertyTerm());
+        node.put("den", asccpManifest.getDen());
         return node;
     }
 
@@ -684,6 +696,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("deprecated", bccpManifest.getIsDeprecated() == 1);
         node.put("guid", bccpManifest.getGuid());
         node.put("propertyTerm", bccpManifest.getPropertyTerm());
+        node.put("den", bccpManifest.getDen());
         return node;
     }
 
@@ -696,6 +709,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("deprecated", asccManifest.getIsDeprecated() == 1);
         node.put("cardinalityMin", asccManifest.getCardinalityMin());
         node.put("cardinalityMax", asccManifest.getCardinalityMax());
+        node.put("den", asccManifest.getDen());
         return node;
     }
 
@@ -709,6 +723,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("cardinalityMin", bccManifest.getCardinalityMin());
         node.put("cardinalityMax", bccManifest.getCardinalityMax());
         node.put("entityType", bccManifest.getEntityType().name());
+        node.put("den", bccManifest.getDen());
         return node;
     }
 

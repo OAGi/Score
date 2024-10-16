@@ -22,7 +22,7 @@
 }
 
 .overlay-spacing {
-  margin-top: 8px;
+  margin: 8px 0;
 }
 
 .cdk-drag-animating {

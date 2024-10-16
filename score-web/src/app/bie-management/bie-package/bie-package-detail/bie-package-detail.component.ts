@@ -9,7 +9,6 @@ import {finalize} from 'rxjs/operators';
 import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
@@ -17,9 +16,7 @@ import {PageRequest} from '../../../basis/basis';
 import {BieListInBiePackageRequest, BiePackage} from '../domain/bie-package';
 import {BieList} from '../../bie-list/domain/bie-list';
 import {BiePackageService} from '../domain/bie-package.service';
-import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {BiePackageAddBieDialogComponent} from '../bie-package-add-bie-dialog/bie-package-add-bie-dialog.component';
-import {BieEditAbieNode} from '../../bie-edit/domain/bie-edit-node';
 
 @Component({
   selector: 'score-bie-package-detail',

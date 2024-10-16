@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
-import {of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -20,6 +20,10 @@ import {initFilter} from '../../common/utility';
 
 
 import {finalize, switchMap} from 'rxjs/operators';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../authentication/auth.service';
+import {TenantList} from '../domain/tenants';
 
 @Component({
   selector: 'score-tenant-biz-ctx-detail',
@@ -27,19 +31,43 @@ import {finalize, switchMap} from 'rxjs/operators';
   styleUrls: ['./tenant-biz-ctx-detail.component.css']
 })
 export class TenantBusinessCtxDetailComponent implements OnInit {
-  title = ' - Business Context Management';
-  displayedColumns: string[] = [
-    'name', 'lastUpdateTimestamp', 'manage'
-  ];
+  title = 'Business Context Management';
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    displayedColumns.push('manage');
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BusinessContext>();
   tenantId: number;
   loading: boolean;
+  tenantInfo: TenantList;
   addBusinessCtxToTenant = false;
 
   loginIdList: string[] = [];
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -50,6 +78,8 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   constructor(private service: TenantListService,
               private bizCtxservice: BusinessContextService,
               private accountService: AccountListService,
+              private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private snackBar: MatSnackBar,
               private route: ActivatedRoute,
@@ -67,13 +97,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBusinessContextList();
-    });
-
-    this.accountService.getAccountNames().subscribe(loginIds => {
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      this.onSearch();
     });
 
     this.route.paramMap.pipe(
@@ -82,11 +106,27 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
       this.loading = true;
       this.tenantId = t;
       this.request.filters.tenantId = t;
-      this.getTenantInfo(t);
+
+      forkJoin([
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([loginIds, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
+
+        this.loginIdList.push(...loginIds);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.getTenantInfo();
+      });
     });
   }
 
-  getTenantInfo(tenantId: number) {
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.getTenantInfo();
+  }
+
+  getTenantInfo() {
     this.loading = true;
 
     this.service.getTenantInfo(this.tenantId).pipe(
@@ -94,7 +134,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.title = resp.name + this.title;
+      this.tenantInfo = resp;
       this.loadBusinessContextList(true);
     }, error => {
       this.dataSource.data = [];

@@ -17,9 +17,7 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -42,7 +40,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 
 @Component({
   selector: 'score-cc-list',
@@ -79,13 +77,18 @@ export class CcListComponent implements OnInit {
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onColumnsChange(defaultTableColumnInfo.columnsOfCoreComponentPage);
+  }
+
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columnsOfCoreComponentPage = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
-    for (const column of columnsOfCoreComponentPage) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    for (const column of columns) {
       switch (column.name) {
         case 'Type':
           if (column.selected) {

@@ -73,7 +73,6 @@ mat-toolbar > .mat-icon-button {
 }
 
 .mat-column-versionName {
-  width: 15%;
 }
 
 .mat-column-state {
@@ -87,6 +86,10 @@ mat-toolbar > .mat-icon-button {
 .mat-column-owner {
   width: 140px;
   font-size: 13px;
+}
+
+.mat-column-description {
+  width: 40%;
 }
 
 .mat-column-lastUpdateTimestamp {

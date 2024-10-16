@@ -59,6 +59,7 @@ public class MessageController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<MessageList> getMessageList(
             @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestParam(name = "subject", required = false) String subject,
             @RequestParam(name = "senderUsernameList", required = false) String senderUsernameList,
             @RequestParam(name = "createStart", required = false) String createStart,
             @RequestParam(name = "createEnd", required = false) String createEnd,
@@ -69,7 +70,7 @@ public class MessageController {
 
         GetMessageListRequest request = new GetMessageListRequest(
                 authenticationService.asScoreUser(requester));
-
+        request.setSubject(subject);
         request.setSenderUsernameList(!StringUtils.hasLength(senderUsernameList) ? Collections.emptyList() :
                 Arrays.asList(senderUsernameList.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         if (StringUtils.hasLength(createStart)) {

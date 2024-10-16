@@ -8,19 +8,12 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {
-  BccpFlatNode,
-  CcFlatNode,
-  CcFlatNodeDatabase,
-  CcFlatNodeDataSource,
-  CcFlatNodeDataSourceSearcher
-} from '../domain/cc-flat-tree';
+import {BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
   CcBccpNodeDetail,
-  CcBdtPriRestri,
   CcBdtScNodeDetail,
   CcNodeDetail,
   CcRevisionResponse,
@@ -823,8 +816,6 @@ export class BccpDetailComponent implements OnInit {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

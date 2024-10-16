@@ -6,9 +6,11 @@
     </mat-toolbar>
   </div>
 
-  <div>
-    <mat-card style="box-shadow: none;">
-      <mat-card class="search-box">
+  <mat-card class="pt-3">
+    <score-search-bar [(model)]="request.filters.name"
+                      (modelChange)="onChange('filters.name', request.filters.name);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
@@ -64,33 +66,18 @@
                 </div>
               </div>
             </div>
-
-            <div class="container-fluid" style="padding: 0;">
-              <div class="row">
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Name</mat-label>
-                    <input matInput [(ngModel)]="request.filters.name"
-                           (ngModelChange)="onChange('filters.name', request.filters.name)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessContextList();"
-                           placeholder="Name">
-                  </mat-form-field>
-                </div>
-              </div>
-            </div>
           </div>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.paginator.pageIndex = 0; this.loadBusinessContextList();">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+      </div>
+    </score-search-bar>
 
-      <mat-card-content class="mat-card-container">
-        <div class="mat-elevation-z1">
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <div class="table-container">
+        <div class="mat-elevation-z1 table-wrapper">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                  [dataSource]="dataSource">
@@ -149,9 +136,9 @@
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

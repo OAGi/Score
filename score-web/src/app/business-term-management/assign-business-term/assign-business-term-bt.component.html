@@ -6,9 +6,11 @@
     </mat-toolbar>
   </div>
 
-  <div>
-    <mat-card style="box-shadow: none;">
-      <mat-card class="search-box">
+  <mat-card class="pt-3">
+    <score-search-bar [(model)]="request.filters.businessTerm"
+                      (modelChange)="onChange('filters.businessTerm', request.filters.businessTerm);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
@@ -69,19 +71,10 @@
               <div class="row">
                 <div class="col-md-2 col-sm-12">
                   <mat-form-field>
-                    <mat-label>Business Term</mat-label>
-                    <input matInput [(ngModel)]="request.filters.businessTerm"
-                           (ngModelChange)="onChange('filters.businessTerm', request.filters.businessTerm)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
-                           placeholder="Business Term">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
                     <mat-label>External Reference URI</mat-label>
                     <input matInput [(ngModel)]="request.filters.externalReferenceUri"
                            (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
+                           (keyup.enter)="this.onSearch();"
                            placeholder="External Reference URI">
                   </mat-form-field>
                 </div>
@@ -90,7 +83,7 @@
                     <mat-label>External Reference ID</mat-label>
                     <input matInput [(ngModel)]="request.filters.externalReferenceId"
                            (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBusinessTermList();"
+                           (keyup.enter)="this.onSearch();"
                            placeholder="External Reference ID">
                   </mat-form-field>
                 </div>
@@ -98,30 +91,29 @@
             </div>
             <div class="container-fluid" style="padding: 0;">
               <div class="row">
-                  <div class="col-md-2 col-sm-12">
-                    <div class="checkbox">
-                      <mat-checkbox color="primary"
-                                    data-id="request.searchByCC"
-                                    [(ngModel)]="request.filters.searchByCC">
-                        Filter by same CC
-                      </mat-checkbox>
-                    </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  data-id="request.searchByCC"
+                                  [(ngModel)]="request.filters.searchByCC">
+                      Filter by same CC
+                    </mat-checkbox>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.paginator.pageIndex = 0; this.loadBusinessTermList();">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+      </div>
+    </score-search-bar>
 
-      <mat-card-content class="mat-card-container mb-4">
-        <div class="mat-elevation-z1">
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <div class="table-container">
+        <div class="mat-elevation-z1 table-wrapper">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                  [dataSource]="dataSource">
@@ -156,16 +148,6 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="definition">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
-              <td mat-cell *matCellDef="let element">
-                <a target="_blank" rel="noopener noreferrer"
-                   href="/business_term_management/business_term/{{ element.businessTermId }}">
-                  <span>{{ element.definition }}</span>
-                </a>
-              </td>
-            </ng-container>
-
             <ng-container matColumnDef="externalReferenceUri">
               <th mat-header-cell *matHeaderCellDef> External Reference URI</th>
               <td mat-cell *matCellDef="let element"> {{ element.externalReferenceUri }}</td>
@@ -174,6 +156,13 @@
             <ng-container matColumnDef="externalReferenceId">
               <th mat-header-cell *matHeaderCellDef> External Reference ID</th>
               <td mat-cell *matCellDef="let element"> {{ element.externalReferenceId }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="definition">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.definition }}</div>
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
@@ -194,21 +183,21 @@
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
         </div>
-      </mat-card-content>
+      </div>
+    </mat-card-content>
 
-      <mat-card>
-        <mat-card-content class="mat-card-container">
-          <mat-form-field>
-            <mat-label>Type Code</mat-label>
-            <input matInput [(ngModel)]="postAssignBtObj.typeCode" maxlength="45"/>
-          </mat-form-field>
-          <mat-checkbox [(ngModel)]="postAssignBtObj.primary">
-            Preferred Business Term
-          </mat-checkbox>
-        </mat-card-content>
-      </mat-card>
+    <mat-card class="mt-3">
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>Type Code</mat-label>
+          <input matInput [(ngModel)]="postAssignBtObj.typeCode" maxlength="45"/>
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="postAssignBtObj.primary">
+          Preferred Business Term
+        </mat-checkbox>
+      </mat-card-content>
     </mat-card>
-  </div>
+  </mat-card>
 
   <div class="row action-group m-0">
     <div class="col-12 actions-wrap">

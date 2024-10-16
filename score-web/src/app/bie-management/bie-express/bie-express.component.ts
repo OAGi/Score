@@ -24,6 +24,8 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {SelectionModel} from '@angular/cdk/collections';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 
 @Component({
   selector: 'score-bie-express',
@@ -33,12 +35,70 @@ import {WebPageInfoService} from '../../basis/basis.service';
 export class BieExpressComponent implements OnInit {
 
   title = 'Express BIE';
-  subtitle = 'Selected Top-Level ABIEs';
+  subtitle = 'Selected Top-Level ASBIEPs';
 
-  displayedColumns: string[] = [
-    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
-    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
-  ];
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+      for (const column of columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
   businessContextSelection = {};
@@ -55,6 +115,7 @@ export class BieExpressComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
 
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
@@ -73,6 +134,7 @@ export class BieExpressComponent implements OnInit {
               private accountService: AccountListService,
               private releaseService: ReleaseService,
               private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private dialog: MatDialog,
               private location: Location,
               private router: Router,
@@ -109,8 +171,11 @@ export class BieExpressComponent implements OnInit {
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([loginIds, releases]) => {
+      this.releaseService.getSimpleReleases(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -139,6 +204,12 @@ export class BieExpressComponent implements OnInit {
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
+    }
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
+      this.sort.active = '';
+      this.sort.direction = '';
     }
   }
 
@@ -172,6 +243,12 @@ export class BieExpressComponent implements OnInit {
     } else {
       this.request.releases = [];
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.selection.clear();
+    this.loadBieList();
   }
 
   loadBieList(isInit?: boolean) {

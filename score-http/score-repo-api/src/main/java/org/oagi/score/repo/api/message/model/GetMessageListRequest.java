@@ -9,12 +9,21 @@ import java.util.Collections;
 
 public class GetMessageListRequest extends PaginationRequest<MessageList> {
 
+    private String subject;
     private Collection<String> senderUsernameList;
     private LocalDateTime createStartDate;
     private LocalDateTime createEndDate;
 
     public GetMessageListRequest(ScoreUser requester) {
         super(requester, MessageList.class);
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public Collection<String> getSenderUsernameList() {

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.MESSAGE;
+import static org.oagi.score.repo.api.impl.jooq.utils.DSLUtils.contains;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.trim;
 import static org.oagi.score.repo.api.user.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.repo.api.user.model.ScoreRole.END_USER;
@@ -104,6 +106,9 @@ public class JooqMessageReadRepository
 
         conditions.add(APP_USER.as("recipient").APP_USER_ID.eq(ULong.valueOf(request.getRequester().getUserId())));
 
+        if (hasLength(request.getSubject())) {
+            conditions.addAll(contains(request.getSubject(), MESSAGE.SUBJECT));
+        }
         if (!request.getSenderUsernameList().isEmpty()) {
             conditions.add(APP_USER.as("sender").LOGIN_ID.in(
                     new HashSet<>(request.getSenderUsernameList()).stream()

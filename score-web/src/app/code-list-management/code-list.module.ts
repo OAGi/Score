@@ -13,6 +13,8 @@ import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.modul
 import {ScoreCommonModule} from '../common/score-common.module';
 import {CodeListUpliftComponent} from './code-list-uplift/code-list-uplift.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {SearchBarModule} from '../common/search-bar/search-bar.module';
 
 const routes: Routes = [
   {
@@ -48,16 +50,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        ConfirmDialogModule,
-        CommonModule,
-        ScoreCommonModule,
-        FontAwesomeModule
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    ConfirmDialogModule,
+    CommonModule,
+    ScoreCommonModule,
+    FontAwesomeModule,
+    ColumnSelectorModule,
+    SearchBarModule
+  ],
   declarations: [
     CodeListListComponent,
     CodeListDetailComponent,

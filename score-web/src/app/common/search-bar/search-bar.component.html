@@ -1,5 +1,6 @@
 <mat-card class="search-box">
   <div class="main-search">
+    <ng-content select="[branchSelector]"></ng-content>
     <button mat-icon-button type="submit" (click)="onSearch()">
       <mat-icon matPrefix>search</mat-icon>
     </button>
@@ -7,9 +8,11 @@
       <input matInput [(ngModel)]="model"
              (ngModelChange)="onModelChange(model)"
              (keyup.enter)="onSearch()"
-             placeholder="Search"/>
+             placeholder="Search"
+             [disabled]="disabled"/>
     </mat-form-field>
-    <button mat-icon-button [matTooltip]="(showAdvancedSearch ? 'Hide' : 'Show') + ' Advanced Search'"
+    <button mat-icon-button *ngIf="advancedSearch"
+            [matTooltip]="(showAdvancedSearch ? 'Hide' : 'Show') + ' Advanced Search'"
             (click)="toggleAdvancedSearch()">
       <mat-icon>{{ showAdvancedSearch ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
     </button>

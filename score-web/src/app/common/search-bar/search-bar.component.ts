@@ -11,6 +11,9 @@ export class SearchBarComponent {
   private value = '';
   showAdvancedSearch = false;
 
+  @Input() disabled = false;  // Add disabled input
+  @Input() advancedSearch = true;
+
   @Input()
   set model(value: string) {
     this.value = value;
@@ -29,7 +32,9 @@ export class SearchBarComponent {
   }
 
   onModelChange(value: string): void {
-    this.modelChange.emit(value);
+    if (!this.disabled) {
+      this.modelChange.emit(value);
+    }
   }
 
   toggleAdvancedSearch(): void {

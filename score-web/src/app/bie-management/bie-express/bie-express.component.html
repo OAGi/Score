@@ -6,40 +6,36 @@
     </mat-toolbar>
   </div>
 
-  <div>
-    <mat-card style="box-shadow: none;">
-      <mat-card class="search-box">
+  <mat-card class="pt-3">
+    <score-search-bar [(model)]="request.filters.den"
+                      (modelChange)="onChange('filters.den', request.filters.den);"
+                      (search)="onSearch();">
+      <div branchSelector class="d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
+        <mat-form-field appearance="outline">
+          <mat-label>Branch</mat-label>
+          <mat-select [(ngModel)]="selectedRelease"
+                      (ngModelChange)="onChange('branch', selectedRelease); onSearch();">
+            <mat-select-trigger class="d-flex">
+              <span>{{ selectedRelease?.releaseNum }}</span>
+            </mat-select-trigger>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
+              <div class="d-flex">
+                <span class="release-num">{{ release.releaseNum }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
+      </div>
+      <div advancedSearchContent style="padding-left: 14.5rem;">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Branch</mat-label>
-                  <mat-select [(ngModel)]="selectedRelease"
-                              (ngModelChange)="onChange('branch', selectedRelease);
-                                              this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
-                    <mat-select-trigger class="d-flex">
-                      <span>{{ selectedRelease?.releaseNum }}</span>
-                      <span class="f12 ml-auto pr-2 {{ selectedRelease?.state }}">
-                        {{ selectedRelease?.state | separate }}
-                      </span>
-                    </mat-select-trigger>
-                    <mat-option>
-                      <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                                             [placeholderLabel]="'Search...'"
-                                             [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
-                    </mat-option>
-                    <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release">
-                      <div class="d-flex">
-                        <span class="release-num">{{ release.releaseNum }}</span>
-                        <span class="f12 ml-auto pr-2 {{ release.state }}">
-                          {{ release.state | separate }}
-                        </span>
-                      </div>
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>State</mat-label>
@@ -48,6 +44,33 @@
                       {{state}}
                     </mat-option>
                   </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Business Context</mat-label>
+                  <input matInput [(ngModel)]="request.filters.businessContext"
+                         (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Business Context">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Version</mat-label>
+                  <input matInput [(ngModel)]="request.filters.version"
+                         (ngModelChange)="onChange('filters.version', request.filters.version)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Version">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Remark</mat-label>
+                  <input matInput [(ngModel)]="request.filters.remark"
+                         (ngModelChange)="onChange('filters.remark', request.filters.remark)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Remark">
                 </mat-form-field>
               </div>
             </div>
@@ -119,64 +142,18 @@
                 </div>
               </div>
             </div>
-
-            <div class="container-fluid" style="padding: 0;">
-              <div class="row">
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>DEN</mat-label>
-                    <input matInput [(ngModel)]="request.filters.den"
-                           (ngModelChange)="onChange('filters.den', request.filters.den)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();"
-                           placeholder="DEN">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Business Context</mat-label>
-                    <input matInput [(ngModel)]="request.filters.businessContext"
-                           (ngModelChange)="onChange('filters.businessContext', request.filters.businessContext)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();"
-                           placeholder="Business Context">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Version</mat-label>
-                    <input matInput [(ngModel)]="request.filters.version"
-                           (ngModelChange)="onChange('filters.version', request.filters.version)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                           placeholder="Version">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Remark</mat-label>
-                    <input matInput [(ngModel)]="request.filters.remark"
-                           (ngModelChange)="onChange('filters.remark', request.filters.remark)"
-                           (keyup.enter)="this.paginator.pageIndex = 0; this.loadBieList();"
-                           placeholder="Remark">
-                  </mat-form-field>
-                </div>
-              </div>
-            </div>
           </div>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" type="submit"
-                  (click)="this.paginator.pageIndex = 0; this.selection.clear(); this.loadBieList();">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Search</span>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+      </div>
+    </score-search-bar>
 
-      <mat-card-content class="mat-card-container">
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
 
-        <div class="mat-elevation-z1">
+      <div class="table-container">
+        <div class="mat-elevation-z1 table-wrapper">
           <table mat-table multiTemplateDataRows
                  matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                  [dataSource]="dataSource">
@@ -302,9 +279,9 @@
             (page)="onPageChange($event)"
             showFirstLastButtons></mat-paginator>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
   <mat-card class="pt-2 pb-0 filter-container" style="box-shadow: none;">
     <mat-card-content>

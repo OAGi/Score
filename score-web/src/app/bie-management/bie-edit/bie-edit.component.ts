@@ -254,7 +254,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   goToPath(path: string) {
-    console.log(path);
     let curNode = this.dataSource.data[0];
     let idx = 0;
     let delimiter = this.extractDelimiter(path);
@@ -708,6 +707,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
         asccpManifestId: asbiepNode.asccpNode.manifestId,
+        den: asbiepNode.asccpNode.den,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
       },
