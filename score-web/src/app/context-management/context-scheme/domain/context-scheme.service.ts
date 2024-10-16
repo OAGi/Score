@@ -129,7 +129,7 @@ export class ContextSchemeService {
       return this.http.delete('/api/context_scheme/' + contextSchemeIds[0]);
     } else {
       return this.http.post<any>('/api/context_scheme/delete', {
-        contextSchemeIds
+        contextSchemeIdList: contextSchemeIds
       });
     }
   }
