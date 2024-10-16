@@ -70,7 +70,6 @@ export class CcListRequest {
     } else {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
-    this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP', 'CDT', 'BDT'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.deprecated = (params.get('deprecated')) ? Array.from(params.get('deprecated').split(',').map(e => e === 'true' ? true : false)) : [];
     this.newComponent = (params.get('newComponent')) ? Array.from(params.get('newComponent').split(',').map(e => e === 'true' ? true : false)) : [];
@@ -107,9 +106,6 @@ export class CcListRequest {
       .set('pageSize', '' + this.page.pageSize);
 
     params = params.set('releaseId', '' + this.release.releaseId);
-    if (this.types && this.types.length > 0) {
-      params = params.set('types', this.types.join(','));
-    }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }

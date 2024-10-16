@@ -280,6 +280,7 @@ export class CcListComponent implements OnInit {
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
+      this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.filter(e => e.selected).map(e => e.name);
 
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);

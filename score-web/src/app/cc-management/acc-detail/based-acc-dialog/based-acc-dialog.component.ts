@@ -49,11 +49,6 @@ export class BasedAccDialogComponent implements OnInit {
     const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
     for (const column of columns) {
       switch (column.name) {
-        case 'Type':
-          if (column.selected) {
-            displayedColumns.push('type');
-          }
-          break;
         case 'State':
           if (column.selected) {
             displayedColumns.push('state');
