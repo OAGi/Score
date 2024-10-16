@@ -19,6 +19,19 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true}
   ];
 
+  filterTypesOfCoreComponentPage: {
+    name: string;
+    selected: boolean;
+  }[] = [
+    {name: 'ACC', selected: true},
+    {name: 'ASCCP', selected: true},
+    {name: 'BCCP', selected: true},
+    {name: 'CDT', selected: true},
+    {name: 'BDT', selected: true},
+    {name: 'ASCC', selected: false},
+    {name: 'BCC', selected: false}
+  ];
+
   columnsOfCodeListPage: {
     name: string;
     selected: boolean;

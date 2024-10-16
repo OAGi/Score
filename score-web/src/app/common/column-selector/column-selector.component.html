@@ -1,7 +1,7 @@
 <div cdkOverlayOrigin #trigger="cdkOverlayOrigin">
   <button mat-raised-button (click)="toggleOverlay()" type="button">
     <div class="d-flex align-items-center justify-content-between" style="width: 100px;">
-      <span class="f12">Columns</span>
+      <span class="f12">{{ title }}</span>
       <mat-icon>{{ overlayVisible ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
     </div>
   </button>
@@ -18,7 +18,7 @@
         <mat-checkbox [(ngModel)]="column.selected" (change)="toggleColumnSelection()">
           <span class="f12">{{ column.name }}</span>
         </mat-checkbox>
-        <mat-icon class="drag-handle mr-2"
+        <mat-icon class="drag-handle mr-2" *ngIf="draggable"
                   cdkDragHandle>drag_handle
         </mat-icon>
       </div>

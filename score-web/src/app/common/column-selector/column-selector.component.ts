@@ -8,6 +8,8 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
   encapsulation: ViewEncapsulation.None,
 })
 export class ColumnSelectorComponent {
+  @Input() title: string = 'Columns';
+  @Input() draggable: boolean = true;
   @Input() columns: { name: string; selected: boolean }[] = [];
   @Output() columnsChange = new EventEmitter<{ name: string; selected: boolean }[]>();
 
@@ -20,8 +22,10 @@ export class ColumnSelectorComponent {
   }
 
   drop(event: CdkDragDrop<{ name: string; selected: boolean }[]>) {
-    moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
-    this.columnsChange.emit(this.columns);
+    if (this.draggable) {
+      moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
+      this.columnsChange.emit(this.columns);
+    }
   }
 
   toggleOverlay() {

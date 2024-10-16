@@ -65,6 +65,26 @@ export class CcListComponent implements OnInit {
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
 
+  get filterTypes() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage;
+  }
+
+  onFilterTypesChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage = updatedColumns;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+
+    this.request.types = updatedColumns.filter(e => e.selected).map(e => e.name);
+    this.onSearch();
+  }
+
+  onFilterTypesReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
+  }
+
   get columns() {
     if (!this.preferencesInfo) {
       return [];

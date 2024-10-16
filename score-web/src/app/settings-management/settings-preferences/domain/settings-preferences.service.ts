@@ -9,6 +9,7 @@ import {loadProperty, saveProperty} from '../../../common/utility';
 export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
+  FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
   TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY = 'TableColumns-AgencyIdListPage';
   TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY = 'TableColumns-ReleasePage';
@@ -49,6 +50,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage)));
+      preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
+        JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
       preferencesInfo.tableColumnsInfo.columnsOfCodeListPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage)));
@@ -122,6 +126,8 @@ export class SettingsPreferencesService {
     return new Observable(subscriber => {
       saveProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
         JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage));
+      saveProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
+        JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage));
       saveProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
         JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage));
       saveProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
