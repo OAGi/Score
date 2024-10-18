@@ -16,6 +16,7 @@ import {CcListModule} from './cc-list/cc-list.module';
 import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
 import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
 import {EditTagsDialogModule} from '../tag-management/edit-tags-dialog/edit-tags-dialog.module';
+import {ModelBrowserModule} from './model-browser/model-browser.module';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import {EditTagsDialogModule} from '../tag-management/edit-tags-dialog/edit-tags
     BccpDetailModule,
     BdtDetailModule,
     ExtensionDetailModule,
+    ModelBrowserModule,
     TransferOwnershipDialogModule,
     FindUsagesDialogModule,
     RefactorDialogModule,

@@ -43,6 +43,15 @@ export class SettingsPreferencesComponent implements OnInit {
     column.selected = !column.selected;
   }
 
+  updateBrowserView(value: boolean) {
+    this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = value;
+    this.updatePreferences();
+  }
+
+  get isBrowserViewEnabled(): boolean {
+    return this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode;
+  }
+
   updatePreferences() {
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
       this.snackBar.open('Updated', '', {

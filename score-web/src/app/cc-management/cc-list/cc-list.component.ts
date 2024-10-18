@@ -400,7 +400,11 @@ export class CcListComponent implements OnInit {
           return '/core_component/acc/' + ccList.manifestId;
         }
       case 'ASCCP':
-        return '/core_component/asccp/' + ccList.manifestId;
+        if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+          return '/core_component/browser/asccp/' + ccList.manifestId;
+        } else {
+          return '/core_component/asccp/' + ccList.manifestId;
+        }
 
       case 'BCCP':
         return '/core_component/bccp/' + ccList.manifestId;

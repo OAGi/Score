@@ -625,7 +625,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return;
     }
 
-    const delimiter = this.preferencesInfo.treeSettingsInfo.delimiter;
+    const delimiter = this.preferencesInfo.viewSettingsInfo.treeSettings.delimiter;
     let queryPath = node.queryPath;
     queryPath = queryPath.replaceAll('/', delimiter);
 

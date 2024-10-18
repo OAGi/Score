@@ -1,6 +1,29 @@
 export class PreferencesInfo {
+  viewSettingsInfo: ViewSettingsInfo;
   tableColumnsInfo: TableColumnsInfo;
-  treeSettingsInfo: TreeSettingsInfo;
+
+  constructor() {
+    this.viewSettingsInfo = new ViewSettingsInfo();
+    this.tableColumnsInfo = new TableColumnsInfo();
+  }
+}
+
+export class ViewSettingsInfo {
+  pageSettings: PageSettings;
+  treeSettings: TreeSettings;
+
+  constructor() {
+    this.pageSettings = new PageSettings();
+    this.treeSettings = new TreeSettings();
+  }
+}
+
+export class PageSettings {
+  browserViewMode: boolean = false;
+}
+
+export class TreeSettings {
+  delimiter: string = '/';
 }
 
 export class TableColumnsInfo {
@@ -235,8 +258,4 @@ export class TableColumnsInfo {
     {name: 'Type Code', selected: true},
     {name: 'Updated On', selected: true}
   ];
-}
-
-export class TreeSettingsInfo {
-  delimiter: string;
 }

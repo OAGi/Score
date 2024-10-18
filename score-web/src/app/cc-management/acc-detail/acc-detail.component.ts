@@ -292,7 +292,7 @@ export class AccDetailComponent implements OnInit {
       return;
     }
 
-    const delimiter = this.preferencesInfo.treeSettingsInfo.delimiter;
+    const delimiter = this.preferencesInfo.viewSettingsInfo.treeSettings.delimiter;
     let queryPath = node.queryPath;
     queryPath = queryPath.replaceAll('/', delimiter);
 

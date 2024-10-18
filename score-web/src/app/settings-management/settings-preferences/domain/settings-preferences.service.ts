@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreferencesInfo, TableColumnsInfo, TreeSettingsInfo} from './preferences';
+import {PreferencesInfo} from './preferences';
 import {UserToken} from '../../../authentication/domain/auth';
-import {loadProperty, saveProperty} from '../../../common/utility';
+import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} from '../../../common/utility';
 
 @Injectable()
 export class SettingsPreferencesService {
@@ -36,7 +36,8 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY = 'TableColumns-BusinessTermPage';
   TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY = 'TableColumns-AssignedBusinessTermPage';
 
-  PATH_DELIMITER_PROPERTY_KEY = 'Settings-Path-Delimiter';
+  PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY = 'PageSettings-BrowserViewMode';
+  TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY = 'TreeSettings-PathDelimiter';
 
   constructor(private http: HttpClient) {
   }
@@ -44,8 +45,6 @@ export class SettingsPreferencesService {
   load(userToken: UserToken): Observable<PreferencesInfo> {
     return new Observable(subscriber => {
       const preferencesInfo = new PreferencesInfo();
-      preferencesInfo.tableColumnsInfo = new TableColumnsInfo();
-      preferencesInfo.treeSettingsInfo = new TreeSettingsInfo();
 
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
@@ -115,7 +114,10 @@ export class SettingsPreferencesService {
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage)));
 
-      preferencesInfo.treeSettingsInfo.delimiter = loadProperty(userToken, this.PATH_DELIMITER_PROPERTY_KEY, '.');
+      preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = loadBooleanProperty(
+        userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, false);
+      preferencesInfo.viewSettingsInfo.treeSettings.delimiter = loadProperty(
+        userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY, '.');
 
       subscriber.next(preferencesInfo);
       subscriber.complete();
@@ -172,7 +174,10 @@ export class SettingsPreferencesService {
       saveProperty(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
         JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage));
 
-      saveProperty(userToken, this.PATH_DELIMITER_PROPERTY_KEY, preferencesInfo.treeSettingsInfo.delimiter);
+      saveBooleanProperty(userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY,
+        preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode);
+      saveProperty(userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY,
+        preferencesInfo.viewSettingsInfo.treeSettings.delimiter);
 
       subscriber.next();
       subscriber.complete();
