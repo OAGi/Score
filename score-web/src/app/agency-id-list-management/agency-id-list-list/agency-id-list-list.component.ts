@@ -1,5 +1,5 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -31,6 +31,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -59,13 +60,42 @@ export class AgencyIdListListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage = updatedColumns;
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage = updatedColumnsWithWidth;
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfAgencyIdListPage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage = defaultTableColumnInfo.columnsOfAgencyIdListPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   get displayedColumns(): string[] {
@@ -99,7 +129,6 @@ export class AgencyIdListListComponent implements OnInit {
         case 'Owner':
           if (column.selected) {
             displayedColumns.push('owner');
-            displayedColumns.push('transferOwnership');
           }
           break;
         case 'Module':
@@ -115,6 +144,13 @@ export class AgencyIdListListComponent implements OnInit {
       }
     }
     return displayedColumns;
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<AgencyIdList>();
@@ -142,6 +178,7 @@ export class AgencyIdListListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
   contextMenuItem: AgencyIdList;
 
   constructor(private service: AgencyIdListService,
@@ -169,6 +206,15 @@ export class AgencyIdListListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });

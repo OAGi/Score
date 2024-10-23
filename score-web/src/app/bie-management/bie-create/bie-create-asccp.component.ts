@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from './domain/bie-create-list';
 import {BieCreateService} from './domain/bie-create.service';
@@ -27,8 +27,9 @@ import {AuthService} from '../../authentication/auth.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -51,6 +52,22 @@ export class BieCreateAsccpComponent implements OnInit {
   businessContextList: BusinessContext[] = [];
   releaseId: number;
   releases: Release[] = [];
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = defaultTableColumnInfo.columnsOfCoreComponentPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
 
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
@@ -100,6 +117,13 @@ export class BieCreateAsccpComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage.find(c => c.name === name)?.width;
+  }
+
   stateList = ['Published', 'Production'];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
@@ -123,6 +147,7 @@ export class BieCreateAsccpComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
@@ -155,6 +180,15 @@ export class BieCreateAsccpComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });

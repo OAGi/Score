@@ -40,14 +40,6 @@ tr.element-row:not(.expanded-row):active {
   margin-bottom: 0;
 }
 
-.mat-column-prefix, .mat-column-owner, .mat-column-std{
-  width: 100px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
-}
-
 .mat-column-more, .mat-column-transferOwnership {
   width: 40px;
 }

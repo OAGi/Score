@@ -109,6 +109,12 @@ public class CcListRepository {
                 case "den":
                     field = field("den");
                     break;
+                case "valueDomain":
+                    field = field("default_value_domain");
+                    break;
+                case "sixDigitId":
+                    field = field(DT.SIX_DIGIT_ID);
+                    break;
                 case "revision":
                     field = field(LOG.REVISION_NUM);
                     break;

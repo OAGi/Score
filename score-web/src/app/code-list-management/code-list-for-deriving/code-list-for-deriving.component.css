@@ -1,6 +1,9 @@
 span.cl-state {
-  font-size: 12px;
-  padding: .15em 4px;
+  font-size: 13px;
+  padding: .30em 4px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 span.release-state {
@@ -35,10 +38,10 @@ span.Deprecated {
   color: #000000;
 }
 
-.mat-column-basedCodeListName, .mat-column-agencyId, .mat-column-versionId {
-  width: 10%;
+.mat-column-owner {
+  font-size: 13px;
 }
 
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
+.mat-column-module {
+  font-size: 13px;
 }

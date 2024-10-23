@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {AssignedBtListRequest, AssignedBusinessTerm, BieToAssign} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -22,6 +22,7 @@ import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-assigned-business-term',
@@ -42,13 +43,43 @@ export class AssignedBusinessTermListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = updatedColumns;
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = updatedColumnsWithWidth;
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.onColumnsChange(defaultTableColumnInfo.columnsOfAssignedBusinessTermPage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = defaultTableColumnInfo.columnsOfAssignedBusinessTermPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   get displayedColumns(): string[] {
@@ -69,7 +100,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
             break;
           case 'Preferred Business Term':
             if (column.selected) {
-              displayedColumns.push('primary');
+              displayedColumns.push('primaryIndicator');
             }
             break;
           case 'External Reference URI':
@@ -103,6 +134,13 @@ export class AssignedBusinessTermListComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<AssignedBusinessTerm>();
   selection = new SelectionModel<AssignedBusinessTerm>(true, []);
   loading = false;
@@ -118,6 +156,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: BusinessTermService,
               private accountService: AccountListService,
@@ -143,6 +182,15 @@ export class AssignedBusinessTermListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });
@@ -325,7 +373,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
   }
 
   openMakeAsPrimaryDialog(assignedBusinessTerm: AssignedBusinessTerm, $event) {
-    if (assignedBusinessTerm.primary) {
+    if (assignedBusinessTerm.primaryIndicator) {
       return;
     }
 

@@ -216,6 +216,10 @@ public class JooqModuleSetReadRepository
                 field = MODULE_SET.NAME;
                 break;
 
+            case "description":
+                field = MODULE_SET.DESCRIPTION;
+                break;
+
             case "lastupdatetimestamp":
                 field = MODULE_SET.LAST_UPDATE_TIMESTAMP;
                 break;

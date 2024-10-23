@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
@@ -22,6 +22,7 @@ import {PageRequest} from '../../../basis/basis';
 import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -32,6 +33,27 @@ export class OasDocAssignDialogComponent implements OnInit {
 
   title = 'Add BIE';
   subtitle = 'Selected Top-Level ASBIEPs';
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
 
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
@@ -88,6 +110,13 @@ export class OasDocAssignDialogComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<BieForOasDoc>();
   selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
@@ -113,6 +142,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(
     private openAPIService: OpenAPIService,
@@ -145,6 +175,15 @@ export class OasDocAssignDialogComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });

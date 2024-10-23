@@ -68,32 +68,8 @@ mat-toolbar > .mat-icon-button {
   outline: none;
 }
 
-.mat-column-versionId {
-  width: 10%;
-}
-
-.mat-column-versionName {
-}
-
-.mat-column-state {
-  width: 100px;
-}
-
-.mat-column-branch {
-  width: 80px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
-}
-
-.mat-column-description {
-  width: 40%;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .mat-column-more {

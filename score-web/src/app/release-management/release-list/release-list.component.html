@@ -191,7 +191,8 @@
             </ng-container>
 
             <ng-container matColumnDef="releaseNum">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Release</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Release')" (onResize)="onResizeWidth($event)"> Release</th>
               <td mat-cell *matCellDef="let element">
                 <ng-template [ngIf]="element.state === 'Processing'"
                              [ngIfElse]="stateWithLink">
@@ -209,7 +210,8 @@
             </ng-container>
 
             <ng-container matColumnDef="state">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
                 <div class="d-flex">
                   <span>{{ element.state }}</span>
@@ -221,7 +223,8 @@
             </ng-container>
 
             <ng-container matColumnDef="creationTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Created on</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.createdBy }}</b></div>
@@ -229,7 +232,8 @@
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy }}</b></div>

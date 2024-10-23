@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {BusinessContext, BusinessContextListRequest} from '../domain/business-context';
 import {BusinessContextService} from '../domain/business-context.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -19,6 +19,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-business-context',
@@ -37,13 +38,42 @@ export class BusinessContextListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage = updatedColumns;
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage = updatedColumnsWithWidth;
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfBusinessContextPage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage = defaultTableColumnInfo.columnsOfBusinessContextPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   get displayedColumns(): string[] {
@@ -69,6 +99,13 @@ export class BusinessContextListComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<BusinessContext>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -83,6 +120,7 @@ export class BusinessContextListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: BusinessContextService,
               private accountService: AccountListService,
@@ -105,6 +143,15 @@ export class BusinessContextListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });

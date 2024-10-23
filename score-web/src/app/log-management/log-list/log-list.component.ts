@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -11,6 +11,11 @@ import {LogCompareDialogComponent} from '../log-compare-dialog/log-compare-dialo
 import {PageRequest} from '../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
+import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {forkJoin} from 'rxjs';
+import {AuthService} from '../../authentication/auth.service';
 
 @Component({
   selector: 'score-log-list',
@@ -21,18 +26,110 @@ export class LogListComponent implements OnInit {
 
   logs: Log[];
   request: LogListRequest;
+  preferencesInfo: PreferencesInfo;
   loading: boolean;
+
+  get columns() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = updatedColumnsWithWidth;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Created at':
+        this.setWidth('Created At', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = defaultTableColumnInfo.columnsOfLogPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['check'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'Commit':
+          if (column.selected) {
+            displayedColumns.push('commit');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revisionNum');
+          }
+          break;
+        case 'Action':
+          if (column.selected) {
+            displayedColumns.push('revisionAction');
+          }
+          break;
+        case 'Actor':
+          if (column.selected) {
+            displayedColumns.push('loginId');
+          }
+          break;
+        case 'Created At':
+          if (column.selected) {
+            displayedColumns.push('timestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfLogPage.find(c => c.name === name)?.width;
+  }
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
-  displayedColumns: string[] = [
-    'check', 'commit', 'revisionNum', 'revisionAction', 'loginId', 'timestamp'
-  ];
   dataSource = new MatTableDataSource<Log>();
   selection = new SelectionModel<number>(true, []);
 
   constructor(private service: LogService,
+              private preferencesService: SettingsPreferencesService,
+              private auth: AuthService,
               private dialog: MatDialog,
               private location: Location,
               private router: Router,
@@ -54,12 +151,32 @@ export class LogListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getRevisions();
+      this.onSearch();
     });
+    forkJoin([
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
 
-    this.getRevisions(true);
+      this.getRevisions(true);
+    }, error => {
+      this.loading = false;
+    });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.getRevisions();
   }
 
   getRevisions(isInit?: boolean) {

@@ -10,12 +10,11 @@ import {BusinessContextService} from './domain/business-context.service';
 import {BusinessContextListComponent} from './business-context-list/business-context-list.component';
 import {BusinessContextCreateComponent} from './business-context-create/business-context-create.component';
 import {BusinessContextDetailComponent} from './business-context-detail/business-context-detail.component';
-import {
-  BusinessContextValueDialogComponent
-} from './business-context-value-dialog/business-context-value-dialog.component';
+import {BusinessContextValueDialogComponent} from './business-context-value-dialog/business-context-value-dialog.component';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {ScoreCommonModule} from '../../common/score-common.module';
 
 const routes: Routes = [
   {
@@ -49,7 +48,8 @@ const routes: Routes = [
     ConfirmDialogModule,
     CommonModule,
     SearchBarModule,
-    ColumnSelectorModule
+    ColumnSelectorModule,
+    ScoreCommonModule
   ],
   declarations: [
     BusinessContextListComponent,

@@ -111,9 +111,7 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-module {
-  width: 15%;
   font-size: 13px;
-  padding-right: 12px;
 }
 
 .element-detail {

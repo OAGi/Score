@@ -1,12 +1,12 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
@@ -20,6 +20,7 @@ import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-module-set-list',
@@ -38,13 +39,42 @@ export class ModuleSetListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = updatedColumns;
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = updatedColumnsWithWidth;
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfModuleSetPage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = defaultTableColumnInfo.columnsOfModuleSetPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   get displayedColumns(): string[] {
@@ -80,6 +110,13 @@ export class ModuleSetListComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<ModuleSet>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -97,6 +134,7 @@ export class ModuleSetListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: ModuleService,
               private accountService: AccountListService,
@@ -119,6 +157,15 @@ export class ModuleSetListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });

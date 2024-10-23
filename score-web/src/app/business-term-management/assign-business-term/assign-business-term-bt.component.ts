@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -23,6 +23,7 @@ import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../authentication/auth.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 
 @Component({
@@ -34,6 +35,26 @@ export class AssignBusinessTermBtComponent implements OnInit {
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
 
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
 
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
@@ -72,6 +93,13 @@ export class AssignBusinessTermBtComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<BusinessTerm>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -88,6 +116,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private businessTermService: BusinessTermService,
               private accountService: AccountListService,
@@ -112,6 +141,15 @@ export class AssignBusinessTermBtComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });
@@ -263,11 +301,11 @@ export class AssignBusinessTermBtComponent implements OnInit {
 
   create() {
     this.checkUniqueness(this.postAssignBtObj, (_) => {
-      if (this.postAssignBtObj.primary) {
+      if (this.postAssignBtObj.primaryIndicator) {
         forkJoin(this.postAssignBtObj.biesToAssign
           .map(bie => (
             this.businessTermService.findIfPrimaryExist(bie.bieId, bie.bieType,
-              this.postAssignBtObj.primary, this.postAssignBtObj.typeCode)
+              this.postAssignBtObj.primaryIndicator, this.postAssignBtObj.typeCode)
               .pipe(map(resp => (resp && resp.length > 0))
               ))))
           .subscribe((ifPrimaries: boolean[]) => {
@@ -300,7 +338,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
     const businessTerm = this.selection.selected[0];
 
     this.businessTermService.assignBusinessTermToBie(businessTerm, this.postAssignBtObj.biesToAssign,
-      this.postAssignBtObj.primary, this.postAssignBtObj.typeCode)
+      this.postAssignBtObj.primaryIndicator, this.postAssignBtObj.typeCode)
       .subscribe(resp => {
         this.snackBar.open('Created', '', {
           duration: 3000,
@@ -321,7 +359,7 @@ export class AssignBusinessTermBtComponent implements OnInit {
     forkJoin(_postAssignBusinessTerm.biesToAssign
       .map( bie => (
         this.businessTermService.checkAssignmentUniqueness(bie.bieId, bie.bieType,
-        this.selection.selected[0], _postAssignBusinessTerm.typeCode, _postAssignBusinessTerm.primary)
+        this.selection.selected[0], _postAssignBusinessTerm.typeCode, _postAssignBusinessTerm.primaryIndicator)
       )))
       .subscribe((ifUniques: boolean[]) => {
         if (ifUniques.filter(isUnique => !isUnique).length > 0) {

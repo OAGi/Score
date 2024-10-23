@@ -68,16 +68,7 @@ mat-toolbar > .mat-icon-button {
   outline: none;
 }
 
-.mat-column-revision {
-  width: 70px;
-}
-
-.mat-column-type, .mat-column-state {
-  width: 100px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
 }
 
@@ -85,21 +76,8 @@ mat-toolbar > .mat-icon-button {
   font-size: 13px;
 }
 
-.mat-column-valueDomain {
-  width: 130px;
-}
-
-.mat-column-sixDigitId {
-  width: 130px;
-}
-
 .mat-column-module {
-  width: 15%;
   font-size: 13px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .mat-column-more {

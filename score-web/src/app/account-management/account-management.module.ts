@@ -26,6 +26,7 @@ import {UpdateTenantComponent} from './tenant-update/tenant-update.component';
 import {TransferOwnershipListComponent} from './take-ownership-list/transfer-ownership-list.component';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {ScoreCommonModule} from '../common/score-common.module';
 
 
 const routes: Routes = [
@@ -94,7 +95,8 @@ const routes: Routes = [
     MaterialModule,
     CommonModule,
     SearchBarModule,
-    ColumnSelectorModule
+    ColumnSelectorModule,
+    ScoreCommonModule
   ],
   declarations: [
     AccountListComponent,

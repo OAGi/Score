@@ -11,7 +11,6 @@ import {ScoreCommonModule} from '../../common/score-common.module';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
-import {CreateDtscDialogComponent} from './create-dtsc-dialog/create-dtsc-dialog.component';
 
 const routes: Routes = [
   {
@@ -41,8 +40,7 @@ const routes: Routes = [
     AngularSplitModule
   ],
   declarations: [
-    BdtDetailComponent,
-    CreateDtscDialogComponent
+    BdtDetailComponent
   ]
 })
 export class BdtDetailModule {

@@ -146,7 +146,7 @@ public class BusinessTermController {
             @RequestParam(name = "businessTerm", required = false) String term,
             @RequestParam(name = "externalReferenceUri", required = false) String externalReferenceUri,
             @RequestParam(name = "typeCode", required = false) String typeCode,
-            @RequestParam(name = "primary", required = false) Boolean primary,
+            @RequestParam(name = "primaryIndicator", required = false) Boolean primaryIndicator,
             @RequestParam(name = "ownerUsernameList", required = false) String ownerUsernameList,
             @RequestParam(name = "updaterUsernameList", required = false) String updaterUsernameList,
             @RequestParam(name = "updateStart", required = false) String updateStart,
@@ -165,7 +165,7 @@ public class BusinessTermController {
         request.setBusinessTerm(term);
         request.setExternalReferenceUri(externalReferenceUri);
         request.setBieTypes(Arrays.asList(bieTypes.split(",")));
-        request.setPrimary((primary == null) ? false : primary);
+        request.setPrimaryIndicator((primaryIndicator == null) ? false : primaryIndicator);
         request.setTypeCode(typeCode);
 
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerUsernameList) ? Collections.emptyList() :
@@ -390,7 +390,7 @@ public class BusinessTermController {
         request.setBieType(bieType);
         request.setBieId(assignedBusinessTerm.getBieId());
         request.setTypeCode(assignedBusinessTerm.getTypeCode());
-        request.setPrimary(assignedBusinessTerm.isPrimary());
+        request.setPrimaryIndicator(assignedBusinessTerm.isPrimaryIndicator());
 
         UpdateBusinessTermAssignmentResponse response =
                 businessTermService.updateBusinessTermAssignment(request);

@@ -10,7 +10,7 @@ public class AssignedBusinessTerm extends Auditable {
     private BigInteger assignedBizTermId;
     private BigInteger bieId;
     private String bieType;
-    private boolean primary;
+    private boolean primaryIndicator;
     private String typeCode;
     private String den;
     private BigInteger businessTermId;
@@ -25,14 +25,14 @@ public class AssignedBusinessTerm extends Auditable {
     }
 
     public AssignedBusinessTerm(BigInteger assignedBizTermId, BigInteger bieId, String bieType,
-                                boolean primary, String typeCode, String den,
+                                boolean primaryIndicator, String typeCode, String den,
                                 BigInteger businessTermId, String businessTerm,
                                 String externalReferenceUri, Date lastUpdateTimestamp,
                                 String owner, String lastUpdateUser) {
         this.assignedBizTermId = assignedBizTermId;
         this.bieId = bieId;
         this.bieType = bieType;
-        this.primary = primary;
+        this.primaryIndicator = primaryIndicator;
         this.typeCode = typeCode;
         this.den = den;
         this.businessTermId = businessTermId;
@@ -59,12 +59,12 @@ public class AssignedBusinessTerm extends Auditable {
         this.bieId = bieId;
     }
 
-    public boolean isPrimary() {
-        return primary;
+    public boolean isPrimaryIndicator() {
+        return primaryIndicator;
     }
 
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+    public void setPrimaryIndicator(boolean primaryIndicator) {
+        this.primaryIndicator = primaryIndicator;
     }
 
     public BigInteger getBusinessTermId() {

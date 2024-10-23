@@ -11,7 +11,7 @@ public class AssignBusinessTermRequest extends Request {
 
     private BigInteger businessTermId;
 
-    private boolean primary;
+    private boolean primaryIndicator;
 
     private String typeCode;
 
@@ -19,11 +19,11 @@ public class AssignBusinessTermRequest extends Request {
     }
 
     public AssignBusinessTermRequest(List<BieToAssign> biesToAssign, BigInteger businessTermId, String typeCode,
-                                     boolean primary) {
+                                     boolean primaryIndicator) {
         this.biesToAssign = biesToAssign;
         this.businessTermId = businessTermId;
         this.typeCode = typeCode;
-        this.primary = primary;
+        this.primaryIndicator = primaryIndicator;
     }
 
     public List<BieToAssign> getBiesToAssign() {
@@ -50,12 +50,12 @@ public class AssignBusinessTermRequest extends Request {
         this.typeCode = typeCode;
     }
 
-    public boolean isPrimary() {
-        return primary;
+    public boolean isPrimaryIndicator() {
+        return primaryIndicator;
     }
 
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+    public void setPrimaryIndicator(boolean primaryIndicator) {
+        this.primaryIndicator = primaryIndicator;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class AssignBusinessTermRequest extends Request {
         return "AssignBusinessTermRequest{" +
                 "biesToAssign=" + biesToAssign +
                 ", businessTermId=" + businessTermId +
-                ", primary=" + primary +
+                ", primaryIndicator=" + primaryIndicator +
                 ", typeCode='" + typeCode + '\'' +
                 '}';
     }

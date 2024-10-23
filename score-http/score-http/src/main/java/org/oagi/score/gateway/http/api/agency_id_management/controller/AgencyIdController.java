@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
+
 @RestController
 public class AgencyIdController {
 
@@ -111,7 +113,9 @@ public class AgencyIdController {
         }
 
         request.setSortActive(sortActive);
-        request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
+        if (hasLength(sortDirection)) {
+            request.setSortDirection(SortDirection.valueOf(sortDirection.toUpperCase()));
+        }
         request.setPageIndex(pageIndex);
         request.setPageSize(pageSize);
         return service.getAgencyIdListList(request);

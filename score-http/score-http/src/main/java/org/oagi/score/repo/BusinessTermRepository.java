@@ -48,7 +48,7 @@ public class BusinessTermRepository {
         if (StringUtils.hasLength(request.getBieDen())) {
             conditions.add(ASCC_MANIFEST.DEN.contains(request.getBieDen()));
         }
-        if (request.isPrimary()) {
+        if (request.isPrimaryIndicator()) {
             conditions.add(ASBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) 1));
         }
         if (StringUtils.hasLength(request.getTypeCode())) {
@@ -65,7 +65,7 @@ public class BusinessTermRepository {
                         inline("ASBIE").as("bieType"),
                         ASBIE_BIZTERM.ASBIE_BIZTERM_ID.as("assignedBizTermId"),
                         ASBIE_BIZTERM.ASBIE_ID.as("bieId"),
-                        ASBIE_BIZTERM.PRIMARY_INDICATOR.as("primary"),
+                        ASBIE_BIZTERM.PRIMARY_INDICATOR.as("primaryIndicator"),
                         ASBIE_BIZTERM.TYPE_CODE.as("typeCode"),
                         ASCC_MANIFEST.DEN.as("den"),
                         BUSINESS_TERM.BUSINESS_TERM_ID,
@@ -110,7 +110,7 @@ public class BusinessTermRepository {
                 conditions.add(BCC_MANIFEST.DEN.contains(request.getBieDen()));
             }
         }
-        if (request.isPrimary()) {
+        if (request.isPrimaryIndicator()) {
             conditions.add(BBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) 1));
         }
         if (StringUtils.hasLength(request.getTypeCode())) {
@@ -127,7 +127,7 @@ public class BusinessTermRepository {
                         inline("BBIE").as("bieType"),
                         BBIE_BIZTERM.BBIE_BIZTERM_ID.as("assignedBizTermId"),
                         BBIE_BIZTERM.BBIE_ID.as("bieId"),
-                        BBIE_BIZTERM.PRIMARY_INDICATOR.as("primary"),
+                        BBIE_BIZTERM.PRIMARY_INDICATOR.as("primaryIndicator"),
                         BBIE_BIZTERM.TYPE_CODE.as("typeCode"),
                         BCC_MANIFEST.DEN.as("den"),
                         BUSINESS_TERM.BUSINESS_TERM_ID,
@@ -208,7 +208,7 @@ public class BusinessTermRepository {
     }
 
     public Optional<SortField> setSort(String field, String direction) {
-        Optional<Field> sortField = Optional.empty();
+        Optional<Field> sortField = null;
         if (StringUtils.hasLength(field)) {
             switch (field) {
                 case "bieType":
@@ -223,8 +223,20 @@ public class BusinessTermRepository {
                     sortField = Optional.of(BUSINESS_TERM.BUSINESS_TERM_);
                     break;
 
-                case "primary":
-                    sortField = Optional.of(field("primary"));
+                case "primaryIndicator":
+                    sortField = Optional.of(field("primaryIndicator"));
+                    break;
+
+                case "externalReferenceUri":
+                    sortField = Optional.of(BUSINESS_TERM.EXTERNAL_REF_URI);
+                    break;
+
+                case "externalReferenceId":
+                    sortField = Optional.of(BUSINESS_TERM.EXTERNAL_REF_ID);
+                    break;
+
+                case "typeCode":
+                    sortField = Optional.of(field("typeCode"));
                     break;
 
                 case "lastUpdateTimestamp":
@@ -263,7 +275,7 @@ public class BusinessTermRepository {
                 assignedBusinessTermRecord.getAssignedBizTermId(),
                 assignedBusinessTermRecord.getBieId(),
                 assignedBusinessTermRecord.getBieType(),
-                assignedBusinessTermRecord.isPrimary(),
+                assignedBusinessTermRecord.isPrimaryIndicator(),
                 assignedBusinessTermRecord.getTypeCode(),
                 assignedBusinessTermRecord.getDen(),
                 assignedBusinessTermRecord.getBusinessTermId(),
@@ -290,7 +302,7 @@ public class BusinessTermRepository {
                             ((StringUtils.hasLength(assignBusinessTermRequest.getTypeCode())) ?
                                     ASBIE_BIZTERM.TYPE_CODE.eq(assignBusinessTermRequest.getTypeCode()) :
                                     or(ASBIE_BIZTERM.TYPE_CODE.isNull(), ASBIE_BIZTERM.TYPE_CODE.eq(""))),
-                            ASBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (assignBusinessTermRequest.isPrimary() ? 1 : 0))));
+                            ASBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (assignBusinessTermRequest.isPrimaryIndicator() ? 1 : 0))));
                     return dslContext.selectCount()
                             .from(ASBIE_BIZTERM)
                             .join(ASCC_BIZTERM).on(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID))
@@ -303,7 +315,7 @@ public class BusinessTermRepository {
                             ((StringUtils.hasLength(assignBusinessTermRequest.getTypeCode())) ?
                                     BBIE_BIZTERM.TYPE_CODE.eq(assignBusinessTermRequest.getTypeCode()) :
                                     or(BBIE_BIZTERM.TYPE_CODE.isNull(), BBIE_BIZTERM.TYPE_CODE.eq(""))),
-                            BBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (assignBusinessTermRequest.isPrimary() ? 1 : 0))));
+                            BBIE_BIZTERM.PRIMARY_INDICATOR.eq((byte) (assignBusinessTermRequest.isPrimaryIndicator() ? 1 : 0))));
                     return dslContext.selectCount()
                             .from(BBIE_BIZTERM)
                             .join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))

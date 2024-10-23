@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
@@ -27,6 +27,7 @@ import {MailService} from '../../../common/score-mail.service';
 import {BiePackageUpliftDialogComponent} from '../bie-package-uplift-dialog/bie-package-uplift-dialog.component';
 import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-bie-package-list',
@@ -45,9 +46,14 @@ export class BiePackageListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = updatedColumns;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = updatedColumnsWithWidth;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
 
     let columns = [];
     for (const tableColumn of this.table.columns) {
@@ -63,9 +69,33 @@ export class BiePackageListComponent implements OnInit {
     this.table.displayedColumns = this.displayedColumns;
   }
 
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
+
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.onColumnsChange(defaultTableColumnInfo.columnsOfBiePackagePage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = defaultTableColumnInfo.columnsOfBiePackagePage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   defaultDisplayedColumns = [
@@ -75,7 +105,6 @@ export class BiePackageListComponent implements OnInit {
     {id: 'versionName', name: 'Package Version Name', isActive: true},
     {id: 'versionId', name: 'Package Version ID', isActive: true},
     {id: 'owner', name: 'Owner', isActive: true},
-    {id: 'transferOwnership', name: 'Transfer Ownership', isActive: true},
     {id: 'description', name: 'Description', isActive: true},
     {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp', isActive: true},
     {id: 'more', name: 'More', isActive: true},
@@ -110,7 +139,6 @@ export class BiePackageListComponent implements OnInit {
           case 'Owner':
             if (column.selected) {
               displayedColumns.push('owner');
-              displayedColumns.push('transferOwnership');
             }
             break;
           case 'Description':
@@ -127,6 +155,13 @@ export class BiePackageListComponent implements OnInit {
       }
     }
     return displayedColumns;
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage.find(c => c.name === name)?.width;
   }
 
   table: TableData<BiePackage>;
@@ -150,6 +185,7 @@ export class BiePackageListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private biePackageService: BiePackageService,
               private accountService: AccountListService,
@@ -179,6 +215,15 @@ export class BiePackageListComponent implements OnInit {
 
     this.table.sortParams = this.request.page.sortActives;
     this.table.sortDirs = this.request.page.sortDirections;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.table.sortObservable.subscribe(() => {
       this.onSearch();
     });

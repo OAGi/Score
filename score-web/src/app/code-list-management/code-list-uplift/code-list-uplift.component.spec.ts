@@ -1,4 +1,4 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {CodeListUpliftComponent} from './code-list-uplift.component';
 
@@ -6,12 +6,12 @@ describe('CodeListUpliftComponent', () => {
   let component: CodeListUpliftComponent;
   let fixture: ComponentFixture<CodeListUpliftComponent>;
 
-  beforeEach(fakeAsync () => {
-    await TestBed.configureTestingModule({
-      declarations: [ CodeListUpliftComponent ]
+  beforeEach(fakeAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [CodeListUpliftComponent]
     })
-    .compileComponents();
-  });
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CodeListUpliftComponent);

@@ -10,6 +10,7 @@ import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {ScoreCommonModule} from '../common/score-common.module';
 
 const routes: Routes = [
   {
@@ -35,15 +36,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        ScoreCommonModule
+    ],
   declarations: [
     NamespaceListComponent,
     NamespaceCreateComponent,

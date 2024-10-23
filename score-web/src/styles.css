@@ -179,6 +179,11 @@ table {
   width: 100%;
 }
 
+/* score-table-column-resize directive works properly because of this. */
+th > div {
+  position: relative;
+}
+
 .mat-mdc-form-field {
   font-size: 14px;
   width: 100%;
@@ -807,11 +812,7 @@ score-confirm-dialog > div {
 }
 
 td.mat-mdc-cell {
-  padding-right: 8px !important;
-}
-
-td.mat-mdc-cell:last-child {
-  padding-right: 0 !important;
+  padding-right: 16px !important;
 }
 
 th.mat-mdc-header-cell, td.mat-mdc-cell {

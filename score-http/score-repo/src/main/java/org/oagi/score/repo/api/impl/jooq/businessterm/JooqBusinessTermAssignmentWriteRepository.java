@@ -65,13 +65,13 @@ public class JooqBusinessTermAssignmentWriteRepository
                             .fetchOne().getAsccBiztermId();
                 }
 
-                if (request.isPrimary()) {
+                if (request.isPrimaryIndicator()) {
                     updateOtherBieBiztermToNotPrimary(bieToAssign.getBieId(), bieToAssign.getBieType(), requesterUserId);
                 }
                 AsbieBiztermRecord asbieBiztermRecord = new AsbieBiztermRecord();
                 asbieBiztermRecord.setAsbieId(ULong.valueOf(bieToAssign.getBieId()));
                 asbieBiztermRecord.setAsccBiztermId(asccBizTermRecordId);
-                asbieBiztermRecord.setPrimaryIndicator((byte) (request.isPrimary() ? 1 : 0));
+                asbieBiztermRecord.setPrimaryIndicator((byte) (request.isPrimaryIndicator() ? 1 : 0));
                 asbieBiztermRecord.setTypeCode(request.getTypeCode());
                 asbieBiztermRecord.setCreatedBy(ULong.valueOf(requesterUserId));
                 asbieBiztermRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
@@ -102,14 +102,14 @@ public class JooqBusinessTermAssignmentWriteRepository
                             .fetchOne().getBccBiztermId();
                 }
 
-                if (request.isPrimary()) {
+                if (request.isPrimaryIndicator()) {
                     updateOtherBieBiztermToNotPrimary(bieToAssign.getBieId(), bieToAssign.getBieType(), requesterUserId);
                 }
 
                 BbieBiztermRecord bbieBizTermRecord = new BbieBiztermRecord();
                 bbieBizTermRecord.setBbieId(ULong.valueOf(bieToAssign.getBieId()));
                 bbieBizTermRecord.setBccBiztermId(bccBizTermRecordId);
-                bbieBizTermRecord.setPrimaryIndicator((byte) (request.isPrimary() ? 1 : 0));
+                bbieBizTermRecord.setPrimaryIndicator((byte) (request.isPrimaryIndicator() ? 1 : 0));
                 bbieBizTermRecord.setTypeCode(request.getTypeCode());
                 bbieBizTermRecord.setCreatedBy(ULong.valueOf(requesterUserId));
                 bbieBizTermRecord.setLastUpdatedBy(ULong.valueOf(requesterUserId));
@@ -190,10 +190,10 @@ public class JooqBusinessTermAssignmentWriteRepository
                 record.setTypeCode(request.getTypeCode());
                 changedField.add(ASBIE_BIZTERM.TYPE_CODE);
             }
-            if (request.isPrimary() != ((record.getPrimaryIndicator() == 1) ? true : false)) {
-                record.setPrimaryIndicator((byte) (request.isPrimary() ? 1 : 0));
+            if (request.isPrimaryIndicator() != ((record.getPrimaryIndicator() == 1) ? true : false)) {
+                record.setPrimaryIndicator((byte) (request.isPrimaryIndicator() ? 1 : 0));
                 changedField.add(ASBIE_BIZTERM.PRIMARY_INDICATOR);
-                if (request.isPrimary()) {
+                if (request.isPrimaryIndicator()) {
                     updateOtherBieBiztermToNotPrimary(request.getBieId(), request.getBieType(), requesterUserId);
                 }
             }
@@ -223,10 +223,10 @@ public class JooqBusinessTermAssignmentWriteRepository
                 record.setTypeCode(request.getTypeCode());
                 changedField.add(BBIE_BIZTERM.TYPE_CODE);
             }
-            if (request.isPrimary() != ((record.getPrimaryIndicator() == 1) ? true : false)) {
-                record.setPrimaryIndicator((byte) (request.isPrimary() ? 1 : 0));
+            if (request.isPrimaryIndicator() != ((record.getPrimaryIndicator() == 1) ? true : false)) {
+                record.setPrimaryIndicator((byte) (request.isPrimaryIndicator() ? 1 : 0));
                 changedField.add(BBIE_BIZTERM.PRIMARY_INDICATOR);
-                if (request.isPrimary()) {
+                if (request.isPrimaryIndicator()) {
                     updateOtherBieBiztermToNotPrimary(request.getBieId(), request.getBieType(), requesterUserId);
                 }
             }

@@ -94,7 +94,8 @@
                  [dataSource]="dataSource">
 
             <ng-container matColumnDef="name">
-              <th *matHeaderCellDef mat-header-cell mat-sort-header> Name</th>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="den word-break-all">
                   <a routerLink="{{ element.moduleSetId }}">{{ element.name }}</a>
@@ -104,14 +105,16 @@
             </ng-container>
 
             <ng-container matColumnDef="description">
-              <th *matHeaderCellDef mat-header-cell> Description</th>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="description">{{ element.description }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th *matHeaderCellDef mat-header-cell mat-sort-header> Updated on</th>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>

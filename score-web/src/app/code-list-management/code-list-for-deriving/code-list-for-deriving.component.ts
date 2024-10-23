@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -19,6 +19,9 @@ import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-code-list-for-deriving',
@@ -33,10 +36,97 @@ export class CodeListForDerivingComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'lastUpdateTimestamp'
-  ];
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+    for (const column of columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('codeListName');
+          }
+          break;
+        case 'Based Code List':
+          if (column.selected) {
+            displayedColumns.push('basedCodeListName');
+          }
+          break;
+        case 'Agency ID':
+          if (column.selected) {
+            displayedColumns.push('agencyId');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('versionId');
+          }
+          break;
+        case 'Extensible':
+          if (column.selected) {
+            displayedColumns.push('extensible');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
@@ -50,15 +140,18 @@ export class CodeListForDerivingComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
+              private preferencesService: SettingsPreferencesService,
               private auth: AuthService,
               private router: Router,
               private route: ActivatedRoute,
@@ -76,17 +169,28 @@ export class CodeListForDerivingComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCodeList();
+      this.onSearch();
     });
 
     this.releases = [];
 
     forkJoin([
       this.releaseService.getSimpleReleases(['Published', ]),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
@@ -142,6 +246,11 @@ export class CodeListForDerivingComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCodeList();
   }
 
   loadCodeList(isInit?: boolean) {

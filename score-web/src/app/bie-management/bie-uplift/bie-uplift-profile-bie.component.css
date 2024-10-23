@@ -20,45 +20,12 @@ tr.element-row:not(.expanded-row):active {
   color: #767676 !important;
 }
 
-.mat-column-release {
-  width: 70px;
-}
-
-.mat-column-businessContexts {
-  width: 10%;
-}
-
 .mat-column-businessContexts .businessContext:not(:last-child)::after {
   content: ', ';
 }
 
-.mat-column-version, .mat-column-status {
-  width: 5%;
-}
-
-.mat-column-bizTerm {
-  width: 10%;
-}
-
-.mat-column-remark {
-  width: 12%;
-}
-
-.mat-column-state {
-  width: 100px;
-}
-
-.mat-column-branch {
-  width: 80px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .branch-selector-container {

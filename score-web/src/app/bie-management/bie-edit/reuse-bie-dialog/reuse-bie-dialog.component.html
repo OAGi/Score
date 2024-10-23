@@ -142,7 +142,8 @@
               </ng-container>
 
               <ng-container matColumnDef="state">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
                 <td mat-cell *matCellDef="let element">
                   <span class="bie-state {{ element.state }}"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
@@ -155,7 +156,8 @@
               </ng-container>
 
               <ng-container matColumnDef="den">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
                 <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
                   <div class="den word-break-all">
                     <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}">
@@ -179,14 +181,16 @@
               </ng-container>
 
               <ng-container matColumnDef="owner">
-                <th mat-header-cell *matHeaderCellDef> Owner</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
                 <td mat-cell *matCellDef="let element">
                   <span [matTooltip]="element.owner">{{ element.owner }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="businessContexts">
-                <th mat-header-cell *matHeaderCellDef> Business Contexts</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
                 <td mat-cell *matCellDef="let element">
                   <ng-container *ngFor="let businessContext of element.businessContexts">
             <span class="businessContext">
@@ -199,35 +203,40 @@
               </ng-container>
 
               <ng-container matColumnDef="version">
-                <th mat-header-cell *matHeaderCellDef> Version</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
                 <td mat-cell *matCellDef="let element">
                   <div [matTooltip]="element.version">{{ element.version }}</div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef> Status</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
                 <td mat-cell *matCellDef="let element">
                   <div [matTooltip]="element.status">{{ element.status }}</div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="bizTerm">
-                <th mat-header-cell *matHeaderCellDef> Business Term</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
                 <td mat-cell *matCellDef="let element">
                   <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="remark">
-                <th mat-header-cell *matHeaderCellDef> Remark</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
                 <td mat-cell *matCellDef="let element">
                   <div>{{ element.remark }}</div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="lastUpdateTimestamp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                   <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>

@@ -141,7 +141,8 @@
             </ng-container>
 
             <ng-container matColumnDef="title">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="title"> Title</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="title"
+                  score-table-column-resize [defaultWidth]="width('Title')" (onResize)="onResizeWidth($event)"> Title</th>
               <td mat-cell *matCellDef="let element">
                 <div class="businessTerm word-break-all">
                   <a routerLink="{{ element.oasDocId }}">
@@ -153,7 +154,8 @@
             </ng-container>
 
             <ng-container matColumnDef="openAPIVersion">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="openAPIVersion"> OpenAPI Version</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="openAPIVersion"
+                  score-table-column-resize [defaultWidth]="width('OpenAPI Version')" (onResize)="onResizeWidth($event)"> OpenAPI Version</th>
               <td mat-cell *matCellDef="let element">
                 <a target="_blank" rel="noopener noreferrer"
                    href="{{ element.openAPIVersion }}">
@@ -162,28 +164,32 @@
             </ng-container>
 
             <ng-container matColumnDef="version">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version">Document Version</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"
+                  score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)">Document Version</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.version }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="licenseName">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="licenseName"> License Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="licenseName"
+                  score-table-column-resize [defaultWidth]="width('License Name')" (onResize)="onResizeWidth($event)"> License Name</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.licenseName }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="description"> Description</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="description"
+                  score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
               <td mat-cell *matCellDef="let element">
                 <div class="description">{{ element.description }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"> Updated on</th>
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="lastUpdateTimestamp"
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>

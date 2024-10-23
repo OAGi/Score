@@ -245,11 +245,28 @@ public class JooqContextSchemeReadRepository
         Field field;
         switch (trim(request.getSortActive()).toLowerCase()) {
             case "name":
+            case "schemename":
                 field = CTX_SCHEME.SCHEME_NAME;
                 break;
 
+            case "contextcategory":
             case "contextcategoryname":
                 field = CTX_CATEGORY.NAME;
+                break;
+
+            case "schemeid":
+                field = CTX_SCHEME.SCHEME_ID;
+                break;
+
+            case "agencyid":
+            case "schemeagencyid":
+                field = CTX_SCHEME.SCHEME_AGENCY_ID;
+                break;
+
+            case "version":
+            case "versionid":
+            case "schemeversionid":
+                field = CTX_SCHEME.SCHEME_VERSION_ID;
                 break;
 
             case "description":

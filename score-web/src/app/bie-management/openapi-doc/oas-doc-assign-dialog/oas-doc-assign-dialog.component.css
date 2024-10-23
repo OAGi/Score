@@ -6,37 +6,16 @@
   max-height: 87vh !important;
 }
 
-.mat-column-state {
-  width: 100px;
-}
-
-.mat-column-branch {
-  width: 80px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
 }
 
-.mat-column-version, .mat-column-status {
-  width: 5%;
-}
-
-.mat-column-remark {
-  width: 12%;
-}
-
 .mat-column-verb, .mat-column-messageBody {
-  width: 200px;
+  width: 160px;
 }
 
 .mat-column-arrayIndicator {
   width: 60px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .bie-guid {

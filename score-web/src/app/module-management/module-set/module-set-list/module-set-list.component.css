@@ -40,10 +40,6 @@ tr.element-row:not(.expanded-row):active {
   margin-bottom: 0;
 }
 
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
-}
-
 .mat-column-more {
   width: 40px;
 }

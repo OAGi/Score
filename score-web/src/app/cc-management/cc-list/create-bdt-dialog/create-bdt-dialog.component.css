@@ -65,24 +65,7 @@ tr.element-row:not(.expanded-row):active {
   outline: none;
 }
 
-.mat-column-type {
-  width: 110px;
-}
-
-.mat-column-sixDigitId {
-  width: 160px;
-}
-
-.mat-column-revision {
-  width: 70px;
-}
-
-.mat-column-state {
-  width: 100px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
 }
 
@@ -91,17 +74,7 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-module {
-  width: 15%;
   font-size: 13px;
-  padding-right: 12px;
-}
-
-.mat-column-valueDomain {
-  width: 160px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .element-detail {

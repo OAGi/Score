@@ -115,7 +115,8 @@
             </ng-container>
 
             <ng-container matColumnDef="schemeName">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
                 <div class="schemeName word-break-all">
                   <a routerLink="{{ element.contextSchemeId }}">
@@ -127,7 +128,8 @@
             </ng-container>
 
             <ng-container matColumnDef="contextCategoryName">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Context Category</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Context Category')" (onResize)="onResizeWidth($event)"> Context Category</th>
               <td mat-cell *matCellDef="let element">
                 <a target="_blank" rel="noopener noreferrer"
                    href="/context_management/context_category/{{ element.contextCategoryId }}">
@@ -137,7 +139,8 @@
             </ng-container>
 
             <ng-container matColumnDef="schemeId">
-              <th mat-header-cell *matHeaderCellDef> Scheme ID</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Scheme ID')" (onResize)="onResizeWidth($event)"> Scheme ID</th>
               <td mat-cell *matCellDef="let element">
                 <div *ngIf="element.codeListId">
                   <a target="_blank" rel="noopener noreferrer"
@@ -153,21 +156,24 @@
             </ng-container>
 
             <ng-container matColumnDef="schemeAgencyId">
-              <th mat-header-cell *matHeaderCellDef> Agency ID</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Agency ID')" (onResize)="onResizeWidth($event)"> Agency ID</th>
               <td mat-cell *matCellDef="let element">
                 <span class="word-break-all">{{ element.schemeAgencyId }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="schemeVersionId">
-              <th mat-header-cell *matHeaderCellDef> Version</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element">
                 <span class="word-break-all">{{ element.schemeVersionId }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>

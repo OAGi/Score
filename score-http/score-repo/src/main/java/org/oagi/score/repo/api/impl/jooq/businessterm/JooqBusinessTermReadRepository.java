@@ -158,8 +158,20 @@ public class JooqBusinessTermReadRepository
                 field = BUSINESS_TERM.BUSINESS_TERM_;
                 break;
 
-            case "comment":
+            case "externalreferenceuri":
+                field = BUSINESS_TERM.EXTERNAL_REF_URI;
+                break;
+
+            case "externalreferenceid":
+                field = BUSINESS_TERM.EXTERNAL_REF_ID;
+                break;
+
+            case "definition":
                 field = BUSINESS_TERM.DEFINITION;
+                break;
+
+            case "comment":
+                field = BUSINESS_TERM.COMMENT;
                 break;
 
             case "lastupdatetimestamp":

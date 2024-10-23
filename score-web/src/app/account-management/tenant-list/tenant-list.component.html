@@ -35,7 +35,8 @@
                  [dataSource]="dataSource">
 
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Tenant Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Tenant Name')" (onResize)="onResizeWidth($event)">Tenant Name</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="{{ element.tenantId }}">
                   {{ element.name }}
@@ -44,7 +45,8 @@
             </ng-container>
 
             <ng-container matColumnDef="users">
-              <th mat-header-cell *matHeaderCellDef>Users</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Users')" (onResize)="onResizeWidth($event)">Users</th>
               <td mat-cell *matCellDef="let element">
                 <button mat-raised-button color="primary" routerLink="users/{{ element.tenantId }}"
                         style="margin-right: 10px;">
@@ -54,9 +56,9 @@
             </ng-container>
 
             <ng-container matColumnDef="businessContexts">
-              <th mat-header-cell *matHeaderCellDef>Business Contexts</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)">Business Contexts</th>
               <td mat-cell *matCellDef="let element">
-
                 <button mat-raised-button color="primary" routerLink="bis-ctx/{{ element.tenantId }}"
                         style="margin-right: 10px;">
                   Manage Business Context

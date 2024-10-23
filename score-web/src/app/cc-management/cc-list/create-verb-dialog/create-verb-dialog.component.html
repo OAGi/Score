@@ -163,11 +163,12 @@
               </ng-container>
 
               <ng-container matColumnDef="state">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
                 <td mat-cell *matCellDef="let element">
-          <span class="cc-state {{ element.state }}"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+                  <span class="cc-state {{ element.state }}"
+                        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                        'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
                   <span *ngIf="element.deprecated" class="cc-state Deprecated"
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                 'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
@@ -175,7 +176,8 @@
               </ng-container>
 
               <ng-container matColumnDef="den">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="den word-break-all">
                     <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
@@ -184,9 +186,9 @@
                       <span>{{ element.den }}</span>
                     </a>
                     <div class="tag-list">
-              <span class="tag ml-2" *ngFor="let tag of element.tagList"
-                    [style.background-color]="tag.backgroundColor"
-                    [style.color]="tag.textColor">{{ tag.name }}</span>
+                      <span class="tag ml-2" *ngFor="let tag of element.tagList"
+                            [style.background-color]="tag.backgroundColor"
+                            [style.color]="tag.textColor">{{ tag.name }}</span>
                     </div>
                   </div>
                   <div class="description">{{ element.guid }}</div>
@@ -194,28 +196,34 @@
               </ng-container>
 
               <ng-container matColumnDef="revision">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Revision</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
                 <td mat-cell *matCellDef="let element">
                   <span>{{ element.revision }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="owner">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Owner</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
                 <td mat-cell *matCellDef="let element">
                   <span [matTooltip]="element.owner">{{ element.owner }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="module">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Module</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
                 <td mat-cell *matCellDef="let element">
-                  <span [innerHTML]="element.module"></span>
+                  <div class="word-break-all">
+                    <span>{{ element.module }}</span>
+                  </div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="lastUpdateTimestamp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                   <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>

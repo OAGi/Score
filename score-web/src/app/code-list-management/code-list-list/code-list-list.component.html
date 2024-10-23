@@ -238,7 +238,8 @@
             </ng-container>
 
             <ng-container matColumnDef="state">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
               <td mat-cell *matCellDef="let element">
               <span class="cl-state {{ element.state }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
@@ -250,7 +251,8 @@
             </ng-container>
 
             <ng-container matColumnDef="codeListName">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
                   <span class="new-component mr-2" *ngIf="element.newComponent">New</span>
@@ -263,7 +265,8 @@
             </ng-container>
 
             <ng-container matColumnDef="basedCodeListName">
-              <th mat-header-cell *matHeaderCellDef> Based Code List</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Based Code List')" (onResize)="onResizeWidth($event)"> Based Code List</th>
               <td mat-cell *matCellDef="let element" matTooltip="{{ element.basedCodeListName }}">
                 <a rel="noopener noreferrer"
                    routerLink="/code_list/{{ element.basedCodeListManifestId }}" *ngIf="element.basedCodeListManifestId > 0">
@@ -273,17 +276,20 @@
             </ng-container>
 
             <ng-container matColumnDef="agencyId">
-              <th mat-header-cell *matHeaderCellDef> Agency ID</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Agency ID')" (onResize)="onResizeWidth($event)"> Agency ID</th>
               <td mat-cell *matCellDef="let element" matTooltip="{{ element.agencyIdListValueName }}"> {{ element.agencyIdListValueValue }}</td>
             </ng-container>
 
             <ng-container matColumnDef="versionId">
-              <th mat-header-cell *matHeaderCellDef> Version</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
               <td mat-cell *matCellDef="let element"> {{ element.versionId }}</td>
             </ng-container>
 
             <ng-container matColumnDef="extensible">
-              <th mat-header-cell *matHeaderCellDef> Extensible</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Extensible')" (onResize)="onResizeWidth($event)"> Extensible</th>
               <td mat-cell *matCellDef="let element" [ngSwitch]="element.extensible">
                 <span *ngSwitchCase="true">Yes</span>
                 <span *ngSwitchCase="false">No</span>
@@ -291,24 +297,20 @@
             </ng-container>
 
             <ng-container matColumnDef="revision">
-              <th mat-header-cell *matHeaderCellDef> Revision</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Revision')" (onResize)="onResizeWidth($event)"> Revision</th>
               <td mat-cell *matCellDef="let element">
                 <span>{{ element.revision }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="owner">
-              <th mat-header-cell *matHeaderCellDef> Owner</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
               <td mat-cell *matCellDef="let element">
-                <span [matTooltip]="element.owner">{{ element.owner }}</span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="transferOwnership">
-              <th mat-header-cell *matHeaderCellDef style="width: 40px;"></th>
-              <td mat-cell *matCellDef="let element">
-                <div class="d-flex">
-                  <mat-icon class="pr-4 pointer align-self-center"
+                <div class="d-flex align-content-center justify-content-between">
+                  <span [matTooltip]="element.owner">{{ element.owner }}</span>
+                  <mat-icon class="pointer align-self-center"
                             *ngIf="isEditable(element)"
                             (click)="openTransferDialog(element, $event)">swap_horiz</mat-icon>
                 </div>
@@ -316,14 +318,18 @@
             </ng-container>
 
             <ng-container matColumnDef="module">
-              <th mat-header-cell *matHeaderCellDef> Module</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
               <td mat-cell *matCellDef="let element">
-                <span>{{ element.modulePath }}</span>
+                <div class="word-break-all">
+                  <span>{{ element.modulePath }}</span>
+                </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdateUser }}</b></div>

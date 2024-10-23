@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
@@ -30,6 +30,7 @@ import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {MailService} from '../../common/score-mail.service';
 import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-bie-list',
@@ -48,13 +49,42 @@ export class BieListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = updatedColumns;
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = updatedColumnsWithWidth;
     this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfBiePage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = defaultTableColumnInfo.columnsOfBiePage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   get displayedColumns(): string[] {
@@ -81,7 +111,6 @@ export class BieListComponent implements OnInit {
           case 'Owner':
             if (column.selected) {
               displayedColumns.push('owner');
-              displayedColumns.push('transferOwnership');
             }
             break;
           case 'Business Contexts':
@@ -121,6 +150,13 @@ export class BieListComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage.find(c => c.name === name)?.width;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(true, [],
     true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
@@ -143,6 +179,7 @@ export class BieListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: BieListService,
               private bieEditService: BieEditService,
@@ -170,6 +207,15 @@ export class BieListComponent implements OnInit {
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
       this.onSearch();
     });
@@ -377,7 +423,12 @@ export class BieListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(bieList: BieList) {
+  openTransferDialog(bieList: BieList, $event?: Event) {
+    if ($event) {
+      $event.stopPropagation();
+      $event.preventDefault();
+    }
+
     if (!this.isEditable(bieList) && !this.isAdmin) {
       return;
     }

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
 import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
@@ -19,6 +19,7 @@ import {initFilter} from '../../../common/utility';
 import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-oas-doc-list',
@@ -37,9 +38,14 @@ export class OasDocListComponent implements OnInit {
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage = updatedColumns;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage = updatedColumnsWithWidth;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
 
     let columns = [];
     for (const tableColumn of this.table.columns) {
@@ -55,9 +61,33 @@ export class OasDocListComponent implements OnInit {
     this.table.displayedColumns = this.displayedColumns;
   }
 
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage;
+    const matched = columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    }
+  }
+
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.onColumnsChange(defaultTableColumnInfo.columnsOfOpenApiDocumentPage);
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage = defaultTableColumnInfo.columnsOfOpenApiDocumentPage;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   defaultDisplayedColumns = [
@@ -112,6 +142,13 @@ export class OasDocListComponent implements OnInit {
     return displayedColumns;
   }
 
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage.find(c => c.name === name)?.width;
+  }
+
   table: TableData<OasDoc>;
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -126,6 +163,7 @@ export class OasDocListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private openAPIService: OpenAPIService,
               private accountService: AccountListService,
@@ -152,6 +190,15 @@ export class OasDocListComponent implements OnInit {
 
     this.table.sortParams = this.request.page.sortActives;
     this.table.sortDirs = this.request.page.sortDirections;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.table.sortObservable.subscribe(() => {
       this.onSearch();
     });

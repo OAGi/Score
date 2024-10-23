@@ -151,41 +151,7 @@ public class AccountListService {
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);
 
         PageRequest pageRequest = request.getPageRequest();
-        String sortDirection = pageRequest.getSortDirection();
-        SortField sortField = null;
-        switch (pageRequest.getSortActive()) {
-            case "loginId":
-                if ("asc".equals(sortDirection)) {
-                    sortField = APP_USER.LOGIN_ID.asc();
-                } else if ("desc".equals(sortDirection)) {
-                    sortField = APP_USER.LOGIN_ID.desc();
-                }
-                break;
-
-            case "name":
-                if ("asc".equals(sortDirection)) {
-                    sortField = APP_USER.NAME.asc();
-                } else if ("desc".equals(sortDirection)) {
-                    sortField = APP_USER.NAME.desc();
-                }
-                break;
-
-            case "organization":
-                if ("asc".equals(sortDirection)) {
-                    sortField = APP_USER.ORGANIZATION.asc();
-                } else if ("desc".equals(sortDirection)) {
-                    sortField = APP_USER.ORGANIZATION.desc();
-                }
-                break;
-
-            case "status":
-                if ("asc".equals(sortDirection)) {
-                    sortField = APP_USER.IS_ENABLED.desc(); // 1 (Enable) to 0 (Disable)
-                } else if ("desc".equals(sortDirection)) {
-                    sortField = APP_USER.IS_ENABLED.asc(); // 0 (Disable) to 1 (Enable)
-                }
-                break;
-        }
+        SortField sortField = getSortField(pageRequest);
 
         SelectWithTiesAfterOffsetStep<Record6<ULong, String, String, Byte, String, ULong>> offsetStep = null;
 
@@ -210,6 +176,43 @@ public class AccountListService {
         response.setLength(pageCount);
 
         return response;
+    }
+    private SortField getSortField(PageRequest pageRequest) {
+        Field field = null;
+        SortField sortField = null;
+        String sortDirection = pageRequest.getSortDirection();
+        if (StringUtils.hasLength(pageRequest.getSortActive())) {
+            switch (pageRequest.getSortActive()) {
+                case "loginId":
+                    field = APP_USER.LOGIN_ID;
+                    break;
+
+                case "role":
+                    field = APP_USER.IS_DEVELOPER;
+                    break;
+
+                case "name":
+                    field = APP_USER.NAME;
+                    break;
+
+                case "organization":
+                    field = APP_USER.ORGANIZATION;
+                    break;
+
+                case "status":
+                    field = APP_USER.IS_ENABLED;
+                    break;
+            }
+        }
+
+        if (field != null) {
+            if ("asc".equals(sortDirection)) {
+                sortField = field.asc();
+            } else if ("desc".equals(sortDirection)) {
+                sortField = field.desc();
+            }
+        }
+        return sortField;
     }
 
     public AppUser getAccountById(BigInteger appUserId) {

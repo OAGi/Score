@@ -136,7 +136,8 @@
             </ng-container>
 
             <ng-container matColumnDef="businessTerm">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Business Term</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
               <td mat-cell *matCellDef="let element">
                 <a target="_blank" rel="noopener noreferrer"
                    href="/business_term_management/business_term/{{ element.businessTermId }}">
@@ -149,24 +150,28 @@
             </ng-container>
 
             <ng-container matColumnDef="externalReferenceUri">
-              <th mat-header-cell *matHeaderCellDef> External Reference URI</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('External Reference URI')" (onResize)="onResizeWidth($event)"> External Reference URI</th>
               <td mat-cell *matCellDef="let element"> {{ element.externalReferenceUri }}</td>
             </ng-container>
 
             <ng-container matColumnDef="externalReferenceId">
-              <th mat-header-cell *matHeaderCellDef> External Reference ID</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('External Reference ID')" (onResize)="onResizeWidth($event)"> External Reference ID</th>
               <td mat-cell *matCellDef="let element"> {{ element.externalReferenceId }}</td>
             </ng-container>
 
             <ng-container matColumnDef="definition">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Definition')" (onResize)="onResizeWidth($event)"> Definition</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.definition }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="lastUpdateTimestamp">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td mat-cell *matCellDef="let element">
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
                 <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
@@ -192,7 +197,7 @@
           <mat-label>Type Code</mat-label>
           <input matInput [(ngModel)]="postAssignBtObj.typeCode" maxlength="45"/>
         </mat-form-field>
-        <mat-checkbox [(ngModel)]="postAssignBtObj.primary">
+        <mat-checkbox [(ngModel)]="postAssignBtObj.primaryIndicator">
           Preferred Business Term
         </mat-checkbox>
       </mat-card-content>
