@@ -141,3 +141,9 @@ mat-toolbar .mat-icon {
   padding: 0 8px;
   display: inline-block;
 }
+
+.browser-mode-toggle-section {
+  padding: 6px 12px;
+  border-radius: 4px;
+  box-shadow: var(--mdc-protected-button-container-elevation-shadow);
+}

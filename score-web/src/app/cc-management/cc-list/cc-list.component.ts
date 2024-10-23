@@ -42,6 +42,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'score-cc-list',
@@ -201,13 +202,20 @@ export class CcListComponent implements OnInit {
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
   loading = false;
-  showAdvancedSearch = false;
+  isElasticsearchOn = false;
 
-  toggleAdvancedSearch(): void {
-    this.showAdvancedSearch = !this.showAdvancedSearch;
+  get browserMode(): boolean {
+    if (!this.preferencesInfo) {
+      return false;
+    }
+
+    return this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode;
   }
 
-  isElasticsearchOn = false;
+  onBrowserModeChange($event: MatSlideToggleChange) {
+    this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
+    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
 
   releases: Release[] = [];
   loginIdList: string[] = [];

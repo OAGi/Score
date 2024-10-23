@@ -304,7 +304,7 @@
       </div>
 
       <div class="table-container">
-        <div class="score-column-container">
+        <div class="score-column-container align-items-center">
           <score-column-selector
             [columns]="columns"
             (columnsChange)="onColumnsChange($event)"
@@ -318,6 +318,13 @@
                                  (columnsChange)="onFilterTypesChange($event)"
                                  (onReset)="onFilterTypesReset()">
           </score-column-selector>
+
+          <section class="browser-mode-toggle-section mr-2">
+            <mat-label class="pr-2">{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
+            <mat-slide-toggle labelPosition="before"
+                              [checked]="browserMode" (change)="onBrowserModeChange($event)">
+            </mat-slide-toggle>
+          </section>
         </div>
         <div class="mat-elevation-z1 table-wrapper mt-3">
           <table mat-table multiTemplateDataRows
