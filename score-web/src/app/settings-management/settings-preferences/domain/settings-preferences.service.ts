@@ -242,7 +242,7 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage);
   }
 
-  update(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+  updateViewSettingsInfo(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return new Observable(subscriber => {
       saveBooleanProperty(userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY,
         preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode);

@@ -223,7 +223,7 @@ export class CcListComponent implements OnInit {
 
   onBrowserModeChange($event: MatSlideToggleChange) {
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
   }
 
   releases: Release[] = [];

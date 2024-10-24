@@ -53,7 +53,7 @@ export class SettingsPreferencesComponent implements OnInit {
   }
 
   updatePreferences() {
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
