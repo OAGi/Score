@@ -11,7 +11,7 @@ import {LogCompareDialogComponent} from '../log-compare-dialog/log-compare-dialo
 import {PageRequest} from '../../basis/basis';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
-import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
@@ -29,11 +29,30 @@ export class LogListComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
   loading: boolean;
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = columns;
+    this.updateTableColumnsForLogPage();
+  }
+
+  updateTableColumnsForLogPage() {
+    this.preferencesService.updateTableColumnsForLogPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfLogPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -43,8 +62,7 @@ export class LogListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -60,19 +78,18 @@ export class LogListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForLogPage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = defaultTableColumnInfo.columnsOfLogPage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -80,8 +97,7 @@ export class LogListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Commit':
           if (column.selected) {
@@ -111,13 +127,6 @@ export class LogListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfLogPage.find(c => c.name === name)?.width;
   }
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;

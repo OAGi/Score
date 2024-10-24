@@ -26,12 +26,14 @@ export class TreeSettings {
   delimiter: string = '/';
 }
 
+export interface TableColumnsProperty {
+  name: string;
+  selected: boolean;
+  width: number | string;
+}
+
 export class TableColumnsInfo {
-  columnsOfCoreComponentPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfCoreComponentPage: TableColumnsProperty[] = [
     {name: 'Type', selected: true, width: 100},
     {name: 'State', selected: true, width: 100},
     {name: 'DEN', selected: true, width: 0},
@@ -56,11 +58,7 @@ export class TableColumnsInfo {
     {name: 'BCC', selected: false}
   ];
 
-  columnsOfCodeListPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfCodeListPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Name', selected: true, width: 0},
     {name: 'Based Code List', selected: true, width: 200},
@@ -73,11 +71,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfAgencyIdListPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfAgencyIdListPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Name', selected: true, width: 0},
     {name: 'Version', selected: true, width: 100},
@@ -87,22 +81,14 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfReleasePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfReleasePage: TableColumnsProperty[] = [
     {name: 'Release', selected: true, width: 0},
     {name: 'State', selected: true, width: 200},
     {name: 'Created On', selected: true, width: 160},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfNamespacePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfNamespacePage: TableColumnsProperty[] = [
     {name: 'URI', selected: true, width: 0},
     {name: 'Prefix', selected: true, width: 100},
     {name: 'Owner', selected: true, width: 140},
@@ -111,21 +97,13 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfContextCategoryPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfContextCategoryPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Description', selected: true, width: 600},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfContextSchemePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfContextSchemePage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Context Category', selected: true, width: 400},
     {name: 'Scheme ID', selected: true, width: 200},
@@ -134,41 +112,25 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfBusinessContextPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfBusinessContextPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfModuleSetPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfModuleSetPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Description', selected: true, width: '60%'},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfModuleSetReleasePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfModuleSetReleasePage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Release Num', selected: true, width: 300},
     {name: 'Default', selected: true, width: 80},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfBiePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfBiePage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Branch', selected: true, width: 100},
     {name: 'DEN', selected: true, width: 0},
@@ -181,11 +143,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfBiePackagePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfBiePackagePage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Branch', selected: true, width: 100},
     {name: 'Package Version Name', selected: true, width: 0},
@@ -195,11 +153,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfAccountPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfAccountPage: TableColumnsProperty[] = [
     {name: 'Login ID', selected: true, width: 0},
     {name: 'Role', selected: true, width: 200},
     {name: 'Name', selected: true, width: 400},
@@ -207,42 +161,26 @@ export class TableColumnsInfo {
     {name: 'Status', selected: true, width: 100}
   ];
 
-  columnsOfPendingAccountPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfPendingAccountPage: TableColumnsProperty[] = [
     {name: 'Preferred Username', selected: true, width: 0},
     {name: 'Email', selected: true, width: 400},
     {name: 'Provider', selected: true, width: 400},
     {name: 'Created On', selected: true, width: 160}
   ];
 
-  columnsOfMessagePage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfMessagePage: TableColumnsProperty[] = [
     {name: 'Sender', selected: true, width: 0},
     {name: 'Subject', selected: true, width: '70%'},
     {name: 'Created On', selected: true, width: 160}
   ];
 
-  columnsOfTenantPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfTenantPage: TableColumnsProperty[] = [
     {name: 'Tenant Name', selected: true, width: 0},
     {name: 'Users', selected: true, width: 400},
     {name: 'Business Contexts', selected: true, width: 400}
   ];
 
-  columnsOfOpenApiDocumentPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfOpenApiDocumentPage: TableColumnsProperty[] = [
     {name: 'Title', selected: true, width: 0},
     {name: 'OpenAPI Version', selected: true, width: 140},
     {name: 'Version', selected: true, width: 140},
@@ -251,11 +189,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfBusinessTermPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfBusinessTermPage: TableColumnsProperty[] = [
     {name: 'Business Term', selected: true, width: 0},
     {name: 'External Reference URI', selected: true, width: '15%'},
     {name: 'External Reference ID', selected: true, width: '15%'},
@@ -263,11 +197,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfAssignedBusinessTermPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfAssignedBusinessTermPage: TableColumnsProperty[] = [
     {name: 'BIE DEN', selected: true, width: 0},
     {name: 'BIE Type', selected: true, width: 100},
     {name: 'Business Term', selected: true, width: 200},
@@ -278,11 +208,7 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
-  columnsOfLogPage: {
-    name: string;
-    selected: boolean;
-    width: number | string;
-  }[] = [
+  columnsOfLogPage: TableColumnsProperty[] = [
     {name: 'Commit', selected: true, width: 200},
     {name: 'Revision', selected: true, width: 100},
     {name: 'Action', selected: true, width: 0},

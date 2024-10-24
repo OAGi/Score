@@ -18,7 +18,11 @@ import {initFilter} from '../../../common/utility';
 import {ModuleSetRelease, ModuleSetReleaseListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
-import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
@@ -28,13 +32,33 @@ import {ScoreTableColumnResizeDirective} from '../../../common/score-table-colum
   styleUrls: ['./module-set-release-list.component.css']
 })
 export class ModuleSetReleaseListComponent implements OnInit {
+
   title = 'Module Set Release';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage = columns;
+    this.updateTableColumnsForModuleSetReleasePage();
+  }
+
+  updateTableColumnsForModuleSetReleasePage() {
+    this.preferencesService.updateTableColumnsForModuleSetReleasePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfModuleSetReleasePage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -44,8 +68,7 @@ export class ModuleSetReleaseListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -61,64 +84,53 @@ export class ModuleSetReleaseListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForModuleSetReleasePage();
     }
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage = defaultTableColumnInfo.columnsOfModuleSetReleasePage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-
-    if (this.preferencesInfo) {
-      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage;
-      for (const column of columns) {
-        switch (column.name) {
-          case 'Name':
-            if (column.selected) {
-              displayedColumns.push('name');
-            }
-            break;
-          case 'Release Num':
-            if (column.selected) {
-              displayedColumns.push('release');
-            }
-            break;
-          case 'Default':
-            if (column.selected) {
-              displayedColumns.push('default');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-
-    if (this.roles.includes('developer')) {
-      displayedColumns.push('more');
-    }
-
-    return displayedColumns;
   }
 
   width(name: string): number | string {
     if (!this.preferencesInfo) {
       return 0;
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage.find(c => c.name === name)?.width;
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Release Num':
+          if (column.selected) {
+            displayedColumns.push('release');
+          }
+          break;
+        case 'Default':
+          if (column.selected) {
+            displayedColumns.push('default');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    if (this.roles.includes('developer')) {
+      displayedColumns.push('more');
+    }
+    return displayedColumns;
   }
 
   dataSource = new MatTableDataSource<ModuleSetRelease>();

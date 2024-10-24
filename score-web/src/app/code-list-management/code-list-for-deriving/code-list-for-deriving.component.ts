@@ -19,7 +19,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
@@ -36,6 +36,18 @@ export class CodeListForDerivingComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+  }
+
+  updateTableColumnsForCodeListPage() {
+    this.preferencesService.updateTableColumnsForCodeListPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
   onResizeWidth($event) {
     switch ($event.name) {
       case 'Updated on':
@@ -49,12 +61,18 @@ export class CodeListForDerivingComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForCodeListPage();
     }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -62,8 +80,7 @@ export class CodeListForDerivingComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'State':
           if (column.selected) {
@@ -118,13 +135,6 @@ export class CodeListForDerivingComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<CodeListForList>();

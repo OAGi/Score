@@ -9,7 +9,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {PageRequest} from '../../basis/basis';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
-import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {initFilter} from '../../common/utility';
@@ -24,11 +24,30 @@ export class AccountListComponent implements OnInit {
 
   title = 'Accounts';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = columns;
+    this.updateTableColumnsForAccountPage();
+  }
+
+  updateTableColumnsForAccountPage() {
+    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfAccountPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -38,8 +57,7 @@ export class AccountListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -51,19 +69,18 @@ export class AccountListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForAccountPage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = defaultTableColumnInfo.columnsOfAccountPage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -71,8 +88,7 @@ export class AccountListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Login ID':
           if (column.selected) {
@@ -102,13 +118,6 @@ export class AccountListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<AccountList>();

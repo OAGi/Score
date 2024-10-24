@@ -108,7 +108,7 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Description')" (onResize)="onResizeWidth($event)"> Description</th>
               <td *matCellDef="let element" mat-cell>
-                <div class="description">{{ element.description }}</div>
+                <div class="description word-break-all">{{ element.description }}</div>
               </td>
             </ng-container>
 

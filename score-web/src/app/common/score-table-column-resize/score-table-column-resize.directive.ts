@@ -24,7 +24,7 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.defaultWidth && changes.defaultWidth.currentValue) {
+    if (changes.defaultWidth && changes.defaultWidth.currentValue !== undefined) {
       this.setInitialWidth();
     }
   }

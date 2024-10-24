@@ -21,7 +21,7 @@ import {Location} from '@angular/common';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
@@ -33,11 +33,30 @@ export class ReleaseListComponent implements OnInit {
 
   title = 'Release';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage = columns;
+    this.updateTableColumnsForReleasePage();
+  }
+
+  updateTableColumnsForReleasePage() {
+    this.preferencesService.updateTableColumnsForReleasePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfReleasePage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -47,8 +66,7 @@ export class ReleaseListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -68,19 +86,18 @@ export class ReleaseListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForReleasePage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage = defaultTableColumnInfo.columnsOfReleasePage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -88,8 +105,8 @@ export class ReleaseListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage;
-    for (const column of columns) {
+
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Release':
           if (column.selected) {
@@ -114,13 +131,6 @@ export class ReleaseListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfReleasePage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<ReleaseList>();

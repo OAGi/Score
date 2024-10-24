@@ -8,7 +8,7 @@ import {AccountList, AccountListRequest} from '../../account-management/domain/a
 import {PageRequest} from '../../basis/basis';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AuthService} from '../../authentication/auth.service';
-import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {ScoreTableColumnResizeDirective} from '../score-table-column-resize/score-table-column-resize.directive';
@@ -22,6 +22,18 @@ export class TransferOwnershipDialogComponent implements OnInit {
 
   loading = false;
 
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+  }
+
+  updateTableColumnsForAccountPage() {
+    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
   onResizeWidth($event) {
     switch ($event.name) {
       default:
@@ -31,12 +43,18 @@ export class TransferOwnershipDialogComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForAccountPage();
     }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -44,8 +62,7 @@ export class TransferOwnershipDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Login ID':
           if (column.selected) {
@@ -70,13 +87,6 @@ export class TransferOwnershipDialogComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<AccountList>();

@@ -10,7 +10,7 @@ import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {PendingListService} from '../domain/pending-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
-import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -24,11 +24,30 @@ export class PendingListComponent implements OnInit {
 
   title = 'Pending Account';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage = columns;
+    this.updateTableColumnsForPendingAccountPage();
+  }
+
+  updateTableColumnsForPendingAccountPage() {
+    this.preferencesService.updateTableColumnsForPendingAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfPendingAccountPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -38,8 +57,7 @@ export class PendingListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -55,19 +73,18 @@ export class PendingListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForPendingAccountPage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage = defaultTableColumnInfo.columnsOfPendingAccountPage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -75,8 +92,7 @@ export class PendingListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Preferred Username':
           if (column.selected) {
@@ -101,13 +117,6 @@ export class PendingListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<PendingAccount>();

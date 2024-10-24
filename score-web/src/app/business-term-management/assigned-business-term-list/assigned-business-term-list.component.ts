@@ -20,7 +20,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {AuthService} from '../../authentication/auth.service';
 import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
-import {PreferencesInfo, TableColumnsInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
@@ -35,11 +35,30 @@ export class AssignedBusinessTermListComponent implements OnInit {
 
   title = 'Business Term Assignment';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = columns;
+    this.updateTableColumnsForAssignedBusinessTermPage();
+  }
+
+  updateTableColumnsForAssignedBusinessTermPage() {
+    this.preferencesService.updateTableColumnsForAssignedBusinessTermPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfAssignedBusinessTermPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -49,8 +68,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -66,27 +84,24 @@ export class AssignedBusinessTermListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForAssignedBusinessTermPage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfAssignedBusinessTermPage);
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = defaultTableColumnInfo.columnsOfAssignedBusinessTermPage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
     if (this.preferencesInfo) {
-      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage;
-      for (const column of columns) {
+      for (const column of this.columns) {
         switch (column.name) {
           case 'BIE DEN':
             if (column.selected) {
@@ -132,13 +147,6 @@ export class AssignedBusinessTermListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<AssignedBusinessTerm>();

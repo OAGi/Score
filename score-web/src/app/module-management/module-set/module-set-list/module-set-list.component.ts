@@ -19,7 +19,11 @@ import {ModuleSet, ModuleSetListRequest} from '../../domain/module';
 import {ModuleService} from '../../domain/module.service';
 import {UserToken} from '../../../authentication/domain/auth';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
@@ -31,11 +35,30 @@ export class ModuleSetListComponent implements OnInit {
 
   title = 'Module Set';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = columns;
+    this.updateTableColumnsForModuleSetPage();
+  }
+
+  updateTableColumnsForModuleSetPage() {
+    this.preferencesService.updateTableColumnsForModuleSetPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfModuleSetPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -45,8 +68,7 @@ export class ModuleSetListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -62,59 +84,48 @@ export class ModuleSetListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForModuleSetPage();
     }
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage = defaultTableColumnInfo.columnsOfModuleSetPage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-
-    if (this.preferencesInfo) {
-      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage;
-      for (const column of columns) {
-        switch (column.name) {
-          case 'Name':
-            if (column.selected) {
-              displayedColumns.push('name');
-            }
-            break;
-          case 'Description':
-            if (column.selected) {
-              displayedColumns.push('description');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-
-    if (this.roles.includes('developer')) {
-      displayedColumns.push('more');
-    }
-
-    return displayedColumns;
   }
 
   width(name: string): number | string {
     if (!this.preferencesInfo) {
       return 0;
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage.find(c => c.name === name)?.width;
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = [];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Description':
+          if (column.selected) {
+            displayedColumns.push('description');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    if (this.roles.includes('developer')) {
+      displayedColumns.push('more');
+    }
+    return displayedColumns;
   }
 
   dataSource = new MatTableDataSource<ModuleSet>();

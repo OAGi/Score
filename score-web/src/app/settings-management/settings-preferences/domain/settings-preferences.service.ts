@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreferencesInfo} from './preferences';
+import {PreferencesInfo, TableColumnsProperty} from './preferences';
 import {UserToken} from '../../../authentication/domain/auth';
 import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} from '../../../common/utility';
 
@@ -12,7 +12,7 @@ export class SettingsPreferencesService {
   FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
   TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY = 'TableColumns-AgencyIdListPage';
-  TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY = 'TableColumns-ReleasePage';
+  public TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY = 'TableColumns-ReleasePage';
   TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY = 'TableColumns-NamespacePage';
 
   TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY = 'TableColumns-ContextCategoryPage';
@@ -29,6 +29,7 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_PENDING_ACCOUNT_PAGE_KEY = 'TableColumns-PendingAccountPage';
 
   TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY = 'TableColumns-MessagePage';
+  TABLE_COLUMNS_FOR_LOG_PAGE_KEY = 'TableColumns-LogPage';
   TABLE_COLUMNS_FOR_TENANT_PAGE_KEY = 'TableColumns-TenantPage';
 
   TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY = 'TableColumns-OpenAPIDocumentPage';
@@ -99,6 +100,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfMessagePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfMessagePage)));
+      preferencesInfo.tableColumnsInfo.columnsOfLogPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_LOG_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfLogPage)));
       preferencesInfo.tableColumnsInfo.columnsOfTenantPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantPage)));
@@ -124,56 +128,122 @@ export class SettingsPreferencesService {
     });
   }
 
+  updateTableColumnsInfo(userToken: UserToken, key: string, columns: any[]): Observable<any> {
+    return new Observable(subscriber => {
+      saveProperty(userToken, key, JSON.stringify(columns));
+
+      subscriber.next();
+      subscriber.complete();
+    });
+  }
+
+  updateTableColumnsForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage);
+  }
+
+  updateFilterTypeForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage);
+  }
+
+  updateTableColumnsForCodeListPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCodeListPage);
+  }
+
+  updateTableColumnsForAgencyIdListPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage);
+  }
+
+  updateTableColumnsForReleasePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfReleasePage);
+  }
+
+  updateTableColumnsForNamespacePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfNamespacePage);
+  }
+
+  updateTableColumnsForContextCategoryPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfContextCategoryPage);
+  }
+
+  updateTableColumnsForContextSchemePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage);
+  }
+
+  updateTableColumnsForBusinessContextPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage);
+  }
+
+  updateTableColumnsForModuleSetPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage);
+  }
+
+  updateTableColumnsForModuleSetReleasePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage);
+  }
+
+  updateTableColumnsForBiePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBiePage);
+  }
+
+  updateTableColumnsForBiePackagePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage);
+  }
+
+  updateTableColumnsForAccountPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfAccountPage);
+  }
+
+  updateTableColumnsForPendingAccountPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_PENDING_ACCOUNT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage);
+  }
+
+  updateTableColumnsForMessagePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfMessagePage);
+  }
+
+  updateTableColumnsForLogPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_LOG_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfLogPage);
+  }
+
+  updateTableColumnsForTenantPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfTenantPage);
+  }
+
+  updateTableColumnsForOpenApiDocumentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage);
+  }
+
+  updateTableColumnsForBusinessTermPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage);
+  }
+
+  updateTableColumnsForAssignedBusinessTermPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage);
+  }
+
   update(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return new Observable(subscriber => {
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage));
-      saveProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfReleasePage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfNamespacePage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextCategoryPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAccountPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_PENDING_ACCOUNT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfPendingAccountPage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfMessagePage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantPage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage));
-
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage));
-      saveProperty(userToken, this.TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY,
-        JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage));
-
       saveBooleanProperty(userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY,
         preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode);
       saveProperty(userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY,

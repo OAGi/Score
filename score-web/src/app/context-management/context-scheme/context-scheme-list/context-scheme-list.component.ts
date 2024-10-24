@@ -17,7 +17,11 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -31,11 +35,30 @@ export class ContextSchemeListComponent implements OnInit {
 
   title = 'Context Scheme';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage = columns;
+    this.updateTableColumnsForContextSchemePage();
+  }
+
+  updateTableColumnsForContextSchemePage() {
+    this.preferencesService.updateTableColumnsForContextSchemePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfContextSchemePage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -45,8 +68,7 @@ export class ContextSchemeListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -62,19 +84,18 @@ export class ContextSchemeListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForContextSchemePage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage = defaultTableColumnInfo.columnsOfContextSchemePage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -82,8 +103,7 @@ export class ContextSchemeListComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'Name':
           if (column.selected) {
@@ -118,13 +138,6 @@ export class ContextSchemeListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<ContextScheme>();

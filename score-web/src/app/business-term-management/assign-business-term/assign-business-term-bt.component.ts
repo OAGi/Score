@@ -20,7 +20,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {AsbieBbieList} from '../../bie-management/bie-list/domain/bie-list';
-import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -35,6 +35,18 @@ export class AssignBusinessTermBtComponent implements OnInit {
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
 
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
+  }
+
+  updateTableColumnsForBusinessTermPage() {
+    this.preferencesService.updateTableColumnsForBusinessTermPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
   onResizeWidth($event) {
     switch ($event.name) {
       case 'Updated on':
@@ -48,19 +60,24 @@ export class AssignBusinessTermBtComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForBusinessTermPage();
     }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
     if (this.preferencesInfo) {
-      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
-      for (const column of columns) {
+      for (const column of this.columns) {
         switch (column.name) {
           case 'Business Term':
             if (column.selected) {
@@ -91,13 +108,6 @@ export class AssignBusinessTermBtComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<BusinessTerm>();

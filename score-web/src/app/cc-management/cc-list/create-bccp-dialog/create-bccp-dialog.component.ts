@@ -19,7 +19,7 @@ import {WorkingRelease} from '../../../release-management/domain/release';
 import {TagService} from '../../../tag-management/domain/tag.service';
 import {Tag} from '../../../tag-management/domain/tag';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {PreferencesInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsProperty} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -41,6 +41,18 @@ export class CreateBccpDialogComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+  }
+
+  updateTableColumnsForCoreComponentPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
   onResizeWidth($event) {
     switch ($event.name) {
       case 'Updated on':
@@ -54,12 +66,18 @@ export class CreateBccpDialogComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForCoreComponentPage();
     }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   get displayedColumns(): string[] {
@@ -67,8 +85,7 @@ export class CreateBccpDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
-    for (const column of columns) {
+    for (const column of this.columns) {
       switch (column.name) {
         case 'State':
           if (column.selected) {
@@ -103,13 +120,6 @@ export class CreateBccpDialogComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage.find(c => c.name === name)?.width;
   }
 
   dataSource = new MatTableDataSource<CcList>();

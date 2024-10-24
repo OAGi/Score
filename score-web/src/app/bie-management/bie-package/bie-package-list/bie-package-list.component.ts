@@ -25,7 +25,11 @@ import {TransferOwnershipDialogComponent} from '../../../common/transfer-ownersh
 import {AccountList} from '../../../account-management/domain/accounts';
 import {MailService} from '../../../common/score-mail.service';
 import {BiePackageUpliftDialogComponent} from '../bie-package-uplift-dialog/bie-package-uplift-dialog.component';
-import {PreferencesInfo, TableColumnsInfo} from '../../../settings-management/settings-preferences/domain/preferences';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
@@ -38,11 +42,30 @@ export class BiePackageListComponent implements OnInit {
 
   title = 'BIE Package';
 
-  get columns() {
+  get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
     return this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = columns;
+    this.updateTableColumnsForBiePackagePage();
+  }
+
+  updateTableColumnsForBiePackagePage() {
+    this.preferencesService.updateTableColumnsForBiePackagePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfBiePackagePage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -52,8 +75,7 @@ export class BiePackageListComponent implements OnInit {
       width: this.width(column.name)
     }));
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = updatedColumnsWithWidth;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+    this.columns = updatedColumnsWithWidth;
 
     let columns = [];
     for (const tableColumn of this.table.columns) {
@@ -82,20 +104,18 @@ export class BiePackageListComponent implements OnInit {
   }
 
   setWidth(name: string, width: number | string) {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
-    const matched = columns.find(c => c.name === name);
+    const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+      this.updateTableColumnsForBiePackagePage();
     }
   }
 
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.onColumnsChange(defaultTableColumnInfo.columnsOfBiePackagePage);
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage = defaultTableColumnInfo.columnsOfBiePackagePage;
-    this.preferencesService.update(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
   }
 
   defaultDisplayedColumns = [
@@ -113,8 +133,7 @@ export class BiePackageListComponent implements OnInit {
   get displayedColumns(): string[] {
     let displayedColumns = ['select'];
     if (this.preferencesInfo) {
-      const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage;
-      for (const column of columns) {
+      for (const column of this.columns) {
         switch (column.name) {
           case 'State':
             if (column.selected) {
@@ -155,13 +174,6 @@ export class BiePackageListComponent implements OnInit {
       }
     }
     return displayedColumns;
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage.find(c => c.name === name)?.width;
   }
 
   table: TableData<BiePackage>;
