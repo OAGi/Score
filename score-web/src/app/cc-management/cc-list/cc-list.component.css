@@ -146,8 +146,8 @@ mat-toolbar .mat-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 180px;
-  padding: 6px 12px;
+  width: 172px;
+  padding: 4px 8px;
   border-radius: 4px;
   box-shadow: var(--mdc-protected-button-container-elevation-shadow);
 }
