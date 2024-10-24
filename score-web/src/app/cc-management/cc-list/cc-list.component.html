@@ -320,7 +320,10 @@
           </score-column-selector>
 
           <section class="browser-mode-toggle-section mr-2">
-            <mat-label class="pr-2">{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
+            <div class="d-flex align-items-center">
+              <mat-icon class="mr-2">{{ browserMode ? 'preview' : 'code_blocks' }}</mat-icon>
+              <mat-label>{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
+            </div>
             <mat-slide-toggle labelPosition="before"
                               [checked]="browserMode" (change)="onBrowserModeChange($event)">
             </mat-slide-toggle>

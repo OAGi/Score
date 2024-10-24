@@ -143,6 +143,10 @@ mat-toolbar .mat-icon {
 }
 
 .browser-mode-toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 180px;
   padding: 6px 12px;
   border-radius: 4px;
   box-shadow: var(--mdc-protected-button-container-elevation-shadow);
