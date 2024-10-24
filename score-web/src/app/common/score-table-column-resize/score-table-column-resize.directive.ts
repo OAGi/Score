@@ -12,6 +12,10 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   private _title: string;
   private _width: number | string;
 
+  private startSiblingWidth: number;
+  private sibling: HTMLElement;
+  private siblingTitle: string;
+
   @Input() defaultWidth: number | string;
   @Output() onResize: EventEmitter<{ name: string; width: number | string }> = new EventEmitter();
 
@@ -115,6 +119,13 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
       this._resizing = true;  // Set resizing flag
       this.startX = event.pageX;
       this.startWidth = this.el.nativeElement.offsetWidth;
+      this.sibling = this.el.nativeElement.nextElementSibling;
+
+      if (this.sibling) {
+        this.startSiblingWidth = this.sibling.offsetWidth;
+        const siblingDivChild = this.sibling.querySelector('div');
+        this.siblingTitle = siblingDivChild ? siblingDivChild.textContent?.trim() : this.sibling.textContent?.trim();
+      }
 
       document.addEventListener('mousemove', this.onMouseMove);
       document.addEventListener('mouseup', this.onMouseUp);
@@ -122,7 +133,20 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
   }
 
   onMouseMove = (event: MouseEvent) => {
-    this._width = this.startWidth + (event.pageX - this.startX);
+    const deltaX = event.pageX - this.startX;
+    this._width = this.startWidth + deltaX;
+
+    if (this._width < 0) {
+      this._width = 0;
+    } // Avoid negative width
+
+    if (this.sibling) {
+      const newSiblingWidth = this.startSiblingWidth - deltaX;
+      if (newSiblingWidth >= 0) {
+        this.renderer.setStyle(this.sibling, 'width', `${newSiblingWidth}px`);
+      }
+    }
+
     if (typeof (this._width) === 'string') {
       this.renderer.setStyle(this.el.nativeElement, 'width', `${this._width}`);
     } else {
@@ -137,6 +161,15 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
       name: this._title,
       width: this._width
     });
+
+    // Emit resize event for the sibling element
+    if (this.sibling) {
+      const siblingWidth = this.sibling.offsetWidth;
+      this.onResize.emit({
+        name: this.siblingTitle,
+        width: siblingWidth
+      });
+    }
 
     // Set a small timeout to differentiate click from drag
     setTimeout(() => {
