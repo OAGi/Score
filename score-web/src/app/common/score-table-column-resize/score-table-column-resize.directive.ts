@@ -64,14 +64,22 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
     this.renderer.addClass(this.resizeHandle, 'resize-handle');
 
     // Find the child <div> element inside the <th>
-    const divChild = this.el.nativeElement.querySelector('div');
-    if (divChild) {
-      this._title = divChild.textContent?.trim();
-      this.renderer.appendChild(divChild, this.resizeHandle);
-    } else {
+    let divChild = this.el.nativeElement.querySelector('div');
+    if (!divChild) {
       this._title = this.el.nativeElement.textContent?.trim();
-      this.renderer.appendChild(this.el.nativeElement, this.resizeHandle);
+      divChild = this.renderer.createElement('div');
+
+      // Move all existing child nodes into the new divChild
+      while (this.el.nativeElement.firstChild) {
+        this.renderer.appendChild(divChild, this.el.nativeElement.firstChild);
+      }
+
+      this.renderer.appendChild(this.el.nativeElement, divChild);
+    } else {
+      this._title = divChild.textContent?.trim();
     }
+
+    this.renderer.appendChild(divChild, this.resizeHandle);
 
     // Style the resize handle for positioning and interaction
     this.renderer.setStyle(this.resizeHandle, 'position', 'absolute');

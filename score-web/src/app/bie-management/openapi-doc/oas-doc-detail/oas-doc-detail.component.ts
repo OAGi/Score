@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {
   BieForOasDoc,
   BieForOasDocDeleteRequest,
@@ -30,6 +30,13 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-oas-doc-detail',
@@ -47,30 +54,169 @@ export class OasDocDetailComponent implements OnInit {
   hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
-  displayedColumns = [
-    {id: 'select', name: ''},
-    {id: 'branch', name: 'Branch'},
-    {id: 'den', name: 'DEN'},
-    {id: 'remark', name: 'Remark'},
-    {id: 'verb', name: 'Verb'},
-    {id: 'arrayIndicator', name: 'Array Indicator'},
-    {id: 'suppressRootIndicator', name: 'Suppress Root Indicator'},
-    {id: 'messageBody', name: 'Message Body'},
-    {id: 'resourceName', name: 'Resource Name'},
-    {id: 'operationId', name: 'Operation ID'},
-    {id: 'tagName', name: 'Tag Name'},
+
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage = columns;
+    this.updateTableColumnsForBieForOasDocPage();
+  }
+
+  updateTableColumnsForBieForOasDocPage() {
+    this.preferencesService.updateTableColumnsForBieForOasDocPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfBieForOasDocPage;
+    this.onColumnsChange(this.columns);
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+
+    let columns = [];
+    for (const tableColumn of this.table.columns) {
+      for (const updatedColumn of updatedColumns) {
+        if (tableColumn.name === updatedColumn.name) {
+          tableColumn.isActive = updatedColumn.selected;
+        }
+      }
+      columns.push(tableColumn);
+    }
+
+    this.table.columns = columns;
+    this.table.displayedColumns = this.displayedColumns;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForBieForOasDocPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  defaultDisplayedColumns = [
+    {id: 'select', name: '', isActive: true},
+    {id: 'branch', name: 'Branch', isActive: true},
+    {id: 'den', name: 'DEN', isActive: true},
+    {id: 'remark', name: 'Remark', isActive: true},
+    {id: 'verb', name: 'Verb', isActive: true},
+    {id: 'arrayIndicator', name: 'Array Indicator', isActive: true},
+    {id: 'suppressRootIndicator', name: 'Suppress Root Indicator', isActive: true},
+    {id: 'messageBody', name: 'Message Body', isActive: true},
+    {id: 'resourceName', name: 'Resource Name', isActive: true},
+    {id: 'operationId', name: 'Operation ID', isActive: true},
+    {id: 'tagName', name: 'Tag Name', isActive: true}
   ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      for (const column of this.columns) {
+        switch (column.name) {
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Verb':
+            if (column.selected) {
+              displayedColumns.push('verb');
+            }
+            break;
+          case 'Array Indicator':
+            if (column.selected) {
+              displayedColumns.push('arrayIndicator');
+            }
+            break;
+          case 'Suppress Root Indicator':
+            if (column.selected) {
+              displayedColumns.push('suppressRootIndicator');
+            }
+            break;
+          case 'Message Body':
+            if (column.selected) {
+              displayedColumns.push('messageBody');
+            }
+            break;
+          case 'Resource Name':
+            if (column.selected) {
+              displayedColumns.push('resourceName');
+            }
+            break;
+          case 'Operation ID':
+            if (column.selected) {
+              displayedColumns.push('operationId');
+            }
+            break;
+          case 'Tag Name':
+            if (column.selected) {
+              displayedColumns.push('tagName');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   table: TableData<BieForOasDoc>;
   selection = new SelectionModel<BieForOasDoc>(true, []);
   businessContextSelection = {};
   request: BieForOasDocListRequest;
+  preferencesInfo: PreferencesInfo;
   loading = false;
   isUpdating: boolean;
   option: BieExpressOption;
   openApiFormats: string[] = ['YAML', 'JSON'];
   topLevelAsbiepIds: number[];
+
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private bizCtxService: BusinessContextService,
               private openAPIService: OpenAPIService,
@@ -81,12 +227,13 @@ export class OasDocDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private dialog: MatDialog,
               public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<BieForOasDoc>(this.displayedColumns, {});
+    this.table = new TableData<BieForOasDoc>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
 
     this.topLevelAsbiepIds = [];
@@ -109,9 +256,17 @@ export class OasDocDetailComponent implements OnInit {
 
     this.table.sortParams = this.request.page.sortActives;
     this.table.sortDirs = this.request.page.sortDirections;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.table.sortObservable.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieListForOasDoc();
+      this.onSearch();
     });
 
     this.request.page = new PageRequest(
@@ -121,7 +276,11 @@ export class OasDocDetailComponent implements OnInit {
     forkJoin([
       this.openAPIService.getOasDoc(oasDocId),
       this.openAPIService.getBieListForOasDoc(this.request, oasDocId),
-    ]).subscribe(([simpleOasDoc, bieForOasDoc]) => {
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([simpleOasDoc, bieForOasDoc, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+      this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
+
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
       this.loadBieListForOasDoc(true);
@@ -140,6 +299,12 @@ export class OasDocDetailComponent implements OnInit {
     const urlTree = this.router.createUrlTree(commands);
     const path = this.location.prepareExternalUrl(urlTree.toString());
     return window.location.origin + path;
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.selection.clear();
+    this.loadBieListForOasDoc();
   }
 
   loadBieListForOasDoc(isInit?: boolean) {

@@ -268,7 +268,8 @@
               </ng-container>
 
               <ng-container matColumnDef="verb">
-                <th mat-header-cell *matHeaderCellDef> Verb</th>
+                <th mat-header-cell *matHeaderCellDef
+                    score-table-column-resize [defaultWidth]="width('Verb')"> Verb</th>
                 <td mat-cell *matCellDef="let element">
                   <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
                               (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
@@ -286,7 +287,8 @@
               </ng-container>
 
               <ng-container matColumnDef="messageBody">
-                <th mat-header-cell *matHeaderCellDef> Message Body</th>
+                <th mat-header-cell *matHeaderCellDef
+                    score-table-column-resize [defaultWidth]="width('Message Body')"> Message Body</th>
                 <td mat-cell *matCellDef="let element">
                   <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
                               (click)="$event.stopPropagation()">
@@ -300,7 +302,8 @@
               </ng-container>
 
               <ng-container matColumnDef="arrayIndicator">
-                <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
+                <th mat-header-cell *matHeaderCellDef
+                    score-table-column-resize [defaultWidth]="width('Array Indicator')"> Array Indicator</th>
                 <td mat-cell *matCellDef="let element">
                   <mat-checkbox [(ngModel)]="element.arrayIndicator" (click)="$event.stopPropagation()"></mat-checkbox>
                 </td>

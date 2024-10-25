@@ -10,14 +10,6 @@
   font-size: 13px;
 }
 
-.mat-column-verb, .mat-column-messageBody {
-  width: 160px;
-}
-
-.mat-column-arrayIndicator {
-  width: 60px;
-}
-
 .bie-guid {
   font-size: 11px !important;
   color: #767676 !important;

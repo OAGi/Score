@@ -70,7 +70,16 @@ export class OasDocAssignDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return 0;
     }
-    return this.columns.find(c => c.name === name)?.width;
+    switch (name) {
+      case 'Verb':
+        return 160;
+      case 'Message Body':
+        return 160;
+      case 'Array Indicator':
+        return 70;
+      default:
+        return this.columns.find(c => c.name === name)?.width;
+    }
   }
 
   get displayedColumns(): string[] {
@@ -116,6 +125,11 @@ export class OasDocAssignDialogComponent implements OnInit {
           case 'Remark':
             if (column.selected) {
               displayedColumns.push('remark');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
             }
             break;
         }

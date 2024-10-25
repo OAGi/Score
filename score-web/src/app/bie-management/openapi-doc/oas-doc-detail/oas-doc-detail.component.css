@@ -1,45 +1,9 @@
-.mat-column-branch {
-  width: 80px;
-}
-
 .mat-column-den {
   font-size: 13px;
 }
 
-.mat-column-remark {
-  width: 12%;
-}
-
-.mat-column-verb {
-  width: 80px;
-}
-
-.mat-column-arrayIndicator, .mat-column-suppressRootIndicator {
-  width: 66px;
-}
-
-.mat-column-messageBody {
-  width: 110px;
-}
-
-.mat-column-resourceName {
-  width: 18%;
-}
-
-.mat-column-operationId {
-  width: 18%;
-}
-
-.mat-column-tagName {
-  width: 10%;
-}
-
 .mat-column-tagName .tagName:not(:last-child)::after {
   content: ', ';
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .bie-guid {

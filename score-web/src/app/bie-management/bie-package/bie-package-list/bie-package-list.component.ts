@@ -66,6 +66,7 @@ export class BiePackageListComponent implements OnInit {
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.columns = defaultTableColumnInfo.columnsOfBiePackagePage;
+    this.onColumnsChange(this.columns);
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {

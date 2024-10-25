@@ -33,6 +33,7 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_TENANT_PAGE_KEY = 'TableColumns-TenantPage';
 
   TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY = 'TableColumns-OpenAPIDocumentPage';
+  TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY = 'TableColumns-BieForOasDocPage';
 
   TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY = 'TableColumns-BusinessTermPage';
   TABLE_COLUMNS_FOR_ASSIGNED_BUSINESS_TERM_PAGE_KEY = 'TableColumns-AssignedBusinessTermPage';
@@ -110,6 +111,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage)));
 
       preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_TERM_PAGE_KEY,
@@ -230,6 +234,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForOpenApiDocumentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage);
+  }
+
+  updateTableColumnsForBieForOasDocPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
   }
 
   updateTableColumnsForBusinessTermPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

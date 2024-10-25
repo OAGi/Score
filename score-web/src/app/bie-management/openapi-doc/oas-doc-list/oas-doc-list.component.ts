@@ -58,6 +58,7 @@ export class OasDocListComponent implements OnInit {
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.columns = defaultTableColumnInfo.columnsOfOpenApiDocumentPage;
+    this.onColumnsChange(this.columns);
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {

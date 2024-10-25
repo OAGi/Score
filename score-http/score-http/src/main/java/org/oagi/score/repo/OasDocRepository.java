@@ -260,53 +260,59 @@ public class OasDocRepository {
             return this;
         }
 
-        public SelectBieForOasDocListArguments setSort(String field, String direction) {
-            if (StringUtils.hasLength(field)) {
+        public SelectBieForOasDocListArguments setSort(String sortKey, String direction) {
+            if (StringUtils.hasLength(sortKey)) {
+                Field field = null;
                 SortField<?> sortField = null;
-                switch (field) {
+                switch (sortKey) {
                     case "state":
-                        if ("asc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.STATE.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.STATE.desc();
-                        }
-
+                        field = TOP_LEVEL_ASBIEP.STATE;
                         break;
 
-                    case "topLevelAsccpPropertyTerm":
-                        if ("asc".equals(direction)) {
-                            sortField = ASCCP.PROPERTY_TERM.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = ASCCP.PROPERTY_TERM.desc();
-                        }
-
+                    case "branch":
+                    case "releaseNum":
+                        field = RELEASE.RELEASE_NUM;
                         break;
 
                     case "den":
-                        if ("asc".equals(direction)) {
-                            sortField = ASCCP_MANIFEST.DEN.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = ASCCP_MANIFEST.DEN.desc();
-                        }
+                        field = ASCCP_MANIFEST.DEN;
                         break;
 
-                    case "releaseNum":
-                        if ("asc".equals(direction)) {
-                            sortField = RELEASE.RELEASE_NUM.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = RELEASE.RELEASE_NUM.desc();
-                        }
+                    case "topLevelAsccpPropertyTerm":
+                        field = ASCCP.PROPERTY_TERM;
+                        break;
 
+                    case "owner":
+                        field = APP_USER.LOGIN_ID;
+                        break;
+
+                    case "businessContexts":
+                        field = BIZ_CTX.NAME;
+                        break;
+
+                    case "version":
+                        field = TOP_LEVEL_ASBIEP.VERSION;
+                        break;
+
+                    case "status":
+                        field = TOP_LEVEL_ASBIEP.STATUS;
+                        break;
+
+                    case "remark":
+                        field = ASBIEP.REMARK;
                         break;
 
                     case "lastUpdateTimestamp":
-                        if ("asc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.asc();
-                        } else if ("desc".equals(direction)) {
-                            sortField = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.desc();
-                        }
-
+                        field = TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP;
                         break;
+                }
+
+                if (field != null) {
+                    if ("asc".equals(direction)) {
+                        sortField = field.asc();
+                    } else if ("desc".equals(direction)) {
+                        sortField = field.desc();
+                    }
                 }
 
                 if (sortField != null) {
@@ -365,6 +371,7 @@ public class OasDocRepository {
             return selectBieForOasDocList(this, type);
         }
     }
+
     private <E> PaginationResponse<E> selectBieForOasDocList(SelectBieForOasDocListArguments arguments, Class<? extends E> type) {
         SelectOnConditionStep<Record> step = getSelectOnConditionStep(arguments);
         SelectConnectByStep<Record> conditionStep = step.where(arguments.getConditions());

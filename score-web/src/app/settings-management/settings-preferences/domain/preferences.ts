@@ -189,6 +189,19 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfBieForOasDocPage: TableColumnsProperty[] = [
+    {name: 'Branch', selected: true, width: 80},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Remark', selected: true, width: '12%'},
+    {name: 'Verb', selected: true, width: 80},
+    {name: 'Array Indicator', selected: true, width: 120},
+    {name: 'Suppress Root Indicator', selected: true, width: 120},
+    {name: 'Message Body', selected: true, width: 120},
+    {name: 'Resource Name', selected: true, width: '15%'},
+    {name: 'Operation ID', selected: true, width: '15%'},
+    {name: 'Tag Name', selected: true, width: '10%'}
+  ];
+
   columnsOfBusinessTermPage: TableColumnsProperty[] = [
     {name: 'Business Term', selected: true, width: 0},
     {name: 'External Reference URI', selected: true, width: '15%'},
