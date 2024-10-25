@@ -123,7 +123,7 @@ export class SettingsPreferencesService {
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage)));
 
       preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = loadBooleanProperty(
-        userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, false);
+        userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, (userToken.roles.includes('developer') ? false : true));
       preferencesInfo.viewSettingsInfo.treeSettings.delimiter = loadProperty(
         userToken, this.TREE_SETTINGS_PATH_DELIMITER_PROPERTY_KEY, '.');
 
