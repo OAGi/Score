@@ -10,7 +10,8 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar [(model)]="request.filters.uri"
+    <score-search-bar placeholder="URI"
+                      [(model)]="request.filters.uri"
                       (modelChange)="onChange('filters.uri', request.filters.uri);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">

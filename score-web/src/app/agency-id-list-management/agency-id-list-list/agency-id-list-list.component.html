@@ -19,7 +19,8 @@
   </div>
 
   <mat-card class="pt-3" style="box-shadow: none;">
-    <score-search-bar [(model)]="request.filters.name"
+    <score-search-bar placeholder="Name"
+                      [(model)]="request.filters.name"
                       (modelChange)="onChange('filters.name', request.filters.name);"
                       (search)="onSearch();">
       <div branchSelector class="d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">

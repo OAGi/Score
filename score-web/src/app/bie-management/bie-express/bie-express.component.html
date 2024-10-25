@@ -7,7 +7,8 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar [(model)]="request.filters.den"
+    <score-search-bar placeholder="DEN"
+                      [(model)]="request.filters.den"
                       (modelChange)="onChange('filters.den', request.filters.den);"
                       (search)="onSearch();">
       <div branchSelector class="d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">

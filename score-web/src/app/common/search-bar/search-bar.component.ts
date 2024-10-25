@@ -11,6 +11,7 @@ export class SearchBarComponent {
   private value = '';
   showAdvancedSearch = false;
 
+  @Input() placeholder = 'Search';
   @Input() disabled = false;  // Add disabled input
   @Input() advancedSearch = true;
 

@@ -9,7 +9,8 @@
   </div>
   <div class="content">
     <mat-card style="box-shadow: none;">
-      <score-search-bar [(model)]="request.filters.loginId"
+      <score-search-bar placeholder="Login ID"
+                        [(model)]="request.filters.loginId"
                         (modelChange)="onChange('filters.loginId', request.filters.loginId);"
                         (search)="onSearch();">
         <div advancedSearchContent style="padding-left: 3rem;">

@@ -8,7 +8,7 @@
       <input matInput [(ngModel)]="model"
              (ngModelChange)="onModelChange(model)"
              (keyup.enter)="onSearch()"
-             placeholder="Search"
+             placeholder="{{ placeholder }}"
              [disabled]="disabled"/>
     </mat-form-field>
     <button mat-icon-button *ngIf="advancedSearch"
