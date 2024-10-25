@@ -23,6 +23,7 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY = 'TableColumns-ModuleSetReleasePage';
 
   TABLE_COLUMNS_FOR_BIE_PAGE_KEY = 'TableColumns-BiePage';
+  TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY = 'TableColumns-BieReuseReportPage';
   TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY = 'TableColumns-BiePackagePage';
 
   TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY = 'TableColumns-AccountPage';
@@ -87,6 +88,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfBiePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePage)));
+      preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage)));
       preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage)));
@@ -199,6 +203,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForBiePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfBiePage);
+  }
+
+  updateTableColumnsForBieReuseReportPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage);
   }
 
   updateTableColumnsForBiePackagePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

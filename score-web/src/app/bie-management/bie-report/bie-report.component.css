@@ -52,22 +52,6 @@ tr.element-row:not(.expanded-row):active {
   outline: none;
 }
 
-.mat-column-releaseNum {
-  width: 100px;
-}
-
-.mat-column-reusedVersion, .mat-column-reusedStatus, .mat-column-reusingVersion, .mat-column-reusingStatus {
-  width: 5%;
-}
-
-.mat-column-reusedState, .mat-column-reusedOwner, .mat-column-reusingState, .mat-column-reusingOwner {
-  width: 90px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
-}
-
 .mat-column-arrow {
   width: 40px;
 }

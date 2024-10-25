@@ -143,6 +143,20 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfBieReuseReportPage: TableColumnsProperty[] = [
+    {name: 'Release', selected: true, width: 100},
+    {name: 'Reusing State', selected: true, width: 100},
+    {name: 'Reusing Property Term', selected: true, width: 0},
+    {name: 'Reusing Owner', selected: true, width: 140},
+    {name: 'Reusing Version', selected: true, width: '5%'},
+    {name: 'Reusing Status', selected: true, width: '5%'},
+    {name: 'Reused State', selected: true, width: 100},
+    {name: 'Reused Property Term', selected: true, width: 0},
+    {name: 'Reused Owner', selected: true, width: 140},
+    {name: 'Reused Version', selected: true, width: '5%'},
+    {name: 'Reused Status', selected: true, width: '5%'}
+  ];
+
   columnsOfBiePackagePage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Branch', selected: true, width: 100},

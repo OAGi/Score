@@ -11,6 +11,11 @@
   display: none;
 }
 
+.search-box .mat-form-field-hide-placeholder .mat-mdc-select-placeholder {
+  color: var(--mat-select-placeholder-text-color);
+  -webkit-text-fill-color: var(--mat-select-placeholder-text-color);
+}
+
 .search-box .advanced-search {
   margin-top: 0.5rem;
   padding-top: 1.5rem;

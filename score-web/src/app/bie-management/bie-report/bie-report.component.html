@@ -14,125 +14,146 @@
       <div class="loading-container" *ngIf="loading">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
-      <div class="mat-elevation-z1">
-        <table mat-table [dataSource]="dataSource">
-          <ng-container matColumnDef="releaseNum">
-            <th mat-header-cell *matHeaderCellDef > Release</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.releaseNum }}
-            </td>
-          </ng-container>
 
-          <ng-container matColumnDef="reusingState">
-            <th mat-header-cell *matHeaderCellDef > State</th>
-            <td mat-cell *matCellDef="let element">
+      <div class="table-container">
+        <div class="score-column-container">
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
+        </div>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table [dataSource]="dataSource">
+            <ng-container matColumnDef="releaseNum">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Release')" (onResize)="onResizeWidth($event)"> Release</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.releaseNum }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reusingState">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing State')" (onResize)="onResizeWidth($event)"> State</th>
+              <td mat-cell *matCellDef="let element">
               <span class="bie-state {{ element.reusingState }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
                     'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
-              <span *ngIf="element.reusingDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                <span *ngIf="element.reusingDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
+                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusingPropertyTerm">
-            <th mat-header-cell *matHeaderCellDef > Property Term</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="den word-break-all">
+            <ng-container matColumnDef="reusingPropertyTerm">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing Property Term')" (onResize)="onResizeWidth($event)"> Property Term</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="den word-break-all">
                 <span *ngIf="isAccessibleLeft(element)">
                   <a href="{{getRouteLink(element)}}" target="_blank">
                     {{ element.reusingPropertyTerm }}
                   </a>
                 </span>
-                <span *ngIf="!isAccessibleLeft(element)">
+                  <span *ngIf="!isAccessibleLeft(element)">
                   {{ element.reusingPropertyTerm }}
                 </span>
-              </div>
-              <div class="bie-guid">{{ element.reusingGuid }}</div>
-            </td>
-          </ng-container>
+                </div>
+                <div class="bie-guid">{{ element.reusingGuid }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusingOwner">
-            <th mat-header-cell *matHeaderCellDef> Owner</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="word-break-all">{{ element.reusingOwner }}</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusingOwner">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.reusingOwner }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusingVersion">
-            <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="word-break-all">{{ element.reusingVersion }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusingVersion">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing Version')" (onResize)="onResizeWidth($event)"> Version</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusingVersion }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusingStatus">
-            <th mat-header-cell *matHeaderCellDef> Status</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="word-break-all">{{ element.reusingStatus }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusingStatus">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing Status')" (onResize)="onResizeWidth($event)"> Status</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusingStatus }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="arrow">
-            <th mat-header-cell *matHeaderCellDef > </th>
-            <td mat-cell *matCellDef="let element">
-              <fa-icon [icon]="faRecycle"></fa-icon>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="arrow">
+              <th mat-header-cell *matHeaderCellDef > </th>
+              <td mat-cell *matCellDef="let element">
+                <fa-icon [icon]="faRecycle"></fa-icon>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusedState">
-            <th mat-header-cell *matHeaderCellDef > State</th>
-            <td mat-cell *matCellDef="let element">
+            <ng-container matColumnDef="reusedState">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused State')" (onResize)="onResizeWidth($event)"> State</th>
+              <td mat-cell *matCellDef="let element">
               <span class="bie-state {{ element.reusedState }}"
                     [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
                     'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
-              <span *ngIf="element.reusedDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                <span *ngIf="element.reusedDeprecated" class="bie-state Deprecated" [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
+                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                     'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusedPropertyTerm">
-            <th mat-header-cell *matHeaderCellDef > Reused</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="dev word-break-all">
+            <ng-container matColumnDef="reusedPropertyTerm">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused Property Term')" (onResize)="onResizeWidth($event)"> Reused</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="dev word-break-all">
                 <span *ngIf="isAccessibleRight(element)">
                   <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
                     {{ element.reusedPropertyTerm }}
                   </a>
                 </span>
-                <span *ngIf="!isAccessibleRight(element)">
+                  <span *ngIf="!isAccessibleRight(element)">
                     {{ element.reusedPropertyTerm }}
                 </span>
-              </div>
-              <div class="bie-guid">{{ element.reusedGuid }}</div>
-            </td>
-          </ng-container>
+                </div>
+                <div class="bie-guid">{{ element.reusedGuid }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusedOwner">
-            <th mat-header-cell *matHeaderCellDef> Owner</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="word-break-all">{{ element.reusedOwner }}</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusedOwner">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.reusedOwner }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusedVersion">
-            <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="word-break-all">{{ element.reusedVersion }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusedVersion">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused Version')" (onResize)="onResizeWidth($event)"> Version</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusedVersion }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="reusedStatus">
-            <th mat-header-cell *matHeaderCellDef> Status</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="word-break-all">{{ element.reusedStatus }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="reusedStatus">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused Status')" (onResize)="onResizeWidth($event)"> Status</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusedStatus }}</div>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

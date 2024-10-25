@@ -778,7 +778,7 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setOwnedByDeveloper(Boolean ownedByDeveloper) {
             if (ownedByDeveloper != null) {
-                conditions.add(APP_USER.IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
+                conditions.add(APP_USER.as("owner").IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
             }
             return this;
         }
