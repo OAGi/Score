@@ -10,8 +10,7 @@
           </div>
         </div>
         <mat-card style="box-shadow: none;">
-          <score-search-bar placeholder="DEN"
-                            [(model)]="verbRequest.filters.den"
+          <score-search-bar [(model)]="verbRequest.filters.den"
                             (modelChange)="onChange('verb', 'filters.den', verbRequest.filters.den)"
                             (search)="onSearch('verb');">
             <div advancedSearchContent style="padding-left: 3rem;">
@@ -231,8 +230,7 @@
           </div>
         </div>
         <mat-card style="box-shadow: none;">
-          <score-search-bar placeholder="DEN"
-                            [(model)]="nounRequest.filters.den"
+          <score-search-bar [(model)]="nounRequest.filters.den"
                             (modelChange)="onChange('noun', 'filters.den', nounRequest.filters.den)"
                             (search)="onSearch('noun');">
             <div advancedSearchContent style="padding-left: 3rem;">

@@ -9,8 +9,7 @@
   </div>
   <div class="content">
     <mat-card style="box-shadow: none;">
-      <score-search-bar placeholder="DEN"
-                        [(model)]="request.filters.den" [disabled]="true"
+      <score-search-bar [(model)]="request.filters.den" [disabled]="true"
                         (search)="onSearch();">
         <div advancedSearchContent style="padding-left: 3rem;">
           <mat-card-content class="mat-card-container">

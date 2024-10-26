@@ -10,8 +10,7 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar placeholder="Release"
-                      [(model)]="request.filters.releaseNum"
+    <score-search-bar [(model)]="request.filters.releaseNum"
                       (modelChange)="onChange('filters.releaseNum', request.filters.releaseNum);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">

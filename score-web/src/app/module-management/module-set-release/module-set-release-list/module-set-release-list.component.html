@@ -11,8 +11,7 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar placeholder="Name"
-                      [(model)]="request.filters.name"
+    <score-search-bar [(model)]="request.filters.name"
                       (modelChange)="onChange('filters.name', request.filters.name);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">

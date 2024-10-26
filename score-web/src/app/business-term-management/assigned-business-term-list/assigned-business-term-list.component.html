@@ -28,8 +28,7 @@
         </div>
       </mat-card-content>
     </mat-card>
-    <score-search-bar placeholder="DEN"
-                      [(model)]="request.filters.bieDen"
+    <score-search-bar [(model)]="request.filters.bieDen"
                       (modelChange)="onChange('filters.bieDen', request.filters.bieDen);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">

@@ -7,8 +7,7 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar placeholder="Preferred Username"
-                      [(model)]="request.filters.preferredUsername"
+    <score-search-bar [(model)]="request.filters.preferredUsername"
                       (modelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">
