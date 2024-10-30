@@ -29,9 +29,6 @@ public class ViewEditContextCategoryPageImpl extends BaseSearchBarPageImpl imple
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//input[@placeholder=\"Name\"]");
-
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//input[@placeholder=\"Description\"]");
 
@@ -101,7 +98,7 @@ public class ViewEditContextCategoryPageImpl extends BaseSearchBarPageImpl imple
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override

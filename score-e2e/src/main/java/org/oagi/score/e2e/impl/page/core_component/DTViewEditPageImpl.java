@@ -274,7 +274,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void showValueDomain() {
-        click(getDriver(), getShowValueDomain());
+        WebElement valueDomain = getShowValueDomain();
+        WebElement header = valueDomain.findElement(By.xpath(".//ancestor::mat-expansion-panel-header"));
+        if ("false".equals(header.getAttribute("aria-expanded"))) {
+            click(getDriver(), getShowValueDomain());
+        }
     }
 
     @Override

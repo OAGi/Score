@@ -200,9 +200,10 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
         String BieUEG = asccp.getPropertyTerm() + " User Extension Group";
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         waitFor(Duration.ofMillis(3000L));
         click(viewEditCoreComponentPage.getTypeSelectField());
-        List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
+        List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
         for (String ccState : Arrays.asList("ACC", "CDT", "BDT")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
@@ -216,9 +217,10 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         invisibilityOfLoadingContainerElement(getDriver());
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getTypeSelectField());
-        options = getDriver().findElements(By.cssSelector("mat-option"));
-        for (String ccState : Arrays.asList("BCCP", "CDT", "BDT")) {
+        options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+        for (String ccState : Arrays.asList("BCCP", "ACC", "ASCCP")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
         }
@@ -702,8 +704,8 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertFalse(accPanel.getObjectClassTermField().isEnabled());
         assertDisabled(accPanel.getComponentTypeSelectField());
         assertDisabled(accPanel.getNamespaceSelectField());
-        assertFalse(accPanel.getDefinitionSourceField().isEnabled());
-        assertFalse(accPanel.getDefinitionField().isEnabled());
+        assertDisabled(accPanel.getDefinitionSourceField());
+        assertEnabled(accPanel.getDefinitionField());
 
         //BCCP node cannot be changed
         //reload the page
@@ -724,8 +726,8 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertDisabled(bccpPanel.getDeprecatedCheckbox());
         assertDisabled(bccpPanel.getValueConstraintSelectField());
         assertDisabled(bccpPanel.getNamespaceSelectField());
-        assertFalse(bccpPanel.getDefinitionSourceField().isEnabled());
-        assertFalse(bccpPanel.getDefinitionField().isEnabled());
+        assertDisabled(bccpPanel.getDefinitionSourceField());
+        assertEnabled(bccpPanel.getDefinitionField());
     }
 
     @Test

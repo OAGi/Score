@@ -529,13 +529,16 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public void selectAllComponentTypes() {
-        click(getDriver(), getTypeSelectField());
+        retry(() -> {
+            click(getDriver(), getTypeSelectField());
+            visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"cdk-overlay-container\"]"));
+        });
         List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP", "CDT", "BDT", "ASCC", "BCC"));
         boolean selected;
         for (String componentType : componentTypes) {
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[text()=\"" + componentType + "\"]//ancestor::mat-option"));
-            selected = optionField.getAttribute("aria-selected").equals("true");
+            WebElement optionField = elementToBeClickable(getDriver(),
+                    By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]//span[text() = \"" + componentType + "\"]//ancestor::mat-checkbox"));
+            selected = optionField.getAttribute("ng-reflect-model").equals("true");
             if (!selected) {
                 click(getDriver(), optionField);
             }

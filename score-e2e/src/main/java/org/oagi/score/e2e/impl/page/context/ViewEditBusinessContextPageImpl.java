@@ -29,9 +29,6 @@ public class ViewEditBusinessContextPageImpl extends BaseSearchBarPageImpl imple
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Name\")]");
-
     private static final By NEW_BUSINESS_CONTEXT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Business Context\")]//ancestor::button[1]");
 
@@ -97,7 +94,7 @@ public class ViewEditBusinessContextPageImpl extends BaseSearchBarPageImpl imple
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
