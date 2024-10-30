@@ -89,6 +89,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
   }
 
   ngOnInit(): void {
+    this.loading = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.type = params.get('type');
@@ -110,6 +111,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
       this.onClick(this.dataSource.data[0]);
 
+      this.loading = false;
       return;
     }, err => {
       let errorMessage;
