@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.SelectAssociationDialog;
+import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
@@ -329,6 +330,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
         assertEquals("WIP", useraBIEWIP.getState());
@@ -337,6 +340,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
                 editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         SelectAssociationDialog selectCCPropertyPage =
                 accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+        selectCCPropertyPage.showAdvancedSearchPanel();
 
         /**
          * ASCCP cannot be appended to the global extension.
@@ -437,6 +441,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -450,6 +456,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             assertNotEquals("Production", asccpToAppend.getState());
             SelectAssociationDialog selectCCPropertyPage =
                     accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            selectCCPropertyPage.showAdvancedSearchPanel();
+
             /**
              *  ASCCP cannot be appended to the global extension.
              */
@@ -561,6 +569,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -579,6 +589,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             assertNotEquals("Production", accAssociation.getState());
             SelectAssociationDialog selectCCPropertyPage =
                     accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            selectCCPropertyPage.showAdvancedSearchPanel();
 
             /**
              *  ASCCP cannot be appended to the global extension.
@@ -674,6 +685,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -692,6 +705,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             assertEquals("Production", ACCAssociation.getState());
             SelectAssociationDialog selectCCPropertyPage =
                     accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            selectCCPropertyPage.showAdvancedSearchPanel();
+
             /**
              *  ASCCP cannot be appended to the global extension.
              */
@@ -783,6 +798,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -801,6 +818,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             assertNotEquals("Production", accAssociation.getState());
             SelectAssociationDialog selectCCPropertyPage =
                     accExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+            selectCCPropertyPage.showAdvancedSearchPanel();
+
             /**
              *  ASCCP cannot be appended to the global extension.
              */

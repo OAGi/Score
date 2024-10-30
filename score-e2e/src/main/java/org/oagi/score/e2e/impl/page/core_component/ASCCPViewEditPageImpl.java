@@ -71,7 +71,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//textarea[@placeholder=\"Definition\"]");
     private static final By DEN_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
 
@@ -561,7 +561,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
+                baseXPath + "//textarea[@placeholder=\"" + name + "\"]"));
     }
 
     private class ACCPanelImpl implements ACCPanel {

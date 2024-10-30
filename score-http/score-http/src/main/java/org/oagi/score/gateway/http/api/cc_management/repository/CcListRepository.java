@@ -113,7 +113,7 @@ public class CcListRepository {
                     field = field("default_value_domain");
                     break;
                 case "sixDigitId":
-                    field = field(DT.SIX_DIGIT_ID);
+                    field = field("six_digit_id");
                     break;
                 case "revision":
                     field = field(LOG.REVISION_NUM);

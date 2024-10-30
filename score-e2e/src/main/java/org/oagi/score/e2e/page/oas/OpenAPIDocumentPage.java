@@ -2,6 +2,7 @@ package org.oagi.score.e2e.page.oas;
 
 import org.oagi.score.e2e.obj.OpenAPIDocumentObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'OpenAPI Document' page.
  */
-public interface OpenAPIDocumentPage extends Page {
+public interface OpenAPIDocumentPage extends Page, SearchBarPage {
 
     /**
      * Return the UI element of the 'Updater' select field.
@@ -80,13 +81,6 @@ public interface OpenAPIDocumentPage extends Page {
      * @param description Description
      */
     void setDescription(String description);
-
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button

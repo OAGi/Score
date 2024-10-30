@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'Uplift BIE' page.
  */
-public interface UpliftBIEPage extends Page {
+public interface UpliftBIEPage extends Page, SearchBarPage {
     /**
      * Return the UI element of the 'Source Branch' select field.
      *
@@ -134,13 +135,6 @@ public interface UpliftBIEPage extends Page {
      * @param updatedEndDate Updated End Date
      */
     void setUpdatedEndDate(LocalDateTime updatedEndDate);
-
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button

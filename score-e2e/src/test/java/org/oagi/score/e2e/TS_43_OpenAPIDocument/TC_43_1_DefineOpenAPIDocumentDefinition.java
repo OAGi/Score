@@ -158,6 +158,7 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
 
         for (OpenAPIDocumentObject openAPIDocument : openAPIDocuments) {
+            openAPIDocumentPage.showAdvancedSearchPanel();
             openAPIDocumentPage.setDescription(openAPIDocument.getDescription());
             openAPIDocumentPage.hitSearchButton();
 

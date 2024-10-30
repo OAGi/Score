@@ -1,6 +1,6 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
-import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeListPage {
+public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements UpliftCodeListPage {
     private static final By SOURCE_BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Source Branch\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By TARGET_BRANCH_SELECT_FIELD_LOCATOR =
@@ -24,10 +24,6 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
-    private static final By CODE_LIST_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By UPLIFT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Uplift\")]//ancestor::button[1]");
 
@@ -109,13 +105,13 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     }
 
     @Override
-    public WebElement getCodeListField() {
-        return visibilityOfElementLocated(getDriver(), CODE_LIST_FIELD_LOCATOR);
+    public WebElement getNameField() {
+        return getInputFieldInSearchBar();
     }
 
     @Override
     public void setCodeList(String name) {
-        sendKeys(getCodeListField(), name);
+        sendKeys(getNameField(), name);
     }
 
     @Override
@@ -148,11 +144,6 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void hitSearchButton() {
         click(getSearchButton());
         waitFor(ofMillis(500L));
@@ -168,6 +159,7 @@ public class UpliftCodeListPageImpl extends BasePageImpl implements UpliftCodeLi
 
     @Override
     public EditCodeListPage hitUpliftButton(CodeListObject codeList, ReleaseObject sourceRelease, ReleaseObject targetRelease) {
+        showAdvancedSearchPanel();
         setSourceRelease(sourceRelease.getReleaseNumber());
         setTargetRelease(targetRelease.getReleaseNumber());
         setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId()).getLoginId());

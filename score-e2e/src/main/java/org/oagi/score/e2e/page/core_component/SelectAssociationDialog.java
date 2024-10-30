@@ -1,11 +1,12 @@
 package org.oagi.score.e2e.page.core_component;
 
 import org.oagi.score.e2e.page.Dialog;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 
-public interface SelectAssociationDialog extends Dialog {
+public interface SelectAssociationDialog extends Dialog, SearchBarPage {
 
     /**
      * Return the UI element of the 'Type' select field.

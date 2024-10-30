@@ -139,6 +139,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //verify all random business terms assigned to the selected BIE are displayed in Business Term Assignment page
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
         for (int i = 0; i < businessTerms.size(); i++) {
@@ -207,6 +208,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //verify both BBIE and ASBIE are listed in the business term assignment page
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
 
@@ -283,6 +285,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //Search based on BIE type and DEN, Business Term, External Reference URI, Type Code
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
         //Search by external reference URI
@@ -293,6 +296,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertTrue(tdBBIE.isDisplayed());
         //Search by type code
         btAssignmentPageForSelectedBIE.openPage();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         click(btAssignmentPageForSelectedBIE.getTurnOffButton()); // list all BIEs in the business term assignment page
         btAssignmentPageForSelectedBIE.setTypeCodeField("random type code");
@@ -349,6 +353,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //Search Preferred only
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         click(btAssignmentPageForSelectedBIE.getPreferredOnlyCheckbox());
         click(btAssignmentPageForSelectedBIE.getSearchButton());
@@ -428,6 +433,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //verify all random business terms assigned to the selected BIE are displayed in Business Term Assignment page
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         assertTrue(btAssignmentPageForSelectedBIE.getTurnOffButton().isEnabled());
         for (int i = 0; i < businessTermsBBIE.size(); i++) {
             btAssignmentPageForSelectedBIE.setBusinessTerm(businessTermsBBIE.get(i).getBusinessTerm());
@@ -598,6 +604,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //Search based on CC only
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         AssignBusinessTermBTPage assignBTPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickAssignBusinessTermButton();
+        assignBTPageForSelectedBIE.showAdvancedSearchPanel();
         click(assignBTPageForSelectedBIE.getFilterBySameCCCheckbox());
         click(assignBTPageForSelectedBIE.getSearchButton());
         //business term with the same CC are displayed
@@ -663,6 +670,7 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         //Verify the same business terms with different type code in business term assignment page
         WebElement asbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage businessTermAssignmentPageForSelectBIE = editBIEPage.getBBIEPanel(asbieNodeForCheck).clickShowBusinessTermsButton();
+        businessTermAssignmentPageForSelectBIE.showAdvancedSearchPanel();
         assertTrue(businessTermAssignmentPageForSelectBIE.getTurnOffButton().isEnabled());
 
         //Search the same business with different type code

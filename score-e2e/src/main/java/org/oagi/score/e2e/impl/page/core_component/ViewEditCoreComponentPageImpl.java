@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.core_component.*;
@@ -17,16 +18,16 @@ import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewEditCoreComponentPage {
+public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl implements ViewEditCoreComponentPage {
 
     public static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
     public static final By CONTINUE_TO_DELETE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Delete\")]//ancestor::button");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
     private static final By CC_TYPE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text() = \"Type\"]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//*[text() = \"Types\"]//ancestor::button");
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
@@ -37,8 +38,10 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+    private static final By BROWSER_VIEW_TOGGLE_BUTTON_LOCATOR =
+            By.xpath("//section[contains(@class, \"browser-mode-toggle-section\")]//mat-slide-toggle");
+    private static final By BROWSER_VIEW_TOGGLE_LABEL_LOCATOR =
+            By.xpath("//section[contains(@class, \"browser-mode-toggle-section\")]//mat-label");
 
     public ViewEditCoreComponentPageImpl(BasePage parent) {
         super(parent);
@@ -72,7 +75,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             click(getDriver(), getBranchSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             click(getDriver(), optionField);
             escape(getDriver());
         });
@@ -87,10 +90,13 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public void setTypeSelect(String type) {
-        click(getDriver(), getTypeSelectField());
+        retry(() -> {
+            click(getDriver(), getTypeSelectField());
+            visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"cdk-overlay-container\"]"));
+        });
         waitFor(ofMillis(2000L));
         WebElement optionField = elementToBeClickable(getDriver(),
-                By.xpath("//mat-option//span[text() = \"" + type + "\"]"));
+                By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]//span[text() = \"" + type + "\"]//ancestor::mat-checkbox"));
         click(getDriver(), optionField);
         escape(getDriver());
     }
@@ -151,7 +157,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"DEN\")]"));
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -332,7 +338,7 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
 
     @Override
     public TransferCCOwnershipDialog openTransferCCOwnershipDialog(WebElement tr) {
-        WebElement td = getColumnByName(tr, "transferOwnership");
+        WebElement td = getColumnByName(tr, "owner");
         click(td.findElement(By.className("mat-icon")));
 
         TransferCCOwnershipDialog transferCCOwnershipDialog =
@@ -444,11 +450,6 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void hitSearchButton() {
         waitFor(ofMillis(3000L));
         retry(() -> {
@@ -456,6 +457,32 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
             waitFor(ofMillis(1000L));
         });
         invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public WebElement getBrowserViewToggleButton() {
+        return elementToBeClickable(getDriver(), BROWSER_VIEW_TOGGLE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getBrowserViewToggleLabel() {
+        return visibilityOfElementLocated(getDriver(), BROWSER_VIEW_TOGGLE_LABEL_LOCATOR);
+    }
+
+    @Override
+    public void toggleToBrowserView() {
+        String browserViewToggleLabel = getText(getBrowserViewToggleLabel());
+        if ("Dev View".equals(browserViewToggleLabel)) {
+            click(getBrowserViewToggleButton());
+        }
+    }
+
+    @Override
+    public void toggleToDevView() {
+        String browserViewToggleLabel = getText(getBrowserViewToggleLabel());
+        if ("Browser View".equals(browserViewToggleLabel)) {
+            click(getBrowserViewToggleButton());
+        }
     }
 
     @Override
@@ -492,11 +519,11 @@ public class ViewEditCoreComponentPageImpl extends BasePageImpl implements ViewE
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 

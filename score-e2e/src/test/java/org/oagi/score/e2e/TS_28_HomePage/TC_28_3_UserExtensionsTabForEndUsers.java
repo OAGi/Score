@@ -103,7 +103,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             WebElement tr = viewEditCCPageForWIP.getTableRecordByValue(ccName);
             WebElement td = viewEditCCPageForWIP.getColumnByName(tr, "owner");
-            assertEquals(ownerName, getText(td));
+            assertTrue(getText(td).startsWith(ownerName));
         }
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -123,7 +123,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             WebElement tr = viewEditCCPageForQA.getTableRecordByValue(ccName);
             WebElement td = viewEditCCPageForQA.getColumnByName(tr, "owner");
-            assertEquals(ownerName, getText(td));
+            assertTrue(getText(td).startsWith(ownerName));
         }
 
         click(homePage.getScoreLogo()); // to go to the home page again.
@@ -144,7 +144,7 @@ public class TC_28_3_UserExtensionsTabForEndUsers extends BaseTest {
 
             WebElement tr = viewEditCCPageForProduction.getTableRecordByValue(ccName);
             WebElement td = viewEditCCPageForProduction.getColumnByName(tr, "owner");
-            assertEquals(ownerName, getText(td));
+            assertTrue(getText(td).startsWith(ownerName));
         }
     }
 

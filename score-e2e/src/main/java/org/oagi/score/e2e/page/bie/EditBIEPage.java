@@ -221,7 +221,7 @@ public interface EditBIEPage extends Page {
      * @param path the path of the Reused BIE node.
      * @return the EditBIEPage
      */
-    void RetainReusedBIEOnNode(String path);
+    void retainReusedBIEOnNode(String path);
 
     /**
      * Create a top level BIE for the selected ASBIE node

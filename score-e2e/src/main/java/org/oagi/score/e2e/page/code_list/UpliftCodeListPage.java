@@ -1,15 +1,15 @@
 package org.oagi.score.e2e.page.code_list;
 
-import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 /**
  * An interface of 'Uplift Code List' page.
  */
-public interface UpliftCodeListPage extends Page {
+public interface UpliftCodeListPage extends Page, SearchBarPage {
 
     void setSourceRelease(String branch);
 
@@ -21,7 +21,7 @@ public interface UpliftCodeListPage extends Page {
 
     void selectCodeList(String name);
 
-    WebElement getCodeListField();
+    WebElement getNameField();
 
     void setCodeList(String name);
 
@@ -52,8 +52,6 @@ public interface UpliftCodeListPage extends Page {
      * @param state state
      */
     void setState(String state);
-
-    WebElement getSearchButton();
 
     void hitSearchButton();
 

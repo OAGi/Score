@@ -374,10 +374,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.toggleTreeUsed(this.cursorNode);
     } else if ($event.key === 'o' || $event.key === 'O') {
       this.menuTriggerList.toArray().filter(e => !!e.menuData)
-        .filter(e => e.menuData.menuId === 'contextMenu').forEach(trigger => {
-        this.contextMenuItem = node;
-        trigger.openMenu();
-      });
+        .filter(e => e.menuData.menuId === 'contextMenu')
+        .forEach(trigger => {
+          this.contextMenuItem = node;
+          trigger.openMenu();
+        });
     } else if ($event.key === 'Enter') {
       this.onClick(this.cursorNode);
     } else {

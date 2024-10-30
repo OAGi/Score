@@ -649,6 +649,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(release.getReleaseNumber());
 
         for (AppUserObject appUser : appUsers) {
@@ -1103,6 +1104,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "WIP");
 
             ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+            viewEditBIEPage.showAdvancedSearchPanel();
             viewEditBIEPage.setBranch(release.getReleaseNumber());
             viewEditBIEPage.setOwner(appUser.getLoginId());
             viewEditBIEPage.setDEN(asccp.getDen());
@@ -1136,6 +1138,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
 
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(release.getReleaseNumber());
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setDEN(asccp.getDen());
@@ -1172,6 +1175,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         click(homePage.getScoreLogo());
         ViewEditBIEPage viewEditBIEPageForCheck = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPageForCheck.showAdvancedSearchPanel();
         viewEditBIEPageForCheck.setBranch(topLevelASBIEP.getReleaseNumber());
         viewEditBIEPageForCheck.setOwner(getAPIFactory().getAppUserAPI().getAppUserByID(topLevelASBIEP.getOwnerUserId()).getLoginId());
         viewEditBIEPageForCheck.setDEN(topLevelASBIEP.getPropertyTerm());
@@ -2234,6 +2238,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         ViewEditBIEPage viewEditBIEPage = copyBIEForSelectBIEPage.copyBIE(asccp.getDen(), releaseNumber);
         waitFor(ofMillis(2000L)); // wait for 2 secs.
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBusinessContext(randomBusinessContextForCopyBIE.getName());
         viewEditBIEPage.hitSearchButton();
 
@@ -2273,6 +2278,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         ViewEditBIEPage viewEditBIEPage = copyBIEForSelectBIEPage.copyBIE(asccp.getDen(), releaseNumber);
         waitFor(ofMillis(2000L)); // wait for 2 secs.
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBusinessContext(randomBusinessContextForCopyBIE.getName());
         viewEditBIEPage.hitSearchButton();
 
@@ -2312,6 +2318,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         ViewEditBIEPage viewEditBIEPage = copyBIEForSelectBIEPage.copyBIE(asccp.getDen(), releaseNumber);
         waitFor(ofMillis(2000L)); // wait for 2 secs.
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBusinessContext(randomBusinessContextForCopyBIE.getName());
         viewEditBIEPage.hitSearchButton();
 
@@ -2378,6 +2385,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         viewEditBIEPage = copyBIEForSelectBIEPage.copyBIE(asccp.getDen(), releaseNumber);
         waitFor(ofMillis(2000L)); // wait for 2 secs.
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBusinessContext(randomBusinessContextForCopyBIE.getName());
         viewEditBIEPage.hitSearchButton();
 
@@ -2450,6 +2458,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         viewEditBIEPage = copyBIEForSelectBIEPage.copyBIE(asccp.getDen(), releaseNumber);
         waitFor(ofMillis(2000L)); // wait for 2 secs.
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBusinessContext(randomBusinessContextForCopyBIE.getName());
         viewEditBIEPage.hitSearchButton();
 
@@ -2487,6 +2496,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setBranch(release.getReleaseNumber());
         viewEditBIEPage.setDEN(asccp.getDen());
@@ -2494,7 +2504,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
-        WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
+        WebElement td = viewEditBIEPage.getColumnByName(tr, "owner");
         assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         TransferBIEOwnershipDialog transferBIEOwnershipDialog =
@@ -2505,12 +2515,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
         viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setOwner(anotherDeveloper.getLoginId());
         viewEditBIEPage.setBranch(release.getReleaseNumber());
         viewEditBIEPage.hitSearchButton();
 
         tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
-        td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
+        td = viewEditBIEPage.getColumnByName(tr, "owner");
         assertTrue(td.findElement(By.tagName("mat-icon")).isEnabled());
 
         td = viewEditBIEPage.getColumnByName(tr, "businessContexts");
@@ -2535,6 +2546,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setBranch(release.getReleaseNumber());
         viewEditBIEPage.setDEN(asccp.getDen());
@@ -2542,8 +2554,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
-        WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertThrows(NoSuchElementException.class, () -> td.findElement(By.tagName("button")));
+        WebElement td = viewEditBIEPage.getColumnByName(tr, "owner");
+        assertThrows(NoSuchElementException.class, () -> td.findElement(By.tagName("mat-icon")));
     }
 
     @Test
@@ -2564,6 +2576,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setBranch(release.getReleaseNumber());
         viewEditBIEPage.setDEN(asccp.getDen());
@@ -2571,8 +2584,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
-        WebElement td = viewEditBIEPage.getColumnByName(tr, "transferOwnership");
-        assertThrows(NoSuchElementException.class, () -> td.findElement(By.tagName("button")));
+        WebElement td = viewEditBIEPage.getColumnByName(tr, "owner");
+        assertThrows(NoSuchElementException.class, () -> td.findElement(By.tagName("mat-icon")));
     }
 
     @Test
@@ -2588,6 +2601,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
                 homePage.getBIEMenu().openCreateBIESubMenu();
+        createBIEForSelectBusinessContextsPage.showAdvancedSearchPanel();
 
         // Test 'Updater' field
         createBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
@@ -2636,6 +2650,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             homePage.openPage();
             CreateBIEForSelectBusinessContextsPage createBIEForSelectBusinessContextsPage =
                     homePage.getBIEMenu().openCreateBIESubMenu();
+            createBIEForSelectBusinessContextsPage.showAdvancedSearchPanel();
             createBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
             createBIEForSelectBusinessContextsPage.setUpdatedStartDate(businessContext.getCreationTimestamp());
             createBIEForSelectBusinessContextsPage.setUpdatedEndDate(businessContext.getLastUpdateTimestamp());
@@ -2668,6 +2683,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCreateBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.showAdvancedSearchPanel();
         createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
         createBIEForSelectTopLevelConceptPage.setDEN("\"Cancel Test Results. Cancel Test Results\"");
         createBIEForSelectTopLevelConceptPage.hitSearchButton();
@@ -2690,6 +2706,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCreateBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.showAdvancedSearchPanel();
         createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
         createBIEForSelectTopLevelConceptPage.setDefinition("test result cancel");
         createBIEForSelectTopLevelConceptPage.hitSearchButton();
@@ -2712,6 +2729,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCreateBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 createBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        createBIEForSelectTopLevelConceptPage.showAdvancedSearchPanel();
         createBIEForSelectTopLevelConceptPage.setBranch("10.8.5");
         createBIEForSelectTopLevelConceptPage.setModule("Model\\Platform\\2_7\\Nouns\\CodeList");
         createBIEForSelectTopLevelConceptPage.hitSearchButton();
@@ -2756,6 +2774,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setState("WIP");
@@ -2763,6 +2782,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_WIP.getDen());
 
         viewEditBIEPage.openPage();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setState("QA");
@@ -2770,6 +2790,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertBieDenInTheSearchResultsAtFirst(viewEditBIEPage, topLevelASBIEP_QA.getDen());
 
         viewEditBIEPage.openPage();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setState("Production");
@@ -2794,6 +2815,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setUpdatedStartDate(topLevelASBIEP_WIP.getLastUpdateTimestamp());
@@ -2819,6 +2841,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setDEN(topLevelASBIEP_WIP.getDen());
@@ -2843,6 +2866,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.setBusinessContext(businessContext.getName());
@@ -2874,6 +2898,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCopyBIESubMenu();
 
         // Test 'Updater' field
+        copyBIEForSelectBusinessContextsPage.showAdvancedSearchPanel();
         copyBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
         for (BusinessContextObject businessContext : businessContexts) {
             copyBIEForSelectBusinessContextsPage.setName(businessContext.getName());
@@ -2920,6 +2945,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             homePage.openPage();
             CopyBIEForSelectBusinessContextsPage copyBIEForSelectBusinessContextsPage =
                     homePage.getBIEMenu().openCopyBIESubMenu();
+            copyBIEForSelectBusinessContextsPage.showAdvancedSearchPanel();
             copyBIEForSelectBusinessContextsPage.setUpdater(developer.getLoginId());
             copyBIEForSelectBusinessContextsPage.setUpdatedStartDate(businessContext.getCreationTimestamp());
             copyBIEForSelectBusinessContextsPage.setUpdatedEndDate(businessContext.getLastUpdateTimestamp());
@@ -2958,6 +2984,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCopyBIESubMenu();
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch("10.8.5");
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.setDEN(topLevelASBIEP_WIP.getDen());
@@ -2986,6 +3013,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCopyBIESubMenu();
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch("10.8.5");
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.setBusinessContext(businessContext.getName());
@@ -3024,6 +3052,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCopyBIESubMenu();
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch("10.8.5");
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.setState("WIP");
@@ -3031,6 +3061,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_WIP.getDen());
 
         copyBIEForSelectBIEPage.openPage();
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch("10.8.5");
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.setState("QA");
@@ -3038,6 +3069,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertBieDenInTheSearchResultsAtFirst(copyBIEForSelectBIEPage, topLevelASBIEP_QA.getDen());
 
         copyBIEForSelectBIEPage.openPage();
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch("10.8.5");
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.setState("Production");
@@ -3115,6 +3147,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         viewEditBIEPage.hitSearchButton();
@@ -3124,6 +3157,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 homePage.getBIEMenu().openCopyBIESubMenu();
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 copyBIEForSelectBusinessContextsPage.next(Arrays.asList(businessContext));
+        copyBIEForSelectBIEPage.showAdvancedSearchPanel();
         copyBIEForSelectBIEPage.setBranch(releaseNum);
         copyBIEForSelectBIEPage.setOwner(developer.getLoginId());
         copyBIEForSelectBIEPage.hitSearchButton();
@@ -3154,6 +3188,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = createBIEForSelectTopLevelConceptPage.createBIE(asccpDen, releaseNum);
 
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
         viewEditBIEPage.setBranch(releaseNum);
         viewEditBIEPage.setOwner(developer.getLoginId());
         for (BusinessContextObject businessContext : businessContexts) {

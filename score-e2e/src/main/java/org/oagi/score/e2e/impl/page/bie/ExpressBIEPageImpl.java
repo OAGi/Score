@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
@@ -35,26 +36,22 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
+public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements ExpressBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"DEN\")]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By GENERATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Generate\")]//ancestor::button[1]");
     private static final By OPEN_API_FORMAT_SELECT_FIELD_LOCATOR =
@@ -89,6 +86,7 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public void selectBIEForExpression(TopLevelASBIEPObject topLevelASBIEP) {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(topLevelASBIEP.getReleaseId());
+        showAdvancedSearchPanel();
         setBranch(release.getReleaseNumber());
         setState(topLevelASBIEP.getState());
         setDEN(topLevelASBIEP.getDen());
@@ -119,10 +117,10 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             click(getDriver(), optionField);
             escape(getDriver());
         });
@@ -171,17 +169,12 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
     public void setDEN(String den) {
         sendKeys(getDENField(), den);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
@@ -204,11 +197,11 @@ public class ExpressBIEPageImpl extends BasePageImpl implements ExpressBIEPage {
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 

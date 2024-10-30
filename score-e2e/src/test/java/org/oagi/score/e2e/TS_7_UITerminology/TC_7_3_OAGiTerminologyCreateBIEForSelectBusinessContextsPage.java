@@ -63,7 +63,7 @@ public class TC_7_3_OAGiTerminologyCreateBIEForSelectBusinessContextsPage extend
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
                 createBIEForSelectBusinessContextsPage.next(Arrays.asList(randomBusinessContext));
         String title = getText(createBIEForSelectTopLevelConceptPage.getTitle());
-        assertEquals("Create BIE (Profiled Component, Noun, BOD)", title);
+        assertEquals("Create BIE (Profiled Component, Noun, BOD) with " + randomBusinessContext.getName(), title);
     }
 
     @AfterEach

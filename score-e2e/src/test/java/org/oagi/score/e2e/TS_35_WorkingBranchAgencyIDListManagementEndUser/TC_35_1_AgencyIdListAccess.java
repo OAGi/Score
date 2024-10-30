@@ -158,6 +158,7 @@ public class TC_35_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setOwner(endUser.getLoginId());
         viewEditAgencyIDListPage.setBranch("Working");
         viewEditAgencyIDListPage.hitSearchButton();

@@ -118,6 +118,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBusinessTermPage viewEditBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu();
+        viewEditBusinessTermPage.showAdvancedSearchPanel();
         viewEditBusinessTermPage.setExternalReferenceURI(randomBusinessTerm.getExternalReferenceUri());
         viewEditBusinessTermPage.hitSearchButton();
         assertBusinessTermNameInTheSearchResultsAtFirst(viewEditBusinessTermPage, randomBusinessTerm.getExternalReferenceUri(), "externalReferenceUri");
@@ -235,7 +236,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
+        assignBusinessTermBIEPage.setBIEDenField(topLevelASBIEP.getDen());
         assignBusinessTermBIEPage.hitSearchButton();
         click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
 
@@ -283,7 +284,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermAssignmentPage businessTermAssignmentPage = bbiePanel.clickShowBusinessTermsButton();
         assertTrue(businessTermAssignmentPage.getTurnOffButton().isEnabled()); // check Selected BIE is enabled
         AssignBusinessTermBIEPage assignBusinessTermBIEPage = businessTermAssignmentPage.assignBusinessTerm();
-        assignBusinessTermBIEPage.setTopLevelBIE(topLevelASBIEP.getPropertyTerm());
+        assignBusinessTermBIEPage.setBIEDenField(topLevelASBIEP.getDen());
         assignBusinessTermBIEPage.hitSearchButton();
         click(assignBusinessTermBIEPage.getSelectCheckboxAtIndex(1));
 
@@ -305,6 +306,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         WebElement bbieNodeForDiscard = editBIEPage.getNodeByPath(path);
         EditBIEPage.BBIEPanel bbiePanelForDiscard = editBIEPage.getBBIEPanel(bbieNodeForDiscard);
         BusinessTermAssignmentPage businessTermAssignmentPageForDiscard = bbiePanelForDiscard.clickShowBusinessTermsButton();
+        businessTermAssignmentPageForDiscard.showAdvancedSearchPanel();
         businessTermAssignmentPageForDiscard.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         businessTermAssignmentPageForDiscard.hitSearchButton();
         click(businessTermAssignmentPageForDiscard.getSelectCheckboxAtIndex(1));

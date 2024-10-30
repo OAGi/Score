@@ -78,6 +78,7 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         assertEquals("Published", getText(td_state));
 
         viewEditAgencyIDListPage.openPage();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setBranch(latestRelease.getReleaseNumber());
         viewEditAgencyIDListPage.setOwner(endUser.getLoginId());
         viewEditAgencyIDListPage.setName(wipAgencyIdList.getName());
@@ -175,6 +176,7 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         for (AgencyIDListObject agencyIdList : Arrays.asList(wipAgencyIdList, qaAgencyIdList, productionAgencyIdList)) {
             ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+            viewEditAgencyIDListPage.showAdvancedSearchPanel();
             viewEditAgencyIDListPage.setOwner(endUser.getLoginId());
             EditAgencyIDListPage editAgencyIDListPage =
                     viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIdList.getName(), latestRelease.getReleaseNumber());

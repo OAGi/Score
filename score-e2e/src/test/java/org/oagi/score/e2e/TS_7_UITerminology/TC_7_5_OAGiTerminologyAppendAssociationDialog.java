@@ -74,11 +74,10 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
         // Can't open the context menu in a small size of the screen.
         getDriver().manage().window().maximize();
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/" + asccp.getPropertyTerm() + " User Extension Group. Details");
+        selectCCPropertyPage.showAdvancedSearchPanel();
 
         String moduleFieldLabel = selectCCPropertyPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);
-        String denFieldLabel = selectCCPropertyPage.getDENFieldLabel();
-        assertEquals("DEN (Dictionary Entry Name)", denFieldLabel);
     }
 
     @Test
@@ -116,10 +115,10 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
         getDriver().manage().window().maximize();
         ACCExtensionViewEditPage ACCExtensionViewEditPage = editBIEPage.extendBIEGloballyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
         SelectAssociationDialog selectCCPropertyPage = ACCExtensionViewEditPage.appendPropertyAtLast("/All User Extension Group. Details");
+        selectCCPropertyPage.showAdvancedSearchPanel();
+
         String moduleFieldLabel = selectCCPropertyPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);
-        String denFieldLabel = selectCCPropertyPage.getDENFieldLabel();
-        assertEquals("DEN (Dictionary Entry Name)", denFieldLabel);
     }
 
     @AfterEach

@@ -38,7 +38,6 @@ public class TC_7_1_OAGiNavigationMenu extends BaseTest {
         String bieMenuTitle = bieMenu.getBIEMenuButtonTitle();
         assertEquals("Manage Profiled Component, Noun, BOD", bieMenuTitle);
 
-
         String createBIETitle = bieMenu.getCreateBIESubMenuButtonTitle();
         assertEquals("Profile a Component, Noun, BOD", createBIETitle);
 

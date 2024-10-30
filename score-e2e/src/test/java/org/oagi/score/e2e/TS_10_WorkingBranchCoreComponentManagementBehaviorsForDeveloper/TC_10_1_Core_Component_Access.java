@@ -694,6 +694,13 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer2.getLoginId(), developer2.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.openPage();
+        click(viewEditCoreComponentPage.getTypeSelectField());
+        List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+        for (String ccState : Arrays.asList("ACC", "ASCCP", "CDT", "BDT")) {
+            List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
+            result.get(0).click();
+        }
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
@@ -703,14 +710,16 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             acc = entry.getValue();
             asccp = randomCoreComponentWithStateContainer.stateASCCPs.get(state);
             bccp = randomCoreComponentWithStateContainer.stateBCCPs.get(state);
+
             /**
              * developer can filter Core Components based on their Type.
              */
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(8000L));
+            waitFor(Duration.ofMillis(2000L));
+            viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ASCCP", "BCCP", "CDT", "BDT")) {
+            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            for (String ccState : Arrays.asList("BCCP", "ACC")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
@@ -721,10 +730,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
             // search by "ASCCP" type
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(8000L));
+            waitFor(Duration.ofMillis(2000L));
+            viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ACC", "BCCP", "CDT", "BDT")) {
+            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            for (String ccState : Arrays.asList("ACC", "ASCCP")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
@@ -735,10 +745,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
             // search by "BCCP" type
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(8000L));
+            waitFor(Duration.ofMillis(2000L));
+            viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            options = getDriver().findElements(By.cssSelector("mat-option"));
-            for (String ccState : Arrays.asList("ACC", "ASCCP", "CDT", "BDT")) {
+            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            for (String ccState : Arrays.asList("ASCCP", "BCCP")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
             }
@@ -786,7 +797,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              * developer can filter Core Components based on their Type.
              */
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(8000L));
+            waitFor(Duration.ofMillis(2000L));
+            viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getStateSelectField());
             List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
 
@@ -872,7 +884,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
             // search by Updated date
             viewEditCoreComponentPage.openPage();
-            waitFor(Duration.ofMillis(8000L));
+            waitFor(Duration.ofMillis(2000L));
+            viewEditCoreComponentPage.showAdvancedSearchPanel();
             viewEditCoreComponentPage.setUpdatedStartDate(startTime);
             viewEditCoreComponentPage.setUpdatedEndDate(endTime);
             viewEditCoreComponentPage.setOwner(developer.getLoginId());
@@ -893,9 +906,10 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setDEN("\"Action Code\"");
         viewEditCoreComponentPage.setOwner("oagis");
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Action Code. Action Code Content_ Code", "oagis").isDisplayed());
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(), \"Corrective Action Type Code. Open_ Code\")]")).size());
@@ -911,14 +925,16 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setDefinition("Notice Document");
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Show Receive Delivery. Show Receive Delivery", "oagis").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setDefinition("\"Notice Document\"");
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         viewEditCoreComponentPage.hitSearchButton();
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("ASN Reference. Document Reference", "oagis").isDisplayed());
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Show Receive Delivery. Show Receive Delivery\")]")).size());
@@ -934,14 +950,16 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setModule("Model\\Platform\\2_6\\Common\\Components\\Components");
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, (getDriver().findElements(By.xpath("//*[contains(text(),\"Model\\OAGIS-Nouns\")]"))).size());
 
         viewEditCoreComponentPage.openPage();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         viewEditCoreComponentPage.setModule("Master");
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         viewEditCoreComponentPage.hitSearchButton();
         assertEquals(0, getDriver().findElements(By.xpath("//mat-chip[.=\"BCC\"]")).size());
     }
@@ -956,7 +974,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-        waitFor(Duration.ofMillis(8000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
+        waitFor(Duration.ofMillis(2000L));
         click(viewEditCoreComponentPage.getComponentTypeSelectField());
         List<WebElement> options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -969,7 +988,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Financial Account Reference Identification. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
+        waitFor(Duration.ofMillis(2000L));
         click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -984,7 +1004,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(viewEditCoreComponentPage.getTableRecordByCCNameAndOwner("Financial Account Reference Base. Details", "oagis").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -1000,7 +1021,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -1015,7 +1037,8 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(1 <= getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
@@ -1029,8 +1052,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertEquals(0, getDriver().findElements(By.xpath("//*[contains(text(),\"Payment Transaction Extension. Details\")]")).size());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
-        viewEditCoreComponentPage.getComponentTypeSelectField().click();
+        waitFor(Duration.ofMillis(2000L));
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
+        click(viewEditCoreComponentPage.getComponentTypeSelectField());
         options = getDriver().findElements(By.cssSelector("mat-option"));
         // developer can search for Core Components based only on their Component Type
         for (String componentState : Arrays.asList("OAGIS10 Nouns", "OAGIS10 BODs")) {
@@ -1072,6 +1096,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
             ACCObject acc;
@@ -1092,11 +1117,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 TransferCCOwnershipDialog transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1111,11 +1136,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(acc.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1154,11 +1179,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 TransferCCOwnershipDialog transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1174,11 +1199,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(bccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1219,11 +1244,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                 assertEquals(developer.getLoginId(), getText(accViewEditPage.getOwnerField()));
                 assertDisabled(accViewEditPage.getOwnerField());
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 WebElement tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 TransferCCOwnershipDialog transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1239,11 +1264,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
 
                 //transfer the ownership back
                 viewEditCoreComponentPage.openPage();
-                waitFor(Duration.ofMillis(8000L));
+                waitFor(Duration.ofMillis(2000L));
                 viewEditCoreComponentPage.setDEN(asccp.getDen());
                 viewEditCoreComponentPage.hitSearchButton();
                 tr = viewEditCoreComponentPage.getTableRecordAtIndex(1);
-                td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+                td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
                 assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
                 transferCCOwnershipDialog =
                         viewEditCoreComponentPage.openTransferCCOwnershipDialog(tr);
@@ -1297,7 +1322,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         assertTrue(findWhereUsedDialog.getTableRecordByValue("Item Identifier Set").isDisplayed());
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Query Base. Details", release.getReleaseNumber());
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + "Query Base. Details" + "/" + "Response Code");
         findWhereUsedDialog = accViewEditPage.findWhereUsed("/" + "Query Base. Details" + "/" + "Response Code");
@@ -1358,7 +1383,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         accSetBaseACCDialog.hitApplyButton("Customer Credit Base. Details");
 
         viewEditCoreComponentPage.openPage();
-        waitFor(Duration.ofMillis(8000L));
+        waitFor(Duration.ofMillis(2000L));
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch("Customer Credit Base. Details", release.getReleaseNumber());
         accViewEditPage.findWhereUsed("/" + "Customer Credit Base. Details");
         assertTrue(findWhereUsedDialog.getTableRecordByValue(ACCForBase.getDen()).isDisplayed());

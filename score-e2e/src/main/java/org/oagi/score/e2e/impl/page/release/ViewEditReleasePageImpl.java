@@ -1,7 +1,7 @@
 package org.oagi.score.e2e.impl.page.release;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
@@ -22,7 +22,7 @@ import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditReleasePage {
+public class ViewEditReleasePageImpl extends BaseSearchBarPageImpl implements ViewEditReleasePage {
 
     private static final By CREATOR_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Creator\")]//ancestor::mat-form-field[1]//mat-select");
@@ -48,9 +48,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
-
     private static final By NEW_RELEASE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Release\")]//ancestor::button[1]");
     private static final By MOVE_BACK_TO_INITIALIZED =
@@ -58,8 +55,6 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     private static final By CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR =
             By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button");
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//span[contains(text(), \"Name\")]//ancestor::mat-form-field//input");
     private static final By DISCARD_RELEASE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Discard\")]");
     private static final By CONTINUE_TO_DISCARD_BUTTON_IN_DIALOG_LOCATOR =
@@ -199,17 +194,12 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
 
     @Override
     public WebElement getReleaseNumField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Release Num\")]"));
+        return getInputFieldInSearchBar();
     }
 
     @Override
     public void setReleaseNum(String releaseNum) {
         sendKeys(getReleaseNumField(), releaseNum);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
@@ -251,6 +241,7 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     private void openReleaseByReleaseNumAndState(String releaseNum, String state) {
         setReleaseNum(releaseNum);
         if (!StringUtils.isEmpty(state)) {
+            showAdvancedSearchPanel();
             setState(state);
         }
 
@@ -319,11 +310,11 @@ public class ViewEditReleasePageImpl extends BasePageImpl implements ViewEditRel
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(ofMillis(500L));
     }
 

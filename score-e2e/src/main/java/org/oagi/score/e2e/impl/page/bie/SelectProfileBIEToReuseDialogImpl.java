@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.openqa.selenium.By;
@@ -14,7 +15,8 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReuseDialog {
+public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl implements SelectProfileBIEToReuseDialog {
+
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
@@ -29,8 +31,6 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By SELECT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
@@ -40,12 +40,9 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
     private final String contextMenuName;
 
     public SelectProfileBIEToReuseDialogImpl(BasePageImpl parent, String contextMenuName) {
+        super(parent.getDriver(), "//mat-dialog-container");
         this.parent = parent;
         this.contextMenuName = contextMenuName;
-    }
-
-    private WebDriver getDriver() {
-        return this.parent.getDriver();
     }
 
     @Override
@@ -113,11 +110,6 @@ public class SelectProfileBIEToReuseDialogImpl implements SelectProfileBIEToReus
     public void setUpdatedEndDate(LocalDateTime updatedEndDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         sendKeys(getUpdatedEndDateField(), formatter.format(updatedEndDate));
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override

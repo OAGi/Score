@@ -112,6 +112,8 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         dtViewEditPageNew.showValueDomain();
         assertDoesNotThrow(() -> dtViewEditPageNew.codeListIdMarkedAsDeleted(codeList));
         escape(getDriver());
+
+        dtViewEditPageNew.showValueDomain();
         dtViewEditPageNew.changeCodeListValueDomain(codeList.getName());
 
         editCodeListPage.openPage();

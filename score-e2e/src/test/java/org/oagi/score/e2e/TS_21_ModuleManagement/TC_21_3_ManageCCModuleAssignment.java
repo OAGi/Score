@@ -84,9 +84,10 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         editCodeListPage.moveToCandidate();
 
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.showAdvancedSearchPanel();
         viewEditReleasePage.setState("Draft");
         viewEditReleasePage.hitSearchButton();
-        if (viewEditReleasePage.getTotalNumberOfItems() > 0){
+        if (viewEditReleasePage.getTotalNumberOfItems() > 0) {
             long timeout = Duration.ofSeconds(300L).toMillis();
             long begin = System.currentTimeMillis();
             while (System.currentTimeMillis() - begin < timeout) {

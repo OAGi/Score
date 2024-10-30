@@ -231,7 +231,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         assertFalse(dtPanel.getQualifierField().isEnabled());
         assertEquals("System Environment", getText(dtPanel.getQualifierField()));
         assertFalse(dtPanel.getDefinitionSourceField().isEnabled());
-        assertFalse(dtPanel.getDefinitionField().isEnabled());
+        assertEquals("true", dtPanel.getDefinitionField().getAttribute("readonly"));
     }
 
     @Test
@@ -300,7 +300,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
-            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =
@@ -326,7 +326,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
             viewEditCoreComponentPage.hitSearchButton();
 
             WebElement tr = viewEditCoreComponentPage.getTableRecordByValue(den);
-            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "transferOwnership");
+            WebElement td = viewEditCoreComponentPage.getColumnByName(tr, "owner");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferCCOwnershipDialog transferCCOwnershipDialog =

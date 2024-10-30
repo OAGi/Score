@@ -119,8 +119,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             assertEquals(developerA.getAppUserId(), cl.getOwnerUserId());
             assertEquals(Boolean.valueOf("true"), developerA.isDeveloper());
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
-            EditCodeListPage editCodeListPage = viewEditCodeListPage.
-                    openCodeListViewEditPage(cl);
+            EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(cl);
             if (cl.getState().equals("WIP")) {
                 /**
                  * The developer can view and edit the details (including code values) of a CL that is in the WIP state and owned by him.
@@ -628,6 +627,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.showAdvancedSearchPanel();
         String previousState = "";
         for (CodeListObject cl : codeListForTesting) {
             if (previousState.equals("")) {
@@ -681,6 +681,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
+        viewEditCodeListPage.showAdvancedSearchPanel();
         viewEditCodeListPage.setOwner(developerA.getLoginId());
         viewEditCodeListPage.setItemsPerPage(50);
         for (CodeListObject cl : codeListForTesting) {

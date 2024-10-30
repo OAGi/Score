@@ -193,8 +193,8 @@ public abstract class PageHelper {
                 element.click();
             } catch (ElementClickInterceptedException e) {
                 if ("mat-select".equals(tagName)) {
-                    WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-select-arrow-wrapper"));
-                    click(arrowWrapper);
+                    WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-mdc-select-arrow-wrapper"));
+                    click(driver, arrowWrapper);
                 } else {
                     if (driver != null) {
                         JavascriptExecutor executor = (JavascriptExecutor) driver;

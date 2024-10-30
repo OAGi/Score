@@ -130,6 +130,7 @@ export class ReleaseListComponent implements OnInit {
           break;
       }
     }
+    displayedColumns.push('more');
     return displayedColumns;
   }
 

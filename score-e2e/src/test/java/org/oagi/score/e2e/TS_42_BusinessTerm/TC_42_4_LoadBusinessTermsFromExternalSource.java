@@ -172,16 +172,19 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
             // Verify that only valid test business terms have been saved through bulk upload
             viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
             viewEditBusinessTermPage.setExternalReferenceURI(randomBT_noTerm_URI);
             viewEditBusinessTermPage.hitSearchButton();
             assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
 
             viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
             viewEditBusinessTermPage.setExternalReferenceURI(randomBT_invalidUri);
             viewEditBusinessTermPage.hitSearchButton();
             assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
 
             viewEditBusinessTermPage.openPage();
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
             viewEditBusinessTermPage.setExternalReferenceURI(randomBT.getExternalReferenceUri());
             viewEditBusinessTermPage.hitSearchButton();
             assertTrue(viewEditBusinessTermPage.getSelectCheckboxAtIndex(1).isDisplayed());
@@ -237,6 +240,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             ViewEditBusinessTermPage viewEditBusinessTermPageForCheck = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
             for (int i = 0; i < 3; i++) {
                 viewEditBusinessTermPageForCheck.openPage();
+                viewEditBusinessTermPageForCheck.showAdvancedSearchPanel();
                 viewEditBusinessTermPageForCheck.setExternalReferenceURI(businessTerms.get(i).getExternalReferenceUri());
                 viewEditBusinessTermPageForCheck.hitSearchButton();
                 assertTrue(viewEditBusinessTermPageForCheck.getSelectCheckboxAtIndex(1).isDisplayed());

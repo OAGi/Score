@@ -1460,7 +1460,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 
-        editBIEPage.RetainReusedBIEOnNode("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        editBIEPage.retainReusedBIEOnNode("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
 

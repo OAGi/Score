@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.bie;
 
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
 import org.openqa.selenium.*;
 
@@ -7,7 +8,7 @@ import java.time.Duration;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialog {
+public class TransferBIEOwnershipDialogImpl extends SearchBarPageImpl implements TransferBIEOwnershipDialog {
 
     private static final By LOGIN_ID_FIELD_LOCATOR
             = By.xpath("//score-transfer-ownership-dialog//input[contains(@placeholder, \"Login ID\")]");
@@ -18,9 +19,6 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     private static final By ORGANIZATION_FIELD_LOCATOR
             = By.xpath("//score-transfer-ownership-dialog//input[contains(@placeholder, \"Organization\")]");
 
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Search\")]//ancestor::button[1]");
-
     private static final By TRANSFER_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Transfer\")]//ancestor::button[1]");
 
@@ -30,11 +28,8 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     private ViewEditBIEPageImpl parent;
 
     public TransferBIEOwnershipDialogImpl(ViewEditBIEPageImpl parent) {
+        super(parent.getDriver(), "//score-transfer-ownership-dialog");
         this.parent = parent;
-    }
-
-    private WebDriver getDriver() {
-        return this.parent.getDriver();
     }
 
     @Override
@@ -49,12 +44,12 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]/span"));
     }
 
     @Override
     public WebElement getLoginIDField() {
-        return visibilityOfElementLocated(getDriver(), LOGIN_ID_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -83,11 +78,6 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
     }
@@ -111,11 +101,11 @@ public class TransferBIEOwnershipDialogImpl implements TransferBIEOwnershipDialo
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 

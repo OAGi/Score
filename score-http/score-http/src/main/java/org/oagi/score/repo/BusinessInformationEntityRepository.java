@@ -925,7 +925,10 @@ public class BusinessInformationEntityRepository {
     public SelectOrderByStep getAsbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(ASCC_MANIFEST.DEN.contains(arguments.getDen()));
+            conditions.add(or(
+                    ASCC_MANIFEST.DEN.contains(arguments.getDen()),
+                    ASCCP_MANIFEST.DEN.contains(arguments.getDen())
+            ));
         }
         return dslContext.select(
                         inline("ASBIE").as("type"),
@@ -974,7 +977,10 @@ public class BusinessInformationEntityRepository {
     public SelectOrderByStep getBbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(BCC_MANIFEST.DEN.contains(arguments.getDen()));
+            conditions.add(or(
+                    BCC_MANIFEST.DEN.contains(arguments.getDen()),
+                    ASCCP_MANIFEST.DEN.contains(arguments.getDen())
+            ));
         }
         return dslContext.select(
                         inline("BBIE").as("type"),
