@@ -16,7 +16,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <jackson.version>2.17.2</jackson.version>
-        <org.springframework.security.version>6.3.3</org.springframework.security.version>
+        <org.springframework.security.version>6.3.4</org.springframework.security.version>
     </properties>
 
     <dependencies>
