@@ -218,7 +218,6 @@ export class OasDocDetailComponent implements OnInit {
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private bizCtxService: BusinessContextService,
               private openAPIService: OpenAPIService,
@@ -251,9 +250,8 @@ export class OasDocDetailComponent implements OnInit {
     // Init BIE list table for OasDoc
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest(['tagName', 'operationId'], ['asc', 'asc'], 0, 10));
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
     this.request.access = 'CanView';
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
@@ -335,8 +333,7 @@ export class OasDocDetailComponent implements OnInit {
       });
 
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
     }, error => {
       this.table.dataSource.data = [];

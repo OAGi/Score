@@ -223,12 +223,12 @@ export class CreateBccpDialogComponent implements OnInit {
         if (this.request.filters.module.length > 0) {
           elm.module = elm.module.replace(
             new RegExp(this.request.filters.module, 'ig'),
-            '<b>$&</b>');
+            '<b class="bg-warning">$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
           elm.definition = elm.definition.replace(
             new RegExp(this.request.filters.definition, 'ig'),
-            '<b>$&</b>');
+            '<b class="bg-warning">$&</b>');
         }
         return elm;
       });

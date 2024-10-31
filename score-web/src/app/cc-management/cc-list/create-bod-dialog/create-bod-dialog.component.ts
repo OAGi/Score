@@ -227,12 +227,12 @@ export class CreateBodDialogComponent implements OnInit {
           if (this.verbRequest.filters.module.length > 0) {
             elm.module = elm.module.replace(
               new RegExp(this.verbRequest.filters.module, 'ig'),
-              '<b>$&</b>');
+              '<b class="bg-warning">$&</b>');
           }
           if (this.verbRequest.filters.definition.length > 0) {
             elm.definition = elm.definition.replace(
               new RegExp(this.verbRequest.filters.definition, 'ig'),
-              '<b>$&</b>');
+              '<b class="bg-warning">$&</b>');
           }
           return elm;
         });
@@ -266,12 +266,12 @@ export class CreateBodDialogComponent implements OnInit {
           if (this.nounRequest.filters.module.length > 0) {
             elm.module = elm.module.replace(
               new RegExp(this.nounRequest.filters.module, 'ig'),
-              '<b>$&</b>');
+              '<b class="bg-warning">$&</b>');
           }
           if (this.nounRequest.filters.definition.length > 0) {
             elm.definition = elm.definition.replace(
               new RegExp(this.nounRequest.filters.definition, 'ig'),
-              '<b>$&</b>');
+              '<b class="bg-warning">$&</b>');
           }
           return elm;
         });
