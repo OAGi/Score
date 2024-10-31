@@ -143,6 +143,7 @@ export class AgencyIdList {
   definition: string;
   definitionSource: string;
   remark: string;
+  modulePath: string;
 
   deprecated: boolean;
   newComponent: boolean;
@@ -180,6 +181,7 @@ export class AgencyIdList {
       this.definition = obj.definition;
       this.definitionSource = obj.definitionSource;
       this.remark = obj.remark;
+      this.modulePath = obj.modulePath;
 
       this.deprecated = obj.deprecated;
       this.state = obj.state;
@@ -214,6 +216,7 @@ export class AgencyIdList {
       ((this.definition) ? hashCode4String(this.definition) : 0) +
       ((this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
       ((this.remark) ? hashCode4String(this.remark) : 0) +
+      ((this.modulePath) ? hashCode4String(this.modulePath) : 0) +
       ((this.deprecated) ? 1231 : 1237) +
       ((this.state) ? hashCode4String(this.state) : 0) +
       ((this.values) ? this.values.map(val => val.hashCode).reduce((s, a) => s + a, 0) : 0);

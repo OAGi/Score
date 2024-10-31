@@ -71,6 +71,14 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfCodeListValuePage: TableColumnsProperty[] = [
+    {name: 'Value', selected: true, width: 0},
+    {name: 'Meaning', selected: true, width: '10%'},
+    {name: 'Deprecated', selected: true, width: 100},
+    {name: 'Definition', selected: true, width: '50%'},
+    {name: 'Definition Source', selected: true, width: '15%'}
+  ];
+
   columnsOfAgencyIdListPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Name', selected: true, width: 0},
@@ -79,6 +87,14 @@ export class TableColumnsInfo {
     {name: 'Owner', selected: true, width: 140},
     {name: 'Module', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfAgencyIdListValuePage: TableColumnsProperty[] = [
+    {name: 'Value', selected: true, width: 0},
+    {name: 'Meaning', selected: true, width: '10%'},
+    {name: 'Deprecated', selected: true, width: 100},
+    {name: 'Definition', selected: true, width: '50%'},
+    {name: 'Definition Source', selected: true, width: '15%'}
   ];
 
   columnsOfReleasePage: TableColumnsProperty[] = [
@@ -112,9 +128,20 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfContextSchemeValuePage: TableColumnsProperty[] = [
+    {name: 'Value', selected: true, width: 0},
+    {name: 'Meaning', selected: true, width: '50%'}
+  ];
+
   columnsOfBusinessContextPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
     {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfBusinessContextValuePage: TableColumnsProperty[] = [
+    {name: 'Context Category', selected: true, width: 0},
+    {name: 'Context Scheme', selected: true, width: '33%'},
+    {name: 'Context Scheme Value', selected: true, width: '33%'}
   ];
 
   columnsOfModuleSetPage: TableColumnsProperty[] = [

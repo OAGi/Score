@@ -282,6 +282,16 @@ export class CodelistListDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: CodeListForList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        if (this.request.filters.module.length > 0) {
+          elm.modulePath = elm.modulePath.replace(
+            new RegExp(this.request.filters.module, 'ig'),
+            '<b class="bg-warning">$&</b>');
+        }
+        if (this.request.filters.definition.length > 0) {
+          elm.definition = elm.definition.replace(
+            new RegExp(this.request.filters.definition, 'ig'),
+            '<b class="bg-warning">$&</b>');
+        }
         return elm;
       });
       if (!isInit) {

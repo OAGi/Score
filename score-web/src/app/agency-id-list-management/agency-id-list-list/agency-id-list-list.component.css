@@ -77,6 +77,7 @@ tr.element-row:not(.expanded-row):active {
 .element-detail-header {
   background-color: #f5f5f5;
   margin-bottom: 12px;
+  padding: 0 16px;
 }
 
 .element-detail-subtitle {

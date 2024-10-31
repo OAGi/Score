@@ -233,7 +233,7 @@
                     score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="word-break-all">
-                    <span>{{ element.module }}</span>
+                    <span [innerHTML]="element.module"></span>
                   </div>
                 </td>
               </ng-container>

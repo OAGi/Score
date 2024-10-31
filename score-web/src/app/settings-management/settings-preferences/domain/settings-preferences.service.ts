@@ -11,13 +11,17 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
   FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
+  TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY = 'TableColumns-CodeListValuePage';
   TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY = 'TableColumns-AgencyIdListPage';
-  public TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY = 'TableColumns-ReleasePage';
+  TABLE_COLUMNS_FOR_AGENCY_ID_LIST_VALUE_PAGE_KEY = 'TableColumns-AgencyIdValueListPage';
+  TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY = 'TableColumns-ReleasePage';
   TABLE_COLUMNS_FOR_NAMESPACE_PAGE_KEY = 'TableColumns-NamespacePage';
 
   TABLE_COLUMNS_FOR_CONTEXT_CATEGORY_PAGE_KEY = 'TableColumns-ContextCategoryPage';
   TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY = 'TableColumns-ContextSchemePage';
+  TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY = 'TableColumns-ContextSchemeValuePage';
   TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY = 'TableColumns-BusinessContextPage';
+  TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY = 'TableColumns-BusinessContextValuePage';
 
   TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY = 'TableColumns-ModuleSetPage';
   TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY = 'TableColumns-ModuleSetReleasePage';
@@ -58,9 +62,15 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCodeListPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage)));
       preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_VALUE_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage)));
       preferencesInfo.tableColumnsInfo.columnsOfReleasePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_RELEASE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfReleasePage)));
@@ -74,9 +84,15 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage)));
+      preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage)));
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage)));
 
       preferencesInfo.tableColumnsInfo.columnsOfModuleSetPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY,
@@ -160,9 +176,19 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCodeListPage);
   }
 
+  updateTableColumnsForCodeListValuePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage);
+  }
+
   updateTableColumnsForAgencyIdListPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage);
+  }
+
+  updateTableColumnsForAgencyIdListValuePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_AGENCY_ID_LIST_VALUE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage);
   }
 
   updateTableColumnsForReleasePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
@@ -185,9 +211,19 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfContextSchemePage);
   }
 
+  updateTableColumnsForContextSchemeValuePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage);
+  }
+
   updateTableColumnsForBusinessContextPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage);
+  }
+
+  updateTableColumnsForBusinessContextValuePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage);
   }
 
   updateTableColumnsForModuleSetPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
@@ -17,6 +17,15 @@ import {v4 as uuid} from 'uuid';
 import {switchMap} from 'rxjs/operators';
 import {hashCode} from '../../../common/utility';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'score-business-context-detail',
@@ -29,14 +38,100 @@ export class BusinessContextDetailComponent implements OnInit {
   disabled: boolean;
   hashCode;
   businessContext: BusinessContext;
-  displayedColumns: string[] = [
-    'select', 'contextCategoryName', 'contextSchemeName', 'contextSchemeValue'
-  ];
+  preferencesInfo: PreferencesInfo;
+
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage = columns;
+    this.updateTableColumnsForBusinessContextValuePage();
+  }
+
+  updateTableColumnsForBusinessContextValuePage() {
+    this.preferencesService.updateTableColumnsForBusinessContextValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfBusinessContextValuePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForBusinessContextValuePage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Context Category':
+          if (column.selected) {
+            displayedColumns.push('contextCategoryName');
+          }
+          break;
+        case 'Context Scheme':
+          if (column.selected) {
+            displayedColumns.push('contextSchemeName');
+          }
+          break;
+        case 'Context Scheme Value':
+          if (column.selected) {
+            displayedColumns.push('contextSchemeValue');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BusinessContextValue>();
   selection = new SelectionModel<BusinessContextValue>(true, []);
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(private service: BusinessContextService,
               private bieListService: BieListService,
@@ -45,7 +140,9 @@ export class BusinessContextDetailComponent implements OnInit {
               private router: Router,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
-              private confirmDialogService: ConfirmDialogService) {
+              private auth: AuthService,
+              private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService) {
   }
 
   ngOnInit() {
@@ -55,9 +152,12 @@ export class BusinessContextDetailComponent implements OnInit {
 
     // load business context
     this.route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this.service.getBusinessContext(params.get('id')))
-    ).subscribe(resp => {
+      switchMap((params: ParamMap) => forkJoin([
+          this.service.getBusinessContext(params.get('id')),
+          this.preferencesService.load(this.auth.getUserToken())
+        ])
+      )).subscribe(([resp, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
       resp.businessContextValueList.forEach((businessContextValue: BusinessContextValue) => {
         businessContextValue.guid = uuid();
       });
@@ -66,6 +166,16 @@ export class BusinessContextDetailComponent implements OnInit {
 
       this._updateDataSource(this.businessContext.businessContextValueList);
     });
+
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }

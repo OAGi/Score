@@ -339,79 +339,94 @@
           </div>
         </mat-toolbar>
         <mat-card>
-          <mat-card-header class="pt-0">
-            <mat-card-subtitle>
-              <mat-form-field>
-                <mat-label>Search</mat-label>
-                <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
-                <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
-                  <mat-icon>search</mat-icon>
-                </button>
-                <button mat-icon-button matSuffix *ngIf="valueSearch && valueSearch.length > 0" (click)="clearFilter()">
-                  <mat-icon>cancel</mat-icon>
-                </button>
-              </mat-form-field>
-            </mat-card-subtitle>
-          </mat-card-header>
           <mat-card-content class="mat-card-container">
-            <div class="mat-elevation-z1">
-              <table mat-table matSort [dataSource]="dataSource">
-                <!-- Checkbox Column -->
-                <ng-container matColumnDef="select">
-                  <th mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox (change)="$event ? masterToggle() : null"
-                                  *ngIf="access === 'CanEdit'"
-                                  [checked]="selection.hasValue() && isAllSelected()"
-                                  [indeterminate]="selection.hasValue() && !isAllSelected()">
-                    </mat-checkbox>
-                  </th>
-                  <td mat-cell *matCellDef="let row">
-                    <mat-checkbox (click)="$event.stopPropagation()"
-                                  *ngIf="access === 'CanEdit'"
-                                  [disabled]="!isAvailable(row) || isRevisionValue(row)"
-                                  (change)="$event ? toggle(row) : null"
-                                  [checked]="isSelected(row)">
-                    </mat-checkbox>
-                  </td>
-                </ng-container>
+            <div class="table-container">
+              <div class="score-column-container align-items-center justify-content-between">
+                <score-column-selector
+                  [columns]="columns"
+                  (columnsChange)="onColumnsChange($event)"
+                  (onReset)="onColumnsReset()">
+                </score-column-selector>
 
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Value</th>
-                  <td mat-cell *matCellDef="let element">
-                    <span class="{{ color(element) }}">{{ element.value }}</span>
-                  </td>
-                </ng-container>
+                <div class="ml-3">
+                  <mat-form-field>
+                    <mat-label>Search</mat-label>
+                    <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
+                    <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
+                      <mat-icon>search</mat-icon>
+                    </button>
+                    <button mat-icon-button matSuffix *ngIf="valueSearch && valueSearch.length > 0" (click)="clearFilter()">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="mat-elevation-z1 table-wrapper">
+                <table mat-table matSort [dataSource]="dataSource">
+                  <!-- Checkbox Column -->
+                  <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    *ngIf="access === 'CanEdit'"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                      </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                      <mat-checkbox (click)="$event.stopPropagation()"
+                                    *ngIf="access === 'CanEdit'"
+                                    [disabled]="!isAvailable(row) || isRevisionValue(row)"
+                                    (change)="$event ? toggle(row) : null"
+                                    [checked]="isSelected(row)">
+                      </mat-checkbox>
+                    </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Meaning</th>
-                  <td mat-cell *matCellDef="let element"> {{ element.name }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                        score-table-column-resize [defaultWidth]="width('Value')" (onResize)="onResizeWidth($event)"> Value</th>
+                    <td mat-cell *matCellDef="let element">
+                      <span class="{{ color(element) }}">{{ element.value }}</span>
+                    </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="deprecated">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Deprecated</th>
-                  <td mat-cell *matCellDef="let element">
-                    <mat-icon *ngIf="element.deprecated">done</mat-icon>
-                  </td>
-                </ng-container>
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                        score-table-column-resize [defaultWidth]="width('Meaning')" (onResize)="onResizeWidth($event)"> Meaning</th>
+                    <td mat-cell *matCellDef="let element"> {{ element.name }}</td>
+                  </ng-container>
 
-                <ng-container matColumnDef="definition">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
-                  <td mat-cell *matCellDef="let element"> {{ element.definition }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="deprecated">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                        score-table-column-resize [defaultWidth]="width('Deprecated')" (onResize)="onResizeWidth($event)"> Deprecated</th>
+                    <td mat-cell *matCellDef="let element">
+                      <mat-icon *ngIf="element.deprecated">done</mat-icon>
+                    </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="definitionSource">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition Source</th>
-                  <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
-                </ng-container>
+                  <ng-container matColumnDef="definition">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                        score-table-column-resize [defaultWidth]="width('Definition')" (onResize)="onResizeWidth($event)"> Definition</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="word-break-all">{{ element.definition }}</div>
+                    </td>
+                  </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                    (click)="openDialog(row)"></tr>
-              </table>
+                  <ng-container matColumnDef="definitionSource">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                        score-table-column-resize [defaultWidth]="width('Definition Source')" (onResize)="onResizeWidth($event)"> Definition Source</th>
+                    <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
+                  </ng-container>
 
-              <mat-paginator
-                [pageSizeOptions]="[10, 25, 50]"
-                showFirstLastButtons></mat-paginator>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                      (click)="openDialog(row)"></tr>
+                </table>
+
+                <mat-paginator
+                  [pageSizeOptions]="[10, 25, 50]"
+                  showFirstLastButtons></mat-paginator>
+              </div>
             </div>
           </mat-card-content>
         </mat-card>

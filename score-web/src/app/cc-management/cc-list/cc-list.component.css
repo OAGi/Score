@@ -97,6 +97,7 @@ mat-toolbar > .mat-icon-button {
 .element-detail-header {
   background-color: #f5f5f5;
   margin-bottom: 12px;
+  padding: 0 16px;
 }
 
 .element-detail-subtitle {
