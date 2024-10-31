@@ -17,7 +17,7 @@
   </div>
 
   <mat-card class="pt-3">
-    <score-search-bar [(model)]="request.filters.businessTerm"
+    <score-search-bar placeholder="Search by Business Term" [(model)]="request.filters.businessTerm"
                       (modelChange)="onChange('filters.businessTerm', request.filters.businessTerm);"
                       (search)="onSearch();">
       <div advancedSearchContent style="padding-left: 3rem;">

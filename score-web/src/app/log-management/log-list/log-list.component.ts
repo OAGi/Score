@@ -16,6 +16,7 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-log-list',
@@ -132,6 +133,7 @@ export class LogListComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   dataSource = new MatTableDataSource<Log>();
   selection = new SelectionModel<number>(true, []);
@@ -149,6 +151,9 @@ export class LogListComponent implements OnInit {
     this.request = new LogListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.reference = this.route.snapshot.paramMap.get('reference');
+
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
     this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
@@ -205,7 +210,8 @@ export class LogListComponent implements OnInit {
 
       this.dataSource.data = resp.list;
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0],
+          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.dataSource.data = [];

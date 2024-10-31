@@ -9,7 +9,7 @@
   </div>
   <div class="content">
     <mat-card style="box-shadow: none;">
-      <score-search-bar [(model)]="request.filters.den"
+      <score-search-bar placeholder="Search by DEN" [(model)]="request.filters.den"
                         (modelChange)="onChange('filters.den', request.filters.den);"
                         (search)="onSearch();">
         <div branchSelector class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">

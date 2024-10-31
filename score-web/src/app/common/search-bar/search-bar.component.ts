@@ -9,8 +9,8 @@ import {Component, EventEmitter, Input, Output, ViewEncapsulation} from '@angula
 export class SearchBarComponent {
 
   private value = '';
-  showAdvancedSearch = false;
 
+  @Input() showAdvancedSearch = false;
   @Input() placeholder = 'Search';
   @Input() disabled = false;  // Add disabled input
   @Input() advancedSearch = true;

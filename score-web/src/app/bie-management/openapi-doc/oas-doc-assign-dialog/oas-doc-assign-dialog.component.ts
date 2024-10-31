@@ -23,6 +23,7 @@ import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
 import {PreferencesInfo, TableColumnsProperty} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -167,6 +168,7 @@ export class OasDocAssignDialogComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(
     private openAPIService: OpenAPIService,
@@ -193,6 +195,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
@@ -270,7 +273,8 @@ export class OasDocAssignDialogComponent implements OnInit {
         this.messageBodySelection[elm.topLevelAsbiepId] = elm.messageBody;
       });
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0],
+          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.dataSource.data = [];

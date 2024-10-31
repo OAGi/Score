@@ -174,9 +174,6 @@ export class AccountListDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
       this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
     }, error => {
       this.dataSource.data = [];
     });

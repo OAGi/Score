@@ -373,9 +373,6 @@ export class BiePackageAddBieDialogComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
     }, error => {
       this.table.dataSource.data = [];
     });
