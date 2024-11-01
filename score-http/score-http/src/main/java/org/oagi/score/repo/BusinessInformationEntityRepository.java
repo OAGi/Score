@@ -618,7 +618,7 @@ public class BusinessInformationEntityRepository {
         }
 
         public SelectBieListArguments setBieIdAndType(BigInteger bieId, List<String> types) {
-            if (types.size() == 1) {
+            if (bieId != null && types.size() == 1) {
                 String type = types.get(0);
                 if (type.equals("ASBIE")) {
                     conditions.add(ASBIE.ASBIE_ID.eq(ULong.valueOf(bieId)));
@@ -942,7 +942,7 @@ public class BusinessInformationEntityRepository {
                         RELEASE.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         ASBIE.REMARK,
-                        APP_USER.as("appUserUpdater").LOGIN_ID.as("lastUpdateUser"),
+                        APP_USER.as("updater").LOGIN_ID.as("lastUpdateUser"),
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
                         APP_USER.as("owner").APP_USER_ID.as("ownerUserId"),
                         ASBIE.LAST_UPDATE_TIMESTAMP,
@@ -967,8 +967,8 @@ public class BusinessInformationEntityRepository {
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
 //                join with APP_USER to get updater and owner
-                .join(APP_USER.as("appUserUpdater"))
-                .on(ASBIE.LAST_UPDATED_BY.eq(APP_USER.as("appUserUpdater").APP_USER_ID))
+                .join(APP_USER.as("updater"))
+                .on(ASBIE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(APP_USER.as("owner"))
                 .on(ASBIE.CREATED_BY.eq(APP_USER.as("owner").APP_USER_ID))
                 .where(conditions);
@@ -994,7 +994,7 @@ public class BusinessInformationEntityRepository {
                         RELEASE.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         BBIE.REMARK,
-                        APP_USER.as("appUserUpdater").LOGIN_ID.as("lastUpdateUser"),
+                        APP_USER.as("updater").LOGIN_ID.as("lastUpdateUser"),
                         APP_USER.as("owner").LOGIN_ID.as("owner"),
                         APP_USER.as("owner").APP_USER_ID.as("ownerUserId"),
                         BBIE.LAST_UPDATE_TIMESTAMP,
@@ -1019,8 +1019,8 @@ public class BusinessInformationEntityRepository {
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
                 //                join with APP_USER to get updater
-                .join(APP_USER.as("appUserUpdater"))
-                .on(BBIE.LAST_UPDATED_BY.eq(APP_USER.as("appUserUpdater").APP_USER_ID))
+                .join(APP_USER.as("updater"))
+                .on(BBIE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(APP_USER.as("owner"))
                 .on(BBIE.CREATED_BY.eq(APP_USER.as("owner").APP_USER_ID))
                 .where(conditions);
@@ -1028,10 +1028,10 @@ public class BusinessInformationEntityRepository {
 
     private <E> PaginationResponse<E> selectAsbieBbieList(SelectBieListArguments arguments, List<String> types, Class<? extends E> type) {
         SelectOrderByStep select = null;
-        if (types.contains("ASBIE")) {
+        if (types.contains("ASBIE") || types.isEmpty()) {
             select = getAsbieList(arguments);
         }
-        if (types.contains("BBIE")) {
+        if (types.contains("BBIE") || types.isEmpty()) {
             select = (select != null) ? select.union(getBbieList(arguments)) :
                     getBbieList(arguments);
         }

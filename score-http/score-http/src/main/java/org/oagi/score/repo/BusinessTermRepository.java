@@ -180,10 +180,10 @@ public class BusinessTermRepository {
                                                        Class<? extends E> type) {
 
         SelectOrderByStep select = null;
-        if (request.getBieTypes().contains("ASBIE")) {
+        if (request.getBieTypes().contains("ASBIE") || request.getBieTypes().isEmpty()) {
             select = getAsbieBiztermAssignmentList(request);
         }
-        if (request.getBieTypes().contains("BBIE")) {
+        if (request.getBieTypes().contains("BBIE") || request.getBieTypes().isEmpty()) {
             select = (select != null) ? select.union(getBbieBiztermAssignmentList(request)) :
                     getBbieBiztermAssignmentList(request);
         }

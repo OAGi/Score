@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 
 import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
+import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
 
 @RestController
 public class BusinessTermController {
@@ -164,7 +165,7 @@ public class BusinessTermController {
         request.setBieDen(bieDen);
         request.setBusinessTerm(term);
         request.setExternalReferenceUri(externalReferenceUri);
-        request.setBieTypes(Arrays.asList(bieTypes.split(",")));
+        request.setBieTypes(hasLength(bieTypes) ? Arrays.asList(bieTypes.split(",")) : Collections.emptyList());
         request.setPrimaryIndicator((primaryIndicator == null) ? false : primaryIndicator);
         request.setTypeCode(typeCode);
 

@@ -186,8 +186,10 @@ export class AssignBusinessTermBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.types = ['BBIE', 'ASBIE'];
 
+    // The value should be 'true' unless 'adv_ser' is false.
     this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+      (!this.route.snapshot.queryParamMap || (!this.route.snapshot.queryParamMap.get('adv_ser')) ||
+        this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
