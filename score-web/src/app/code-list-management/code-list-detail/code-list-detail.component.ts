@@ -63,6 +63,7 @@ export class CodeListDetailComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
   hashCode;
   valueSearch: string;
+  highlightText: string;
   workingRelease = WorkingRelease;
 
   get columns(): TableColumnsProperty[] {
@@ -284,6 +285,7 @@ export class CodeListDetailComponent implements OnInit {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+    this.highlightText = filterValue;
   }
 
   clearFilter() {

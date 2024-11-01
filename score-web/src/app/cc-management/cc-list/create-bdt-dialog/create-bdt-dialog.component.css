@@ -81,10 +81,6 @@ tr.element-row:not(.expanded-row):active {
   font-size: 12px;
 }
 
-.element-detail {
-  font-size: 12px;
-}
-
 .element-detail-wrapper {
   width: 100%;
   border: 0;

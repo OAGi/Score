@@ -192,6 +192,7 @@ export class BiePackageListComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BiePackageListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   contextMenuItem: BiePackage;
@@ -340,6 +341,8 @@ export class BiePackageListComponent implements OnInit {
         }
         return elm;
       });
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

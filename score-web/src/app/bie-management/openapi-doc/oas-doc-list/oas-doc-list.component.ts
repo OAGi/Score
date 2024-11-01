@@ -171,6 +171,7 @@ export class OasDocListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: OasDocListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -287,6 +288,8 @@ export class OasDocListComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

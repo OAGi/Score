@@ -221,9 +221,8 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="word-break-all">
-                    <span [innerHTML]="element.modulePath"></span>
-                  </div>
+                  <div class="word-break-all"
+                       [innerHTML]="element.modulePath | highlight : highlightTextForModule : ['bg-warning']"></div>
                 </td>
               </ng-container>
 

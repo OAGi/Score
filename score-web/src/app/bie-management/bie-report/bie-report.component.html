@@ -46,18 +46,18 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="reusingPropertyTerm">
+            <ng-container matColumnDef="reusingDen">
               <th mat-header-cell *matHeaderCellDef
-                  score-table-column-resize [defaultWidth]="width('Reusing Property Term')" (onResize)="onResizeWidth($event)"> Property Term</th>
+                  score-table-column-resize [defaultWidth]="width('Reusing DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
                 <span *ngIf="isAccessibleLeft(element)">
                   <a href="{{getRouteLink(element)}}" target="_blank">
-                    {{ element.reusingPropertyTerm }}
+                    {{ element.reusingDen }}
                   </a>
                 </span>
                   <span *ngIf="!isAccessibleLeft(element)">
-                  {{ element.reusingPropertyTerm }}
+                  {{ element.reusingDen }}
                 </span>
                 </div>
                 <div class="bie-guid">{{ element.reusingGuid }}</div>
@@ -88,6 +88,14 @@
               </td>
             </ng-container>
 
+            <ng-container matColumnDef="reusingRemark">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reusing Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusingRemark }}</div>
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="arrow">
               <th mat-header-cell *matHeaderCellDef > </th>
               <td mat-cell *matCellDef="let element">
@@ -108,18 +116,18 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="reusedPropertyTerm">
+            <ng-container matColumnDef="reusedDen">
               <th mat-header-cell *matHeaderCellDef
-                  score-table-column-resize [defaultWidth]="width('Reused Property Term')" (onResize)="onResizeWidth($event)"> Reused</th>
+                  score-table-column-resize [defaultWidth]="width('Reused DEN')" (onResize)="onResizeWidth($event)"> Reused</th>
               <td mat-cell *matCellDef="let element">
                 <div class="dev word-break-all">
                 <span *ngIf="isAccessibleRight(element)">
                   <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
-                    {{ element.reusedPropertyTerm }}
+                    {{ element.reusedDen }}
                   </a>
                 </span>
                   <span *ngIf="!isAccessibleRight(element)">
-                    {{ element.reusedPropertyTerm }}
+                    {{ element.reusedDen }}
                 </span>
                 </div>
                 <div class="bie-guid">{{ element.reusedGuid }}</div>
@@ -147,6 +155,14 @@
                   score-table-column-resize [defaultWidth]="width('Reused Status')" (onResize)="onResizeWidth($event)"> Status</th>
               <td mat-cell *matCellDef="let element">
                 <div class="word-break-all">{{ element.reusedStatus }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reusedRemark">
+              <th mat-header-cell *matHeaderCellDef
+                  score-table-column-resize [defaultWidth]="width('Reused Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all">{{ element.reusedRemark }}</div>
               </td>
             </ng-container>
 

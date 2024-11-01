@@ -149,6 +149,7 @@ export class NamespaceListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: NamespaceListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   contextMenuItem: NamespaceList;
@@ -255,8 +256,10 @@ export class NamespaceListComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.dataSource.data = resp.list;
       this.paginator.length = resp.length;
+      this.dataSource.data = resp.list;
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

@@ -235,12 +235,12 @@ export class UnboundedPipe implements PipeTransform {
 @Pipe({name: 'highlight'})
 export class HighlightSearch implements PipeTransform {
 
-  transform(value: any, keyword: string): any {
-    if (!keyword) {
+  transform(value: any, keyword: string, classes?: string[]): any {
+    if (!value || !keyword) {
       return value;
     }
     const re = new RegExp(keyword, 'gi');
-    return value.replace(re, '<mark>$&</mark>');
+    return value.replace(re, '<mark' + ((classes) ? ' class="' + classes.join(',') + '"' : '') + '>$&</mark>');
   }
 }
 

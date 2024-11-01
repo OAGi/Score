@@ -188,6 +188,9 @@ public class JooqModuleSetReadRepository
         if (StringUtils.hasLength(request.getName())) {
             conditions.addAll(contains(request.getName(), MODULE_SET.NAME));
         }
+        if (StringUtils.hasLength(request.getDescription())) {
+            conditions.addAll(contains(request.getDescription(), MODULE_SET.DESCRIPTION));
+        }
 
         if (!request.getUpdaterUsernameList().isEmpty()) {
             conditions.add(APP_USER.as("updater").LOGIN_ID.in(

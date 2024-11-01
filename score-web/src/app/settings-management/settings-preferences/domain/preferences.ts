@@ -58,6 +58,16 @@ export class TableColumnsInfo {
     {name: 'BCC', selected: false}
   ];
 
+  columnsOfCoreComponentAccRefactorPage: TableColumnsProperty[] = [
+    {name: 'Type', selected: true, width: 100},
+    {name: 'State', selected: true, width: 100},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Issue', selected: true, width: 120},
+    {name: 'Revision', selected: true, width: 80},
+    {name: 'Owner', selected: true, width: 140},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
   columnsOfCodeListPage: TableColumnsProperty[] = [
     {name: 'State', selected: true, width: 100},
     {name: 'Name', selected: true, width: 0},
@@ -173,15 +183,26 @@ export class TableColumnsInfo {
   columnsOfBieReuseReportPage: TableColumnsProperty[] = [
     {name: 'Release', selected: true, width: 100},
     {name: 'Reusing State', selected: true, width: 100},
-    {name: 'Reusing Property Term', selected: true, width: 0},
+    {name: 'Reusing DEN', selected: true, width: 0},
     {name: 'Reusing Owner', selected: true, width: 140},
     {name: 'Reusing Version', selected: true, width: '5%'},
     {name: 'Reusing Status', selected: true, width: '5%'},
+    {name: 'Reusing Remark', selected: false, width: '5%'},
     {name: 'Reused State', selected: true, width: 100},
-    {name: 'Reused Property Term', selected: true, width: 0},
+    {name: 'Reused DEN', selected: true, width: 0},
     {name: 'Reused Owner', selected: true, width: 140},
     {name: 'Reused Version', selected: true, width: '5%'},
-    {name: 'Reused Status', selected: true, width: '5%'}
+    {name: 'Reused Status', selected: true, width: '5%'},
+    {name: 'Reused Remark', selected: false, width: '5%'}
+  ];
+
+  columnsOfBieUpliftReportPage: TableColumnsProperty[] = [
+    {name: 'Type', selected: true, width: 100},
+    {name: 'Path', selected: true, width: 0},
+    {name: 'Context Definition', selected: true, width: '40%'},
+    {name: 'Matched', selected: true, width: '5%'},
+    {name: 'Reused', selected: true, width: '5%'},
+    {name: 'Issue', selected: true, width: '10%'},
   ];
 
   columnsOfBiePackagePage: TableColumnsProperty[] = [
@@ -190,7 +211,7 @@ export class TableColumnsInfo {
     {name: 'Package Version Name', selected: true, width: 0},
     {name: 'Package Version ID', selected: true, width: 200},
     {name: 'Owner', selected: true, width: 140},
-    {name: 'Description', selected: true, width: 400},
+    {name: 'Description', selected: true, width: '40%'},
     {name: 'Updated On', selected: true, width: 160}
   ];
 

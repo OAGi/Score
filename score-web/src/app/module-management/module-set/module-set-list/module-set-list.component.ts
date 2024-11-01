@@ -6,7 +6,7 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTable, MatTableDataSource} from '@angular/material/table';
+import {MatTableDataSource} from '@angular/material/table';
 import {ActivatedRoute, Router} from '@angular/router';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {finalize} from 'rxjs/operators';
@@ -139,6 +139,7 @@ export class ModuleSetListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ModuleSetListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   contextMenuItem: ModuleSet;
@@ -257,8 +258,10 @@ export class ModuleSetListComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.dataSource.data = resp.results;
       this.paginator.length = resp.length;
+      this.dataSource.data = resp.results;
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

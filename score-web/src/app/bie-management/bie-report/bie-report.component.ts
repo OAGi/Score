@@ -99,9 +99,9 @@ export class BieReportComponent implements OnInit {
               displayedColumns.push('reusingState');
             }
             break;
-          case 'Reusing Property Term':
+          case 'Reusing DEN':
             if (column.selected) {
-              displayedColumns.push('reusingPropertyTerm');
+              displayedColumns.push('reusingDen');
             }
             break;
           case 'Reusing Owner':
@@ -119,14 +119,19 @@ export class BieReportComponent implements OnInit {
               displayedColumns.push('reusingStatus');
             }
             break;
+          case 'Reusing Remark':
+            if (column.selected) {
+              displayedColumns.push('reusingRemark');
+            }
+            break;
           case 'Reused State':
             if (column.selected) {
               displayedColumns.push('reusedState');
             }
             break;
-          case 'Reused Property Term':
+          case 'Reused DEN':
             if (column.selected) {
-              displayedColumns.push('reusedPropertyTerm');
+              displayedColumns.push('reusedDen');
             }
             break;
           case 'Reused Owner':
@@ -142,6 +147,11 @@ export class BieReportComponent implements OnInit {
           case 'Reused Status':
             if (column.selected) {
               displayedColumns.push('reusedStatus');
+            }
+            break;
+          case 'Reused Remark':
+            if (column.selected) {
+              displayedColumns.push('reusedRemark');
             }
             break;
         }

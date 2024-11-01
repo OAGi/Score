@@ -255,9 +255,8 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Module')" (onResize)="onResizeWidth($event)"> Module</th>
                 <td mat-cell *matCellDef="let element">
-                  <div class="word-break-all">
-                    <span [innerHTML]="element.module"></span>
-                  </div>
+                  <div class="word-break-all"
+                       [innerHTML]="element.module | highlight : highlightTextForModule : ['bg-warning']"></div>
                 </td>
               </ng-container>
 
@@ -280,7 +279,8 @@
                           <mat-card-subtitle class="element-detail-subtitle">{{ element.definitionSource }}</mat-card-subtitle>
                         </mat-card-header>
                         <mat-card-content>
-                          <p [innerHTML]="element.definition" class="element-detail-content"></p>
+                          <p [innerHTML]="element.definition | highlight : highlightTextForDefinition : ['bg-warning']"
+                             class="element-detail-content"></p>
                         </mat-card-content>
                       </mat-card>
                     </div>

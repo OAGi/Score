@@ -45,6 +45,7 @@ export class AgencyIdListDetailComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
   hashCode;
   valueSearch: string;
+  highlightText: string;
   workingRelease = WorkingRelease;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
@@ -252,6 +253,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+    this.highlightText = filterValue;
   }
 
   clearFilter() {

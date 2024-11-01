@@ -196,6 +196,8 @@ export class CodeListListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
   preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
@@ -348,18 +350,11 @@ export class CodeListListComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: CodeListForList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.modulePath = elm.modulePath.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

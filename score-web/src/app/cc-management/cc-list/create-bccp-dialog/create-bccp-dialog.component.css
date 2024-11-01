@@ -81,6 +81,31 @@ tr.element-row:not(.expanded-row):active {
   font-size: 12px;
 }
 
+.element-detail-wrapper {
+  width: 100%;
+  border: 0;
+  padding-right: 24px;
+}
+
+.element-detail-header {
+  background-color: #f5f5f5;
+  margin-bottom: 12px;
+  padding: 0 16px;
+}
+
+.element-detail-subtitle {
+  margin: 8px 0 8px;
+  font-size: 12px;
+  min-height: 20px;
+}
+
+.element-detail-content {
+  color: #545454;
+  margin-bottom: 0;
+  font-size: 12px;
+  min-height: 20px;
+}
+
 .header {
   border-bottom: 1px solid transparent;
   box-sizing: border-box;

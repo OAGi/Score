@@ -10,6 +10,7 @@ export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
   FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY = 'TableColumns-CoreComponentAccRefactorPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
   TABLE_COLUMNS_FOR_CODE_LIST_VALUE_PAGE_KEY = 'TableColumns-CodeListValuePage';
   TABLE_COLUMNS_FOR_AGENCY_ID_LIST_PAGE_KEY = 'TableColumns-AgencyIdListPage';
@@ -28,6 +29,7 @@ export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_BIE_PAGE_KEY = 'TableColumns-BiePage';
   TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY = 'TableColumns-BieReuseReportPage';
+  TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY = 'TableColumns-BieUpliftReportPage';
   TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY = 'TableColumns-BiePackagePage';
 
   TABLE_COLUMNS_FOR_ACCOUNT_PAGE_KEY = 'TableColumns-AccountPage';
@@ -59,6 +61,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage)));
       preferencesInfo.tableColumnsInfo.columnsOfCodeListPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCodeListPage)));
@@ -107,6 +112,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage)));
       preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BIE_PACKAGE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBiePackagePage)));
@@ -169,6 +177,11 @@ export class SettingsPreferencesService {
   updateFilterTypeForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage);
+  }
+
+  updateTableColumnsForCoreComponentAccRefactorPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage);
   }
 
   updateTableColumnsForCodeListPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
@@ -244,6 +257,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForBieReuseReportPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfBieReuseReportPage);
+  }
+
+  updateTableColumnsForBieUpliftReportPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage);
   }
 
   updateTableColumnsForBiePackagePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

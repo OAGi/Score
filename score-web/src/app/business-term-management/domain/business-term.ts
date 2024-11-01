@@ -9,6 +9,7 @@ export class BusinessTermListRequest {
     businessTerm: string;
     externalReferenceUri: string;
     externalReferenceId: string;
+    definition: string;
     bieId: number;
     bieType: string;
     searchByCC: string;
@@ -54,6 +55,7 @@ export class BusinessTermListRequest {
       businessTerm: params.get('businessTerm') || '',
       externalReferenceUri: params.get('externalReferenceUri') || '',
       externalReferenceId: params.get('externalReferenceId') || '',
+      definition: params.get('definition') || '',
       bieType: params.get('bieType') || '',
       bieId: Number(params.get('bieId')),
       searchByCC: params.get('searchByCC') || '',
@@ -80,6 +82,9 @@ export class BusinessTermListRequest {
     }
     if (this.filters.businessTerm && this.filters.businessTerm.length > 0) {
       params = params.set('businessTerm', '' + this.filters.businessTerm);
+    }
+    if (this.filters.definition && this.filters.definition.length > 0) {
+      params = params.set('definition', '' + this.filters.definition);
     }
     if (this.filters.bieId) {
       params = params.set('bieId', '' + this.filters.bieId);

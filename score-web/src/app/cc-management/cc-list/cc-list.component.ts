@@ -236,6 +236,8 @@ export class CcListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
   tags: Tag[] = [];
   preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
@@ -384,18 +386,11 @@ export class CcListComponent implements OnInit {
 
       this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
@@ -468,6 +463,7 @@ export class CcListComponent implements OnInit {
         } else {
           return '/core_component/acc/' + ccList.manifestId;
         }
+
       case 'ASCCP':
         if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
           return '/core_component/browser/asccp/' + ccList.manifestId;

@@ -107,7 +107,8 @@ export class CreateBodDialogComponent implements OnInit {
 
   nounDataSource = new MatTableDataSource<CcList>();
   verbDataSource = new MatTableDataSource<CcList>();
-  expandedElement: CcList | null;
+  nounExpandedElement: CcList | null;
+  verbExpandedElement: CcList | null;
   nounSelection = new SelectionModel<CcList>(true, []);
   verbSelection = new SelectionModel<CcList>(true, []);
   loading = false;
@@ -118,7 +119,11 @@ export class CreateBodDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   verbRequest: CcListRequest;
+  highlightTextForVerbModule: string;
+  highlightTextForVerbDefinition: string;
   nounRequest: CcListRequest;
+  highlightTextForNounModule: string;
+  highlightTextForNounDefinition: string;
   preferencesInfo: PreferencesInfo;
   action: string;
 
@@ -222,22 +227,13 @@ export class CreateBodDialogComponent implements OnInit {
         this.verbPaginator.pageIndex, this.verbPaginator.pageSize);
 
       this.ccListService.getCcList(this.verbRequest).subscribe(resp => {
-        const list = resp.list.map((elm: CcList) => {
+        this.verbDataSource.data = resp.list.map((elm: CcList) => {
           elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          if (this.verbRequest.filters.module.length > 0) {
-            elm.module = elm.module.replace(
-              new RegExp(this.verbRequest.filters.module, 'ig'),
-              '<b class="bg-warning">$&</b>');
-          }
-          if (this.verbRequest.filters.definition.length > 0) {
-            elm.definition = elm.definition.replace(
-              new RegExp(this.verbRequest.filters.definition, 'ig'),
-              '<b class="bg-warning">$&</b>');
-          }
           return elm;
         });
+        this.highlightTextForVerbModule = this.verbRequest.filters.module;
+        this.highlightTextForVerbDefinition = this.verbRequest.filters.definition;
 
-        this.verbDataSource.data = list;
         this.verbPaginator.length = resp.length;
         this.verbPaginator.pageIndex = resp.page;
 
@@ -261,22 +257,13 @@ export class CreateBodDialogComponent implements OnInit {
         this.nounPaginator.pageIndex, this.nounPaginator.pageSize);
 
       this.ccListService.getCcList(this.nounRequest).subscribe(resp => {
-        const list = resp.list.map((elm: CcList) => {
+        this.nounDataSource.data = resp.list.map((elm: CcList) => {
           elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          if (this.nounRequest.filters.module.length > 0) {
-            elm.module = elm.module.replace(
-              new RegExp(this.nounRequest.filters.module, 'ig'),
-              '<b class="bg-warning">$&</b>');
-          }
-          if (this.nounRequest.filters.definition.length > 0) {
-            elm.definition = elm.definition.replace(
-              new RegExp(this.nounRequest.filters.definition, 'ig'),
-              '<b class="bg-warning">$&</b>');
-          }
           return elm;
         });
+        this.highlightTextForNounModule = this.nounRequest.filters.module;
+        this.highlightTextForNounDefinition = this.nounRequest.filters.definition;
 
-        this.nounDataSource.data = list;
         this.nounPaginator.length = resp.length;
         this.nounPaginator.pageIndex = resp.page;
 

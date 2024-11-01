@@ -139,6 +139,7 @@ export class BusinessTermListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessTermListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -252,6 +253,8 @@ export class BusinessTermListComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.highlightText = this.request.filters.definition;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

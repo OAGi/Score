@@ -31,6 +31,9 @@ export class BusinessTermService {
     if (request.filters.externalReferenceId) {
       params = params.set('externalReferenceId', request.filters.externalReferenceId);
     }
+    if (request.filters.definition) {
+      params = params.set('definition', request.filters.definition);
+    }
     if (request.filters.bieId) {
       params = params.set('bieId', request.filters.bieId);
     }

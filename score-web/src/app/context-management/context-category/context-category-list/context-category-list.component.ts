@@ -133,6 +133,7 @@ export class ContextCategoryListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ContextCategoryListRequest;
+  highlightText: string;
   preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -242,6 +243,8 @@ export class ContextCategoryListComponent implements OnInit {
     ).subscribe(resp => {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list;
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0],
           this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));

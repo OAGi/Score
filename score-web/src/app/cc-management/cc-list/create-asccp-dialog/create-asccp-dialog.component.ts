@@ -140,6 +140,8 @@ export class CreateAsccpDialogComponent implements OnInit {
   tags: Tag[] = [];
   preferencesInfo: PreferencesInfo;
   request: CcListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
   action: string;
 
   workingRelease = WorkingRelease;
@@ -222,22 +224,13 @@ export class CreateAsccpDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      const list = resp.list.map((elm: CcList) => {
+      this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
 
-      this.dataSource.data = list;
       this.loading = false;
     });
   }
