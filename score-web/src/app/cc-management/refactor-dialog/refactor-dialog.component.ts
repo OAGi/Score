@@ -35,7 +35,7 @@ export class RefactorDialogComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
   }
 
   set columns(columns: TableColumnsProperty[]) {
@@ -43,18 +43,19 @@ export class RefactorDialogComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
-    this.updateTableColumnsForCoreComponentPage();
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
+    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
   }
 
-  updateTableColumnsForCoreComponentPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -83,7 +84,7 @@ export class RefactorDialogComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentPage();
+      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
     }
   }
 

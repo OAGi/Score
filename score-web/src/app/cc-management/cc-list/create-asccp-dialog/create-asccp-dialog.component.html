@@ -151,7 +151,14 @@
         </div>
 
         <div class="table-container">
-          <div class="mat-elevation-z1 table-wrapper">
+          <div class="score-column-container align-items-center">
+            <score-column-selector
+              [columns]="columns"
+              (columnsChange)="onColumnsChange($event)"
+              (onReset)="onColumnsReset()">
+            </score-column-selector>
+          </div>
+          <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table multiTemplateDataRows
                    matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                    [dataSource]="dataSource">

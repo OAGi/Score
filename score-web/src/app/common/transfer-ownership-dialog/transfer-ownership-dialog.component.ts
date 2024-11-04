@@ -29,9 +29,33 @@ export class TransferOwnershipDialogComponent implements OnInit {
     return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
   }
 
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = columns;
+    this.updateTableColumnsForAccountPage();
+  }
+
   updateTableColumnsForAccountPage() {
     this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfAccountPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -82,6 +106,11 @@ export class TransferOwnershipDialogComponent implements OnInit {
         case 'Organization':
           if (column.selected) {
             displayedColumns.push('organization');
+          }
+          break;
+        case 'Status':
+          if (column.selected) {
+            displayedColumns.push('status');
           }
           break;
       }

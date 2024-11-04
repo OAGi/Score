@@ -9,6 +9,10 @@ import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} fr
 export class SettingsPreferencesService {
 
   TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY = 'TableColumns-CoreComponentPage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY = 'TableColumns-CoreComponentWithoutDtColumnsPage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY = 'TableColumns-CoreComponentWithoutTypeAndDtColumnsPage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY = 'TableColumns-CoreComponentForVerbBodPage';
+  TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY = 'TableColumns-CoreComponentForNounBodPage';
   FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY = 'FilterTypes-CoreComponentPage';
   TABLE_COLUMNS_FOR_CORE_COMPONENT_ACC_REFACTOR_PAGE_KEY = 'TableColumns-CoreComponentAccRefactorPage';
   TABLE_COLUMNS_FOR_CODE_LIST_PAGE_KEY = 'TableColumns-CodeListPage';
@@ -22,6 +26,7 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_CONTEXT_SCHEME_PAGE_KEY = 'TableColumns-ContextSchemePage';
   TABLE_COLUMNS_FOR_CONTEXT_SCHEME_VALUE_PAGE_KEY = 'TableColumns-ContextSchemeValuePage';
   TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY = 'TableColumns-BusinessContextPage';
+  TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_WITH_TENANT_PAGE_KEY = 'TableColumns-BusinessContextWithTenantPage';
   TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY = 'TableColumns-BusinessContextValuePage';
 
   TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY = 'TableColumns-ModuleSetPage';
@@ -38,6 +43,8 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_MESSAGE_PAGE_KEY = 'TableColumns-MessagePage';
   TABLE_COLUMNS_FOR_LOG_PAGE_KEY = 'TableColumns-LogPage';
   TABLE_COLUMNS_FOR_TENANT_PAGE_KEY = 'TableColumns-TenantPage';
+  TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_ACCOUNT_PAGE_KEY = 'TableColumns-TenantManagementForAccountPage';
+  TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_BUSINESS_CONTEXT_PAGE_KEY = 'TableColumns-TenantManagementForBusinessContextPage';
 
   TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY = 'TableColumns-OpenAPIDocumentPage';
   TABLE_COLUMNS_FOR_BIE_FOR_OAS_DOC_PAGE_KEY = 'TableColumns-BieForOasDocPage';
@@ -58,6 +65,18 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage)));
       preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage =
         JSON.parse(loadProperty(userToken, this.FILTER_TYPES_FOR_CORE_COMPONENT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage)));
@@ -95,6 +114,9 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_WITH_TENANT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage)));
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage)));
@@ -132,9 +154,16 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfLogPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_LOG_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfLogPage)));
+
       preferencesInfo.tableColumnsInfo.columnsOfTenantPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
           JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_ACCOUNT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage)));
+      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage =
+        JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_BUSINESS_CONTEXT_PAGE_KEY,
+          JSON.stringify(preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage)));
 
       preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage =
         JSON.parse(loadProperty(userToken, this.TABLE_COLUMNS_FOR_OPENAPI_DOCUMENT_PAGE_KEY,
@@ -172,6 +201,26 @@ export class SettingsPreferencesService {
   updateTableColumnsForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage);
+  }
+
+  updateTableColumnsForCoreComponentWithoutDtColumnsPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_DT_COLUMNS_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage);
+  }
+
+  updateTableColumnsForCoreComponentWithoutTypeAndDtColumnsPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_WITHOUT_TYPE_AND_DT_COLUMNS_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutTypeAndDtColumnsPage);
+  }
+
+  updateTableColumnsForCoreComponentForVerbBODPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_VERB_BOD_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage);
+  }
+
+  updateTableColumnsForCoreComponentForNounBODPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_CORE_COMPONENT_FOR_NOUN_BOD_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage);
   }
 
   updateFilterTypeForCoreComponentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
@@ -234,6 +283,11 @@ export class SettingsPreferencesService {
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage);
   }
 
+  updateTableColumnsForBusinessContextWithTenantPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_WITH_TENANT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage);
+  }
+
   updateTableColumnsForBusinessContextValuePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_BUSINESS_CONTEXT_VALUE_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage);
@@ -292,6 +346,16 @@ export class SettingsPreferencesService {
   updateTableColumnsForTenantPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_TENANT_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfTenantPage);
+  }
+
+  updateTableColumnsForTenantManagementForAccountPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_ACCOUNT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage);
+  }
+
+  updateTableColumnsForTenantManagementForBusinessContextPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_TENANT_MANAGEMENT_FOR_BUSINESS_CONTEXT_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage);
   }
 
   updateTableColumnsForOpenApiDocumentPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

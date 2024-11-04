@@ -6,11 +6,11 @@
     <div class="content" mat-dialog-content>
       <div class="table-container">
         <div class="score-column-container align-items-center">
-          <div class="close pr-2">
-            <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
 
           <div class="header d-flex align-items-center">
             <span>Select a base ACC to move "{{title}}"</span>

@@ -160,7 +160,14 @@
         </div>
 
         <div class="table-container">
-          <div class="mat-elevation-z1 table-wrapper">
+          <div class="score-column-container align-items-center">
+            <score-column-selector
+              [columns]="columns"
+              (columnsChange)="onColumnsChange($event)"
+              (onReset)="onColumnsReset()">
+            </score-column-selector>
+          </div>
+          <div class="mat-elevation-z1 table-wrapper mt-3">
             <table mat-table multiTemplateDataRows
                    matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
                    [dataSource]="dataSource">
@@ -179,6 +186,18 @@
                 </td>
               </ng-container>
 
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)"> Type</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-chip-list [ngSwitch]="element.type">
+                    <mat-chip *ngSwitchDefault>
+                      <span *ngIf="element.basedManifestId">BDT</span>
+                      <span *ngIf="!element.basedManifestId">CDT</span>
+                    </mat-chip>
+                  </mat-chip-list>
+              </ng-container>
+
               <ng-container matColumnDef="state">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
@@ -190,18 +209,6 @@
                         [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
                 'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
                 </td>
-              </ng-container>
-
-              <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)"> Type</th>
-                <td mat-cell *matCellDef="let element">
-                  <mat-chip-list [ngSwitch]="element.type">
-                    <mat-chip *ngSwitchDefault>
-                      <span *ngIf="element.basedManifestId">BDT</span>
-                      <span *ngIf="!element.basedManifestId">CDT</span>
-                    </mat-chip>
-                  </mat-chip-list>
               </ng-container>
 
               <ng-container matColumnDef="den">

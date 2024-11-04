@@ -24,7 +24,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
@@ -55,9 +55,33 @@ export class CodeListUpliftComponent implements OnInit {
     return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
   }
 
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage = columns;
+    this.updateTableColumnsForCodeListPage();
+  }
+
   updateTableColumnsForCodeListPage() {
     this.preferencesService.updateTableColumnsForCodeListPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfCodeListPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {

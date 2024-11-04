@@ -33,41 +33,12 @@ tr.element-row:not(.expanded-row):active {
   border-bottom-width: 0;
 }
 
-.mat-column-release {
-  width: 70px;
-}
-
-.mat-column-businessContexts {
-  width: 10%;
-}
-
 .mat-column-businessContexts .businessContext:not(:last-child)::after {
   content: ', ';
 }
 
-.mat-column-version, .mat-column-status {
-  width: 5%;
-}
-
-.mat-column-bizTerm {
-  width: 10%;
-}
-
-.mat-column-remark {
-  width: 12%;
-}
-
-.mat-column-state {
-  width: 100px;
-}
-
 .mat-column-owner {
-  width: 140px;
   font-size: 13px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .header {

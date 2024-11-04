@@ -17,7 +17,11 @@ import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {PreferencesInfo, TableColumnsProperty} from '../../../settings-management/settings-preferences/domain/preferences';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
@@ -39,51 +43,169 @@ export class CreateBodDialogComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  get columns(): TableColumnsProperty[] {
+  // Verb
+  get verbColumns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage;
   }
 
-  updateTableColumnsForCoreComponentPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  set verbColumns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage = columns;
+    this.updateTableColumnsForCoreComponentForVerbBODPage();
+  }
+
+  updateTableColumnsForCoreComponentForVerbBODPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentForVerbBODPage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
-  onResizeWidth($event) {
+  onVerbColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.verbColumns = defaultTableColumnInfo.columnsOfCoreComponentForVerbBODPage;
+  }
+
+  onVerbColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.verbWidth(column.name)
+    }));
+
+    this.verbColumns = updatedColumnsWithWidth;
+  }
+
+  onResizeVerbWidth($event) {
     switch ($event.name) {
       case 'Updated on':
-        this.setWidth('Updated On', $event.width);
+        this.setVerbWidth('Updated On', $event.width);
         break;
 
       default:
-        this.setWidth($event.name, $event.width);
+        this.setVerbWidth($event.name, $event.width);
         break;
     }
   }
 
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
+  setVerbWidth(name: string, width: number | string) {
+    const matched = this.verbColumns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentPage();
+      this.updateTableColumnsForCoreComponentForVerbBODPage();
     }
   }
 
-  width(name: string): number | string {
+  verbWidth(name: string): number | string {
     if (!this.preferencesInfo) {
       return 0;
     }
-    return this.columns.find(c => c.name === name)?.width;
+    return this.verbColumns.find(c => c.name === name)?.width;
   }
 
-  get displayedColumns(): string[] {
+  get displayedVerbColumns(): string[] {
     let displayedColumns = ['select'];
     if (!this.preferencesInfo) {
       return displayedColumns;
     }
-    for (const column of this.columns) {
+    for (const column of this.verbColumns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
+  // Noun
+  get nounColumns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage;
+  }
+
+  set nounColumns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage = columns;
+    this.updateTableColumnsForCoreComponentForNounBODPage();
+  }
+
+  updateTableColumnsForCoreComponentForNounBODPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentForNounBODPage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onNounColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.nounColumns = defaultTableColumnInfo.columnsOfCoreComponentForNounBODPage;
+  }
+
+  onNounColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.nounWidth(column.name)
+    }));
+
+    this.nounColumns = updatedColumnsWithWidth;
+  }
+
+  onResizeNounWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setNounWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setNounWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setNounWidth(name: string, width: number | string) {
+    const matched = this.nounColumns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForCoreComponentForNounBODPage();
+    }
+  }
+
+  nounWidth(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.nounColumns.find(c => c.name === name)?.width;
+  }
+
+  get displayedNounColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.nounColumns) {
       switch (column.name) {
         case 'State':
           if (column.selected) {

@@ -58,12 +58,36 @@ export class BieCreateAsccpComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
   }
 
-  updateTableColumnsForCoreComponentPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
+    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+  }
+
+  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -82,7 +106,7 @@ export class BieCreateAsccpComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForCoreComponentPage();
+      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
     }
   }
 

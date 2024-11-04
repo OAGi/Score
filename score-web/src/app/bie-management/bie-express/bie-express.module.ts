@@ -12,6 +12,7 @@ import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -31,6 +32,7 @@ const routes: Routes = [
         CommonModule,
         ScoreCommonModule,
         SearchBarModule,
+        ColumnSelectorModule,
     ],
   declarations: [
     BieExpressComponent,

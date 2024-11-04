@@ -42,11 +42,6 @@ tr.element-row:not(.expanded-row):active {
   border-bottom-width: 0;
 }
 
-.element-detail {
-  overflow: hidden;
-  display: flex;
-}
-
 .mat-mdc-card-content p {
   font-family: 'Roboto', 'sans-serif';
 }
@@ -78,13 +73,14 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .element-detail {
+  overflow: hidden;
+  display: flex;
   font-size: 12px;
 }
 
 .element-detail-wrapper {
   width: 100%;
   border: 0;
-  padding-right: 24px;
 }
 
 .element-detail-header {

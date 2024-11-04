@@ -46,9 +46,33 @@ export class BieExpressComponent implements OnInit {
     return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
   }
 
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = columns;
+    this.updateTableColumnsForBiePage();
+  }
+
   updateTableColumnsForBiePage() {
     this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfBiePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {

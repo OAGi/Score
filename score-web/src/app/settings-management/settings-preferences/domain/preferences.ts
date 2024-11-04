@@ -45,6 +45,37 @@ export class TableColumnsInfo {
     {name: 'Updated On', selected: true, width: 160}
   ];
 
+  columnsOfCoreComponentWithoutTypeAndDtColumnsPage: TableColumnsProperty[] = [
+    {name: 'State', selected: true, width: 100},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Revision', selected: true, width: 80},
+    {name: 'Owner', selected: true, width: 140},
+    {name: 'Module', selected: true, width: 400},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfCoreComponentWithoutDtColumnsPage: TableColumnsProperty[] = [
+    {name: 'Type', selected: true, width: 100},
+    {name: 'State', selected: true, width: 100},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Revision', selected: true, width: 80},
+    {name: 'Owner', selected: true, width: 140},
+    {name: 'Module', selected: true, width: 400},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfCoreComponentForVerbBODPage: TableColumnsProperty[] = [
+    {name: 'State', selected: true, width: 100},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfCoreComponentForNounBODPage: TableColumnsProperty[] = [
+    {name: 'State', selected: true, width: 100},
+    {name: 'DEN', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
   filterTypesOfCoreComponentPage: {
     name: string;
     selected: boolean;
@@ -125,7 +156,7 @@ export class TableColumnsInfo {
 
   columnsOfContextCategoryPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
-    {name: 'Description', selected: true, width: 600},
+    {name: 'Description', selected: true, width: '60%'},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
@@ -145,6 +176,12 @@ export class TableColumnsInfo {
 
   columnsOfBusinessContextPage: TableColumnsProperty[] = [
     {name: 'Name', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160}
+  ];
+
+  columnsOfBusinessContextWithTenantPage: TableColumnsProperty[] = [
+    {name: 'Name', selected: true, width: 0},
+    {name: 'Tenant', selected: true, width: 400},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
@@ -240,6 +277,21 @@ export class TableColumnsInfo {
     {name: 'Tenant Name', selected: true, width: 0},
     {name: 'Users', selected: true, width: 400},
     {name: 'Business Contexts', selected: true, width: 400}
+  ];
+
+  columnsOfTenantManagementForAccountPage: TableColumnsProperty[] = [
+    {name: 'Login ID', selected: true, width: 0},
+    {name: 'Role', selected: true, width: 200},
+    {name: 'Name', selected: true, width: 400},
+    {name: 'Organization', selected: true, width: 400},
+    {name: 'Status', selected: true, width: 100},
+    {name: 'Manage', selected: true, width: 120}
+  ];
+
+  columnsOfTenantManagementForBusinessContextPage: TableColumnsProperty[] = [
+    {name: 'Name', selected: true, width: 0},
+    {name: 'Updated On', selected: true, width: 160},
+    {name: 'Manage', selected: true, width: 120}
   ];
 
   columnsOfOpenApiDocumentPage: TableColumnsProperty[] = [

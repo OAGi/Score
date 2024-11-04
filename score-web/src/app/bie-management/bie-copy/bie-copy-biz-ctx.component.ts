@@ -33,12 +33,53 @@ export class BieCopyBizCtxComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+    return (this.isTenantEnabled) ?
+      this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage :
+      this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    if (this.isTenantEnabled) {
+      this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextWithTenantPage = columns;
+    } else {
+      this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage = columns;
+    }
+    this.updateTableColumnsForBusinessContextPage();
   }
 
   updateTableColumnsForBusinessContextPage() {
-    this.preferencesService.updateTableColumnsForBusinessContextPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
+    if (this.isTenantEnabled) {
+      this.preferencesService.updateTableColumnsForBusinessContextWithTenantPage(
+        this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+      });
+    } else {
+      this.preferencesService.updateTableColumnsForBusinessContextPage(
+        this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+      });
+    }
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    if (this.isTenantEnabled) {
+      this.columns = defaultTableColumnInfo.columnsOfBusinessContextWithTenantPage;
+    } else {
+      this.columns = defaultTableColumnInfo.columnsOfBusinessContextPage;
+    }
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -76,10 +117,11 @@ export class BieCopyBizCtxComponent implements OnInit {
           case 'Name':
             if (column.selected) {
               displayedColumns.push('name');
-
-              if (this.isTenantEnabled) {
-                displayedColumns.push('tenant');
-              }
+            }
+            break;
+          case 'Tenant':
+            if (column.selected) {
+              displayedColumns.push('tenant');
             }
             break;
           case 'Updated On':

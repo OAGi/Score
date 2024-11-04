@@ -6,17 +6,19 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {CommonModule} from '@angular/common';
 import {SearchBarModule} from '../search-bar/search-bar.module';
 import {ScoreCommonModule} from '../score-common.module';
+import {ColumnSelectorModule} from '../column-selector/column-selector.module';
 
 @NgModule({
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    MatDialogModule,
-    CommonModule,
-    SearchBarModule,
-    ScoreCommonModule
-  ],
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        MatDialogModule,
+        CommonModule,
+        SearchBarModule,
+        ScoreCommonModule,
+        ColumnSelectorModule
+    ],
   declarations: [
     TransferOwnershipDialogComponent
   ],

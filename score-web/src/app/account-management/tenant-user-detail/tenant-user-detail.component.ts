@@ -34,7 +34,7 @@ export class TenantUserDetailComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage;
   }
 
   set columns(columns: TableColumnsProperty[]) {
@@ -42,18 +42,19 @@ export class TenantUserDetailComponent implements OnInit {
       return;
     }
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = columns;
-    this.updateTableColumnsForAccountPage();
+    this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage = columns;
+    this.updateTableColumnsForTenantManagementForAccountPage();
   }
 
-  updateTableColumnsForAccountPage() {
-    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  updateTableColumnsForTenantManagementForAccountPage() {
+    this.preferencesService.updateTableColumnsForTenantManagementForAccountPage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 
   onColumnsReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfAccountPage;
+    this.columns = defaultTableColumnInfo.columnsOfTenantManagementForAccountPage;
   }
 
   onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
@@ -78,7 +79,7 @@ export class TenantUserDetailComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForAccountPage();
+      this.updateTableColumnsForTenantManagementForAccountPage();
     }
   }
 
@@ -121,9 +122,13 @@ export class TenantUserDetailComponent implements OnInit {
             displayedColumns.push('status');
           }
           break;
+        case 'Manage':
+          if (column.selected) {
+            displayedColumns.push('manage');
+          }
+          break;
       }
     }
-    displayedColumns.push('manage');
     return displayedColumns;
   }
 

@@ -17,6 +17,7 @@ import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.m
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -46,7 +47,8 @@ const routes: Routes = [
         DragDropModule,
         AngularSplitModule,
         FontAwesomeModule,
-        SearchBarModule
+        SearchBarModule,
+        ColumnSelectorModule
     ],
   declarations: [
     AccDetailComponent,

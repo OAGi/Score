@@ -39,12 +39,37 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     if (!this.preferencesInfo) {
       return [];
     }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextPage;
+    return this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage;
   }
 
-  updateTableColumnsForBusinessContextPage() {
-    this.preferencesService.updateTableColumnsForBusinessContextPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForBusinessContextPage = columns;
+    this.updateTableColumnsForTenantManagementForBusinessContextPage();
+  }
+
+  updateTableColumnsForTenantManagementForBusinessContextPage() {
+    this.preferencesService.updateTableColumnsForTenantManagementForBusinessContextPage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfTenantManagementForBusinessContextPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
   }
 
   onResizeWidth($event) {
@@ -63,7 +88,7 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
     const matched = this.columns.find(c => c.name === name);
     if (matched) {
       matched.width = width;
-      this.updateTableColumnsForBusinessContextPage();
+      this.updateTableColumnsForTenantManagementForBusinessContextPage();
     }
   }
 
@@ -91,9 +116,13 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
             displayedColumns.push('lastUpdateTimestamp');
           }
           break;
+        case 'Manage':
+          if (column.selected) {
+            displayedColumns.push('manage');
+          }
+          break;
       }
     }
-    displayedColumns.push('manage');
     return displayedColumns;
   }
 

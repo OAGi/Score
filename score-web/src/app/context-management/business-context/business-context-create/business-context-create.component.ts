@@ -54,7 +54,8 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   updateTableColumnsForBusinessContextValuePage() {
-    this.preferencesService.updateTableColumnsForBusinessContextValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    this.preferencesService.updateTableColumnsForBusinessContextValuePage(
+      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
 

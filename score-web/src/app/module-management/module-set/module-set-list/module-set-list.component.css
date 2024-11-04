@@ -29,6 +29,7 @@ tr.element-row:not(.expanded-row):active {
 .element-detail {
   overflow: hidden;
   display: flex;
+  font-size: 12px;
 }
 
 .mat-mdc-card-content p {
