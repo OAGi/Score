@@ -1,7 +1,6 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ContextScheme, ContextSchemeListRequest} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
-import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';

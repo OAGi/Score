@@ -12,7 +12,7 @@ import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../domain/account-list.service';
 import {AccountList, AccountListRequest} from '../domain/accounts';
 import {PendingAccount} from '../domain/pending-list';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';

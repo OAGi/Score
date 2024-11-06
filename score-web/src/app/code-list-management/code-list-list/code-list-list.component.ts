@@ -8,9 +8,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
 import {AccountList} from '../../account-management/domain/accounts';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';

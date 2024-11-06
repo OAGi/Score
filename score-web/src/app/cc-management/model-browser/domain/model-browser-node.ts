@@ -3,7 +3,7 @@ import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../../common/flat-tree';
 import {BehaviorSubject, empty, forkJoin, Observable} from 'rxjs';
 import {ModelBrowserService} from './model-browser.service';
-import {CcAccNodeDetail, CcAsccpNodeDetail, CcGraph, CcGraphNode} from '../../domain/core-component-node';
+import {CcGraph, CcGraphNode} from '../../domain/core-component-node';
 import {hashCode4String, sha256} from '../../../common/utility';
 
 export interface ModelBrowserNode extends FlatNode {

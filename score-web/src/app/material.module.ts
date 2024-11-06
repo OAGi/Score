@@ -43,8 +43,8 @@ import {MatTreeModule} from '@angular/material/tree';
 import {NgModule} from '@angular/core';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatBadgeModule} from '@angular/material/badge';
-import {MatMultiSortModule} from "ngx-mat-multi-sort";
-import {MatIconButtonSizesModule} from "mat-icon-button-sizes";
+import {MatMultiSortModule} from 'ngx-mat-multi-sort';
+import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
 
 @NgModule({
   exports: [

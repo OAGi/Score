@@ -16,7 +16,6 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-log-list',

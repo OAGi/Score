@@ -9,9 +9,7 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {
-  BusinessContextValueDialogComponent
-} from '../business-context-value-dialog/business-context-value-dialog.component';
+import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
 import {switchMap} from 'rxjs/operators';

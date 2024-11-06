@@ -26,7 +26,7 @@ import {
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {MatMenuTrigger} from '@angular/material/menu';
 import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
-import {BieEditBbieScNodeDetail, ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 
 
 @Component({

@@ -5,7 +5,8 @@ import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
   CcBccpNodeDetail,
-  CcBdtScNodeDetail, CcDtNodeDetail,
+  CcBdtScNodeDetail,
+  CcDtNodeDetail,
   CcGraph
 } from '../../../cc-management/domain/core-component-node';
 import {base64Encode} from '../../../common/utility';

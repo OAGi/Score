@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreferencesInfo, TableColumnsProperty} from './preferences';
+import {PreferencesInfo} from './preferences';
 import {UserToken} from '../../../authentication/domain/auth';
 import {loadBooleanProperty, loadProperty, saveBooleanProperty, saveProperty} from '../../../common/utility';
 

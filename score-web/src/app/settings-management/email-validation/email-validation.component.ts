@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {switchMap} from 'rxjs/operators';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingsApplicationSettingsService} from '../settings-application-settings/domain/settings-application-settings.service';
 

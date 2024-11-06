@@ -14,9 +14,7 @@ import {hashCode} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveAs} from 'file-saver';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {
-  ReleaseWhatsChangedDialogComponent
-} from './release-whats-changed-dialog/release-whats-changed-dialog.component';
+import {ReleaseWhatsChangedDialogComponent} from './release-whats-changed-dialog/release-whats-changed-dialog.component';
 
 @Component({
   selector: 'score-release-list',

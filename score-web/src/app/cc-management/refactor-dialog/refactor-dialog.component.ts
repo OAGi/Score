@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
@@ -11,7 +11,6 @@ import {RefactorDialogService} from './domain/refactor-dialog.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../authentication/auth.service';
 import {forkJoin} from 'rxjs';

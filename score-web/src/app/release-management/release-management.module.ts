@@ -12,9 +12,7 @@ import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {
-  ReleaseWhatsChangedDialogComponent
-} from './release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component';
+import {ReleaseWhatsChangedDialogComponent} from './release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 

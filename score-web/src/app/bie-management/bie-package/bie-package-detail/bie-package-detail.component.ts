@@ -25,7 +25,6 @@ import {
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {forkJoin} from 'rxjs';
-import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-bie-package-detail',
