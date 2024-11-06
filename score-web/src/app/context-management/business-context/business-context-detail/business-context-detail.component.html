@@ -52,13 +52,17 @@
               <ng-container matColumnDef="contextCategoryName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Context Category')" (onResize)="onResizeWidth($event)"> Context Category</th>
-                <td mat-cell *matCellDef="let element"> {{ element.contextCategoryName }}</td>
+                <td mat-cell *matCellDef="let element">
+                  <span class="word-break-all">{{ element.contextCategoryName }}</span>
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="contextSchemeName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Context Scheme')" (onResize)="onResizeWidth($event)"> Context Scheme</th>
-                <td mat-cell *matCellDef="let element"> {{ element.contextSchemeName }}</td>
+                <td mat-cell *matCellDef="let element">
+                  <span class="word-break-all">{{ element.contextSchemeName }}</span>
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="contextSchemeValue">
@@ -66,7 +70,7 @@
                     score-table-column-resize [defaultWidth]="width('Context Scheme Value')" (onResize)="onResizeWidth($event)"> Context Scheme Value</th>
                 <td mat-cell *matCellDef="let element">
                   <span>{{ element.contextSchemeValue }}</span>
-                  <div class="description ellipsis">
+                  <div class="description word-break-all">
                     {{ element.contextSchemeValueMeaning }}
                   </div>
                 </td>

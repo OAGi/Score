@@ -75,7 +75,23 @@ public class AsccpWriteRepository {
 
         AsccpRecord asccp = new AsccpRecord();
         asccp.setGuid(ScoreGuid.randomGuid());
-        asccp.setPropertyTerm(request.getInitialPropertyTerm());
+        String propertyTerm = request.getInitialPropertyTerm();
+        String roleOfAcc = objectClassTerm(roleOfAccManifest.getAccManifestId());
+        String den = propertyTerm + ". " + roleOfAcc;
+        // Check the length of den and shorten propertyTerm if necessary
+        if (den.length() > 200) {
+            // Calculate max length for propertyTerm to fit within 200 characters
+            int maxPropertyTermLength = 200 - roleOfAcc.length() - 2; // 2 accounts for the ". " separator
+
+            // Truncate propertyTerm if it exceeds the calculated max length
+            if (propertyTerm.length() > maxPropertyTermLength) {
+                propertyTerm = propertyTerm.substring(0, maxPropertyTermLength);
+            }
+
+            // Rebuild den with truncated propertyTerm
+            den = propertyTerm + ". " + roleOfAcc;
+        }
+        asccp.setPropertyTerm(propertyTerm);
         asccp.setRoleOfAccId(roleOfAccManifest.getAccId());
         asccp.setState(request.getInitialState().name());
         asccp.setDefinition(request.getDefinition());
@@ -103,7 +119,7 @@ public class AsccpWriteRepository {
         asccpManifest.setAsccpId(asccp.getAsccpId());
         asccpManifest.setRoleOfAccManifestId(roleOfAccManifest.getAccManifestId());
         asccpManifest.setReleaseId(ULong.valueOf(request.getReleaseId()));
-        asccpManifest.setDen(asccp.getPropertyTerm() + ". " + objectClassTerm(roleOfAccManifest.getAccManifestId()));
+        asccpManifest.setDen(den);
         asccpManifest = dslContext.insertInto(ASCCP_MANIFEST)
                 .set(asccpManifest)
                 .returning(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).fetchOne();
