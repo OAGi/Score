@@ -52,7 +52,7 @@
                     <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
                     <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
                     <div class="float-left element-title">
-                      <span>{{element.name}}</span>
+                      <span>{{ element.name }}</span>
                     </div>
                     <mat-icon *ngIf="roles.includes('developer')"
                               (click)="openEditDialog(element, tile)" [inline]="true" class="element-edit-icon">edit

@@ -22,7 +22,7 @@
                     <mat-icon *ngIf="element.directory" class="float-left" inline=true>folder_open</mat-icon>
                     <mat-icon *ngIf="!element.directory" class="float-left" inline=true>insert_drive_file</mat-icon>
                     <div class="float-left element-title">
-                      <span>{{element.name}}</span>
+                      <span>{{ element.name }}</span>
                     </div>
                   </div>
                 </div>
@@ -76,7 +76,7 @@
           <div style="width: 6%;"></div>
           <div style="width: 47%;">
             <div class="assign-cc-table-header">
-              <h4>Assigned <span *ngIf="selectedModuleElement">"{{selectedModuleElement.name}}"</span></h4>
+              <h4>Assigned <span *ngIf="selectedModuleElement">"{{ selectedModuleElement.name }}"</span></h4>
               <div class="assign-cc-table-filter">
                 <div class="assign-cc-table-filter-type">
                   <mat-form-field>

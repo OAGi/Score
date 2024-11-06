@@ -167,7 +167,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"
                   score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)">Document Version</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.version }}</div>
+                <div class="word-break-all">{{ element.version }}</div>
               </td>
             </ng-container>
 
@@ -175,7 +175,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="licenseName"
                   score-table-column-resize [defaultWidth]="width('License Name')" (onResize)="onResizeWidth($event)"> License Name</th>
               <td mat-cell *matCellDef="let element">
-                <div class="ellipsis">{{ element.licenseName }}</div>
+                <div class="word-break-all">{{ element.licenseName }}</div>
               </td>
             </ng-container>
 
