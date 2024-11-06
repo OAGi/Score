@@ -266,7 +266,8 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
               break;
 
             case 401:
-              if (req.url.indexOf(environment.statePath) !== -1) {
+              if (req.url.indexOf(environment.loginPath) !== -1 ||
+                  req.url.indexOf(environment.statePath) !== -1) {
                 // ignore
               } else if (req.url.indexOf(environment.logoutPath) === -1) {
                 this.snackBar.open('Authentication Failure', '', {

@@ -142,7 +142,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             click(getDriver(), getBranchSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
             click(getDriver(), optionField);
             escape(getDriver());
         });

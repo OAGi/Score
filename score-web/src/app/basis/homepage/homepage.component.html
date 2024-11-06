@@ -415,9 +415,8 @@
                                        [placeholderLabel]="'Search...'"
                                        [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
               </mat-option>
-              <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
-                {{ release.releaseNum }}
-              </mat-option>
+              <mat-option *ngFor="let release of releaseFilteredList | async"
+                          [value]="release">{{ release.releaseNum }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
