@@ -82,7 +82,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.loginId }}
+                <span class="word-break-all">{{ element.loginId }}</span>
               </td>
             </ng-container>
 
@@ -99,7 +99,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.name }}
+                <span class="word-break-all">{{ element.name }}</span>
               </td>
             </ng-container>
 
@@ -107,7 +107,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.organization }}
+                <span class="word-break-all">{{ element.organization }}</span>
               </td>
             </ng-container>
 

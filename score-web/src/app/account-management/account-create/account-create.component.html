@@ -40,18 +40,18 @@
         </div>
         <mat-form-field>
           <mat-label>Login ID</mat-label>
-          <input matInput required data-id="user.loginId" [(ngModel)]="account.loginId" maxlength="255"
+          <input matInput required data-id="user.loginId" [(ngModel)]="account.loginId" maxlength="45"
                  (change)="changeLogin(account.loginId)">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput data-id="user.name" [(ngModel)]="account.name" maxlength="255"/>
+          <input matInput data-id="user.name" [(ngModel)]="account.name" maxlength="100"/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Organization</mat-label>
-          <input matInput data-id="user.organization" [(ngModel)]="account.organization" maxlength="255"/>
+          <input matInput data-id="user.organization" [(ngModel)]="account.organization" maxlength="100"/>
         </mat-form-field>
 
         <div class="col-6">

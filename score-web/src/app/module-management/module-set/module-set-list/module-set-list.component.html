@@ -107,7 +107,9 @@
                   score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="den word-break-all">
-                  <a routerLink="{{ element.moduleSetId }}">{{ element.name }}</a>
+                  <a routerLink="{{ element.moduleSetId }}">
+                    <span class="word-break-all">{{ element.name }}</span>
+                  </a>
                 </div>
                 <div class="description">{{ element.guid }}</div>
               </td>
@@ -127,7 +129,7 @@
                   score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
               <td *matCellDef="let element" mat-cell>
                 <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-                <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy.username }}</b></div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdatedBy.username }}</b></div>
               </td>
             </ng-container>
 

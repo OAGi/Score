@@ -217,7 +217,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
                 <td mat-cell *matCellDef="let element">
-                  <span [matTooltip]="element.owner">{{ element.owner }}</span>
+                  <span class="word-break-all" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
                 </td>
               </ng-container>
 
@@ -226,10 +226,11 @@
                     score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)"> Business Contexts</th>
                 <td mat-cell *matCellDef="let element">
                   <ng-container *ngFor="let businessContext of element.businessContexts">
-                <span class="businessContext">
+                <span class="businessContext word-break-all">
                   <a target="_blank" rel="noopener noreferrer"
                      routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                    {{ businessContext.name }}</a>
+                    <span class="word-break-all">{{ businessContext.name }}</span>
+                  </a>
                 </span>
                   </ng-container>
                 </td>
@@ -239,7 +240,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Version')" (onResize)="onResizeWidth($event)"> Version</th>
                 <td mat-cell *matCellDef="let element">
-                  <div [matTooltip]="element.version">{{ element.version }}</div>
+                  <div class="word-break-all" [matTooltip]="element.version" [innerHTML]="element.version"></div>
                 </td>
               </ng-container>
 
@@ -247,7 +248,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
                 <td mat-cell *matCellDef="let element">
-                  <div [matTooltip]="element.status">{{ element.status }}</div>
+                  <div class="word-break-all" [matTooltip]="element.status" [innerHTML]="element.status"></div>
                 </td>
               </ng-container>
 
@@ -255,7 +256,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
                 <td mat-cell *matCellDef="let element">
-                  <div [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
+                  <div class="word-break-all" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
                 </td>
               </ng-container>
 
@@ -263,7 +264,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
                 <td mat-cell *matCellDef="let element">
-                  <div>{{ element.remark }}</div>
+                  <div class="word-break-all" [innerHTML]="element.remark"></div>
                 </td>
               </ng-container>
 

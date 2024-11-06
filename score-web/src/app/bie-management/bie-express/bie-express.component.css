@@ -77,3 +77,8 @@ tr.element-row:not(.expanded-row):active {
 .mat-column-owner {
   font-size: 13px;
 }
+
+/* @TODO: <mat-select>'s width should be synchronized with the <th>'s width. */
+.mat-column-businessContexts mat-select {
+  width: 140px;
+}

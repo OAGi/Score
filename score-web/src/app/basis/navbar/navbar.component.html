@@ -117,7 +117,7 @@
     <button mat-button [matMenuTriggerFor]="settingMenu">{{ username }} ({{ isDeveloper ? 'developer' : 'end-user' }})</button>
     <mat-menu #settingMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
-        <button mat-menu-item class="disabled" disabled="disabled">Signed in as {{ username }}</button>
+        <button mat-menu-item class="disabled" disabled="disabled"><span class="word-break-all">Signed in as {{ username }}</span></button>
         <mat-divider></mat-divider>
         <button mat-menu-item (click)="languageCurrentOagis(translate)">
           <mat-icon *ngIf="!getActiveCcts(translate)">done</mat-icon>

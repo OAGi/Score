@@ -39,7 +39,7 @@
                   score-table-column-resize [defaultWidth]="width('Tenant Name')" (onResize)="onResizeWidth($event)">Tenant Name</th>
               <td mat-cell *matCellDef="let element">
                 <a routerLink="{{ element.tenantId }}">
-                  {{ element.name }}
+                  <span class="word-break-all">{{ element.name }}</span>
                 </a>
               </td>
             </ng-container>

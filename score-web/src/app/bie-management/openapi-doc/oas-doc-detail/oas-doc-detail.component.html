@@ -190,7 +190,7 @@
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"
                   score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
               <td mat-cell *matCellDef="let element">
-                <div>{{ element.remark }}</div>
+                <div class="word-break-all" [innerHTML]="element.remark"></div>
               </td>
             </ng-container>
 

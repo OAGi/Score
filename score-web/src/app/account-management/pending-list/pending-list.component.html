@@ -94,7 +94,9 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Preferred Username')" (onResize)="onResizeWidth($event)"> Preferred Username</th>
               <td mat-cell *matCellDef="let element">
-                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">{{ element.preferredUsername }}</a>
+                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
+                  <span class="word-break-all">{{ element.preferredUsername }}</span>
+                </a>
               </td>
             </ng-container>
 
@@ -102,7 +104,9 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Email')" (onResize)="onResizeWidth($event)"> Email</th>
               <td mat-cell *matCellDef="let element">
-                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">{{ element.email }}</a>
+                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
+                  <span class="word-break-all">{{ element.email }}</span>
+                </a>
               </td>
             </ng-container>
 
@@ -110,7 +114,7 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header
                   score-table-column-resize [defaultWidth]="width('Provider')" (onResize)="onResizeWidth($event)"> Provider</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.providerName }}
+                <span class="word-break-all">{{ element.providerName }}</span>
               </td>
             </ng-container>
 
