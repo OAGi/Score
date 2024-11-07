@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -19,6 +19,10 @@ import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-code-list-for-deriving',
@@ -33,10 +37,107 @@ export class CodeListForDerivingComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'codeListName', 'basedCodeListName', 'agencyId',
-    'versionId', 'lastUpdateTimestamp'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
+  }
+
+  updateTableColumnsForCodeListPage() {
+    this.preferencesService.updateTableColumnsForCodeListPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForCodeListPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('codeListName');
+          }
+          break;
+        case 'Based Code List':
+          if (column.selected) {
+            displayedColumns.push('basedCodeListName');
+          }
+          break;
+        case 'Agency ID':
+          if (column.selected) {
+            displayedColumns.push('agencyId');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('versionId');
+          }
+          break;
+        case 'Extensible':
+          if (column.selected) {
+            displayedColumns.push('extensible');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CodeListForList>();
   selection = new SelectionModel<number>(false, []);
   loading = false;
@@ -50,15 +151,21 @@ export class CodeListForDerivingComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
+              private preferencesService: SettingsPreferencesService,
               private auth: AuthService,
               private router: Router,
               private route: ActivatedRoute,
@@ -70,23 +177,37 @@ export class CodeListForDerivingComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.states.push('Published');
 
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCodeList();
+      this.onSearch();
     });
 
     this.releases = [];
 
     forkJoin([
       this.releaseService.getSimpleReleases(['Published', ]),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
@@ -144,6 +265,11 @@ export class CodeListForDerivingComponent implements OnInit {
     }
   }
 
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCodeList();
+  }
+
   loadCodeList(isInit?: boolean) {
     this.loading = true;
 
@@ -161,6 +287,8 @@ export class CodeListForDerivingComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
     }, error => {
       this.dataSource.data = [];
     });

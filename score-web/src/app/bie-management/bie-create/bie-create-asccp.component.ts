@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from './domain/bie-create-list';
 import {BieCreateService} from './domain/bie-create.service';
@@ -27,6 +27,10 @@ import {AuthService} from '../../authentication/auth.service';
 import {Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -50,9 +54,116 @@ export class BieCreateAsccpComponent implements OnInit {
   releaseId: number;
   releases: Release[] = [];
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
+    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+  }
+
+  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   stateList = ['Published', 'Production'];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
@@ -67,7 +178,10 @@ export class BieCreateAsccpComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
   tags: Tag[] = [];
+  preferencesInfo: PreferencesInfo;
 
   workingRelease = WorkingRelease;
 
@@ -75,6 +189,8 @@ export class BieCreateAsccpComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
@@ -85,6 +201,7 @@ export class BieCreateAsccpComponent implements OnInit {
               private service: BieCreateService,
               private tagService: TagService,
               private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -100,15 +217,26 @@ export class BieCreateAsccpComponent implements OnInit {
     this.request.states = this.stateList;
     this.request.isBIEUsable = true;
 
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadData();
+      this.onSearch();
     });
 
     // Init releases
@@ -118,13 +246,15 @@ export class BieCreateAsccpComponent implements OnInit {
     forkJoin([
       this.accountService.getAccountNames(),
       this.releaseService.getSimpleReleases(),
-      this.tagService.getTags()
-    ]).subscribe(([loginIds, releases, tags]) => {
+      this.tagService.getTags(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, releases, tags, preferencesInfo]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
@@ -166,6 +296,14 @@ export class BieCreateAsccpComponent implements OnInit {
     });
   }
 
+  get businessContextNames(): string {
+    if (!this.businessContextList) {
+      return '';
+    } else {
+      return this.businessContextList.map(e => e.name).join(', ');
+    }
+  }
+
   onPageChange(event: PageEvent) {
     this.loadData();
   }
@@ -198,10 +336,17 @@ export class BieCreateAsccpComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadData();
   }
 
   loadData(isInit?: boolean) {
@@ -219,26 +364,17 @@ export class BieCreateAsccpComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      const list = resp.list.map((elm: CcList) => {
+      this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b>$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b>$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
 
-      this.dataSource.data = list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
           businessContextIdList: this.businessContextIdList.map(e => '' + e).join(',')
-        }));
+        }) + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.dataSource.data = [];

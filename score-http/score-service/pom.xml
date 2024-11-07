@@ -5,14 +5,14 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-service</artifactId>
-    <version>3.3.2</version>
+    <version>3.3.3</version>
     <name>score-service</name>
     <description>Score Service</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -21,23 +21,23 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>17</maven.compiler.release>
 
-        <mariadb-client.version>3.4.1</mariadb-client.version>
-        <jOOQ.version>3.19.10</jOOQ.version>
+        <mariadb-client.version>3.5.0</mariadb-client.version>
+        <jOOQ.version>3.19.14</jOOQ.version>
         <gson.version>2.11.0</gson.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
+        <snakeyaml.version>2.3</snakeyaml.version>
 
         <slf4j.version>1.7.36</slf4j.version>
         <junit.version>4.13.2</junit.version>
         <junit.platform.version>1.10.2</junit.platform.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
-        <commons-lang.version>3.14.0</commons-lang.version>
+        <commons-lang.version>3.17.0</commons-lang.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-repo</artifactId>
-            <version>3.3.2</version>
+            <version>3.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

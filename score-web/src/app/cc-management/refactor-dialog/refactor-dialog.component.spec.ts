@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {RefactorDialogComponent} from './refactor-dialog.component';
 
@@ -6,7 +6,7 @@ describe('BasedAccDialogComponent', () => {
   let component: RefactorDialogComponent;
   let fixture: ComponentFixture<RefactorDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [RefactorDialogComponent]
     })

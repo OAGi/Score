@@ -66,7 +66,7 @@ public class TC_7_4_OAGiTerminologyCopyBIEForSelectBusinessContextsPage extends 
         CopyBIEForSelectBIEPage copyBIEForSelectBIEPage =
                 copyBIEForSelectBusinessContextsPage.next(Arrays.asList(randomBusinessContext));
         String title = getText(copyBIEForSelectBIEPage.getTitle());
-        assertEquals("Copy BIE (Profiled Component, Noun, BOD)", title);
+        assertEquals("Copy BIE (Profiled Component, Noun, BOD) with " + randomBusinessContext.getName(), title);
     }
 
     @AfterEach

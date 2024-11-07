@@ -98,6 +98,19 @@ public class NamespaceReadRepository {
                     field = NAMESPACE.PREFIX;
                     break;
 
+                case "owner":
+                    field = APP_USER.as("owner").LOGIN_ID;
+                    break;
+
+                case "std":
+                case "standard":
+                    field = NAMESPACE.IS_STD_NMSP;
+                    break;
+
+                case "description":
+                    field = NAMESPACE.DESCRIPTION;
+                    break;
+
                 case "lastUpdateTimestamp":
                     field = NAMESPACE.LAST_UPDATE_TIMESTAMP;
                     break;

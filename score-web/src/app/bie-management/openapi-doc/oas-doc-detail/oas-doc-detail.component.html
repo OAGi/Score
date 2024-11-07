@@ -119,147 +119,162 @@
       </mat-toolbar>
     </mat-card-header>
     <mat-card-content class="mat-card-container">
-      <div class="container-fluid p-2">
-        <div class="row">
-          <div class="col-12">
-            <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
-              <!--
-              <button mat-stroked-button>
-                <div class="d-inline-flex align-items-center">
-                  <span class="p-1 f12">Edit columns</span>
-                  <mat-icon class="pl-1">menu</mat-icon>
-                </div>
-              </button>
-              -->
-              <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
-              <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
-                <div class="d-inline-flex align-items-center">
-                  <span class="p-1 f12">{{ columnName }}</span>
-                  <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
-                </div>
-              </ng-template>
-            </mat-multi-sort-table-settings>
+      <div class="table-container">
+        <div class="d-flex">
+          <mat-multi-sort-table-settings [tableData]="table" [closeDialogOnChoice]="false">
+            <!--
+            <button mat-stroked-button>
+              <div class="d-inline-flex align-items-center">
+                <span class="p-1 f12">Edit columns</span>
+                <mat-icon class="pl-1">menu</mat-icon>
+              </div>
+            </button>
+            -->
+            <!-- Optional custom content for the sort indicator chip (here column name with icons)  -->
+            <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+              <div class="d-inline-flex align-items-center">
+                <span class="p-1 f12">{{ columnName }}</span>
+                <mat-icon *ngIf="direction">{{direction === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+              </div>
+            </ng-template>
+          </mat-multi-sort-table-settings>
+          <div class="score-column-container flex-grow-1">
+            <score-column-selector
+              [columns]="columns"
+              (columnsChange)="onColumnsChange($event)"
+              (onReset)="onColumnsReset()">
+            </score-column-selector>
           </div>
         </div>
-      </div>
-      <div class="mat-elevation-z1">
-        <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? toggle(row) : null"
-                            [checked]="isSelected(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table matMultiSort (matSortChange)="table.onSortEvent()" [dataSource]="table.dataSource">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                              (change)="$event ? toggle(row) : null"
+                              [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="branch">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"> Branch</th>
-            <td mat-cell *matCellDef="let element">
-              <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="branch">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="branch"
+                  score-table-column-resize [defaultWidth]="width('Branch')" (onResize)="onResizeWidth($event)"> Branch</th>
+              <td mat-cell *matCellDef="let element">
+                <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"> DEN</th>
-            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
-              <div class="den word-break-all">
-                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                   matTooltip="{{ element.den }}">
-                  <div>
-                    <span>{{ element.den }}</span>
-                  </div>
-                  <div>
-                    <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>
-                  </div>
-                </a>
-              </div>
-              <div class="bie-guid">{{ element.guid }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="den">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="den"
+                  score-table-column-resize [defaultWidth]="width('DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
+              <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+                <div class="den word-break-all">
+                  <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                     matTooltip="{{ element.den }}">
+                    <div>
+                      <span>{{ element.den }}</span>
+                    </div>
+                    <div>
+                      <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>
+                    </div>
+                  </a>
+                </div>
+                <div class="bie-guid">{{ element.guid }}</div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="remark">
-            <th mat-header-cell *matHeaderCellDef> Remark</th>
-            <td mat-cell *matCellDef="let element">
-              <div>{{ element.remark }}</div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="remark">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"
+                  score-table-column-resize [defaultWidth]="width('Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="word-break-all" [innerHTML]="element.remark"></div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="verb">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="verb"> Verb</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="element.verb"
-                          (ngModelChange)="onChange('verb', element)">
-                <mat-option value="GET">GET</mat-option>
-                <mat-option value="PUT">PUT</mat-option>
-                <mat-option value="POST">POST</mat-option>
-                <mat-option value="DELETE">DELETE</mat-option>
-                <mat-option value="PATCH">PATCH</mat-option>
-              </mat-select>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="verb">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="verb"
+                  score-table-column-resize [defaultWidth]="width('Verb')" (onResize)="onResizeWidth($event)"> Verb</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-select [(ngModel)]="element.verb"
+                            (ngModelChange)="onChange('verb', element)">
+                  <mat-option value="GET">GET</mat-option>
+                  <mat-option value="PUT">PUT</mat-option>
+                  <mat-option value="POST">POST</mat-option>
+                  <mat-option value="DELETE">DELETE</mat-option>
+                  <mat-option value="PATCH">PATCH</mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="arrayIndicator">
-            <th mat-header-cell *matHeaderCellDef> Array Indicator</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="arrayIndicator">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="arrayIndicator"
+                  score-table-column-resize [defaultWidth]="width('Array Indicator')" (onResize)="onResizeWidth($event)"> Array Indicator</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-checkbox [(ngModel)]="element.arrayIndicator"></mat-checkbox>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="suppressRootIndicator">
-            <th mat-header-cell *matHeaderCellDef> Suppress Root</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="suppressRootIndicator">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="suppressRootIndicator"
+                  score-table-column-resize [defaultWidth]="width('Suppress Root Indicator')" (onResize)="onResizeWidth($event)"> Suppress Root</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-checkbox [(ngModel)]="element.suppressRootIndicator"></mat-checkbox>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="messageBody">
-            <th mat-header-cell *matHeaderCellDef> Message Body</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-select [(ngModel)]="element.messageBody">
-                <mat-option value="Request" [disabled]="element.verb === 'GET' || element.verb === 'DELETE'">Request</mat-option>
-                <mat-option value="Response">Response</mat-option>
-              </mat-select>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="messageBody">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="messageBody"
+                  score-table-column-resize [defaultWidth]="width('Message Body')" (onResize)="onResizeWidth($event)"> Message Body</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-select [(ngModel)]="element.messageBody">
+                  <mat-option value="Request" [disabled]="element.verb === 'GET' || element.verb === 'DELETE'">Request</mat-option>
+                  <mat-option value="Response">Response</mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="resourceName">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="resourceName"> Resource Name</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-form-field>
-                <input matInput [(ngModel)]="element.resourceName">
-              </mat-form-field>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="resourceName">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="resourceName"
+                  score-table-column-resize [defaultWidth]="width('Resource Name')" (onResize)="onResizeWidth($event)"> Resource Name</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="element.resourceName">
+                </mat-form-field>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="operationId">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="operationId"> Operation ID</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-form-field>
-                <input matInput [(ngModel)]="element.operationId">
-              </mat-form-field>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="operationId">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="operationId"
+                  score-table-column-resize [defaultWidth]="width('Operation ID')" (onResize)="onResizeWidth($event)"> Operation ID</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="element.operationId">
+                </mat-form-field>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="tagName">
-            <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="tagName"> Tag Name</th>
-            <td mat-cell *matCellDef="let element">
-              <mat-form-field>
-                <input matInput [(ngModel)]="element.tagName">
-              </mat-form-field>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="tagName">
+              <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="tagName"
+                  score-table-column-resize [defaultWidth]="width('Tag Name')" (onResize)="onResizeWidth($event)"> Tag Name</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="element.tagName">
+                </mat-form-field>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: table.displayedColumns; let entry" [ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="table.displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: table.displayedColumns; let entry" [ngClass]="{'highlight': entry.status == 'Duplication'}"></tr>
+          </table>
 
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

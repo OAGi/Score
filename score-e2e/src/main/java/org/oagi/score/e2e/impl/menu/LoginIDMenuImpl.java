@@ -17,7 +17,7 @@ public class LoginIDMenuImpl extends DelegateBasePageImpl implements LoginIDMenu
 
     private final HomePageImpl homePage;
 
-    private final By SIGN_IN_LABEL_LOCATOR = By.xpath("//button/span[contains(text(), \"Signed in as\")]");
+    private final By SIGN_IN_LABEL_LOCATOR = By.xpath("//button//span[contains(text(), \"Signed in as\")]");
 
     private final By OAGIS_TERMINOLOGY_BUTTON_LOCATOR = By.xpath("//span[contains(text(), \"OAGIS Terminology\")]//ancestor::button[1]");
 

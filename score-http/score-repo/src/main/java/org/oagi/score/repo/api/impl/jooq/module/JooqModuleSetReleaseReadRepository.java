@@ -206,8 +206,13 @@ public class JooqModuleSetReleaseReadRepository
                 field = MODULE_SET.NAME;
                 break;
 
-            case "releaseNum":
+            case "release":
+            case "releasenum":
                 field = RELEASE.RELEASE_NUM;
+                break;
+
+            case "default":
+                field = MODULE_SET_RELEASE.IS_DEFAULT;
                 break;
 
             case "lastupdatetimestamp":

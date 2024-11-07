@@ -15,13 +15,7 @@ import {BieListService} from '../bie-list/domain/bie-list.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {BieUpliftService} from './domain/bie-uplift.service';
-import {
-  BieUpliftMap,
-  BieUpliftSourceFlatNode,
-  BieUpliftTargetFlatNode,
-  MatchInfo,
-  UpliftNode
-} from './domain/bie-uplift';
+import {BieUpliftMap, BieUpliftSourceFlatNode, BieUpliftTargetFlatNode, MatchInfo, UpliftNode} from './domain/bie-uplift';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {
   AsbiepFlatNode,

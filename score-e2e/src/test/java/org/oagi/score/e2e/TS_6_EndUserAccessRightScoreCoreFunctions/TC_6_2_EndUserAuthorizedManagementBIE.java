@@ -1156,6 +1156,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
@@ -1291,6 +1294,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEReleaseOne);
         assertEquals("WIP", useraBIEReleaseOne.getState());
@@ -1519,6 +1525,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (TopLevelASBIEPObject topLevelAsbiep : biesForTesting) {
             BIEMenu bieMenu = homePage.getBIEMenu();
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1668,6 +1677,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
@@ -2192,8 +2204,9 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
-        ;
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
             EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIEWIP);
@@ -2446,6 +2459,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -2710,6 +2725,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         for (TopLevelASBIEPObject useraBIEWIP : biesForTesting) {
             ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -3357,6 +3374,8 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
 
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         CreateBIEForSelectTopLevelConceptPage createBIEForSelectTopLevelConceptPage =
@@ -3417,8 +3436,10 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
          * The end user ASCCP is amended
          */
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
-        ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), this.release);
         asccpViewEditPage.hitAmendButton();
         homePage.logout();
@@ -3569,6 +3590,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), this.release);
         asccpViewEditPage.hitAmendButton();
         asccpViewEditPage.moveToQA();
@@ -3720,6 +3742,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         loginPage().signIn(usera.getLoginId(), usera.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), this.release);
         asccpViewEditPage.hitAmendButton();
         waitFor(Duration.ofMillis(5000));

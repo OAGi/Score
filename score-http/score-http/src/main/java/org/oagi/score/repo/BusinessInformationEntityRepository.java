@@ -497,7 +497,7 @@ public class BusinessInformationEntityRepository {
                     ASCCP.PROPERTY_TERM,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
-                    APP_USER.LOGIN_ID.as("owner"),
+                    APP_USER.as("owner").LOGIN_ID.as("owner"),
                     ASBIEP.BIZ_TERM,
                     ASBIEP.REMARK,
                     TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
@@ -618,7 +618,7 @@ public class BusinessInformationEntityRepository {
         }
 
         public SelectBieListArguments setBieIdAndType(BigInteger bieId, List<String> types) {
-            if (types.size() == 1) {
+            if (bieId != null && types.size() == 1) {
                 String type = types.get(0);
                 if (type.equals("ASBIE")) {
                     conditions.add(ASBIE.ASBIE_ID.eq(ULong.valueOf(bieId)));
@@ -641,7 +641,7 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setOwnerLoginIds(List<String> ownerLoginIds) {
             if (!ownerLoginIds.isEmpty()) {
-                conditions.add(APP_USER.LOGIN_ID.in(ownerLoginIds));
+                conditions.add(APP_USER.as("owner").LOGIN_ID.in(ownerLoginIds));
             }
             return this;
         }
@@ -723,6 +723,9 @@ public class BusinessInformationEntityRepository {
                     case "owner":
                         field = APP_USER.as("owner").LOGIN_ID;
                         break;
+                    case "businessContexts":
+                        field = BIZ_CTX.NAME;
+                        break;
                     case "version":
                         field = TOP_LEVEL_ASBIEP.VERSION;
                         break;
@@ -775,7 +778,7 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setOwnedByDeveloper(Boolean ownedByDeveloper) {
             if (ownedByDeveloper != null) {
-                conditions.add(APP_USER.IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
+                conditions.add(APP_USER.as("owner").IS_DEVELOPER.eq(ownedByDeveloper ? (byte) 1 : 0));
             }
             return this;
         }
@@ -836,7 +839,7 @@ public class BusinessInformationEntityRepository {
                 .join(ABIE).on(ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.ABIE_ID))
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
-                .join(APP_USER).on(APP_USER.APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
+                .join(APP_USER.as("owner")).on(APP_USER.as("owner").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
@@ -922,7 +925,10 @@ public class BusinessInformationEntityRepository {
     public SelectOrderByStep getAsbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(ASCC_MANIFEST.DEN.contains(arguments.getDen()));
+            conditions.add(or(
+                    ASCC_MANIFEST.DEN.contains(arguments.getDen()),
+                    ASCCP_MANIFEST.DEN.contains(arguments.getDen())
+            ));
         }
         return dslContext.select(
                         inline("ASBIE").as("type"),
@@ -936,9 +942,9 @@ public class BusinessInformationEntityRepository {
                         RELEASE.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         ASBIE.REMARK,
-                        APP_USER.as("appUserUpdater").LOGIN_ID.as("lastUpdateUser"),
-                        APP_USER.LOGIN_ID.as("owner"),
-                        APP_USER.APP_USER_ID.as("ownerUserId"),
+                        APP_USER.as("updater").LOGIN_ID.as("lastUpdateUser"),
+                        APP_USER.as("owner").LOGIN_ID.as("owner"),
+                        APP_USER.as("owner").APP_USER_ID.as("ownerUserId"),
                         ASBIE.LAST_UPDATE_TIMESTAMP,
                         ASBIE.IS_USED.as("used"),
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
@@ -961,17 +967,20 @@ public class BusinessInformationEntityRepository {
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
 //                join with APP_USER to get updater and owner
-                .join(APP_USER.as("appUserUpdater"))
-                .on(ASBIE.LAST_UPDATED_BY.eq(APP_USER.as("appUserUpdater").APP_USER_ID))
-                .join(APP_USER)
-                .on(ASBIE.CREATED_BY.eq(APP_USER.APP_USER_ID))
+                .join(APP_USER.as("updater"))
+                .on(ASBIE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .join(APP_USER.as("owner"))
+                .on(ASBIE.CREATED_BY.eq(APP_USER.as("owner").APP_USER_ID))
                 .where(conditions);
     }
 
     public SelectOrderByStep getBbieList(SelectBieListArguments arguments) {
         List<Condition> conditions = arguments.getConditions().stream().collect(Collectors.toList());
         if (arguments.getDen() != null && StringUtils.hasLength(arguments.getDen())) {
-            conditions.add(BCC_MANIFEST.DEN.contains(arguments.getDen()));
+            conditions.add(or(
+                    BCC_MANIFEST.DEN.contains(arguments.getDen()),
+                    ASCCP_MANIFEST.DEN.contains(arguments.getDen())
+            ));
         }
         return dslContext.select(
                         inline("BBIE").as("type"),
@@ -985,9 +994,9 @@ public class BusinessInformationEntityRepository {
                         RELEASE.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         BBIE.REMARK,
-                        APP_USER.as("appUserUpdater").LOGIN_ID.as("lastUpdateUser"),
-                        APP_USER.LOGIN_ID.as("owner"),
-                        APP_USER.APP_USER_ID.as("ownerUserId"),
+                        APP_USER.as("updater").LOGIN_ID.as("lastUpdateUser"),
+                        APP_USER.as("owner").LOGIN_ID.as("owner"),
+                        APP_USER.as("owner").APP_USER_ID.as("ownerUserId"),
                         BBIE.LAST_UPDATE_TIMESTAMP,
                         BBIE.IS_USED.as("used"),
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
@@ -1010,19 +1019,19 @@ public class BusinessInformationEntityRepository {
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
                 //                join with APP_USER to get updater
-                .join(APP_USER.as("appUserUpdater"))
-                .on(BBIE.LAST_UPDATED_BY.eq(APP_USER.as("appUserUpdater").APP_USER_ID))
-                .join(APP_USER)
-                .on(BBIE.CREATED_BY.eq(APP_USER.APP_USER_ID))
+                .join(APP_USER.as("updater"))
+                .on(BBIE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .join(APP_USER.as("owner"))
+                .on(BBIE.CREATED_BY.eq(APP_USER.as("owner").APP_USER_ID))
                 .where(conditions);
     }
 
     private <E> PaginationResponse<E> selectAsbieBbieList(SelectBieListArguments arguments, List<String> types, Class<? extends E> type) {
         SelectOrderByStep select = null;
-        if (types.contains("ASBIE")) {
+        if (types.contains("ASBIE") || types.isEmpty()) {
             select = getAsbieList(arguments);
         }
-        if (types.contains("BBIE")) {
+        if (types.contains("BBIE") || types.isEmpty()) {
             select = (select != null) ? select.union(getBbieList(arguments)) :
                     getBbieList(arguments);
         }

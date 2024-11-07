@@ -191,8 +191,7 @@
                                     (click)="copyLink(node, $event)">
                             link
                           </mat-icon>
-                          <mat-icon [style.visibility]="dataSource.isExpandable(node) ? '' : 'hidden'"
-                                    class="context-menu-icon"
+                          <mat-icon class="context-menu-icon"
                                     [matMenuTriggerFor]="contextMenu"
                                     [matMenuTriggerData]="{'menuId': 'contextMenu'}"
                                     (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
@@ -204,10 +203,16 @@
 
                   <!-- Context Menu Area -->
                   <mat-menu class="context-menu" #contextMenu="matMenu">
-                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                    <mat-divider *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)"
+                            *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)">
                       <span class="context-menu-item">Expand 2</span>
                     </button>
-                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)"
+                            *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)">
                       <span class="context-menu-item">Expand 3</span>
                     </button>
                     <mat-divider *ngIf="canReuseBIE(contextMenuItem) || canCreateBIEFromThis(contextMenuItem)"></mat-divider>
@@ -248,24 +253,24 @@
                             [matTooltipDisabled]="canExtend(contextMenuItem)">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
                     </button>
-                    <mat-divider *ngIf="canEdit"></mat-divider>
+                    <mat-divider *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="enableChildren(contextMenuItem)"
-                            *ngIf="canEdit"
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
                             [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Enable Children</span>
                     </button>
                     <button mat-menu-item (click)="setMaxCardinality(contextMenuItem)"
-                            *ngIf="canEdit"
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
                             [disabled]="!isCardinalityEditable(contextMenuItem)">
                       <span class="context-menu-item">Set Children Max Cardinality to 1</span>
                     </button>
-                    <mat-divider *ngIf="canEdit"></mat-divider>
+                    <mat-divider *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="checkNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
                       <span class="context-menu-item">Check nillable on Child BCCs</span>
                     </button>
                     <button mat-menu-item (click)="uncheckNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
                       <span class="context-menu-item">Uncheck nillable on Child BCCs</span>
                     </button>
                   </mat-menu>

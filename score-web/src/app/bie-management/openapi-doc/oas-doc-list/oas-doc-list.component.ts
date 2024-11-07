@@ -1,9 +1,9 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Location} from '@angular/common';
 import {SelectionModel} from '@angular/cdk/collections';
 import {OasDoc, OasDocListRequest} from '../domain/openapi-doc';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -16,6 +16,15 @@ import {AccountListService} from '../../../account-management/domain/account-lis
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {PageRequest} from '../../../basis/basis';
 import {initFilter} from '../../../common/utility';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-oas-doc-list',
@@ -25,15 +34,135 @@ import {initFilter} from '../../../common/utility';
 export class OasDocListComponent implements OnInit {
 
   title = 'OpenAPI Document';
-  displayedColumns = [
-    {id: 'select', name: ''},
-    {id: 'title', name: 'Title'},
-    {id: 'openAPIVersion', name: 'OpenAPI Version'},
-    {id: 'version', name: 'Version'},
-    {id: 'licenseName', name: 'License Name'},
-    {id: 'description', name: 'Description'},
-    {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp'},
+
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage = columns;
+    this.updateTableColumnsForOpenApiDocumentPage();
+  }
+
+  updateTableColumnsForOpenApiDocumentPage() {
+    this.preferencesService.updateTableColumnsForOpenApiDocumentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfOpenApiDocumentPage;
+    this.onColumnsChange(this.columns);
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+
+    let columns = [];
+    for (const tableColumn of this.table.columns) {
+      for (const updatedColumn of updatedColumns) {
+        if (tableColumn.name === updatedColumn.name) {
+          tableColumn.isActive = updatedColumn.selected;
+        }
+      }
+      columns.push(tableColumn);
+    }
+
+    this.table.columns = columns;
+    this.table.displayedColumns = this.displayedColumns;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForOpenApiDocumentPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  defaultDisplayedColumns = [
+    {id: 'select', name: '', isActive: true},
+    {id: 'title', name: 'Title', isActive: true},
+    {id: 'openAPIVersion', name: 'OpenAPI Version', isActive: true},
+    {id: 'version', name: 'Version', isActive: true},
+    {id: 'licenseName', name: 'License Name', isActive: true},
+    {id: 'description', name: 'Description', isActive: true},
+    {id: 'lastUpdateTimestamp', name: 'Last Update Timestamp', isActive: true},
   ];
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      for (const column of this.columns) {
+        switch (column.name) {
+          case 'Title':
+            if (column.selected) {
+              displayedColumns.push('title');
+            }
+            break;
+          case 'OpenAPI Version':
+            if (column.selected) {
+              displayedColumns.push('openAPIVersion');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'License Name':
+            if (column.selected) {
+              displayedColumns.push('licenseName');
+            }
+            break;
+          case 'Description':
+            if (column.selected) {
+              displayedColumns.push('description');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   table: TableData<OasDoc>;
   selection = new SelectionModel<number>(true, []);
   loading = false;
@@ -42,15 +171,22 @@ export class OasDocListComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: OasDocListRequest;
+  highlightText: string;
+  preferencesInfo: PreferencesInfo;
+
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private openAPIService: OpenAPIService,
               private accountService: AccountListService,
+              private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -58,11 +194,13 @@ export class OasDocListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.table = new TableData<OasDoc>(this.displayedColumns, {});
+    this.table = new TableData<OasDoc>(this.defaultDisplayedColumns, {});
     this.table.dataSource = new MatMultiSortTableDataSource<OasDoc>(this.sort, false);
 
     this.request = new OasDocListRequest(this.route.snapshot.queryParamMap,
       new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -70,17 +208,31 @@ export class OasDocListComponent implements OnInit {
 
     this.table.sortParams = this.request.page.sortActives;
     this.table.sortDirs = this.request.page.sortDirections;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.table.sortObservable.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadOasDocList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+      this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfOpenApiDocumentPage);
+
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadOasDocList(true);
+      this.loadOasDocList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -114,6 +266,11 @@ export class OasDocListComponent implements OnInit {
     }
   }
 
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadOasDocList();
+  }
+
   loadOasDocList(isInit?: boolean) {
     this.loading = true;
 
@@ -131,8 +288,11 @@ export class OasDocListComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.highlightText = this.request.filters.description;
+
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0],
+          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.table.dataSource.data = [];

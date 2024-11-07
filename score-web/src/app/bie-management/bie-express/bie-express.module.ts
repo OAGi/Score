@@ -11,6 +11,8 @@ import {BieExpressService} from './domain/bie-express.service';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -21,15 +23,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    TranslateModule,
-    CommonModule,
-    ScoreCommonModule,
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        TranslateModule,
+        CommonModule,
+        ScoreCommonModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+    ],
   declarations: [
     BieExpressComponent,
     MetaHeaderDialogComponent,

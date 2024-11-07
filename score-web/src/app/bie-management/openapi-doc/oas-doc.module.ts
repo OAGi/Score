@@ -7,12 +7,13 @@ import {OasDocCreateComponent} from './oas-doc-create/oas-doc-create.component';
 import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
 import {OasDocDetailComponent} from './oas-doc-detail/oas-doc-detail.component';
 import {OpenAPIService} from './domain/openapi.service';
-import {OasDocBieListComponent} from './oas-doc-create/oas-doc-bie-list.component';
 import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 
 const routes: Routes = [
@@ -31,30 +32,23 @@ const routes: Routes = [
             path: '',
             component: OasDocCreateComponent,
             canActivate: [AuthService]
-          },
-          {
-            path: 'bie_list',
-            component: OasDocBieListComponent,
-            canActivate: [AuthService]
           }
         ]
       },
       {
         path: ':id',
-        children: [{
-          path: '',
-          component: OasDocDetailComponent,
-          canActivate: [AuthService],
-        }, {
-          path: 'assign',
-          component: OasDocAssignDialogComponent,
-          canActivate: [AuthService],
-        },
+        children: [
           {
-            path: 'bie_list',
-            component: OasDocBieListComponent,
+            path: '',
+            component: OasDocDetailComponent,
             canActivate: [AuthService],
-          }]
+          },
+          {
+            path: 'assign',
+            component: OasDocAssignDialogComponent,
+            canActivate: [AuthService],
+          }
+        ]
       },
     ]
   }
@@ -65,7 +59,6 @@ const routes: Routes = [
     OasDocCreateComponent,
     OasDocListComponent,
     OasDocDetailComponent,
-    OasDocBieListComponent,
     OasDocAssignDialogComponent
   ],
   imports: [
@@ -76,7 +69,9 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     ScoreCommonModule,
-    MatMultiSortModule
+    MatMultiSortModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   exports: [
     OasDocCreateComponent,

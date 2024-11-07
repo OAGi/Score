@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
@@ -18,10 +19,10 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIEForSelectBIEPage {
+public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implements CopyBIEForSelectBIEPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
@@ -35,9 +36,6 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"DEN\")]");
-
     private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Business Context\")]");
 
@@ -46,9 +44,6 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By COPY_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Copy\")]//ancestor::button[1]");
@@ -93,10 +88,10 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             click(searchedSelectField);
             escape(getDriver());
         });
@@ -160,7 +155,7 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -193,11 +188,6 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
         invisibilityOfLoadingContainerElement(getDriver());
@@ -222,11 +212,11 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 
@@ -247,6 +237,8 @@ public class CopyBIEForSelectBIEPageImpl extends BasePageImpl implements CopyBIE
     public ViewEditBIEPage copyBIE(String asccpDEN, String branch) {
         setDEN(asccpDEN);
         setBranch(branch);
+        showAdvancedSearchPanel();
+        clear(getBusinessContextField());
         waitFor(Duration.ofMillis(2000));
         hitSearchButton();
 

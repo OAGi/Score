@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {PaginationResponseDialogComponent} from './pagination-response-dialog.component';
 
@@ -6,7 +6,7 @@ describe('PaginationResponseDialogComponent', () => {
   let component: PaginationResponseDialogComponent;
   let fixture: ComponentFixture<PaginationResponseDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PaginationResponseDialogComponent]
     })

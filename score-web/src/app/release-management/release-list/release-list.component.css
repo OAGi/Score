@@ -1,11 +1,3 @@
-.mat-column-creationTimestamp, .mat-column-lastUpdateTimestamp {
-  width: 160px;
-}
-
-.mat-column-state {
-  width: 10%;
-}
-
 .mat-column-more {
   width: 40px;
 }

@@ -10,147 +10,13 @@
   </div>
 
   <mat-card class="pt-3">
-    <mat-card class="search-box">
-      <mat-card-content class="mat-card-container">
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Creator</mat-label>
-                <mat-select [(ngModel)]="request.creatorLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="creatorIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching creator found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredCreatorIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Created start date</mat-label>
-                <input matInput [matDatepicker]="createdDateStart" placeholder="Created start date"
-                       [max]="request.createdDate.end" [value]="request.createdDate.start"
-                       (dateInput)="onDateEvent('created.startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="createdDateStart"></mat-datepicker-toggle>
-                <mat-datepicker #createdDateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('created.startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Created end date</mat-label>
-                <input matInput [matDatepicker]="createdDateEnd" placeholder="Created end date"
-                       [min]="request.createdDate.start" [value]="request.createdDate.end"
-                       (dateInput)="onDateEvent('created.endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="createdDateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #createdDateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('created.endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                    {{loginId}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated start date</mat-label>
-                <input matInput [matDatepicker]="updatedDateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end"
-                       (dateInput)="onDateEvent('updated.startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="updatedDateStart"></mat-datepicker-toggle>
-                <mat-datepicker #updatedDateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('updated.startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated end date</mat-label>
-                <input matInput [matDatepicker]="updatedDateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start"
-                       (dateInput)="onDateEvent('updated.endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="updatedDateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #updatedDateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('updated.endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Namespace</mat-label>
-                <mat-select [(ngModel)]="request.namespaces" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                           [placeholderLabel]="'Search...'"
-                                           [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
-                    <span>{{ namespace.uri }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-
+    <score-search-bar placeholder="Search by Release" [(model)]="request.filters.releaseNum"
+                      (modelChange)="onChange('filters.releaseNum', request.filters.releaseNum);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
+        <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
             <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Release Num</mat-label>
-                  <input matInput [(ngModel)]="request.filters.releaseNum"
-                         (ngModelChange)="onChange('filters.releaseNum', request.filters.releaseNum)"
-                         (keyup.enter)="this.paginator.pageIndex = 0; this.loadReleases();"
-                         placeholder="Release Num">
-                </mat-form-field>
-              </div>
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>State</mat-label>
@@ -161,112 +27,243 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Creator</mat-label>
+                  <mat-select [(ngModel)]="request.creatorLoginIds" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="creatorIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching creator found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredCreatorIdList | async" [value]="loginId">
+                      {{loginId}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Created start date</mat-label>
+                  <input matInput [matDatepicker]="createdDateStart" placeholder="Created start date"
+                         [max]="request.createdDate.end" [value]="request.createdDate.start"
+                         (dateInput)="onDateEvent('created.startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="createdDateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #createdDateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('created.startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Created end date</mat-label>
+                  <input matInput [matDatepicker]="createdDateEnd" placeholder="Created end date"
+                         [min]="request.createdDate.start" [value]="request.createdDate.end"
+                         (dateInput)="onDateEvent('created.endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="createdDateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #createdDateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('created.endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Namespace</mat-label>
+                  <mat-select [(ngModel)]="request.namespaces" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace.namespaceId">
+                      <span>{{ namespace.uri }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Updater</mat-label>
+                  <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                             [placeholderLabel]="'Search...'"
+                                             [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                      {{loginId}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Updated start date</mat-label>
+                  <input matInput [matDatepicker]="updatedDateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('updated.startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="updatedDateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #updatedDateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('updated.startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <mat-label>Updated end date</mat-label>
+                  <input matInput [matDatepicker]="updatedDateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('updated.endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="updatedDateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #updatedDateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('updated.endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.loadReleases();">
-          <mat-icon>search</mat-icon>
-          <span class="ml-2">Search</span>
-        </button>
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+      </div>
+    </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="mat-elevation-z1">
-        <table mat-table multiTemplateDataRows
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
 
-          <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!isSelectable(row)"
-                            matTooltip="This release cannot be modified."
-                            [matTooltipDisabled]="isSelectable(row)"
-                            (change)="$event ? toggle(row) : null"
-                            [checked]="isSelected(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container>
+      <div class="table-container">
+        <div class="score-column-container align-items-center">
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
+        </div>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table multiTemplateDataRows
+                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                 [dataSource]="dataSource">
 
-          <ng-container matColumnDef="releaseNum">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Release</th>
-            <td mat-cell *matCellDef="let element">
-              <ng-template [ngIf]="element.state === 'Processing'"
-                           [ngIfElse]="stateWithLink">
-                <div class="den word-break-all">
-                  <span>{{ element.releaseNum }}</span>
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                              [checked]="selection.hasValue() && isAllSelected()"
+                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!isSelectable(row)"
+                              matTooltip="This release cannot be modified."
+                              [matTooltipDisabled]="isSelectable(row)"
+                              (change)="$event ? toggle(row) : null"
+                              [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="releaseNum">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Release')" (onResize)="onResizeWidth($event)"> Release</th>
+              <td mat-cell *matCellDef="let element">
+                <ng-template [ngIf]="element.state === 'Processing'"
+                             [ngIfElse]="stateWithLink">
+                  <div class="den word-break-all">
+                    <span>{{ element.releaseNum }}</span>
+                  </div>
+                </ng-template>
+                <ng-template #stateWithLink>
+                  <div class="den word-break-all">
+                    <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
+                  </div>
+                </ng-template>
+                <div class="description">{{ element.guid }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="state">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('State')" (onResize)="onResizeWidth($event)"> State</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="d-flex">
+                  <span>{{ element.state }}</span>
+                  <mat-progress-spinner mode="indeterminate" [diameter]="18"
+                                        *ngIf="element.state === 'Processing'"
+                                        style="margin-left: 12px;"></mat-progress-spinner>
                 </div>
-              </ng-template>
-              <ng-template #stateWithLink>
-                <div class="den word-break-all">
-                  <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
-                </div>
-              </ng-template>
-              <div class="description">{{ element.guid }}</div>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="d-flex">
-                <span>{{ element.state }}</span>
-                <mat-progress-spinner mode="indeterminate" [diameter]="18"
-                                      *ngIf="element.state === 'Processing'"
-                                      style="margin-left: 12px;"></mat-progress-spinner>
-              </div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="creationTimestamp">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created on</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b>{{ element.createdBy }}</b></div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="creationTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created on</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description"><span class="pr-1">by</span><b>{{ element.createdBy }}</b></div>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="lastUpdateTimestamp">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pr-1">by</span><b class="word-break-all">{{ element.lastUpdatedBy }}</b></div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="lastUpdateTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
-            <td mat-cell *matCellDef="let element">
-              <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description"><span class="pr-1">by</span><b>{{ element.lastUpdatedBy }}</b></div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="more">
-            <th mat-header-cell *matHeaderCellDef>
-            </th>
-            <td mat-cell *matCellDef="let element">
-              <button mat-icon-button
-                      *ngIf="userToken.roles.includes('developer') &&
+            <ng-container matColumnDef="more">
+              <th mat-header-cell *matHeaderCellDef>
+              </th>
+              <td mat-cell *matCellDef="let element">
+                <button mat-icon-button
+                        *ngIf="userToken.roles.includes('developer') &&
                              (element.state === 'Initialized' || element.state === 'Draft')"
-                      [matMenuTriggerFor]="contextMenu"
-                      (click)="contextMenuItem = element; $event.stopPropagation();">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-            </td>
-          </ng-container>
+                        [matMenuTriggerFor]="contextMenu"
+                        (click)="contextMenuItem = element; $event.stopPropagation();">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-              (click)="toggle(row)"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="toggle(row)"></tr>
+          </table>
 
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
       </div>
     </mat-card-content>
 

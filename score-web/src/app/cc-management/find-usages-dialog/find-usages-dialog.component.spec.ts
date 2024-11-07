@@ -6,7 +6,7 @@ describe('FindUsagesDialogComponent', () => {
   let component: FindUsagesDialogComponent;
   let fixture: ComponentFixture<FindUsagesDialogComponent>;
 
-  beforeEach(async () => {
+  beforeEach(fakeAsync () => {
     await TestBed.configureTestingModule({
       declarations: [ FindUsagesDialogComponent ]
     })

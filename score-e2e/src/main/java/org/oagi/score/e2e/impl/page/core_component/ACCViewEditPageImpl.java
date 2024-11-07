@@ -70,7 +70,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//textarea[@placeholder=\"Definition\"]");
     private static final By CARDINALITY_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Cardinality Max\")]//ancestor::mat-form-field//input");
     private static final By MOVE_TO_QA_BUTTON_LOCATOR =
@@ -859,7 +859,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
+                baseXPath + "//textarea[@placeholder=\"" + name + "\"]"));
     }
 
     private WebElement getInputFieldByName(String name) {

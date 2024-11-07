@@ -24,7 +24,7 @@ import {
   Base,
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail, CcBdtPriRestri,
+  CcBccpNodeDetail,
   CcBdtScNodeDetail,
   CcId,
   CcNodeDetail,
@@ -43,9 +43,7 @@ import {
   UserExtensionGroup
 } from '../domain/core-component-node';
 import {initFilter, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
-import {
-  AppendAssociationDialogComponent
-} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
@@ -64,6 +62,8 @@ import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-extension-detail',
@@ -118,6 +118,7 @@ export class ExtensionDetailComponent implements OnInit {
     return 1000000 * this.virtualScrollItemSize;
   }
 
+  preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
 
   get hideCardinality(): boolean {
@@ -136,6 +137,7 @@ export class ExtensionDetailComponent implements OnInit {
               private namespaceService: NamespaceService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private tagService: TagService,
               private location: Location,
               private router: Router,
@@ -157,14 +159,16 @@ export class ExtensionDetailComponent implements OnInit {
           this.service.getLastPublishedRevision(this.type, this.manifestId),
           this.service.getAccNode(this.manifestId),
           this.namespaceService.getSimpleNamespaces(),
-          this.tagService.getTags()
+          this.tagService.getTags(),
+          this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags]) => {
+      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags, preferencesInfo]) => {
       this.lastRevision = revisionResponse;
       this.namespaces = namespaces;
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
 
       // subscribe an event
       this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
@@ -265,6 +269,21 @@ export class ExtensionDetailComponent implements OnInit {
         return true;
       }
       return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
+    });
+  }
+
+  copyPath(node: CcFlatNode) {
+    if (!node) {
+      return;
+    }
+
+    const delimiter = this.preferencesInfo.viewSettingsInfo.treeSettings.delimiter;
+    let queryPath = node.queryPath;
+    queryPath = queryPath.replaceAll('/', delimiter);
+
+    this.clipboard.copy(queryPath);
+    this.snackBar.open('Copied to clipboard', '', {
+      duration: 3000
     });
   }
 
@@ -1253,8 +1272,6 @@ export class ExtensionDetailComponent implements OnInit {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

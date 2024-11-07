@@ -3,6 +3,7 @@ package org.oagi.score.e2e.page.agency_id_list;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'View/Edit Agency ID List' page.
  */
-public interface ViewEditAgencyIDListPage extends Page {
+public interface ViewEditAgencyIDListPage extends Page, SearchBarPage {
 
     EditAgencyIDListPage openNewAgencyIDList(AppUserObject user, String release);
 
@@ -172,13 +173,6 @@ public interface ViewEditAgencyIDListPage extends Page {
      * @param module module
      */
     void setModule(String module);
-
-    /**
-     * Return the UI element of 'Search' button.
-     *
-     * @return the UI element of 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button

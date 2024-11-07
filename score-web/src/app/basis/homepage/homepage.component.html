@@ -60,7 +60,7 @@
                        [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username}])}">
-                      {{ element.username }}
+                      <span class="word-break-all">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>
@@ -250,7 +250,7 @@
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
                        {key: 'releaseIds', value: selectedRelease.releaseId}])}">
-                      {{ element.username }}
+                      <span class="word-break-all">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>
@@ -358,10 +358,11 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Business Contexts</th>
                   <td mat-cell *matCellDef="let element">
                     <ng-container *ngFor="let businessContext of element.businessContexts">
-                      <span class="businessContext">
+                      <span class="businessContext word-break-all">
                         <a target="_blank" rel="noopener noreferrer"
                            routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
-                          {{ businessContext.name }}</a>
+                          <span class="word-break-all">{{ businessContext.name }}</span>
+                        </a>
                       </span>
                     </ng-container>
                   </td>
@@ -415,9 +416,8 @@
                                        [placeholderLabel]="'Search...'"
                                        [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
               </mat-option>
-              <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
-                {{ release.releaseNum }}
-              </mat-option>
+              <mat-option *ngFor="let release of releaseFilteredList | async"
+                          [value]="release">{{ release.releaseNum }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -462,7 +462,7 @@
                        {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'types', value:  ['ACC']},
                        {key: 'componentTypes', value: [UEGValue]}]) }">
-                      {{ element.username }}
+                      <span class="word-break-all">{{ element.username }}</span>
                     </a>
                   </td>
                 </ng-container>

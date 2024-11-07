@@ -69,7 +69,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//textarea[@placeholder=\"Definition\"]");
     private static final By DEN_COMPONENT_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field");
     private static final By PROPERTY_TERM_COMPONENT_LOCATOR =
@@ -580,7 +580,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
+                baseXPath + "//textarea[@placeholder=\"" + name + "\"]"));
     }
 
     private class ACCPanelImpl implements ACCPanel {

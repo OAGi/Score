@@ -314,14 +314,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
-        click(homePage.getBIEsTab());
-        homePage.setBranch(release.getReleaseNumber());
 
         HomePage.UEsByUsersAndStatesPanel uesByUsersAndStatesPanel = homePage.openUEsByUsersAndStatesPanel();
-
-        click(homePage.getScoreLogo()); // to go to the home page again.
+        homePage.setBranch(release.getReleaseNumber());
         uesByUsersAndStatesPanel.setUsername(endUser1.getLoginId()); //select endUser1
-
         WebElement tr = uesByUsersAndStatesPanel.getTableRecordByValue(endUser1.getLoginId());
         WebElement td_Total = uesByUsersAndStatesPanel.getColumnByName(tr, "total");
         assertEquals(container1.numberOfWIPUEGs +

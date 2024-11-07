@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {CreateBccpDialogComponent} from './create-bccp-dialog.component';
 
@@ -6,7 +6,7 @@ describe('AppendBccpDialogComponent', () => {
   let component: CreateBccpDialogComponent;
   let fixture: ComponentFixture<CreateBccpDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CreateBccpDialogComponent]
     })

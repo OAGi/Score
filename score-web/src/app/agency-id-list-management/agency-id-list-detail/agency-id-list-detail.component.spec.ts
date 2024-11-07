@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AgencyIdListDetailComponent} from './agency-id-list-detail.component';
 
@@ -6,7 +6,7 @@ describe('CodeListCreateComponent', () => {
   let component: AgencyIdListDetailComponent;
   let fixture: ComponentFixture<AgencyIdListDetailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AgencyIdListDetailComponent]
     })

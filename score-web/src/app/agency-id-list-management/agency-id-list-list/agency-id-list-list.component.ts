@@ -1,5 +1,5 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -29,6 +29,10 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -49,9 +53,116 @@ export class AgencyIdListListComponent implements OnInit {
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'name', 'versionId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListPage = columns;
+    this.updateTableColumnsForAgencyIdListPage();
+  }
+
+  updateTableColumnsForAgencyIdListPage() {
+    this.preferencesService.updateTableColumnsForAgencyIdListPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfAgencyIdListPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForAgencyIdListPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'Name':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Version':
+          if (column.selected) {
+            displayedColumns.push('versionId');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<AgencyIdList>();
   selection = new SelectionModel<AgencyIdList>(true, [],
     true, (a, b) => a.agencyIdListManifestId === b.agencyIdListManifestId);
@@ -68,6 +179,9 @@ export class AgencyIdListListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: AgencyIdListForListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
+  preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
@@ -76,6 +190,8 @@ export class AgencyIdListListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
   contextMenuItem: AgencyIdList;
 
   constructor(private service: AgencyIdListService,
@@ -85,6 +201,7 @@ export class AgencyIdListListComponent implements OnInit {
               private auth: AuthService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -96,23 +213,35 @@ export class AgencyIdListListComponent implements OnInit {
     this.request = new AgencyIdListForListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadAgencyIdList();
+      this.onSearch();
     });
 
     this.releases = [];
     forkJoin([
       this.releaseService.getSimpleReleases(['Published', 'Draft']),
       this.namespaceService.getSimpleNamespaces(),
-      this.accountService.getAccountNames()
-    ]).subscribe(([releases, namespaces, loginIds]) => {
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
       this.releases.push(...releases);
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       if (this.releases.length > 0) {
@@ -127,6 +256,8 @@ export class AgencyIdListListComponent implements OnInit {
           this.request.release = this.releases[0];
         }
       }
+
+      this.preferencesInfo = preferencesInfo;
 
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -182,6 +313,11 @@ export class AgencyIdListListComponent implements OnInit {
     }
   }
 
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadAgencyIdList();
+  }
+
   loadAgencyIdList(isInit?: boolean) {
     this.loading = true;
 
@@ -199,8 +335,12 @@ export class AgencyIdListListComponent implements OnInit {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
+
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0],
+          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.dataSource.data = [];

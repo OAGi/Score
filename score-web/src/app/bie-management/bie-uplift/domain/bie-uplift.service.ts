@@ -1,13 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {
-  BieUpliftMap,
-  BieValidationResponse,
-  FindTargetAsccpManifestResponse,
-  MatchInfo,
-  UpliftNode
-} from './bie-uplift';
+import {BieUpliftMap, BieValidationResponse, FindTargetAsccpManifestResponse, MatchInfo, UpliftNode} from './bie-uplift';
 
 @Injectable()
 export class BieUpliftService implements OnInit {

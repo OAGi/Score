@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.context;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
@@ -14,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ViewEditContextCategoryPageImpl extends BasePageImpl implements ViewEditContextCategoryPage {
+public class ViewEditContextCategoryPageImpl extends BaseSearchBarPageImpl implements ViewEditContextCategoryPage {
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
@@ -28,14 +29,8 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
 
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//input[@placeholder=\"Name\"]");
-
     private static final By DESCRIPTION_FIELD_LOCATOR =
             By.xpath("//input[@placeholder=\"Description\"]");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By NEW_CONTEXT_CATEGORY_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Context Category\")]//ancestor::button[1]");
@@ -103,7 +98,7 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -119,11 +114,6 @@ public class ViewEditContextCategoryPageImpl extends BasePageImpl implements Vie
     @Override
     public void setDescription(String description) {
         sendKeys(getDescriptionField(), description);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override

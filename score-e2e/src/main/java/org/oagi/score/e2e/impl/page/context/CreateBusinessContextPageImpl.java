@@ -65,7 +65,7 @@ public class CreateBusinessContextPageImpl extends BasePageImpl implements Creat
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }
 
     @Override

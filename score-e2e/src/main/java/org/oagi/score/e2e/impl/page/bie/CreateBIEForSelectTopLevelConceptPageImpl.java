@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
@@ -20,12 +21,12 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl implements CreateBIEForSelectTopLevelConceptPage {
+public class CreateBIEForSelectTopLevelConceptPageImpl extends BaseSearchBarPageImpl implements CreateBIEForSelectTopLevelConceptPage {
 
     private static final By SELECTED_BUSINESS_CONTEXTS_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Selected Business Contexts\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
@@ -40,14 +41,10 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
             By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"DEN\")]");
     private static final By DEFINITION_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Definition\")]");
     private static final By MODULE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Module\")]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
     private final List<BusinessContextObject> selectedBusinessContexts;
@@ -95,10 +92,10 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             click(optionField);
         });
     }
@@ -175,7 +172,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -204,11 +201,6 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
         invisibilityOfLoadingContainerElement(getDriver());
@@ -221,7 +213,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BasePageImpl impl
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

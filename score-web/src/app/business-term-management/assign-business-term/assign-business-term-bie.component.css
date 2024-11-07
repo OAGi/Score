@@ -38,11 +38,6 @@ tr.element-row:not(.expanded-row):active {
   border-bottom-width: 0;
 }
 
-.element-detail {
-  overflow: hidden;
-  display: flex;
-}
-
 .mat-mdc-card-content p {
   font-family: 'Roboto', 'sans-serif';
 }
@@ -63,10 +58,6 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-column-type {
   width: 110px;
-}
-
-.mat-column-revision {
-  width: 70px;
 }
 
 .mat-column-release {
@@ -97,6 +88,10 @@ tr.element-row:not(.expanded-row):active {
   width: 100px;
 }
 
+.mat-column-branch {
+  width: 80px;
+}
+
 .mat-column-owner {
   width: 140px;
   font-size: 13px;
@@ -106,21 +101,17 @@ tr.element-row:not(.expanded-row):active {
   width: 160px;
 }
 
-.mat-column-more {
-  width: 40px;
-}
-
 .den {
   font-size: 13px;
 }
 
 .mat-column-module {
-  width: 15%;
   font-size: 13px;
-  padding-right: 12px;
 }
 
 .element-detail {
+  overflow: hidden;
+  display: flex;
   font-size: 12px;
 }
 

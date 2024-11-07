@@ -9,11 +9,12 @@ export class BusinessTermListRequest {
     businessTerm: string;
     externalReferenceUri: string;
     externalReferenceId: string;
+    definition: string;
     bieId: number;
     bieType: string;
     searchByCC: string;
     typeCode: string;
-    primary: boolean;
+    primaryIndicator: boolean;
   };
   updaterUsernameList: string[] = [];
   updatedDate: {
@@ -54,11 +55,12 @@ export class BusinessTermListRequest {
       businessTerm: params.get('businessTerm') || '',
       externalReferenceUri: params.get('externalReferenceUri') || '',
       externalReferenceId: params.get('externalReferenceId') || '',
+      definition: params.get('definition') || '',
       bieType: params.get('bieType') || '',
       bieId: Number(params.get('bieId')),
       searchByCC: params.get('searchByCC') || '',
       typeCode: params.get('typeCode') || '',
-      primary: Boolean(params.get('primary')) || false
+      primaryIndicator: Boolean(params.get('primaryIndicator')) || false
     };
   }
 
@@ -81,14 +83,17 @@ export class BusinessTermListRequest {
     if (this.filters.businessTerm && this.filters.businessTerm.length > 0) {
       params = params.set('businessTerm', '' + this.filters.businessTerm);
     }
+    if (this.filters.definition && this.filters.definition.length > 0) {
+      params = params.set('definition', '' + this.filters.definition);
+    }
     if (this.filters.bieId) {
       params = params.set('bieId', '' + this.filters.bieId);
     }
     if (this.filters.searchByCC) {
       params = params.set('searchByCC', '' + this.filters.searchByCC);
     }
-    if (this.filters.primary) {
-      params = params.set('primary', '' + this.filters.primary);
+    if (this.filters.primaryIndicator) {
+      params = params.set('primaryIndicator', '' + this.filters.primaryIndicator);
     }
     if (this.filters.typeCode) {
       params = params.set('typeCode', '' + this.filters.typeCode);
@@ -112,7 +117,7 @@ export class AssignedBtListRequest {
     bieDen: string;
     searchByCC: string;
     typeCode: string;
-    primary: boolean;
+    primaryIndicator: boolean;
   };
   updaterUsernameList: string[] = [];
   updatedDate: {
@@ -157,7 +162,7 @@ export class AssignedBtListRequest {
       bieId: Number(params.get('bieId')),
       searchByCC: params.get('searchByCC') || '',
       typeCode: params.get('typeCode') || '',
-      primary: Boolean(params.get('primary')) || false
+      primaryIndicator: Boolean(params.get('primaryIndicator')) || false
     };
   }
 
@@ -201,8 +206,8 @@ export class AssignedBtListRequest {
     if (this.filters.searchByCC) {
       params = params.set('searchByCC', '' + this.filters.searchByCC);
     }
-    if (this.filters.primary) {
-      params = params.set('primary', '' + this.filters.primary);
+    if (this.filters.primaryIndicator) {
+      params = params.set('primaryIndicator', '' + this.filters.primaryIndicator);
     }
     if (this.filters.typeCode) {
       params = params.set('typeCode', '' + this.filters.typeCode);
@@ -227,7 +232,7 @@ export class BusinessTerm {
 
 export class AssignedBusinessTerm {
   assignedBizTermId: number;
-  primary: boolean;
+  primaryIndicator: boolean;
   typeCode: string;
   bieId: number;
   den: string;
@@ -244,7 +249,7 @@ export class AssignedBusinessTerm {
 }
 
 export class PostAssignBusinessTerm {
-  primary: boolean;
+  primaryIndicator: boolean;
   typeCode: string;
   biesToAssign: BieToAssign[];
   businessTermId: number;

@@ -13,6 +13,8 @@ import {ContextSchemeCreateComponent} from './context-scheme-create/context-sche
 import {ContextSchemeDetailComponent} from './context-scheme-detail/context-scheme-detail.component';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -38,16 +40,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        ConfirmDialogModule,
-        CommonModule,
-        ScoreCommonModule,
-        FontAwesomeModule
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    ConfirmDialogModule,
+    CommonModule,
+    ScoreCommonModule,
+    FontAwesomeModule,
+    SearchBarModule,
+    ColumnSelectorModule
+  ],
   declarations: [
     ContextSchemeListComponent,
     ContextSchemeCreateComponent,

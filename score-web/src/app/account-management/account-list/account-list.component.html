@@ -10,126 +10,132 @@
   </div>
 
   <mat-card class="pt-3">
-    <mat-card class="search-box">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.loginId"
-                       (ngModelChange)="onChange('filters.loginId', request.filters.loginId)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                       placeholder="Login ID">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Name</mat-label>
-                <input matInput [(ngModel)]="request.filters.name"
-                       (ngModelChange)="onChange('filters.name', request.filters.name)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                       placeholder="Name">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.organization"
-                       (ngModelChange)="onChange('filters.organization', request.filters.organization)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadAccounts();"
-                       placeholder="Organization">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Role</mat-label>
-                <mat-select [(ngModel)]="request.filters.roles" multiple>
-                  <mat-option [value]="'developer'">
-                    Developer
-                  </mat-option>
-                  <mat-option [value]="'end-user'">
-                    End-User
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Status</mat-label>
-                <mat-select [(ngModel)]="request.filters.status" multiple>
-                  <mat-option [value]="'enable'">
-                    Enable
-                  </mat-option>
-                  <mat-option [value]="'disable'">
-                    Disable
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+    <score-search-bar placeholder="Search by Login ID" [(model)]="request.filters.loginId"
+                      (modelChange)="onChange('filters.loginId', request.filters.loginId);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
+        <mat-card-content class="mat-card-container">
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Name</mat-label>
+                  <input matInput [(ngModel)]="request.filters.name"
+                         (ngModelChange)="onChange('filters.name', request.filters.name)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Name">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.organization"
+                         (ngModelChange)="onChange('filters.organization', request.filters.organization)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Organization">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Role</mat-label>
+                  <mat-select [(ngModel)]="request.filters.roles" multiple>
+                    <mat-option [value]="'developer'">
+                      Developer
+                    </mat-option>
+                    <mat-option [value]="'end-user'">
+                      End-User
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>Status</mat-label>
+                  <mat-select [(ngModel)]="request.filters.status" multiple>
+                    <mat-option [value]="'enable'">
+                      Enable
+                    </mat-option>
+                    <mat-option [value]="'disable'">
+                      Disable
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.loadAccounts();">
-          <mat-icon>search</mat-icon>
-          <span class="ml-2">Search</span>
-        </button>
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+      </div>
+    </score-search-bar>
 
     <mat-card-content class="mat-card-container">
       <div class="loading-container" *ngIf="loading">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
-      <div class="mat-elevation-z1">
-        <table mat-table
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
 
-          <ng-container matColumnDef="loginId">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Login ID</th>
-            <td mat-cell *matCellDef="let element">
-              <a routerLink="{{ element.appUserId }}"> {{ element.loginId }} </a>
-            </td>
-          </ng-container>
+      <div class="table-container">
+        <div class="score-column-container align-items-center">
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
+        </div>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table
+                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                 [dataSource]="dataSource">
 
-          <ng-container matColumnDef="role">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Role</th>
-            <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
-              <span *ngSwitchCase="true">Developer</span>
-              <span *ngSwitchCase="false">End User</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="loginId">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
+              <td mat-cell *matCellDef="let element">
+                <a routerLink="{{ element.appUserId }}">
+                  <span class="word-break-all">{{ element.loginId }}</span>
+                </a>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef> Name</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.name }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Role')" (onResize)="onResizeWidth($event)"> Role</th>
+              <td mat-cell *matCellDef="let element" [ngSwitch]="element.developer">
+                <span *ngSwitchCase="true">Developer</span>
+                <span *ngSwitchCase="false">End User</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="organization">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Organization</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.organization }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.name }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
-            <td mat-cell *matCellDef="let element">
-              {{ (element.enabled) ? 'Enable' : 'Disable' }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="organization">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.organization }}</span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)"> Status</th>
+              <td mat-cell *matCellDef="let element">
+                {{ (element.enabled) ? 'Enable' : 'Disable' }}
+              </td>
+            </ng-container>
 
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

@@ -19,14 +19,6 @@ mat-chip-list:focus {
   border: 0;
 }
 
-.mat-column-value, .mat-column-name {
-  width: 10%;
-}
-
-.mat-column-deprecated {
-  width: 100px;
-}
-
 .btn-comment {
   margin-left: 10px;
   cursor: pointer;

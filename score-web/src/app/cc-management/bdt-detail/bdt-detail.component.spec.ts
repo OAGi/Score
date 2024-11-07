@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {BdtDetailComponent} from './bdt-detail.component';
 
@@ -6,7 +6,7 @@ describe('BccpDetailComponent', () => {
   let component: BdtDetailComponent;
   let fixture: ComponentFixture<BdtDetailComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [BdtDetailComponent]
     })

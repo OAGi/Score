@@ -12,6 +12,8 @@ import {BiePackageService} from './domain/bie-package.service';
 import {BiePackageDetailComponent} from './bie-package-detail/bie-package-detail.component';
 import {BiePackageAddBieDialogComponent} from './bie-package-add-bie-dialog/bie-package-add-bie-dialog.component';
 import {BiePackageUpliftDialogComponent} from './bie-package-uplift-dialog/bie-package-uplift-dialog.component';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 
 const routes: Routes = [
@@ -52,7 +54,9 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     ScoreCommonModule,
-    MatMultiSortModule
+    MatMultiSortModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   exports: [
     BiePackageListComponent,

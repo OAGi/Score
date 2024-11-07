@@ -54,7 +54,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//textarea[@placeholder=\"Definition\"]");
     private static final By VALUE_DOMAIN_LOCATOR =
             By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
 
@@ -90,7 +90,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private static final By SIX_HEXADECIMAL_IDENTIFIER_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Six Hexadecimal Identifier\")]//ancestor::mat-form-field//input");
     private static final By CONTENT_COMPONENT_DEFINITION_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Content Component Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//textarea[@placeholder=\"Content Component Definition\"]");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =
             By.xpath("//mat-dialog-container//p");
     private static final By DELETE_ANYWAY_WARNING_DIALOG_MESSAGE_LOCATOR =
@@ -274,7 +274,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public void showValueDomain() {
-        click(getDriver(), getShowValueDomain());
+        WebElement valueDomain = getShowValueDomain();
+        WebElement header = valueDomain.findElement(By.xpath(".//ancestor::mat-expansion-panel-header"));
+        if ("false".equals(header.getAttribute("aria-expanded"))) {
+            click(getDriver(), getShowValueDomain());
+        }
     }
 
     @Override

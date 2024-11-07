@@ -29,58 +29,74 @@
       </mat-card-content>
     </mat-card>
 
-    <div class="mat-elevation-z1">
-      <table mat-table matSort [dataSource]="dataSource">
-        <ng-container matColumnDef="ccType" size="10">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
-          <td mat-cell *matCellDef="let row">
-            {{ row.ccType }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="displayPath">
-          <th mat-header-cell *matHeaderCellDef>Source {{ data.sourceReleaseNum }} Path &rarr;
-            Target {{ data.targetReleaseNum }} Path
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <div class="display-path-content">
-              <span>{{ row.sourceDisplayPath }}</span>
-              <span>&darr;</span>
-              <span>{{ row.targetDisplayPath }}</span>
-            </div>
-          </td>
-        </ng-container>
+    <div class="table-container">
+      <div class="score-column-container align-items-center justify-content-between">
+        <score-column-selector
+          [columns]="columns"
+          (columnsChange)="onColumnsChange($event)"
+          (onReset)="onColumnsReset()">
+        </score-column-selector>
+      </div>
+      <div class="mat-elevation-z1 table-wrapper mt-3">
+        <table mat-table matSort [dataSource]="dataSource">
+          <ng-container matColumnDef="ccType" size="10">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)">Type</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.ccType }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="displayPath">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Path')" (onResize)="onResizeWidth($event)">
+              Source {{ data.sourceReleaseNum }} Path &rarr;
+              Target {{ data.targetReleaseNum }} Path
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <div class="display-path-content">
+                <span>{{ row.sourceDisplayPath }}</span>
+                <span>&darr;</span>
+                <span>{{ row.targetDisplayPath }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="context">
-          <th mat-header-cell *matHeaderCellDef>Context Definition</th>
-          <td mat-cell *matCellDef="let row">
-            {{ row.context }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="context">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Context Definition')" (onResize)="onResizeWidth($event)">Context Definition</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="description word-break-all" [innerHTML]="row.context"></div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="match" size="10">
-          <th mat-header-cell *matHeaderCellDef>Matched</th>
-          <td mat-cell *matCellDef="let row">
-            {{ row.match }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="match" size="10">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Matched')" (onResize)="onResizeWidth($event)">Matched</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.match }}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="reuse" size="10">
-          <th mat-header-cell *matHeaderCellDef>Reused</th>
-          <td mat-cell *matCellDef="let row">
-            {{ row.reuse }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="reuse" size="10">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Reused')" (onResize)="onResizeWidth($event)">Reused</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.reuse }}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="validCode" size="10">
-          <th mat-header-cell *matHeaderCellDef>Issue</th>
-          <td mat-cell *matCellDef="let row">
-            <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="validCode" size="10">
+            <th mat-header-cell *matHeaderCellDef
+                score-table-column-resize [defaultWidth]="width('Issue')" (onResize)="onResizeWidth($event)">Issue</th>
+            <td mat-cell *matCellDef="let row">
+              <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
     </div>
   </div>
   <div class="actions ml-auto" mat-dialog-actions>

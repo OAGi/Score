@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {TransferOwnershipDialogComponent} from './transfer-ownership-dialog.component';
 
@@ -6,7 +6,7 @@ describe('BusinessContextValueDialogComponent', () => {
   let component: TransferOwnershipDialogComponent;
   let fixture: ComponentFixture<TransferOwnershipDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TransferOwnershipDialogComponent]
     })

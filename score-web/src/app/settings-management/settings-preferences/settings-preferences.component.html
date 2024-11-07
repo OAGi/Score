@@ -1,0 +1,80 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="settings-layout">
+    <score-settings-menu active="Preferences"></score-settings-menu>
+    <div class="layout-main">
+      <div class="context-section">
+        <mat-card class="p-0">
+          <mat-toolbar class="bg-white">
+            <span class="title">{{ title }}</span>
+            <span class="flex-11-auto"></span>
+          </mat-toolbar>
+          <mat-card class="mb-2">
+            <mat-card-content class="mat-card-container">
+              <div>
+                <div class="subhead">
+                  <h4 class="subhead-heading">View Settings</h4>
+                </div>
+                <div class="webpage-setting">
+                  <div class="row">
+                    <div class="col-md-4 col-sm-12">
+                      <mat-label>Browser view mode</mat-label>
+                      <div class="actions">
+                        <button mat-raised-button color="primary"
+                                (click)="updateBrowserView(true)"
+                                [disabled]="isBrowserViewEnabled">
+                          Enable
+                        </button>
+                        <button mat-raised-button color="warn"
+                                (click)="updateBrowserView(false)"
+                                [disabled]="!isBrowserViewEnabled">
+                          Disable
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4">
+                <div class="subhead">
+                  <h4 class="subhead-heading">Tree View Settings</h4>
+                </div>
+                <div class="webpage-setting">
+                  <div class="row">
+                    <div class="col-3">
+                      <mat-form-field>
+                        <mat-label>Path Delimiter</mat-label>
+                        <input matInput
+                               [(ngModel)]="preferencesInfo.viewSettingsInfo.treeSettings.delimiter"
+                               pattern="[^0-9A-Za-z]+"
+                               #delimiterInput="ngModel"
+                               required />
+                        <mat-error *ngIf="delimiterInput.hasError('required')">
+                          Delimiter is required.
+                        </mat-error>
+                        <mat-error *ngIf="delimiterInput.hasError('pattern')">
+                          Only non-alphanumeric characters are allowed.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="actions pt-2">
+                    <div>
+                      <button mat-raised-button color="primary" (click)="updatePreferences()"
+                              [disabled]="delimiterInput.invalid">
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

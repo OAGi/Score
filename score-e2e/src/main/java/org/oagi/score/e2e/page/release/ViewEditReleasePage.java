@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.release;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.oagi.score.e2e.page.core_component.ACCViewEditPage;
 import org.openqa.selenium.WebElement;
 
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'View/Edit Release' page.
  */
-public interface ViewEditReleasePage extends Page {
+public interface ViewEditReleasePage extends Page, SearchBarPage {
     /**
      * Return the UI element of the 'Creator' select field.
      *
@@ -136,13 +137,6 @@ public interface ViewEditReleasePage extends Page {
      * @param releaseNum release num text
      */
     void setReleaseNum(String releaseNum);
-
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button.

@@ -266,8 +266,29 @@ public class JooqAgencyIdListReadRepository
 
         Field field;
         switch (trim(request.getSortActive()).toLowerCase()) {
+            case "state":
+                field = AGENCY_ID_LIST.STATE;
+                break;
+
             case "name":
                 field = AGENCY_ID_LIST.NAME;
+                break;
+
+            case "version":
+            case "versionid":
+                field = AGENCY_ID_LIST.VERSION_ID;
+                break;
+
+            case "revision":
+                field = LOG.REVISION_NUM;
+                break;
+
+            case "owner":
+                field = APP_USER.as("owner").LOGIN_ID;
+                break;
+
+            case "module":
+                field = MODULE.PATH;
                 break;
 
             case "lastupdatetimestamp":

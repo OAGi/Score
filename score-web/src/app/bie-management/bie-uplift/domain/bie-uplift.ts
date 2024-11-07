@@ -1,10 +1,4 @@
-import {
-  AsbiepFlatNode,
-  BbiepFlatNode,
-  BbieScFlatNode,
-  BieFlatNode,
-  WrappedBieFlatNode
-} from '../../domain/bie-flat-tree';
+import {AsbiepFlatNode, BbiepFlatNode, BbieScFlatNode, BieFlatNode, WrappedBieFlatNode} from '../../domain/bie-flat-tree';
 
 
 export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {

@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.impl.page.namespace;
 
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
 import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
 import org.openqa.selenium.*;
 
@@ -7,19 +8,13 @@ import java.time.Duration;
 
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOwershipDialog {
-
-    private static final By LOGIN_ID_FIELD_LOCATOR
-            = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Login ID\")]//ancestor::div[1]/input");
+public class TransferNamespaceOwnershipDialogImpl extends SearchBarPageImpl implements TransferNamespaceOwershipDialog {
 
     private static final By NAME_FIELD_LOCATOR
             = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Name\")]//ancestor::div[1]/input");
 
     private static final By ORGANIZATION_FIELD_LOCATOR
             = By.xpath("//score-transfer-ownership-dialog//mat-label[contains(text(), \"Organization\")]//ancestor::div[1]/input");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By TRANSFER_BUTTON_LOCATOR =
             By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"Transfer\")]//ancestor::button[1]");
@@ -30,11 +25,8 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
     private ViewEditNamespacePageImpl parent;
 
     public TransferNamespaceOwnershipDialogImpl(ViewEditNamespacePageImpl parent) {
+        super(parent.getDriver(), "//score-transfer-ownership-dialog");
         this.parent = parent;
-    }
-
-    private WebDriver getDriver() {
-        return this.parent.getDriver();
     }
 
     @Override
@@ -54,7 +46,7 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
 
     @Override
     public WebElement getLoginIDField() {
-        return visibilityOfElementLocated(getDriver(), LOGIN_ID_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -80,11 +72,6 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
     @Override
     public void setOrganization(String organization) {
         sendKeys(getOrganizationField(), organization);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
@@ -118,11 +105,11 @@ public class TransferNamespaceOwnershipDialogImpl implements TransferNamespaceOw
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//score-transfer-ownership-dialog//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//score-transfer-ownership-dialog//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 

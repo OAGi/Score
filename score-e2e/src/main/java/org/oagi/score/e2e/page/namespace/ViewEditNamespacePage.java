@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.namespace;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,8 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'View/Edit Namespace' page.
  */
-public interface ViewEditNamespacePage extends Page {
+public interface ViewEditNamespacePage extends Page, SearchBarPage {
+
     WebElement getOwerSelectField();
 
     void setOwner(String owner);
@@ -81,9 +83,8 @@ public interface ViewEditNamespacePage extends Page {
 
     void hitSearchButton();
 
-    WebElement getSearchButton();
-
     WebElement getNewNamespaceButton();
+
     CreateNamespacePage hitNewNamespaceButton();
 
     EditNamespacePage openNamespaceByURIAndOwner(String uri, String owner);
@@ -94,5 +95,5 @@ public interface ViewEditNamespacePage extends Page {
      * @param tr the table record
      * @return the 'Transfer Namespace Ownership' dialog object
      */
-     TransferNamespaceOwershipDialog openTransferNamespaceOwnershipDialog(WebElement tr);
+    TransferNamespaceOwershipDialog openTransferNamespaceOwnershipDialog(WebElement tr);
 }

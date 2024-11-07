@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {CodeListListComponent} from './code-list-list.component';
 
@@ -6,7 +6,7 @@ describe('CodeListForCreatingComponent', () => {
   let component: CodeListListComponent;
   let fixture: ComponentFixture<CodeListListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CodeListListComponent]
     })

@@ -172,8 +172,8 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         assertEquals("Code", getText(dtPanel.getDataTypeTermField()));
         assertFalse(dtPanel.getQualifierField().isEnabled());
         assertEquals("System Environment", getText(dtPanel.getQualifierField()));
-        assertFalse(dtPanel.getDefinitionSourceField().isEnabled());
-        assertFalse(dtPanel.getDefinitionField().isEnabled());
+        assertDisabled(dtPanel.getDefinitionSourceField());
+        assertEnabled(dtPanel.getDefinitionField());
     }
 
     @Test

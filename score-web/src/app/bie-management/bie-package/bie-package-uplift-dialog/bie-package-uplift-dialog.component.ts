@@ -1,8 +1,8 @@
-import {Component, HostListener, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -15,17 +15,12 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
+import {initFilter, saveBranch} from '../../../common/utility';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
-import {BieListService} from '../../bie-list/domain/bie-list.service';
-import {BieEditService} from '../../bie-edit/domain/bie-edit.service';
-import {MailService} from '../../../common/score-mail.service';
+import {BieList} from '../../bie-list/domain/bie-list';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {UserToken} from '../../../authentication/domain/auth';
 import {BieListInBiePackageRequest, BiePackage} from '../domain/bie-package';
 import {BiePackageService} from '../domain/bie-package.service';
-import {BiePackageAddBieDialogComponent} from '../bie-package-add-bie-dialog/bie-package-add-bie-dialog.component';
 
 @Component({
   selector: 'score-bie-package-uplift-dialog',

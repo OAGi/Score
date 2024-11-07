@@ -4,12 +4,7 @@ import {AccountListDialogComponent} from './account-list-dialog/account-list-dia
 import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
-import {
-  CanActivateAdmin,
-  CanActivateDeveloper,
-  CanActivateTenantInstance,
-  CanActivateUser
-} from '../authentication/auth.service';
+import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanActivateUser} from '../authentication/auth.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
@@ -24,6 +19,9 @@ import {TenantUserDetailComponent} from './tenant-user-detail/tenant-user-detail
 import {TenantCreateComponent} from './tenant-create/tenant-create.component';
 import {UpdateTenantComponent} from './tenant-update/tenant-update.component';
 import {TransferOwnershipListComponent} from './take-ownership-list/transfer-ownership-list.component';
+import {SearchBarModule} from '../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {ScoreCommonModule} from '../common/score-common.module';
 
 
 const routes: Routes = [
@@ -90,7 +88,10 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule
+    CommonModule,
+    SearchBarModule,
+    ColumnSelectorModule,
+    ScoreCommonModule
   ],
   declarations: [
     AccountListComponent,

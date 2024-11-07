@@ -10,6 +10,8 @@ import {ModuleAddDialogComponent} from './module-set-edit/module-add-dialog/modu
 import {ModuleEditDialogComponent} from './module-set-edit/module-edit-dialog/module-edit-dialog.component';
 import {ModuleSetEditComponent} from './module-set-edit/module-set-edit.component';
 import {ModuleSetListComponent} from './module-set-list/module-set-list.component';
+import {SearchBarModule} from '../../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -41,7 +43,9 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    SearchBarModule,
+    ColumnSelectorModule
   ],
   declarations: [
     ModuleSetListComponent,

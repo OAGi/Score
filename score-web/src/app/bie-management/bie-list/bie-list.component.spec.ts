@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 
 import {BieListComponent} from './bie-list.component';
 
@@ -6,7 +6,7 @@ describe('BieListComponent', () => {
   let component: BieListComponent;
   let fixture: ComponentFixture<BieListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [BieListComponent]
     })

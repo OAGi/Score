@@ -1,16 +1,14 @@
 package org.oagi.score.e2e.impl.page.core_component;
 
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
 import org.oagi.score.e2e.page.core_component.DTCreateDialog;
 import org.openqa.selenium.*;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class DTCreateDialogImpl implements DTCreateDialog {
-    private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//input[contains(@placeholder, \"DEN\")]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//span[contains(text(), \"Search\")]//ancestor::button[1]");
+public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDialog {
+
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
@@ -19,12 +17,9 @@ public class DTCreateDialogImpl implements DTCreateDialog {
     private String branch;
 
     public DTCreateDialogImpl(ViewEditCoreComponentPageImpl parent, String branch) {
+        super(parent.getDriver(), "//mat-dialog-container");
         this.parent = parent;
         this.branch = branch;
-    }
-
-    private WebDriver getDriver() {
-        return this.parent.getDriver();
     }
 
     @Override
@@ -66,11 +61,6 @@ public class DTCreateDialogImpl implements DTCreateDialog {
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return visibilityOfElementLocated(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public WebElement getCreateButton() {
         return visibilityOfElementLocated(getDriver(), CREATE_BUTTON_LOCATOR);
     }
@@ -83,12 +73,12 @@ public class DTCreateDialogImpl implements DTCreateDialog {
 
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"mat-mdc-dialog-content\")]//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
@@ -98,7 +88,7 @@ public class DTCreateDialogImpl implements DTCreateDialog {
 
     @Override
     public WebElement getDENField() {
-        return visibilityOfElementLocated(getDriver(), DEN_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     private String getDENFieldFromTheTable(WebElement tableData) {

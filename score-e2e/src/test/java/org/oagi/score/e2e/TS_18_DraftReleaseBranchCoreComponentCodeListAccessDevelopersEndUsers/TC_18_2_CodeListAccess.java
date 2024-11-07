@@ -70,6 +70,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
+        viewEditReleasePage.showAdvancedSearchPanel();
         viewEditReleasePage.setState("Draft");
         viewEditReleasePage.hitSearchButton();
         long timeout = Duration.ofSeconds(300L).toMillis();
@@ -174,6 +175,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         clStates.add("Production");
         clStates.add("Deleted");
         viewEditCodeListPage.setBranch(existingReleaseNum);
+        viewEditCodeListPage.showAdvancedSearchPanel();
 
         for (String state : clStates) {
             viewEditCodeListPage.setState(state);

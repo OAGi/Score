@@ -8,18 +8,12 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {
-  AsccpFlatNode,
-  CcFlatNode,
-  CcFlatNodeDatabase,
-  CcFlatNodeDataSource,
-  CcFlatNodeDataSourceSearcher
-} from '../domain/cc-flat-tree';
+import {AsccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNodeDetail,
   CcAsccpNodeDetail,
-  CcBccpNodeDetail, CcBdtPriRestri,
+  CcBccpNodeDetail,
   CcBdtScNodeDetail,
   CcNodeDetail,
   CcRevisionResponse,
@@ -49,6 +43,8 @@ import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
 import {FormControl} from '@angular/forms';
+import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 
 @Component({
   selector: 'score-asccp-detail',
@@ -99,6 +95,7 @@ export class AsccpDetailComponent implements OnInit {
     return 1000000 * this.virtualScrollItemSize;
   }
 
+  preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
 
   get hideCardinality(): boolean {
@@ -117,6 +114,7 @@ export class AsccpDetailComponent implements OnInit {
               private namespaceService: NamespaceService,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private tagService: TagService,
               private location: Location,
               private router: Router,
@@ -138,14 +136,16 @@ export class AsccpDetailComponent implements OnInit {
           this.service.getLastPublishedRevision(this.type, this.manifestId),
           this.service.getAsccpNode(this.manifestId),
           this.namespaceService.getSimpleNamespaces(),
-          this.tagService.getTags()
+          this.tagService.getTags(),
+          this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags]) => {
+      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags, preferencesInfo]) => {
       this.lastRevision = revisionResponse;
       this.namespaces = namespaces;
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
 
       // subscribe an event
       this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
@@ -246,6 +246,21 @@ export class AsccpDetailComponent implements OnInit {
         return true;
       }
       return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
+    });
+  }
+
+  copyPath(node: CcFlatNode) {
+    if (!node) {
+      return;
+    }
+
+    const delimiter = this.preferencesInfo.viewSettingsInfo.treeSettings.delimiter;
+    let queryPath = node.queryPath;
+    queryPath = queryPath.replaceAll('/', delimiter);
+
+    this.clipboard.copy(queryPath);
+    this.snackBar.open('Copied to clipboard', '', {
+      duration: 3000
     });
   }
 
@@ -816,8 +831,6 @@ export class AsccpDetailComponent implements OnInit {
 
   openEditTags() {
     const dialogRef = this.dialog.open(EditTagsDialogComponent, {
-      width: '90%',
-      maxWidth: '90%',
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe(_ => {

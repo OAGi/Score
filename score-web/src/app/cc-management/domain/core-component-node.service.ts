@@ -19,7 +19,8 @@ import {
   CcNodeUpdateResponse,
   CcRevisionResponse,
   CcSeqUpdateRequest,
-  Comment, VerifyAppendAssociationResponse
+  Comment,
+  VerifyAppendAssociationResponse
 } from './core-component-node';
 import {base64Encode} from '../../common/utility';
 import {map} from 'rxjs/operators';

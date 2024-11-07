@@ -29,6 +29,7 @@ tr.element-row:not(.expanded-row):active {
 .element-detail {
   overflow: hidden;
   display: flex;
+  font-size: 12px;
 }
 
 .mat-mdc-card-content p {
@@ -38,19 +39,6 @@ tr.element-row:not(.expanded-row):active {
 
 .mat-mdc-card-content {
   margin-bottom: 0;
-}
-
-.mat-column-prefix {
-  width: 90px;
-}
-
-.mat-column-owner {
-  width: 140px;
-  font-size: 13px;
-}
-
-.mat-column-lastUpdateTimestamp {
-  width: 160px;
 }
 
 .mat-column-more {

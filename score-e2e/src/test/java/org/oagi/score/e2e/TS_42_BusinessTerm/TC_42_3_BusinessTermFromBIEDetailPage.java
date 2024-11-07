@@ -77,6 +77,7 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         //verify end user can see all random business terms assigned to the selected BIE
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         for (int i = 0; i < businessTerms.size(); i++) {
             btAssignmentPageForSelectedBIE.setBusinessTerm(businessTerms.get(i).getBusinessTerm());
             click(btAssignmentPageForSelectedBIE.getSearchButton());
@@ -115,6 +116,7 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
 
         WebElement bbieNodeForCheck = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP).getNodeByPath(path);
         BusinessTermAssignmentPage btAssignmentPageForSelectedBIE = editBIEPage.getBBIEPanel(bbieNodeForCheck).clickShowBusinessTermsButton();
+        btAssignmentPageForSelectedBIE.showAdvancedSearchPanel();
         btAssignmentPageForSelectedBIE.setBusinessTerm(randomBusinessTerm.getBusinessTerm());
         btAssignmentPageForSelectedBIE.hitSearchButton();
         assertTrue(btAssignmentPageForSelectedBIE.getSelectCheckboxAtIndex(1).isDisplayed());

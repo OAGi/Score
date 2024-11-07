@@ -14,7 +14,7 @@
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName"
+          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName" maxlength="100"
                 [disabled]="!roles.includes('developer')">
         </mat-form-field>
 

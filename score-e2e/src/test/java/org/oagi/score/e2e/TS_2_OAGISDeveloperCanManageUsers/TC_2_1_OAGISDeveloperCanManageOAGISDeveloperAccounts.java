@@ -21,8 +21,10 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTest {
@@ -63,6 +65,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
 
         newAccountPage.createNewAccount(newUser);
         LoginPage loginPage = homePage.logout();
+        waitFor(ofMillis(1000L));
 
         homePage = loginPage.signIn(newUser.getLoginId(), newUser.getPassword());
         WebElement loginIDMenu = homePage.getLoginIDMenu().getLoginIDMenuButton();

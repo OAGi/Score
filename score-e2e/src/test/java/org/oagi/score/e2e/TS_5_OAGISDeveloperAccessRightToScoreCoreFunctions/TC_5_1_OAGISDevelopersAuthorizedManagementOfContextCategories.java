@@ -342,6 +342,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         homePage.openPage();
         contextMenu = homePage.getContextMenu();
         viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
+        viewEditContextCategoryPage.showAdvancedSearchPanel();
         viewEditContextCategoryPage.setUpdater(appUser.getLoginId());
         viewEditContextCategoryPage.hitSearchButton();
         assertContextCategoryNameInTheSearchResultsAtFirst(
@@ -382,6 +383,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         homePage.openPage();
         contextMenu = homePage.getContextMenu();
         viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
+        viewEditContextCategoryPage.showAdvancedSearchPanel();
         viewEditContextCategoryPage.setUpdatedStartDate(randomContextCategory.getCreationTimestamp());
         viewEditContextCategoryPage.setUpdatedEndDate(randomContextCategory.getLastUpdateTimestamp());
         viewEditContextCategoryPage.hitSearchButton();
@@ -403,6 +405,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         homePage.openPage();
         contextMenu = homePage.getContextMenu();
         viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
+        viewEditContextCategoryPage.showAdvancedSearchPanel();
         viewEditContextCategoryPage.setName(randomContextCategory.getName());
         viewEditContextCategoryPage.hitSearchButton();
         assertContextCategoryNameInTheSearchResultsAtFirst(
@@ -423,6 +426,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         homePage.openPage();
         contextMenu = homePage.getContextMenu();
         viewEditContextCategoryPage = contextMenu.openViewEditContextCategorySubMenu();
+        viewEditContextCategoryPage.showAdvancedSearchPanel();
         viewEditContextCategoryPage.setDescription(randomContextCategory.getDescription().substring(0, 10));
         viewEditContextCategoryPage.hitSearchButton();
         assertContextCategoryNameInTheSearchResultsAtFirst(

@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.bie;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * An interface of 'Copy BIE - Select BIE' page.
  */
-public interface CopyBIEForSelectBIEPage extends Page {
+public interface CopyBIEForSelectBIEPage extends Page, SearchBarPage {
 
     /**
      * Return the UI element of the page subtitle.
@@ -128,13 +129,6 @@ public interface CopyBIEForSelectBIEPage extends Page {
      * @param state State
      */
     void setState(String state);
-
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button

@@ -367,6 +367,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setOwner(endUser.getLoginId());
         viewEditAgencyIDListPage.hitSearchButton();
 
@@ -669,6 +670,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setName(agencyIDList.getName());
         viewEditAgencyIDListPage.setDeprecated(true);
@@ -693,6 +695,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
         for (AgencyIDListObject agencyIDList : agencyIDLists) {
+            viewEditAgencyIDListPage.showAdvancedSearchPanel();
             viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
             viewEditAgencyIDListPage.setName(agencyIDList.getName());
             viewEditAgencyIDListPage.setState(agencyIDList.getState());
@@ -720,6 +723,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setUpdatedStartDate(agencyIDList.getCreationTimestamp());
         viewEditAgencyIDListPage.setUpdatedEndDate(agencyIDList.getLastUpdateTimestamp());
         viewEditAgencyIDListPage.setName(agencyIDList.getName());
@@ -762,6 +766,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setDefinition(agencyIDList.getDefinition().substring(0, 10));
         viewEditAgencyIDListPage.setName(agencyIDList.getName());
         viewEditAgencyIDListPage.hitSearchButton();
@@ -781,6 +786,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
+        viewEditAgencyIDListPage.showAdvancedSearchPanel();
         viewEditAgencyIDListPage.setBranch(release.getReleaseNumber());
         viewEditAgencyIDListPage.setModule("3055_D16B");
         viewEditAgencyIDListPage.hitSearchButton();

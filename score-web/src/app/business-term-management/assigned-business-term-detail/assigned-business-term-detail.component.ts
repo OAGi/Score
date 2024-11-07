@@ -50,7 +50,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   isDisabled() {
     return (this.assignedBusinessTerm.assignedBizTermId === undefined || !this.assignedBusinessTerm.assignedBizTermId) ||
       (this.assignedBusinessTerm.bieType !== 'ASBIE' && this.assignedBusinessTerm.bieType !== 'BBIE') ||
-      (this.assignedBusinessTerm.primary === undefined) ||
+      (this.assignedBusinessTerm.primaryIndicator === undefined) ||
       (this.assignedBusinessTerm.typeCode === undefined || this.assignedBusinessTerm.typeCode === '');
   }
 
@@ -68,7 +68,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     this.service.checkAssignmentUniqueness(
       _assignedBusinessTerm.bieId, _assignedBusinessTerm.bieType,
       _assignedBusinessTerm.businessTermId, _assignedBusinessTerm.typeCode,
-      _assignedBusinessTerm.primary)
+      _assignedBusinessTerm.primaryIndicator)
       .subscribe(resp => {
       if (!resp) {
         this.openDialogAssignedBusinessTermUpdate();
@@ -79,16 +79,16 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   }
 
   checkIfPrimaryWillBeOverwrittenAndDoUpdate(_assignedBusinessTerm: AssignedBusinessTerm) {
-    if (_assignedBusinessTerm.primary) {
+    if (_assignedBusinessTerm.primaryIndicator) {
       return this.service.findIfPrimaryExist(_assignedBusinessTerm.bieId,
-        _assignedBusinessTerm.bieType, _assignedBusinessTerm.primary, _assignedBusinessTerm.typeCode)
+        _assignedBusinessTerm.bieType, _assignedBusinessTerm.primaryIndicator, _assignedBusinessTerm.typeCode)
         .subscribe(resp => {
         if (resp && resp.length > 0) {
           const dialogConfig = this.confirmDialogService.newConfig();
           dialogConfig.data.header = 'Overwrite previous preferred business term?';
           dialogConfig.data.content = [
-            ' The preferred business term already exists for selected BIE and type code.' +
-            ' Are you sure you want to do the update and overwrite the previous preferred business term assignment?'
+            'The preferred business term already exists for selected BIE and type code.',
+            'Are you sure you want to do the update and overwrite the previous preferred business term assignment?'
           ];
           dialogConfig.data.action = 'Update';
           this.confirmDialogService.open(dialogConfig).afterClosed()
@@ -152,7 +152,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   isDirty(): boolean {
     return !!this.assignedBusinessTerm.assignedBizTermId
       || this.assignedBusinessTerm.typeCode && this.assignedBusinessTerm.typeCode.length > 0
-      || this.assignedBusinessTerm.primary != null;
+      || this.assignedBusinessTerm.primaryIndicator != null;
   }
 
   followTheExternalUri() {

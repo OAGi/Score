@@ -7,124 +7,134 @@
   </div>
 
   <mat-card class="pt-3">
-    <mat-card class="search-box">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.preferredUsername"
-                       (ngModelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadPendingList();"
-                       placeholder="Preferred Username">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.email"
-                       (ngModelChange)="onChange('filters.email', request.filters.email)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadPendingList();"
-                       placeholder="Email">
-              </mat-form-field>
-            </div>
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.providerName"
-                       (ngModelChange)="onChange('filters.providerName', request.filters.providerName)"
-                       (keyup.enter)="this.paginator.pageIndex = 0; this.loadPendingList();"
-                       placeholder="Provider">
-              </mat-form-field>
-            </div>
+    <score-search-bar placeholder="Search by Preferred Username" [(model)]="request.filters.preferredUsername"
+                      (modelChange)="onChange('filters.preferredUsername', request.filters.preferredUsername);"
+                      (search)="onSearch();">
+      <div advancedSearchContent style="padding-left: 3rem;">
+        <mat-card-content class="mat-card-container">
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.email"
+                         (ngModelChange)="onChange('filters.email', request.filters.email)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Email">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.providerName"
+                         (ngModelChange)="onChange('filters.providerName', request.filters.providerName)"
+                         (keyup.enter)="onSearch();"
+                         placeholder="Provider">
+                </mat-form-field>
+              </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
-              <mat-form-field>
-                <mat-label>Created start date</mat-label>
-                <input matInput [matDatepicker]="dateStart" placeholder="Created start date"
-                       [max]="request.createdDate.end" [value]="request.createdDate.start"
-                       (dateInput)="onDateEvent('startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+              <div class="col-md-2 col-sm-12" style="display: flex;">
+                <mat-form-field>
+                  <mat-label>Created start date</mat-label>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Created start date"
+                         [max]="request.createdDate.end" [value]="request.createdDate.start"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
-              <mat-form-field>
-                <mat-label>Created end date</mat-label>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Created end date"
-                       [min]="request.createdDate.start" [value]="request.createdDate.end"
-                       (dateInput)="onDateEvent('endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+              <div class="col-md-2 col-sm-12" style="display: flex;">
+                <mat-form-field>
+                  <mat-label>Created end date</mat-label>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Created end date"
+                         [min]="request.createdDate.start" [value]="request.createdDate.end"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit"
-                (click)="this.paginator.pageIndex = 0; this.loadPendingList();">
-          <mat-icon>search</mat-icon>
-          <span class="ml-2">Search</span>
-        </button>
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+      </div>
+    </score-search-bar>
 
     <mat-card-content class="mat-card-container">
-      <div class="mat-elevation-z1">
-        <table mat-table
-               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-               [dataSource]="dataSource">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
 
-          <ng-container matColumnDef="preferredUsername">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Preferred Username</th>
-            <td mat-cell *matCellDef="let element">
-              <a routerLink="/account/pending/{{ element.appOauth2UserId }}">{{ element.preferredUsername }}</a>
-            </td>
-          </ng-container>
+      <div class="table-container">
+        <div class="score-column-container align-items-center">
+          <score-column-selector
+            [columns]="columns"
+            (columnsChange)="onColumnsChange($event)"
+            (onReset)="onColumnsReset()">
+          </score-column-selector>
+        </div>
+        <div class="mat-elevation-z1 table-wrapper mt-3">
+          <table mat-table
+                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
+                 [dataSource]="dataSource">
 
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef> Email</th>
-            <td mat-cell *matCellDef="let element">
-              <a routerLink="/account/pending/{{ element.appOauth2UserId }}">{{ element.email }}</a>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="preferredUsername">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Preferred Username')" (onResize)="onResizeWidth($event)"> Preferred Username</th>
+              <td mat-cell *matCellDef="let element">
+                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
+                  <span class="word-break-all">{{ element.preferredUsername }}</span>
+                </a>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="providerName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Provider</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.providerName }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Email')" (onResize)="onResizeWidth($event)"> Email</th>
+              <td mat-cell *matCellDef="let element">
+                <a routerLink="/account/pending/{{ element.appOauth2UserId }}">
+                  <span class="word-break-all">{{ element.email }}</span>
+                </a>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="creationTimestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="providerName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Provider')" (onResize)="onResizeWidth($event)"> Provider</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="word-break-all">{{ element.providerName }}</span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+            <ng-container matColumnDef="creationTimestamp">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  score-table-column-resize [defaultWidth]="width('Created On')" (onResize)="onResizeWidth($event)"> Created</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+              </td>
+            </ng-container>
 
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPageChange($event)"
-          showFirstLastButtons></mat-paginator>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <mat-paginator
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons></mat-paginator>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

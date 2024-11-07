@@ -1,5 +1,5 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
@@ -17,9 +17,7 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -41,6 +39,11 @@ import {saveAs} from 'file-saver';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {MatSlideToggleChange} from '@angular/material/slide-toggle';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-cc-list',
@@ -65,15 +68,164 @@ export class CcListComponent implements OnInit {
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
   workingRelease = WorkingRelease;
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'valueDomain', 'sixDigitId', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp'
-  ];
+  get filterTypes() {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage;
+  }
+
+  onFilterTypesChange(updatedColumns: { name: string; selected: boolean }[]) {
+    this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage = updatedColumns;
+    this.preferencesService.updateFilterTypeForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+
+    this.request.types = updatedColumns.filter(e => e.selected).map(e => e.name);
+    this.onSearch();
+  }
+
+  onFilterTypesReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
+  }
+
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
+    this.updateTableColumnsForCoreComponentPage();
+  }
+
+  updateTableColumnsForCoreComponentPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForCoreComponentPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Value Domain':
+          if (column.selected) {
+            displayedColumns.push('valueDomain');
+          }
+          break;
+        case 'Six Hexadecimal ID':
+          if (column.selected) {
+            displayedColumns.push('sixDigitId');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
   loading = false;
-
   isElasticsearchOn = false;
+
+  get browserMode(): boolean {
+    if (!this.preferencesInfo) {
+      return false;
+    }
+
+    return this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode;
+  }
+
+  onBrowserModeChange($event: MatSlideToggleChange) {
+    this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
+    this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {});
+  }
 
   releases: Release[] = [];
   loginIdList: string[] = [];
@@ -84,7 +236,10 @@ export class CcListComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
   tags: Tag[] = [];
+  preferencesInfo: PreferencesInfo;
   namespaces: SimpleNamespace[] = [];
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<SimpleNamespace[]> = new ReplaySubject<SimpleNamespace[]>(1);
@@ -94,6 +249,8 @@ export class CcListComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private service: CcListService,
               private nodeService: CcNodeService,
@@ -106,6 +263,7 @@ export class CcListComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -134,15 +292,26 @@ export class CcListComponent implements OnInit {
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
+    this.searchBar.showAdvancedSearch =
+      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCcList();
+      this.onSearch();
     });
 
     this.loading = true;
@@ -151,8 +320,9 @@ export class CcListComponent implements OnInit {
       this.accountService.getAccountNames(),
       this.namespaceService.getSimpleNamespaces(),
       this.aboutService.getProductInfo(),
-      this.tagService.getTags()
-    ]).subscribe(([releases, loginIds, namespaces, productInfos, tags]) => {
+      this.tagService.getTags(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([releases, loginIds, namespaces, productInfos, tags, preferencesInfo]) => {
       for (const productInfo of productInfos) {
         if (productInfo.productName === 'Elasticsearch' && productInfo.productVersion !== '0.0.0.0') {
           this.isElasticsearchOn = true;
@@ -179,6 +349,8 @@ export class CcListComponent implements OnInit {
       }
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.tags = tags;
+      this.preferencesInfo = preferencesInfo;
+      this.request.types = this.preferencesInfo.tableColumnsInfo.filterTypesOfCoreComponentPage.filter(e => e.selected).map(e => e.name);
 
       this.namespaces.push(...namespaces);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
@@ -190,6 +362,11 @@ export class CcListComponent implements OnInit {
     }, error => {
       this.loading = false;
     });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCcList();
   }
 
   loadCcList(isInit?: boolean) {
@@ -209,20 +386,14 @@ export class CcListComponent implements OnInit {
 
       this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b class="bg-warning">$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
+
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0],
+          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
       this.selection.clear();
     }, error => {
@@ -238,16 +409,22 @@ export class CcListComponent implements OnInit {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
+        this.request.page.sortActive = '';
+        this.request.page.sortDirection = '';
         this.sort.active = '';
         this.sort.direction = '';
       } else {
+        this.request.page.sortActive = 'lastUpdateTimestamp';
+        this.request.page.sortDirection = 'desc';
         this.sort.active = 'lastUpdateTimestamp';
         this.sort.direction = 'desc';
       }
@@ -286,8 +463,13 @@ export class CcListComponent implements OnInit {
         } else {
           return '/core_component/acc/' + ccList.manifestId;
         }
+
       case 'ASCCP':
-        return '/core_component/asccp/' + ccList.manifestId;
+        if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+          return '/core_component/browser/asccp/' + ccList.manifestId;
+        } else {
+          return '/core_component/asccp/' + ccList.manifestId;
+        }
 
       case 'BCCP':
         return '/core_component/bccp/' + ccList.manifestId;
@@ -420,7 +602,7 @@ export class CcListComponent implements OnInit {
 
           this.loading = false;
         }, error => {
-            this.loading = false;
+          this.loading = false;
         });
       });
   }

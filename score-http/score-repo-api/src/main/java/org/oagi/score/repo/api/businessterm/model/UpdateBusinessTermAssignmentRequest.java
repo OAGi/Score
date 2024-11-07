@@ -15,7 +15,7 @@ public class UpdateBusinessTermAssignmentRequest extends Request {
 
     private String typeCode;
 
-    private boolean primary;
+    private boolean primaryIndicator;
 
     public UpdateBusinessTermAssignmentRequest(ScoreUser requester) {
         super(requester);
@@ -50,12 +50,12 @@ public class UpdateBusinessTermAssignmentRequest extends Request {
         this.typeCode = typeCode;
     }
 
-    public boolean isPrimary() {
-        return primary;
+    public boolean isPrimaryIndicator() {
+        return primaryIndicator;
     }
 
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+    public void setPrimaryIndicator(boolean primaryIndicator) {
+        this.primaryIndicator = primaryIndicator;
     }
 
     public BigInteger getBieId() {
@@ -73,7 +73,7 @@ public class UpdateBusinessTermAssignmentRequest extends Request {
                 ", bieId=" + bieId +
                 ", bieType='" + bieType + '\'' +
                 ", typeCode='" + typeCode + '\'' +
-                ", primary='" + primary + '\'' +
+                ", primaryIndicator='" + primaryIndicator + '\'' +
                 '}';
     }
 }

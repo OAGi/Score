@@ -74,9 +74,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
         homePage.getLoginIDMenu().checkOAGISTerminology();
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
-
-        String denFieldLabel = viewEditCoreComponentPage.getDENFieldLabel();
-        assertEquals("DEN (Dictionary Entry Name)", denFieldLabel);
+        viewEditCoreComponentPage.showAdvancedSearchPanel();
 
         String moduleFieldLabel = viewEditCoreComponentPage.getModuleFieldLabel();
         assertEquals("Module (Part of schema file path, no extension)", moduleFieldLabel);
@@ -199,6 +197,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
 
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
 
         ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), release.getReleaseNumber());
         homePage.getLoginIDMenu().checkOAGISTerminology();

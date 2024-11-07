@@ -1,0 +1,602 @@
+<mat-sidenav-container class="example-container" [hasBackdrop]="false">
+  <mat-sidenav #sidenav>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content (click)="sidenav.close();">
+    <div class="cdk-overlay-backdrop cdk-overlay-dark-backdrop cdk-overlay-backdrop-showing" *ngIf="loading">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+    <div class="context-section">
+      <div class="row m-0">
+        <div class="col-12 p-0">
+          <mat-card class="search-box-container mb-1">
+            <mat-card-content>
+              <div class="container-fluid" *ngIf="searcher && dataSource">
+                <div class="row">
+                  <div class="col-5 tree-search-box">
+                    <div class="row align-items-center">
+                      <div class="col-9">
+                        <mat-form-field>
+                          <mat-label *ngIf="!selectedNode">Search</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
+                          <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                                 [disabled]="searcher.isSearching"
+                                 (keyup.enter)="search(searcher.inputKeyword)">
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.searchResult.length > 0"
+                                    align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+                          <mat-hint matSuffix *ngIf="searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0"
+                                    align="end">0 results</mat-hint>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3 buttons">
+                        <button mat-icon-button mat-small-icon-button
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                                (click)="move(-1)">
+                          <mat-icon>keyboard_arrow_up</mat-icon>
+                        </button>
+                        <button mat-icon-button mat-small-icon-button
+                                [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                                (click)="move(1)">
+                          <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                        <button mat-icon-button mat-small-icon-button
+                                [hidden]="searcher.fullSearched"
+                                [disabled]="searcher.isSearching"
+                                [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
+                                (click)="search(searcher.inputKeyword, false, true)">
+                          <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+                        </button>
+                        <button mat-icon-button mat-small-icon-button
+                                [disabled]="searcher.isSearching"
+                                [hidden]="!searcher.inputKeyword"
+                                (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                        <div style="height: 19px;">
+                          <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                                                [hidden]="!searcher.isSearching"></mat-progress-spinner>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-7 actions-wrap">
+                    <div class="actions ml-auto d-flex align-items-center">
+                      <div>
+                        <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
+                                [matMenuTriggerFor]="settingsContextMenu"
+                                [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
+                          <mat-icon>settings</mat-icon>
+                        </button>
+                      </div>
+                      <div class="ml-3">
+                      </div>
+                    </div>
+                    <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+                      <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
+                        <mat-checkbox class="d-inline-flex pr-2" [(ngModel)]="hideCardinality">
+                          <span>Hide cardinality</span>
+                        </mat-checkbox>
+                      </button>
+                    </mat-menu>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="tree-breadcrumbs-wrap" id="tree-breadcrumbs-wrap" *ngIf="selectedNode">
+                    <div class="tree-breadcrumb"
+                         *ngFor="let bread of selectedNode.parents; let last = last;">
+                      <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                      <span *ngIf="last"
+                            class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
+                      <span *ngIf="!last" class="tree-breadcrumb-item"
+                            (click)="scrollToNode(bread)">{{ bread.name }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+      <div class="row m-0" (window:resize)="onResize($event)">
+        <div class="col-12 p-0">
+          <as-split unit="percent" [direction]="'horizontal'" style="overflow-y: scroll;">
+            <as-split-area class="left-panel" size="30">
+              <mat-card class="bie-node-tree-panel">
+                <mat-card-content class="mat-card-container">
+                  <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
+                                               minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
+                                               [style.height.px]="innerHeight" #virtualScroll>
+                    <div *cdkVirtualFor="let node of dataSource" class="example-item"
+                         (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
+                      <div class="mat-tree-node d-flex pointer"
+                           tabIndex="0"
+                           [attr.data-level]="node.level"
+                           [attr.data-path]="node.path"
+                           [class]="{'tree-node-selected': cursorNode === node}"
+                           (click)="onClick(node, $event)"
+                           (keydown)="keyNavigation(node, $event)"
+                           [style.padding-left]="node.level * paddingPixel + 'px'">
+                        <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
+                                (click)="toggle(node, $event)"
+                                class="align-self-center"
+                                mat-icon-button>
+                          <mat-icon class="mat-icon-rtl-mirror">
+                            {{ node.expanded ? 'expand_more' : 'chevron_right' }}
+                          </mat-icon>
+                        </button>
+                        <ng-template #disabledRef>
+                          <button mat-icon-button disabled></button>
+                        </ng-template>
+
+                        <span [class]="['align-self-center', node.type.toLowerCase(),
+                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                              [class.deprecated]="node.deprecated"
+                              [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
+                              [innerHTML]="node.name | highlight : searcher.searchKeyword">
+                        </span>
+
+                        <span [class]="['pl-3']" *ngIf="!dataSource.hideCardinality">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+
+                        <div class="ml-auto align-self-center mr-2" style="margin-bottom: 3px">
+                          <mat-icon [hidden]="!node.showCopyLinkIcon"
+                                    class="copy-link-icon"
+                                    matTooltip="Copy Link"
+                                    (click)="copyLink(node, $event)">
+                            link
+                          </mat-icon>
+                          <mat-icon class="context-menu-icon"
+                                    [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
+                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                          </mat-icon>
+                        </div>
+                      </div>
+                    </div>
+                  </cdk-virtual-scroll-viewport>
+
+                  <!-- Context Menu Area -->
+                  <mat-menu class="context-menu" #contextMenuForLeaf="matMenu">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                  </mat-menu>
+
+                  <mat-menu class="context-menu" #contextMenu="matMenu">
+                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                      <span class="context-menu-item">Copy Path</span>
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
+                      <span class="context-menu-item">Expand 2</span>
+                    </button>
+                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
+                      <span class="context-menu-item">Expand 3</span>
+                    </button>
+                  </mat-menu>
+                </mat-card-content>
+              </mat-card>
+            </as-split-area>
+            <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
+              <!-- ACC -->
+              <div class="bie-edit-detail-panel scroll" *ngIf="isAccDetail() && asAccDetail().isLoaded">
+                <mat-tab-group mat-align-tabs="start">
+                  <mat-tab label="{{ selectedNode.name }}">
+                    <div class="bie-edit-detail-container">
+                      <div class="row">
+                        <div class="col-4">
+                          <mat-form-field>
+                            <mat-label>Release</mat-label>
+                            <input matInput placeholder="Release" [(ngModel)]="asAccDetail().asccp.releaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                          <mat-form-field>
+                            <mat-label>State</mat-label>
+                            <input matInput placeholder="State" [(ngModel)]="asAccDetail().asccp.state" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Owner</mat-label>
+                            <input matInput placeholder="Owner" [(ngModel)]="asAccDetail().asccp.owner" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-3 col-sm-6">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAccDetail().asccp.deprecated"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asAccDetail().asccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Type Definition" [readonly]="true"
+                                        value="{{ asAccDetail().acc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+
+              <!-- ASCCP -->
+              <div class="bie-edit-detail-panel scroll" *ngIf="isAsccpDetail()">
+                <mat-tab-group mat-align-tabs="start">
+                  <mat-tab label="{{ selectedNode.name }}">
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsccpDetail().ascc.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsccpDetail().asccp.nillable"
+                                          matTooltip="This property cannot change since the Core Component is not nillable."
+                                          [matTooltipDisabled]="asAsccpDetail().asccp.nillable"
+                                          [disabled]="true">
+                              Nillable
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required [value]="asAsccpDetail().ascc.cardinalityMin" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsccpDetail().ascc.cardinalityMax | unbounded}})" required
+                                   [value]="asAsccpDetail().ascc.cardinalityMax | unbounded"  [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Association Definition" [readonly]="true"
+                                        value="{{ asAsccpDetail().ascc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asAsccpDetail().asccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Type Definition" [readonly]="true"
+                                        value="{{ asAsccpDetail().acc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+
+              <!-- BCCP -->
+              <div class="bie-edit-detail-panel scroll" *ngIf="isBccpDetail()">
+                <mat-tab-group mat-align-tabs="start">
+                  <mat-tab label="{{ selectedNode.name }}">
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBccpDetail().bcc.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBccpDetail().bcc.nillable"
+                                          matTooltip="This property cannot change since the Core Component is not nillable."
+                                          [matTooltipDisabled]="asBccpDetail().bccp.nillable"
+                                          [disabled]="true">
+                              Nillable
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required [value]="asBccpDetail().bcc.cardinalityMin" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBccpDetail().bcc.cardinalityMax | unbounded}})" required
+                                   [value]="asBccpDetail().bcc.cardinalityMax | unbounded" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row form-field-box">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Constraint</mat-label>
+                                <mat-select [value]="asBccpDetail().bcc.fixedOrDefault"
+                                            [disabled]="true">
+                                  <mat-option value="none">None</mat-option>
+                                  <mat-option value="fixed">Fixed Value</mat-option>
+                                  <mat-option value="default">Default Value</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBccpDetail().bcc.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBccpDetail().bcc.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                       [(ngModel)]="asBccpDetail().bcc.fixedValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBccpDetail().bcc.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                       [(ngModel)]="asBccpDetail().bcc.defaultValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Domain Restriction</mat-label>
+                                <mat-select placeholder="Value Domain Restriction" required
+                                            [value]="asBccpDetail().bdt.valueDomainType"
+                                            [disabled]="true">
+                                  <mat-option value="Primitive">Primitive</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBccpDetail().bdt.valueDomainType === 'Primitive'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [value]="asBccpDetail().bdt.defaultBdtPriRestri.bdtPriRestriId">
+                                  <mat-option *ngFor="let xbt of asBccpDetail().bdt.bdtPriRestriList"
+                                              [value]="xbt.bdtPriRestriId" [disabled]="true">
+                                    {{ xbt.xbtName }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Association Definition" [readonly]="true"
+                                        value="{{ asBccpDetail().bcc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asBccpDetail().bccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+
+              <!-- BDT_SC -->
+              <div class="bie-edit-detail-panel scroll" *ngIf="isBdtScDetail()">
+                <mat-tab-group mat-align-tabs="start">
+                  <mat-tab label="{{ selectedNode.name }}">
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBdtScDetail().bdtSc.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required
+                                   [value]="asBdtScDetail().bdtSc.cardinalityMin">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBdtScDetail().bdtSc.cardinalityMax | unbounded}})" required
+                                   [value]="asBdtScDetail().bdtSc.cardinalityMax | unbounded">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row form-field-box">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content
+                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity.">
+                              <mat-form-field>
+                                <mat-label>Value Constraint</mat-label>
+                                <mat-select [value]="asBdtScDetail().bdtSc.fixedOrDefault"
+                                            [disabled]="true">
+                                  <mat-option value="none">None</mat-option>
+                                  <mat-option value="fixed">Fixed Value</mat-option>
+                                  <mat-option value="default">Default Value</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                       [(ngModel)]="asBdtScDetail().bdtSc.fixedValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                       [(ngModel)]="asBdtScDetail().bdtSc.defaultValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Domain Restriction</mat-label>
+                                <mat-select placeholder="Value Domain Restriction" required
+                                            [value]="asBdtScDetail().bdtSc.valueDomainType"
+                                            [disabled]="true">
+                                  <mat-option value="Primitive">Primitive</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBdtScDetail().bdtSc.valueDomainType === 'Primitive'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [value]="asBdtScDetail().bdtSc.defaultBdtScPriRestri.bdtScPriRestriId">
+                                  <mat-option *ngFor="let xbt of asBdtScDetail().bdtSc.bdtScPriRestriList"
+                                              [value]="xbt.bdtScPriRestriId" [disabled]="true">
+                                    {{ xbt.xbtName }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asBdtScDetail().bdtSc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+                </mat-tab-group>
+              </div>
+            </as-split-area>
+          </as-split>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

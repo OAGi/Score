@@ -90,6 +90,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         // Uplift Production BIE
         upliftBIEPage.openPage();
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prevRelease);
         upliftBIEPage.setTargetBranch(currRelease);
         upliftBIEPage.setState("Production");
@@ -398,6 +399,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(topLevelASBIEP.getDen());
@@ -420,6 +422,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
@@ -511,6 +514,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
@@ -549,6 +553,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setState("QA");
@@ -670,6 +675,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //Test part where only the association information are transferred
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2915.topLevelASBIEP.getDen());
@@ -767,6 +773,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         bieMenu = homePage.getBIEMenu();
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2915dReusedChild.topLevelASBIEP.getDen());
@@ -781,6 +788,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //uplift BIEUserbReusedParent
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2915dReusedParent.topLevelASBIEP.getDen());
@@ -799,6 +807,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //Test Assertion Verification
 
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2915dReusedScenario.topLevelASBIEP.getDen());
@@ -980,6 +989,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         //Uplift TOPBIEGETBOM
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2919_TOPBIEGETBOM.topLevelASBIEP.getDen());
@@ -1016,9 +1026,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //BIEPrimitiveDate
         upliftBIEPage.openPage();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
-
         upliftBIEPage.setDEN(preconditionsTa2919_BIEPrimitiveDate.topLevelASBIEP.getDen());
         upliftBIEPage.hitSearchButton();
         tr = upliftBIEPage.getTableRecordAtIndex(1);
@@ -1263,6 +1273,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //Uplift TOPBIEGETBOM
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2919TOPBIEGETBOM.topLevelASBIEP.getDen());
@@ -1392,6 +1403,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         //Uplift BIEBOMDoubleNested
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2910BIEBOMDoubleNested.topLevelASBIEP.getDen());
@@ -1473,6 +1485,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         bieMenu = homePage.getBIEMenu();
 
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2910JournalEntry.topLevelASBIEP.getDen());
@@ -1736,6 +1749,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.hitUpdateButton();
 
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getDen());
@@ -1896,6 +1910,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         //Uplift BIECAGUplift after CodeList uplift
 
         upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2911BIECAGUplift.topLevelASBIEP.getDen());
@@ -2100,6 +2115,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage.moveToQA();
 
         UpliftBIEPage upliftBIEPage = bieMenu.openUpliftBIESubMenu();
+        upliftBIEPage.showAdvancedSearchPanel();
         upliftBIEPage.setSourceBranch(prev_release);
         upliftBIEPage.setTargetBranch(curr_release);
         upliftBIEPage.setDEN(preconditionsTa2912JournalEntry.topLevelASBIEP.getDen());

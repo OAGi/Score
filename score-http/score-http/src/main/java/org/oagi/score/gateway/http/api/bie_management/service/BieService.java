@@ -281,6 +281,8 @@ public class BieService {
         PaginationResponse<AsbieListRecord> result = bieRepository.selectBieLists()
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
+                .setVersion(request.getVersion())
+                .setRemark(request.getRemark())
                 .setStates(request.getStates())
                 .setBieIdAndType(request.getBieId(), request.getTypes())
                 .setReleaseIds(request.getReleaseIds())

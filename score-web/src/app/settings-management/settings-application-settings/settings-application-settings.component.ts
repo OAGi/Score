@@ -9,7 +9,6 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {forkJoin} from 'rxjs';
 import {ApplicationSettingsInfo} from './domain/application-settings';
 import {MailService} from '../../common/score-mail.service';
-import {FunctionsRequiringEmailTransmissionProperties} from '../../authentication/domain/auth';
 
 @Component({
   selector: 'score-settings-application-settings',

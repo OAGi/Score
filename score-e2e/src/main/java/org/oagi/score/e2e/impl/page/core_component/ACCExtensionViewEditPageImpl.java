@@ -45,7 +45,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Definition\")]//ancestor::mat-form-field//textarea");
+            By.xpath("//textarea[@placeholder=\"Definition\"]");
     private static final By SEARCH_INPUT_TEXT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"tree-search-box\")]//mat-form-field//input[@type=\"search\"]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
@@ -548,7 +548,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
 
         private WebElement getTextAreaFieldByName(String baseXPath, String name) {
             return visibilityOfElementLocated(getDriver(), By.xpath(
-                    baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/textarea"));
+                    baseXPath + "//textarea[@placeholder=\"" + name + "\"]"));
         }
 
         private WebElement getSelectFieldByName(String baseXPath, String name) {

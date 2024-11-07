@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -25,6 +25,9 @@ import {AgencyIdListCommentControl} from './agency-id-list-comment-component';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {initFilter} from '../../common/utility';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-agency-id-list-detail',
@@ -39,8 +42,10 @@ export class AgencyIdListDetailComponent implements OnInit {
   manifestId: number;
 
   agencyIdList: AgencyIdList;
+  preferencesInfo: PreferencesInfo;
   hashCode;
   valueSearch: string;
+  highlightText: string;
   workingRelease = WorkingRelease;
 
   namespaceListFilterCtrl: FormControl = new FormControl();
@@ -48,9 +53,101 @@ export class AgencyIdListDetailComponent implements OnInit {
   valueFilterCtrl: FormControl = new FormControl();
   valueFilteredList: ReplaySubject<AgencyIdListValue[]> = new ReplaySubject<AgencyIdListValue[]>(1);
 
-  displayedColumns: string[] = [
-    'select', 'value', 'name', 'deprecated', 'definition', 'definitionSource'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfAgencyIdListValuePage = columns;
+    this.updateTableColumnsForAgencyIdListValuePage();
+  }
+
+  updateTableColumnsForAgencyIdListValuePage() {
+    this.preferencesService.updateTableColumnsForAgencyIdListValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfAgencyIdListValuePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForAgencyIdListValuePage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Value':
+          if (column.selected) {
+            displayedColumns.push('value');
+          }
+          break;
+        case 'Meaning':
+          if (column.selected) {
+            displayedColumns.push('name');
+          }
+          break;
+        case 'Deprecated':
+          if (column.selected) {
+            displayedColumns.push('deprecated');
+          }
+          break;
+        case 'Definition':
+          if (column.selected) {
+            displayedColumns.push('definition');
+          }
+          break;
+        case 'Definition Source':
+          if (column.selected) {
+            displayedColumns.push('definitionSource');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
 
   dataSource = new MatTableDataSource<AgencyIdListValue>();
   selection = new SelectionModel<AgencyIdListValue>(true, []);
@@ -58,6 +155,7 @@ export class AgencyIdListDetailComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   commentControl: AgencyIdListCommentControl;
 
@@ -70,6 +168,7 @@ export class AgencyIdListDetailComponent implements OnInit {
               private dialog: MatDialog,
               private auth: AuthService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               private stompService: RxStompService) {
   }
 
@@ -85,10 +184,12 @@ export class AgencyIdListDetailComponent implements OnInit {
         this.manifestId = Number(params.get('manifestId'));
         return forkJoin([
           this.service.getAgencyIdList(this.manifestId),
-          this.namespaceService.getSimpleNamespaces()
+          this.namespaceService.getSimpleNamespaces(),
+          this.preferencesService.load(this.auth.getUserToken())
         ]);
       })
-    ).subscribe(([agencyIdList, namespaces]) => {
+    ).subscribe(([agencyIdList, namespaces, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
       this.namespaces = namespaces;
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.getSelectableNamespaces(), (e) => e.uri);
@@ -96,6 +197,15 @@ export class AgencyIdListDetailComponent implements OnInit {
       this.isUpdating = false;
     });
 
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = (data: AgencyIdListValue, filter: string) => {
@@ -143,6 +253,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+    this.highlightText = filterValue;
   }
 
   clearFilter() {

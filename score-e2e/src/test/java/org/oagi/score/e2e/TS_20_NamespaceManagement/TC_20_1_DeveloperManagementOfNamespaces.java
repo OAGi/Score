@@ -202,7 +202,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
             viewEditNamespacePage.hitSearchButton();
 
             WebElement tr = viewEditNamespacePage.getTableRecordByValue(testURI);
-            WebElement td = viewEditNamespacePage.getColumnByName(tr, "transferOwnership");
+            WebElement td = viewEditNamespacePage.getColumnByName(tr, "owner");
             assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
 
             TransferNamespaceOwershipDialog transferNamespaceOwershipDialog =

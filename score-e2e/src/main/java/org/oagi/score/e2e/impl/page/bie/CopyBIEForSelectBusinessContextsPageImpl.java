@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.bie;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
@@ -15,7 +16,7 @@ import java.util.List;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl implements CopyBIEForSelectBusinessContextsPage {
+public class CopyBIEForSelectBusinessContextsPageImpl extends BaseSearchBarPageImpl implements CopyBIEForSelectBusinessContextsPage {
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
@@ -28,12 +29,6 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Name\")]");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
 
     private static final By NEXT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Next\")]//ancestor::button[1]");
@@ -104,17 +99,12 @@ public class CopyBIEForSelectBusinessContextsPageImpl extends BasePageImpl imple
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
     public void setName(String name) {
         sendKeys(getNameField(), name);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override

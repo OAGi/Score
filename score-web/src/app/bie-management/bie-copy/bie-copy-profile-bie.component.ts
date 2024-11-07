@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {BieCopyService} from './domain/bie-copy.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -23,6 +23,10 @@ import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -37,10 +41,130 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxIds: number[] = [];
   bizCtxList: BusinessContext[] = [];
 
-  displayedColumns: string[] = [
-    'select', 'state', 'branch', 'den', 'owner', 'businessContexts',
-    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = columns;
+    this.updateTableColumnsForBiePage();
+  }
+
+  updateTableColumnsForBiePage() {
+    this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfBiePage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForBiePage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (this.preferencesInfo) {
+      for (const column of this.columns) {
+        switch (column.name) {
+          case 'State':
+            if (column.selected) {
+              displayedColumns.push('state');
+            }
+            break;
+          case 'Branch':
+            if (column.selected) {
+              displayedColumns.push('branch');
+            }
+            break;
+          case 'DEN':
+            if (column.selected) {
+              displayedColumns.push('den');
+            }
+            break;
+          case 'Owner':
+            if (column.selected) {
+              displayedColumns.push('owner');
+            }
+            break;
+          case 'Business Contexts':
+            if (column.selected) {
+              displayedColumns.push('businessContexts');
+            }
+            break;
+          case 'Version':
+            if (column.selected) {
+              displayedColumns.push('version');
+            }
+            break;
+          case 'Status':
+            if (column.selected) {
+              displayedColumns.push('status');
+            }
+            break;
+          case 'Business Term':
+            if (column.selected) {
+              displayedColumns.push('bizTerm');
+            }
+            break;
+          case 'Remark':
+            if (column.selected) {
+              displayedColumns.push('remark');
+            }
+            break;
+          case 'Updated On':
+            if (column.selected) {
+              displayedColumns.push('lastUpdateTimestamp');
+            }
+            break;
+        }
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(false, []);
   loading = false;
@@ -54,6 +178,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+  preferencesInfo: PreferencesInfo;
 
   releases: SimpleRelease[] = [];
 
@@ -61,6 +186,8 @@ export class BieCopyProfileBieComponent implements OnInit {
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
@@ -70,6 +197,7 @@ export class BieCopyProfileBieComponent implements OnInit {
               private accountService: AccountListService,
               private releaseService: ReleaseService,
               private auth: AuthService,
+              private preferencesService: SettingsPreferencesService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -82,15 +210,28 @@ export class BieCopyProfileBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
+    // The value should be 'true' unless 'adv_ser' is false.
+    this.searchBar.showAdvancedSearch =
+      (!this.route.snapshot.queryParamMap || (!this.route.snapshot.queryParamMap.get('adv_ser')) ||
+        this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieList();
+      this.onSearch();
     });
 
     // Load Business Contexts
@@ -106,9 +247,12 @@ export class BieCopyProfileBieComponent implements OnInit {
         return forkJoin([
           this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e))),
           this.accountService.getAccountNames(),
-          this.releaseService.getSimpleReleases()
+          this.releaseService.getSimpleReleases(),
+          this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([resp, loginIds, releases]) => {
+      })).subscribe(([resp, loginIds, releases, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
@@ -127,12 +271,22 @@ export class BieCopyProfileBieComponent implements OnInit {
     });
   }
 
+  get businessContextNames(): string {
+    if (!this.bizCtxList) {
+      return '';
+    } else {
+      return this.bizCtxList.map(e => e.name).join(', ');
+    }
+  }
+
   onPageChange(event: PageEvent) {
     this.loadBieList();
   }
 
   onChange(property?: string, source?) {
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
@@ -177,6 +331,11 @@ export class BieCopyProfileBieComponent implements OnInit {
     }
   }
 
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
+  }
+
   loadBieList(isInit?: boolean) {
     this.loading = true;
 
@@ -197,7 +356,7 @@ export class BieCopyProfileBieComponent implements OnInit {
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
           bizCtxIds: this.bizCtxIds.map(e => '' + e).join(',')
-        }));
+        }) + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
       }
     }, error => {
       this.dataSource.data = [];

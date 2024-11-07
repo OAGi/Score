@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.context;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
 import org.oagi.score.e2e.page.context.LoadFromCodeListDialog;
 import org.openqa.selenium.*;
 
@@ -10,43 +11,34 @@ import java.time.format.DateTimeFormatter;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
+public class LoadFromCodeListDialogImpl extends SearchBarPageImpl implements LoadFromCodeListDialog {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR
-            = By.xpath("//mat-label[contains(text(), \"Branch\")]//ancestor::div[1]/mat-select[1]");
+            = By.xpath("//mat-dialog-container//div[contains(@class, \"branch-selector\")]//mat-select[1]");
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//mat-label[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//mat-dialog-container//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
+            By.xpath("//mat-dialog-container//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
-
-    private static final By NAME_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Name\")]");
-
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//input[contains(@placeholder, \"Updated end date\")]");
 
     private static final By SELECT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Select\")]//ancestor::button[1]");
 
     private final BasePageImpl parent;
 
     public LoadFromCodeListDialogImpl(BasePageImpl parent) {
+        super(parent.getDriver(), "//mat-dialog-container");
         this.parent = parent;
-    }
-
-    private WebDriver getDriver() {
-        return this.parent.getDriver();
     }
 
     @Override
@@ -61,7 +53,7 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]/span"));
     }
 
     @Override
@@ -74,9 +66,9 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
         retry(() -> {
             WebElement optionField;
             try {
-                click(getBranchSelectField());
+                click(getDriver(), getBranchSelectField());
                 optionField = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                        By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             } catch (Exception e) {
                 throw new NoSuchElementException("Cannot locate a branch using " + branch, e);
             }
@@ -138,17 +130,12 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), NAME_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
     public void setName(String name) {
         sendKeys(getNameField(), name);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override
@@ -167,7 +154,7 @@ public class LoadFromCodeListDialogImpl implements LoadFromCodeListDialog {
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

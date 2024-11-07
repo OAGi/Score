@@ -1,14 +1,7 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FindUsagesDialogService} from './domain/find-usages-dialog.service';
-import {
-  AsccpFlatNode,
-  BccpFlatNode,
-  CcFlatNode,
-  CcFlatNodeDatabase,
-  CcFlatNodeDataSource,
-  DtFlatNode
-} from '../domain/cc-flat-tree';
+import {AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, DtFlatNode} from '../domain/cc-flat-tree';
 import {getKey, next} from '../../common/flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {forkJoin} from 'rxjs';

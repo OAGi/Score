@@ -2,7 +2,8 @@ import {NgModule} from '@angular/core';
 import {
   ArraySortPipe,
   DateAgoPipe,
-  HighlightSearch, JoinPipe,
+  HighlightSearch,
+  JoinPipe,
   PastTensePipe,
   SeparatePipe,
   TruncatePipe,
@@ -16,6 +17,7 @@ import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {ConfirmDialogModule} from './confirm-dialog/confirm-dialog.module';
 import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-actions-snack-bar.module';
+import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score-table-column-resize.directive';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-action
     JoinPipe,
     ArraySortPipe,
     TruncatePipe,
-    PastTensePipe
+    PastTensePipe,
+    ScoreTableColumnResizeDirective
   ],
   imports: [
     MatDialogModule,
@@ -48,6 +51,7 @@ import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-action
     ArraySortPipe,
     TruncatePipe,
     PastTensePipe,
+    ScoreTableColumnResizeDirective
   ]
 })
 export class ScoreCommonModule {

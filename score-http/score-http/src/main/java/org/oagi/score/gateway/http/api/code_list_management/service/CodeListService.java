@@ -165,30 +165,7 @@ public class CodeListService extends EventHandler {
         }
 
         PageRequest pageRequest = request.getPageRequest();
-        String sortDirection = pageRequest.getSortDirection();
-        SortField sortField = null;
-        if (StringUtils.hasLength(pageRequest.getSortActive())) {
-            switch (pageRequest.getSortActive()) {
-                case "codeListName":
-                    if ("asc".equals(sortDirection)) {
-                        sortField = CODE_LIST.NAME.asc();
-                    } else if ("desc".equals(sortDirection)) {
-                        sortField = CODE_LIST.NAME.desc();
-                    }
-
-                    break;
-
-                case "lastUpdateTimestamp":
-                    if ("asc".equals(sortDirection)) {
-                        sortField = CODE_LIST.LAST_UPDATE_TIMESTAMP.asc();
-                    } else if ("desc".equals(sortDirection)) {
-                        sortField = CODE_LIST.LAST_UPDATE_TIMESTAMP.desc();
-                    }
-
-                    break;
-            }
-        }
-
+        SortField sortField = getSortField(pageRequest);
 
         SelectWithTiesAfterOffsetStep<Record> offsetStep = null;
         if (sortField != null) {
@@ -239,6 +216,62 @@ public class CodeListService extends EventHandler {
                 .fetchOptionalInto(Integer.class).orElse(0));
 
         return response;
+    }
+
+    private SortField getSortField(PageRequest pageRequest) {
+        Field field = null;
+        SortField sortField = null;
+        String sortDirection = pageRequest.getSortDirection();
+        if (StringUtils.hasLength(pageRequest.getSortActive())) {
+            switch (pageRequest.getSortActive()) {
+                case "codeListName":
+                    field = CODE_LIST.NAME;
+                    break;
+
+                case "basedCodeListName":
+                    field = CODE_LIST.as("based_code_list").NAME;
+                    break;
+
+                case "agencyId":
+                    field = AGENCY_ID_LIST_VALUE.NAME;
+                    break;
+
+                case "version":
+                case "versionId":
+                    field = CODE_LIST.VERSION_ID;
+                    break;
+
+                case "extensible":
+                    field = CODE_LIST.EXTENSIBLE_INDICATOR;
+                    break;
+
+                case "revision":
+                    field = LOG.REVISION_NUM;
+                    break;
+
+                case "owner":
+                    field = APP_USER.as("owner").LOGIN_ID;
+                    break;
+
+                case "module":
+                case "modulePath":
+                    field = MODULE.PATH;
+                    break;
+
+                case "lastUpdateTimestamp":
+                    field = CODE_LIST.LAST_UPDATE_TIMESTAMP;
+                    break;
+            }
+        }
+
+        if (field != null) {
+            if ("asc".equals(sortDirection)) {
+                sortField = field.asc();
+            } else if ("desc".equals(sortDirection)) {
+                sortField = field.desc();
+            }
+        }
+        return sortField;
     }
 
     public CodeList getCodeList(AuthenticatedPrincipal user, BigInteger manifestId) {

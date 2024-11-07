@@ -13,11 +13,11 @@ import {BusinessTermDetailComponent} from './business-term-detail/business-term-
 import {AssignedBusinessTermListComponent} from './assigned-business-term-list/assigned-business-term-list.component';
 import {AssignBusinessTermBtComponent} from './assign-business-term/assign-business-term-bt.component';
 import {AssignBusinessTermBieComponent} from './assign-business-term/assign-business-term-bie.component';
-import {
-  AssignedBusinessTermDetailComponent
-} from './assigned-business-term-detail/assigned-business-term-detail.component';
+import {AssignedBusinessTermDetailComponent} from './assigned-business-term-detail/assigned-business-term-detail.component';
 import {BusinessTermUploadFileComponent} from './business-term-upload-file/business-term-upload-file.component';
-import {TranslateModule} from "@ngx-translate/core";
+import {TranslateModule} from '@ngx-translate/core';
+import {SearchBarModule} from '../common/search-bar/search-bar.module';
+import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 
 const routes: Routes = [
   {
@@ -78,16 +78,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        MaterialModule,
-        ConfirmDialogModule,
-        CommonModule,
-        ScoreCommonModule,
-        TranslateModule
-    ],
+  imports: [
+    RouterModule.forChild(routes),
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    ConfirmDialogModule,
+    CommonModule,
+    ScoreCommonModule,
+    TranslateModule,
+    SearchBarModule,
+    ColumnSelectorModule
+  ],
   declarations: [
     BusinessTermListComponent,
     BusinessTermCreateComponent,

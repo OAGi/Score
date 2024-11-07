@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.page.admin;
 
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.NoSuchElementException;
@@ -8,7 +9,7 @@ import java.util.NoSuchElementException;
 /**
  * An interface of 'Accounts' page.
  */
-public interface AccountsPage extends Page {
+public interface AccountsPage extends Page, SearchBarPage {
 
     /**
      * Return the UI element of 'Login ID' field.
@@ -37,13 +38,6 @@ public interface AccountsPage extends Page {
      * @return the UI element of 'Status' select field
      */
     WebElement getStatusSelectField();
-
-    /**
-     * Return the UI element of 'Search' button.
-     *
-     * @return the UI element of 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Return the UI element of the table record at the given index, which starts from 1.

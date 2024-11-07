@@ -2,6 +2,7 @@ package org.oagi.score.e2e.page.business_term;
 
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.Page;
+import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * An interface for 'Business Term Assignment' page
  */
-public interface BusinessTermAssignmentPage extends Page {
+public interface BusinessTermAssignmentPage extends Page, SearchBarPage {
 
     /**
      * Return the list of BIE types.
@@ -164,13 +165,6 @@ public interface BusinessTermAssignmentPage extends Page {
      * @return the UI element of the 'Preferred Only' checkbox
      */
     WebElement getPreferredOnlyCheckbox();
-
-    /**
-     * Return the UI element of the 'Search' button.
-     *
-     * @return the UI element of the 'Search' button
-     */
-    WebElement getSearchButton();
 
     /**
      * Hit the 'Search' button.

@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.business_term;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBIEPage;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class BusinessTermAssignmentPageImpl extends BasePageImpl implements BusinessTermAssignmentPage {
+public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implements BusinessTermAssignmentPage {
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
@@ -35,9 +36,6 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     private static final By TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Type\")]//ancestor::div[1]/mat-select[1]");
 
-    private static final By BIE_DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"BIE DEN\")]//ancestor::div[1]/input");
-
     private static final By BUSINESS_TERM_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Business Term\")]//ancestor::div[1]/input");
 
@@ -50,8 +48,6 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     private static final By PREFERRED_ONLY_CHECKBOX_LOCATOR =
             By.xpath("//label[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
 
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//mat-icon[contains(text(), \"search\")]//ancestor::button[1]");
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");
 
@@ -168,7 +164,7 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
 
     @Override
     public WebElement getBIEDenField() {
-        return visibilityOfElementLocated(getDriver(), BIE_DEN_FIELD_LOCATOR);
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -224,11 +220,6 @@ public class BusinessTermAssignmentPageImpl extends BasePageImpl implements Busi
     @Override
     public WebElement getPreferredOnlyCheckbox() {
         return visibilityOfElementLocated(getDriver(), PREFERRED_ONLY_CHECKBOX_LOCATOR);
-    }
-
-    @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
     }
 
     @Override

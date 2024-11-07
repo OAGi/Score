@@ -5,7 +5,7 @@ describe('BiePackageListComponent', () => {
   let component: BiePackageListComponent;
   let fixture: ComponentFixture<BiePackageListComponent>;
 
-  beforeEach(async () => {
+  beforeEach(fakeAsync () => {
     await TestBed.configureTestingModule({
       declarations: [BiePackageListComponent]
     })

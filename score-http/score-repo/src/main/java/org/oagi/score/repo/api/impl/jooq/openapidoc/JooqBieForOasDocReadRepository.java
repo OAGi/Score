@@ -229,20 +229,34 @@ public class JooqBieForOasDocReadRepository extends JooqScoreRepository
                 case "den":
                     field = ASCCP_MANIFEST.DEN;
                     break;
+                case "remark":
+                    field = ASBIEP.REMARK;
+                    break;
                 case "verb":
                     field = OAS_OPERATION.as("oas_operation").VERB.as("verb");
                     break;
-                case "lastupdatetimestamp":
-                    field = OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP;
+                case "array":
+                case "arrayindicator":
+                    field = field("array_indicator");
                     break;
-                case "operationid":
-                    field = OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id");
+                case "suppressroot":
+                case "suppressrootindicator":
+                    field = field("suppress_root_indicator");
+                    break;
+                case "messagebody":
+                    field = field("oas_doc_message_body_type");
                     break;
                 case "resourcename":
                     field = OAS_RESOURCE.as("oas_resource").PATH.as("resource_name");
                     break;
+                case "operationid":
+                    field = OAS_OPERATION.as("oas_operation").OPERATION_ID.as("operation_id");
+                    break;
                 case "tagname":
                     field = OAS_TAG.NAME.as("tag_name");
+                    break;
+                case "lastupdatetimestamp":
+                    field = OAS_MESSAGE_BODY.LAST_UPDATE_TIMESTAMP;
                     break;
                 default:
                     continue;

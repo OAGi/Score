@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -13,11 +13,19 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {PageRequest} from '../../../basis/basis';
 import {CcNodeService} from '../../domain/core-component-node.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
 import {WorkingRelease} from '../../../release-management/domain/release';
 import {OagisComponentType, OagisComponentTypes} from '../../domain/core-component-node';
 import {WebPageInfoService} from '../../../basis/basis.service';
+import {
+  PreferencesInfo,
+  TableColumnsInfo,
+  TableColumnsProperty
+} from '../../../settings-management/settings-preferences/domain/preferences';
+import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {AuthService} from '../../../authentication/auth.service';
+import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 
 @Component({
   selector: 'score-append-association-dialog',
@@ -40,9 +48,116 @@ export class AppendAssociationDialogComponent implements OnInit {
   workingRelease = WorkingRelease;
   action: string;
 
-  displayedColumns: string[] = [
-    'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
-  ];
+  get columns(): TableColumnsProperty[] {
+    if (!this.preferencesInfo) {
+      return [];
+    }
+    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+  }
+
+  set columns(columns: TableColumnsProperty[]) {
+    if (!this.preferencesInfo) {
+      return;
+    }
+
+    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentWithoutDtColumnsPage = columns;
+    this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+  }
+
+  updateTableColumnsForCoreComponentWithoutDtColumnsPage() {
+    this.preferencesService.updateTableColumnsForCoreComponentWithoutDtColumnsPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
+    });
+  }
+
+  onColumnsReset() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    this.columns = defaultTableColumnInfo.columnsOfCoreComponentWithoutDtColumnsPage;
+  }
+
+  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
+    const updatedColumnsWithWidth = updatedColumns.map(column => ({
+      name: column.name,
+      selected: column.selected,
+      width: this.width(column.name)
+    }));
+
+    this.columns = updatedColumnsWithWidth;
+  }
+
+  onResizeWidth($event) {
+    switch ($event.name) {
+      case 'Updated on':
+        this.setWidth('Updated On', $event.width);
+        break;
+
+      default:
+        this.setWidth($event.name, $event.width);
+        break;
+    }
+  }
+
+  setWidth(name: string, width: number | string) {
+    const matched = this.columns.find(c => c.name === name);
+    if (matched) {
+      matched.width = width;
+      this.updateTableColumnsForCoreComponentWithoutDtColumnsPage();
+    }
+  }
+
+  width(name: string): number | string {
+    if (!this.preferencesInfo) {
+      return 0;
+    }
+    return this.columns.find(c => c.name === name)?.width;
+  }
+
+  get displayedColumns(): string[] {
+    let displayedColumns = ['select'];
+    if (!this.preferencesInfo) {
+      return displayedColumns;
+    }
+    for (const column of this.columns) {
+      switch (column.name) {
+        case 'Type':
+          if (column.selected) {
+            displayedColumns.push('type');
+          }
+          break;
+        case 'State':
+          if (column.selected) {
+            displayedColumns.push('state');
+          }
+          break;
+        case 'DEN':
+          if (column.selected) {
+            displayedColumns.push('den');
+          }
+          break;
+        case 'Revision':
+          if (column.selected) {
+            displayedColumns.push('revision');
+          }
+          break;
+        case 'Owner':
+          if (column.selected) {
+            displayedColumns.push('owner');
+          }
+          break;
+        case 'Module':
+          if (column.selected) {
+            displayedColumns.push('module');
+          }
+          break;
+        case 'Updated On':
+          if (column.selected) {
+            displayedColumns.push('lastUpdateTimestamp');
+          }
+          break;
+      }
+    }
+    return displayedColumns;
+  }
+
   dataSource = new MatTableDataSource<CcList>();
   expandedElement: CcList | null;
   selection = new SelectionModel<CcList>(false, []);
@@ -54,17 +169,23 @@ export class AppendAssociationDialogComponent implements OnInit {
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
+  highlightTextForModule: string;
+  highlightTextForDefinition: string;
+  preferencesInfo: PreferencesInfo;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   constructor(public dialogRef: MatDialogRef<AppendAssociationDialogComponent>,
+              private auth: AuthService,
               private ccListService: CcListService,
               private accountService: AccountListService,
               private service: CcNodeService,
               private confirmDialogService: ConfirmDialogService,
+              private preferencesService: SettingsPreferencesService,
               public webPageInfo: WebPageInfoService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.action = data.action;
@@ -85,18 +206,37 @@ export class AppendAssociationDialogComponent implements OnInit {
 
     this.sort.active = 'lastUpdateTimestamp';
     this.sort.direction = 'desc';
+    // Prevent the sorting event from being triggered if any columns are currently resizing.
+    const originalSort = this.sort.sort;
+    this.sort.sort = (sortChange) => {
+      if (this.tableColumnResizeDirectives &&
+        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+        return;
+      }
+      originalSort.apply(this.sort, [sortChange]);
+    };
     this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadCcList();
+      this.onSearch();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    this.loading = true;
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.preferencesService.load(this.auth.getUserToken())
+    ]).subscribe(([loginIds, preferencesInfo]) => {
+      this.preferencesInfo = preferencesInfo;
+
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadCcList(true);
+      this.loadCcList(true);
+    });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadCcList();
   }
 
   loadCcList(isInit?: boolean) {
@@ -114,22 +254,13 @@ export class AppendAssociationDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      const list = resp.list.map((elm: CcList) => {
+      this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(
-            new RegExp(this.request.filters.module, 'ig'),
-            '<b>$&</b>');
-        }
-        if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(
-            new RegExp(this.request.filters.definition, 'ig'),
-            '<b>$&</b>');
-        }
         return elm;
       });
+      this.highlightTextForModule = this.request.filters.module;
+      this.highlightTextForDefinition = this.request.filters.definition;
 
-      this.dataSource.data = list;
       this.loading = false;
     });
   }
@@ -163,16 +294,22 @@ export class AppendAssociationDialogComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
-    if (property === 'filters.den') {
+    if (property === 'filters.den' && !!source) {
+      this.request.page.sortActive = '';
+      this.request.page.sortDirection = '';
       this.sort.active = '';
       this.sort.direction = '';
     }
 
     if (property === 'fuzzySearch') {
       if (this.request.fuzzySearch) {
+        this.request.page.sortActive = '';
+        this.request.page.sortDirection = '';
         this.sort.active = '';
         this.sort.direction = '';
       } else {
+        this.request.page.sortActive = 'lastUpdateTimestamp';
+        this.request.page.sortDirection = 'desc';
         this.sort.active = 'lastUpdateTimestamp';
         this.sort.direction = 'desc';
       }

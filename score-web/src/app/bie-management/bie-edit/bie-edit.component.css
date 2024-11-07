@@ -35,6 +35,12 @@
   height: 16px;
 }
 
+.mat-tree-node > span {
+  cursor: pointer;
+  padding-right: 2px !important;
+  margin-right: 10px;
+}
+
 .mat-tree-node .abie, .mat-tree-node .asbiep, .mat-tree-node .asbiep-extension {
   color: #4078c0 !important;
   font-weight: bold !important;

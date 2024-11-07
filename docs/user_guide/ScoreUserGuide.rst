@@ -1211,15 +1211,18 @@ page. To visit this page:
 
 The "Core Component" page is returned where ACC, ASCC, ASCCP, BCC, BCCP,
 CDT (Core Data Type), and BDT (Business Data Type) are displayed
-according to filters in the bottom table. You can use the filters
-described and depicted on the screenshot below to filter the list of CCs
-that is displayed:
+according to selected filters in the table below.
+
+The page includes a search bar with a Branch selector on the left,
+an input field for DEN searches, and a chevron down button to access additional filters.
+Hovering over the chevron down button displays a tooltip message, "Show Advanced Search."
+Click this button to reveal further search filters.
 
 -  *Branch* allows for filtering the Core Components based on their
    release. To do this:
 
    -  | Choose the release you would like to view from the "Branch"
-        drop-down list near the top-left of the page. Specifically,
+        drop-down list on the top-left of the search bar. Specifically,
         "Working" means the release being worked on, based on the latest
         release. In other words, if the current latest release is
         "10.6", "Working" means 10.6 plus changes; and if "10.6" or
@@ -1337,6 +1340,18 @@ definition. Click on its DEN to open its detail page.
 
 |Graphical user interface, text, application, email Description
 automatically generated|
+
+Browser View Mode
+~~~~~~~~~~~~~~~~~
+
+The Top-Level BIE is generated from an ASCCP (see `BIE in brief <#bie-in-brief>`__),
+and you might want to see how it will appear before creating the BIE.
+The *Browser View* mode is used to meet this need.
+When in *Dev View* mode, ASCCP appears in an editable state on the Core Component screen,
+just like other Core Components. However, in Browser View mode, it appears similarly to a BIE.
+To switch between Dev View and Browser View,
+click the Toggle button located at the top of the table on the Core Component screen.
+By default, Developer users see Dev View mode, while End-User users see Browser View mode initially.
 
 How to Read a Core Component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9537,18 +9552,17 @@ Common functions
 How to use the Search field in general
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On many pages where entities need to be selected, to find the entity you
-need, type the search term into a Search field, such as the *Name*,
-*Description*, *Property Term*, *DEN*, *Business Context* fields and
-then click the "Search" button. This will list entities whose respective
-fields contain those terms.
+On many pages where entities need to be selected, you can find the entity
+you need by typing a search term into the Search field. Common fields include
+*Name*, *Description*, *Property Term*, *DEN*, and *Business Context*.
+Once you enter your term, click the "Search" button to list entities
+where those fields contain the entered terms.
 
-Multiple words entered into the text search field are treated as AND.
-The system will return entities that contain both of these words in any
-order. However, there is an option to search for words that must appear
-together in the same order using double quotes. For example, enter
-["Process Inventory"] in the DEN search field will return entities whose
-DEN contains those two words in that order.
+When you enter multiple words in the search field, they are treated as an
+AND search. The system will return entities containing both words in any order.
+If you need to search for exact phrases, enclose them in double quotes.
+For example, entering ["Process Inventory"] in the DEN search field will
+only return entities whose DEN contains those exact words in that order.
 
 In future Score release an autocomplete drop-down list with suggested
 terms will appear when you are typing a search term into the Filter
@@ -9558,28 +9572,25 @@ continue typing.
 How to use Search Filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Additional filters are provided on many pages to narrow down entities
-for a selection and analysis. The following search filters are available
-on most pages:
+A search bar includes a Search button, an input field, and a chevron down button.
+Click the chevron down button to reveal additional search filters.
 
--  *Owner* allows for filtering based on the owner. To use it, click on
-   this filter and from the drop-down list select one or more users.
+The following search filters are typically available within the advanced search area on most pages:
 
--  *State* allows for filtering based on the state (e.g. WIP). To use
-   it, click on this filter and from the drop-down list select one or
-   more states.
+- *Owner*: Filter based on the owner.
+  Click on this filter and select one or more users from the drop-down list.
 
--  *Updater* allows for filtering based on the user who last
-   modified/updated an element (e.g. a field). To use it, click on this
-   filter and from the drop-down list select one or more users.
+- *State*: Filter based on the entity state (e.g., WIP).
+  Click on this filter and select one or more states from the list.
 
--  *Updated start date* and *Updated end date* allow for filtering based
-   on the timeframe that an entity was changed. To use these filters,
-   click on each of them and from the calendar displayed select a date.
-   You can use both of them or each one separately to set only the
-   starting time point or the ending time point.
+- *Updater*: Filter based on the user who last modified the entity.
+  Click on this filter and choose one or more users from the list.
 
-Note: If a search filter is left blank then the filter is not used.
+- *Updated Start Date* / *Updated End Date*: Filter based on the timeframe of the last update.
+  Click on these filters and select a date from the calendar.
+  You can use them together to set a time range or individually for just a start or end date.
+
+Note: If a search filter is left blank, it will not be applied.
 
 .. _drop-down-list-1:
 
@@ -9757,8 +9768,8 @@ Features with restricted behavior
 
 
 .. |Graphical user interface, text, application, email Description automatically generated| image:: media/image4.png
-   :width: 6.5in
-   :height: 2.48611in
+   :width: 6.8in
+   :height: 3.60396in
 .. |image1| image:: media/image6.png
    :width: 2.74814in
    :height: 1.95383in

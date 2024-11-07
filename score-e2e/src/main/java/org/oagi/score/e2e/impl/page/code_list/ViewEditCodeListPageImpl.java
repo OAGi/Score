@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.page.code_list;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.CodeListObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
@@ -18,14 +19,12 @@ import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
-public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCodeListPage {
+public class ViewEditCodeListPageImpl extends BaseSearchBarPageImpl implements ViewEditCodeListPage {
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Branch\")]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
-    private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"New Code List\")]//ancestor::button[1]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
@@ -69,6 +68,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
         } else {
             ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseById(codeList.getReleaseId());
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(codeList.getOwnerUserId());
+            showAdvancedSearchPanel();
             setBranch(release.getReleaseNumber());
             setOwner(owner.getLoginId());
             openCodeListByName(codeList.getName());
@@ -82,7 +82,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public WebElement getNameField() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//input[contains(@placeholder, \"Name\")]"));
+        return getInputFieldInSearchBar();
     }
 
     @Override
@@ -124,11 +124,11 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     public void setItemsPerPage(int items) {
         WebElement itemsPerPageField = elementToBeClickable(getDriver(),
                 By.xpath("//div[.=\" Items per page: \"]/following::mat-form-field//mat-select"));
-        click(itemsPerPageField);
+        click(getDriver(), itemsPerPageField);
         waitFor(Duration.ofMillis(500L));
         WebElement itemField = elementToBeClickable(getDriver(),
                 By.xpath("//span[contains(text(), \"" + items + "\")]//ancestor::mat-option//div[1]//preceding-sibling::span"));
-        click(itemField);
+        click(getDriver(), itemField);
         waitFor(Duration.ofMillis(500L));
     }
 
@@ -152,17 +152,12 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
     }
 
     @Override
-    public WebElement getSearchButton() {
-        return elementToBeClickable(getDriver(), SEARCH_BUTTON_LOCATOR);
-    }
-
-    @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getBranchSelectField());
+            click(getDriver(), getBranchSelectField());
             sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
             WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
             click(searchedSelectField);
             escape(getDriver());
         });
@@ -197,6 +192,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public void searchCodeListByNameAndDeprecation(CodeListObject cl, String releaseNumber) {
+        showAdvancedSearchPanel();
         setBranch(releaseNumber);
         setDeprecated(cl);
         sendKeys(getNameField(), cl.getName());
@@ -305,6 +301,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public void searchCodeListByDefinitionAndBranch(CodeListObject codeList, String releaseNumber) {
+        showAdvancedSearchPanel();
         setBranch(releaseNumber);
         sendKeys(getDefinitionField(), codeList.getDefinition());
         retry(() -> {
@@ -332,6 +329,7 @@ public class ViewEditCodeListPageImpl extends BasePageImpl implements ViewEditCo
 
     @Override
     public void searchCodeListByModuleAndBranch(CodeListObject codeList, String releaseNumber) {
+        showAdvancedSearchPanel();
         setBranch(releaseNumber);
         String moduleSetName = getAPIFactory().getCodeListAPI().getModuleNameForCodeList(codeList, releaseNumber);
         sendKeys(getModuleField(), moduleSetName);

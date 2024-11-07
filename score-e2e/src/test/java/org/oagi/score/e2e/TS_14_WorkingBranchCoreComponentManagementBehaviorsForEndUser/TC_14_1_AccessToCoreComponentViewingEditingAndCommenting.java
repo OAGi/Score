@@ -427,13 +427,16 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             coreComponentAPI.appendBCC(acc, bccp, "WIP");
             asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "WIP");
             asccpForTesting.add(asccp);
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertEquals("WIP", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
@@ -448,7 +451,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (BCCPObject bccp : bccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(bccpViewEditPage.getDefinitionField());
             assertDisabled(bccpViewEditPage.getDefinitionSourceField());
@@ -463,7 +466,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(asccpViewEditPage.getDefinitionField());
             assertDisabled(asccpViewEditPage.getDefinitionSourceField());
@@ -517,13 +520,16 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             coreComponentAPI.appendBCC(acc, bccp, "QA");
             asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "QA");
             asccpForTesting.add(asccp);
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertEquals("QA", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
@@ -538,7 +544,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (BCCPObject bccp : bccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(bccpViewEditPage.getDefinitionField());
             assertDisabled(bccpViewEditPage.getDefinitionSourceField());
@@ -553,7 +559,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(asccpViewEditPage.getDefinitionField());
             assertDisabled(asccpViewEditPage.getDefinitionSourceField());
@@ -609,11 +615,15 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             asccpForTesting.add(asccp);
 
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertEquals("Candidate", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
@@ -628,7 +638,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (BCCPObject bccp : bccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(bccpViewEditPage.getDefinitionField());
             assertDisabled(bccpViewEditPage.getDefinitionSourceField());
@@ -643,7 +653,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(asccpViewEditPage.getDefinitionField());
             assertDisabled(asccpViewEditPage.getDefinitionSourceField());
@@ -697,13 +707,16 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             coreComponentAPI.appendBCC(acc, bccp, "ReleaseDraft");
             asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "ReleaseDraft");
             asccpForTesting.add(asccp);
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertEquals("ReleaseDraft", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
@@ -718,7 +731,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (BCCPObject bccp : bccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(bccpViewEditPage.getDefinitionField());
             assertDisabled(bccpViewEditPage.getDefinitionSourceField());
@@ -733,7 +746,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(asccpViewEditPage.getDefinitionField());
             assertDisabled(asccpViewEditPage.getDefinitionSourceField());
@@ -787,13 +800,16 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "Published");
             asccpForTesting.add(asccp);
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(acc.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertEquals("Published", acc.getState());
             assertDisabled(accViewEditPage.getDefinitionField());
@@ -808,7 +824,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (BCCPObject bccp : bccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(bccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(bccpViewEditPage.getDefinitionField());
             assertDisabled(bccpViewEditPage.getDefinitionSourceField());
@@ -823,7 +839,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         for (ASCCPObject asccp : asccpForTesting) {
             AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(asccp.getOwnerUserId());
             assertTrue(owner.isDeveloper());
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertDisabled(asccpViewEditPage.getDefinitionField());
             assertDisabled(asccpViewEditPage.getDefinitionSourceField());
@@ -841,12 +857,12 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     public void test_TA_8() {
         AppUserObject endUser;
         ReleaseObject release;
-
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
             release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(release.getReleaseNumber());
@@ -990,11 +1006,14 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             coreComponentAPI.appendBCC(acc, bccp, "Deleted");
             asccp = coreComponentAPI.createRandomASCCP(acc, developerA, namespace, "Deleted");
             asccpForTesting.add(asccp);
-
         }
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        viewEditCoreComponentPage.toggleToDevView();
+
         for (ACCObject acc : accForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), workingBranch.getReleaseNumber());
             assertThrows(TimeoutException.class, () -> {
                 accViewEditPage.hitReviseButton();
@@ -1002,7 +1021,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         }
 
         for (BCCPObject bccp : bccpForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(bccp.getDen(), workingBranch.getReleaseNumber());
             assertThrows(TimeoutException.class, () -> {
                 bccpViewEditPage.hitReviseButton();
@@ -1010,7 +1029,7 @@ public class TC_14_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
         }
 
         for (ASCCPObject asccp : asccpForTesting) {
-            ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+            viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             ASCCPViewEditPage asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByDenAndBranch(asccp.getDen(), workingBranch.getReleaseNumber());
             assertThrows(TimeoutException.class, () -> {
                 asccpViewEditPage.hitReviseButton();

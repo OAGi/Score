@@ -98,28 +98,36 @@ public class CcListRepository {
 
         PageRequest pageRequest = request.getPageRequest();
         Field field = null;
-        switch (pageRequest.getSortActive()) {
-            case "type":
-                field = field("type");
-                break;
-            case "state":
-                field = field("state");
-                break;
-            case "den":
-                field = field("den");
-                break;
-            case "revision":
-                field = field(LOG.REVISION_NUM);
-                break;
-            case "owner":
-                field = field("owner");
-                break;
-            case "module":
-                field = field("module_path");
-                break;
-            case "lastUpdateTimestamp":
-                field = field("last_update_timestamp");
-                break;
+        if (hasLength(pageRequest.getSortActive())) {
+            switch (pageRequest.getSortActive()) {
+                case "type":
+                    field = field("type");
+                    break;
+                case "state":
+                    field = field("state");
+                    break;
+                case "den":
+                    field = field("den");
+                    break;
+                case "valueDomain":
+                    field = field("default_value_domain");
+                    break;
+                case "sixDigitId":
+                    field = field("six_digit_id");
+                    break;
+                case "revision":
+                    field = field(LOG.REVISION_NUM);
+                    break;
+                case "owner":
+                    field = field("owner");
+                    break;
+                case "module":
+                    field = field("module_path");
+                    break;
+                case "lastUpdateTimestamp":
+                    field = field("last_update_timestamp");
+                    break;
+            }
         }
 
         List<SortField> sortFields = new ArrayList<>();
