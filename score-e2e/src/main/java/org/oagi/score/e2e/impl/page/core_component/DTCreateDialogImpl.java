@@ -78,7 +78,7 @@ public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDia
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

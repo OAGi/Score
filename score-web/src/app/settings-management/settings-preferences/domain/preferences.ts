@@ -34,10 +34,10 @@ export interface TableColumnsProperty {
 
 export class TableColumnsInfo {
   columnsOfCoreComponentPage: TableColumnsProperty[] = [
-    {name: 'Type', selected: true, width: 100},
-    {name: 'State', selected: true, width: 100},
+    {name: 'Type', selected: true, width: 80},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
-    {name: 'Value Domain', selected: true, width: 120},
+    {name: 'Value Domain', selected: true, width: 126},
     {name: 'Six Hexadecimal ID', selected: true, width: 140},
     {name: 'Revision', selected: true, width: 80},
     {name: 'Owner', selected: true, width: 140},
@@ -46,7 +46,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfCoreComponentWithoutTypeAndDtColumnsPage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Revision', selected: true, width: 80},
     {name: 'Owner', selected: true, width: 140},
@@ -55,8 +55,8 @@ export class TableColumnsInfo {
   ];
 
   columnsOfCoreComponentWithoutDtColumnsPage: TableColumnsProperty[] = [
-    {name: 'Type', selected: true, width: 100},
-    {name: 'State', selected: true, width: 100},
+    {name: 'Type', selected: true, width: 80},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Revision', selected: true, width: 80},
     {name: 'Owner', selected: true, width: 140},
@@ -65,13 +65,13 @@ export class TableColumnsInfo {
   ];
 
   columnsOfCoreComponentForVerbBODPage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Updated On', selected: true, width: 160}
   ];
 
   columnsOfCoreComponentForNounBODPage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Updated On', selected: true, width: 160}
   ];
@@ -90,8 +90,8 @@ export class TableColumnsInfo {
   ];
 
   columnsOfCoreComponentAccRefactorPage: TableColumnsProperty[] = [
-    {name: 'Type', selected: true, width: 100},
-    {name: 'State', selected: true, width: 100},
+    {name: 'Type', selected: true, width: 80},
+    {name: 'State', selected: true, width: 104},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Issue', selected: true, width: 120},
     {name: 'Revision', selected: true, width: 80},
@@ -100,7 +100,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfCodeListPage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'Name', selected: true, width: 0},
     {name: 'Based Code List', selected: true, width: 200},
     {name: 'Agency ID', selected: true, width: 100},
@@ -121,7 +121,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfAgencyIdListPage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'Name', selected: true, width: 0},
     {name: 'Version', selected: true, width: 100},
     {name: 'Revision', selected: true, width: 100},
@@ -205,7 +205,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfBiePage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'Branch', selected: true, width: 100},
     {name: 'DEN', selected: true, width: 0},
     {name: 'Owner', selected: true, width: 140},
@@ -234,7 +234,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfBieUpliftReportPage: TableColumnsProperty[] = [
-    {name: 'Type', selected: true, width: 100},
+    {name: 'Type', selected: true, width: 80},
     {name: 'Path', selected: true, width: 0},
     {name: 'Context Definition', selected: true, width: '40%'},
     {name: 'Matched', selected: true, width: '5%'},
@@ -243,7 +243,7 @@ export class TableColumnsInfo {
   ];
 
   columnsOfBiePackagePage: TableColumnsProperty[] = [
-    {name: 'State', selected: true, width: 100},
+    {name: 'State', selected: true, width: 104},
     {name: 'Branch', selected: true, width: 100},
     {name: 'Package Version Name', selected: true, width: 0},
     {name: 'Package Version ID', selected: true, width: 200},

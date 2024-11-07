@@ -68,7 +68,7 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
@@ -107,9 +107,10 @@ public class EditBusinessContextPageImpl extends BasePageImpl implements EditBus
                 getAPIFactory().getContextCategoryAPI().getContextCategoryById(contextScheme.getContextCategoryId());
 
         WebElement td = visibilityOfElementLocated(getDriver(), By.xpath(
-                "//tbody//td/span[contains(text(), \"" + contextSchemeValue.getValue() + "\")]" +
-                        "/ancestor::tr/td[contains(text(), \"" + contextScheme.getSchemeName() + "\")]" +
-                        "/ancestor::tr/td[contains(text(), \"" + contextCategory.getName() + "\")]"));
+                "//tbody//td//span[contains(text(), \"" + contextSchemeValue.getValue() + "\")]" +
+                        "//ancestor::tr/td//span[contains(text(), \"" + contextScheme.getSchemeName() + "\")]" +
+                        "//ancestor::tr/td//span[contains(text(), \"" + contextCategory.getName() + "\")]" +
+                        "//ancestor::td"));
         click(td);
         waitFor(ofMillis(2000L));
 

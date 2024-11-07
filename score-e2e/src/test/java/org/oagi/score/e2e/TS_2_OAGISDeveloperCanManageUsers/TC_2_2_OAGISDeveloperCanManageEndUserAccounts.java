@@ -18,8 +18,10 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
@@ -60,6 +62,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
 
         newAccountPage.createNewAccount(newUser);
         LoginPage loginPage = homePage.logout();
+        waitFor(ofMillis(1000L));
 
         homePage = loginPage.signIn(newUser.getLoginId(), newUser.getPassword());
         WebElement loginIDMenu = homePage.getLoginIDMenu().getLoginIDMenuButton();
@@ -165,6 +168,8 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         assertEquals("Password must be at least 5 characters.", editAccountPage.getPasswordErrorMessage());
 
         homePage.logout();
+        waitFor(ofMillis(1000L));
+
         homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         WebElement loginIDMenu = homePage.getLoginIDMenu().getLoginIDMenuButton();
         assertTrue(loginIDMenu.getText().contains(appUser.getLoginId()));

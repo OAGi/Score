@@ -213,7 +213,7 @@ public class CreateBIEForSelectTopLevelConceptPageImpl extends BaseSearchBarPage
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

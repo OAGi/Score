@@ -154,7 +154,7 @@ public class LoadFromCodeListDialogImpl extends SearchBarPageImpl implements Loa
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//td//*[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override

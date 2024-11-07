@@ -190,7 +190,7 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
 
     @Override
     public WebElement getTableRecordByValue(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//td[contains(text(), \"" + value + "\")]//ancestor::tr"));
     }
 
     @Override
