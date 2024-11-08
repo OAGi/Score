@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-service</artifactId>
-    <version>3.3.3</version>
+    <version>3.4.0</version>
     <name>score-service</name>
     <description>Score Service</description>
 
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-repo</artifactId>
-            <version>3.3.3</version>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
