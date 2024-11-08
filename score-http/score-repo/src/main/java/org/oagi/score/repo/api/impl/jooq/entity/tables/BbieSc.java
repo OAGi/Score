@@ -226,6 +226,12 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     public final TableField<BbieScRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Business term to indicate what the BBIE SC is called in a particular business context. With this current design, only one business term is allowed per business context.");
 
     /**
+     * The column <code>oagi.bbie_sc.display_name</code>. The display name of
+     * the BBIE_SC
+     */
+    public final TableField<BbieScRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The display name of the BBIE_SC");
+
+    /**
      * The column <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether
      * the field/component is used in the content model. It indicates whether
      * the field/component should be generated.

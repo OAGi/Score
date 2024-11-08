@@ -168,13 +168,13 @@
               <td mat-cell *matCellDef="let element">
                 <div class="den word-break-all">
                 <span *ngIf='!isAdmin && element.access === "Prohibited"'
-                      matTooltip="Only the owner can access BIE in this state.">{{ element.den }}</span>
+                      matTooltip="Only the owner can access BIE in this state.">{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
                   <span *ngIf='!isAdmin && element.access === "Unprepared"'
                         matTooltip="This profile BIE is in progress.">{{ element.den }}</span>
                   <a *ngIf="isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')"
                      href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
-                    <span>{{ element.den }}</span>
+                    <span>{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
                   </a>
                 </div>
                 <div class="bie-guid">

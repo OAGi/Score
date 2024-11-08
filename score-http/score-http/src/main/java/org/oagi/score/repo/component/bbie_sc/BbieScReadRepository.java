@@ -164,6 +164,7 @@ public class BbieScReadRepository {
             bbieSc.setRemark(bbieScRecord.getRemark());
             bbieSc.setBizTerm(bbieScRecord.getBizTerm());
             bbieSc.setDefinition(bbieScRecord.getDefinition());
+            bbieSc.setDisplayName(bbieScRecord.getDisplayName());
             bbieSc.setDefaultValue(bbieScRecord.getDefaultValue());
             bbieSc.setFixedValue(bbieScRecord.getFixedValue());
             bbieSc.setExample(bbieScRecord.getExample());
@@ -183,6 +184,7 @@ public class BbieScReadRepository {
     public List<BieEditUsed> getUsedBbieScList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE_SC.IS_USED, BBIE_SC.BBIE_SC_ID, BBIE_SC.BASED_DT_SC_MANIFEST_ID,
                         BBIE_SC.HASH_PATH, BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID,
+                        BBIE_SC.DISPLAY_NAME,
                         BBIE_SC.CARDINALITY_MIN, BBIE_SC.CARDINALITY_MAX,
                         BBIE_SC.IS_DEPRECATED)
                 .from(BBIE_SC)
@@ -195,6 +197,7 @@ public class BbieScReadRepository {
                     bieEditUsed.setManifestId(record.get(BBIE_SC.BASED_DT_SC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(BBIE_SC.HASH_PATH));
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+                    bieEditUsed.setDisplayName(record.get(BBIE_SC.DISPLAY_NAME));
                     bieEditUsed.setCardinalityMin(record.get(BBIE_SC.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE_SC.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(BBIE_SC.IS_DEPRECATED) == 1);

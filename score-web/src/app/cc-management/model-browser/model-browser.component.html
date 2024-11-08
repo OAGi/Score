@@ -19,7 +19,7 @@
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
-                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{ selectedNode.name }}</mat-label>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
@@ -111,7 +111,7 @@
                                                [style.height.px]="innerHeight" #virtualScroll>
                     <div *cdkVirtualFor="let node of dataSource" class="example-item"
                          (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
-                      <div class="mat-tree-node d-flex pointer"
+                      <div class="mat-tree-node d-flex align-items-center pointer"
                            tabIndex="0"
                            [attr.data-level]="node.level"
                            [attr.data-path]="node.path"
@@ -121,7 +121,6 @@
                            [style.padding-left]="node.level * paddingPixel + 'px'">
                         <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                                 (click)="toggle(node, $event)"
-                                class="align-self-center"
                                 mat-icon-button>
                           <mat-icon class="mat-icon-rtl-mirror">
                             {{ node.expanded ? 'expand_more' : 'chevron_right' }}
@@ -131,30 +130,33 @@
                           <button mat-icon-button disabled></button>
                         </ng-template>
 
-                        <span [class]="['align-self-center', node.type.toLowerCase(),
-                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
-                              [class.deprecated]="node.deprecated"
-                              [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
-                              [innerHTML]="node.name | highlight : searcher.searchKeyword">
-                        </span>
+                        <div class="d-inline-flex align-items-center flex-grow-1">
+                          <span [class]="[node.type.toLowerCase(),
+                                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                                [style.padding-right.px]="2"
+                                [class.deprecated]="node.deprecated"
+                                [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                                [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
+                                [innerHTML]="node.name | highlight : searcher.searchKeyword">
+                          </span>
 
-                        <span [class]="['pl-3']" *ngIf="!dataSource.hideCardinality">
-                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                        </span>
+                          <span [class]="['pl-4']" *ngIf="!dataSource.hideCardinality">
+                            {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                          </span>
 
-                        <div class="ml-auto align-self-center mr-2" style="margin-bottom: 3px">
-                          <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden'}}"
-                                    class="copy-link-icon"
-                                    matTooltip="Copy Link"
-                                    (click)="copyLink(node, $event)">
-                            link
-                          </mat-icon>
-                          <mat-icon class="context-menu-icon"
-                                    [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
-                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
-                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                          </mat-icon>
+                          <div class="ml-auto mr-2">
+                            <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
+                                      class="copy-link-icon"
+                                      matTooltip="Copy Link"
+                                      (click)="copyLink(node, $event)">
+                              link
+                            </mat-icon>
+                            <mat-icon class="context-menu-icon"
+                                      [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
+                                      [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                      (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                            </mat-icon>
+                          </div>
                         </div>
                       </div>
                     </div>

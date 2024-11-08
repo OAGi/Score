@@ -119,6 +119,7 @@ public class AsbieReadRepository {
     public List<BieEditUsed> getUsedAsbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(ASBIE.IS_USED, ASBIE.ASBIE_ID, ASBIE.BASED_ASCC_MANIFEST_ID,
                         ASBIE.HASH_PATH, ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
+                        ASBIEP.DISPLAY_NAME,
                         ASBIE.CARDINALITY_MIN, ASBIE.CARDINALITY_MAX,
                         ASBIE.IS_DEPRECATED)
                 .from(ASBIE)
@@ -132,6 +133,7 @@ public class AsbieReadRepository {
                     bieEditUsed.setManifestId(record.get(ASBIE.BASED_ASCC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(ASBIE.HASH_PATH));
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+                    bieEditUsed.setDisplayName(record.get(ASBIEP.DISPLAY_NAME));
                     bieEditUsed.setCardinalityMin(record.get(ASBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(ASBIE.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(ASBIE.IS_DEPRECATED) == 1);

@@ -97,6 +97,7 @@ public class BbiepReadRepository {
             bbiep.setRemark(bbiepRecord.getRemark());
             bbiep.setBizTerm(bbiepRecord.getBizTerm());
             bbiep.setDefinition(bbiepRecord.getDefinition());
+            bbiep.setDisplayName(bbiepRecord.getDisplayName());
         }
 
         return bbiep;

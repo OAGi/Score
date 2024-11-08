@@ -288,6 +288,7 @@ export class UsedBie {
   type: string;
   manifestId: number;
   ownerTopLevelAsbiepId: number;
+  displayName: string;
   cardinalityMin: number;
   cardinalityMax: number;
   deprecated: boolean;
@@ -299,6 +300,7 @@ export class UsedBie {
     this.type = obj && obj.type || '';
     this.manifestId = obj && obj.manifestId || 0;
     this.ownerTopLevelAsbiepId = obj && obj.ownerTopLevelAsbiepId || 0;
+    this.displayName = obj && obj.displayName || '';
     this.cardinalityMin = obj && obj.cardinalityMin || 0;
     this.cardinalityMax = obj && obj.cardinalityMax || 0;
     this.deprecated = obj && obj.deprecated || false;

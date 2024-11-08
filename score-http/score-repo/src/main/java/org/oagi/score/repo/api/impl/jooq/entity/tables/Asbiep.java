@@ -135,6 +135,12 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     public final TableField<AsbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column represents a business term to indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
 
     /**
+     * The column <code>oagi.asbiep.display_name</code>. The display name of the
+     * ASBIEP
+     */
+    public final TableField<AsbiepRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The display name of the ASBIEP");
+
+    /**
      * The column <code>oagi.asbiep.created_by</code>. A foreign key referring
      * to the user who creates the ASBIEP. The creator of the ASBIEP is also its
      * owner by default. ASBIEPs created as children of another ABIE have the

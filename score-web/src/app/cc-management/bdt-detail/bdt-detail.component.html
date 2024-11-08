@@ -75,7 +75,7 @@
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
-                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{ selectedNode.name }}</mat-label>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
@@ -301,7 +301,7 @@
                         </div>
 
                         <div class="ml-auto align-self-center mr-2">
-                          <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden'}}"
+                          <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                                     matTooltip="Copy Link"
                                     (click)="copyLink(node, $event)">
                             link

@@ -92,6 +92,7 @@ public class AsbiepReadRepository {
             asbiep.setRemark(asbiepRecord.getRemark());
             asbiep.setBizTerm(asbiepRecord.getBizTerm());
             asbiep.setDefinition(asbiepRecord.getDefinition());
+            asbiep.setDisplayName(asbiepRecord.getDisplayName());
         }
 
         return asbiep;

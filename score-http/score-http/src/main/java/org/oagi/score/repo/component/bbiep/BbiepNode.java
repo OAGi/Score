@@ -46,6 +46,7 @@ public class BbiepNode {
         private String remark;
         private String bizTerm;
         private String definition;
+        private String displayName;
     }
 
     private Bbiep bbiep = new Bbiep();

@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -76,6 +76,54 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
+
+  // For editing 'displayName' of a node.
+  editingNode: BieFlatNode;
+  originalDisplayName: string;
+
+  startEditing(node: BieFlatNode): void {
+    this.editingNode = node;
+    if (node.displayName) {
+      this.originalDisplayName = node.displayName;
+    } else {
+      node.displayName = node.name;
+      this.originalDisplayName = undefined;
+    }
+
+    setTimeout(() => {
+      // Focus the input and select its text
+      this.editInput.nativeElement.focus();
+      this.editInput.nativeElement.select();
+    });
+  }
+
+  stopEditing(revert: boolean = false): void {
+    if (revert) {
+      this.editingNode.displayName = this.originalDisplayName;  // Revert the value
+    }
+    this.editingNode = undefined;
+  }
+
+  @HostListener('document:click', ['$event.target'])
+  onClickOutside(targetElement: HTMLElement): void {
+    const clickedInside = targetElement.closest('.mat-tree-node');
+    if (!clickedInside || !this.editingNode) {
+      this.stopEditing();
+    }
+  }
+
+  @ViewChild('editInput') editInput!: ElementRef;
+
+  // Listen for 'esc' key press within the input
+  @HostListener('document:keydown.escape', ['$event'])
+  cancelEditing($event: KeyboardEvent): void {
+    if (this.editingNode) {
+      this.stopEditing(true);
+      $event.preventDefault();
+    }
+  }
+  // End of 'displayName'
+
   isUpdating = false;
   _versionChanged: boolean;
   _changedVersionValue: string;
@@ -164,6 +212,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private auth: AuthService,
               private stompService: RxStompService,
               private clipboard: Clipboard,
+              private renderer: Renderer2,
               public webPageInfo: WebPageInfoService) {
   }
 
@@ -351,6 +400,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
+    // Skip if the target is an input, textarea, or contenteditable element
+    const target = $event.target as HTMLElement;
+    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    if (isInputField) {
+      return;
+    }
+
     const charCode = $event.key?.toLowerCase();
 
     // Handle 'Ctrl/Command+S'
@@ -364,6 +420,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
+    // Skip if the target is an input, textarea, or contenteditable element
+    const target = $event.target as HTMLElement;
+    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    if (isInputField) {
+      return;
+    }
+
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
     } else if ($event.key === 'ArrowUp') {

@@ -17,6 +17,7 @@ public class BieForOasDoc extends Auditable {
     private BigInteger oasOperationId;
     private String den;
     private String propertyTerm;
+    private String displayName;
     private String releaseNum;
     private String remark;
     private String guid;
@@ -97,6 +98,15 @@ public class BieForOasDoc extends Auditable {
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
     }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -283,6 +293,7 @@ public class BieForOasDoc extends Auditable {
                 ", oasOperationId=" + oasOperationId +
                 ", den='" + den + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", displayName='" + displayName + '\'' +
                 ", releaseNum='" + releaseNum + '\'' +
                 ", remark='" + remark + '\'' +
                 ", guid='" + guid + '\'' +

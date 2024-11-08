@@ -175,7 +175,7 @@
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
                     <div>
-                      <span>{{ element.den }}</span>
+                      <span>{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
                     </div>
                     <div>
                       <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>

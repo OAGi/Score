@@ -62,6 +62,7 @@ public class AsbiepWriteRepository {
             asbiepRecord.setDefinition(asbiep.getDefinition());
             asbiepRecord.setRemark(asbiep.getRemark());
             asbiepRecord.setBizTerm(asbiep.getBizTerm());
+            asbiepRecord.setDisplayName(asbiep.getDisplayName());
 
             asbiepRecord.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
 
@@ -89,12 +90,17 @@ public class AsbiepWriteRepository {
                 asbiepRecord.setBizTerm(emptyToNull(asbiep.getBizTerm()));
             }
 
+            if (asbiep.getDisplayName() != null) {
+                asbiepRecord.setDisplayName(emptyToNull(asbiep.getDisplayName()));
+            }
+
             if (asbiepRecord.changed()) {
                 asbiepRecord.setLastUpdatedBy(requesterId);
                 asbiepRecord.setLastUpdateTimestamp(request.getLocalDateTime());
                 asbiepRecord.update(ASBIEP.DEFINITION,
                         ASBIEP.REMARK,
                         ASBIEP.BIZ_TERM,
+                        ASBIEP.DISPLAY_NAME,
                         ASBIEP.LAST_UPDATED_BY,
                         ASBIEP.LAST_UPDATE_TIMESTAMP);
             }

@@ -212,6 +212,7 @@ public class BbieReadRepository {
     public List<BieEditUsed> getUsedBbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE.IS_USED, BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID,
                         BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
+                        BBIEP.DISPLAY_NAME,
                         BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX,
                         BBIE.IS_DEPRECATED)
                 .from(BBIE)
@@ -228,6 +229,7 @@ public class BbieReadRepository {
                     bieEditUsed.setManifestId(record.get(BBIE.BASED_BCC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(BBIE.HASH_PATH));
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+                    bieEditUsed.setDisplayName(record.get(BBIEP.DISPLAY_NAME));
                     bieEditUsed.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(BBIE.IS_DEPRECATED) == 1);

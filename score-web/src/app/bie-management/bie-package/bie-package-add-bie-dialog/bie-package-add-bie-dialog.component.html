@@ -223,7 +223,7 @@
                   <div class="den word-break-all">
                     <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                        matTooltip="{{ element.den }}">
-                      <span>{{ element.den }}</span>
+                      <span>{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
                     </a>
                   </div>
                   <div class="bie-guid">{{ element.guid }}</div>

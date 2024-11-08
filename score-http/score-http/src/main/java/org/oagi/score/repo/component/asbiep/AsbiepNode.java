@@ -34,6 +34,7 @@ public class AsbiepNode {
 
         private BigInteger asbiepId;
         private String guid;
+        private String displayName;
         private String remark;
         private String bizTerm;
         private String definition;

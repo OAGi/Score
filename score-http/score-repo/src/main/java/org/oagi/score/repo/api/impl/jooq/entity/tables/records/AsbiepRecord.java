@@ -194,13 +194,29 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
     }
 
     /**
+     * Setter for <code>oagi.asbiep.display_name</code>. The display name of the
+     * ASBIEP
+     */
+    public void setDisplayName(String value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>oagi.asbiep.display_name</code>. The display name of the
+     * ASBIEP
+     */
+    public String getDisplayName() {
+        return (String) get(9);
+    }
+
+    /**
      * Setter for <code>oagi.asbiep.created_by</code>. A foreign key referring
      * to the user who creates the ASBIEP. The creator of the ASBIEP is also its
      * owner by default. ASBIEPs created as children of another ABIE have the
      * same CREATED_BY.
      */
     public void setCreatedBy(ULong value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -210,7 +226,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * same CREATED_BY.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(9);
+        return (ULong) get(10);
     }
 
     /**
@@ -218,7 +234,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * referring to the last user who has updated the ASBIEP record. 
      */
     public void setLastUpdatedBy(ULong value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
@@ -226,7 +242,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * referring to the last user who has updated the ASBIEP record. 
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(10);
+        return (ULong) get(11);
     }
 
     /**
@@ -235,7 +251,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * another ABIE have the same CREATION_TIMESTAMP.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
@@ -244,7 +260,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * another ABIE have the same CREATION_TIMESTAMP.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(12);
     }
 
     /**
@@ -252,7 +268,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * when the ASBIEP was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
@@ -260,7 +276,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * when the ASBIEP was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(13);
     }
 
     /**
@@ -268,7 +284,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
@@ -276,7 +292,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(13);
+        return (ULong) get(14);
     }
 
     // -------------------------------------------------------------------------
@@ -302,7 +318,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
     /**
      * Create a detached, initialised AsbiepRecord
      */
-    public AsbiepRecord(ULong asbiepId, String guid, ULong basedAsccpManifestId, String path, String hashPath, ULong roleOfAbieId, String definition, String remark, String bizTerm, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
+    public AsbiepRecord(ULong asbiepId, String guid, ULong basedAsccpManifestId, String path, String hashPath, ULong roleOfAbieId, String definition, String remark, String bizTerm, String displayName, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
         super(Asbiep.ASBIEP);
 
         setAsbiepId(asbiepId);
@@ -314,6 +330,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
         setDefinition(definition);
         setRemark(remark);
         setBizTerm(bizTerm);
+        setDisplayName(displayName);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

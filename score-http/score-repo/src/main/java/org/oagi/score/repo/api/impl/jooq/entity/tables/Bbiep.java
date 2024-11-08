@@ -124,6 +124,12 @@ public class Bbiep extends TableImpl<BbiepRecord> {
     public final TableField<BbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Business term to indicate what the BIE is called in a particular business context such as in an industry.");
 
     /**
+     * The column <code>oagi.bbiep.display_name</code>. The display name of the
+     * BBIEP
+     */
+    public final TableField<BbiepRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The display name of the BBIEP");
+
+    /**
      * The column <code>oagi.bbiep.created_by</code>. A foreign key referring to
      * the user who creates the BBIEP. The creator of the BBIEP is also its
      * owner by default. BBIEPs created as children of another ABIE have the

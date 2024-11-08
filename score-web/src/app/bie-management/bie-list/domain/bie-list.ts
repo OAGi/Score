@@ -163,6 +163,7 @@ export class BieList {
   topLevelAsbiepId: number;
   den: string;
   propertyTerm: string;
+  displayName: string;
   guid: string;
   releaseNum: string;
   bizCtxId: number;

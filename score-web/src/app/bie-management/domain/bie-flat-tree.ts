@@ -12,6 +12,7 @@ export interface BieFlatNode extends FlatNode {
   self: BieFlatNode;
   bieId: number;
   bieType: string;
+  displayName: string;
   topLevelAsbiepId: number;
   deprecated: boolean;
   ccDeprecated: boolean;
@@ -225,6 +226,17 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   $hashCode?: number;
 
   name: string;
+  _displayName: string;
+
+  get displayName(): string {
+    return this._displayName;
+  }
+
+  set displayName(value: string) {
+    this._displayName = value;
+    this.fireChangeEvent('displayName', this._displayName);
+  }
+
   level: number;
   bieType: string;
   topLevelAsbiepId: number;
@@ -791,6 +803,14 @@ export class WrappedBieFlatNode implements BieFlatNode {
     this._node.name = name;
   }
 
+  get displayName(): string {
+    return this._node.displayName;
+  }
+
+  set displayName(displayName: string) {
+    this._node.displayName = displayName;
+  }
+
   get level(): number {
     return this._node.level;
   }
@@ -1338,6 +1358,14 @@ export class AsbiepDetail {
     this._node.fireChangeEvent('definition', value);
   }
 
+  get displayName(): string {
+    return this._node.displayName;
+  }
+
+  set displayName(value: string) {
+    this._node.displayName = value;
+  }
+
   get basedAsccpManifestId(): number {
     return this._node.asccpNode.manifestId;
   }
@@ -1366,6 +1394,7 @@ export class AsbiepDetail {
       this.remark = obj.remark;
       this.bizTerm = obj.bizTerm;
       this.definition = obj.definition;
+      this.displayName = obj.displayName;
     }
   }
 
@@ -1375,7 +1404,8 @@ export class AsbiepDetail {
       ((this.roleOfAbieId) ? this.roleOfAbieId : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0);
+      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
+      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0);
   }
 
   get json(): any {
@@ -1386,6 +1416,7 @@ export class AsbiepDetail {
       remark: this.remark,
       bizTerm: this.bizTerm,
       definition: this.definition,
+      displayName: this.displayName,
       basedAsccpManifestId: this.basedAsccpManifestId,
       path: this.path,
       hashPath: this.hashPath,
@@ -1721,6 +1752,14 @@ export class BbiepDetail {
     this._node.fireChangeEvent('definition', value);
   }
 
+  get displayName(): string {
+    return this._node.displayName;
+  }
+
+  set displayName(value: string) {
+    this._node.displayName = value;
+  }
+
   get path(): string {
     return this._node.bbiepPath;
   }
@@ -1740,6 +1779,7 @@ export class BbiepDetail {
       this.definition = obj.definition;
       this.remark = obj.remark;
       this.bizTerm = obj.bizTerm;
+      this.displayName = obj.displayName;
     }
   }
 
@@ -1748,7 +1788,8 @@ export class BbiepDetail {
       ((this.guid) ? hashCode4String(this.guid) : 0) +
       ((!!this.definition) ? hashCode4String(this.definition) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0);
+      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
+      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0);
   }
 
   get json(): any {
@@ -1758,6 +1799,7 @@ export class BbiepDetail {
       definition: this.definition,
       remark: this.remark,
       bizTerm: this.bizTerm,
+      displayName: this.displayName,
       basedBccpManifestId: this.basedBccpManifestId,
       path: this.path,
       hashPath: this.hashPath
@@ -1867,6 +1909,14 @@ export class BbieScDetail {
     this._node.fireChangeEvent('definition', value);
   }
 
+  get displayName(): string {
+    return this._node.displayName;
+  }
+
+  set displayName(value: string) {
+    this._node.displayName = value;
+  }
+
   get defaultValue(): string {
     return this._defaultValue;
   }
@@ -1964,6 +2014,7 @@ export class BbieScDetail {
       this.definition = obj.definition;
       this.bizTerm = obj.bizTerm;
       this.remark = obj.remark;
+      this.displayName = obj.displayName;
       this.defaultValue = obj.defaultValue;
       this.fixedValue = obj.fixedValue;
       this.example = obj.example;
@@ -1992,6 +2043,7 @@ export class BbieScDetail {
       ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
       ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
       ((!!this.remark) ? hashCode4String(this.remark) : 0) +
+      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0) +
       ((!!this.example) ? hashCode4String(this.example) : 0) +
       ((this.deprecated) ? 1231 : 1237) +
       ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
@@ -2013,6 +2065,7 @@ export class BbieScDetail {
       facetPattern: this.facetPattern,
       bizTerm: this.bizTerm,
       remark: this.remark,
+      displayName: this.displayName,
       example: this.example,
       deprecated: this.deprecated,
       defaultValue: this.defaultValue,
@@ -2200,6 +2253,18 @@ export class BiePathLikeExpressionEvaluator<T extends BieFlatNode> extends PathL
     }
     return next;
   }
+
+  protected doEval(node: T, token: string): boolean {
+    const result = super.doEval(node, token);
+    if (result || !node.displayName) {
+      return result;
+    }
+    if (this.caseSensitive) {
+      return node.displayName.indexOf(token) > -1;
+    } else {
+      return node.displayName.toLowerCase().indexOf(token.toLowerCase()) > -1;
+    }
+  }
 }
 
 export class BieFlatNodeDatabase<T extends BieFlatNode> {
@@ -2336,6 +2401,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       if (!!used && used.length > 0) {
         node.bieId = used[0].bieId;
         node.used = used[0].used;
+        node.displayName = used[0].displayName;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
@@ -2355,6 +2421,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       if (!!used && used.length > 0) {
         node.bieId = used[0].bieId;
         node.used = used[0].used;
+        node.displayName = used[0].displayName;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
@@ -2374,6 +2441,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       if (!!used && used.length > 0) {
         node.bieId = used[0].bieId;
         node.used = used[0].used;
+        node.displayName = used[0].displayName;
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;

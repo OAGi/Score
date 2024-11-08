@@ -495,6 +495,7 @@ public class BusinessInformationEntityRepository {
                     ASBIEP.GUID,
                     ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
+                    ASBIEP.DISPLAY_NAME,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                     APP_USER.as("owner").LOGIN_ID.as("owner"),
@@ -520,7 +521,7 @@ public class BusinessInformationEntityRepository {
 
         public SelectBieListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN, ASBIEP.DISPLAY_NAME));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))

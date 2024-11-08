@@ -46,6 +46,7 @@ public class BbieScNode {
         private String remark;
         private String bizTerm;
         private String definition;
+        private String displayName;
         private String defaultValue;
         private String fixedValue;
         private String example;
