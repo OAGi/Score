@@ -298,7 +298,7 @@
                           </div>
 
                           <div class="ml-auto align-self-center mr-2 d-inline-flex">
-                            <mat-icon [hidden]="!node.showCopyLinkIcon"
+                            <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden'}}"
                                       matTooltip="Copy Link"
                                       (click)="copyLink(node, $event)">
                               link
@@ -846,7 +846,7 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
-                            <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="60"
+                            <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="100"
                                    [(ngModel)]="asAsccpDetail().asccp.propertyTerm"
                                    [disabled]="true">
                           </mat-form-field>

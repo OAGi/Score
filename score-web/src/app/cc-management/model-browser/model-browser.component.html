@@ -144,7 +144,7 @@
                         </span>
 
                         <div class="ml-auto align-self-center mr-2" style="margin-bottom: 3px">
-                          <mat-icon [hidden]="!node.showCopyLinkIcon"
+                          <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden'}}"
                                     class="copy-link-icon"
                                     matTooltip="Copy Link"
                                     (click)="copyLink(node, $event)">
