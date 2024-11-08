@@ -177,7 +177,45 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
     @Override
     public List<ForeignKey<XbtManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK);
+    }
+
+    private transient LogPath _log;
+
+    /**
+     * Get the implicit join path to the <code>oagi.log</code> table.
+     */
+    public LogPath log() {
+        if (_log == null)
+            _log = new LogPath(this, Keys.XBT_MANIFEST_LOG_ID_FK, null);
+
+        return _log;
+    }
+
+    private transient XbtManifestPath _xbtManifestNextXbtManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
+     * via the <code>xbt_manifest_next_xbt_manifest_id_fk</code> key.
+     */
+    public XbtManifestPath xbtManifestNextXbtManifestIdFk() {
+        if (_xbtManifestNextXbtManifestIdFk == null)
+            _xbtManifestNextXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, null);
+
+        return _xbtManifestNextXbtManifestIdFk;
+    }
+
+    private transient XbtManifestPath _xbtManifestPrevXbtManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
+     * via the <code>xbt_manifest_prev_xbt_manifest_id_fk</code> key.
+     */
+    public XbtManifestPath xbtManifestPrevXbtManifestIdFk() {
+        if (_xbtManifestPrevXbtManifestIdFk == null)
+            _xbtManifestPrevXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, null);
+
+        return _xbtManifestPrevXbtManifestIdFk;
     }
 
     private transient ReleasePath _release;
@@ -202,44 +240,6 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
             _xbt = new XbtPath(this, Keys.XBT_MANIFEST_XBT_ID_FK, null);
 
         return _xbt;
-    }
-
-    private transient LogPath _log;
-
-    /**
-     * Get the implicit join path to the <code>oagi.log</code> table.
-     */
-    public LogPath log() {
-        if (_log == null)
-            _log = new LogPath(this, Keys.XBT_MANIFEST_LOG_ID_FK, null);
-
-        return _log;
-    }
-
-    private transient XbtManifestPath _xbtManifestPrevXbtManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
-     * via the <code>xbt_manifest_prev_xbt_manifest_id_fk</code> key.
-     */
-    public XbtManifestPath xbtManifestPrevXbtManifestIdFk() {
-        if (_xbtManifestPrevXbtManifestIdFk == null)
-            _xbtManifestPrevXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, null);
-
-        return _xbtManifestPrevXbtManifestIdFk;
-    }
-
-    private transient XbtManifestPath _xbtManifestNextXbtManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table,
-     * via the <code>xbt_manifest_next_xbt_manifest_id_fk</code> key.
-     */
-    public XbtManifestPath xbtManifestNextXbtManifestIdFk() {
-        if (_xbtManifestNextXbtManifestIdFk == null)
-            _xbtManifestNextXbtManifestIdFk = new XbtManifestPath(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, null);
-
-        return _xbtManifestNextXbtManifestIdFk;
     }
 
     private transient ModuleXbtManifestPath _moduleXbtManifest;

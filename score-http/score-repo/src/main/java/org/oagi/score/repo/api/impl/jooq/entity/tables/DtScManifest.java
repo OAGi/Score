@@ -189,19 +189,20 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
 
     @Override
     public List<ForeignKey<DtScManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.BASED_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.BASED_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK);
     }
 
-    private transient ReleasePath _release;
+    private transient DtScManifestPath _basedDtScManifestIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
+     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
+     * via the <code>based_dt_sc_manifest_id_fk</code> key.
      */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK, null);
+    public DtScManifestPath basedDtScManifestIdFk() {
+        if (_basedDtScManifestIdFk == null)
+            _basedDtScManifestIdFk = new DtScManifestPath(this, Keys.BASED_DT_SC_MANIFEST_ID_FK, null);
 
-        return _release;
+        return _basedDtScManifestIdFk;
     }
 
     private transient DtScPath _dtSc;
@@ -228,30 +229,29 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtManifest;
     }
 
-    private transient DtScManifestPath _basedDtScManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
-     * via the <code>based_dt_sc_manifest_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public DtScManifestPath basedDtScManifestIdFk() {
-        if (_basedDtScManifestIdFk == null)
-            _basedDtScManifestIdFk = new DtScManifestPath(this, Keys.BASED_DT_SC_MANIFEST_ID_FK, null);
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK, null);
 
-        return _basedDtScManifestIdFk;
+        return _release;
     }
 
-    private transient DtScManifestPath _dtScReplacementDtScManifestIdFk;
+    private transient DtScManifestPath _dtScNextDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
-     * via the <code>dt_sc_replacement_dt_sc_manifest_id_fk</code> key.
+     * via the <code>dt_sc_next_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifestPath dtScReplacementDtScManifestIdFk() {
-        if (_dtScReplacementDtScManifestIdFk == null)
-            _dtScReplacementDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, null);
+    public DtScManifestPath dtScNextDtScManifestIdFk() {
+        if (_dtScNextDtScManifestIdFk == null)
+            _dtScNextDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK, null);
 
-        return _dtScReplacementDtScManifestIdFk;
+        return _dtScNextDtScManifestIdFk;
     }
 
     private transient DtScManifestPath _dtScPrevDtScManifestIdFk;
@@ -267,17 +267,17 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return _dtScPrevDtScManifestIdFk;
     }
 
-    private transient DtScManifestPath _dtScNextDtScManifestIdFk;
+    private transient DtScManifestPath _dtScReplacementDtScManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc_manifest</code> table,
-     * via the <code>dt_sc_next_dt_sc_manifest_id_fk</code> key.
+     * via the <code>dt_sc_replacement_dt_sc_manifest_id_fk</code> key.
      */
-    public DtScManifestPath dtScNextDtScManifestIdFk() {
-        if (_dtScNextDtScManifestIdFk == null)
-            _dtScNextDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK, null);
+    public DtScManifestPath dtScReplacementDtScManifestIdFk() {
+        if (_dtScReplacementDtScManifestIdFk == null)
+            _dtScReplacementDtScManifestIdFk = new DtScManifestPath(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, null);
 
-        return _dtScNextDtScManifestIdFk;
+        return _dtScReplacementDtScManifestIdFk;
     }
 
     private transient BbieScPath _bbieSc;

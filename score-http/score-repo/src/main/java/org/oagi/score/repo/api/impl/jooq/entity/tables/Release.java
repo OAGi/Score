@@ -224,19 +224,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public List<ForeignKey<ReleaseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
-
-        return _namespace;
+        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_NAMESPACE_ID_FK);
     }
 
     private transient AppUserPath _releaseCreatedByFk;
@@ -263,6 +251,18 @@ public class Release extends TableImpl<ReleaseRecord> {
             _releaseLastUpdatedByFk = new AppUserPath(this, Keys.RELEASE_LAST_UPDATED_BY_FK, null);
 
         return _releaseLastUpdatedByFk;
+    }
+
+    private transient NamespacePath _namespace;
+
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
+
+        return _namespace;
     }
 
     private transient AccManifestPath _accManifest;
@@ -304,19 +304,6 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _agencyIdListValueManifest;
     }
 
-    private transient AsccpManifestPath _asccpManifest;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest</code> table
-     */
-    public AsccpManifestPath asccpManifest() {
-        if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
-
-        return _asccpManifest;
-    }
-
     private transient AsccManifestPath _asccManifest;
 
     /**
@@ -330,17 +317,17 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _asccManifest;
     }
 
-    private transient BccpManifestPath _bccpManifest;
+    private transient AsccpManifestPath _asccpManifest;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
-     * table
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
      */
-    public BccpManifestPath bccpManifest() {
-        if (_bccpManifest == null)
-            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
-        return _bccpManifest;
+        return _asccpManifest;
     }
 
     private transient BccManifestPath _bccManifest;
@@ -354,6 +341,19 @@ public class Release extends TableImpl<ReleaseRecord> {
             _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
         return _bccManifest;
+    }
+
+    private transient BccpManifestPath _bccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
+     * table
+     */
+    public BccpManifestPath bccpManifest() {
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _bccpManifest;
     }
 
     private transient BlobContentManifestPath _blobContentManifest;

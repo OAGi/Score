@@ -233,43 +233,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     @Override
     public List<ForeignKey<ModuleRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_MODULE_SET_ID_FK, Keys.MODULE_PARENT_MODULE_ID_FK, Keys.MODULE_NAMESPACE_ID_FK, Keys.MODULE_CREATED_BY_FK, Keys.MODULE_LAST_UPDATED_BY_FK, Keys.MODULE_OWNER_USER_ID_FK);
-    }
-
-    private transient ModuleSetPath _moduleSet;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set</code> table.
-     */
-    public ModuleSetPath moduleSet() {
-        if (_moduleSet == null)
-            _moduleSet = new ModuleSetPath(this, Keys.MODULE_MODULE_SET_ID_FK, null);
-
-        return _moduleSet;
-    }
-
-    private transient ModulePath _module;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
-     */
-    public ModulePath module() {
-        if (_module == null)
-            _module = new ModulePath(this, Keys.MODULE_PARENT_MODULE_ID_FK, null);
-
-        return _module;
-    }
-
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.MODULE_NAMESPACE_ID_FK, null);
-
-        return _namespace;
+        return Arrays.asList(Keys.MODULE_CREATED_BY_FK, Keys.MODULE_LAST_UPDATED_BY_FK, Keys.MODULE_MODULE_SET_ID_FK, Keys.MODULE_NAMESPACE_ID_FK, Keys.MODULE_OWNER_USER_ID_FK, Keys.MODULE_PARENT_MODULE_ID_FK);
     }
 
     private transient AppUserPath _moduleCreatedByFk;
@@ -298,6 +262,30 @@ public class Module extends TableImpl<ModuleRecord> {
         return _moduleLastUpdatedByFk;
     }
 
+    private transient ModuleSetPath _moduleSet;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set</code> table.
+     */
+    public ModuleSetPath moduleSet() {
+        if (_moduleSet == null)
+            _moduleSet = new ModuleSetPath(this, Keys.MODULE_MODULE_SET_ID_FK, null);
+
+        return _moduleSet;
+    }
+
+    private transient NamespacePath _namespace;
+
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.MODULE_NAMESPACE_ID_FK, null);
+
+        return _namespace;
+    }
+
     private transient AppUserPath _moduleOwnerUserIdFk;
 
     /**
@@ -309,6 +297,18 @@ public class Module extends TableImpl<ModuleRecord> {
             _moduleOwnerUserIdFk = new AppUserPath(this, Keys.MODULE_OWNER_USER_ID_FK, null);
 
         return _moduleOwnerUserIdFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, Keys.MODULE_PARENT_MODULE_ID_FK, null);
+
+        return _module;
     }
 
     private transient ModuleAccManifestPath _moduleAccManifest;

@@ -202,19 +202,7 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
 
     @Override
     public List<ForeignKey<AccManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ACC_MANIFEST_RELEASE_ID_FK, Keys.ACC_MANIFEST_ACC_ID_FK, Keys.ACC_MANIFEST_BASED_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_LOG_ID_FK, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_PREV_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.ACC_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.ACC_MANIFEST_ACC_ID_FK, Keys.ACC_MANIFEST_BASED_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_LOG_ID_FK, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_PREV_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_RELEASE_ID_FK, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK);
     }
 
     private transient AccPath _acc;
@@ -254,17 +242,17 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
         return _log;
     }
 
-    private transient AccManifestPath _accReplacementAccManifestIdFk;
+    private transient AccManifestPath _accManifestNextAccManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table,
-     * via the <code>acc_replacement_acc_manifest_id_fk</code> key.
+     * via the <code>acc_manifest_next_acc_manifest_id_fk</code> key.
      */
-    public AccManifestPath accReplacementAccManifestIdFk() {
-        if (_accReplacementAccManifestIdFk == null)
-            _accReplacementAccManifestIdFk = new AccManifestPath(this, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK, null);
+    public AccManifestPath accManifestNextAccManifestIdFk() {
+        if (_accManifestNextAccManifestIdFk == null)
+            _accManifestNextAccManifestIdFk = new AccManifestPath(this, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK, null);
 
-        return _accReplacementAccManifestIdFk;
+        return _accManifestNextAccManifestIdFk;
     }
 
     private transient AccManifestPath _accManifestPrevAccManifestIdFk;
@@ -280,17 +268,29 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
         return _accManifestPrevAccManifestIdFk;
     }
 
-    private transient AccManifestPath _accManifestNextAccManifestIdFk;
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.ACC_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient AccManifestPath _accReplacementAccManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.acc_manifest</code> table,
-     * via the <code>acc_manifest_next_acc_manifest_id_fk</code> key.
+     * via the <code>acc_replacement_acc_manifest_id_fk</code> key.
      */
-    public AccManifestPath accManifestNextAccManifestIdFk() {
-        if (_accManifestNextAccManifestIdFk == null)
-            _accManifestNextAccManifestIdFk = new AccManifestPath(this, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK, null);
+    public AccManifestPath accReplacementAccManifestIdFk() {
+        if (_accReplacementAccManifestIdFk == null)
+            _accReplacementAccManifestIdFk = new AccManifestPath(this, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK, null);
 
-        return _accManifestNextAccManifestIdFk;
+        return _accReplacementAccManifestIdFk;
     }
 
     private transient AbiePath _abie;
@@ -318,19 +318,6 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
         return _accManifestTag;
     }
 
-    private transient AsccpManifestPath _asccpManifest;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest</code> table
-     */
-    public AsccpManifestPath asccpManifest() {
-        if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK.getInverseKey());
-
-        return _asccpManifest;
-    }
-
     private transient AsccManifestPath _asccManifest;
 
     /**
@@ -342,6 +329,19 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
             _asccManifest = new AsccManifestPath(this, null, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK.getInverseKey());
 
         return _asccManifest;
+    }
+
+    private transient AsccpManifestPath _asccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
+     */
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK.getInverseKey());
+
+        return _asccpManifest;
     }
 
     private transient BccManifestPath _bccManifest;

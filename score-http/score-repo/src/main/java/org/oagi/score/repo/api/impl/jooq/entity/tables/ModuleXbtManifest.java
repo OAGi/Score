@@ -189,20 +189,7 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
 
     @Override
     public List<ForeignKey<ModuleXbtManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK);
-    }
-
-    private transient ModuleSetReleasePath _moduleSetRelease;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set_release</code>
-     * table.
-     */
-    public ModuleSetReleasePath moduleSetRelease() {
-        if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
-
-        return _moduleSetRelease;
+        return Arrays.asList(Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_XBT_MANIFEST_CREATED_BY_FK, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
     }
 
     private transient XbtManifestPath _xbtManifest;
@@ -215,18 +202,6 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
             _xbtManifest = new XbtManifestPath(this, Keys.MODULE_XBT_MANIFEST_BCCP_MANIFEST_ID_FK, null);
 
         return _xbtManifest;
-    }
-
-    private transient ModulePath _module;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
-     */
-    public ModulePath module() {
-        if (_module == null)
-            _module = new ModulePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, null);
-
-        return _module;
     }
 
     private transient AppUserPath _moduleXbtManifestCreatedByFk;
@@ -253,6 +228,31 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
             _moduleXbtManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_XBT_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleXbtManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_ID_FK, null);
+
+        return _module;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_XBT_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
+
+        return _moduleSetRelease;
     }
 
     @Override

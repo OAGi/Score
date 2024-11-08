@@ -186,19 +186,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
     @Override
     public List<ForeignKey<OasResourceRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_RESOURCE_OAS_DOC_ID_FK, Keys.OAS_RESOURCE_CREATED_BY_FK, Keys.OAS_RESOURCE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasDocPath _oasDoc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
-     */
-    public OasDocPath oasDoc() {
-        if (_oasDoc == null)
-            _oasDoc = new OasDocPath(this, Keys.OAS_RESOURCE_OAS_DOC_ID_FK, null);
-
-        return _oasDoc;
+        return Arrays.asList(Keys.OAS_RESOURCE_CREATED_BY_FK, Keys.OAS_RESOURCE_LAST_UPDATED_BY_FK, Keys.OAS_RESOURCE_OAS_DOC_ID_FK);
     }
 
     private transient AppUserPath _oasResourceCreatedByFk;
@@ -225,6 +213,18 @@ public class OasResource extends TableImpl<OasResourceRecord> {
             _oasResourceLastUpdatedByFk = new AppUserPath(this, Keys.OAS_RESOURCE_LAST_UPDATED_BY_FK, null);
 
         return _oasResourceLastUpdatedByFk;
+    }
+
+    private transient OasDocPath _oasDoc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     */
+    public OasDocPath oasDoc() {
+        if (_oasDoc == null)
+            _oasDoc = new OasDocPath(this, Keys.OAS_RESOURCE_OAS_DOC_ID_FK, null);
+
+        return _oasDoc;
     }
 
     private transient OasOperationPath _oasOperation;

@@ -251,7 +251,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
 
     @Override
     public List<ForeignKey<AsbiepRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, Keys.ASBIEP_CREATED_BY_FK, Keys.ASBIEP_LAST_UPDATED_BY_FK, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, Keys.ASBIEP_CREATED_BY_FK, Keys.ASBIEP_LAST_UPDATED_BY_FK, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK);
     }
 
     private transient AsccpManifestPath _asccpManifest;
@@ -264,18 +264,6 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
             _asccpManifest = new AsccpManifestPath(this, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
-    }
-
-    private transient AbiePath _abie;
-
-    /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
-     */
-    public AbiePath abie() {
-        if (_abie == null)
-            _abie = new AbiePath(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, null);
-
-        return _abie;
     }
 
     private transient AppUserPath _asbiepCreatedByFk;
@@ -315,6 +303,18 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
             _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient AbiePath _abie;
+
+    /**
+     * Get the implicit join path to the <code>oagi.abie</code> table.
+     */
+    public AbiePath abie() {
+        if (_abie == null)
+            _abie = new AbiePath(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, null);
+
+        return _abie;
     }
 
     private transient AsbiePath _asbie;

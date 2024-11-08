@@ -176,19 +176,7 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
 
     @Override
     public List<ForeignKey<SeqKeyRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
-    }
-
-    private transient AccManifestPath _accManifest;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
-     */
-    public AccManifestPath accManifest() {
-        if (_accManifest == null)
-            _accManifest = new AccManifestPath(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, null);
-
-        return _accManifest;
+        return Arrays.asList(Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK);
     }
 
     private transient AsccManifestPath _asccManifest;
@@ -215,17 +203,16 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return _bccManifest;
     }
 
-    private transient SeqKeyPath _seqKeyPrevSeqKeyIdFk;
+    private transient AccManifestPath _accManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.seq_key</code> table, via
-     * the <code>seq_key_prev_seq_key_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
      */
-    public SeqKeyPath seqKeyPrevSeqKeyIdFk() {
-        if (_seqKeyPrevSeqKeyIdFk == null)
-            _seqKeyPrevSeqKeyIdFk = new SeqKeyPath(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, null);
+    public AccManifestPath accManifest() {
+        if (_accManifest == null)
+            _accManifest = new AccManifestPath(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, null);
 
-        return _seqKeyPrevSeqKeyIdFk;
+        return _accManifest;
     }
 
     private transient SeqKeyPath _seqKeyNextSeqKeyIdFk;
@@ -239,6 +226,19 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
             _seqKeyNextSeqKeyIdFk = new SeqKeyPath(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK, null);
 
         return _seqKeyNextSeqKeyIdFk;
+    }
+
+    private transient SeqKeyPath _seqKeyPrevSeqKeyIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table, via
+     * the <code>seq_key_prev_seq_key_id_fk</code> key.
+     */
+    public SeqKeyPath seqKeyPrevSeqKeyIdFk() {
+        if (_seqKeyPrevSeqKeyIdFk == null)
+            _seqKeyPrevSeqKeyIdFk = new SeqKeyPath(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, null);
+
+        return _seqKeyPrevSeqKeyIdFk;
     }
 
     @Override

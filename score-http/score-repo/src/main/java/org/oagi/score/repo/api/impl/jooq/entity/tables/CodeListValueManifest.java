@@ -194,45 +194,7 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
 
     @Override
     public List<ForeignKey<CodeListValueManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CODE_LIST_VALUE_MANIFEST_RELEASE_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_BASED_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_PREV_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_NEXT_CODE_LIST_VALUE_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.CODE_LIST_VALUE_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
-    }
-
-    private transient CodeListValuePath _codeListValue;
-
-    /**
-     * Get the implicit join path to the <code>oagi.code_list_value</code>
-     * table.
-     */
-    public CodeListValuePath codeListValue() {
-        if (_codeListValue == null)
-            _codeListValue = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_VALUE_ID_FK, null);
-
-        return _codeListValue;
-    }
-
-    private transient CodeListManifestPath _codeListManifest;
-
-    /**
-     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
-     * table.
-     */
-    public CodeListManifestPath codeListManifest() {
-        if (_codeListManifest == null)
-            _codeListManifest = new CodeListManifestPath(this, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_MANIFEST_ID_FK, null);
-
-        return _codeListManifest;
+        return Arrays.asList(Keys.CODE_LIST_VALUE_MANIFEST_BASED_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_NEXT_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_PREV_CODE_LIST_VALUE_MANIFEST_ID_FK, Keys.CODE_LIST_VALUE_MANIFEST_RELEASE_ID_FK, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID_FK);
     }
 
     private transient CodeListValueManifestPath _codeListValueManifestBasedCodeListValueManifestIdFk;
@@ -250,19 +212,45 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
         return _codeListValueManifestBasedCodeListValueManifestIdFk;
     }
 
-    private transient CodeListValueManifestPath _codeListValueReplacementCodeListValueManifestIdFk;
+    private transient CodeListManifestPath _codeListManifest;
+
+    /**
+     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
+     * table.
+     */
+    public CodeListManifestPath codeListManifest() {
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifestPath(this, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_MANIFEST_ID_FK, null);
+
+        return _codeListManifest;
+    }
+
+    private transient CodeListValuePath _codeListValue;
+
+    /**
+     * Get the implicit join path to the <code>oagi.code_list_value</code>
+     * table.
+     */
+    public CodeListValuePath codeListValue() {
+        if (_codeListValue == null)
+            _codeListValue = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_MANIFEST_CODE_LIST_VALUE_ID_FK, null);
+
+        return _codeListValue;
+    }
+
+    private transient CodeListValueManifestPath _codeListValueManifestNextCodeListValueManifestIdFk;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.code_list_value_manifest</code> table, via the
-     * <code>code_list_value_replacement_code_list_value_manifest_id_fk</code>
+     * <code>code_list_value_manifest_next_code_list_value_manifest_id_fk</code>
      * key.
      */
-    public CodeListValueManifestPath codeListValueReplacementCodeListValueManifestIdFk() {
-        if (_codeListValueReplacementCodeListValueManifestIdFk == null)
-            _codeListValueReplacementCodeListValueManifestIdFk = new CodeListValueManifestPath(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID_FK, null);
+    public CodeListValueManifestPath codeListValueManifestNextCodeListValueManifestIdFk() {
+        if (_codeListValueManifestNextCodeListValueManifestIdFk == null)
+            _codeListValueManifestNextCodeListValueManifestIdFk = new CodeListValueManifestPath(this, Keys.CODE_LIST_VALUE_MANIFEST_NEXT_CODE_LIST_VALUE_MANIFEST_ID_FK, null);
 
-        return _codeListValueReplacementCodeListValueManifestIdFk;
+        return _codeListValueManifestNextCodeListValueManifestIdFk;
     }
 
     private transient CodeListValueManifestPath _codeListValueManifestPrevCodeListValueManifestIdFk;
@@ -280,19 +268,31 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
         return _codeListValueManifestPrevCodeListValueManifestIdFk;
     }
 
-    private transient CodeListValueManifestPath _codeListValueManifestNextCodeListValueManifestIdFk;
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.CODE_LIST_VALUE_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient CodeListValueManifestPath _codeListValueReplacementCodeListValueManifestIdFk;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.code_list_value_manifest</code> table, via the
-     * <code>code_list_value_manifest_next_code_list_value_manifest_id_fk</code>
+     * <code>code_list_value_replacement_code_list_value_manifest_id_fk</code>
      * key.
      */
-    public CodeListValueManifestPath codeListValueManifestNextCodeListValueManifestIdFk() {
-        if (_codeListValueManifestNextCodeListValueManifestIdFk == null)
-            _codeListValueManifestNextCodeListValueManifestIdFk = new CodeListValueManifestPath(this, Keys.CODE_LIST_VALUE_MANIFEST_NEXT_CODE_LIST_VALUE_MANIFEST_ID_FK, null);
+    public CodeListValueManifestPath codeListValueReplacementCodeListValueManifestIdFk() {
+        if (_codeListValueReplacementCodeListValueManifestIdFk == null)
+            _codeListValueReplacementCodeListValueManifestIdFk = new CodeListValueManifestPath(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID_FK, null);
 
-        return _codeListValueManifestNextCodeListValueManifestIdFk;
+        return _codeListValueReplacementCodeListValueManifestIdFk;
     }
 
     @Override

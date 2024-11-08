@@ -241,19 +241,7 @@ public class Xbt extends TableImpl<XbtRecord> {
 
     @Override
     public List<ForeignKey<XbtRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.XBT_SUBTYPE_OF_XBT_ID_FK, Keys.XBT_CREATED_BY_FK, Keys.XBT_OWNER_USER_ID_FK, Keys.XBT_LAST_UPDATED_BY_FK);
-    }
-
-    private transient XbtPath _xbt;
-
-    /**
-     * Get the implicit join path to the <code>oagi.xbt</code> table.
-     */
-    public XbtPath xbt() {
-        if (_xbt == null)
-            _xbt = new XbtPath(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK, null);
-
-        return _xbt;
+        return Arrays.asList(Keys.XBT_CREATED_BY_FK, Keys.XBT_LAST_UPDATED_BY_FK, Keys.XBT_OWNER_USER_ID_FK, Keys.XBT_SUBTYPE_OF_XBT_ID_FK);
     }
 
     private transient AppUserPath _xbtCreatedByFk;
@@ -269,6 +257,19 @@ public class Xbt extends TableImpl<XbtRecord> {
         return _xbtCreatedByFk;
     }
 
+    private transient AppUserPath _xbtLastUpdatedByFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>xbt_last_updated_by_fk</code> key.
+     */
+    public AppUserPath xbtLastUpdatedByFk() {
+        if (_xbtLastUpdatedByFk == null)
+            _xbtLastUpdatedByFk = new AppUserPath(this, Keys.XBT_LAST_UPDATED_BY_FK, null);
+
+        return _xbtLastUpdatedByFk;
+    }
+
     private transient AppUserPath _xbtOwnerUserIdFk;
 
     /**
@@ -282,17 +283,16 @@ public class Xbt extends TableImpl<XbtRecord> {
         return _xbtOwnerUserIdFk;
     }
 
-    private transient AppUserPath _xbtLastUpdatedByFk;
+    private transient XbtPath _xbt;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>xbt_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>oagi.xbt</code> table.
      */
-    public AppUserPath xbtLastUpdatedByFk() {
-        if (_xbtLastUpdatedByFk == null)
-            _xbtLastUpdatedByFk = new AppUserPath(this, Keys.XBT_LAST_UPDATED_BY_FK, null);
+    public XbtPath xbt() {
+        if (_xbt == null)
+            _xbt = new XbtPath(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK, null);
 
-        return _xbtLastUpdatedByFk;
+        return _xbt;
     }
 
     private transient CdtAwdPriXpsTypeMapPath _cdtAwdPriXpsTypeMap;

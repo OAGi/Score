@@ -173,7 +173,7 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
 
     @Override
     public List<ForeignKey<BlobContentManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
+        return Arrays.asList(Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK);
     }
 
     private transient BlobContentPath _blobContent;
@@ -188,16 +188,18 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         return _blobContent;
     }
 
-    private transient ReleasePath _release;
+    private transient BlobContentManifestPath _blobContentManifestNextBlobContentManifestIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
+     * Get the implicit join path to the <code>oagi.blob_content_manifest</code>
+     * table, via the
+     * <code>blob_content_manifest_next_blob_content_manifest_id_fk</code> key.
      */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, null);
+    public BlobContentManifestPath blobContentManifestNextBlobContentManifestIdFk() {
+        if (_blobContentManifestNextBlobContentManifestIdFk == null)
+            _blobContentManifestNextBlobContentManifestIdFk = new BlobContentManifestPath(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK, null);
 
-        return _release;
+        return _blobContentManifestNextBlobContentManifestIdFk;
     }
 
     private transient BlobContentManifestPath _blobContentManifestPrevBlobContentManifestIdFk;
@@ -214,18 +216,16 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         return _blobContentManifestPrevBlobContentManifestIdFk;
     }
 
-    private transient BlobContentManifestPath _blobContentManifestNextBlobContentManifestIdFk;
+    private transient ReleasePath _release;
 
     /**
-     * Get the implicit join path to the <code>oagi.blob_content_manifest</code>
-     * table, via the
-     * <code>blob_content_manifest_next_blob_content_manifest_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.release</code> table.
      */
-    public BlobContentManifestPath blobContentManifestNextBlobContentManifestIdFk() {
-        if (_blobContentManifestNextBlobContentManifestIdFk == null)
-            _blobContentManifestNextBlobContentManifestIdFk = new BlobContentManifestPath(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK, null);
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, null);
 
-        return _blobContentManifestNextBlobContentManifestIdFk;
+        return _release;
     }
 
     private transient ModuleBlobContentManifestPath _moduleBlobContentManifest;

@@ -155,7 +155,7 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
 
     @Override
     public List<ForeignKey<AsccpManifestTagRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK);
+        return Arrays.asList(Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK);
     }
 
     private transient AsccpManifestPath _asccpManifest;
@@ -170,18 +170,6 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
         return _asccpManifest;
     }
 
-    private transient TagPath _tag;
-
-    /**
-     * Get the implicit join path to the <code>oagi.tag</code> table.
-     */
-    public TagPath tag() {
-        if (_tag == null)
-            _tag = new TagPath(this, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK, null);
-
-        return _tag;
-    }
-
     private transient AppUserPath _appUser;
 
     /**
@@ -192,6 +180,18 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
             _appUser = new AppUserPath(this, Keys.ASCCP_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
+    }
+
+    private transient TagPath _tag;
+
+    /**
+     * Get the implicit join path to the <code>oagi.tag</code> table.
+     */
+    public TagPath tag() {
+        if (_tag == null)
+            _tag = new TagPath(this, Keys.ASCCP_MANIFEST_TAG_TAG_ID_FK, null);
+
+        return _tag;
     }
 
     @Override

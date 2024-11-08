@@ -257,7 +257,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
 
     @Override
     public List<ForeignKey<TopLevelAsbiepRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK, Keys.TOP_LEVEL_ASBIEP_SOURCE_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK, Keys.TOP_LEVEL_ASBIEP_SOURCE_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient AsbiepPath _asbiep;
@@ -272,19 +272,6 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return _asbiep;
     }
 
-    private transient AppUserPath _topLevelAsbiepOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>top_level_asbiep_owner_user_id_fk</code> key.
-     */
-    public AppUserPath topLevelAsbiepOwnerUserIdFk() {
-        if (_topLevelAsbiepOwnerUserIdFk == null)
-            _topLevelAsbiepOwnerUserIdFk = new AppUserPath(this, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, null);
-
-        return _topLevelAsbiepOwnerUserIdFk;
-    }
-
     private transient AppUserPath _topLevelAsbiepLastUpdatedByFk;
 
     /**
@@ -296,6 +283,19 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
             _topLevelAsbiepLastUpdatedByFk = new AppUserPath(this, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, null);
 
         return _topLevelAsbiepLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _topLevelAsbiepOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>top_level_asbiep_owner_user_id_fk</code> key.
+     */
+    public AppUserPath topLevelAsbiepOwnerUserIdFk() {
+        if (_topLevelAsbiepOwnerUserIdFk == null)
+            _topLevelAsbiepOwnerUserIdFk = new AppUserPath(this, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, null);
+
+        return _topLevelAsbiepOwnerUserIdFk;
     }
 
     private transient ReleasePath _release;
@@ -347,18 +347,6 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return _asbie;
     }
 
-    private transient BbiepPath _bbiep;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table
-     */
-    public BbiepPath bbiep() {
-        if (_bbiep == null)
-            _bbiep = new BbiepPath(this, null, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
-
-        return _bbiep;
-    }
-
     private transient BbiePath _bbie;
 
     /**
@@ -381,6 +369,18 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
             _bbieSc = new BbieScPath(this, null, Keys.BBIE_SC_OWNER_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
 
         return _bbieSc;
+    }
+
+    private transient BbiepPath _bbiep;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table
+     */
+    public BbiepPath bbiep() {
+        if (_bbiep == null)
+            _bbiep = new BbiepPath(this, null, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK.getInverseKey());
+
+        return _bbiep;
     }
 
     private transient BiePackageTopLevelAsbiepPath _biePackageTopLevelAsbiep;

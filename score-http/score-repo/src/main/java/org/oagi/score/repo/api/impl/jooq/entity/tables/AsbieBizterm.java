@@ -195,19 +195,7 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
 
     @Override
     public List<ForeignKey<AsbieBiztermRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK, Keys.ASBIE_BIZTERM_ASBIE_FK);
-    }
-
-    private transient AsccBiztermPath _asccBizterm;
-
-    /**
-     * Get the implicit join path to the <code>oagi.ascc_bizterm</code> table.
-     */
-    public AsccBiztermPath asccBizterm() {
-        if (_asccBizterm == null)
-            _asccBizterm = new AsccBiztermPath(this, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK, null);
-
-        return _asccBizterm;
+        return Arrays.asList(Keys.ASBIE_BIZTERM_ASBIE_FK, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK);
     }
 
     private transient AsbiePath _asbie;
@@ -220,6 +208,18 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
             _asbie = new AsbiePath(this, Keys.ASBIE_BIZTERM_ASBIE_FK, null);
 
         return _asbie;
+    }
+
+    private transient AsccBiztermPath _asccBizterm;
+
+    /**
+     * Get the implicit join path to the <code>oagi.ascc_bizterm</code> table.
+     */
+    public AsccBiztermPath asccBizterm() {
+        if (_asccBizterm == null)
+            _asccBizterm = new AsccBiztermPath(this, Keys.ASBIE_BIZTERM_ASCC_BIZTERM_FK, null);
+
+        return _asccBizterm;
     }
 
     @Override

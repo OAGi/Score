@@ -99,7 +99,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
      * OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as
      * QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". " + DEN.
      */
-    public final TableField<BccManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + \"_ \" + OBJECT_CLASS_TERM + \". \" + DEN.");
+    public final TableField<BccManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(351).nullable(false), this, "DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + \"_ \" + OBJECT_CLASS_TERM + \". \" + DEN.");
 
     /**
      * The column <code>oagi.bcc_manifest.conflict</code>. This indicates that
@@ -202,19 +202,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
 
     @Override
     public List<ForeignKey<BccManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BCC_MANIFEST_RELEASE_ID_FK, Keys.BCC_MANIFEST_BCC_ID_FK, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.BCC_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.BCC_MANIFEST_BCC_ID_FK, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_RELEASE_ID_FK, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK);
     }
 
     private transient BccPath _bcc;
@@ -229,18 +217,6 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return _bcc;
     }
 
-    private transient SeqKeyPath _seqKey;
-
-    /**
-     * Get the implicit join path to the <code>oagi.seq_key</code> table.
-     */
-    public SeqKeyPath seqKey() {
-        if (_seqKey == null)
-            _seqKey = new SeqKeyPath(this, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, null);
-
-        return _seqKey;
-    }
-
     private transient AccManifestPath _accManifest;
 
     /**
@@ -251,6 +227,56 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
             _accManifest = new AccManifestPath(this, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, null);
 
         return _accManifest;
+    }
+
+    private transient BccManifestPath _bccManifestNextBccManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
+     * via the <code>bcc_manifest_next_bcc_manifest_id_fk</code> key.
+     */
+    public BccManifestPath bccManifestNextBccManifestIdFk() {
+        if (_bccManifestNextBccManifestIdFk == null)
+            _bccManifestNextBccManifestIdFk = new BccManifestPath(this, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK, null);
+
+        return _bccManifestNextBccManifestIdFk;
+    }
+
+    private transient BccManifestPath _bccManifestPrevBccManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
+     * via the <code>bcc_manifest_prev_bcc_manifest_id_fk</code> key.
+     */
+    public BccManifestPath bccManifestPrevBccManifestIdFk() {
+        if (_bccManifestPrevBccManifestIdFk == null)
+            _bccManifestPrevBccManifestIdFk = new BccManifestPath(this, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, null);
+
+        return _bccManifestPrevBccManifestIdFk;
+    }
+
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.BCC_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient SeqKeyPath _seqKey;
+
+    /**
+     * Get the implicit join path to the <code>oagi.seq_key</code> table.
+     */
+    public SeqKeyPath seqKey() {
+        if (_seqKey == null)
+            _seqKey = new SeqKeyPath(this, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, null);
+
+        return _seqKey;
     }
 
     private transient BccpManifestPath _bccpManifest;
@@ -276,32 +302,6 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
             _bccReplacementBccManifestIdFk = new BccManifestPath(this, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK, null);
 
         return _bccReplacementBccManifestIdFk;
-    }
-
-    private transient BccManifestPath _bccManifestPrevBccManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
-     * via the <code>bcc_manifest_prev_bcc_manifest_id_fk</code> key.
-     */
-    public BccManifestPath bccManifestPrevBccManifestIdFk() {
-        if (_bccManifestPrevBccManifestIdFk == null)
-            _bccManifestPrevBccManifestIdFk = new BccManifestPath(this, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, null);
-
-        return _bccManifestPrevBccManifestIdFk;
-    }
-
-    private transient BccManifestPath _bccManifestNextBccManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table,
-     * via the <code>bcc_manifest_next_bcc_manifest_id_fk</code> key.
-     */
-    public BccManifestPath bccManifestNextBccManifestIdFk() {
-        if (_bccManifestNextBccManifestIdFk == null)
-            _bccManifestNextBccManifestIdFk = new BccManifestPath(this, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK, null);
-
-        return _bccManifestNextBccManifestIdFk;
     }
 
     private transient BbiePath _bbie;

@@ -215,20 +215,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
 
     @Override
     public List<ForeignKey<NamespaceRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.NAMESPACE_OWNER_USER_ID_FK, Keys.NAMESPACE_CREATED_BY_FK, Keys.NAMESPACE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient AppUserPath _namespaceOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>namespace_owner_user_id_fk</code> key.
-     */
-    public AppUserPath namespaceOwnerUserIdFk() {
-        if (_namespaceOwnerUserIdFk == null)
-            _namespaceOwnerUserIdFk = new AppUserPath(this, Keys.NAMESPACE_OWNER_USER_ID_FK, null);
-
-        return _namespaceOwnerUserIdFk;
+        return Arrays.asList(Keys.NAMESPACE_CREATED_BY_FK, Keys.NAMESPACE_LAST_UPDATED_BY_FK, Keys.NAMESPACE_OWNER_USER_ID_FK);
     }
 
     private transient AppUserPath _namespaceCreatedByFk;
@@ -255,6 +242,19 @@ public class Namespace extends TableImpl<NamespaceRecord> {
             _namespaceLastUpdatedByFk = new AppUserPath(this, Keys.NAMESPACE_LAST_UPDATED_BY_FK, null);
 
         return _namespaceLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _namespaceOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>namespace_owner_user_id_fk</code> key.
+     */
+    public AppUserPath namespaceOwnerUserIdFk() {
+        if (_namespaceOwnerUserIdFk == null)
+            _namespaceOwnerUserIdFk = new AppUserPath(this, Keys.NAMESPACE_OWNER_USER_ID_FK, null);
+
+        return _namespaceOwnerUserIdFk;
     }
 
     private transient AccPath _acc;

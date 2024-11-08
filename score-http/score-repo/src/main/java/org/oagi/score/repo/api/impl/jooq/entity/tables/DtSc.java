@@ -297,19 +297,7 @@ public class DtSc extends TableImpl<DtScRecord> {
 
     @Override
     public List<ForeignKey<DtScRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_SC_OWNER_DT_ID_FK, Keys.DT_SC_BASED_DT_SC_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK, Keys.DT_SC_CREATED_BY_FK, Keys.DT_SC_OWNER_USER_ID_FK, Keys.DT_SC_LAST_UPDATED_BY_FK, Keys.DT_SC_PREV_DT_SC_ID_FK, Keys.DT_SC_NEXT_DT_SC_ID_FK);
-    }
-
-    private transient DtPath _dt;
-
-    /**
-     * Get the implicit join path to the <code>oagi.dt</code> table.
-     */
-    public DtPath dt() {
-        if (_dt == null)
-            _dt = new DtPath(this, Keys.DT_SC_OWNER_DT_ID_FK, null);
-
-        return _dt;
+        return Arrays.asList(Keys.DT_SC_BASED_DT_SC_ID_FK, Keys.DT_SC_CREATED_BY_FK, Keys.DT_SC_LAST_UPDATED_BY_FK, Keys.DT_SC_NEXT_DT_SC_ID_FK, Keys.DT_SC_OWNER_DT_ID_FK, Keys.DT_SC_OWNER_USER_ID_FK, Keys.DT_SC_PREV_DT_SC_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK);
     }
 
     private transient DtScPath _dtScBasedDtScIdFk;
@@ -325,19 +313,6 @@ public class DtSc extends TableImpl<DtScRecord> {
         return _dtScBasedDtScIdFk;
     }
 
-    private transient DtScPath _dtScReplacementDtScIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.dt_sc</code> table, via the
-     * <code>dt_sc_replacement_dt_sc_id_fk</code> key.
-     */
-    public DtScPath dtScReplacementDtScIdFk() {
-        if (_dtScReplacementDtScIdFk == null)
-            _dtScReplacementDtScIdFk = new DtScPath(this, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK, null);
-
-        return _dtScReplacementDtScIdFk;
-    }
-
     private transient AppUserPath _dtScCreatedByFk;
 
     /**
@@ -349,19 +324,6 @@ public class DtSc extends TableImpl<DtScRecord> {
             _dtScCreatedByFk = new AppUserPath(this, Keys.DT_SC_CREATED_BY_FK, null);
 
         return _dtScCreatedByFk;
-    }
-
-    private transient AppUserPath _dtScOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>dt_sc_owner_user_id_fk</code> key.
-     */
-    public AppUserPath dtScOwnerUserIdFk() {
-        if (_dtScOwnerUserIdFk == null)
-            _dtScOwnerUserIdFk = new AppUserPath(this, Keys.DT_SC_OWNER_USER_ID_FK, null);
-
-        return _dtScOwnerUserIdFk;
     }
 
     private transient AppUserPath _dtScLastUpdatedByFk;
@@ -377,6 +339,44 @@ public class DtSc extends TableImpl<DtScRecord> {
         return _dtScLastUpdatedByFk;
     }
 
+    private transient DtScPath _dtScNextDtScIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt_sc</code> table, via the
+     * <code>dt_sc_next_dt_sc_id_fk</code> key.
+     */
+    public DtScPath dtScNextDtScIdFk() {
+        if (_dtScNextDtScIdFk == null)
+            _dtScNextDtScIdFk = new DtScPath(this, Keys.DT_SC_NEXT_DT_SC_ID_FK, null);
+
+        return _dtScNextDtScIdFk;
+    }
+
+    private transient DtPath _dt;
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt</code> table.
+     */
+    public DtPath dt() {
+        if (_dt == null)
+            _dt = new DtPath(this, Keys.DT_SC_OWNER_DT_ID_FK, null);
+
+        return _dt;
+    }
+
+    private transient AppUserPath _dtScOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>dt_sc_owner_user_id_fk</code> key.
+     */
+    public AppUserPath dtScOwnerUserIdFk() {
+        if (_dtScOwnerUserIdFk == null)
+            _dtScOwnerUserIdFk = new AppUserPath(this, Keys.DT_SC_OWNER_USER_ID_FK, null);
+
+        return _dtScOwnerUserIdFk;
+    }
+
     private transient DtScPath _dtScPrevDtScIdFk;
 
     /**
@@ -390,17 +390,17 @@ public class DtSc extends TableImpl<DtScRecord> {
         return _dtScPrevDtScIdFk;
     }
 
-    private transient DtScPath _dtScNextDtScIdFk;
+    private transient DtScPath _dtScReplacementDtScIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_sc</code> table, via the
-     * <code>dt_sc_next_dt_sc_id_fk</code> key.
+     * <code>dt_sc_replacement_dt_sc_id_fk</code> key.
      */
-    public DtScPath dtScNextDtScIdFk() {
-        if (_dtScNextDtScIdFk == null)
-            _dtScNextDtScIdFk = new DtScPath(this, Keys.DT_SC_NEXT_DT_SC_ID_FK, null);
+    public DtScPath dtScReplacementDtScIdFk() {
+        if (_dtScReplacementDtScIdFk == null)
+            _dtScReplacementDtScIdFk = new DtScPath(this, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK, null);
 
-        return _dtScNextDtScIdFk;
+        return _dtScReplacementDtScIdFk;
     }
 
     private transient CdtScAwdPriPath _cdtScAwdPri;

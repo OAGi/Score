@@ -155,7 +155,19 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
 
     @Override
     public List<ForeignKey<DtManifestTagRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_MANIFEST_TAG_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_TAG_TAG_ID_FK, Keys.DT_MANIFEST_TAG_CREATED_BY_FK);
+        return Arrays.asList(Keys.DT_MANIFEST_TAG_CREATED_BY_FK, Keys.DT_MANIFEST_TAG_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_TAG_TAG_ID_FK);
+    }
+
+    private transient AppUserPath _appUser;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     */
+    public AppUserPath appUser() {
+        if (_appUser == null)
+            _appUser = new AppUserPath(this, Keys.DT_MANIFEST_TAG_CREATED_BY_FK, null);
+
+        return _appUser;
     }
 
     private transient DtManifestPath _dtManifest;
@@ -180,18 +192,6 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
             _tag = new TagPath(this, Keys.DT_MANIFEST_TAG_TAG_ID_FK, null);
 
         return _tag;
-    }
-
-    private transient AppUserPath _appUser;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table.
-     */
-    public AppUserPath appUser() {
-        if (_appUser == null)
-            _appUser = new AppUserPath(this, Keys.DT_MANIFEST_TAG_CREATED_BY_FK, null);
-
-        return _appUser;
     }
 
     @Override

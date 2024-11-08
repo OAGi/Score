@@ -248,20 +248,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
 
     @Override
     public List<ForeignKey<OasDocRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_DOC_OWNER_USER_ID_FK, Keys.OAS_DOC_CREATED_BY_FK, Keys.OAS_DOC_LAST_UPDATED_BY_FK);
-    }
-
-    private transient AppUserPath _oasDocOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_doc_owner_user_id_fk</code> key.
-     */
-    public AppUserPath oasDocOwnerUserIdFk() {
-        if (_oasDocOwnerUserIdFk == null)
-            _oasDocOwnerUserIdFk = new AppUserPath(this, Keys.OAS_DOC_OWNER_USER_ID_FK, null);
-
-        return _oasDocOwnerUserIdFk;
+        return Arrays.asList(Keys.OAS_DOC_CREATED_BY_FK, Keys.OAS_DOC_LAST_UPDATED_BY_FK, Keys.OAS_DOC_OWNER_USER_ID_FK);
     }
 
     private transient AppUserPath _oasDocCreatedByFk;
@@ -288,6 +275,19 @@ public class OasDoc extends TableImpl<OasDocRecord> {
             _oasDocLastUpdatedByFk = new AppUserPath(this, Keys.OAS_DOC_LAST_UPDATED_BY_FK, null);
 
         return _oasDocLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _oasDocOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>oas_doc_owner_user_id_fk</code> key.
+     */
+    public AppUserPath oasDocOwnerUserIdFk() {
+        if (_oasDocOwnerUserIdFk == null)
+            _oasDocOwnerUserIdFk = new AppUserPath(this, Keys.OAS_DOC_OWNER_USER_ID_FK, null);
+
+        return _oasDocOwnerUserIdFk;
     }
 
     private transient OasDocTagPath _oasDocTag;
