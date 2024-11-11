@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -77,12 +77,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
 
-  // For editing 'displayName' of a node.
-  editingNode: BieFlatNode;
+  // For renaming 'displayName' of a node.
+  renamingNode: BieFlatNode;
   originalDisplayName: string;
 
-  startEditing(node: BieFlatNode): void {
-    this.editingNode = node;
+  startRenaming(node: BieFlatNode, $event?: MouseEvent): void {
+    if (!this.canRename(node)) {
+      return;
+    }
+
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    this.renamingNode = node;
+    this.cdr.detectChanges();
+
     if (node.displayName) {
       this.originalDisplayName = node.displayName;
     } else {
@@ -91,34 +102,35 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
 
     setTimeout(() => {
-      // Focus the input and select its text
-      this.editInput.nativeElement.focus();
-      this.editInput.nativeElement.select();
+      const editInput = this.el.nativeElement.querySelector('.edit-input');
+      if (editInput) {
+        this.renderer.selectRootElement(editInput).focus();
+        this.renderer.selectRootElement(editInput).select();
+      }
     });
   }
 
-  stopEditing(revert: boolean = false): void {
+  stopRenaming(revert: boolean = false): void {
     if (revert) {
-      this.editingNode.displayName = this.originalDisplayName;  // Revert the value
+      this.renamingNode.displayName = this.originalDisplayName;  // Revert the value
     }
-    this.editingNode = undefined;
+    this.renamingNode = undefined;
+    this.cdr.detectChanges();
   }
 
   @HostListener('document:click', ['$event.target'])
   onClickOutside(targetElement: HTMLElement): void {
     const clickedInside = targetElement.closest('.mat-tree-node');
-    if (!clickedInside || !this.editingNode) {
-      this.stopEditing();
+    if (!clickedInside || !this.renamingNode) {
+      this.stopRenaming();
     }
   }
-
-  @ViewChild('editInput') editInput!: ElementRef;
 
   // Listen for 'esc' key press within the input
   @HostListener('document:keydown.escape', ['$event'])
   cancelEditing($event: KeyboardEvent): void {
-    if (this.editingNode) {
-      this.stopEditing(true);
+    if (this.renamingNode) {
+      this.stopRenaming(true);
       $event.preventDefault();
     }
   }
@@ -213,6 +225,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private stompService: RxStompService,
               private clipboard: Clipboard,
               private renderer: Renderer2,
+              private el: ElementRef,
+              private cdr: ChangeDetectorRef,
               public webPageInfo: WebPageInfoService) {
   }
 
@@ -682,6 +696,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   canRemoveReusedBIE(node: BieFlatNode): boolean {
     return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && node.derived;
+  }
+
+  canRename(node: BieFlatNode): boolean {
+    return !!node && this.canEdit && !node.derived && !node.locked;
   }
 
   copyPath(node: BieFlatNode) {

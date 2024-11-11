@@ -188,7 +188,7 @@
                     releaseIds: element.sourceReleaseId,
                     topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
                   <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                    {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                    {{ element.sourceDen + ((element.sourceDisplayName) ? (' (' + element.sourceDisplayName + ')') : '') }} in {{ element.sourceReleaseNum }}
                   </span>
                   </a>
                 </div>

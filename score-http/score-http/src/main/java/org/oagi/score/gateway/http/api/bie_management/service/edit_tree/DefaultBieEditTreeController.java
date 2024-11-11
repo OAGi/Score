@@ -154,6 +154,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 APP_USER.LOGIN_ID,
                 ASCCP.GUID,
                 ASCCP.PROPERTY_TERM.as("name"),
+                ASBIEP.DISPLAY_NAME,
                 ASBIEP.ASBIEP_ID,
                 ASBIEP.BASED_ASCCP_MANIFEST_ID.as("asccp_manifest_id"),
                 ABIE.ABIE_ID,

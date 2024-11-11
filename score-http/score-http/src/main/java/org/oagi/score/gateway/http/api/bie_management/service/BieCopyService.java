@@ -220,7 +220,8 @@ public class BieCopyService implements InitializingBean {
                 ASBIEP.ROLE_OF_ABIE_ID,
                 ASBIEP.DEFINITION,
                 ASBIEP.REMARK,
-                ASBIEP.BIZ_TERM)
+                ASBIEP.BIZ_TERM,
+                ASBIEP.DISPLAY_NAME)
                 .from(ASBIEP)
                 .where(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId)))
                 .fetchInto(BieCopyAsbiep.class);
@@ -235,7 +236,8 @@ public class BieCopyService implements InitializingBean {
                 BBIEP.BASED_BCCP_MANIFEST_ID,
                 BBIEP.DEFINITION,
                 BBIEP.REMARK,
-                BBIEP.BIZ_TERM)
+                BBIEP.BIZ_TERM,
+                BBIEP.DISPLAY_NAME)
                 .from(BBIEP)
                 .where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId)))
                 .fetchInto(BieCopyBbiep.class);
@@ -263,6 +265,7 @@ public class BieCopyService implements InitializingBean {
                 BBIE_SC.EXAMPLE,
                 BBIE_SC.REMARK,
                 BBIE_SC.BIZ_TERM,
+                BBIE_SC.DISPLAY_NAME,
                 BBIE_SC.IS_USED.as("used"),
                 BBIE_SC.IS_DEPRECATED.as("deprecated"))
                 .from(BBIE_SC)
@@ -348,6 +351,7 @@ public class BieCopyService implements InitializingBean {
         private String definition;
         private String remark;
         private String bizTerm;
+        private String displayName;
 
     }
 
@@ -362,6 +366,7 @@ public class BieCopyService implements InitializingBean {
         private String definition;
         private String remark;
         private String bizTerm;
+        private String displayName;
 
     }
 
@@ -388,6 +393,7 @@ public class BieCopyService implements InitializingBean {
         private String example;
         private String remark;
         private String bizTerm;
+        private String displayName;
         private boolean used;
         private boolean deprecated;
 
@@ -617,6 +623,7 @@ public class BieCopyService implements InitializingBean {
                     .set(ASBIEP.DEFINITION, asbiep.getDefinition())
                     .set(ASBIEP.REMARK, asbiep.getRemark())
                     .set(ASBIEP.BIZ_TERM, asbiep.getBizTerm())
+                    .set(ASBIEP.DISPLAY_NAME, asbiep.getDisplayName())
                     .set(ASBIEP.CREATED_BY, ULong.valueOf(userId))
                     .set(ASBIEP.LAST_UPDATED_BY, ULong.valueOf(userId))
                     .set(ASBIEP.CREATION_TIMESTAMP, timestamp.toLocalDateTime())
@@ -635,6 +642,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIEP.DEFINITION, bbiep.getDefinition())
                     .set(BBIEP.REMARK, bbiep.getRemark())
                     .set(BBIEP.BIZ_TERM, bbiep.getBizTerm())
+                    .set(BBIEP.DISPLAY_NAME, bbiep.getDisplayName())
                     .set(BBIEP.CREATED_BY, ULong.valueOf(userId))
                     .set(BBIEP.LAST_UPDATED_BY, ULong.valueOf(userId))
                     .set(BBIEP.CREATION_TIMESTAMP, timestamp.toLocalDateTime())
@@ -723,6 +731,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                     .set(BBIE_SC.REMARK, bbieSc.getRemark())
                     .set(BBIE_SC.BIZ_TERM, bbieSc.getBizTerm())
+                    .set(BBIE_SC.DISPLAY_NAME, bbieSc.getDisplayName())
                     .set(BBIE_SC.CARDINALITY_MIN, bbieSc.getCardinalityMin())
                     .set(BBIE_SC.CARDINALITY_MAX, bbieSc.getCardinalityMax())
                     .set(BBIE_SC.IS_USED, (byte) ((bbieSc.isUsed()) ? 1 : 0))

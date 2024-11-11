@@ -1071,6 +1071,7 @@ public class BieUpliftingService {
                 targetAsbiep.setDefinition(asbiep.getDefinition());
                 targetAsbiep.setRemark(asbiep.getRemark());
                 targetAsbiep.setBizTerm(asbiep.getBizTerm());
+                targetAsbiep.setDisplayName(asbiep.getDisplayName());
 
                 WrappedAsbiep upliftingAsbiep = new WrappedAsbiep();
                 upliftingAsbiep.setAsbiep(targetAsbiep);
@@ -1111,6 +1112,7 @@ public class BieUpliftingService {
                 targetBbiep.setDefinition(bbiep.getDefinition());
                 targetBbiep.setRemark(bbiep.getRemark());
                 targetBbiep.setBizTerm(bbiep.getBizTerm());
+                targetBbiep.setDisplayName(bbiep.getDisplayName());
 
                 this.toBbiepToBbieMap.get(bbiep.getBbiepId()).setToBbiep(targetBbiep);
             }
@@ -1167,6 +1169,7 @@ public class BieUpliftingService {
                 targetBbieSc.setDefinition(bbieSc.getDefinition());
                 targetBbieSc.setRemark(bbieSc.getRemark());
                 targetBbieSc.setBizTerm(bbieSc.getBizTerm());
+                targetBbieSc.setDisplayName(bbieSc.getDisplayName());
                 targetBbieSc.setExample(bbieSc.getExample());
                 targetBbieSc.setDeprecated(bbieSc.isDeprecated());
                 targetBbieSc.setUsed(bbieSc.isUsed());

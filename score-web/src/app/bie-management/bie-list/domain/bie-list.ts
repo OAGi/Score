@@ -186,6 +186,7 @@ export class BieList {
   sourceTopLevelAsbiepId: number;
   sourceReleaseId: number;
   sourceDen: string;
+  sourceDisplayName: string;
   sourceAction: string;
   sourceTimestamp: Date;
 }

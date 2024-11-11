@@ -16,6 +16,7 @@ public class BieEditNode {
     private String guid;
     private String hashPath;
     private String name;
+    private String displayName;
     private boolean used;
     private boolean required;
     private boolean locked;

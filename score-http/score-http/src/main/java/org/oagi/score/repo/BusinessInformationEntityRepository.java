@@ -512,6 +512,7 @@ public class BusinessInformationEntityRepository {
                     TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP,
                     TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.as("source_release_id"),
                     ASCCP_MANIFEST.as("source_asccp_manifest").DEN.as("source_den"),
+                    ASBIEP.as("source_asbiep").DISPLAY_NAME.as("source_display_name"),
                     RELEASE.as("source_release").RELEASE_NUM.as("source_release_num")));
         }
 

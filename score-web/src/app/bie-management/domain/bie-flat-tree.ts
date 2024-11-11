@@ -2539,6 +2539,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     node.topLevelAsbiepId = this._topLevelAsbiepId;
     node.rootNode = this._abieNode;
     node.deprecated = this._abieNode.deprecated;
+    node.displayName = this._abieNode.displayName;
     return node as unknown as T;
   }
 

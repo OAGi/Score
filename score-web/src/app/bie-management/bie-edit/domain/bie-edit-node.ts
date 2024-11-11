@@ -21,6 +21,7 @@ export class BieEditNode {
   bieType: string;
   guid: string;
   name: string;
+  displayName: string;
   required: boolean;
   locked: boolean;
   derived: boolean;
@@ -42,6 +43,7 @@ export class BieEditNode {
     this.bieType = obj && obj.bieType || '';
     this.guid = obj && obj.guid || '';
     this.name = obj && obj.name || '';
+    this.displayName = obj && obj.displayName || '';
     this.required = obj && obj.required || false;
     this.locked = obj && obj.locked || false;
     this.topLevelAsbiepState = obj && obj.topLevelAsbiepState || '';

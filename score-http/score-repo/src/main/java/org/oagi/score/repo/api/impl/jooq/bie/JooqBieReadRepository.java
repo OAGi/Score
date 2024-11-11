@@ -265,6 +265,7 @@ public class JooqBieReadRepository
                 ASBIEP.DEFINITION,
                 ASBIEP.REMARK,
                 ASBIEP.BIZ_TERM,
+                ASBIEP.DISPLAY_NAME,
                 ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(ASBIEP);
     }
@@ -281,6 +282,7 @@ public class JooqBieReadRepository
             asbiep.setDefinition(record.get(ASBIEP.DEFINITION));
             asbiep.setRemark(record.get(ASBIEP.REMARK));
             asbiep.setBizTerm(record.get(ASBIEP.BIZ_TERM));
+            asbiep.setDisplayName(record.get(ASBIEP.DISPLAY_NAME));
             asbiep.setOwnerTopLevelAsbiepId(record.get(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
             return asbiep;
         };
@@ -295,6 +297,7 @@ public class JooqBieReadRepository
                 BBIEP.DEFINITION,
                 BBIEP.REMARK,
                 BBIEP.BIZ_TERM,
+                BBIEP.DISPLAY_NAME,
                 BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(BBIEP);
     }
@@ -310,6 +313,7 @@ public class JooqBieReadRepository
             bbiep.setDefinition(record.get(BBIEP.DEFINITION));
             bbiep.setRemark(record.get(BBIEP.REMARK));
             bbiep.setBizTerm(record.get(BBIEP.BIZ_TERM));
+            bbiep.setDisplayName(record.get(BBIEP.DISPLAY_NAME));
             bbiep.setOwnerTopLevelAsbiepId(record.get(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
             return bbiep;
         };
@@ -334,6 +338,7 @@ public class JooqBieReadRepository
                 BBIE_SC.DEFINITION,
                 BBIE_SC.BIZ_TERM,
                 BBIE_SC.REMARK,
+                BBIE_SC.DISPLAY_NAME,
                 BBIE_SC.EXAMPLE,
                 BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID)
                 .from(BBIE_SC);
@@ -363,6 +368,7 @@ public class JooqBieReadRepository
             bbieSc.setDefinition(record.get(BBIE_SC.DEFINITION));
             bbieSc.setBizTerm(record.get(BBIE_SC.BIZ_TERM));
             bbieSc.setRemark(record.get(BBIE_SC.REMARK));
+            bbieSc.setDisplayName(record.get(BBIE_SC.DISPLAY_NAME));
             bbieSc.setExample(record.get(BBIE_SC.EXAMPLE));
             bbieSc.setOwnerTopLevelAsbiepId(record.get(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
             return bbieSc;

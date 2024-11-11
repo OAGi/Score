@@ -36,6 +36,7 @@ public class BieList {
     private BigInteger sourceTopLevelAsbiepId;
     private BigInteger sourceReleaseId;
     private String sourceDen;
+    private String sourceDisplayName;
     private String sourceReleaseNum;
     private String sourceAction;
     private Date sourceTimestamp;

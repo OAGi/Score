@@ -116,9 +116,9 @@
                          *ngFor="let bread of selectedNode.parents; let last = last;">
                       <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
                       <span *ngIf="last"
-                            class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
+                            class="tree-breadcrumb-item-last">{{ bread.displayName ? bread.displayName : bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
                       <span *ngIf="!last" class="tree-breadcrumb-item"
-                            (click)="scrollToNode(bread)">{{ bread.name }}</span>
+                            (click)="scrollToNode(bread)">{{ bread.displayName ? bread.displayName : bread.name }}</span>
                     </div>
                   </div>
                 </div>
@@ -168,7 +168,7 @@
                         </mat-checkbox>
 
                         <div class="d-inline-flex align-items-center flex-grow-1"
-                             *ngIf="editingNode !== node; else editMode">
+                             *ngIf="renamingNode !== node; else editMode">
                           <span [class]="[node.type.toLowerCase(),
                                           this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
                                 [style.padding-right.px]="2"
@@ -176,7 +176,7 @@
                                 [matTooltip]="node.deprecated ? 'Deprecated' : ''"
                                 [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                                 [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
-                                (dblclick)="startEditing(node)">
+                                (dblclick)="startRenaming(node)">
                           </span>
 
                           <span [class]="['pl-4']" *ngIf="!dataSource.hideCardinality">
@@ -207,8 +207,8 @@
                             <input matInput #editInput
                                    [(ngModel)]="node.displayName"
                                    [maxLength]="100"
-                                   (blur)="stopEditing()"
-                                   (keydown.enter)="stopEditing()"
+                                   (blur)="stopRenaming()"
+                                   (keydown.enter)="stopRenaming()"
                                    class="edit-input"/>
                           </div>
                         </ng-template>
@@ -220,6 +220,11 @@
                   <mat-menu class="context-menu" #contextMenu="matMenu">
                     <button mat-menu-item (click)="copyPath(contextMenuItem)">
                       <span class="context-menu-item">Copy Path</span>
+                    </button>
+                    <button mat-menu-item (click)="startRenaming(contextMenuItem, $event)"
+                            *ngIf="canEdit"
+                            [disabled]="!canRename(contextMenuItem)">
+                      <span class="context-menu-item">Rename</span>
                     </button>
                     <mat-divider *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)"
@@ -281,11 +286,13 @@
                     </button>
                     <mat-divider *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="checkNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
+                            [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Check nillable on Child BCCs</span>
                     </button>
                     <button mat-menu-item (click)="uncheckNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
+                            [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Uncheck nillable on Child BCCs</span>
                     </button>
                   </mat-menu>
@@ -296,7 +303,7 @@
               <!-- ABIE -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ (selectedNode.displayName ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
                         <div class="col-4">
@@ -474,7 +481,7 @@
               <!-- ASBIEP -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isAsbiepDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ (selectedNode.displayName ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
@@ -792,7 +799,7 @@
               <!-- BBIEP -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isBbiepDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ (selectedNode.displayName ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
@@ -1193,7 +1200,7 @@
               <!-- BBIE_SC -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isBbieScDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ (selectedNode.displayName ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
