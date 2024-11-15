@@ -41,4 +41,10 @@ public class BieList {
     private String sourceAction;
     private Date sourceTimestamp;
 
+    private BigInteger basedTopLevelAsbiepId;
+    private BigInteger basedTopLevelAsbiepReleaseId;
+    private String basedTopLevelAsbiepReleaseNum;
+    private String basedTopLevelAsbiepDen;
+    private String basedTopLevelAsbiepDisplayName;
+
 }

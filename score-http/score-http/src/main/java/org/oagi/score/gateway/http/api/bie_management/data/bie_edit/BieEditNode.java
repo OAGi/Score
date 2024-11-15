@@ -34,6 +34,9 @@ public class BieEditNode {
     private String deprecatedReason;
     private String deprecatedRemark;
 
+    // Issue #1635
+    private BigInteger basedTopLevelAsbiepId;
+
     // Issue #1519
     private BieForOasDoc bieForOasDoc;
 

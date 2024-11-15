@@ -32,6 +32,8 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {BieCreateService} from '../bie-create/domain/bie-create.service';
+import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 
 @Component({
   selector: 'score-bie-list',
@@ -193,6 +195,7 @@ export class BieListComponent implements OnInit {
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private service: BieListService,
+              private bieCreateService: BieCreateService,
               private bieEditService: BieEditService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
@@ -396,7 +399,7 @@ export class BieListComponent implements OnInit {
     return element.owner === this.username && element.state === 'WIP';
   }
 
-  isDeprecable(element: BieList): boolean {
+  isDeprecatable(element: BieList): boolean {
     if (!element) {
       return false;
     }
@@ -503,6 +506,34 @@ export class BieListComponent implements OnInit {
       den: bie.den
     };
     const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
+  }
+
+  createInheritedBie(bie: BieList) {
+    if (!bie) {
+      return;
+    }
+
+    this.loading = true;
+    this.bieCreateService.createInheritedBie(bie.topLevelAsbiepId)
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
+      .subscribe(_ => {
+        this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+          data: {
+            titleIcon: 'info',
+            title: 'Request Received',
+            message: 'This may take a moment, so please check back shortly.',
+            action: 'Search',
+            onAction: (data, snackBarRef) => {
+              this.onSearch();
+              snackBarRef.dismissWithAction();
+            }
+          }
+        });
+      }, error => {
+        this.loading = false;
+      });
   }
 
   canToolbarAction(action: string) {

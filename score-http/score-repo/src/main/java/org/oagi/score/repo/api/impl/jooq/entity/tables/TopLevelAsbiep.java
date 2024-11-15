@@ -82,6 +82,12 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
     public final TableField<TopLevelAsbiepRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "A internal, primary database key of an top-level ASBIEP.");
 
     /**
+     * The column <code>oagi.top_level_asbiep.based_top_level_asbiep_id</code>.
+     * Foreign key referencing the inherited base TOP_LEVEL_ASBIEP_ID.
+     */
+    public final TableField<TopLevelAsbiepRecord, ULong> BASED_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("based_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key referencing the inherited base TOP_LEVEL_ASBIEP_ID.");
+
+    /**
      * The column <code>oagi.top_level_asbiep.asbiep_id</code>. Foreign key to
      * the ASBIEP table pointing to a record which is a top-level ASBIEP.
      */

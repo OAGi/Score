@@ -194,7 +194,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
     public void updateState(BigInteger userId,
                             BigInteger releaseId,
                             ReleaseState releaseState) {
-        AppUser appUser = sessionService.getAppUserByUsername(userId);
+        AppUser appUser = sessionService.getAppUserByUserId(userId);
         if (!appUser.isDeveloper()) {
             throw new IllegalArgumentException("It only allows to update the state of the release for developers.");
         }

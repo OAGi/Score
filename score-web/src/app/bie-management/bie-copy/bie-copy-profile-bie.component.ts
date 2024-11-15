@@ -27,6 +27,7 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -386,8 +387,12 @@ export class BieCopyProfileBieComponent implements OnInit {
   copy() {
     const topLevelAsbiepId: number = this.selection.selected[0].topLevelAsbiepId;
     this.service.copy(topLevelAsbiepId, this.bizCtxIds).subscribe(_ => {
-      this.snackBar.open('Copying request queued', '', {
-        duration: 3000,
+      this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
+        data: {
+          titleIcon: 'info',
+          title: 'Request Received',
+          message: 'This may take a moment, so please check back shortly.'
+        }
       });
 
       // Issue #1366

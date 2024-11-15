@@ -23,10 +23,13 @@ import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListRequest;
 import org.oagi.score.repo.api.businesscontext.model.GetBusinessContextListResponse;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.OasMessageBody;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccManifestRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AccRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.message.model.SendMessageRequest;
-import org.oagi.score.repo.api.openapidoc.model.*;
+import org.oagi.score.repo.api.openapidoc.model.BieForOasDoc;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
+import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
 import org.oagi.score.repo.api.user.model.ScoreRole;
 import org.oagi.score.repo.api.user.model.ScoreUser;
 import org.oagi.score.repository.ABIERepository;
@@ -187,6 +190,7 @@ public class BieService {
                 .setAsccpManifestId(request.getAsccpManifestId())
                 .setExcludePropertyTerms(request.getExcludePropertyTerms())
                 .setTopLevelAsbiepIds(request.getTopLevelAsbiepIds())
+                .setBasedTopLevelAsbiepIds(request.getBasedTopLevelAsbiepIds())
                 .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
                 .setStates(request.getStates())
                 .setDeprecated(request.getDeprecated())
@@ -416,6 +420,13 @@ public class BieService {
                     .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepListThatHasThisAsSource))
                     .execute();
         }
+
+
+        // Issue #1635
+        dslContext.update(TOP_LEVEL_ASBIEP)
+                .setNull(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID)
+                .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds))
+                .execute();
     }
 
     private void ensureProperDeleteBieRequest(AuthenticatedPrincipal prinpical, List<BigInteger> topLevelAsbiepIds) {

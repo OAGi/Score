@@ -76,6 +76,9 @@ export class BieListService {
     if (request.topLevelAsbiepIds.length > 0) {
       params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
     }
+    if (request.basedTopLevelAsbiepIds.length > 0) {
+      params = params.set('basedTopLevelAsbiepIds', request.basedTopLevelAsbiepIds.join(','));
+    }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
     }
@@ -200,6 +203,7 @@ export class BieListService {
   }
 
   confirmAsbieBbieListByIdAndType(biesToAssign: BieToAssign[]): Observable<PageResponse<AsbieBbieList>> {
-    return this.http.post<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie/confirm', { biesToAssign });
+    return this.http.post<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie/confirm', {biesToAssign});
   }
+
 }

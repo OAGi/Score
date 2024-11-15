@@ -10,6 +10,8 @@ public class TopLevelAsbiep extends Auditable implements Serializable {
 
     private BigInteger topLevelAsbiepId;
 
+    private BigInteger basedTopLevelAsbiepId;
+
     private ScoreUser owner;
 
     private BigInteger asbiepId;
@@ -32,6 +34,14 @@ public class TopLevelAsbiep extends Auditable implements Serializable {
 
     public void setTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
         this.topLevelAsbiepId = topLevelAsbiepId;
+    }
+
+    public BigInteger getBasedTopLevelAsbiepId() {
+        return basedTopLevelAsbiepId;
+    }
+
+    public void setBasedTopLevelAsbiepId(BigInteger basedTopLevelAsbiepId) {
+        this.basedTopLevelAsbiepId = basedTopLevelAsbiepId;
     }
 
     public ScoreUser getOwner() {

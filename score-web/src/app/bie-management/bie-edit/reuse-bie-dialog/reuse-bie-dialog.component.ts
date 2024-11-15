@@ -196,6 +196,7 @@ export class ReuseBieDialogComponent implements OnInit {
     const release = new SimpleRelease();
     release.releaseId = this.data.releaseId;
     this.request.releases = [release, ];
+    this.request.basedTopLevelAsbiepIds = [this.data.basedTopLevelAsbiepId, ];
     this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId, ];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;

@@ -13,7 +13,9 @@ public class BieEditRef {
     private BigInteger basedAsccManifestId;
     private String hashPath;
     private BigInteger topLevelAsbiepId;
+    private BigInteger basedTopLevelAsbiepId;
     private BigInteger refTopLevelAsbiepId;
+    private BigInteger refBasedTopLevelAsbiepId;
     private boolean refInverseMode;
 
 }

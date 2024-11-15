@@ -14,7 +14,7 @@
   font-family: Roboto;
 }
 
-.mat-tree-node .deprecated, .mat-option .deprecated {
+.mat-tree-node .deprecated, .mat-option .deprecated, span.deprecated {
   text-decoration: line-through;
   background-color: #ececec;
 }

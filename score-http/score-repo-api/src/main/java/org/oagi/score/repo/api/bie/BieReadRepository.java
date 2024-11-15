@@ -11,6 +11,12 @@ public interface BieReadRepository {
     GetReuseBieListResponse getReuseBieList(
             GetReuseBieListRequest request) throws ScoreDataAccessException;
 
+    GetBaseBieResponse getBaseBie(
+            GetBaseBieRequest request) throws ScoreDataAccessException;
+
+    GetInheritedBieListResponse getInheritedBieList(
+            GetInheritedBieListRequest request) throws ScoreDataAccessException;
+
     GetAssignedBusinessContextResponse getAssignedBusinessContext(
             GetAssignedBusinessContextRequest request) throws ScoreDataAccessException;
 

@@ -50,7 +50,7 @@ export class BieUpliftSourceFlatNode extends WrappedBieFlatNode {
       return true;
     }
     if (this.target) {
-      return !this.derived;
+      return !this.reused;
     }
     return false;
   }
@@ -266,7 +266,7 @@ export class MatchInfo {
       this.targetDisplayPath = '';
       this.match = 'Unmatched';
     }
-    if (source.derived) {
+    if (source.reused) {
       this.reuse = 'Not selected';
       if (target && target.reusedTopLevelAsbiepId) {
         this.reuse = 'Selected';

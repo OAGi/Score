@@ -530,7 +530,7 @@ export class BieUpliftComponent implements OnInit {
   createUpliftBIE() {
     this.loading = true;
     const source = this.sourceDataSource.data.filter(e => {
-      if (e.derived) {
+      if (e.reused) {
         return true;
       }
       if (!e.fixed) {
@@ -613,9 +613,10 @@ export class BieUpliftComponent implements OnInit {
   }
 
   matchReused(node: BieUpliftTargetFlatNode) {
-    if (node.source && node.source.derived) {
+    if (node.source && node.source.reused) {
       const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
         data: {
+          title: 'Select Profile BIE to reuse',
           asccpManifestId: (node._node as unknown as AsbiepFlatNode).asccpNode.manifestId,
           releaseId: this.targetReleaseId,
           topLevelAsbiepId: this.topLevelAsbiepId

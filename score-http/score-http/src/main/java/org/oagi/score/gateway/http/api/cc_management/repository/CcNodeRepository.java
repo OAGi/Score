@@ -122,7 +122,7 @@ public class CcNodeRepository {
         accNode.setGroup(oagisComponentType.isGroup());
         boolean isWorkingRelease = accNode.getReleaseNum().equals("Working");
         accNode.setAccess(AccessPrivilege.toAccessPrivilege(
-                sessionService.getAppUserByUsername(user), sessionService.getAppUserByUsername(accNode.getOwnerUserId()),
+                sessionService.getAppUserByUsername(user), sessionService.getAppUserByUserId(accNode.getOwnerUserId()),
                 accNode.getState(), isWorkingRelease));
         accNode.setHasChild(hasChild(accNode));
         accNode.setHasExtension(hasExtension(user, accNode));
@@ -210,7 +210,7 @@ public class CcNodeRepository {
                 .fetchOneInto(CcAsccpNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(asccpNode.getOwnerUserId());
+        AppUser owner = sessionService.getAppUserByUserId(asccpNode.getOwnerUserId());
         boolean isWorkingRelease = asccpNode.getReleaseNum().equals("Working");
         asccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, asccpNode.getState(), isWorkingRelease));
         asccpNode.setHasChild(true); // role_of_acc_id must not be null.
@@ -324,7 +324,7 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBccpNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(bccpNode.getOwnerUserId());
+        AppUser owner = sessionService.getAppUserByUserId(bccpNode.getOwnerUserId());
         boolean isWorkingRelease = bccpNode.getReleaseNum().equals("Working");
         bccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bccpNode.getState(), isWorkingRelease));
         bccpNode.setHasChild(hasChild(bccpNode));
@@ -338,7 +338,7 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBdtNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(bdtNode.getOwnerUserId());
+        AppUser owner = sessionService.getAppUserByUserId(bdtNode.getOwnerUserId());
         boolean isWorkingRelease = bdtNode.getReleaseNum().equals("Working");
         bdtNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bdtNode.getState(), isWorkingRelease));
         bdtNode.setHasChild(hasChild(bdtNode));
@@ -352,7 +352,7 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBdtScNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(dtScNode.getOwnerUserId());
+        AppUser owner = sessionService.getAppUserByUserId(dtScNode.getOwnerUserId());
         boolean isWorkingRelease = dtScNode.getReleaseNum().equals("Working");
         dtScNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, dtScNode.getState(), isWorkingRelease));
 

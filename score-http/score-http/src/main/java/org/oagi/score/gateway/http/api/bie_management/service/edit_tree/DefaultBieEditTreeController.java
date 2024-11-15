@@ -164,7 +164,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
                 TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
                 TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
-                TOP_LEVEL_ASBIEP.INVERSE_MODE)
+                TOP_LEVEL_ASBIEP.INVERSE_MODE,
+                TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID.as("based_top_level_asbiep_id"))
                 .from(TOP_LEVEL_ASBIEP)
                 .join(ASBIEP).on(and(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID),
@@ -178,6 +179,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(APP_USER).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .leftJoin(TOP_LEVEL_ASBIEP.as("based")).on(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID))
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchOneInto(BieEditAbieNode.class);
         rootNode.setHasChild(hasChild(rootNode));

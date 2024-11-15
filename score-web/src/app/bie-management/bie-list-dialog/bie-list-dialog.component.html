@@ -40,7 +40,7 @@
               <div class="den word-break-all">
             <span *ngIf="isAccessibleLeft(element)">
               <a href="{{ getRouteLink(element) }}" target="_blank">
-                {{ element.reusingDen }}
+                {{ element.reusingDen + ((element.reusingDisplayName) ? (' (' + element.reusingDisplayName + ')') : '') }}
               </a>
             </span>
                 <span *ngIf="!isAccessibleLeft(element)">

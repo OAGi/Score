@@ -101,7 +101,7 @@ public class SessionService {
                 .fetchOneInto(AppUser.class);
     }
 
-    public AppUser getAppUserByUsername(BigInteger appUserId) {
+    public AppUser getAppUserByUserId(BigInteger appUserId) {
         return dslContext.select(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,

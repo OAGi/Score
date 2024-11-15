@@ -13,7 +13,7 @@ import {
   CodeList
 } from '../../bie-edit/domain/bie-edit-node';
 import {BieEditAbieNode, RefBie, UsedBie} from './bie-edit-node';
-import {AsbiepFlatNode, BieEditNodeDetail} from '../../domain/bie-flat-tree';
+import {AbieFlatNode, AsbiepFlatNode, BieEditNodeDetail} from '../../domain/bie-flat-tree';
 
 @Injectable()
 export class BieEditService {
@@ -71,6 +71,11 @@ export class BieEditService {
     return this.http.get<BieEditNodeDetail>(url, {params});
   }
 
+  getDetailById(bieId: number, bieType: string): Observable<BieEditNodeDetail> {
+    const url = '/api/profile_bie/' + bieType.toLowerCase() + '/' + bieId;
+    return this.http.get<BieEditNodeDetail>(url, {});
+  }
+
   updateDetails(topLevelAsbiepId: number, request: BieDetailUpdateRequest): Observable<BieDetailUpdateResponse> {
     return this.http.post<BieDetailUpdateResponse>('/api/profile_bie/' + topLevelAsbiepId + '/detail', request.json);
   }
@@ -106,6 +111,18 @@ export class BieEditService {
       topLevelAsbiepId,
       asccpManifestId
     });
+  }
+
+  useBaseBIE(abieNode: AbieFlatNode, baseTopLevelAsbiepId: number): Observable<any> {
+    const url = '/api/profile_bie/' + abieNode.topLevelAsbiepId + '/use_base';
+    return this.http.post<any>(url, {
+      baseTopLevelAsbiepId
+    });
+  }
+
+  removeBaseBIE(abieNode: AbieFlatNode): Observable<any> {
+    const url = '/api/profile_bie/' + abieNode.topLevelAsbiepId + '/remove_base';
+    return this.http.post<any>(url, {});
   }
 
   createLocalAbieExtension(node: AsbiepFlatNode): Observable<BieEditCreateExtensionResponse> {

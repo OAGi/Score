@@ -30,6 +30,7 @@ public class JooqBieReadRepository
     private SelectOnConditionStep selectTopLevelAsbiep() {
         return dslContext().select(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.RELEASE_ID,
                 ASCCP.PROPERTY_TERM,
@@ -67,6 +68,9 @@ public class JooqBieReadRepository
         return record -> {
             TopLevelAsbiep topLevelAsbiep = new TopLevelAsbiep();
             topLevelAsbiep.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            if (record.get(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID) != null) {
+                topLevelAsbiep.setBasedTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+            }
             topLevelAsbiep.setAsbiepId(record.get(TOP_LEVEL_ASBIEP.ASBIEP_ID).toBigInteger());
             topLevelAsbiep.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
             topLevelAsbiep.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
@@ -457,6 +461,31 @@ public class JooqBieReadRepository
                         .fetch(mapperTopLevelAsbiep()) :
                 Collections.emptyList();
         return new GetReuseBieListResponse(reuseTopLevelAsbiepList);
+    }
+
+    @Override
+    public GetBaseBieResponse getBaseBie(GetBaseBieRequest request) throws ScoreDataAccessException {
+        ULong topLevelAsbiepId = ULong.valueOf(request.getTopLevelAsbiepId());
+        ULong basedTopLevelAsbiepId = dslContext().select(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId))
+                .fetchOptionalInto(ULong.class).orElse(null);
+        TopLevelAsbiep basedTopLevelAsbiep = null;
+        if (basedTopLevelAsbiepId != null) {
+            basedTopLevelAsbiep = (TopLevelAsbiep) selectTopLevelAsbiep()
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(basedTopLevelAsbiepId))
+                    .fetchOne(mapperTopLevelAsbiep());
+        }
+        return new GetBaseBieResponse(basedTopLevelAsbiep);
+    }
+
+    @Override
+    public GetInheritedBieListResponse getInheritedBieList(GetInheritedBieListRequest request) throws ScoreDataAccessException {
+        ULong topLevelAsbiepId = ULong.valueOf(request.getTopLevelAsbiepId());
+        List<TopLevelAsbiep> inheritedTopLevelAsbiepList = selectTopLevelAsbiep()
+                .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId))
+                .fetch(mapperTopLevelAsbiep());
+        return new GetInheritedBieListResponse(inheritedTopLevelAsbiepList);
     }
 
     private List<ULong> getReuseTopLevelAsbiepList(ULong topLevelAsbiepId, boolean isReusedBie) {

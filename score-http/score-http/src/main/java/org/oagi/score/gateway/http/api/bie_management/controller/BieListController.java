@@ -56,6 +56,7 @@ public class BieListController {
                                             @RequestParam(name = "deprecated", required = false) String deprecated,
                                             @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
                                             @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
+                                            @RequestParam(name = "basedTopLevelAsbiepIds", required = false) String basedTopLevelAsbiepIds,
                                             @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
                                             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -93,6 +94,8 @@ public class BieListController {
                 Arrays.asList(excludePropertyTerms.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setTopLevelAsbiepIds(!StringUtils.hasLength(topLevelAsbiepIds) ? Collections.emptyList() :
                 Arrays.asList(topLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
+        request.setBasedTopLevelAsbiepIds(!StringUtils.hasLength(basedTopLevelAsbiepIds) ? Collections.emptyList() :
+                Arrays.asList(basedTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setExcludeTopLevelAsbiepIds(!StringUtils.hasLength(excludeTopLevelAsbiepIds) ? Collections.emptyList() :
                 Arrays.asList(excludeTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :

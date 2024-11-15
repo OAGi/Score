@@ -1,14 +1,17 @@
 <div class="container">
   <div class="header pt-3 pb-1">
-    <mat-icon>{{ data.titleIcon }}</mat-icon>
-    <span class="pl-1">{{ data.title }}</span>
+    <mat-icon *ngIf="data.titleIcon">{{ data.titleIcon }}</mat-icon>
+    <span [classList]="[ data.titleIcon ? 'pl-2' : '' ]">{{ data.title }}</span>
   </div>
   <mat-divider></mat-divider>
   <div class="message pt-2" matSnackBarLabel>
     <span>{{ data.message }}</span>
   </div>
   <div class="actions pt-2 pb-3" matSnackBarActions>
-    <button mat-raised-button color="accent" matSnackBarAction (click)="data.onAction(data, snackBarRef)">{{ data.action }}</button>
-    <button mat-raised-button color="primary" matSnackBarAction (click)="snackBarRef.dismissWithAction()">Close</button>
+    <button mat-raised-button color="accent" matSnackBarAction
+            *ngIf="data.action"
+            (click)="data.onAction(data, snackBarRef)">{{ data.action }}</button>
+    <button mat-raised-button color="primary" matSnackBarAction
+            (click)="snackBarRef.dismissWithAction()">Close</button>
   </div>
 </div>

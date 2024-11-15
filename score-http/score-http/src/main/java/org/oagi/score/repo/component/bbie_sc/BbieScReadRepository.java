@@ -8,6 +8,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.data.BdtScPriRestri;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieScRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtScRecord;
 import org.oagi.score.repo.component.dt_sc.DtScReadRepository;
 import org.oagi.score.service.common.data.CcState;
@@ -90,6 +91,14 @@ public class BbieScReadRepository {
         return bbieScNode;
     }
 
+    public BbieScNode getBbieScNode(BigInteger bbieScId) {
+        BbieScRecord bbieScRecord = dslContext.selectFrom(BBIE_SC)
+                .where(BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScId)))
+                .fetchOne();
+        return getBbieScNode(bbieScRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                bbieScRecord.getBasedDtScManifestId().toBigInteger(), bbieScRecord.getHashPath());
+    }
+
     public BdtScPriRestri getDefaultBdtScPriRestriByBdtScManifestId(BigInteger dtScManifestId) {
         ULong bdtScManifestId = ULong.valueOf(dtScManifestId);
         return dslContext.select(BDT_SC_PRI_RESTRI.fields())
@@ -141,6 +150,7 @@ public class BbieScReadRepository {
 
         BbieScRecord bbieScRecord = getBbieScByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (bbieScRecord != null) {
+            bbieSc.setOwnerTopLevelAsbiepId(bbieScRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             bbieSc.setBbieScId(bbieScRecord.getBbieScId().toBigInteger());
             bbieSc.setBbieHashPath(dslContext.select(BBIE.HASH_PATH)
                     .from(BBIE)

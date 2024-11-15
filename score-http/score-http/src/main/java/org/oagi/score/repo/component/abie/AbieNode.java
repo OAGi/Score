@@ -27,6 +27,7 @@ public class AbieNode {
         private String hashPath;
         private BigInteger basedAccManifestId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger abieId;
         private String guid;
         private String version;

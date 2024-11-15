@@ -4,10 +4,7 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditUsed;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditRef;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbieRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccManifestRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccRecord;
-import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpRecord;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.component.ascc.AsccReadRepository;
 import org.oagi.score.repo.component.asccp.AsccpReadRepository;
 import org.oagi.score.service.common.data.CcState;
@@ -81,13 +78,23 @@ public class AsbieReadRepository {
         return asbieNode;
     }
 
+    public AsbieNode getAsbieNode(BigInteger asbieId) {
+        AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
+                .where(ASBIE.ASBIE_ID.eq(ULong.valueOf(asbieId)))
+                .fetchOne();
+        return getAsbieNode(asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                asbieRecord.getBasedAsccManifestId().toBigInteger(), asbieRecord.getHashPath());
+    }
+
     public AsbieNode.Asbie getAsbie(BigInteger topLevelAsbiepId, String hashPath) {
         AsbieNode.Asbie asbie = new AsbieNode.Asbie();
         asbie.setHashPath(hashPath);
 
         AsbieRecord asbieRecord = getAsbieByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (asbieRecord != null) {
+            asbie.setOwnerTopLevelAsbiepId(asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             asbie.setAsbieId(asbieRecord.getAsbieId().toBigInteger());
+            asbie.setToAsbiepId(asbieRecord.getToAsbiepId().toBigInteger());
             asbie.setGuid(asbieRecord.getGuid());
             asbie.setFromAbieHashPath(dslContext.select(ABIE.HASH_PATH)
                     .from(ABIE)
@@ -164,13 +171,18 @@ public class AsbieReadRepository {
                 ASBIE.HASH_PATH,
                 ASBIE.BASED_ASCC_MANIFEST_ID,
                 ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id"),
+                TOP_LEVEL_ASBIEP.as("asbie_top_level_asbiep").BASED_TOP_LEVEL_ASBIEP_ID.as("based_top_level_asbiep_id"),
                 ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.as("ref_top_level_asbiep_id"),
-                TOP_LEVEL_ASBIEP.INVERSE_MODE)
+                TOP_LEVEL_ASBIEP.as("asbiep_top_level_asbiep").BASED_TOP_LEVEL_ASBIEP_ID.as("ref_based_top_level_asbiep_id"),
+                TOP_LEVEL_ASBIEP.as("asbiep_top_level_asbiep").INVERSE_MODE)
                 .from(ASBIE)
                 .join(ASBIEP).on(
                         and(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID),
                             ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)))
-                .join(TOP_LEVEL_ASBIEP).on(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(TOP_LEVEL_ASBIEP.as("asbie_top_level_asbiep"))
+                .on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("asbie_top_level_asbiep").TOP_LEVEL_ASBIEP_ID))
+                .join(TOP_LEVEL_ASBIEP.as("asbiep_top_level_asbiep"))
+                .on(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("asbiep_top_level_asbiep").TOP_LEVEL_ASBIEP_ID))
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetch(record -> {
                     BieEditRef bieEditRef = new BieEditRef();
@@ -178,7 +190,15 @@ public class AsbieReadRepository {
                     bieEditRef.setBasedAsccManifestId(record.get(ASBIE.BASED_ASCC_MANIFEST_ID).toBigInteger());
                     bieEditRef.setHashPath(record.get(ASBIE.HASH_PATH));
                     bieEditRef.setTopLevelAsbiepId(record.get(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.as("top_level_asbiep_id")).toBigInteger());
+                    ULong basedTopLevelAsbiepId = record.get(TOP_LEVEL_ASBIEP.as("asbie_top_level_asbiep").BASED_TOP_LEVEL_ASBIEP_ID.as("based_top_level_asbiep_id"));
+                    if (basedTopLevelAsbiepId != null) {
+                        bieEditRef.setBasedTopLevelAsbiepId(basedTopLevelAsbiepId.toBigInteger());
+                    }
                     bieEditRef.setRefTopLevelAsbiepId(record.get(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.as("ref_top_level_asbiep_id")).toBigInteger());
+                    ULong refBasedTopLevelAsbiepId = record.get(TOP_LEVEL_ASBIEP.as("asbiep_top_level_asbiep").BASED_TOP_LEVEL_ASBIEP_ID.as("ref_based_top_level_asbiep_id"));
+                    if (refBasedTopLevelAsbiepId != null) {
+                        bieEditRef.setRefBasedTopLevelAsbiepId(refBasedTopLevelAsbiepId.toBigInteger());
+                    }
                     bieEditRef.setRefInverseMode(record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) == 1);
                     return bieEditRef;
                 });

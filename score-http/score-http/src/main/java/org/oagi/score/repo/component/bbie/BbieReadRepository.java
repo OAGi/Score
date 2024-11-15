@@ -112,6 +112,14 @@ public class BbieReadRepository {
         return bbieNode;
     }
 
+    public BbieNode getBbieNode(BigInteger bbieId) {
+        BbieRecord bbieRecord = dslContext.selectFrom(BBIE)
+                .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbieId)))
+                .fetchOne();
+        return getBbieNode(bbieRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                bbieRecord.getBasedBccManifestId().toBigInteger(), bbieRecord.getHashPath());
+    }
+
     public BigInteger getDefaultBdtPriRestriIdByBdtManifestId(BigInteger bdtManifestId) {
         ULong dtManifestId = ULong.valueOf(bdtManifestId);
         String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
@@ -163,7 +171,9 @@ public class BbieReadRepository {
 
         BbieRecord bbieRecord = getBbieByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (bbieRecord != null) {
+            bbie.setOwnerTopLevelAsbiepId(bbieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             bbie.setBbieId(bbieRecord.getBbieId().toBigInteger());
+            bbie.setToBbiepId(bbieRecord.getToBbiepId().toBigInteger());
             bbie.setFromAbieHashPath(dslContext.select(ABIE.HASH_PATH)
                     .from(ABIE)
                     .where(and(

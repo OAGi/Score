@@ -148,7 +148,7 @@
                       <fa-icon [icon]="faRecycle"
                                matTooltip="Reused"
                                [class]="['pl-3', 'pointer']" class="pointer"
-                               *ngIf="node.derived"></fa-icon>
+                               *ngIf="node.reused"></fa-icon>
 
                       <div class="ml-auto mr-2">
                         <mat-icon *ngIf="sourceDataSource.isExpandable(node)"
@@ -289,7 +289,7 @@
                                matTooltip="Select BIE"
                                (click)="matchReused(node)"
                                [class]="['pl-3', 'pointer', 'warn']" class="pointer"
-                               *ngIf="node.source && node.source.derived && !node.reusedTopLevelAsbiepId"></fa-icon>
+                               *ngIf="node.source && node.source.reused && !node.reusedTopLevelAsbiepId"></fa-icon>
                       <fa-icon [icon]="faRecycle"
                                matTooltip="Reused"
                                (click)="matchReused(node)"

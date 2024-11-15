@@ -32,7 +32,9 @@ public class AsbiepNode {
         private BigInteger basedAsccpManifestId;
         private BigInteger refTopLevelAsbiepId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger asbiepId;
+        private BigInteger roleOfAbieId;
         private String guid;
         private String displayName;
         private String remark;

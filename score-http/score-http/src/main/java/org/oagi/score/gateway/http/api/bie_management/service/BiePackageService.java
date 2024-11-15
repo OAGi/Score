@@ -6,7 +6,6 @@ import org.oagi.score.gateway.http.api.application_management.service.Applicatio
 import org.oagi.score.gateway.http.api.bie_management.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.event.BieCopyRequestEvent;
 import org.oagi.score.gateway.http.event.BiePackageUpliftRequestEvent;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.redis.event.EventListenerContainer;
@@ -106,7 +105,7 @@ public class BiePackageService implements ApplicationContextAware, InitializingB
 
         result.getResult().forEach(biePackage -> biePackage.setAccess(
                 AccessPrivilege.toAccessPrivilege(
-                        sessionService.getAppUserByUsername(request.getRequester().getUserId()),
+                        sessionService.getAppUserByUserId(request.getRequester().getUserId()),
                         biePackage.getOwner().getUserId(), biePackage.getState())));
 
         PageResponse<BiePackage> response = new PageResponse();
@@ -245,7 +244,7 @@ public class BiePackageService implements ApplicationContextAware, InitializingB
             bieList.setBusinessContexts(getBusinessContextListResponse.getResults());
             bieList.setAccess(
                     AccessPrivilege.toAccessPrivilege(
-                            sessionService.getAppUserByUsername(request.getRequester().getUserId()),
+                            sessionService.getAppUserByUserId(request.getRequester().getUserId()),
                             bieList.getOwnerUserId(), bieList.getState())
             );
         });

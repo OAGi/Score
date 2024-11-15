@@ -19,3 +19,7 @@ ALTER TABLE `bbiep`
     ADD COLUMN `display_name` varchar(100) DEFAULT NULL COMMENT 'The display name of the BBIEP' AFTER `biz_term`;
 ALTER TABLE `bbie_sc`
     ADD COLUMN `display_name` varchar(100) DEFAULT NULL COMMENT 'The display name of the BBIE_SC' AFTER `biz_term`;
+
+-- Issue #1635 (https://github.com/OAGi/Score/issues/1635)
+ALTER TABLE `top_level_asbiep`
+    ADD COLUMN `based_top_level_asbiep_id` BIGINT(20) UNSIGNED DEFAULT NULL COMMENT 'Foreign key referencing the inherited base TOP_LEVEL_ASBIEP_ID.' AFTER `top_level_asbiep_id`;

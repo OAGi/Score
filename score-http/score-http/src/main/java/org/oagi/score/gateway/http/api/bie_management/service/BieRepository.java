@@ -506,11 +506,22 @@ public class BieRepository {
     }
 
     public BigInteger createTopLevelAsbiep(BigInteger userId, BigInteger releaseId, BieState state) {
+        return createTopLevelAsbiep(userId, releaseId, null, state, null, null);
+    }
+
+    public BigInteger createTopLevelAsbiep(BigInteger userId, BigInteger releaseId,
+                                           BigInteger basedTopLevelAsbiepId, BieState state,
+                                           String version, String status) {
         TopLevelAsbiepRecord record = new TopLevelAsbiepRecord();
         LocalDateTime timestamp = LocalDateTime.now();
         record.setOwnerUserId(ULong.valueOf(userId));
         record.setReleaseId(ULong.valueOf(releaseId));
+        if (basedTopLevelAsbiepId != null) {
+            record.setBasedTopLevelAsbiepId(ULong.valueOf(basedTopLevelAsbiepId));
+        }
         record.setState(state.name());
+        record.setVersion(version);
+        record.setStatus(status);
         record.setLastUpdatedBy(ULong.valueOf(userId));
         record.setLastUpdateTimestamp(timestamp);
 
@@ -791,6 +802,7 @@ public class BieRepository {
                 TOP_LEVEL_ASBIEP.DEPRECATED_REASON.as("reusingDeprecatedReason"),
                 TOP_LEVEL_ASBIEP.DEPRECATED_REMARK.as("reusingDeprecatedRemark"),
                 ASCCP.as("reusing_asccp").PROPERTY_TERM.as("reusingPropertyTerm"),
+                ASBIEP.as("reusing_asbiep").DISPLAY_NAME.as("reusingDisplayName"),
                 ASCCP_MANIFEST.as("reusing_asccp_manifest").DEN.as("reusingDen"),
                 ABIE.as("reusing_abie").GUID.as("reusingGuid"),
                 APP_USER.as("reusing_app_user").LOGIN_ID.as("reusingOwner"),
@@ -805,6 +817,7 @@ public class BieRepository {
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").DEPRECATED_REASON.as("reusedDeprecatedReason"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").DEPRECATED_REMARK.as("reusedDeprecatedRemark"),
                 ASCCP.as("reused_asccp").PROPERTY_TERM.as("reusedPropertyTerm"),
+                ASBIEP.DISPLAY_NAME.as("reusedDisplayName"),
                 ASCCP_MANIFEST.as("reused_asccp_manifest").DEN.as("reusedDen"),
                 ABIE.as("reused_abie").GUID.as("reusedGuid"),
                 APP_USER.as("reused_app_user").LOGIN_ID.as("reusedOwner"),

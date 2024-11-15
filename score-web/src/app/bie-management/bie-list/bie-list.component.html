@@ -265,7 +265,10 @@
                   <a *ngIf="isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared')"
                      routerLink="{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
-                    <span>{{ element.den + ((element.displayName) ? (' (' + element.displayName + ')') : '') }}</span>
+                    <div class="d-inline-flex align-items-center">
+                      <span>{{ element.den }}</span>
+                      <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
+                    </div>
                   </a>
                 </div>
                 <div class="bie-guid">
@@ -275,12 +278,24 @@
                   <span>Source:</span>
                   <a target="_blank" rel="noopener noreferrer"
                      href="/profile_bie?{{ request.toQuery({
-                    den: element.sourceDen,
-                    releaseIds: element.sourceReleaseId,
-                    topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
-                  <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                    {{ element.sourceDen + ((element.sourceDisplayName) ? (' (' + element.sourceDisplayName + ')') : '') }} in {{ element.sourceReleaseNum }}
-                  </span>
+                      den: element.sourceDen,
+                      releaseIds: element.sourceReleaseId,
+                      topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
+                    <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
+                      {{ element.sourceDen + ((element.sourceDisplayName) ? (' (' + element.sourceDisplayName + ')') : '') }} in {{ element.sourceReleaseNum }}
+                    </span>
+                  </a>
+                </div>
+                <div class="bie-based" *ngIf="!!element.basedTopLevelAsbiepId && !!element.basedTopLevelAsbiepReleaseId">
+                  <span>Based on:</span>
+                  <a target="_blank" rel="noopener noreferrer"
+                     href="/profile_bie?{{ request.toQuery({
+                      den: element.basedTopLevelAsbiepDen,
+                      releaseIds: element.basedTopLevelAsbiepReleaseId,
+                      topLevelAsbiepIds: element.basedTopLevelAsbiepId }) }}">
+                    <span class="d-inline">
+                      {{ element.basedTopLevelAsbiepDen + ((element.basedTopLevelAsbiepDisplayName) ? (' (' + element.basedTopLevelAsbiepDisplayName + ')') : '') }} in {{ element.basedTopLevelAsbiepReleaseNum }}
+                    </span>
                   </a>
                 </div>
               </td>
@@ -384,6 +399,9 @@
       <button mat-menu-item (click)="openFindReuseBieListDialog(contextMenuItem)">
         <span class="context-menu-item">Find Reuses</span>
       </button>
+      <button mat-menu-item (click)="createInheritedBie(contextMenuItem)">
+        <span class="context-menu-item">Create Inherited BIE</span>
+      </button>
       <button mat-menu-item (click)="openTransferDialog(contextMenuItem)"
               [disabled]="!isEditable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Transfer Ownership</span>
@@ -393,7 +411,7 @@
         <span class="context-menu-item">Request Ownership Transfer</span>
       </button>
       <button mat-menu-item (click)="deprecate(contextMenuItem)"
-              [disabled]="!isDeprecable(contextMenuItem) && !isAdmin">
+              [disabled]="!isDeprecatable(contextMenuItem) && !isAdmin">
         <span class="context-menu-item">Deprecate</span>
       </button>
       <button mat-menu-item (click)="discard(contextMenuItem)"
