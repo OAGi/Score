@@ -27,7 +27,7 @@
         <aspectj.version>1.9.22.1</aspectj.version>
         <lettuce.version>6.4.0.RELEASE</lettuce.version>
         <redisson.version>3.37.0</redisson.version>
-        <netty.version>4.1.114.Final</netty.version>
+        <netty.version>4.1.115.Final</netty.version>
         <lombok.version>1.18.34</lombok.version>
         <mariadb-client.version>3.5.0</mariadb-client.version>
         <log4j.version>2.23.1</log4j.version>
