@@ -748,7 +748,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && node.reused;
   }
 
-  canOverrideBaseReuseBIE(node: BieFlatNode): boolean {
+  canOverrideBaseReusedBIE(node: BieFlatNode): boolean {
     return this.canRemoveReusedBIE(node) && node.inherited;
   }
 
@@ -951,7 +951,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  removeOverrideReuseBIE(node: BieFlatNode) {
+  removeOverrideReusedBIE(node: BieFlatNode) {
     const asbiepNode = (node as AsbiepFlatNode);
     // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
     this.service.getDetail((node.parent as AsbiepFlatNode).basedTopLevelAsbiepId, 'ASBIE',
@@ -978,14 +978,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  overrideBaseReuseBIE(node: BieFlatNode) {
+  overrideBaseReusedBIE(node: BieFlatNode) {
     if (!this.canRemoveReusedBIE(node)) {
       return;
     }
 
     const asbiepNode = (node as AsbiepFlatNode);
     // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
-    this.service.getDetail(asbiepNode.basedTopLevelAsbiepId, 'ASBIE',
+    this.service.getDetail(asbiepNode.parent.basedTopLevelAsbiepId, 'ASBIE',
       (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(asbie => {
       this.service.getDetailById((asbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(asbiep => {
         const baseReusedTopLevelAsbiepId = (asbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
@@ -1754,6 +1754,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         bieMinLength = bbiepDetail.bbie.facetMinLength;
         bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetMinLength) {
@@ -1763,6 +1766,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         bieMinLength = bbieScDetail.bbieSc.facetMinLength;
         bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetMinimumLength = undefined;
@@ -1831,6 +1837,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         bieMinLength = bbiepDetail.bbie.facetMinLength;
         bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetMinLength) {
@@ -1840,6 +1849,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         bieMinLength = bbieScDetail.bbieSc.facetMinLength;
         bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetMaximumLength = undefined;
@@ -1905,6 +1917,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         biePattern = bbiepDetail.bbie.facetPattern;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetPattern) {
@@ -1912,6 +1927,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         disabled = true;
       } else {
         biePattern = bbieScDetail.bbieSc.facetPattern;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetPattern = undefined;

@@ -9,7 +9,7 @@ import {
   BieEditNodeDetail,
   ChangeListener
 } from '../../domain/bie-flat-tree';
-import {hashCode4String} from '../../../common/utility';
+import {hashCode4Array, hashCode4String} from '../../../common/utility';
 
 export class BieEditNode {
   ccManifestId: number;
@@ -76,8 +76,7 @@ export class BieEditNode {
   }
 
   get hashCode(): number {
-    return ((this.version) ? hashCode4String(this.version) : 0) +
-      ((this.status) ? hashCode4String(this.status) : 0);
+    return hashCode4Array(this.version, this.status);
   }
 
   reset(): void {
@@ -122,7 +121,7 @@ export class BieEditAbieNode extends BieEditNode {
   }
 
   get hashCode(): number {
-    return super.hashCode + ((this.inverseMode) ? 1 : 0);
+    return hashCode4Array(super.hashCode, this.inverseMode);
   }
 }
 

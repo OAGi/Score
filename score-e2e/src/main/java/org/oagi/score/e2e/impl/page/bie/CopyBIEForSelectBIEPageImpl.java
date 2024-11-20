@@ -4,6 +4,7 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.bie.CopyBIEForSelectBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.By;
@@ -251,14 +252,18 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN, e);
             }
-            if (!asccpDEN.equals(getText(td.findElement(By.tagName("a"))))) {
+            if (!getText(td.findElement(By.cssSelector("a > div > span"))).startsWith(asccpDEN)) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + asccpDEN);
             }
             WebElement select = getColumnByName(tr, "select");
             click(select);
             waitFor(Duration.ofMillis(1000L));
             click(getCopyButton());
-            assert "Copying request queued".equals(getSnackBarMessage(getDriver()));
+            MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+            assert "This may take a moment, so please check back shortly.".equals(
+                    getText(multiActionSnackBar.getMessageElement())
+            );
+            click(multiActionSnackBar.getActionButtonByName("Close"));
 
             ViewEditBIEPage viewEditBIEPage = new ViewEditBIEPageImpl(this);
             assert viewEditBIEPage.isOpened();

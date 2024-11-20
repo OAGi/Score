@@ -270,13 +270,13 @@
                             *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem) && !contextMenuItem.inherited">
                       <span class="context-menu-item">Retain Reused BIE</span>
                     </button>
-                    <button mat-menu-item (click)="overrideBaseReuseBIE(contextMenuItem)"
-                            *ngIf="canEdit && canOverrideBaseReuseBIE(contextMenuItem)">
-                      <span class="context-menu-item">Override Base Reuse BIE</span>
+                    <button mat-menu-item (click)="overrideBaseReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canOverrideBaseReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Override Base Reused BIE</span>
                     </button>
-                    <button mat-menu-item (click)="removeOverrideReuseBIE(contextMenuItem)"
-                            *ngIf="canEdit && canOverrideBaseReuseBIE(contextMenuItem)">
-                      <span class="context-menu-item">Remove Override Reuse BIE</span>
+                    <button mat-menu-item (click)="removeOverrideReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canOverrideBaseReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Remove Override Reused BIE</span>
                     </button>
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
@@ -1357,13 +1357,14 @@
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
                             <mat-card-content
-                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity."
-                              [matTooltipDisabled]="!isReflectValue()">
+                              matTooltip="This value constraint cannot be modified by the definition of the {{ isReflectValue() ? 'Business Information Entity' : 'Base BIE' }}."
+                              [matTooltipDisabled]="!isReflectValue() && !(asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
                                 <mat-select [(ngModel)]="asBbiepDetail().bbie.fixedOrDefault"
                                             [disabled]="!isEditable(selectedNode) ||
-                                                        isReflectValue()"
+                                                        isReflectValue() ||
+                                                        (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')"
                                             (ngModelChange)="onChangeFixedOrDefault(asBbiepDetail().bbie.fixedOrDefault)">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
@@ -1381,7 +1382,8 @@
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbiepDetail().bbie.fixedValue"
                                        [disabled]="!isEditable(selectedNode) ||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.fixedOrDefault == 'default'">
@@ -1390,20 +1392,23 @@
                                        [(ngModel)]="asBbiepDetail().bbie.defaultValue"
                                        [disabled]="!isEditable(selectedNode) ||
                                                    !!(isVersionIdNode(selectedNode) && rootNode.version) ||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               </mat-form-field>
                             </mat-card-content>
                           </mat-card>
                         </div>
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
-                            <mat-card-content>
+                            <mat-card-content
+                              matTooltip="This value domain restriction cannot be modified by the definition of the Base BIE."
+                              [matTooltipDisabled]="!asBbiepDetail().base">
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbiepDetail().bbie.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option *ngFor="let valueDomainType of valueDomainTypes"
                                               [value]="valueDomainType.valueOf()">
                                     {{ valueDomainType.toString() | separate }}
@@ -1415,7 +1420,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.bdtPriRestriId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1435,7 +1440,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1464,7 +1469,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1710,7 +1715,7 @@
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
                             <mat-card-content
-                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity."
+                              matTooltip="This value constraint cannot be modified by the definition of the Business Information Entity."
                               [matTooltipDisabled]="!isReflectValue()">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
@@ -2021,13 +2026,14 @@
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
                             <mat-card-content
-                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity."
-                              [matTooltipDisabled]="!isReflectValue()">
+                              matTooltip="This value constraint cannot be modified by the definition of the {{ isReflectValue() ? 'Business Information Entity' : 'Base BIE' }}."
+                              [matTooltipDisabled]="!isReflectValue() && !(asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
                                 <mat-select [(ngModel)]="asBbieScDetail().bbieSc.fixedOrDefault"
                                             [disabled]="!isEditable(selectedNode)||
-                                                        isReflectValue()"
+                                                        isReflectValue() ||
+                                                        (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')"
                                             (ngModelChange)="onChangeFixedOrDefault(asBbieScDetail().bbieSc.fixedOrDefault)">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
@@ -2045,7 +2051,8 @@
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.fixedValue"
                                        [disabled]="!isEditable(selectedNode)||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.fixedOrDefault == 'default'">
@@ -2053,20 +2060,23 @@
                                 <input matInput placeholder="Default Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.defaultValue"
                                        [disabled]="!isEditable(selectedNode)||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               </mat-form-field>
                             </mat-card-content>
                           </mat-card>
                         </div>
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
-                            <mat-card-content>
+                            <mat-card-content
+                              matTooltip="This value domain restriction cannot be modified by the definition of the Base BIE."
+                              [matTooltipDisabled]="!asBbieScDetail().base">
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option *ngFor="let valueDomainType of valueDomainTypes"
                                               [value]="valueDomainType.valueOf()">
                                     {{ valueDomainType.toString() | separate }}
@@ -2079,7 +2089,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.bdtScPriRestriId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -2099,7 +2109,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -2128,7 +2138,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"

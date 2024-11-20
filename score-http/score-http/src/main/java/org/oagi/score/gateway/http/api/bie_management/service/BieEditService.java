@@ -95,6 +95,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.in;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.impl.jooq.utils.ScoreDigestUtils.sha256;
 import static org.oagi.score.repo.api.impl.utils.StringUtils.hasLength;
@@ -773,42 +774,42 @@ public class BieEditService implements InitializingBean {
     }
 
     private void overrideInheritedBIE(AppUser requester,
-                                      TopLevelAsbiep topLevelAsbiepRecord,
-                                      TopLevelAsbiep baseTopLevelAsbiepRecord) {
-        ULong topLevelAsbiepId = ULong.valueOf(topLevelAsbiepRecord.getTopLevelAsbiepId());
-        ULong baseTopLevelAsbiepId = ULong.valueOf(baseTopLevelAsbiepRecord.getTopLevelAsbiepId());
+                                      TopLevelAsbiep topLevelAsbiep,
+                                      TopLevelAsbiep baseTopLevelAsbiep) {
+        ULong topLevelAsbiepId = ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId());
+        ULong baseTopLevelAsbiepId = ULong.valueOf(baseTopLevelAsbiep.getTopLevelAsbiepId());
         ULong requesterUserId = ULong.valueOf(requester.getAppUserId());
 
         Map<ULong, ULong> abieIdChangeMap = new HashMap<>();
         List<AbieRecord> abieRecords = dslContext.selectFrom(ABIE)
                 .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, AbieRecord> existingAbieRecordMapByHashPath =
+        Map<String, AbieRecord> inheritedAbieMapByHashPath =
                 abieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(AbieRecord::getHashPath, Function.identity()));
         abieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(abie -> {
-                    if (existingAbieRecordMapByHashPath.containsKey(abie.getHashPath())) {
-                        AbieRecord existingAbieRecord = existingAbieRecordMapByHashPath.get(abie.getHashPath());
-                        if (!hasLength(existingAbieRecord.getDefinition())) {
-                            existingAbieRecord.setDefinition(abie.getDefinition());
+                .forEach(baseAbie -> {
+                    if (inheritedAbieMapByHashPath.containsKey(baseAbie.getHashPath())) {
+                        AbieRecord inheritedAbie = inheritedAbieMapByHashPath.get(baseAbie.getHashPath());
+                        if (!hasLength(inheritedAbie.getDefinition())) {
+                            inheritedAbie.setDefinition(baseAbie.getDefinition());
                         }
-                        if (!hasLength(existingAbieRecord.getRemark())) {
-                            existingAbieRecord.setRemark(abie.getRemark());
+                        if (!hasLength(inheritedAbie.getRemark())) {
+                            inheritedAbie.setRemark(baseAbie.getRemark());
                         }
-                        if (!hasLength(existingAbieRecord.getBizTerm())) {
-                            existingAbieRecord.setBizTerm(abie.getBizTerm());
+                        if (!hasLength(inheritedAbie.getBizTerm())) {
+                            inheritedAbie.setBizTerm(baseAbie.getBizTerm());
                         }
-                        existingAbieRecord.update();
+                        inheritedAbie.update();
 
-                        abieIdChangeMap.put(abie.getAbieId(), existingAbieRecord.getAbieId());
+                        abieIdChangeMap.put(baseAbie.getAbieId(), inheritedAbie.getAbieId());
                     } else {
-                        ULong oldAbieId = abie.getAbieId();
-                        abie.setAbieId(null);
-                        abie.setLastUpdatedBy(requesterUserId);
-                        abie.setLastUpdateTimestamp(LocalDateTime.now());
-                        abie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newAbieId = dslContext.insertInto(ABIE).set(abie)
+                        ULong oldAbieId = baseAbie.getAbieId();
+                        baseAbie.setAbieId(null);
+                        baseAbie.setLastUpdatedBy(requesterUserId);
+                        baseAbie.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseAbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newAbieId = dslContext.insertInto(ABIE).set(baseAbie)
                                 .returning(ABIE.ABIE_ID).fetchOne().getAbieId();
                         abieIdChangeMap.put(oldAbieId, newAbieId);
                     }
@@ -818,39 +819,39 @@ public class BieEditService implements InitializingBean {
         List<AsbiepRecord> asbiepRecords = dslContext.selectFrom(ASBIEP)
                 .where(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, AsbiepRecord> existingAsbiepRecordMapByHashPath =
+        Map<String, AsbiepRecord> inheritedAsbiepMapByHashPath =
                 asbiepRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(AsbiepRecord::getHashPath, Function.identity()));
         asbiepRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(asbiep -> {
-                    if (existingAsbiepRecordMapByHashPath.containsKey(asbiep.getHashPath())) {
-                        AsbiepRecord existingAsbiepRecord = existingAsbiepRecordMapByHashPath.get(asbiep.getHashPath());
+                .forEach(baseAsbiep -> {
+                    if (inheritedAsbiepMapByHashPath.containsKey(baseAsbiep.getHashPath())) {
+                        AsbiepRecord inheritedAsbiep = inheritedAsbiepMapByHashPath.get(baseAsbiep.getHashPath());
 
-                        if (!hasLength(existingAsbiepRecord.getDefinition())) {
-                            existingAsbiepRecord.setDefinition(asbiep.getDefinition());
+                        if (!hasLength(inheritedAsbiep.getDefinition())) {
+                            inheritedAsbiep.setDefinition(baseAsbiep.getDefinition());
                         }
-                        if (!hasLength(existingAsbiepRecord.getRemark())) {
-                            existingAsbiepRecord.setRemark(asbiep.getRemark());
+                        if (!hasLength(inheritedAsbiep.getRemark())) {
+                            inheritedAsbiep.setRemark(baseAsbiep.getRemark());
                         }
-                        if (!hasLength(existingAsbiepRecord.getBizTerm())) {
-                            existingAsbiepRecord.setBizTerm(asbiep.getBizTerm());
+                        if (!hasLength(inheritedAsbiep.getBizTerm())) {
+                            inheritedAsbiep.setBizTerm(baseAsbiep.getBizTerm());
                         }
                         // Root node's display name is not overwritten.
-                        if (!hasLength(existingAsbiepRecord.getDisplayName()) &&
-                            !topLevelAsbiepRecord.getAsbiepId().equals(existingAsbiepRecord.getAsbiepId().toBigInteger())) {
-                            existingAsbiepRecord.setDisplayName(asbiep.getDisplayName());
+                        if (!hasLength(inheritedAsbiep.getDisplayName()) &&
+                            !topLevelAsbiep.getAsbiepId().equals(inheritedAsbiep.getAsbiepId().toBigInteger())) {
+                            inheritedAsbiep.setDisplayName(baseAsbiep.getDisplayName());
                         }
-                        existingAsbiepRecord.update();
+                        inheritedAsbiep.update();
 
-                        asbiepIdChangeMap.put(asbiep.getAsbiepId(), existingAsbiepRecord.getAsbiepId());
+                        asbiepIdChangeMap.put(baseAsbiep.getAsbiepId(), inheritedAsbiep.getAsbiepId());
                     } else {
-                        ULong oldAsbiepId = asbiep.getAsbiepId();
-                        asbiep.setAsbiepId(null);
-                        asbiep.setRoleOfAbieId(abieIdChangeMap.get(asbiep.getRoleOfAbieId()));
-                        asbiep.setLastUpdatedBy(requesterUserId);
-                        asbiep.setLastUpdateTimestamp(LocalDateTime.now());
-                        asbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newAsbiepId = dslContext.insertInto(ASBIEP).set(asbiep)
+                        ULong oldAsbiepId = baseAsbiep.getAsbiepId();
+                        baseAsbiep.setAsbiepId(null);
+                        baseAsbiep.setRoleOfAbieId(abieIdChangeMap.get(baseAsbiep.getRoleOfAbieId()));
+                        baseAsbiep.setLastUpdatedBy(requesterUserId);
+                        baseAsbiep.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseAsbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newAsbiepId = dslContext.insertInto(ASBIEP).set(baseAsbiep)
                                 .returning(ASBIEP.ASBIEP_ID).fetchOne().getAsbiepId();
                         asbiepIdChangeMap.put(oldAsbiepId, newAsbiepId);
                     }
@@ -860,36 +861,36 @@ public class BieEditService implements InitializingBean {
         List<BbiepRecord> bbiepRecords = dslContext.selectFrom(BBIEP)
                 .where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, BbiepRecord> existingBbiepRecordMapByHashPath =
+        Map<String, BbiepRecord> inheritedBbiepMapByHashPath =
                 bbiepRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(BbiepRecord::getHashPath, Function.identity()));
         bbiepRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(bbiep -> {
-                    if (existingBbiepRecordMapByHashPath.containsKey(bbiep.getHashPath())) {
-                        BbiepRecord existingBbiepRecord = existingBbiepRecordMapByHashPath.get(bbiep.getHashPath());
+                .forEach(baseBbiep -> {
+                    if (inheritedBbiepMapByHashPath.containsKey(baseBbiep.getHashPath())) {
+                        BbiepRecord inheritedBbiep = inheritedBbiepMapByHashPath.get(baseBbiep.getHashPath());
 
-                        if (!hasLength(existingBbiepRecord.getDefinition())) {
-                            existingBbiepRecord.setDefinition(bbiep.getDefinition());
+                        if (!hasLength(inheritedBbiep.getDefinition())) {
+                            inheritedBbiep.setDefinition(baseBbiep.getDefinition());
                         }
-                        if (!hasLength(existingBbiepRecord.getRemark())) {
-                            existingBbiepRecord.setRemark(bbiep.getRemark());
+                        if (!hasLength(inheritedBbiep.getRemark())) {
+                            inheritedBbiep.setRemark(baseBbiep.getRemark());
                         }
-                        if (!hasLength(existingBbiepRecord.getBizTerm())) {
-                            existingBbiepRecord.setBizTerm(bbiep.getBizTerm());
+                        if (!hasLength(inheritedBbiep.getBizTerm())) {
+                            inheritedBbiep.setBizTerm(baseBbiep.getBizTerm());
                         }
-                        if (!hasLength(existingBbiepRecord.getDisplayName())) {
-                            existingBbiepRecord.setDisplayName(bbiep.getDisplayName());
+                        if (!hasLength(inheritedBbiep.getDisplayName())) {
+                            inheritedBbiep.setDisplayName(baseBbiep.getDisplayName());
                         }
-                        existingBbiepRecord.update();
+                        inheritedBbiep.update();
 
-                        bbiepIdChangeMap.put(bbiep.getBbiepId(), existingBbiepRecord.getBbiepId());
+                        bbiepIdChangeMap.put(baseBbiep.getBbiepId(), inheritedBbiep.getBbiepId());
                     } else {
-                        ULong oldBbiepId = bbiep.getBbiepId();
-                        bbiep.setBbiepId(null);
-                        bbiep.setLastUpdatedBy(requesterUserId);
-                        bbiep.setLastUpdateTimestamp(LocalDateTime.now());
-                        bbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newBbiepId = dslContext.insertInto(BBIEP).set(bbiep)
+                        ULong oldBbiepId = baseBbiep.getBbiepId();
+                        baseBbiep.setBbiepId(null);
+                        baseBbiep.setLastUpdatedBy(requesterUserId);
+                        baseBbiep.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseBbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newBbiepId = dslContext.insertInto(BBIEP).set(baseBbiep)
                                 .returning(BBIEP.BBIEP_ID).fetchOne().getBbiepId();
                         bbiepIdChangeMap.put(oldBbiepId, newBbiepId);
                     }
@@ -898,51 +899,47 @@ public class BieEditService implements InitializingBean {
         List<AsbieRecord> asbieRecords = dslContext.selectFrom(ASBIE)
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, AsbieRecord> existingAsbieRecordMapByHashPath =
+        Map<String, AsbieRecord> inheritedAsbieMapByHashPath =
                 asbieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(AsbieRecord::getHashPath, Function.identity()));
         asbieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(asbie -> {
-                    if (existingAsbieRecordMapByHashPath.containsKey(asbie.getHashPath())) {
-                        AsbieRecord existingAsbieRecord = existingAsbieRecordMapByHashPath.get(asbie.getHashPath());
+                .forEach(baseAsbie -> {
+                    if (inheritedAsbieMapByHashPath.containsKey(baseAsbie.getHashPath())) {
+                        AsbieRecord inheritedAsbie = inheritedAsbieMapByHashPath.get(baseAsbie.getHashPath());
 
-                        if (!hasLength(existingAsbieRecord.getDefinition())) {
-                            existingAsbieRecord.setDefinition(asbie.getDefinition());
+                        if (!hasLength(inheritedAsbie.getDefinition())) {
+                            inheritedAsbie.setDefinition(baseAsbie.getDefinition());
                         }
-                        if (!hasLength(existingAsbieRecord.getRemark())) {
-                            existingAsbieRecord.setRemark(asbie.getRemark());
+                        if (!hasLength(inheritedAsbie.getRemark())) {
+                            inheritedAsbie.setRemark(baseAsbie.getRemark());
                         }
-                        if (existingAsbieRecord.getCardinalityMin() < asbie.getCardinalityMin()) {
-                            existingAsbieRecord.setCardinalityMin(asbie.getCardinalityMin());
+                        if (inheritedAsbie.getCardinalityMin() < baseAsbie.getCardinalityMin()) {
+                            inheritedAsbie.setCardinalityMin(baseAsbie.getCardinalityMin());
                         }
-                        if (asbie.getCardinalityMax() > 0 &&
-                            (existingAsbieRecord.getCardinalityMax() <= 0 ||
-                            existingAsbieRecord.getCardinalityMax() > asbie.getCardinalityMax())) {
-                            existingAsbieRecord.setCardinalityMax(asbie.getCardinalityMax());
+                        if (baseAsbie.getCardinalityMax() > 0 &&
+                            (inheritedAsbie.getCardinalityMax() <= 0 ||
+                            inheritedAsbie.getCardinalityMax() > baseAsbie.getCardinalityMax())) {
+                            inheritedAsbie.setCardinalityMax(baseAsbie.getCardinalityMax());
                         }
-                        if (!Objects.equals(existingAsbieRecord.getIsNillable(), asbie.getIsNillable())) {
-                            existingAsbieRecord.setIsNillable(asbie.getIsNillable());
+                        if (baseAsbie.getIsNillable() == (byte) 1) {
+                            inheritedAsbie.setIsNillable(baseAsbie.getIsNillable());
                         }
-                        if (!Objects.equals(existingAsbieRecord.getIsDeprecated(), asbie.getIsDeprecated())) {
-                            existingAsbieRecord.setIsDeprecated(asbie.getIsDeprecated());
+                        if (baseAsbie.getIsDeprecated() == (byte) 1) {
+                            inheritedAsbie.setIsDeprecated(baseAsbie.getIsDeprecated());
                         }
-                        if (asbie.getIsUsed() == (byte) 1) {
-                            existingAsbieRecord.setIsUsed(asbie.getIsUsed());
+                        if (baseAsbie.getIsUsed() == (byte) 1) {
+                            inheritedAsbie.setIsUsed(baseAsbie.getIsUsed());
                         }
-                        existingAsbieRecord.update();
+                        inheritedAsbie.update();
                     } else {
-                        ULong oldAsbieId = asbie.getAsbieId();
-                        asbie.setAsbieId(null);
-                        asbie.setFromAbieId(abieIdChangeMap.get(asbie.getFromAbieId()));
-                        ULong asbiepId = asbiepIdChangeMap.get(asbie.getToAsbiepId());
-                        // There's no change if the ASBIE is reusing the BIE.
-                        if (asbiepId != null) {
-                            asbie.setToAsbiepId(asbiepId);
-                        }
-                        asbie.setLastUpdatedBy(requesterUserId);
-                        asbie.setLastUpdateTimestamp(LocalDateTime.now());
-                        asbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newAsbieId = dslContext.insertInto(ASBIE).set(asbie)
+                        ULong oldAsbieId = baseAsbie.getAsbieId();
+                        baseAsbie.setAsbieId(null);
+                        baseAsbie.setFromAbieId(abieIdChangeMap.get(baseAsbie.getFromAbieId()));
+                        baseAsbie.setToAsbiepId(asbiepIdChangeMap.get(baseAsbie.getToAsbiepId()));
+                        baseAsbie.setLastUpdatedBy(requesterUserId);
+                        baseAsbie.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseAsbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newAsbieId = dslContext.insertInto(ASBIE).set(baseAsbie)
                                 .returning(ASBIE.ASBIE_ID).fetchOne().getAsbieId();
                     }
                 });
@@ -951,77 +948,79 @@ public class BieEditService implements InitializingBean {
         List<BbieRecord> bbieRecords = dslContext.selectFrom(BBIE)
                 .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, BbieRecord> existingBbieRecordMapByHashPath =
+        Map<String, BbieRecord> inheritedBbieMapByHashPath =
                 bbieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(BbieRecord::getHashPath, Function.identity()));
         bbieRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(bbie -> {
-                    if (existingBbieRecordMapByHashPath.containsKey(bbie.getHashPath())) {
-                        BbieRecord existingBbieRecord = existingBbieRecordMapByHashPath.get(bbie.getHashPath());
+                .forEach(baseBbie -> {
+                    if (inheritedBbieMapByHashPath.containsKey(baseBbie.getHashPath())) {
+                        BbieRecord inheritedBbie = inheritedBbieMapByHashPath.get(baseBbie.getHashPath());
 
-                        if (!hasLength(existingBbieRecord.getDefinition())) {
-                            existingBbieRecord.setDefinition(bbie.getDefinition());
+                        if (!hasLength(inheritedBbie.getDefinition())) {
+                            inheritedBbie.setDefinition(baseBbie.getDefinition());
                         }
-                        if (!hasLength(existingBbieRecord.getRemark())) {
-                            existingBbieRecord.setRemark(bbie.getRemark());
+                        if (!hasLength(inheritedBbie.getRemark())) {
+                            inheritedBbie.setRemark(baseBbie.getRemark());
                         }
-                        if ((existingBbieRecord.getBdtPriRestriId() != null && !existingBbieRecord.getBdtPriRestriId().equals(bbie.getBdtPriRestriId())) ||
-                            (existingBbieRecord.getCodeListManifestId() != null && !existingBbieRecord.getCodeListManifestId().equals(bbie.getCodeListManifestId())) ||
-                            (existingBbieRecord.getAgencyIdListManifestId() != null && !existingBbieRecord.getAgencyIdListManifestId().equals(bbie.getAgencyIdListManifestId()))) {
-                            existingBbieRecord.setBdtPriRestriId(bbie.getBdtPriRestriId());
-                            existingBbieRecord.setCodeListManifestId(bbie.getCodeListManifestId());
-                            existingBbieRecord.setAgencyIdListManifestId(bbie.getAgencyIdListManifestId());
+                        if ((inheritedBbie.getBdtPriRestriId() != null && !inheritedBbie.getBdtPriRestriId().equals(baseBbie.getBdtPriRestriId())) ||
+                            (inheritedBbie.getCodeListManifestId() != null && !inheritedBbie.getCodeListManifestId().equals(baseBbie.getCodeListManifestId())) ||
+                            (inheritedBbie.getAgencyIdListManifestId() != null && !inheritedBbie.getAgencyIdListManifestId().equals(baseBbie.getAgencyIdListManifestId()))) {
+                            inheritedBbie.setBdtPriRestriId(baseBbie.getBdtPriRestriId());
+                            inheritedBbie.setCodeListManifestId(baseBbie.getCodeListManifestId());
+                            inheritedBbie.setAgencyIdListManifestId(baseBbie.getAgencyIdListManifestId());
                         }
-                        if (existingBbieRecord.getCardinalityMin() < bbie.getCardinalityMin()) {
-                            existingBbieRecord.setCardinalityMin(bbie.getCardinalityMin());
+                        if (inheritedBbie.getCardinalityMin() < baseBbie.getCardinalityMin()) {
+                            inheritedBbie.setCardinalityMin(baseBbie.getCardinalityMin());
                         }
-                        if (bbie.getCardinalityMax() > 0 &&
-                            (existingBbieRecord.getCardinalityMax() <= 0 ||
-                            existingBbieRecord.getCardinalityMax() > bbie.getCardinalityMax())) {
-                            existingBbieRecord.setCardinalityMax(bbie.getCardinalityMax());
+                        if (baseBbie.getCardinalityMax() > 0 &&
+                            (inheritedBbie.getCardinalityMax() <= 0 ||
+                            inheritedBbie.getCardinalityMax() > baseBbie.getCardinalityMax())) {
+                            inheritedBbie.setCardinalityMax(baseBbie.getCardinalityMax());
                         }
-                        if (existingBbieRecord.getFacetMinLength() != null) {
-                            existingBbieRecord.setFacetMinLength(bbie.getFacetMinLength());
+                        if (!Objects.equals(inheritedBbie.getFacetMinLength(), baseBbie.getFacetMinLength())) {
+                            inheritedBbie.setFacetMinLength(baseBbie.getFacetMinLength());
                         }
-                        if (existingBbieRecord.getFacetMaxLength() != null) {
-                            existingBbieRecord.setFacetMaxLength(bbie.getFacetMaxLength());
+                        if (!Objects.equals(inheritedBbie.getFacetMaxLength(), baseBbie.getFacetMaxLength())) {
+                            inheritedBbie.setFacetMaxLength(baseBbie.getFacetMaxLength());
                         }
-                        if (!hasLength(existingBbieRecord.getFacetPattern())) {
-                            existingBbieRecord.setFacetPattern(bbie.getFacetPattern());
+                        if (!hasLength(inheritedBbie.getFacetPattern())) {
+                            inheritedBbie.setFacetPattern(baseBbie.getFacetPattern());
                         }
-                        if (!hasLength(existingBbieRecord.getFixedValue())) {
-                            existingBbieRecord.setFixedValue(bbie.getFixedValue());
+                        if (!hasLength(inheritedBbie.getDefaultValue())) {
+                            inheritedBbie.setDefaultValue(baseBbie.getDefaultValue());
+                            inheritedBbie.setFixedValue(null);
                         }
-                        if (!hasLength(existingBbieRecord.getDefaultValue())) {
-                            existingBbieRecord.setDefaultValue(bbie.getDefaultValue());
+                        if (!hasLength(inheritedBbie.getFixedValue())) {
+                            inheritedBbie.setFixedValue(baseBbie.getFixedValue());
+                            inheritedBbie.setDefaultValue(null);
                         }
-                        if (!Objects.equals(existingBbieRecord.getIsNillable(), bbie.getIsNillable())) {
-                            existingBbieRecord.setIsNillable(bbie.getIsNillable());
+                        if (baseBbie.getIsNillable() == (byte) 1) {
+                            inheritedBbie.setIsNillable(baseBbie.getIsNillable());
                         }
-                        if (!Objects.equals(existingBbieRecord.getIsNull(), bbie.getIsNull())) {
-                            existingBbieRecord.setIsNull(bbie.getIsNull());
+                        if (baseBbie.getIsNull() == (byte) 1) {
+                            inheritedBbie.setIsNull(baseBbie.getIsNull());
                         }
-                        if (!hasLength(existingBbieRecord.getExample())) {
-                            existingBbieRecord.setExample(bbie.getExample());
+                        if (!hasLength(inheritedBbie.getExample())) {
+                            inheritedBbie.setExample(baseBbie.getExample());
                         }
-                        if (!Objects.equals(existingBbieRecord.getIsDeprecated(), bbie.getIsDeprecated())) {
-                            existingBbieRecord.setIsDeprecated(bbie.getIsDeprecated());
+                        if (baseBbie.getIsDeprecated() == (byte) 1) {
+                            inheritedBbie.setIsDeprecated(baseBbie.getIsDeprecated());
                         }
-                        if (bbie.getIsUsed() == (byte) 1) {
-                            existingBbieRecord.setIsUsed(bbie.getIsUsed());
+                        if (baseBbie.getIsUsed() == (byte) 1) {
+                            inheritedBbie.setIsUsed(baseBbie.getIsUsed());
                         }
-                        existingBbieRecord.update();
+                        inheritedBbie.update();
 
-                        bbieIdChangeMap.put(bbie.getBbieId(), existingBbieRecord.getBbieId());
+                        bbieIdChangeMap.put(baseBbie.getBbieId(), inheritedBbie.getBbieId());
                     } else {
-                        ULong oldBbieId = bbie.getBbieId();
-                        bbie.setBbieId(null);
-                        bbie.setFromAbieId(abieIdChangeMap.get(bbie.getFromAbieId()));
-                        bbie.setToBbiepId(bbiepIdChangeMap.get(bbie.getToBbiepId()));
-                        bbie.setLastUpdatedBy(requesterUserId);
-                        bbie.setLastUpdateTimestamp(LocalDateTime.now());
-                        bbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newBbieId = dslContext.insertInto(BBIE).set(bbie)
+                        ULong oldBbieId = baseBbie.getBbieId();
+                        baseBbie.setBbieId(null);
+                        baseBbie.setFromAbieId(abieIdChangeMap.get(baseBbie.getFromAbieId()));
+                        baseBbie.setToBbiepId(bbiepIdChangeMap.get(baseBbie.getToBbiepId()));
+                        baseBbie.setLastUpdatedBy(requesterUserId);
+                        baseBbie.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseBbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newBbieId = dslContext.insertInto(BBIE).set(baseBbie)
                                 .returning(BBIE.BBIE_ID).fetchOne().getBbieId();
                         bbieIdChangeMap.put(oldBbieId, newBbieId);
                     }
@@ -1030,73 +1029,104 @@ public class BieEditService implements InitializingBean {
         List<BbieScRecord> bbieScRecords = dslContext.selectFrom(BBIE_SC)
                 .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.in(baseTopLevelAsbiepId, topLevelAsbiepId))
                 .fetch();
-        Map<String, BbieScRecord> existingBbieScRecordMapByHashPath =
+        Map<String, BbieScRecord> inheritedBbieScMapByHashPath =
                 bbieScRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(topLevelAsbiepId))
                         .collect(Collectors.toMap(BbieScRecord::getHashPath, Function.identity()));
         bbieScRecords.stream().filter(e -> e.getOwnerTopLevelAsbiepId().equals(baseTopLevelAsbiepId))
-                .forEach(bbieSc -> {
-                    if (existingBbieScRecordMapByHashPath.containsKey(bbieSc.getHashPath())) {
-                        BbieScRecord existingBbieScRecord = existingBbieScRecordMapByHashPath.get(bbieSc.getHashPath());
+                .forEach(baseBbieSc -> {
+                    if (inheritedBbieScMapByHashPath.containsKey(baseBbieSc.getHashPath())) {
+                        BbieScRecord inheritedBbieSc = inheritedBbieScMapByHashPath.get(baseBbieSc.getHashPath());
 
-                        if (!hasLength(existingBbieScRecord.getDefinition())) {
-                            existingBbieScRecord.setDefinition(bbieSc.getDefinition());
+                        if (!hasLength(inheritedBbieSc.getDefinition())) {
+                            inheritedBbieSc.setDefinition(baseBbieSc.getDefinition());
                         }
-                        if (!hasLength(existingBbieScRecord.getRemark())) {
-                            existingBbieScRecord.setRemark(bbieSc.getRemark());
+                        if (!hasLength(inheritedBbieSc.getRemark())) {
+                            inheritedBbieSc.setRemark(baseBbieSc.getRemark());
                         }
-                        if (!hasLength(existingBbieScRecord.getDisplayName())) {
-                            existingBbieScRecord.setDisplayName(bbieSc.getDisplayName());
+                        if (!hasLength(inheritedBbieSc.getDisplayName())) {
+                            inheritedBbieSc.setDisplayName(baseBbieSc.getDisplayName());
                         }
-                        if ((existingBbieScRecord.getDtScPriRestriId() != null && !existingBbieScRecord.getDtScPriRestriId().equals(bbieSc.getDtScPriRestriId())) ||
-                            (existingBbieScRecord.getCodeListManifestId() != null && !existingBbieScRecord.getCodeListManifestId().equals(bbieSc.getCodeListManifestId())) ||
-                            (existingBbieScRecord.getAgencyIdListManifestId() != null && !existingBbieScRecord.getAgencyIdListManifestId().equals(bbieSc.getAgencyIdListManifestId()))) {
-                            existingBbieScRecord.setDtScPriRestriId(bbieSc.getDtScPriRestriId());
-                            existingBbieScRecord.setCodeListManifestId(bbieSc.getCodeListManifestId());
-                            existingBbieScRecord.setAgencyIdListManifestId(bbieSc.getAgencyIdListManifestId());
+                        if ((inheritedBbieSc.getDtScPriRestriId() != null && !inheritedBbieSc.getDtScPriRestriId().equals(baseBbieSc.getDtScPriRestriId())) ||
+                            (inheritedBbieSc.getCodeListManifestId() != null && !inheritedBbieSc.getCodeListManifestId().equals(baseBbieSc.getCodeListManifestId())) ||
+                            (inheritedBbieSc.getAgencyIdListManifestId() != null && !inheritedBbieSc.getAgencyIdListManifestId().equals(baseBbieSc.getAgencyIdListManifestId()))) {
+                            inheritedBbieSc.setDtScPriRestriId(baseBbieSc.getDtScPriRestriId());
+                            inheritedBbieSc.setCodeListManifestId(baseBbieSc.getCodeListManifestId());
+                            inheritedBbieSc.setAgencyIdListManifestId(baseBbieSc.getAgencyIdListManifestId());
                         }
-                        if (existingBbieScRecord.getCardinalityMin() < bbieSc.getCardinalityMin()) {
-                            existingBbieScRecord.setCardinalityMin(bbieSc.getCardinalityMin());
+                        if (inheritedBbieSc.getCardinalityMin() < baseBbieSc.getCardinalityMin()) {
+                            inheritedBbieSc.setCardinalityMin(baseBbieSc.getCardinalityMin());
                         }
-                        if (bbieSc.getCardinalityMax() > 0 &&
-                            (existingBbieScRecord.getCardinalityMax() <= 0 ||
-                            existingBbieScRecord.getCardinalityMax() > bbieSc.getCardinalityMax())) {
-                            existingBbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());
+                        if (baseBbieSc.getCardinalityMax() > 0 &&
+                            (inheritedBbieSc.getCardinalityMax() <= 0 ||
+                            inheritedBbieSc.getCardinalityMax() > baseBbieSc.getCardinalityMax())) {
+                            inheritedBbieSc.setCardinalityMax(baseBbieSc.getCardinalityMax());
                         }
-                        if (existingBbieScRecord.getFacetMinLength() != null) {
-                            existingBbieScRecord.setFacetMinLength(bbieSc.getFacetMinLength());
+                        if (!Objects.equals(inheritedBbieSc.getFacetMinLength(), baseBbieSc.getFacetMinLength())) {
+                            inheritedBbieSc.setFacetMinLength(baseBbieSc.getFacetMinLength());
                         }
-                        if (existingBbieScRecord.getFacetMaxLength() != null) {
-                            existingBbieScRecord.setFacetMaxLength(bbieSc.getFacetMaxLength());
+                        if (!Objects.equals(inheritedBbieSc.getFacetMaxLength(), baseBbieSc.getFacetMaxLength())) {
+                            inheritedBbieSc.setFacetMaxLength(baseBbieSc.getFacetMaxLength());
                         }
-                        if (!hasLength(existingBbieScRecord.getFacetPattern())) {
-                            existingBbieScRecord.setFacetPattern(bbieSc.getFacetPattern());
+                        if (!hasLength(inheritedBbieSc.getFacetPattern())) {
+                            inheritedBbieSc.setFacetPattern(baseBbieSc.getFacetPattern());
                         }
-                        if (!hasLength(existingBbieScRecord.getFixedValue())) {
-                            existingBbieScRecord.setFixedValue(bbieSc.getFixedValue());
+                        if (!hasLength(inheritedBbieSc.getDefaultValue())) {
+                            inheritedBbieSc.setDefaultValue(baseBbieSc.getDefaultValue());
+                            inheritedBbieSc.setFixedValue(null);
                         }
-                        if (!hasLength(existingBbieScRecord.getDefaultValue())) {
-                            existingBbieScRecord.setDefaultValue(bbieSc.getDefaultValue());
+                        if (!hasLength(inheritedBbieSc.getFixedValue())) {
+                            inheritedBbieSc.setFixedValue(baseBbieSc.getFixedValue());
+                            inheritedBbieSc.setDefaultValue(null);
                         }
-                        if (!hasLength(existingBbieScRecord.getExample())) {
-                            existingBbieScRecord.setExample(bbieSc.getExample());
+                        if (!hasLength(inheritedBbieSc.getExample())) {
+                            inheritedBbieSc.setExample(baseBbieSc.getExample());
                         }
-                        if (!Objects.equals(existingBbieScRecord.getIsDeprecated(), bbieSc.getIsDeprecated())) {
-                            existingBbieScRecord.setIsDeprecated(bbieSc.getIsDeprecated());
+                        if (baseBbieSc.getIsDeprecated() == (byte) 1) {
+                            inheritedBbieSc.setIsDeprecated(baseBbieSc.getIsDeprecated());
                         }
-                        if (bbieSc.getIsUsed() == (byte) 1) {
-                            existingBbieScRecord.setIsUsed(bbieSc.getIsUsed());
+                        if (baseBbieSc.getIsUsed() == (byte) 1) {
+                            inheritedBbieSc.setIsUsed(baseBbieSc.getIsUsed());
                         }
-                        existingBbieScRecord.update();
+                        inheritedBbieSc.update();
                     } else {
-                        bbieSc.setBbieScId(null);
-                        bbieSc.setBbieId(bbieIdChangeMap.get(bbieSc.getBbieId()));
-                        bbieSc.setLastUpdatedBy(requesterUserId);
-                        bbieSc.setLastUpdateTimestamp(LocalDateTime.now());
-                        bbieSc.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
-                        ULong newBbieScId = dslContext.insertInto(BBIE_SC).set(bbieSc)
+                        baseBbieSc.setBbieScId(null);
+                        baseBbieSc.setBbieId(bbieIdChangeMap.get(baseBbieSc.getBbieId()));
+                        baseBbieSc.setLastUpdatedBy(requesterUserId);
+                        baseBbieSc.setLastUpdateTimestamp(LocalDateTime.now());
+                        baseBbieSc.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+                        ULong newBbieScId = dslContext.insertInto(BBIE_SC).set(baseBbieSc)
                                 .returning(BBIE_SC.BBIE_SC_ID).fetchOne().getBbieScId();
                     }
                 });
+    }
+
+    private boolean isInInheritance(ULong baseAsbiepId, ULong asbiepId) {
+        List<Record2<ULong, ULong>> topLevelAsbiepIdToAsbiepIdList =
+                dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                                TOP_LEVEL_ASBIEP.ASBIEP_ID)
+                        .from(TOP_LEVEL_ASBIEP)
+                        .where(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(baseAsbiepId))
+                        .fetch();
+        Set<ULong> inheritance = new HashSet<>();
+        while (!topLevelAsbiepIdToAsbiepIdList.isEmpty()) {
+            inheritance.addAll(topLevelAsbiepIdToAsbiepIdList.stream()
+                    .map(e -> e.get(TOP_LEVEL_ASBIEP.ASBIEP_ID)).collect(Collectors.toList()));
+            if (inheritance.contains(asbiepId)) {
+                return true;
+            }
+
+            topLevelAsbiepIdToAsbiepIdList =
+                    dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                                    TOP_LEVEL_ASBIEP.ASBIEP_ID)
+                            .from(TOP_LEVEL_ASBIEP)
+                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(
+                                    topLevelAsbiepIdToAsbiepIdList.stream()
+                                            .map(e -> e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)).collect(Collectors.toList())
+                            ))
+                            .fetch();
+        }
+
+        return inheritance.contains(asbiepId);
     }
 
     @Transactional
@@ -1146,11 +1176,11 @@ public class BieEditService implements InitializingBean {
         }
 
         doReuseBIE(requester, topLevelAsbiep.getTopLevelAsbiepId(),
-                request.getAsbieHashPath(), request.getReuseTopLevelAsbiepId());
+                request.getAsbieHashPath(), request.getReuseTopLevelAsbiepId(), false);
     }
 
     private void doReuseBIE(AppUser requester, BigInteger topLevelAsbiepId,
-                            String asbieHashPath, BigInteger reuseTopLevelAsbiepId) {
+                            String asbieHashPath, BigInteger reuseTopLevelAsbiepId, boolean inherit) {
         AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
                 .where(and(
                         ASBIE.HASH_PATH.eq(asbieHashPath),
@@ -1167,7 +1197,10 @@ public class BieEditService implements InitializingBean {
 
         TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(reuseTopLevelAsbiepId);
 
-        asbieRecord.setToAsbiepId(ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId()));
+        if (!isInInheritance(ULong.valueOf(reuseTopLevelAsbiepId), prevToAsbiepId)) {
+            asbieRecord.setToAsbiepId(ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId()));
+        }
+
         asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.isDeprecated() ? 1 : 0));
         asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
         asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
@@ -1197,7 +1230,7 @@ public class BieEditService implements InitializingBean {
                 topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiepId);
         for (TopLevelAsbiep inheritedTopLevelAsbiep : inheritedTopLevelAsbiepList) {
             doReuseBIE(requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(),
-                    asbieHashPath, reuseTopLevelAsbiepId);
+                    asbieHashPath, reuseTopLevelAsbiepId, true);
         }
     }
 

@@ -285,7 +285,7 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + topLevelASBIEP.getDen(), e);
             }
-            if (!topLevelASBIEP.getDen().equals(getText(td.findElement(By.cssSelector("a > span"))))) {
+            if (!getText(td.findElement(By.cssSelector("a > div > span"))).startsWith(topLevelASBIEP.getDen())) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + topLevelASBIEP.getDen());
             }
             WebElement tdName = td.findElement(By.tagName("a"));

@@ -1,5 +1,5 @@
 import {CcGraph, CcGraphNode} from '../../cc-management/domain/core-component-node';
-import {hashCode4String, sha256} from '../../common/utility';
+import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
@@ -1159,13 +1159,10 @@ export class AbieDetail {
   }
 
   get hashCode(): number {
-    return ((this.abieId) ? this.abieId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.version) ? hashCode4String(this.version) : 0) +
-      ((!!this.status) ? hashCode4String(this.status) : 0) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0);
+    return hashCode4Array(
+      this.abieId, this.guid,
+      this.version, this.status, this.remark, this.bizTerm, this.definition
+    );
   }
 
   get json(): any {
@@ -1309,15 +1306,12 @@ export class AsbieDetail {
   }
 
   get hashCode(): number {
-    return ((this.asbieId) ? this.asbieId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((this.cardinalityMin) ? this.cardinalityMin : 0) +
-      ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      (((this.nillable) ? 1231 : 1237)) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((this.seqKey) ? this.seqKey : 0) +
-      ((this.deprecated) ? 1231 : 1237);
+    return hashCode4Array(
+      this.asbieId, this.guid,
+      this.definition, this.cardinalityMin, this.cardinalityMax,
+      this.nillable, this.deprecated, this.remark,
+      this.seqKey
+    );
   }
 
   get json(): any {
@@ -1427,13 +1421,11 @@ export class AsbiepDetail {
   }
 
   get hashCode(): number {
-    return ((this.asbiepId) ? this.asbiepId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.roleOfAbieId) ? this.roleOfAbieId : 0) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0);
+    return hashCode4Array(
+      this.asbiepId, this.guid, this.roleOfAbieId,
+      this.remark, this.bizTerm, this.definition,
+      ((!!this.displayName && this.displayName !== this._node.name) ? this.displayName : undefined)
+    );
   }
 
   get json(): any {
@@ -1690,24 +1682,14 @@ export class BbieDetail {
   }
 
   get hashCode(): number {
-    return ((this.bbieId) ? this.bbieId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((this.cardinalityMin) ? this.cardinalityMin : 0) +
-      ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.facetMinLength) ? this.facetMinLength : 0) +
-      ((this.facetMaxLength) ? this.facetMaxLength : 0) +
-      ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
-      ((this.nillable) ? 1231 : 1237) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.example) ? hashCode4String(this.example) : 0) +
-      ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
-      ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
-      ((this.bdtPriRestriId) ? this.bdtPriRestriId : 0) +
-      ((this.codeListManifestId) ? this.codeListManifestId : 0) +
-      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0) +
-      ((this.seqKey) ? this.seqKey : 0);
+    return hashCode4Array(
+      this.bbieId, this.guid, this.definition, this.cardinalityMin, this.cardinalityMax,
+      this.facetMinLength, this.facetMaxLength, this.facetPattern,
+      this.nillable, this.deprecated,
+      this.remark, this.example, this.defaultValue, this.fixedValue,
+      this.bdtPriRestriId, this.codeListManifestId, this.agencyIdListManifestId,
+      this.seqKey
+    );
   }
 
   get json(): any {
@@ -1816,12 +1798,10 @@ export class BbiepDetail {
   }
 
   get hashCode(): number {
-    return ((this.bbiepId) ? this.bbiepId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
-      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0);
+    return hashCode4Array(
+      this.bbiepId, this.guid, this.definition, this.remark, this.bizTerm,
+      ((!!this.displayName && this.displayName !== this._node.name) ? this.displayName : undefined)
+    );
   }
 
   get json(): any {
@@ -2067,24 +2047,14 @@ export class BbieScDetail {
   }
 
   get hashCode(): number {
-    return ((this.bbieScId) ? this.bbieScId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((this.cardinalityMin) ? this.cardinalityMin : 0) +
-      ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.facetMinLength) ? this.facetMinLength : 0) +
-      ((this.facetMaxLength) ? this.facetMaxLength : 0) +
-      ((!!this.facetPattern) ? hashCode4String(this.facetPattern) : 0) +
-      ((!!this.bizTerm) ? hashCode4String(this.bizTerm) : 0) +
-      ((!!this.remark) ? hashCode4String(this.remark) : 0) +
-      ((!!this.displayName && this.displayName !== this._node.name) ? hashCode4String(this.displayName) : 0) +
-      ((!!this.example) ? hashCode4String(this.example) : 0) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
-      ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
-      ((this.bdtScPriRestriId) ? this.bdtScPriRestriId : 0) +
-      ((this.codeListManifestId) ? this.codeListManifestId : 0) +
-      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0);
+    return hashCode4Array(
+      this.bbieScId, this.guid, this.definition, this.cardinalityMin, this.cardinalityMax,
+      this.facetMinLength, this.facetMaxLength, this.facetPattern,
+      this.bizTerm, this.remark,
+      ((!!this.displayName && this.displayName !== this._node.name) ? this.displayName : undefined),
+      this.example, this.deprecated, this.defaultValue, this.fixedValue,
+      this.bdtScPriRestriId, this.codeListManifestId, this.agencyIdListManifestId
+    );
   }
 
   get json(): any {

@@ -221,23 +221,15 @@ export class CcAccNodeDetail extends CcNodeDetail {
   }
 
   get hashCode(): number {
-    return ((this.accId) ? this.accId : 0) +
-      ((this.manifestId) ? this.manifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.type) ? hashCode4String(this.type) : 0) +
-      ((this.objectClassTerm) ? hashCode4String(this.objectClassTerm) : 0) +
-      ((this.oagisComponentType) ? this.oagisComponentType : 0) +
-      ((this.abstracted) ? 1231 : 1237) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.replacementAccManifestId) ? this.replacementAccManifestId : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((this.namespaceId) ? this.namespaceId : 0) +
-      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
-      ((this.releaseId) ? this.releaseId : 0) +
-      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
-      ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+    return hashCode4Array(
+      this.accId, this.manifestId, this.guid, this.type, this.replacementAccManifestId,
+      this.objectClassTerm, this.oagisComponentType,
+      this.abstracted, this.deprecated,
+      this.namespaceId,
+      this.definition, this.definitionSource,
+      this.owner, this.releaseId, this.releaseNum,
+      this.revisionNum, this.revisionTrackingNum
+    );
   }
 
   get objectClassTerm(): string {
@@ -465,19 +457,14 @@ class AsccDetail {
   }
 
   get hashCode(): number {
-    return ((this.asccId) ? this.asccId : 0) +
-      ((this.manifestId) ? this.manifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.cardinalityMin) ? this.cardinalityMin : 0) +
-      ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
-      ((this.releaseId) ? this.releaseId : 0) +
-      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
-      ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+    return hashCode4Array(
+      this.asccId, this.manifestId, this.guid,
+      this.cardinalityMin, this.cardinalityMax,
+      this.deprecated,
+      this.definition, this.definitionSource,
+      this.owner, this.releaseId, this.releaseNum,
+      this.revisionNum, this.revisionTrackingNum
+    );
   }
 
   get cardinalityMin(): number {
@@ -625,23 +612,15 @@ class AsccpDetail {
   }
 
   get hashCode(): number {
-    return ((this.asccpId) ? this.asccpId : 0) +
-      ((this.manifestId) ? this.manifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.propertyTerm) ? hashCode4String(this.propertyTerm) : 0) +
-      ((this.reusable) ? 1231 : 1237) +
-      ((this.nillable) ? 1231 : 1237) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.replacementAsccpManifestId) ? this.replacementAsccpManifestId : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((this.namespaceId) ? this.namespaceId : 0) +
-      ((!!this.state) ? hashCode4String(this.state) : 0) +
-      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
-      ((this.releaseId) ? this.releaseId : 0) +
-      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
-      ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+    return hashCode4Array(
+      this.asccpId, this.manifestId, this.guid, this.replacementAsccpManifestId,
+      this.propertyTerm,
+      this.reusable, this.nillable, this.deprecated,
+      this.definition, this.definitionSource,
+      this.namespaceId,
+      this.owner, this.releaseId, this.releaseNum,
+      this.revisionNum, this.revisionTrackingNum
+    );
   }
 
   get propertyTerm(): string {
@@ -744,7 +723,7 @@ export class CcAsccpNodeDetail extends CcNodeDetail {
   }
 
   get hashCode(): number {
-    return this.asccp.hashCode + ((this.ascc) ? this.ascc.hashCode : 0);
+    return hashCode4Array(this.asccp, this.ascc);
   }
 }
 
@@ -856,23 +835,15 @@ class BccDetail {
   }
 
   get hashCode(): number {
-    return ((this.bccId) ? this.bccId : 0) +
-      ((this.manifestId) ? this.manifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.cardinalityMin) ? this.cardinalityMin : 0) +
-      ((this.cardinalityMax) ? this.cardinalityMax : 0) +
-      ((this.nillable) ? 1231 : 1237) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.entityType) ? this.entityType : 0) +
-      ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
-      ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
-      ((this.releaseId) ? this.releaseId : 0) +
-      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
-      ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+    return hashCode4Array(
+      this.bccId, this.manifestId, this.guid,
+      this.cardinalityMin, this.cardinalityMax,
+      this.nillable, this.deprecated, this.entityType,
+      this.defaultValue, this.fixedValue,
+      this.definition, this.definitionSource,
+      this.owner, this.releaseId, this.releaseNum,
+      this.revisionNum, this.revisionTrackingNum
+    );
   }
 
   get entityType(): number {
@@ -1082,24 +1053,16 @@ class BccpDetail {
   }
 
   get hashCode(): number {
-    return ((this.bccpId) ? this.bccpId : 0) +
-      ((this.manifestId) ? this.manifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((!!this.propertyTerm) ? hashCode4String(this.propertyTerm) : 0) +
-      ((this.nillable) ? 1231 : 1237) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.replacementBccpManifestId) ? this.replacementBccpManifestId : 0) +
-      ((!!this.defaultValue) ? hashCode4String(this.defaultValue) : 0) +
-      ((!!this.fixedValue) ? hashCode4String(this.fixedValue) : 0) +
-      ((!!this.definition) ? hashCode4String(this.definition) : 0) +
-      ((!!this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((this.namespaceId) ? this.namespaceId : 0) +
-      ((!!this.state) ? hashCode4String(this.state) : 0) +
-      ((!!this.owner) ? hashCode4String(this.owner) : 0) +
-      ((this.releaseId) ? this.releaseId : 0) +
-      ((!!this.releaseNum) ? hashCode4String(this.releaseNum) : 0) +
-      ((this.revisionNum) ? this.revisionNum : 0) +
-      ((this.revisionTrackingNum) ? this.revisionTrackingNum : 0);
+    return hashCode4Array(
+      this.bccpId, this.manifestId, this.guid, this.replacementBccpManifestId,
+      this.propertyTerm,
+      this.nillable, this.deprecated,
+      this.defaultValue, this.fixedValue,
+      this.definition, this.definitionSource,
+      this.namespaceId,
+      this.owner, this.releaseId, this.releaseNum,
+      this.revisionNum, this.revisionTrackingNum
+    );
   }
 
   get propertyTerm(): string {
@@ -1296,7 +1259,7 @@ export class CcBccpNodeDetail extends CcNodeDetail {
   }
 
   get hashCode(): number {
-    return this.bccp.hashCode + ((this.bcc) ? this.bcc.hashCode : 0);
+    return hashCode4Array(this.bccp, this.bcc);
   }
 }
 
@@ -1883,7 +1846,7 @@ export class CcDtNodeDetail extends CcNodeDetail {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
       this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
       this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
-      this._namespaceId, this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
+      this._namespaceId, this.definition, this.definitionSource, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtPriRestriList);
   }
 

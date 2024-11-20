@@ -379,13 +379,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     public void expandTree(String nodeName) {
         try {
             By chevronRightLocator = By.xpath(
-                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]");
+                    "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[contains(@class, \"mat-tree-node\")]//mat-icon[contains(text(), \"chevron_right\")]//ancestor::button[1]");
             click(elementToBeClickable(getDriver(), chevronRightLocator));
         } catch (TimeoutException maybeAlreadyExpanded) {
         }
 
         By expandMoreLocator = By.xpath(
-                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[1]//mat-icon[contains(text(), \"expand_more\")]//ancestor::button[1]");
+                "//*[contains(text(), \"" + nodeName + "\")]//ancestor::div[contains(@class, \"mat-tree-node\")]//mat-icon[contains(text(), \"expand_more\")]//ancestor::button[1]");
         assert elementToBeClickable(getDriver(), expandMoreLocator).isEnabled();
     }
 
