@@ -424,6 +424,13 @@ public interface EditBIEPage extends Page {
          */
         void resetDetail();
 
+        /**
+         * Retrieves the TopLevelASBIEP Panel associated with the base of this top-level ASBIEP.
+         *
+         * @return the {@link TopLevelASBIEPPanel} representing the base of this top-level ASBIEP
+         */
+        TopLevelASBIEPPanel getBaseTopLevelASBIEPPanel();
+
     }
 
     /**
@@ -535,6 +542,13 @@ public interface EditBIEPage extends Page {
          * Reset detail
          */
         void resetDetail();
+
+        /**
+         * Retrieves the ASBIE Panel associated with the base of this ASBIE.
+         *
+         * @return the {@link ASBIEPanel} representing the base of this ASBIE
+         */
+        ASBIEPanel getBaseASBIEPanel();
     }
 
     interface ReusedASBIEPanel {
@@ -752,6 +766,13 @@ public interface EditBIEPage extends Page {
          * Reset detail
          */
         void resetDetail();
+
+        /**
+         * Retrieves the BBIE Panel associated with the base of this BBIE.
+         *
+         * @return the {@link BBIEPanel} representing the base of this BBIE
+         */
+        BBIEPanel getBaseBBIEPanel();
     }
 
     interface BBIESCPanel {
@@ -861,6 +882,13 @@ public interface EditBIEPage extends Page {
          * @return the UI element of the 'Component Definition' field
          */
         WebElement getComponentDefinitionField();
+
+        /**
+         * Retrieves the BBIESC Panel associated with the base of this BBIESC.
+         *
+         * @return the {@link BBIESCPanel} representing the base of this BBIESC
+         */
+        BBIESCPanel getBaseBBIESCPanel();
 
     }
 

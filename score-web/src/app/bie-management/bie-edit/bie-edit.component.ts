@@ -82,8 +82,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   renamingNode: BieFlatNode;
   originalDisplayName: string;
 
-  startRenaming(node: BieFlatNode, $event?: MouseEvent): void {
-    if (!this.canRename(node)) {
+  startChangingDisplayName(node: BieFlatNode, $event?: MouseEvent): void {
+    if (!this.canChangeDisplayName(node)) {
       return;
     }
 
@@ -111,7 +111,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  stopRenaming(revert: boolean = false): void {
+  stopChangingDisplayName(revert: boolean = false): void {
     if (revert) {
       this.renamingNode.displayName = this.originalDisplayName;  // Revert the value
     }
@@ -123,7 +123,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   onClickOutside(targetElement: HTMLElement): void {
     const clickedInside = targetElement.closest('.mat-tree-node');
     if (!clickedInside || !this.renamingNode) {
-      this.stopRenaming();
+      this.stopChangingDisplayName();
     }
   }
 
@@ -131,7 +131,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   @HostListener('document:keydown.escape', ['$event'])
   cancelEditing($event: KeyboardEvent): void {
     if (this.renamingNode) {
-      this.stopRenaming(true);
+      this.stopChangingDisplayName(true);
       $event.preventDefault();
     }
   }
@@ -752,7 +752,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return this.canRemoveReusedBIE(node) && node.inherited;
   }
 
-  canRename(node: BieFlatNode): boolean {
+  canChangeDisplayName(node: BieFlatNode): boolean {
     return !!node && this.canEdit && !node.reused && !node.locked;
   }
 

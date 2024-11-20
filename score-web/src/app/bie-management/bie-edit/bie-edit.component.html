@@ -176,7 +176,7 @@
                                 [matTooltip]="node.deprecated ? 'Deprecated' : ''"
                                 [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
                                 [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
-                                (dblclick)="startRenaming(node)">
+                                (dblclick)="startChangingDisplayName(node)">
                           </span>
 
                           <span [class]="['pl-4']" *ngIf="!dataSource.hideCardinality">
@@ -210,8 +210,8 @@
                             <input matInput #editInput
                                    [(ngModel)]="node.displayName"
                                    [maxLength]="100"
-                                   (blur)="stopRenaming()"
-                                   (keydown.enter)="stopRenaming()"
+                                   (blur)="stopChangingDisplayName()"
+                                   (keydown.enter)="stopChangingDisplayName()"
                                    class="edit-input"/>
                           </div>
                         </ng-template>
@@ -224,10 +224,10 @@
                     <button mat-menu-item (click)="copyPath(contextMenuItem)">
                       <span class="context-menu-item">Copy Path</span>
                     </button>
-                    <button mat-menu-item (click)="startRenaming(contextMenuItem, $event)"
+                    <button mat-menu-item (click)="startChangingDisplayName(contextMenuItem, $event)"
                             *ngIf="canEdit"
-                            [disabled]="!canRename(contextMenuItem)">
-                      <span class="context-menu-item">Rename</span>
+                            [disabled]="!canChangeDisplayName(contextMenuItem)">
+                      <span class="context-menu-item">Change Display Name</span>
                     </button>
                     <mat-divider *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)"

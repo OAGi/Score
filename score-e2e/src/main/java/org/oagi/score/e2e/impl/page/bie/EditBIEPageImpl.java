@@ -372,6 +372,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     }
 
     public TopLevelASBIEPPanel getTopLevelASBIEPPanel() {
+        WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                "//mat-tab-header//div[@role=\"tab\"][1]"));
+        click(tab);
         return new TopLevelASBIEPPanelImpl();
     }
 
@@ -573,6 +576,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             click(asccpNode);
             waitFor(ofMillis(1000L));
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][1]"));
+            click(tab);
             String nodeText = getText(asccpNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle.trim());
@@ -585,6 +591,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             click(bccpNode);
             waitFor(ofMillis(1000L));
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][1]"));
+            click(tab);
             String nodeText = getText(bccpNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle.trim());
@@ -597,6 +606,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         return retry(() -> {
             click(bdtScNode);
             waitFor(ofMillis(1000L));
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][1]"));
+            click(tab);
             String nodeText = getText(bdtScNode);
             String panelTitle = getText(getTitle());
             assert nodeText.contains(panelTitle.trim());
@@ -756,6 +768,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(getResetDetailButton());
             click(getDialogButtonByName(getDriver(), "Reset"));
             assert "Reset".equals(getSnackBarMessage(getDriver()));
+        }
+
+        @Override
+        public TopLevelASBIEPPanel getBaseTopLevelASBIEPPanel() {
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][2]"));
+            click(tab);
+            return this;
         }
     }
 
@@ -960,6 +980,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(getResetDetailButton());
             click(getDialogButtonByName(getDriver(), "Reset"));
             assert "Reset".equals(getSnackBarMessage(getDriver()));
+        }
+
+        @Override
+        public ASBIEPanel getBaseASBIEPanel() {
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][2]"));
+            click(tab);
+            return this;
         }
     }
 
@@ -1214,6 +1242,14 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             click(getDialogButtonByName(getDriver(), "Reset"));
             assert "Reset".equals(getSnackBarMessage(getDriver()));
         }
+
+        @Override
+        public BBIEPanel getBaseBBIEPanel() {
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][2]"));
+            click(tab);
+            return this;
+        }
     }
 
     private void pressEscape() {
@@ -1372,6 +1408,13 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             return getTextAreaFieldByName("Component Definition");
         }
 
+        @Override
+        public BBIESCPanel getBaseBBIESCPanel() {
+            WebElement tab = elementToBeClickable(getDriver(), By.xpath(
+                    "//mat-tab-header//div[@role=\"tab\"][2]"));
+            click(tab);
+            return this;
+        }
     }
 
 }

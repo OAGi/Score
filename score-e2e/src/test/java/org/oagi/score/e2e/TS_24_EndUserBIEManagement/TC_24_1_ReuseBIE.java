@@ -950,7 +950,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
-        viewEditBIEPage.BackToWP();
+        viewEditBIEPage.backToWIP();
         viewEditBIEPage.setDEN(useraBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
