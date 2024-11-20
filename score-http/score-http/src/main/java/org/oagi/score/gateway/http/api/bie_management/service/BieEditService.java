@@ -907,6 +907,15 @@ public class BieEditService implements InitializingBean {
                     if (inheritedAsbieMapByHashPath.containsKey(baseAsbie.getHashPath())) {
                         AsbieRecord inheritedAsbie = inheritedAsbieMapByHashPath.get(baseAsbie.getHashPath());
 
+                        ULong prevToAsbiepId = inheritedAsbie.getToAsbiepId();
+                        ULong asbiepId = asbiepIdChangeMap.get(baseAsbie.getToAsbiepId());
+                        if (asbiepId == null) {
+                            asbiepId = baseAsbie.getToAsbiepId();
+                        }
+                        if (!isInInheritance(asbiepId, prevToAsbiepId)) {
+                            inheritedAsbie.setToAsbiepId(asbiepId);
+                        }
+
                         if (!hasLength(inheritedAsbie.getDefinition())) {
                             inheritedAsbie.setDefinition(baseAsbie.getDefinition());
                         }
@@ -935,7 +944,11 @@ public class BieEditService implements InitializingBean {
                         ULong oldAsbieId = baseAsbie.getAsbieId();
                         baseAsbie.setAsbieId(null);
                         baseAsbie.setFromAbieId(abieIdChangeMap.get(baseAsbie.getFromAbieId()));
-                        baseAsbie.setToAsbiepId(asbiepIdChangeMap.get(baseAsbie.getToAsbiepId()));
+                        ULong asbiepId = asbiepIdChangeMap.get(baseAsbie.getToAsbiepId());
+                        if (asbiepId == null) {
+                            asbiepId = baseAsbie.getToAsbiepId();
+                        }
+                        baseAsbie.setToAsbiepId(asbiepId);
                         baseAsbie.setLastUpdatedBy(requesterUserId);
                         baseAsbie.setLastUpdateTimestamp(LocalDateTime.now());
                         baseAsbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
@@ -1196,9 +1209,9 @@ public class BieEditService implements InitializingBean {
                         .fetchOneInto(ULong.class);
 
         TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(reuseTopLevelAsbiepId);
-
-        if (!isInInheritance(ULong.valueOf(reuseTopLevelAsbiepId), prevToAsbiepId)) {
-            asbieRecord.setToAsbiepId(ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId()));
+        ULong reuseAsbiepId = ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId());
+        if (!inherit || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+            asbieRecord.setToAsbiepId(reuseAsbiepId);
         }
 
         asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.isDeprecated() ? 1 : 0));
@@ -1455,10 +1468,10 @@ public class BieEditService implements InitializingBean {
                             asbie.setPath(asbieRecord.getPath() + ">" + asbie.getPath());
                             asbie.setHashPath(sha256(asbie.getPath()));
                             asbie.setFromAbieId(abieIdChangeMap.get(asbie.getFromAbieId()));
-                            ULong asbieId = asbiepIdChangeMap.get(asbie.getToAsbiepId());
+                            ULong asbiepId = asbiepIdChangeMap.get(asbie.getToAsbiepId());
                             // There's no change if the ASBIE is reusing the BIE.
-                            if (asbieId != null) {
-                                asbie.setToAsbiepId(asbieId);
+                            if (asbiepId != null) {
+                                asbie.setToAsbiepId(asbiepId);
                             }
                             asbie.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
                             asbie.setLastUpdateTimestamp(LocalDateTime.now());
