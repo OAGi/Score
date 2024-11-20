@@ -18,6 +18,8 @@ import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.bie.model.GetBaseBieRequest;
+import org.oagi.score.repo.api.bie.model.GetInheritedBieListRequest;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
@@ -104,8 +106,10 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 if (topLevelAsbiep.getOwnerUserId().equals(userId)) {
                     accessPrivilege = AccessPrivilege.CanEdit;
                 } else {
-                    // Issue #1010, #1576
-                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) || appUser.isAdmin()) {
+                    // Issue #1010, #1576, #1635
+                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) ||
+                        useAsBaseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) ||
+                        appUser.isAdmin()) {
                         accessPrivilege = AccessPrivilege.CanView;
                     } else {
                         throw new DataAccessForbiddenException("'" + appUser.getLoginId() +
@@ -135,6 +139,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
         return !bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
                 .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                .getTopLevelAsbiepList().isEmpty();
+    }
+
+    public boolean useAsBaseBie(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
+        BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
+        return !bieReadRepository.getInheritedBieList(new GetInheritedBieListRequest(sessionService.asScoreUser(user))
+                .withTopLevelAsbiepId(topLevelAsbiepId))
                 .getTopLevelAsbiepList().isEmpty();
     }
 

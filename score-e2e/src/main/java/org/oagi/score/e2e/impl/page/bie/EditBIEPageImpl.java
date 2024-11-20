@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.BusinessContextObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.SelectBaseProfileBIEDialog;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
@@ -103,6 +104,9 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private static final By REUSE_BIE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Reuse BIE\")]");
+
+    private static final By USE_BASE_BIE_OPTION_LOCATOR =
+            By.xpath("//span[contains(text(), \"Use Base BIE\")]");
 
     private final TopLevelASBIEPObject asbiep;
     private BasePage parent;
@@ -569,6 +573,23 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuse = new SelectProfileBIEToReuseDialogImpl(this, "Reuse BIE");
         assert selectProfileBIEToReuse.isOpened();
         return selectProfileBIEToReuse;
+    }
+
+    @Override
+    public SelectBaseProfileBIEDialog openSelectBaseProfileBIEDialog() {
+        WebElement node = clickOnDropDownMenuByPath("/" + this.asbiep.getPropertyTerm());
+        try {
+            click(getDriver(), elementToBeClickable(getDriver(), USE_BASE_BIE_OPTION_LOCATOR));
+        } catch (TimeoutException e) {
+            click(getDriver(), node);
+            new Actions(getDriver()).sendKeys("O").perform();
+            click(getDriver(), elementToBeClickable(getDriver(), USE_BASE_BIE_OPTION_LOCATOR));
+        }
+        waitFor(ofMillis(1000L));
+
+        SelectBaseProfileBIEDialog selectBaseProfileBIEDialog = new SelectBaseProfileBIEDialogImpl(this, "Use Base BIE");
+        assert selectBaseProfileBIEDialog.isOpened();
+        return selectBaseProfileBIEDialog;
     }
 
     @Override
