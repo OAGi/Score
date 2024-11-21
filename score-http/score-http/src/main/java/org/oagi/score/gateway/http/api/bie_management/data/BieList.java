@@ -21,6 +21,8 @@ public class BieList {
     private List<BusinessContext> businessContexts;
     private String owner;
     private BigInteger ownerUserId;
+    private boolean ownerIsDeveloper;
+    private boolean ownerIsAdmin;
     private AccessPrivilege access;
     private String version;
     private String status;

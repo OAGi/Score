@@ -521,6 +521,8 @@ public class BusinessInformationEntityRepository {
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                     APP_USER.as("owner").LOGIN_ID.as("owner"),
+                    APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                    APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                     ASBIEP.BIZ_TERM,
                     ASBIEP.REMARK,
                     TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),

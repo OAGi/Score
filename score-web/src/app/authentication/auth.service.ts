@@ -144,6 +144,22 @@ export class AuthService implements OnInit, CanActivate {
     return userToken.roles.includes(this.ROLE_ADMIN);
   }
 
+  isDeveloper() {
+    const userToken = this.getUserToken();
+    if (!userToken.enabled) {
+      return false;
+    }
+    return userToken.roles.includes(this.ROLE_DEVELOPER);
+  }
+
+  isEndUser() {
+    const userToken = this.getUserToken();
+    if (!userToken.enabled) {
+      return false;
+    }
+    return userToken.roles.includes(this.ROLE_END_USER);
+  }
+
   logout(url?) {
     localStorage.removeItem(this.USER_INFO_KEY);
 

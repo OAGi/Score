@@ -198,9 +198,7 @@ export class ReuseBieDialogComponent implements OnInit {
     this.request.releases = [release, ];
     this.request.basedTopLevelAsbiepIds = [this.data.basedTopLevelAsbiepId, ];
     this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId, ];
-    if (this.isDeveloper) {
-      this.request.ownedByDeveloper = true;
-    }
+    this.request.ownedByDeveloper = this.isDeveloper;
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

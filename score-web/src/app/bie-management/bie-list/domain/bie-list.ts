@@ -176,6 +176,8 @@ export class BieList {
   access: string;
   owner: string;
   ownerUserId: number;
+  ownerIsDeveloper: boolean;
+  ownerIsAdmin: boolean;
   version: string;
   status: string;
   bizTerm: string;

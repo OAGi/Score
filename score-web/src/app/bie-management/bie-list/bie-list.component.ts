@@ -403,8 +403,15 @@ export class BieListComponent implements OnInit {
     if (!element) {
       return false;
     }
-
     return element.owner === this.username && element.state === 'Production';
+  }
+
+  isInheritable(element: BieList): boolean {
+    if (!element) {
+      return false;
+    }
+    return (this.auth.isDeveloper() && element.ownerIsDeveloper ||
+            this.auth.isEndUser() && !element.ownerIsDeveloper);
   }
 
   discardAllSelected() {
