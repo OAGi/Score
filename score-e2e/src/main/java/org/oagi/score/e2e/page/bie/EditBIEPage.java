@@ -254,7 +254,9 @@ public interface EditBIEPage extends Page {
 
     SelectProfileBIEToReuseDialog reuseBIEOnNodeAndLevel(String path, int dataLevel);
 
-    SelectBaseProfileBIEDialog openSelectBaseProfileBIEDialog();
+    SelectBaseProfileBIEDialog openUseBaseBIEDialog();
+
+    SelectProfileBIEToReuseDialog openOverrideBaseReusedBIEDialog(String path);
 
     ASBIEPanel getASBIEPanel(WebElement asccpNode);
 

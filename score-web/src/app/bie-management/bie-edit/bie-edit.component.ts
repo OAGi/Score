@@ -554,7 +554,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  openNewEditBieTab(node: BieFlatNode) {
+  openNewEditBieTab(node: BieFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
     window.open('/profile_bie/' + node.topLevelAsbiepId, '_blank');
   }
 
@@ -685,6 +690,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
+      // Using $event.preventDefault() prevents the [checked] behavior from functioning correctly.
       $event.stopPropagation();
     }
 
@@ -779,8 +785,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  copyLink(node: BieFlatNode, $event?) {
-    if ($event) {
+  copyLink(node: BieFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
       $event.preventDefault();
       $event.stopPropagation();
     }

@@ -186,7 +186,7 @@
                           <fa-icon [icon]="faRecycle"
                                    matTooltip="Reused"
                                    [class]="['pl-3', 'pointer']" *ngIf="node.reused"
-                                   (click)="openNewEditBieTab(node)"></fa-icon>
+                                   (click)="openNewEditBieTab(node, $event)"></fa-icon>
                           <fa-icon [icon]="faSitemap"
                                    matTooltip="Inherited"
                                    [class]="['pl-3', 'pointer']" *ngIf="node.inherited"></fa-icon>
@@ -1665,14 +1665,16 @@
                           <mat-form-field>
                             <mat-label>Cardinality Min</mat-label>
                             <input matInput placeholder="Cardinality Min" required
-                                   [value]="asBbiepDetail().base.bbie.cardinalityMin">
+                                   [value]="asBbiepDetail().base.bbie.cardinalityMin"
+                                   [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-6">
                           <mat-form-field>
                             <mat-label>Cardinality Max</mat-label>
                             <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().base.bcc.cardinalityMax | unbounded}})" required
-                                   [value]="asBbiepDetail().base.bbie.cardinalityMax | unbounded">
+                                   [value]="asBbiepDetail().base.bbie.cardinalityMax | unbounded"
+                                   [disabled]="true">
                           </mat-form-field>
                         </div>
                       </div>

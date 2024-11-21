@@ -11,11 +11,8 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.SelectBaseProfileBIEDialog;
-import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
-import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -144,7 +141,7 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
 
         homePage = loginPage().signIn(anotherEndUser.getLoginId(), anotherEndUser.getPassword());
         editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(anotherBIE);
-        SelectBaseProfileBIEDialog selectBaseProfileBIEDialog = editBIEPage.openSelectBaseProfileBIEDialog();
+        SelectBaseProfileBIEDialog selectBaseProfileBIEDialog = editBIEPage.openUseBaseBIEDialog();
         selectBaseProfileBIEDialog.selectBaseBIE(baseBIE);
 
         topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();

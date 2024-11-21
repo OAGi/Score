@@ -27,7 +27,7 @@ public class SearchBarPageImpl implements SearchBarPage {
         return driver;
     }
 
-    private By xpath(String expression) {
+    public By xpath(String expression) {
         String xpathExpression = (this.baseXPath != null ? this.baseXPath : "") + expression;
         return By.xpath(xpathExpression);
     }

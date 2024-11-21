@@ -836,17 +836,13 @@ public class BieEditService implements InitializingBean {
                         if (!hasLength(inheritedAsbiep.getBizTerm())) {
                             inheritedAsbiep.setBizTerm(baseAsbiep.getBizTerm());
                         }
-                        // Root node's display name is not overwritten.
-                        if (!hasLength(inheritedAsbiep.getDisplayName()) &&
-                            !topLevelAsbiep.getAsbiepId().equals(inheritedAsbiep.getAsbiepId().toBigInteger())) {
-                            inheritedAsbiep.setDisplayName(baseAsbiep.getDisplayName());
-                        }
                         inheritedAsbiep.update();
 
                         asbiepIdChangeMap.put(baseAsbiep.getAsbiepId(), inheritedAsbiep.getAsbiepId());
                     } else {
                         ULong oldAsbiepId = baseAsbiep.getAsbiepId();
                         baseAsbiep.setAsbiepId(null);
+                        baseAsbiep.setDisplayName(null);
                         baseAsbiep.setRoleOfAbieId(abieIdChangeMap.get(baseAsbiep.getRoleOfAbieId()));
                         baseAsbiep.setLastUpdatedBy(requesterUserId);
                         baseAsbiep.setLastUpdateTimestamp(LocalDateTime.now());
@@ -878,15 +874,13 @@ public class BieEditService implements InitializingBean {
                         if (!hasLength(inheritedBbiep.getBizTerm())) {
                             inheritedBbiep.setBizTerm(baseBbiep.getBizTerm());
                         }
-                        if (!hasLength(inheritedBbiep.getDisplayName())) {
-                            inheritedBbiep.setDisplayName(baseBbiep.getDisplayName());
-                        }
                         inheritedBbiep.update();
 
                         bbiepIdChangeMap.put(baseBbiep.getBbiepId(), inheritedBbiep.getBbiepId());
                     } else {
                         ULong oldBbiepId = baseBbiep.getBbiepId();
                         baseBbiep.setBbiepId(null);
+                        baseBbiep.setDisplayName(null);
                         baseBbiep.setLastUpdatedBy(requesterUserId);
                         baseBbiep.setLastUpdateTimestamp(LocalDateTime.now());
                         baseBbiep.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
@@ -1056,9 +1050,6 @@ public class BieEditService implements InitializingBean {
                         if (!hasLength(inheritedBbieSc.getRemark())) {
                             inheritedBbieSc.setRemark(baseBbieSc.getRemark());
                         }
-                        if (!hasLength(inheritedBbieSc.getDisplayName())) {
-                            inheritedBbieSc.setDisplayName(baseBbieSc.getDisplayName());
-                        }
                         if ((inheritedBbieSc.getDtScPriRestriId() != null && !inheritedBbieSc.getDtScPriRestriId().equals(baseBbieSc.getDtScPriRestriId())) ||
                             (inheritedBbieSc.getCodeListManifestId() != null && !inheritedBbieSc.getCodeListManifestId().equals(baseBbieSc.getCodeListManifestId())) ||
                             (inheritedBbieSc.getAgencyIdListManifestId() != null && !inheritedBbieSc.getAgencyIdListManifestId().equals(baseBbieSc.getAgencyIdListManifestId()))) {
@@ -1103,6 +1094,7 @@ public class BieEditService implements InitializingBean {
                         inheritedBbieSc.update();
                     } else {
                         baseBbieSc.setBbieScId(null);
+                        baseBbieSc.setDisplayName(null);
                         baseBbieSc.setBbieId(bbieIdChangeMap.get(baseBbieSc.getBbieId()));
                         baseBbieSc.setLastUpdatedBy(requesterUserId);
                         baseBbieSc.setLastUpdateTimestamp(LocalDateTime.now());

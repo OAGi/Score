@@ -2418,12 +2418,10 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
        * If the Reuse BIE has a Base BIE, it retrieves the Base of the Reuse BIE;
        * otherwise, it retrieves the Base of the current BIE.
        */
-      node.basedTopLevelAsbiepId = (reused[0].refBasedTopLevelAsbiepId ?
-        reused[0].refBasedTopLevelAsbiepId : reused[0].basedTopLevelAsbiepId);
+      node.basedTopLevelAsbiepId = reused[0].refBasedTopLevelAsbiepId;
       node.rootNode = new BieEditAbieNode();
       node.rootNode.topLevelAsbiepId = reused[0].refTopLevelAsbiepId;
-      node.rootNode.basedTopLevelAsbiepId = (reused[0].refBasedTopLevelAsbiepId ?
-        reused[0].refBasedTopLevelAsbiepId : reused[0].basedTopLevelAsbiepId);
+      node.rootNode.basedTopLevelAsbiepId = reused[0].refBasedTopLevelAsbiepId;
       node.rootNode.inverseMode = reused[0].refInverseMode;
     }
 
@@ -2453,11 +2451,13 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     let baseUsed = this._baseUsedAsbieMap[node.asccNode.manifestId];
     if (!!baseUsed && baseUsed.length > 0) {
       baseUsed = baseUsed.filter(u => {
+        console.log(node);
+        console.log(u);
         if (node.reused) {
           return u.ownerTopLevelAsbiepId === (node.parent as AbieFlatNode).basedTopLevelAsbiepId &&
             u.hashPath === node.asbieHashPath;
         } else {
-          return u.ownerTopLevelAsbiepId === node.basedTopLevelAsbiepId &&
+          return u.ownerTopLevelAsbiepId === (node.basedTopLevelAsbiepId ? node.basedTopLevelAsbiepId : node.topLevelAsbiepId) &&
             u.hashPath === node.asbieHashPath;
         }
       });
@@ -3158,7 +3158,8 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 
         if (node.inherited) {
           asbiepRequests.push(...[
-            this.service.getDetail((node.reused) ? (node.parent as AsbiepFlatNode).basedTopLevelAsbiepId : node.basedTopLevelAsbiepId, 'ASBIE',
+            this.service.getDetail((node.reused) ? (node.parent as AsbiepFlatNode).basedTopLevelAsbiepId :
+              (node.basedTopLevelAsbiepId ? node.basedTopLevelAsbiepId : node.topLevelAsbiepId), 'ASBIE',
               asbiepNode.asccNode.manifestId, asbiepNode.asbiePath)
           ]);
         }
