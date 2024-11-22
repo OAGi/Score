@@ -1332,7 +1332,8 @@ export class AsbieDetail {
       fromAbiePath: this.fromAbiePath,
       fromAbieHashPath: this.fromAbieHashPath,
       toAsbiepPath: this.toAsbiepPath,
-      toAsbiepHashPath: this.toAsbiepHashPath
+      toAsbiepHashPath: this.toAsbiepHashPath,
+      toAsbiepId: this.toAsbiepId // Used for the reused BIE, if it exists, when the request is sent.
     };
   }
 }

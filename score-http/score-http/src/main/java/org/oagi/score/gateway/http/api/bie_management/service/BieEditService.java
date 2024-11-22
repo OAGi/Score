@@ -1181,11 +1181,11 @@ public class BieEditService implements InitializingBean {
         }
 
         doReuseBIE(requester, topLevelAsbiep.getTopLevelAsbiepId(),
-                request.getAsbieHashPath(), request.getReuseTopLevelAsbiepId(), false);
+                request.getAsbieHashPath(), request.getReuseTopLevelAsbiepId());
     }
 
     private void doReuseBIE(AppUser requester, BigInteger topLevelAsbiepId,
-                            String asbieHashPath, BigInteger reuseTopLevelAsbiepId, boolean inherit) {
+                            String asbieHashPath, BigInteger reuseTopLevelAsbiepId) {
         AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
                 .where(and(
                         ASBIE.HASH_PATH.eq(asbieHashPath),
@@ -1202,7 +1202,7 @@ public class BieEditService implements InitializingBean {
 
         TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(reuseTopLevelAsbiepId);
         ULong reuseAsbiepId = ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId());
-        if (!inherit || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+        if (!isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
             asbieRecord.setToAsbiepId(reuseAsbiepId);
         }
 
@@ -1235,7 +1235,7 @@ public class BieEditService implements InitializingBean {
                 topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiepId);
         for (TopLevelAsbiep inheritedTopLevelAsbiep : inheritedTopLevelAsbiepList) {
             doReuseBIE(requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(),
-                    asbieHashPath, reuseTopLevelAsbiepId, true);
+                    asbieHashPath, reuseTopLevelAsbiepId);
         }
     }
 

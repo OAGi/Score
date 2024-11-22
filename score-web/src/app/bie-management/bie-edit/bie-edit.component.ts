@@ -898,6 +898,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       if (!asbiepNode.used) {
         this.toggleTreeUsed(asbiepNode);
       }
+      (node.detail as BieEditAsbiepNodeDetail).asbie.toAsbiepId = selectedTopLevelAsbiepId;
+
       this.updateDetails(asbiepNode.parents, () => {
         this.isUpdating = true;
         this.service.reuseBIE(asbiepNode, selectedTopLevelAsbiepId)
