@@ -18,12 +18,12 @@ import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
-import org.oagi.score.repo.api.bie.model.GetBaseBieRequest;
 import org.oagi.score.repo.api.bie.model.GetInheritedBieListRequest;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
+import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.OagisComponentType;
@@ -86,6 +86,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     private AccessPrivilege accessPrivilege;
     private BieState state;
     private boolean forceBieUpdate;
+    @Autowired
+    private TopLevelAsbiepRepository topLevelAsbiepRepository;
 
     public void initialize(AuthenticatedPrincipal user, TopLevelAsbiep topLevelAsbiep) {
         this.user = user;
@@ -1151,7 +1153,15 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
             // Issue #1604
             // Apply cascade state update to reused BIEs.
             topLevelAsbiepQueue.addAll(
-                    repository.getReusedTopLevelAsbiepListByTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
+                    topLevelAsbiepRepository.getReusedTopLevelAsbiepListByTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
+                            .stream().filter(e -> topLevelAsbiep.getOwnerUserId().equals(e.getOwnerUserId()))
+                            .collect(Collectors.toList())
+            );
+
+            // Issue #1635
+            // Apply cascade state update to inherited BIEs.
+            topLevelAsbiepQueue.addAll(
+                    topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
                             .stream().filter(e -> topLevelAsbiep.getOwnerUserId().equals(e.getOwnerUserId()))
                             .collect(Collectors.toList())
             );

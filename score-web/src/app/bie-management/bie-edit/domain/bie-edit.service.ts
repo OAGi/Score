@@ -89,7 +89,12 @@ export class BieEditService {
   reuseBIE(asbiepNode: AsbiepFlatNode, reuseTopLevelAsbiepId: number): Observable<any> {
     const url = '/api/profile_bie/' + asbiepNode.topLevelAsbiepId + '/asbiep/' + asbiepNode.asccpNode.manifestId + '/reuse';
     return this.http.post<any>(url, {
+      asccManifestId: asbiepNode.asccNode.manifestId,
+      accManifestId: asbiepNode.accNode.manifestId,
+      asbiePath: asbiepNode.asbiePath,
       asbieHashPath: asbiepNode.asbieHashPath,
+      fromAbiePath: asbiepNode.abiePath,
+      fromAbieHashPath: asbiepNode.abieHashPath,
       reuseTopLevelAsbiepId
     });
   }

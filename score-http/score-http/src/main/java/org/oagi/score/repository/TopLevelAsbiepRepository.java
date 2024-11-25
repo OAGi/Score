@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -89,5 +90,9 @@ public class TopLevelAsbiepRepository implements ScoreRepository<TopLevelAsbiep>
                         ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIds)
                 ))
                 .fetch(topLevelAsbiepRecordMapper());
+    }
+
+    public List<TopLevelAsbiep> getReusedTopLevelAsbiepListByTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
+        return findRefTopLevelAsbieps(Arrays.asList(topLevelAsbiepId));
     }
 }

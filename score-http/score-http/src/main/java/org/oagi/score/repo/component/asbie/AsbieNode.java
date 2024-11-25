@@ -36,7 +36,7 @@ public class AsbieNode {
         private BigInteger asbieId;
         private BigInteger toAsbiepId;
         private String guid;
-        private BigInteger seqKey;
+        private BigInteger seqKey = BigInteger.ZERO;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
         private Boolean nillable;

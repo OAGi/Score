@@ -212,7 +212,7 @@ public class BieEditService implements InitializingBean {
                 .getTopLevelAsbiepList().isEmpty();
     }
 
-    private void ensureReusingRelationships(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
+    private void ensureBieRelationshipsForChangingState(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
         // Issue #1010
         ScoreUser requester = sessionService.asScoreUser(user);
         BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
@@ -295,6 +295,7 @@ public class BieEditService implements InitializingBean {
                             .getTopLevelAsbiepList();
 
             inheritedTopLevelAsbiepList = inheritedTopLevelAsbiepList.stream()
+                    .filter(e -> !requester.getUserId().equals(e.getOwner().getUserId()))
                     .filter(e -> e.getState().getLevel() > state.getLevel()).collect(Collectors.toList());
             if (!inheritedTopLevelAsbiepList.isEmpty()) {
                 Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
@@ -326,7 +327,9 @@ public class BieEditService implements InitializingBean {
                                     .withTopLevelAsbiepId(topLevelAsbiepId))
                             .getBaseTopLevelAsbiep();
 
-            if (basedTopLevelAsbiep != null && basedTopLevelAsbiep.getState().getLevel() < state.getLevel()) {
+            if (basedTopLevelAsbiep != null &&
+                    !requester.getUserId().equals(basedTopLevelAsbiep.getOwner().getUserId()) &&
+                    basedTopLevelAsbiep.getState().getLevel() < state.getLevel()) {
                 Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
                 failureMessageBody = failureMessageBody.append("\n---\n[**")
                         .append(source.get(ASCCP.PROPERTY_TERM))
@@ -366,7 +369,7 @@ public class BieEditService implements InitializingBean {
 
     @Transactional
     public void updateState(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
-        ensureReusingRelationships(user, topLevelAsbiepId, state);
+        ensureBieRelationshipsForChangingState(user, topLevelAsbiepId, state);
 
         BieEditTreeController treeController = getTreeController(user, topLevelAsbiepId);
         treeController.updateState(state);
@@ -1180,62 +1183,84 @@ public class BieEditService implements InitializingBean {
             throw new IllegalArgumentException("The BIE in " + e.getInvalidState() + " state cannot be edited.");
         }
 
-        doReuseBIE(requester, topLevelAsbiep.getTopLevelAsbiepId(),
-                request.getAsbieHashPath(), request.getReuseTopLevelAsbiepId());
+        doReuseBIE(user, requester, topLevelAsbiep.getTopLevelAsbiepId(), request);
     }
 
-    private void doReuseBIE(AppUser requester, BigInteger topLevelAsbiepId,
-                            String asbieHashPath, BigInteger reuseTopLevelAsbiepId) {
+    private void doReuseBIE(AuthenticatedPrincipal user, AppUser requester,
+                            BigInteger topLevelAsbiepId, ReuseBIERequest request) {
+        TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(request.getReuseTopLevelAsbiepId());
+        ULong reuseAsbiepId = ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId());
+
         AsbieRecord asbieRecord = dslContext.selectFrom(ASBIE)
                 .where(and(
-                        ASBIE.HASH_PATH.eq(asbieHashPath),
+                        ASBIE.HASH_PATH.eq(request.getAsbieHashPath()),
                         ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId))
                 ))
-                .fetchOne();
-        ULong prevToAsbiepId = asbieRecord.getToAsbiepId();
+                .fetchOptional().orElse(null);
+        if (asbieRecord == null) {
+            LocalDateTime timestamp = LocalDateTime.now();
+            AbieNode.Abie abie = new AbieNode.Abie();
+            abie.setPath(request.getFromAbiePath());
+            abie.setHashPath(request.getFromAbieHashPath());
+            abie.setBasedAccManifestId(request.getAccManifestId());
+            abie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+            abie = abieWriteRepository.upsertAbie(new UpsertAbieRequest(user, timestamp, topLevelAsbiepId, abie));
 
-        ULong ownerTopLevelAsbiepOfToAsbiep =
-                dslContext.select(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
-                        .from(ASBIEP)
-                        .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
-                        .fetchOneInto(ULong.class);
+            AsbieNode.Asbie asbie = new AsbieNode.Asbie();
+            asbie.setUsed(true);
+            asbie.setBasedAsccManifestId(request.getAsccManifestId());
+            asbie.setPath(request.getAsbiePath());
+            asbie.setHashPath(request.getAsbieHashPath());
+            asbie.setFromAbiePath(request.getFromAbiePath());
+            asbie.setFromAbieHashPath(request.getFromAbieHashPath());
+            asbie.setToAsbiepId(reuseTopLevelAsbiep.getAsbiepId());
+            asbie.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
+            asbieWriteRepository.upsertAsbie(new UpsertAsbieRequest(user, timestamp, topLevelAsbiepId, asbie));
+        } else {
+            ULong prevToAsbiepId = asbieRecord.getToAsbiepId();
 
-        TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(reuseTopLevelAsbiepId);
-        ULong reuseAsbiepId = ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId());
-        if (!isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
-            asbieRecord.setToAsbiepId(reuseAsbiepId);
-        }
+            ULong ownerTopLevelAsbiepOfToAsbiep =
+                    dslContext.select(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                            .from(ASBIEP)
+                            .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
+                            .fetchOneInto(ULong.class);
 
-        asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.isDeprecated() ? 1 : 0));
-        asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
-        asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
-        asbieRecord.update(
-                ASBIE.TO_ASBIEP_ID,
-                ASBIE.IS_DEPRECATED,
-                ASBIE.LAST_UPDATED_BY,
-                ASBIE.LAST_UPDATE_TIMESTAMP);
 
-        boolean isReused = !asbieRecord.getOwnerTopLevelAsbiepId().equals(ownerTopLevelAsbiepOfToAsbiep);
-        if (!isReused) {
-            // Delete orphan ASBIEP record.
-            dslContext.deleteFrom(ASBIEP)
-                    .where(ASBIEP.ASBIEP_ID.eq(prevToAsbiepId))
-                    .execute();
+            if (!isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+                asbieRecord.setToAsbiepId(reuseAsbiepId);
+            }
 
-            PurgeBieEvent event = new PurgeBieEvent(
-                    asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
-            /*
-             * Message Publishing
-             */
-            redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
+            asbieRecord.setIsUsed((byte) 1);
+            asbieRecord.setIsDeprecated((byte) (reuseTopLevelAsbiep.isDeprecated() ? 1 : 0));
+            asbieRecord.setLastUpdatedBy(ULong.valueOf(requester.getAppUserId()));
+            asbieRecord.setLastUpdateTimestamp(LocalDateTime.now());
+            asbieRecord.update(
+                    ASBIE.TO_ASBIEP_ID,
+                    ASBIE.IS_DEPRECATED,
+                    ASBIE.LAST_UPDATED_BY,
+                    ASBIE.LAST_UPDATE_TIMESTAMP);
+
+            boolean isReused = !asbieRecord.getOwnerTopLevelAsbiepId().equals(ownerTopLevelAsbiepOfToAsbiep);
+            if (!isReused) {
+                // Delete orphan ASBIEP record.
+                dslContext.deleteFrom(ASBIEP)
+                        .where(ASBIEP.ASBIEP_ID.eq(prevToAsbiepId))
+                        .execute();
+
+                PurgeBieEvent event = new PurgeBieEvent(
+                        asbieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
+                /*
+                 * Message Publishing
+                 */
+                redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
+            }
         }
 
         // Issue #1635
         List<TopLevelAsbiep> inheritedTopLevelAsbiepList =
                 topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiepId);
         for (TopLevelAsbiep inheritedTopLevelAsbiep : inheritedTopLevelAsbiepList) {
-            doReuseBIE(requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(),
-                    asbieHashPath, reuseTopLevelAsbiepId);
+            doReuseBIE(user, requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(), request);
         }
     }
 
