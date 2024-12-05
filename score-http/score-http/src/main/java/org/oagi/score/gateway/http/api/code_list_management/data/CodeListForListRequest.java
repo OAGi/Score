@@ -13,7 +13,8 @@ import java.util.List;
 @Data
 public class CodeListForListRequest {
 
-    private long releaseId;
+    private BigInteger libraryId;
+    private BigInteger releaseId;
     private String name;
     private String definition;
     private String module;

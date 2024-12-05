@@ -4,8 +4,10 @@ import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {SimpleRelease} from '../../../release-management/domain/release';
+import {Library} from '../../../library-management/domain/library';
 
 export class BieListRequest {
+  library: Library = new Library();
   releases: SimpleRelease[] = [];
   filters: {
     propertyTerm: string;

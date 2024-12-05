@@ -46,6 +46,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeList
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
@@ -80,6 +81,12 @@ public class Release extends TableImpl<ReleaseRecord> {
      * interpreted to be released later than the other.
      */
     public final TableField<ReleaseRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.");
+
+    /**
+     * The column <code>oagi.release.library_id</code>. A foreign key pointed to
+     * a library of the current record.
+     */
+    public final TableField<ReleaseRecord, ULong> LIBRARY_ID = createField(DSL.name("library_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointed to a library of the current record.");
 
     /**
      * The column <code>oagi.release.guid</code>. A globally unique identifier
@@ -224,7 +231,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public List<ForeignKey<ReleaseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_NAMESPACE_ID_FK);
+        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_LIBRARY_ID_FK, Keys.RELEASE_NAMESPACE_ID_FK);
     }
 
     private transient AppUserPath _releaseCreatedByFk;
@@ -251,6 +258,18 @@ public class Release extends TableImpl<ReleaseRecord> {
             _releaseLastUpdatedByFk = new AppUserPath(this, Keys.RELEASE_LAST_UPDATED_BY_FK, null);
 
         return _releaseLastUpdatedByFk;
+    }
+
+    private transient LibraryPath _library;
+
+    /**
+     * Get the implicit join path to the <code>oagi.library</code> table.
+     */
+    public LibraryPath library() {
+        if (_library == null)
+            _library = new LibraryPath(this, Keys.RELEASE_LIBRARY_ID_FK, null);
+
+        return _library;
     }
 
     private transient NamespacePath _namespace;

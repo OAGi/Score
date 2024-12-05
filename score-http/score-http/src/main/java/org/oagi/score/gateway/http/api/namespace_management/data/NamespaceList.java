@@ -9,6 +9,7 @@ import java.util.Date;
 public class NamespaceList {
 
     private BigInteger namespaceId = BigInteger.ZERO;
+    private BigInteger libraryId;
     private String uri;
     private String prefix;
     private String owner;

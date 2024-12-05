@@ -7,9 +7,7 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AccountList} from '../../account-management/domain/accounts';
-import {
-  TransferOwnershipDialogComponent
-} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AgencyIdList, AgencyIdListForListRequest} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -17,10 +15,9 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
-import {WorkingRelease} from '../../release-management/domain/release';
+import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
+import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -33,6 +30,8 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-agency-id-list-list',
@@ -170,12 +169,14 @@ export class AgencyIdListListComponent implements OnInit {
   canSelect = ['WIP', 'Deleted'];
   loading = false;
 
-  releases: Release[] = [];
+  releases: SimpleRelease[] = [];
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: AgencyIdListForListRequest;
@@ -196,6 +197,7 @@ export class AgencyIdListListComponent implements OnInit {
 
   constructor(private service: AgencyIdListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
               private auth: AuthService,
@@ -213,64 +215,55 @@ export class AgencyIdListListComponent implements OnInit {
     this.request = new AgencyIdListForListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    this.releases = [];
-    forkJoin([
-      this.releaseService.getSimpleReleases(['Published', 'Draft']),
-      this.namespaceService.getSimpleNamespaces(),
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
-      this.releases.push(...releases);
-      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-      if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
-        if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
-          }
-        } else {
-          this.request.release = this.releases[0];
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
-      }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.preferencesInfo = preferencesInfo;
+      this.releases = [];
+      forkJoin([
+        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']),
+        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([releases, namespaces, loginIds, preferencesInfo]) => {
+        this.initReleases(releases);
 
-      this.namespaces.push(...namespaces);
-      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
+        this.preferencesInfo = preferencesInfo;
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+        this.namespaces.push(...namespaces);
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
 
-      this.loadAgencyIdList(true);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.loadAgencyIdList(true);
+      });
     });
   }
 
-  getRelease(releaseNum: string): Release | undefined {
+  getRelease(releaseNum: string): SimpleRelease | undefined {
     for (const release of this.releases) {
       if (release.releaseNum === releaseNum) {
         return release;
@@ -311,6 +304,54 @@ export class AgencyIdListListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || this.request.library.libraryId === 0) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = [...releases];
+    if (this.releases.length > 0) {
+      if (this.request.release.releaseId === 0) {
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
+        if (savedReleaseId) {
+          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+          if (!this.request.release) {
+            this.request.release = this.releases[0];
+            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
+          }
+        }
+      } else {
+        this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
+      }
+    }
+    if (!this.request.release || this.request.release.releaseId === 0) {
+      this.request.release = this.releases[0];
+    }
+    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Draft', 'Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
   }
 
   onSearch() {
@@ -403,9 +444,12 @@ export class AgencyIdListListComponent implements OnInit {
   get showCreateAgencyIdListBtn(): boolean {
     const userToken = this.auth.getUserToken();
     if (userToken.roles.includes('developer')) {
-      return false;
+      if (!this.request.release.workingRelease) {
+        return false;
+      }
+      return this.dataSource.data.filter(e => e.state !== 'Deleted').length === 0;
     } else {
-      if (this.request.release.releaseId === WorkingRelease.releaseId) {
+      if (this.request.release.workingRelease) {
         return false;
       } else {
         return this.request.release.state === 'Published';
@@ -449,12 +493,35 @@ export class AgencyIdListListComponent implements OnInit {
       });
   }
 
+  openDialogAgencyIdListListPurge() {
+    const agencyIdListIds = this.selection.selected.map(e => e.agencyIdListManifestId);
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Purge Agency Id ' + (agencyIdListIds.length > 1 ? 'Lists' : 'List') + '?';
+    dialogConfig.data.content = [
+      'Are you sure you want to purge selected agency id ' + (agencyIdListIds.length > 1 ? 'lists' : 'list') + '?'
+    ];
+    dialogConfig.data.action = 'Purge anyway';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.purge(...agencyIdListIds).subscribe(_ => {
+            this.snackBar.open('Purged', '', {
+              duration: 3000,
+            });
+            this.selectionClear();
+            this.loadAgencyIdList();
+          });
+        }
+      });
+  }
+
   openDialogAgencyIdListListRestore() {
     const agencyIdListIds = this.selection.selected.map(e => e.agencyIdListManifestId);
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Restore Agency Id ' + (agencyIdListIds.length > 1 ? 'Lists' : 'List') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to Restore selected agency Id ' + (agencyIdListIds.length > 1 ? 'lists' : 'list') + '?'
+      'Are you sure you want to restore selected agency Id ' + (agencyIdListIds.length > 1 ? 'lists' : 'list') + '?'
     ];
     dialogConfig.data.action = 'Restore';
 
@@ -476,7 +543,7 @@ export class AgencyIdListListComponent implements OnInit {
     if (!item) {
       return false;
     }
-    return item.prevAgencyIdListManifestId !== undefined;
+    return !!item.prevAgencyIdListManifestId;
   }
 
   isEditable(item: AgencyIdList) {

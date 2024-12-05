@@ -124,6 +124,20 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
     public final TableField<AgencyIdListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
+     * The column <code>oagi.agency_id_list_value.is_developer_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by developers.
+     */
+    public final TableField<AgencyIdListValueRecord, Byte> IS_DEVELOPER_DEFAULT = createField(DSL.name("is_developer_default"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether this agency ID list value can be used as the default for components referenced by developers.");
+
+    /**
+     * The column <code>oagi.agency_id_list_value.is_user_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by users.
+     */
+    public final TableField<AgencyIdListValueRecord, Byte> IS_USER_DEFAULT = createField(DSL.name("is_user_default"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether this agency ID list value can be used as the default for components referenced by users.");
+
+    /**
      * The column
      * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
      * This refers to a replacement if the record is deprecated.

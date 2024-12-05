@@ -4,7 +4,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
-import {Module, ModuleElement, ModuleSet, Tile} from '../../../domain/module';
+import {Module, ModuleElement, ModuleSet, ModuleSetListRequest, Tile} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -19,6 +19,7 @@ export class ModuleAddDialogComponent implements OnInit {
 
   parentDirName: string;
   moduleSetId: number;
+  libraryId: number;
   parentModuleId: number;
 
   /* create new module */
@@ -50,6 +51,7 @@ export class ModuleAddDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: any) {
 
     this.moduleSetId = data.moduleSetId;
+    this.libraryId = data.libraryId;
     this.parentModuleId = data.parentModuleId;
     this.parentDirName = data.parentDirName;
   }
@@ -57,13 +59,17 @@ export class ModuleAddDialogComponent implements OnInit {
   ngOnInit() {
     this.module = new ModuleElement();
     this.moduleDir = new ModuleElement();
-    this.namespaceService.getSimpleNamespaces().subscribe(resp => {
+    this.namespaceService.getSimpleNamespaces(this.libraryId).subscribe(resp => {
       this.namespaceList = resp.filter(e => e.standard);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.namespaceList, (e) => e.uri);
     });
 
-    this.moduleService.getModuleSetList().subscribe(resp => {
+    const request = new ModuleSetListRequest();
+    request.library.libraryId = this.libraryId;
+    request.page.pageIndex = -1;
+    request.page.pageSize = -1;
+    this.moduleService.getModuleSetList(request).subscribe(resp => {
       this.moduleSetList = resp.results;
     });
   }

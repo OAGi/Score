@@ -40,10 +40,11 @@ public class NamespaceService {
     @Autowired
     private NamespaceReadRepository readRepository;
 
-    public List<SimpleNamespace> getSimpleNamespaces(AuthenticatedPrincipal user) {
+    public List<SimpleNamespace> getSimpleNamespaces(AuthenticatedPrincipal user, BigInteger libraryId) {
         AppUser requester = sessionService.getAppUserByUsername(user);
         return dslContext.select(NAMESPACE.NAMESPACE_ID, NAMESPACE.URI, NAMESPACE.IS_STD_NMSP.as("standard"))
                 .from(NAMESPACE)
+                .where(NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(libraryId)))
                 .fetchInto(SimpleNamespace.class);
     }
 
@@ -81,14 +82,20 @@ public class NamespaceService {
         String uri = namespace.getUri();
         boolean isURIExist = dslContext.selectCount()
                 .from(NAMESPACE)
-                .where(NAMESPACE.URI.eq(uri))
+                .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
+                        NAMESPACE.URI.eq(uri)
+                ))
                 .fetchOneInto(Integer.class) > 0;
         if (isURIExist) {
             throw new IllegalArgumentException("Namespace '" + uri + "' exists.");
         }
         boolean isPrefixExist = dslContext.selectCount()
                 .from(NAMESPACE)
-                .where(NAMESPACE.PREFIX.eq(namespace.getPrefix()))
+                .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
+                        NAMESPACE.PREFIX.eq(namespace.getPrefix())
+                ))
                 .fetchOneInto(Integer.class) > 0;
         if (isPrefixExist) {
             throw new IllegalArgumentException("Namespace Prefix '" + namespace.getPrefix() + "' exists.");
@@ -99,6 +106,7 @@ public class NamespaceService {
         LocalDateTime timestamp = LocalDateTime.now();
 
         NamespaceRecord namespaceRecord = new NamespaceRecord();
+        namespaceRecord.setLibraryId(ULong.valueOf(namespace.getLibraryId()));
         namespaceRecord.setUri(namespace.getUri());
         namespaceRecord.setPrefix(namespace.getPrefix());
         namespaceRecord.setDescription(namespace.getDescription());
@@ -121,6 +129,7 @@ public class NamespaceService {
         boolean isUriExist = dslContext.selectCount()
                 .from(NAMESPACE)
                 .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
                         NAMESPACE.URI.eq(uri),
                         NAMESPACE.NAMESPACE_ID.notEqual(ULong.valueOf(namespace.getNamespaceId()))
                 ))
@@ -132,6 +141,7 @@ public class NamespaceService {
         boolean isPrefixExist = dslContext.selectCount()
                 .from(NAMESPACE)
                 .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
                         NAMESPACE.PREFIX.eq(namespace.getPrefix()),
                         NAMESPACE.NAMESPACE_ID.notEqual(ULong.valueOf(namespace.getNamespaceId()))
                 ))
@@ -220,7 +230,7 @@ public class NamespaceService {
                 .fetchOptionalInto(Integer.class).orElse(0);
 
         if (referenced > 0) {
-            throw new IllegalArgumentException("The namespace in use can not be discard.");
+            throw new IllegalArgumentException("The namespace in use cannot be discarded.");
         }
 
         namespaceRecord.delete();

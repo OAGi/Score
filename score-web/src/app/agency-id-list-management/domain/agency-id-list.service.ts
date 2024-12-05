@@ -12,11 +12,14 @@ export class AgencyIdListService {
   }
 
   getAgencyIdListList(request: AgencyIdListForListRequest): Observable<PaginationResponse<AgencyIdList>> {
-    let params = new HttpParams().set('releaseId', '' + request.release.releaseId)
+    let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
+      .set('releaseId', '' + request.release.releaseId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+
     if (request.updaterLoginIds.length > 0) {
       params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
     }
@@ -67,8 +70,9 @@ export class AgencyIdListService {
     return this.http.get<AgencyIdList>('/api/agency_id_list/' + manifestId);
   }
 
-  getSimpleAgencyIdLists(releaseId: number): Observable<any> {
+  getSimpleAgencyIdLists(libraryId: number, releaseId: number): Observable<any> {
     const params = new HttpParams()
+      .set('libraryId', libraryId.toString())
       .set('releaseId', releaseId.toString())
       .set('sortActive', '')
       .set('sortDirection', 'ASC')
@@ -126,6 +130,12 @@ export class AgencyIdListService {
 
   delete(...agencyIdListManifestIds): Observable<any> {
     return this.http.post<any>('/api/agency_id_list/delete', {
+      agencyIdListManifestIds
+    });
+  }
+
+  purge(...agencyIdListManifestIds): Observable<any> {
+    return this.http.post<any>('/api/agency_id_list/purge', {
       agencyIdListManifestIds
     });
   }

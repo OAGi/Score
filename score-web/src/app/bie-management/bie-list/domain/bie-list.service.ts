@@ -27,6 +27,7 @@ export class BieListService {
 
   getBieListWithRequest(request: BieListRequest): Observable<PageResponse<BieList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActives', request.page.sortActives.join(','))
       .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)

@@ -1,6 +1,5 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
-import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../domain/release.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -8,13 +7,13 @@ import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReleaseList, ReleaseListRequest, WorkingRelease} from '../domain/release';
+import {ReleaseList, ReleaseListRequest, SimpleRelease, WorkingRelease} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
+import {initFilter, loadLibrary, saveLibrary} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {finalize} from 'rxjs/operators';
 import {Location} from '@angular/common';
@@ -24,6 +23,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-release-list',
@@ -139,6 +140,8 @@ export class ReleaseListComponent implements OnInit {
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
   loginIdList: string[] = [];
   creatorIdListFilterCtrl: FormControl = new FormControl();
   filteredCreatorIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
@@ -162,6 +165,7 @@ export class ReleaseListComponent implements OnInit {
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private service: ReleaseService,
+              private libraryService: LibraryService,
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
               private snackBar: MatSnackBar,
@@ -178,43 +182,47 @@ export class ReleaseListComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.excludes.push(WorkingRelease.releaseNum);
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    forkJoin([
-      this.namespaceService.getSimpleNamespaces(),
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([namespaces, loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
+        }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.namespaces.push(...namespaces);
-      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
+      forkJoin([
+        this.namespaceService.getSimpleNamespaces(this.request.library.libraryId),
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([namespaces, loginIds, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-      initFilter(this.creatorIdListFilterCtrl, this.filteredCreatorIdList, this.loginIdList);
+        this.namespaces.push(...namespaces);
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.namespaces, (e) => e.uri);
 
-      this.loadReleases(true);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+        initFilter(this.creatorIdListFilterCtrl, this.filteredCreatorIdList, this.loginIdList);
+
+        this.loadReleases(true);
+      });
     });
   }
 
@@ -265,6 +273,29 @@ export class ReleaseListComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || this.request.library.libraryId === 0) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+    this.onSearch();
   }
 
   onSearch() {
@@ -340,11 +371,11 @@ export class ReleaseListComponent implements OnInit {
     this.router.navigateByUrl('/release/create');
   }
 
-  createDraft(release: Release) {
+  createDraft(release: SimpleRelease) {
     this.router.navigateByUrl('release/' + release.releaseId + '/assign');
   }
 
-  updateState(release: Release, state: string) {
+  updateState(release: SimpleRelease, state: string) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Update state to \'' + state + '\'?';
     dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
@@ -368,7 +399,7 @@ export class ReleaseListComponent implements OnInit {
       });
   }
 
-  discard(release?: Release) {
+  discard(release?: SimpleRelease) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard Release?';
     if (release) {

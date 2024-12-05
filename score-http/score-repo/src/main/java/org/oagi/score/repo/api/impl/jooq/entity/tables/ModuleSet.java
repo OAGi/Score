@@ -34,6 +34,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.ModuleSetRecord;
@@ -64,6 +65,12 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
      * The column <code>oagi.module_set.module_set_id</code>. Primary key.
      */
     public final TableField<ModuleSetRecord, ULong> MODULE_SET_ID = createField(DSL.name("module_set_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key.");
+
+    /**
+     * The column <code>oagi.module_set.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public final TableField<ModuleSetRecord, ULong> LIBRARY_ID = createField(DSL.name("library_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointed to a library of the current record.");
 
     /**
      * The column <code>oagi.module_set.guid</code>. A globally unique
@@ -186,7 +193,7 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
 
     @Override
     public List<ForeignKey<ModuleSetRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_SET_CREATED_BY_FK, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.MODULE_SET_CREATED_BY_FK, Keys.MODULE_SET_LAST_UPDATED_BY_FK, Keys.MODULE_SET_LIBRARY_ID_FK);
     }
 
     private transient AppUserPath _moduleSetCreatedByFk;
@@ -213,6 +220,18 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
             _moduleSetLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_SET_LAST_UPDATED_BY_FK, null);
 
         return _moduleSetLastUpdatedByFk;
+    }
+
+    private transient LibraryPath _library;
+
+    /**
+     * Get the implicit join path to the <code>oagi.library</code> table.
+     */
+    public LibraryPath library() {
+        if (_library == null)
+            _library = new LibraryPath(this, Keys.MODULE_SET_LIBRARY_ID_FK, null);
+
+        return _library;
     }
 
     private transient ModulePath _module;

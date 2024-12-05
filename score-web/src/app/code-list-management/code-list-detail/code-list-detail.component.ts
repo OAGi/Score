@@ -64,7 +64,6 @@ export class CodeListDetailComponent implements OnInit {
   hashCode;
   valueSearch: string;
   highlightText: string;
-  workingRelease = WorkingRelease;
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -207,16 +206,19 @@ export class CodeListDetailComponent implements OnInit {
         return forkJoin([
           this.service.getCodeList(this.manifestId),
           this.service.getCodeListRevision(this.manifestId),
-          this.namespaceService.getSimpleNamespaces(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([codeList, revision, namespaces, preferencesInfo]) => {
-      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
-        this.agencyIdLists = resp.agencyIdLists;
-        this.allAgencyIdListValues = resp.agencyIdListValues;
+      })).subscribe(([codeList, revision, preferencesInfo]) => {
+
+      this.namespaceService.getSimpleNamespaces(codeList.libraryId).subscribe(namespaces => {
         this.namespaces = namespaces;
         initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
           this.getSelectableNamespaces(), (e) => e.uri);
+      });
+
+      this.service.getSimpleAgencyIdListValues(codeList.releaseId).subscribe(resp => {
+        this.agencyIdLists = resp.agencyIdLists;
+        this.allAgencyIdListValues = resp.agencyIdListValues;
         this.revision = revision;
         this.preferencesInfo = preferencesInfo;
 
@@ -572,13 +574,13 @@ export class CodeListDetailComponent implements OnInit {
       return;
     }
     if (!this.codeList.listId) {
-      this.snackBar.open('List Id is required', '', {
+      this.snackBar.open('List ID is required', '', {
         duration: 3000,
       });
       return;
     }
     if (!this.codeList.agencyIdListValueManifestId) {
-      this.snackBar.open('Agency Id is required', '', {
+      this.snackBar.open('Agency ID List Value is required', '', {
         duration: 3000,
       });
       return;
@@ -776,10 +778,7 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   isWorkingRelease(): boolean {
-    if (this.codeList) {
-      return this.codeList.releaseId === this.workingRelease.releaseId;
-    }
-    return false;
+    return this.codeList.workingRelease;
   }
 
   get state(): string {

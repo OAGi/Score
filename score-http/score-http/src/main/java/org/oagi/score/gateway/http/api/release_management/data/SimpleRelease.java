@@ -10,5 +10,6 @@ public class SimpleRelease {
     private BigInteger releaseId;
     private String releaseNum;
     private ReleaseState state;
+    private boolean workingRelease;
 
 }

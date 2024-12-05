@@ -28,13 +28,15 @@ public class NamespaceController {
 
     @RequestMapping(value = "/simple_namespaces", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<SimpleNamespace> getSimpleNamespaces(@AuthenticationPrincipal AuthenticatedPrincipal user) {
-        return service.getSimpleNamespaces(user);
+    public List<SimpleNamespace> getSimpleNamespaces(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                     @RequestParam(name = "libraryId") BigInteger libraryId) {
+        return service.getSimpleNamespaces(user, libraryId);
     }
 
     @RequestMapping(value = "/namespace_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<NamespaceList> getNamespaceList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                        @RequestParam(name = "libraryId") BigInteger libraryId,
                                                         @RequestParam(name = "uri", required = false) String uri,
                                                         @RequestParam(name = "prefix", required = false) String prefix,
                                                         @RequestParam(name = "description", required = false) String description,
@@ -49,6 +51,7 @@ public class NamespaceController {
                                                         @RequestParam(name = "pageSize") int pageSize) {
         NamespaceListRequest request = new NamespaceListRequest();
 
+        request.setLibraryId(libraryId);
         request.setUri(uri);
         request.setPrefix(prefix);
         request.setDescription(description);

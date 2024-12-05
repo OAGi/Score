@@ -274,7 +274,7 @@
                         </mat-option>
                         <mat-option *ngFor="let agencyIdList of filteredAgencyLists | async"
                                     [value]="agencyIdList">
-                          {{ agencyIdList.name }}
+                          <span>{{ agencyIdList.name + (agencyIdList.state === 'Deleted' ? ' (Deleted)' : '')}}</span>
                         </mat-option>
                       </mat-select>
                     </mat-form-field>

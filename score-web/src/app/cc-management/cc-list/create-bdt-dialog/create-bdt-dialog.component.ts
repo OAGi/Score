@@ -206,6 +206,7 @@ export class CreateBdtDialogComponent implements OnInit {
   ngOnInit() {
     this.refSpec = 1;
     this.request = new CcListRequest();
+    this.request.library.libraryId = this.data.libraryId;
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.request.types = ['DT'];

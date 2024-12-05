@@ -167,6 +167,7 @@ public class OpenAPIDocController {
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
             @RequestParam(name = "ownedByDeveloper", required = false) Boolean ownedByDeveloper,
+            @RequestParam(name = "libraryId", required = false) BigInteger libraryId,
             @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
@@ -195,6 +196,9 @@ public class OpenAPIDocController {
 
         request.setOwnedByDeveloper(ownedByDeveloper);
 
+        if (libraryId != null && libraryId.compareTo(BigInteger.ZERO) > 0) {
+            request.setLibraryId(libraryId);
+        }
         if (releaseId != null && releaseId.compareTo(BigInteger.ZERO) > 0) {
             request.setReleaseId(releaseId);
         }

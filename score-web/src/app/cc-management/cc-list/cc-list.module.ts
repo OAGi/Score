@@ -18,6 +18,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {LibraryService} from '../../library-management/domain/library.service';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -38,7 +40,8 @@ const routes: Routes = [
     ScoreCommonModule,
     SearchBarModule,
     ColumnSelectorModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    TitleWithLibrarySelector
   ],
   declarations: [
     CcListComponent,
@@ -51,6 +54,7 @@ const routes: Routes = [
   providers: [
     CcListService,
     CcNodeService,
+    LibraryService,
     TagService
   ]
 })

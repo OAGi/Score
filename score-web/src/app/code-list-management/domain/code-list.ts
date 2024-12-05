@@ -3,8 +3,10 @@ import {SimpleRelease} from '../../release-management/domain/release';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
+import {Library} from '../../library-management/domain/library';
 
 export class CodeListForListRequest {
+  library: Library = new Library();
   release: SimpleRelease;
   filters: {
     name: string;
@@ -76,9 +78,7 @@ export class CodeListForListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.release) {
-      params = params.set('releaseId', this.release.releaseId.toString());
-    }
+    params = params.set('releaseId', '' + this.release.releaseId);
     if (this.access && this.access.length > 0) {
       params = params.set('access', '' + this.access);
     }
@@ -144,7 +144,9 @@ export class CodeListForList {
 }
 
 export class CodeList {
+  libraryId: number;
   releaseId: number;
+  workingRelease: boolean;
   codeListManifestId: number;
   codeListName: string;
   basedCodeListManifestId: number;

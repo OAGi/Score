@@ -182,6 +182,7 @@ public class BieService {
                 .getUserTenantsRoleByUserId(requester.getAppUserId());
 
         PaginationResponse<BieList> result = bieRepository.selectBieLists()
+                .setLibraryId(request.getLibraryId())
                 .setDen(request.getDen())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setVersion(request.getVersion())

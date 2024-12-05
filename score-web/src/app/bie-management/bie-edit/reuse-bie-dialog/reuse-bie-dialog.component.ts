@@ -25,6 +25,7 @@ import {
 } from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {Library} from '../../../library-management/domain/library';
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -193,6 +194,8 @@ export class ReuseBieDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.asccpManifestId = this.data.asccpManifestId;
     this.request.filters.den = this.data.den;
+    this.request.library = new Library();
+    this.request.library.libraryId = this.data.libraryId;
     const release = new SimpleRelease();
     release.releaseId = this.data.releaseId;
     this.request.releases = [release, ];

@@ -16,7 +16,7 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter, saveBooleanProperty, saveBranch} from '../../common/utility';
+import {base64Decode, initFilter, loadLibrary, saveBooleanProperty, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {HttpParams} from '@angular/common/http';
 import {SimpleRelease} from '../../release-management/domain/release';
@@ -28,6 +28,8 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -182,6 +184,8 @@ export class BieCopyProfileBieComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
 
   releases: SimpleRelease[] = [];
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
   @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
@@ -197,6 +201,7 @@ export class BieCopyProfileBieComponent implements OnInit {
               private bieListService: BieListService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private auth: AuthService,
               private preferencesService: SettingsPreferencesService,
               private location: Location,
@@ -211,64 +216,67 @@ export class BieCopyProfileBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
-    // The value should be 'true' unless 'adv_ser' is false.
-    this.searchBar.showAdvancedSearch =
-      (!this.route.snapshot.queryParamMap || (!this.route.snapshot.queryParamMap.get('adv_ser')) ||
-        this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      // The value should be 'true' unless 'adv_ser' is false.
+      this.searchBar.showAdvancedSearch =
+        (!this.route.snapshot.queryParamMap || (!this.route.snapshot.queryParamMap.get('adv_ser')) ||
+          this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    // Load Business Contexts
-    this.route.queryParamMap.pipe(
-      switchMap((params: ParamMap) => {
-        let bizCtxIds = params.get('bizCtxIds');
-        if (!bizCtxIds) {
-          const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
-          const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-          bizCtxIds = httpParams.get('bizCtxIds');
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-        return forkJoin([
-          this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e))),
-          this.accountService.getAccountNames(),
-          this.releaseService.getSimpleReleases(),
-          this.preferencesService.load(this.auth.getUserToken())
-        ]);
-      })).subscribe(([resp, loginIds, releases, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+      // Load Business Contexts
+      this.route.queryParamMap.pipe(
+        switchMap((params: ParamMap) => {
+          let bizCtxIds = params.get('bizCtxIds');
+          if (!bizCtxIds) {
+            const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
+            const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
+            bizCtxIds = httpParams.get('bizCtxIds');
+          }
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+          return forkJoin([
+            this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e))),
+            this.accountService.getAccountNames(),
+            this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+            this.preferencesService.load(this.auth.getUserToken())
+          ]);
+        })).subscribe(([resp, loginIds, releases, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
 
-      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
-      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.bizCtxIds = resp.list.map(e => e.businessContextId);
-      this.bizCtxList = resp.list;
-      // Issue #1625
-      this.request.filters.businessContext = this.bizCtxList.map(e => e.name).join(', ');
+        this.initReleases(releases);
 
-      this.loadBieList(true);
-    }, err => {
-      console.error(err);
+        this.bizCtxIds = resp.list.map(e => e.businessContextId);
+        this.bizCtxList = resp.list;
+        // Issue #1625
+        this.request.filters.businessContext = this.bizCtxList.map(e => e.name).join(', ');
+
+        this.loadBieList(true);
+      }, err => {
+        console.error(err);
+      });
     });
   }
 
@@ -330,6 +338,38 @@ export class BieCopyProfileBieComponent implements OnInit {
     } else {
       this.request.releases = [];
     }
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || this.request.library.libraryId === 0) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = releases.filter(e => !e.workingRelease && e.state === 'Published');
+    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.request.releases = [];
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
   }
 
   onSearch() {

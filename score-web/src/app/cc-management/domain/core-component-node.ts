@@ -1,13 +1,16 @@
 import {AgencyIdList} from '../../agency-id-list-management/domain/agency-id-list';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CodeListForList} from '../../code-list-management/domain/code-list';
-import {compare, emptyToUndefined, hashCode, hashCode4Array, hashCode4String,} from '../../common/utility';
+import {compare, emptyToUndefined, hashCode, hashCode4Array,} from '../../common/utility';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {ShortTag} from '../../tag-management/domain/tag';
 
 export class CcNode {
   type: string;
+  libraryId: number;
   releaseId: number;
+  releaseNum: string;
+  workingRelease: boolean;
   guid: string;
   name: string;
   hasChild: boolean;
@@ -20,7 +23,10 @@ export class CcNode {
   listeners: ChangeListener<CcNode>[] = [];
 
   constructor(obj?: CcNode) {
+    this.libraryId = obj && obj.libraryId || 0;
     this.releaseId = obj && obj.releaseId || 0;
+    this.releaseNum = obj && obj.releaseNum || '';
+    this.workingRelease = obj && obj.workingRelease || false;
     this.type = obj && obj.type || '';
     this.guid = obj && obj.guid || '';
     this.name = obj && obj.name || '';
@@ -140,8 +146,11 @@ export class CcAccNodeDetail extends CcNodeDetail {
 
   private _state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -174,6 +183,8 @@ export class CcAccNodeDetail extends CcNodeDetail {
     this.namespaceId = obj.namespaceId;
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -207,6 +218,8 @@ export class CcAccNodeDetail extends CcNodeDetail {
       namespaceId: this.namespaceId,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -227,7 +240,7 @@ export class CcAccNodeDetail extends CcNodeDetail {
       this.abstracted, this.deprecated,
       this.namespaceId,
       this.definition, this.definitionSource,
-      this.owner, this.releaseId, this.releaseNum,
+      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
       this.revisionNum, this.revisionTrackingNum
     );
   }
@@ -389,8 +402,11 @@ class AsccDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -417,6 +433,8 @@ class AsccDetail {
 
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -443,6 +461,8 @@ class AsccDetail {
       manifestId: this.manifestId,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -462,7 +482,7 @@ class AsccDetail {
       this.cardinalityMin, this.cardinalityMax,
       this.deprecated,
       this.definition, this.definitionSource,
-      this.owner, this.releaseId, this.releaseNum,
+      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
       this.revisionNum, this.revisionTrackingNum
     );
   }
@@ -532,8 +552,11 @@ class AsccpDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -565,6 +588,8 @@ class AsccpDetail {
 
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -598,6 +623,8 @@ class AsccpDetail {
       namespaceId: this.namespaceId,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -618,7 +645,7 @@ class AsccpDetail {
       this.reusable, this.nillable, this.deprecated,
       this.definition, this.definitionSource,
       this.namespaceId,
-      this.owner, this.releaseId, this.releaseNum,
+      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
       this.revisionNum, this.revisionTrackingNum
     );
   }
@@ -758,8 +785,11 @@ class BccDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -791,6 +821,8 @@ class BccDetail {
 
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -821,6 +853,8 @@ class BccDetail {
       definitionSource: this.definitionSource,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -841,7 +875,7 @@ class BccDetail {
       this.nillable, this.deprecated, this.entityType,
       this.defaultValue, this.fixedValue,
       this.definition, this.definitionSource,
-      this.owner, this.releaseId, this.releaseNum,
+      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
       this.revisionNum, this.revisionTrackingNum
     );
   }
@@ -972,8 +1006,11 @@ class BccpDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -1008,6 +1045,8 @@ class BccpDetail {
 
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -1039,6 +1078,8 @@ class BccpDetail {
       namespaceId: this.namespaceId,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -1060,7 +1101,7 @@ class BccpDetail {
       this.defaultValue, this.fixedValue,
       this.definition, this.definitionSource,
       this.namespaceId,
-      this.owner, this.releaseId, this.releaseNum,
+      this.owner, this.libraryId, this.libraryName, this.releaseId, this.releaseNum,
       this.revisionNum, this.revisionTrackingNum
     );
   }
@@ -1190,8 +1231,11 @@ class BdtDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -1222,6 +1266,8 @@ class BdtDetail {
 
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -1498,8 +1544,11 @@ export class CcDtNodeDetail extends CcNodeDetail {
   private _namespaceId: number;
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
+  workingRelease: boolean; // Is 'Working' Branch?
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
@@ -1539,6 +1588,8 @@ export class CcDtNodeDetail extends CcNodeDetail {
     this._namespaceId = obj.namespaceId;
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -1833,6 +1884,8 @@ export class CcDtNodeDetail extends CcNodeDetail {
       namespaceId: this._namespaceId,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -1846,7 +1899,8 @@ export class CcDtNodeDetail extends CcNodeDetail {
     return hashCode4Array(this.bdtId, this.manifestId, this.guid, this.representationTerm, this.dataTypeTerm, this.qualifier,
       this.basedBdtId, this.basedBdtManifestId, this.basedBdtDen, this.basedBdtState,
       this._sixDigitId, this.contentComponentDefinition, this.commonlyUsed,
-      this._namespaceId, this.definition, this.definitionSource, this.releaseId, this.releaseNum, this.revisionNum,
+      this._namespaceId, this.definition, this.definitionSource,
+      this.libraryId, this.libraryName, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtPriRestriList);
   }
 
@@ -1972,6 +2026,8 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
 
   state: string;
   owner: string;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
   revisionId: number;
@@ -2045,6 +2101,8 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
     this.fixedOrDefault = this.defaultValue ? 'default' : this.fixedValue ? 'fixed' : 'none';
     this.state = obj.state;
     this.owner = obj.owner;
+    this.libraryId = obj.libraryId;
+    this.libraryName = obj.libraryName;
     this.releaseId = obj.releaseId;
     this.releaseNum = obj.releaseNum;
     this.revisionId = obj.revisionId;
@@ -2354,6 +2412,8 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
       definitionSource: this.definitionSource,
       state: this.state,
       owner: this.owner,
+      libraryId: this.libraryId,
+      libraryName: this.libraryName,
       releaseId: this.releaseId,
       releaseNum: this.releaseNum,
       revisionNum: this.revisionNum,
@@ -2374,7 +2434,8 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   get hashCode(): number {
     return hashCode4Array(this.bdtScId, this.manifestId, this.guid, this.representationTerm, this.objectClassTerm, this.propertyTerm,
       this.representationTerm, this.cardinalityMin, this.cardinalityMax, this.defaultValue, this.fixedValue,
-      this.definition, this.definitionSource, this.state, this.releaseId, this.releaseNum, this.revisionNum,
+      this.definition, this.definitionSource, this.state,
+      this.libraryId, this.libraryName, this.releaseId, this.releaseNum, this.revisionNum,
       this.revisionTrackingNum, this.bdtScPriRestriList);
   }
 

@@ -551,6 +551,13 @@ public class BusinessInformationEntityRepository {
             return this.selectFields;
         }
 
+        public SelectBieListArguments setLibraryId(BigInteger libraryId) {
+            if (libraryId != null) {
+                conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
+            }
+            return this;
+        }
+
         public SelectBieListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
                 conditions.addAll(contains(den, ASCCP_MANIFEST.DEN, ASBIEP.DISPLAY_NAME));
@@ -893,6 +900,7 @@ public class BusinessInformationEntityRepository {
                 .join(APP_USER.as("owner")).on(APP_USER.as("owner").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
                 .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID))

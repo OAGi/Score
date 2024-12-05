@@ -11,11 +11,17 @@ import java.util.List;
 
 public class AgencyIdList extends Auditable implements CoreComponent, Serializable {
 
+    private BigInteger libraryId;
+
+    private String libraryName;
+
     private BigInteger releaseId;
 
     private String releaseNum;
 
     private String releaseState;
+
+    private boolean workingRelease;
 
     private String revisionNum;
 
@@ -65,9 +71,7 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
 
     private boolean newComponent;
 
-    private BigInteger prevAgencyIdListId;
-
-    private BigInteger nextAgencyIdListId;
+    private BigInteger prevAgencyIdListManifestId;
 
     private AgencyIdList prev;
 
@@ -79,6 +83,22 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
 
     public void setAgencyIdListManifestId(BigInteger agencyIdListManifestId) {
         this.agencyIdListManifestId = agencyIdListManifestId;
+    }
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
+    }
+
+    public String getLibraryName() {
+        return libraryName;
+    }
+
+    public void setLibraryName(String libraryName) {
+        this.libraryName = libraryName;
     }
 
     public String getReleaseNum() {
@@ -103,6 +123,14 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
 
     public void setReleaseId(BigInteger releaseId) {
         this.releaseId = releaseId;
+    }
+
+    public boolean isWorkingRelease() {
+        return workingRelease;
+    }
+
+    public void setWorkingRelease(boolean workingRelease) {
+        this.workingRelease = workingRelease;
     }
 
     public String getRevisionNum() {
@@ -279,20 +307,12 @@ public class AgencyIdList extends Auditable implements CoreComponent, Serializab
         this.newComponent = newComponent;
     }
 
-    public BigInteger getPrevAgencyIdListId() {
-        return prevAgencyIdListId;
+    public BigInteger getPrevAgencyIdListManifestId() {
+        return prevAgencyIdListManifestId;
     }
 
-    public void setPrevAgencyIdListId(BigInteger prevAgencyIdListId) {
-        this.prevAgencyIdListId = prevAgencyIdListId;
-    }
-
-    public BigInteger getNextAgencyIdListId() {
-        return nextAgencyIdListId;
-    }
-
-    public void setNextAgencyIdListId(BigInteger nextAgencyIdListId) {
-        this.nextAgencyIdListId = nextAgencyIdListId;
+    public void setPrevAgencyIdListManifestId(BigInteger prevAgencyIdListManifestId) {
+        this.prevAgencyIdListManifestId = prevAgencyIdListManifestId;
     }
 
     public String getAgencyIdListValueName() {

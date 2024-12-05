@@ -148,3 +148,7 @@ mat-toolbar .mat-icon {
   border-radius: 4px;
   box-shadow: var(--mdc-protected-button-container-elevation-shadow);
 }
+
+.library-divider {
+  color: #cccccc;
+}

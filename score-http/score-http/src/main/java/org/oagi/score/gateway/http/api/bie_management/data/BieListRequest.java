@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class BieListRequest {
 
+    private BigInteger libraryId;
     private String den;
     private String propertyTerm;
     private String businessContext;

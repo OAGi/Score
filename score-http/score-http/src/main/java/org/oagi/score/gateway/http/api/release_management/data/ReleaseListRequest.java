@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class ReleaseListRequest {
 
+    private BigInteger libraryId;
     private String releaseNum;
     private List<String> excludes = Collections.emptyList();
     private List<ReleaseState> states = Collections.emptyList();

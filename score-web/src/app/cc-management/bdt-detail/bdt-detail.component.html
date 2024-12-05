@@ -377,10 +377,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Data Type">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput *ngIf="!rootNode.basedManifestId" value="CDT" [disabled]="true">
-                            <input matInput *ngIf="rootNode.basedManifestId" value="BDT" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBdtDetail().libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -428,7 +427,14 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput *ngIf="!rootNode.basedManifestId" value="CDT" [disabled]="true">
+                            <input matInput *ngIf="rootNode.basedManifestId" value="BDT" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -707,9 +713,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Data Type Supplementary Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="DTSC" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -751,7 +757,13 @@
                       </div>
 
                       <div class="row" *ngIf="!asBdtScDetail().spec">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type Supplementary Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DTSC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -768,6 +780,12 @@
                       </div>
 
                       <div class="row" *ngIf="asBdtScDetail().spec">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type Supplementary Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DTSC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
                         <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
@@ -775,7 +793,7 @@
                                    [(ngModel)]="asBdtScDetail().guid" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Specification</mat-label>
                             <input matInput maxlength="41"

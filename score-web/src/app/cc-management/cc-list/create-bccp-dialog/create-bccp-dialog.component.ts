@@ -189,6 +189,7 @@ export class CreateBccpDialogComponent implements OnInit {
   ngOnInit() {
     this.request = new CcListRequest();
     this.request.commonlyUsed = [];
+    this.request.library.libraryId = this.data.libraryId;
     this.request.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.request.types = ['DT'];

@@ -151,6 +151,7 @@ export class ModuleSetEditComponent implements OnInit {
 
     dialogConfig.data = {
       moduleSetId: this.moduleSet.moduleSetId,
+      libraryId: this.moduleSet.libraryId,
       parentModuleId: tileIndex > 0 ? this.tiles[tileIndex - 1].current.moduleId : this.rootElement.moduleId,
       parentDirName: tileIndex > 0 ? this.tiles[tileIndex - 1].current.name : this.rootElement.name
     };
@@ -182,7 +183,10 @@ export class ModuleSetEditComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth / 2 + 'px';
     element.moduleSetId = this.moduleSet.moduleSetId;
-    dialogConfig.data = element;
+    dialogConfig.data = {
+      module: element,
+      moduleSet: this.moduleSet
+    };
     const buf = {
       name: element.name,
       versionNum: element.versionNum,

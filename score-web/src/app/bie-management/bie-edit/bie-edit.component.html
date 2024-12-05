@@ -326,19 +326,25 @@
                   <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput placeholder="Library" [(ngModel)]="rootNode.libraryName" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
                             <input matInput placeholder="Release" [(ngModel)]="rootNode.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>State</mat-label>
                             <input matInput placeholder="State" [(ngModel)]="rootNode.topLevelAsbiepState" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput placeholder="Owner" [(ngModel)]="rootNode.loginId" [disabled]="true">
@@ -506,13 +512,19 @@
                     </ng-template>
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput placeholder="Release" [(ngModel)]="baseNode.libraryName" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
                             <input matInput placeholder="Release" [(ngModel)]="baseNode.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>State</mat-label>
                             <input matInput placeholder="State" [(ngModel)]="baseNode.topLevelAsbiepState" [disabled]="true">
@@ -793,19 +805,25 @@
                       <div *ngIf="selectedNode && selectedNode.reused && reusedNode && reusedNodeDetail" class="detail-reused">
                         <h4 class="mb-2"> From Reused BIE</h4>
                         <div class="row">
-                          <div class="col-4">
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="reusedNode.libraryName" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Release</mat-label>
                               <input matInput [(ngModel)]="reusedNode.releaseNum" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>State</mat-label>
                               <input matInput [(ngModel)]="reusedNode.topLevelAsbiepState" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Owner</mat-label>
                               <input matInput [(ngModel)]="reusedNode.loginId" [disabled]="true">
@@ -1064,19 +1082,25 @@
                       <div *ngIf="selectedNode.inherited && selectedNode.reused && reusedBaseNode && reusedBaseNodeDetail" class="detail-reused">
                         <h4 class="mb-2"> From Reused BIE</h4>
                         <div class="row">
-                          <div class="col-4">
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="reusedBaseNode.libraryName" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Release</mat-label>
                               <input matInput [(ngModel)]="reusedBaseNode.releaseNum" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>State</mat-label>
                               <input matInput [(ngModel)]="reusedBaseNode.topLevelAsbiepState" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Owner</mat-label>
                               <input matInput [(ngModel)]="reusedBaseNode.loginId" [disabled]="true">

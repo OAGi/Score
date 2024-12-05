@@ -292,7 +292,7 @@ export class ReleaseAssignComponent implements OnInit {
     };
 
     this.isLoading = true;
-    this.service.validate(request).pipe(finalize(() => {
+    this.service.validate(this.releaseDetail.releaseId, request).pipe(finalize(() => {
       this.isLoading = false;
     })).subscribe(resp => {
       const map: ReleaseValidationResponse = resp;

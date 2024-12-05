@@ -194,6 +194,12 @@ export class OpenAPIService {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+    if (request.library) {
+      params = params.set('libraryId', request.library.libraryId.toString());
+    }
+    if (request.release) {
+      params = params.set('releaseId', request.release.releaseId.toString());
+    }
     if (request.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
     }
@@ -235,9 +241,6 @@ export class OpenAPIService {
     }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
-    }
-    if (request.release) {
-      params = params.set('releaseId', request.release.releaseId.toString());
     }
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());

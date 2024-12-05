@@ -124,9 +124,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     const userToken = this.authService.getUserToken();
     forkJoin([
-      this.releaseService.getSimpleReleases()
+      this.releaseService.getSimpleReleases(1)
     ]).subscribe(([resp]) => {
-      resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
+      resp = [{state: '', releaseId: -1, releaseNum : 'All', workingRelease: false}].concat(resp.filter(e => !e.workingRelease));
       initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
 
       const branch = loadBranch(userToken, 'CC');

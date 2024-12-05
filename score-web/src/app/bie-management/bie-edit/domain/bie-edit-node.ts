@@ -14,6 +14,8 @@ import {hashCode4Array, hashCode4String} from '../../../common/utility';
 export class BieEditNode {
   ccManifestId: number;
   topLevelAsbiepId: number;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
   type: string;
@@ -38,6 +40,7 @@ export class BieEditNode {
 
   constructor(obj?: BieEditNode) {
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
+    this.libraryId = obj && obj.libraryId || 0;
     this.releaseId = obj && obj.releaseId || 0;
     this.type = obj && obj.type || '';
     this.ccType = obj && obj.ccType || '';
@@ -51,6 +54,7 @@ export class BieEditNode {
     this.inverseMode = obj && obj.inverseMode || false;
     this.deprecated = obj && obj.deprecated || false;
     this.basedTopLevelAsbiepId = obj && obj.basedTopLevelAsbiepId || 0;
+    this.libraryName = obj && obj.libraryName || '';
     this.releaseNum = obj && obj.releaseNum || '';
     this.loginId = obj && obj.loginId || '';
     this.version = obj && obj.version || '';

@@ -248,7 +248,7 @@ export class BiePackageListComponent implements OnInit {
 
     forkJoin([
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases(),
+      this.releaseService.getSimpleReleases(1),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([loginIds, releases, preferencesInfo]) => {
       this.preferencesInfo = preferencesInfo;
@@ -258,7 +258,7 @@ export class BiePackageListComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      this.releases = releases.filter(e => !e.workingRelease && e.state === 'Published');
       initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
       this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
       this.loadBiePackageList(true);

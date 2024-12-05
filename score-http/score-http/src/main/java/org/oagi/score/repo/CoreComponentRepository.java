@@ -279,15 +279,18 @@ public class CoreComponentRepository {
         return unionOfSummaryCcList;
     }
 
-    public List<SummaryCcExt> getSummaryCcExtList(BigInteger releaseId) {
+    public List<SummaryCcExt> getSummaryCcExtList(BigInteger libraryId, BigInteger releaseId) {
         List<ULong> uegAccIds;
         if (releaseId.longValue() > 0) {
             uegAccIds = dslContext.select(max(ACC.ACC_ID).as("id"))
                             .from(ACC)
                             .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                            .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                            .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                             .where(and(
                                     ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
-                                    ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))
+                                    ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                    LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId))
                             ))
                             .groupBy(ACC.GUID)
                             .fetchInto(ULong.class);
@@ -296,9 +299,12 @@ public class CoreComponentRepository {
             uegAccIds = dslContext.select(max(ACC.ACC_ID).as("id"))
                             .from(ACC)
                             .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                            .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                            .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                             .where(and(
                                     ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
-                                    ACC_MANIFEST.RELEASE_ID.greaterThan(ULong.valueOf(0))
+                                    ACC_MANIFEST.RELEASE_ID.greaterThan(ULong.valueOf(0)),
+                                    LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId))
                             ))
                             .groupBy(ACC.GUID)
                             .fetchInto(ULong.class);

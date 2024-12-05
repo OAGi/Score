@@ -10,8 +10,11 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface AgencyIdListReadRepository {
+
     GetAgencyIdListListResponse getAgencyIdListList(GetAgencyIdListListRequest request) throws ScoreDataAccessException;
+
     AgencyIdList getAgencyIdList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
-    AgencyIdList getAgencyIdListById(BigInteger agencyIdListId) throws ScoreDataAccessException;
+
     List<AgencyIdListValue> getAgencyIdListValueList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
+    
 }

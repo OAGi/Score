@@ -3,9 +3,11 @@ import {PageRequest} from '../../basis/basis';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode, hashCode4String} from '../../common/utility';
+import {base64Decode, base64Encode, hashCode4Array, hashCode4String} from '../../common/utility';
+import {Library} from '../../library-management/domain/library';
 
 export class AgencyIdListForListRequest {
+  library: Library = new Library();
   release: SimpleRelease;
   filters: {
     name: string;
@@ -79,9 +81,7 @@ export class AgencyIdListForListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.release) {
-      params = params.set('releaseId', this.release.releaseId.toString());
-    }
+    params = params.set('releaseId', '' + this.release.releaseId);
     if (this.access && this.access.length > 0) {
       params = params.set('access', '' + this.access);
     }
@@ -127,7 +127,9 @@ export class AgencyIdListForListRequest {
 }
 
 export class AgencyIdList {
+  libraryId: number;
   releaseId: number;
+  workingRelease: boolean;
   agencyIdListManifestId: number;
   agencyIdListValueManifestId: number;
   name: string;
@@ -203,23 +205,11 @@ export class AgencyIdList {
   }
 
   get hashCode(): number {
-    return ((this.releaseId) ? this.releaseId : 0) +
-      ((this.agencyIdListManifestId) ? this.agencyIdListManifestId : 0) +
-      ((this.agencyIdListValueManifestId) ? this.agencyIdListValueManifestId : 0) +
-      ((this.name) ? hashCode4String(this.name) : 0) +
-      ((this.basedAgencyIdListManifestId) ? this.basedAgencyIdListManifestId : 0) +
-      ((this.agencyId) ? this.agencyId : 0) +
-      ((this.versionId) ? hashCode4String(this.versionId) : 0) +
-      ((this.namespaceId) ? this.namespaceId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.listId) ? hashCode4String(this.listId) : 0) +
-      ((this.definition) ? hashCode4String(this.definition) : 0) +
-      ((this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((this.remark) ? hashCode4String(this.remark) : 0) +
-      ((this.modulePath) ? hashCode4String(this.modulePath) : 0) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.state) ? hashCode4String(this.state) : 0) +
-      ((this.values) ? this.values.map(val => val.hashCode).reduce((s, a) => s + a, 0) : 0);
+    return hashCode4Array(this.releaseId,
+      this.agencyIdListManifestId, this.agencyIdListValueManifestId, this.basedAgencyIdListManifestId,
+      this.name, this.agencyId, this.versionId, this.namespaceId,
+      this.guid, this.listId, this.definition, this.definitionSource, this.remark, this.modulePath,
+      this.deprecated, this.state, this.values);
   }
 }
 
@@ -233,6 +223,8 @@ export class AgencyIdListValue {
   definitionSource: string;
 
   deprecated: boolean;
+  developerDefault: boolean;
+  userDefault: boolean;
   used: boolean;
 
   get derived(): boolean {
@@ -250,20 +242,16 @@ export class AgencyIdListValue {
       this.definitionSource = obj.definitionSource;
 
       this.deprecated = obj.deprecated;
+      this.developerDefault = obj.developerDefault;
+      this.userDefault = obj.userDefault;
       this.used = obj.used;
     }
   }
 
   get hashCode(): number {
-    return ((this.agencyIdListValueManifestId) ? this.agencyIdListValueManifestId : 0) +
-      ((this.basedAgencyIdListValueManifestId) ? this.basedAgencyIdListValueManifestId : 0) +
-      ((this.guid) ? hashCode4String(this.guid) : 0) +
-      ((this.value) ? hashCode4String(this.value) : 0) +
-      ((this.name) ? hashCode4String(this.name) : 0) +
-      ((this.definition) ? hashCode4String(this.definition) : 0) +
-      ((this.definitionSource) ? hashCode4String(this.definitionSource) : 0) +
-      ((this.deprecated) ? 1231 : 1237) +
-      ((this.used) ? 1231 : 1237);
+    return hashCode4Array(this.agencyIdListValueManifestId, this.basedAgencyIdListValueManifestId,
+      this.guid, this.value, this.name, this.definition, this.definitionSource,
+      this.deprecated, this.developerDefault, this.userDefault, this.used);
   }
 }
 

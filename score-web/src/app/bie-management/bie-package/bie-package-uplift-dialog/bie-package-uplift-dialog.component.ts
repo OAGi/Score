@@ -111,7 +111,7 @@ export class BiePackageUpliftDialogComponent implements OnInit {
     forkJoin([
       this.biePackageService.get(this.request.biePackageId),
       this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
+      this.releaseService.getSimpleReleases(1)
     ]).subscribe(([biePackage, loginIds, releases]) => {
       this.init(biePackage);
 
@@ -119,7 +119,7 @@ export class BiePackageUpliftDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      this.releases = releases.filter(e => !e.workingRelease && e.state === 'Published');
       if (!!this.data.releaseId) {
         this.releases = this.releases.filter(e => e.releaseId === this.data.releaseId);
       }

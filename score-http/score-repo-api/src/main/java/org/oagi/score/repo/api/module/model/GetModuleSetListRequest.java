@@ -13,11 +13,20 @@ public class GetModuleSetListRequest extends PaginationRequest<ModuleSet> {
         super(requester, ModuleSet.class);
     }
 
+    private BigInteger libraryId;
     private String name;
     private String description;
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
+    }
 
     public String getName() {
         return name;

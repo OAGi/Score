@@ -38,6 +38,7 @@ public class JooqModuleSetReadRepository
     private SelectOnConditionStep select() {
         return dslContext().select(
                 MODULE_SET.MODULE_SET_ID,
+                LIBRARY.LIBRARY_ID,
                 MODULE_SET.GUID,
                 MODULE_SET.NAME,
                 MODULE_SET.DESCRIPTION,
@@ -54,6 +55,7 @@ public class JooqModuleSetReadRepository
                 MODULE_SET.CREATION_TIMESTAMP,
                 MODULE_SET.LAST_UPDATE_TIMESTAMP)
                 .from(MODULE_SET)
+                .join(LIBRARY).on(MODULE_SET.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(APP_USER.as("creator")).on(MODULE_SET.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(MODULE_SET.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
     }
@@ -62,6 +64,7 @@ public class JooqModuleSetReadRepository
         return record -> {
             ModuleSet moduleSet = new ModuleSet();
             moduleSet.setModuleSetId(record.get(MODULE_SET.MODULE_SET_ID).toBigInteger());
+            moduleSet.setLibraryId(record.get(LIBRARY.LIBRARY_ID).toBigInteger());
             moduleSet.setGuid(record.get(MODULE_SET.GUID));
             moduleSet.setName(record.get(MODULE_SET.NAME));
             moduleSet.setDescription(record.get(MODULE_SET.DESCRIPTION));
@@ -129,7 +132,8 @@ public class JooqModuleSetReadRepository
                 .from(MODULE)
                 .where(and(
                         MODULE.MODULE_SET_ID.eq(moduleSetId),
-                        MODULE.TYPE.eq("DIRECTORY")
+                        MODULE.TYPE.eq("DIRECTORY"),
+                        MODULE.PARENT_MODULE_ID.isNotNull() // Do not count the root directory
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0);
         moduleSetMetadata.setNumberOfDirectories(numberOfDirectories);
@@ -185,6 +189,7 @@ public class JooqModuleSetReadRepository
     private Collection<Condition> getConditions(GetModuleSetListRequest request) {
         List<Condition> conditions = new ArrayList();
 
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         if (StringUtils.hasLength(request.getName())) {
             conditions.addAll(contains(request.getName(), MODULE_SET.NAME));
         }

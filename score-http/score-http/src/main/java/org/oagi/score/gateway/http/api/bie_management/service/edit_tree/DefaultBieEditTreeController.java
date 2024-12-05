@@ -158,11 +158,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     public BieEditAbieNode getRootNode(BigInteger topLevelAsbiepId) {
         BieEditAbieNode rootNode = dslContext.select(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                LIBRARY.LIBRARY_ID,
                 TOP_LEVEL_ASBIEP.RELEASE_ID,
                 TOP_LEVEL_ASBIEP.STATE.as("top_level_asbiep_state"),
                 TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                 TOP_LEVEL_ASBIEP.VERSION,
                 TOP_LEVEL_ASBIEP.STATUS,
+                LIBRARY.NAME.as("library_name"),
                 RELEASE.RELEASE_NUM,
                 APP_USER.LOGIN_ID,
                 ASCCP.GUID,
@@ -191,6 +193,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(APP_USER).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .leftJoin(TOP_LEVEL_ASBIEP.as("based")).on(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID))
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))

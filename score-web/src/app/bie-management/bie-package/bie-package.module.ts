@@ -14,6 +14,7 @@ import {BiePackageAddBieDialogComponent} from './bie-package-add-bie-dialog/bie-
 import {BiePackageUpliftDialogComponent} from './bie-package-uplift-dialog/bie-package-uplift-dialog.component';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 
 const routes: Routes = [
@@ -46,18 +47,19 @@ const routes: Routes = [
     BiePackageAddBieDialogComponent,
     BiePackageUpliftDialogComponent
   ],
-  imports: [
-    RouterModule.forChild(routes),
-    CommonModule,
-    MaterialModule,
-    TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ScoreCommonModule,
-    MatMultiSortModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        CommonModule,
+        MaterialModule,
+        TranslateModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ScoreCommonModule,
+        MatMultiSortModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   exports: [
     BiePackageListComponent,
     BiePackageDetailComponent,

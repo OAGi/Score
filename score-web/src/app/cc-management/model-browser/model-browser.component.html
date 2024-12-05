@@ -191,13 +191,19 @@
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput placeholder="Library" [(ngModel)]="asAccDetail().asccp.libraryName" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
                             <input matInput placeholder="Release" [(ngModel)]="asAccDetail().asccp.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>State</mat-label>
                             <input matInput placeholder="State" [(ngModel)]="asAccDetail().asccp.state" [disabled]="true">

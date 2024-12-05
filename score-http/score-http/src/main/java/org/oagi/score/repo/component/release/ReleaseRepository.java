@@ -1,8 +1,6 @@
 package org.oagi.score.repo.component.release;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record8;
+import org.jooq.*;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
@@ -53,13 +51,21 @@ public class ReleaseRepository implements ScoreRepository<Release> {
     @Autowired
     private AgencyIdService agencyIdService;
 
-    @Override
-    public List<Release> findAll() {
+    private SelectOnConditionStep<Record12<
+            ULong, String, String, String, String,
+            String, ULong, ULong, ULong, LocalDateTime,
+            ULong, LocalDateTime>> getSelectReleaseStep() {
         return dslContext.select(RELEASE.RELEASE_ID, RELEASE.GUID, RELEASE.RELEASE_NUM,
                 RELEASE.RELEASE_NOTE, RELEASE.RELEASE_LICENSE, RELEASE.STATE,
-                RELEASE.NAMESPACE_ID, RELEASE.CREATED_BY, RELEASE.CREATION_TIMESTAMP,
+                LIBRARY.LIBRARY_ID, RELEASE.NAMESPACE_ID, RELEASE.CREATED_BY, RELEASE.CREATION_TIMESTAMP,
                 RELEASE.LAST_UPDATED_BY, RELEASE.LAST_UPDATE_TIMESTAMP)
-                .from(RELEASE).fetchInto(Release.class);
+                .from(RELEASE)
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID));
+    }
+
+    @Override
+    public List<Release> findAll() {
+        return getSelectReleaseStep().fetchInto(Release.class);
     }
 
     @Override
@@ -67,20 +73,17 @@ public class ReleaseRepository implements ScoreRepository<Release> {
         if (id == null || id.longValue() <= 0L) {
             return null;
         }
-        return dslContext.select(RELEASE.RELEASE_ID, RELEASE.GUID, RELEASE.RELEASE_NUM,
-                RELEASE.RELEASE_NOTE, RELEASE.RELEASE_LICENSE, RELEASE.STATE,
-                RELEASE.NAMESPACE_ID, RELEASE.CREATED_BY, RELEASE.CREATION_TIMESTAMP,
-                RELEASE.LAST_UPDATED_BY, RELEASE.LAST_UPDATE_TIMESTAMP)
-                .from(RELEASE).where(RELEASE.RELEASE_ID.eq(ULong.valueOf(id)))
+        return getSelectReleaseStep()
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(id)))
                 .fetchOneInto(Release.class);
     }
 
-    public List<Release> findByReleaseNum(String releaseNum) {
-        return dslContext.select(RELEASE.RELEASE_ID, RELEASE.GUID, RELEASE.RELEASE_NUM,
-                RELEASE.RELEASE_NOTE, RELEASE.RELEASE_LICENSE, RELEASE.STATE,
-                RELEASE.NAMESPACE_ID, RELEASE.CREATED_BY, RELEASE.CREATION_TIMESTAMP,
-                RELEASE.LAST_UPDATED_BY, RELEASE.LAST_UPDATE_TIMESTAMP)
-                .from(RELEASE).where(RELEASE.RELEASE_NUM.eq(releaseNum))
+    public List<Release> findByReleaseNum(BigInteger libraryId, String releaseNum) {
+        return getSelectReleaseStep()
+                .where(and(
+                        RELEASE.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        RELEASE.RELEASE_NUM.eq(releaseNum)
+                ))
                 .fetchInto(Release.class);
     }
 
@@ -97,12 +100,24 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         e -> e.get(ASCCP_MANIFEST.RELEASE_ID).toBigInteger()));
     }
 
-    public Release getWorkingRelease() {
-        List<Release> releases = findByReleaseNum("Working");
+    public Release getWorkingRelease(BigInteger libraryId) {
+        List<Release> releases = findByReleaseNum(libraryId, "Working");
         if (releases.size() != 1) {
             throw new IllegalStateException();
         }
         return releases.get(0);
+    }
+
+    public Release getLatestRelease(BigInteger libraryId) {
+        return dslContext.select()
+                .from(RELEASE)
+                .where(and(
+                        RELEASE.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        RELEASE.RELEASE_NUM.notEqual("Working")
+                ))
+                .orderBy(RELEASE.RELEASE_ID.desc())
+                .limit(1)
+                .fetchOneInto(Release.class);
     }
 
     private void ensureUniqueReleaseNum(BigInteger releaseId, String releaseNum) {
@@ -123,6 +138,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                                 String releaseNum,
                                 String releaseNote,
                                 String releaseLicense,
+                                BigInteger libraryId,
                                 BigInteger namespaceId) {
 
         ensureUniqueReleaseNum(null, releaseNum);
@@ -133,6 +149,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .set(RELEASE.RELEASE_NUM, releaseNum)
                 .set(RELEASE.RELEASE_NOTE, releaseNote)
                 .set(RELEASE.RELEASE_LICENSE, releaseLicense)
+                .set(RELEASE.LIBRARY_ID, ULong.valueOf(libraryId))
                 .set(RELEASE.NAMESPACE_ID, (namespaceId != null) ? ULong.valueOf(namespaceId) : null)
                 .set(RELEASE.STATE, Initialized.name())
                 .set(RELEASE.CREATED_BY, ULong.valueOf(userId))
@@ -217,11 +234,16 @@ public class ReleaseRepository implements ScoreRepository<Release> {
             List<BigInteger> codeListManifestIds,
             List<BigInteger> agencyIdListManifestIds) {
 
+        ULong libraryId = dslContext.select(RELEASE.LIBRARY_ID)
+                .from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchOneInto(ULong.class);
+
         ReleaseRecord releaseRecord = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
                 .fetchOne();
         ReleaseRecord workingReleaseRecord = dslContext.selectFrom(RELEASE)
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchOne();
 
         if (workingReleaseRecord == null) {
@@ -1644,6 +1666,11 @@ public class ReleaseRepository implements ScoreRepository<Release> {
     }
 
     public AssignComponents getAssignComponents(BigInteger releaseId) {
+        ULong libraryId = dslContext.select(RELEASE.LIBRARY_ID)
+                .from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchOneInto(ULong.class);
+
         AssignComponents assignComponents = new AssignComponents();
 
         // ACCs
@@ -1662,7 +1689,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .where(and(
                                 or(
                                         RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                        RELEASE.RELEASE_NUM.eq("Working")
+                                        and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                                 ),
                                 ACC.STATE.notEqual(CcState.Published.name())
                         ))
@@ -1702,7 +1729,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .where(and(
                         or(
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                RELEASE.RELEASE_NUM.eq("Working")
+                                and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                         ),
                         ASCCP.STATE.notEqual(CcState.Published.name())
                 ))
@@ -1742,7 +1769,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .where(and(
                         or(
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                RELEASE.RELEASE_NUM.eq("Working")
+                                and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                         ),
                         BCCP.STATE.notEqual(CcState.Published.name())
                 ))
@@ -1782,7 +1809,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .where(and(
                         or(
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                RELEASE.RELEASE_NUM.eq("Working")
+                                and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                         ),
                         CODE_LIST.STATE.notEqual(CcState.Published.name())
                 ))
@@ -1822,7 +1849,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .where(and(
                         or(
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                RELEASE.RELEASE_NUM.eq("Working")
+                                and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                         ),
                         AGENCY_ID_LIST.STATE.notEqual(CcState.Published.name())
                 ))
@@ -1862,7 +1889,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .where(and(
                         or(
                                 RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                                RELEASE.RELEASE_NUM.eq("Working")
+                                and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId))
                         ),
                         DT.STATE.notEqual(CcState.Published.name())
                 ))
@@ -1972,7 +1999,7 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                     ccNodeService.updateDtState(user, dtManifestId, fromCcState, toCcState);
                 }
             } else if (toCcState == Candidate) {
-                updateCCStates(user, fromCcState, toCcState, timestamp);
+                updateCCStates(user, releaseRecord, fromCcState, toCcState, timestamp);
 
                 // Remove module set releases
                 List<ULong> moduleSetReleases = dslContext.select(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID)
@@ -2176,19 +2203,21 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                         .execute();
 
             } else if (toCcState == CcState.Published) {
-                updateCCStates(user, fromCcState, toCcState, timestamp);
+                updateCCStates(user, releaseRecord, fromCcState, toCcState, timestamp);
             }
         }
     }
 
-    private void updateCCStates(AuthenticatedPrincipal user, CcState fromCcState, CcState toCcState, LocalDateTime timestamp) {
+    private void updateCCStates(AuthenticatedPrincipal user, ReleaseRecord releaseRecord,
+                                CcState fromCcState, CcState toCcState, LocalDateTime timestamp) {
         for (BigInteger accManifestId : dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID)
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         ACC.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             ccNodeService.updateAccState(user, accManifestId, fromCcState, toCcState);
@@ -2199,7 +2228,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         ASCCP.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             ccNodeService.updateAsccpState(user, asccpManifestId, fromCcState, toCcState);
@@ -2210,7 +2240,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         BCCP.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             ccNodeService.updateBccpState(user, bccpManifestId, fromCcState, toCcState);
@@ -2221,7 +2252,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         CODE_LIST.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             codeListService.updateCodeListState(user, timestamp, codeListManifestId, toCcState);
@@ -2233,7 +2265,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         AGENCY_ID_LIST.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             agencyIdService.updateAgencyIdListState(user, timestamp, agencyIdListManifestId, toCcState.toString());
@@ -2245,7 +2278,8 @@ public class ReleaseRepository implements ScoreRepository<Release> {
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .where(and(
                         DT.STATE.eq(fromCcState.name()),
-                        RELEASE.RELEASE_NUM.eq("Working")
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        RELEASE.LIBRARY_ID.eq(releaseRecord.getLibraryId())
                 ))
                 .fetchInto(BigInteger.class)) {
             ccNodeService.updateDtState(user, dtManifestId, fromCcState, toCcState);

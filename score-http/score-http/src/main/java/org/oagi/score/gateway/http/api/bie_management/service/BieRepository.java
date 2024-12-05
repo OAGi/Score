@@ -45,7 +45,7 @@ public class BieRepository {
     @Autowired
     private TenantService tenantService;
 
-    public List<SummaryBie> getSummaryBieList(BigInteger releaseId, AppUser requester) {
+    public List<SummaryBie> getSummaryBieList(BigInteger libraryId, BigInteger releaseId, AppUser requester) {
 
         SelectOnConditionStep step = dslContext.selectDistinct(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
@@ -59,6 +59,13 @@ public class BieRepository {
                 .join(ASBIEP).on(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(RELEASE)
+                .on(and(
+                        TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID),
+                        ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID)
+                ))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID));
 
         if (configService.isTenantEnabled()) {
@@ -70,6 +77,7 @@ public class BieRepository {
 
         SelectConditionStep cond;
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
         if (releaseId.longValue() > 0) {
             conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
         } else {

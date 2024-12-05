@@ -1,8 +1,10 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white d-flex flex-column align-items-start">
-      <span class="title">{{ "BIE_COPY.TITLE" | translate }} with {{ businessContextNames }}</span>
-      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+      <score-title-with-library-selector [title]="('BIE_COPY.TITLE' | translate) + ' with ' + businessContextNames"
+                                         [subtitle]="subtitle"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
     </mat-toolbar>
   </div>
 

@@ -6,7 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {ReleaseDetail} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {NamespaceList} from '../../namespace-management/domain/namespace';
+import {NamespaceList, NamespaceListRequest} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -56,7 +56,12 @@ export class ReleaseDetailComponent implements OnInit {
       this.releaseDetail = resp;
       this.$hashCode = hashCode(this.releaseDetail);
 
-      this.namespaceService.getNamespaceList().subscribe(resp => {
+      const request = new NamespaceListRequest();
+      request.library.libraryId = this.releaseDetail.libraryId;
+      request.page.pageIndex = -1;
+      request.page.pageSize = -1;
+
+      this.namespaceService.getNamespaceList(request).subscribe(resp => {
         this.namespaceList = resp.list.filter(e => e.std);
         this.filteredNamespaceList.next(this.namespaceList.slice());
 

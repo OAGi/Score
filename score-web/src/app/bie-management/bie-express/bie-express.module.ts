@@ -13,6 +13,7 @@ import {PaginationResponseDialogComponent} from './pagination-response-dialog/pa
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -33,6 +34,7 @@ const routes: Routes = [
         ScoreCommonModule,
         SearchBarModule,
         ColumnSelectorModule,
+        TitleWithLibrarySelector,
     ],
   declarations: [
     BieExpressComponent,

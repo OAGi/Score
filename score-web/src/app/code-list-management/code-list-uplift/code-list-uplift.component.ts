@@ -14,10 +14,9 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {AuthService} from '../../authentication/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -28,6 +27,8 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-code-list-uplift',
@@ -44,7 +45,7 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
 export class CodeListUpliftComponent implements OnInit {
 
   faLocationArrow = faLocationArrow;
-  title = 'Code List';
+  title = 'Uplift Code List';
   workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
   releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 
@@ -178,11 +179,18 @@ export class CodeListUpliftComponent implements OnInit {
   expandedElement: CodeListForList | null;
   loading = false;
 
-  releases: Release[] = [];
+  releases: SimpleRelease[] = [];
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
+  sourceRelease: SimpleRelease;
   targetRelease: SimpleRelease;
+  sourceReleaseListFilterCtrl: FormControl = new FormControl();
+  sourceReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  targetReleaseListFilterCtrl: FormControl = new FormControl();
+  targetReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
 
   get targetReleaseList(): SimpleRelease[] {
-    const sourceRelease: SimpleRelease = this.request.release;
+    const sourceRelease: SimpleRelease = this.sourceRelease;
     if (!!sourceRelease) {
       return this.releases.filter(val => val.releaseId > sourceRelease.releaseId);
     }
@@ -209,6 +217,7 @@ export class CodeListUpliftComponent implements OnInit {
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private accountService: AccountListService,
               private auth: AuthService,
               private dialog: MatDialog,
@@ -234,64 +243,51 @@ export class CodeListUpliftComponent implements OnInit {
     this.request.access = 'CanView';
     this.request.ownedByDeveloper = false;
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    this.releases = [];
-    forkJoin([
-      this.releaseService.getSimpleReleases(['Published']),
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([releases, loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.releases.push(...releases.filter(e => e.releaseNum !== 'Working'));
-      if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
-        if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
-          }
-        } else {
-          this.request.release = this.releases[0];
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
-      }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      this.releases = [];
+      forkJoin([
+        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([releases, loginIds, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
 
-      this.loadCodeList(true);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      const targetReleaseList = this.targetReleaseList;
-      if (targetReleaseList.length > 0) {
-        this.targetRelease = targetReleaseList[0];
-      }
+        this.initReleases(releases);
+
+        this.loadCodeList(true);
+      });
     });
   }
 
-  getRelease(releaseNum: string): Release | undefined {
+  getRelease(releaseNum: string): SimpleRelease | undefined {
     for (const release of this.releases) {
       if (release.releaseNum === releaseNum) {
         return release;
@@ -305,13 +301,23 @@ export class CodeListUpliftComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
+  }
+
+  onSourceReleaseChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
+    }
 
-      const targetReleaseList = this.targetReleaseList;
-      if (targetReleaseList.length > 0) {
-        this.targetRelease = targetReleaseList[0];
-      }
+    this.targetRelease = undefined;
+    this.paginator.pageIndex = 0;
+    this.loadCodeList();
+
+    // Reset targetReleaseFilteredList using targetReleaseList
+    initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
+
+    const targetReleaseList = this.targetReleaseList;
+    if (targetReleaseList.length > 0) {
+      this.targetRelease = targetReleaseList[0];
     }
   }
 
@@ -339,6 +345,56 @@ export class CodeListUpliftComponent implements OnInit {
     }
   }
 
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || this.request.library.libraryId === 0) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = releases.filter(e => !e.workingRelease);
+    if (this.releases.length > 0) {
+      const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
+      if (savedReleaseId) {
+        this.sourceRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+        if (!this.sourceRelease) {
+          this.sourceRelease = this.releases[0];
+          saveBranch(this.auth.getUserToken(), this.request.cookieType, this.sourceRelease.releaseId);
+        }
+      } else {
+        this.sourceRelease = this.releases[0];
+      }
+
+      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, this.releases, (e) => e.releaseNum);
+      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
+
+      const targetReleaseList = this.targetReleaseList;
+      if (targetReleaseList.length > 0) {
+        this.targetRelease = targetReleaseList[0];
+      }
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
+  }
+
   onSearch() {
     this.paginator.pageIndex = 0;
     this.loadCodeList();
@@ -350,6 +406,7 @@ export class CodeListUpliftComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
+    this.request.release = this.sourceRelease;
 
     this.service.getCodeListList(this.request).pipe(
       finalize(() => {
@@ -407,11 +464,11 @@ export class CodeListUpliftComponent implements OnInit {
   get showCreateCodeListBtn(): boolean {
     const userToken = this.auth.getUserToken();
     if (userToken.roles.includes('developer')) {
-      if (this.request.release.releaseId !== WorkingRelease.releaseId) {
+      if (!this.request.release.workingRelease) {
         return false;
       }
     } else {
-      if (this.request.release.releaseId === WorkingRelease.releaseId) {
+      if (this.request.release.workingRelease) {
         return false;
       }
     }

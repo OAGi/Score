@@ -732,6 +732,7 @@ export class AsccpDetail {
 
   asccpManifestId: number;
   asccManifestId: number;
+  libraryName: string;
   releaseNum: string;
   owner: string;
   guid: string;
@@ -1032,6 +1033,7 @@ export class ModelBrowserAccNodeDetail extends ModelBrowserNodeDetail {
 
   updateAsccp(asccp: any) {
     this.asccp.asccpManifestId = asccp.manifestId;
+    this.asccp.libraryName = asccp.libraryName;
     this.asccp.releaseNum = asccp.releaseNum;
     this.asccp.owner = asccp.owner;
     this.asccp.guid = asccp.guid;

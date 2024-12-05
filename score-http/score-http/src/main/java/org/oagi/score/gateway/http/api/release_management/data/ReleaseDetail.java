@@ -11,6 +11,7 @@ public class ReleaseDetail {
     private String releaseNum;
     private String releaseNote;
     private String releaseLicense;
+    private BigInteger libraryId;
     private BigInteger namespaceId;
     private String state;
     private boolean isLatestRelease;

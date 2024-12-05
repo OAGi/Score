@@ -30,6 +30,7 @@ export class ModuleService {
     }
 
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
@@ -95,6 +96,7 @@ export class ModuleService {
 
   createModuleSet(moduleSet: ModuleSet): Observable<ModuleSet> {
     return this.http.put<ModuleSet>('/api/module_set', {
+      libraryId: moduleSet.libraryId,
       name: moduleSet.name,
       description: moduleSet.description,
       createModuleSetRelease: moduleSet.createModuleSetRelease,
@@ -176,6 +178,7 @@ export class ModuleService {
     }
 
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)

@@ -9,6 +9,8 @@ public class ModuleSet extends Auditable implements Comparable<ModuleSet>, Seria
 
     private BigInteger moduleSetId;
 
+    private BigInteger libraryId;
+
     private String guid;
 
     private String name;
@@ -21,6 +23,14 @@ public class ModuleSet extends Auditable implements Comparable<ModuleSet>, Seria
 
     public void setModuleSetId(BigInteger moduleSetId) {
         this.moduleSetId = moduleSetId;
+    }
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
     }
 
     public String getGuid() {

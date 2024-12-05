@@ -170,17 +170,20 @@ public class CcListService {
         }
     }
 
-    public List<SummaryCcExt> getMyExtensionsUnusedInBIEs(AuthenticatedPrincipal user) {
+    public List<SummaryCcExt> getMyExtensionsUnusedInBIEs(AuthenticatedPrincipal user, BigInteger libraryId) {
         BigInteger requesterId = sessionService.userId(user);
 
-        Release workingRelease = releaseRepository.getWorkingRelease();
+        Release workingRelease = releaseRepository.getWorkingRelease(libraryId);
 
         List<ULong> uegAccManifestIds = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID.as("id"))
                 .from(ACC)
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .where(and(
                         ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
                         ACC_MANIFEST.RELEASE_ID.notEqual(ULong.valueOf(workingRelease.getReleaseId())),
+                        LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
                         ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))))
                 .fetchInto(ULong.class);
 

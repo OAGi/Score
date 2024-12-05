@@ -31,9 +31,11 @@ public class ReleaseController {
     @RequestMapping(value = "/simple_releases", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleRelease> getSimpleReleases(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                 @RequestParam(name = "libraryId") BigInteger libraryId,
                                                  @RequestParam(name = "states", required = false) String states) {
         SimpleReleasesRequest request = new SimpleReleasesRequest(user);
 
+        request.setLibraryId(libraryId);
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
                         .map(e -> ReleaseState.valueOf(e)).collect(Collectors.toList()) : Collections.emptyList());
@@ -57,6 +59,7 @@ public class ReleaseController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<ReleaseList> getReleases(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                 @RequestParam(name = "libraryId") BigInteger libraryId,
                                                  @RequestParam(name = "releaseNum", required = false) String releaseNum,
                                                  @RequestParam(name = "states", required = false) String states,
                                                  @RequestParam(name = "excludes", required = false) String excludes,
@@ -74,6 +77,7 @@ public class ReleaseController {
 
         ReleaseListRequest request = new ReleaseListRequest();
 
+        request.setLibraryId(libraryId);
         request.setReleaseNum(releaseNum);
         request.setStates(StringUtils.hasLength(states) ?
                 Arrays.asList(states.split(",")).stream()
@@ -171,10 +175,12 @@ public class ReleaseController {
         service.transitState(user, request);
     }
 
-    @RequestMapping(value = "/release/validate", method = RequestMethod.POST,
+    @RequestMapping(value = "/release/{id:[\\d]+}/validate", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ReleaseValidationResponse validate(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                              @PathVariable("id") BigInteger releaseId,
                                               @RequestBody ReleaseValidationRequest request) {
+        request.setReleaseId(releaseId);
         return service.validate(user, request);
     }
 
@@ -183,7 +189,8 @@ public class ReleaseController {
     public ReleaseValidationResponse createDraft(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                  @PathVariable("id") BigInteger releaseId,
                                                  @RequestBody ReleaseValidationRequest request) {
-        return service.createDraft(user, releaseId, request);
+        request.setReleaseId(releaseId);
+        return service.createDraft(user, request);
     }
 
     @RequestMapping(value = "/release/{id:[\\d]+}/generate_migration_script", method = RequestMethod.GET,

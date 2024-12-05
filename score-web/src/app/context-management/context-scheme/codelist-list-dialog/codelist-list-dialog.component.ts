@@ -13,12 +13,11 @@ import {finalize} from 'rxjs/operators';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {PageRequest} from '../../../basis/basis';
-import {Release} from '../../../bie-management/bie-create/domain/bie-create-list';
 import {CodeListForList, CodeListForListRequest} from '../../../code-list-management/domain/code-list';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
-import {WorkingRelease} from '../../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {
@@ -170,12 +169,12 @@ export class CodelistListDialogComponent implements OnInit {
   selection = new SelectionModel<CodeListForList>(true, []);
   loading = false;
 
-  releases: Release[];
+  releases: SimpleRelease[];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
@@ -229,7 +228,7 @@ export class CodelistListDialogComponent implements OnInit {
     this.releases = [];
 
     forkJoin([
-      this.releaseService.getSimpleReleases(['Published']),
+      this.releaseService.getSimpleReleases(1, ['Published']),
       this.accountService.getAccountNames(),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([releases, loginIds, preferencesInfo]) => {

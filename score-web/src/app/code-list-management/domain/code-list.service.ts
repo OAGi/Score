@@ -12,11 +12,14 @@ export class CodeListService {
   }
 
   getCodeListList(request: CodeListForListRequest): Observable<PageResponse<CodeListForList>> {
-    let params = new HttpParams().set('releaseId', '' + request.release.releaseId)
+    let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
+      .set('releaseId', '' + request.release.releaseId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+
     if (request.updaterLoginIds.length > 0) {
       params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
     }
@@ -68,8 +71,9 @@ export class CodeListService {
     return this.http.get<CodeList>('/api/code_list/' + manifestId + '/revision');
   }
 
-  getSimpleCodeLists(releaseId: number): Observable<PageResponse<CodeListForList>> {
+  getSimpleCodeLists(libraryId: number, releaseId: number): Observable<PageResponse<CodeListForList>> {
     const params = new HttpParams()
+      .set('libraryId', libraryId.toString())
       .set('releaseId', releaseId.toString())
       .set('sortActive', '')
       .set('sortDirection', '')
@@ -127,6 +131,12 @@ export class CodeListService {
 
   delete(...codeListManifestIds): Observable<any> {
     return this.http.post<any>('/api/code_list/delete', {
+      codeListManifestIds
+    });
+  }
+
+  purge(...codeListManifestIds): Observable<any> {
+    return this.http.post<any>('/api/code_list/purge', {
       codeListManifestIds
     });
   }

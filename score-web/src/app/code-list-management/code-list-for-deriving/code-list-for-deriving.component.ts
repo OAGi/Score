@@ -13,10 +13,9 @@ import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {initFilter, loadBranch, saveBranch} from '../../common/utility';
-import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
@@ -142,12 +141,12 @@ export class CodeListForDerivingComponent implements OnInit {
   selection = new SelectionModel<number>(false, []);
   loading = false;
 
-  releases: Release[];
+  releases: SimpleRelease[];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
@@ -202,7 +201,7 @@ export class CodeListForDerivingComponent implements OnInit {
     this.releases = [];
 
     forkJoin([
-      this.releaseService.getSimpleReleases(['Published', ]),
+      this.releaseService.getSimpleReleases(1, ['Published', ]),
       this.accountService.getAccountNames(),
       this.preferencesService.load(this.auth.getUserToken())
     ]).subscribe(([releases, loginIds, preferencesInfo]) => {

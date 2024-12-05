@@ -12,6 +12,7 @@ import {ModuleSetEditComponent} from './module-set-edit/module-set-edit.componen
 import {ModuleSetListComponent} from './module-set-list/module-set-list.component';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -37,16 +38,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    ScoreCommonModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        ScoreCommonModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     ModuleSetListComponent,
     ModuleSetCreateComponent,

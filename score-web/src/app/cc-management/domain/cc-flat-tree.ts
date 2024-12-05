@@ -18,6 +18,7 @@ import {ShortTag} from '../../tag-management/domain/tag';
 
 export interface CcFlatNode extends FlatNode {
   type: string;
+  libraryId: number;
   releaseId: number;
   guid: string;
   state: string;
@@ -61,6 +62,7 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
   abstract get type(): string;
   abstract get typeClass(): string;
   abstract get manifestId(): number;
+  abstract get libraryId(): number;
   abstract get releaseId(): number;
 
   abstract get path(): string;
@@ -251,6 +253,10 @@ export class AccFlatNode extends CcFlatNodeImpl {
     return this.accNode.manifestId;
   }
 
+  get libraryId(): number {
+    return this.detail ? (this.detail as CcAccNodeDetail).libraryId : undefined;
+  }
+
   get releaseId(): number {
     return this.detail ? (this.detail as CcAccNodeDetail).releaseId : undefined;
   }
@@ -339,6 +345,10 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
 
   get manifestId(): number {
     return this.asccpNode.manifestId;
+  }
+
+  get libraryId(): number {
+    return this.detail ? (this.detail as CcAsccpNodeDetail).asccp.libraryId : undefined;
   }
 
   get releaseId(): number {
@@ -480,6 +490,10 @@ export class BccpFlatNode extends CcFlatNodeImpl {
     return this.bccpNode.manifestId;
   }
 
+  get libraryId(): number {
+    return this.detail ? (this.detail as CcBccpNodeDetail).bccp.libraryId : undefined;
+  }
+
   get releaseId(): number {
     return this.detail ? (this.detail as CcBccpNodeDetail).bccp.releaseId : undefined;
   }
@@ -606,6 +620,10 @@ export class DtFlatNode extends CcFlatNodeImpl {
     return this.dtNode.manifestId;
   }
 
+  get libraryId(): number {
+    return this.detail ? (this.detail as CcDtNodeDetail).libraryId : undefined;
+  }
+
   get releaseId(): number {
     return this.detail ? (this.detail as CcDtNodeDetail).releaseId : undefined;
   }
@@ -698,6 +716,10 @@ export class DtScFlatNode extends CcFlatNodeImpl {
   }
 
   set den(val: string) {
+  }
+
+  get libraryId(): number {
+    return this.detail ? (this.detail as CcBdtScNodeDetail).libraryId : undefined;
   }
 
   get releaseId(): number {

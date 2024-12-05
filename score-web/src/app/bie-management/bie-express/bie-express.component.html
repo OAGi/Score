@@ -1,7 +1,9 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white">
-      <span class="title">{{ "BIE_EXPRESS.TITLE" | translate }}</span>
+      <score-title-with-library-selector [title]="'BIE_EXPRESS.TITLE' | translate"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
     </mat-toolbar>
   </div>

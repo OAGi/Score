@@ -41,6 +41,8 @@ public class CcListController {
     @RequestMapping(value = "/core_component", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CcList> getCcList(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "libraryId") BigInteger libraryId,
             @RequestParam(name = "releaseId") BigInteger releaseId,
             @RequestParam(name = "den", required = false) String den,
             @RequestParam(name = "definition", required = false) String definition,
@@ -68,6 +70,7 @@ public class CcListController {
 
         CcListRequest request = new CcListRequest();
 
+        request.setLibraryId(libraryId);
         request.setReleaseId(releaseId);
         request.setTypes(CcListTypes.fromString(types));
         if (StringUtils.hasLength(states)) {

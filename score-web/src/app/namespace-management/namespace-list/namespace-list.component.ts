@@ -11,7 +11,7 @@ import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-
 import {NamespaceList, NamespaceListRequest} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 import {PageRequest} from '../../basis/basis';
-import {initFilter} from '../../common/utility';
+import {initFilter, loadLibrary, saveLibrary} from '../../common/utility';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {Location} from '@angular/common';
 import {FormControl} from '@angular/forms';
@@ -24,6 +24,8 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-namespace-list',
@@ -143,6 +145,8 @@ export class NamespaceListComponent implements OnInit {
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -161,6 +165,7 @@ export class NamespaceListComponent implements OnInit {
   @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
   constructor(private service: NamespaceService,
+              private libraryService: LibraryService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
@@ -176,39 +181,43 @@ export class NamespaceListComponent implements OnInit {
     this.request = new NamespaceListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
+        }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      forkJoin([
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([loginIds, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
 
-      this.loadNamespaceList(true);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.loadNamespaceList(true);
+      });
     });
   }
 
@@ -237,6 +246,29 @@ export class NamespaceListComponent implements OnInit {
   }
 
   onChange(property?: string, source?) {
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || this.request.library.libraryId === 0) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+    this.onSearch();
   }
 
   onSearch() {

@@ -3,6 +3,7 @@ import {ParamMap} from '@angular/router';
 import {ScoreUser} from '../../authentication/domain/auth';
 import {PageRequest} from '../../basis/basis';
 import {base64Decode, base64Encode} from '../../common/utility';
+import {Library} from '../../library-management/domain/library';
 
 export class SimpleModule {
   moduleId: number;
@@ -32,6 +33,7 @@ export class ModuleElement {
 }
 
 export class ModuleSetListRequest {
+  library: Library = new Library();
   filters: {
     name: string;
     description: string;
@@ -105,6 +107,7 @@ export class ModuleSetListRequest {
 
 export class ModuleSet {
   moduleSetId: number;
+  libraryId: number;
   guid: string;
   name: string;
   description: string;
@@ -211,13 +214,16 @@ export class ModuleSetRelease {
   moduleSetReleaseName: string;
   moduleSetReleaseDescription: string;
 
-  moduleSetId: number;
   /* moduleSet */
+  moduleSetId: number;
   moduleSetName: string;
 
-  releaseId: number;
   /* release */
+  releaseId: number;
   releaseNum: string;
+
+  /* library */
+  libraryId: number;
 
   default: boolean;
   createdBy: ScoreUser;
@@ -227,6 +233,7 @@ export class ModuleSetRelease {
 }
 
 export class ModuleSetReleaseListRequest {
+  library: Library = new Library();
   filters: {
     name: string;
   };

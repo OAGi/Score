@@ -21,6 +21,7 @@ import {PreferencesInfo, TableColumnsProperty} from '../../../settings-managemen
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {AuthService} from '../../../authentication/auth.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {Library} from '../../../library-management/domain/library';
 
 @Component({
   selector: 'score-meta-header-dialog',
@@ -141,6 +142,7 @@ export class MetaHeaderDialogComponent implements OnInit {
   states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
   preferencesInfo: PreferencesInfo;
+  library: Library;
   release: SimpleRelease;
 
   @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
@@ -160,6 +162,7 @@ export class MetaHeaderDialogComponent implements OnInit {
     private route: ActivatedRoute,
     public webPageInfo: WebPageInfoService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
+    this.library = data.library;
     this.release = data.release;
   }
 
@@ -168,6 +171,7 @@ export class MetaHeaderDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.den = 'Meta Header. Meta Header';
     this.request.access = 'CanView';
+    this.request.library = this.library;
     this.request.releases = [this.release, ];
 
     this.paginator.pageIndex = this.request.page.pageIndex;

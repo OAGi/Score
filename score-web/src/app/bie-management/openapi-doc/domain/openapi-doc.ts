@@ -6,6 +6,7 @@ import {base64Decode, base64Encode, hashCode4Array} from '../../../common/utilit
 import {ScoreUser} from '../../../authentication/domain/auth';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {ChangeListener} from '../../domain/bie-flat-tree';
+import {Library} from '../../../library-management/domain/library';
 
 export class OasDocListRequest {
   filters: {
@@ -94,7 +95,9 @@ export class OasDocListRequest {
 export class OasDoc {
   oasDocId: number;
   guid: string;
+  libraryId: number;
   releaseId: number;
+  workingRelease: boolean;
   openAPIVersion: string;
   title: string;
   description: string;
@@ -126,6 +129,7 @@ export interface SimpleOasDoc {
 }
 
 export class BieForOasDocListRequest {
+  library: Library = new Library();
   release: SimpleRelease;
   filters: {
     propertyTerm: string;

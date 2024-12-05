@@ -16,10 +16,12 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
         super(requester, AgencyIdList.class);
     }
 
+    private BigInteger libraryId;
+    private BigInteger releaseId;
+
     private String name;
     private String definition;
     private String module;
-    private BigInteger releaseId;
 
     private Boolean deprecated;
     private Boolean newComponent;
@@ -30,6 +32,22 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
     private List<CcState> states;
     private List<String> ownerLoginIds;
     private List<String> updaterLoginIds;
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
+    }
+
+    public BigInteger getReleaseId() {
+        return releaseId;
+    }
+
+    public void setReleaseId(BigInteger releaseId) {
+        this.releaseId = releaseId;
+    }
 
     public Boolean getDeprecated() {
         return deprecated;
@@ -125,13 +143,5 @@ public class GetAgencyIdListListRequest extends PaginationRequest<AgencyIdList> 
 
     public void setUpdateEndDate(LocalDateTime updateEndDate) {
         this.updateEndDate = updateEndDate;
-    }
-
-    public BigInteger getReleaseId() {
-        return releaseId;
-    }
-
-    public void setReleaseId(BigInteger releaseId) {
-        this.releaseId = releaseId;
     }
 }

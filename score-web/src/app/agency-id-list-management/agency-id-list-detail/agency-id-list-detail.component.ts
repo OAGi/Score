@@ -184,15 +184,17 @@ export class AgencyIdListDetailComponent implements OnInit {
         this.manifestId = Number(params.get('manifestId'));
         return forkJoin([
           this.service.getAgencyIdList(this.manifestId),
-          this.namespaceService.getSimpleNamespaces(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
       })
-    ).subscribe(([agencyIdList, namespaces, preferencesInfo]) => {
+    ).subscribe(([agencyIdList, preferencesInfo]) => {
+      this.namespaceService.getSimpleNamespaces(agencyIdList.libraryId).subscribe(namespaces => {
+        this.namespaces = namespaces;
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList, this.getSelectableNamespaces(), (e) => e.uri);
+      });
+
       this.preferencesInfo = preferencesInfo;
-      this.namespaces = namespaces;
-      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
-        this.getSelectableNamespaces(), (e) => e.uri);
+
       this.init(agencyIdList);
       this.isUpdating = false;
     });
@@ -240,7 +242,7 @@ export class AgencyIdListDetailComponent implements OnInit {
       if (!!namespaceId && e.namespaceId === namespaceId) {
         return true;
       }
-      return ('developer' in this.userRoles) ? e.standard : !e.standard;
+      return (this.userRoles.includes('developer')) ? e.standard : !e.standard;
     });
   }
 
@@ -304,6 +306,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = {};
+    dialogConfig.data.userRoles = this.userRoles;
     dialogConfig.data.agencyIdListValue = new AgencyIdListValue();
     dialogConfig.data.isEditable = this.isEditable();
     dialogConfig.data.agencyId = this.agencyIdList.agencyIdListValueManifestId;
@@ -324,12 +327,19 @@ export class AgencyIdListDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(AgencyIdListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().pipe(finalize(() => {
       this.isUpdating = false;
-    })).subscribe(result => {
+    })).subscribe((result: AgencyIdListValue) => {
       if (!result) {
         return;
       }
 
       const data = this.dataSource.data;
+      if (result.developerDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
+      }
+      if (result.userDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
+      }
+
       if (isAddAction) {
         for (const value of data) {
           if (value.value === result.value) {
@@ -731,7 +741,7 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   isWorkingRelease(): boolean {
     if (this.agencyIdList) {
-      return this.agencyIdList.releaseNum === this.workingRelease.releaseNum;
+      return this.agencyIdList.workingRelease;
     }
     return false;
   }

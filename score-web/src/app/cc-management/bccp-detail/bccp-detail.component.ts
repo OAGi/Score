@@ -68,7 +68,7 @@ export class BccpDetailComponent implements OnInit {
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
-  workingRelease = WorkingRelease;
+  workingRelease = false;
   namespaces: SimpleNamespace[];
   tags: Tag[] = [];
   commentControl: CommentControl;
@@ -132,15 +132,18 @@ export class BccpDetailComponent implements OnInit {
           this.service.getGraphNode(this.type, this.manifestId),
           this.service.getLastPublishedRevision(this.type, this.manifestId),
           this.service.getBccpNode(this.manifestId),
-          this.namespaceService.getSimpleNamespaces(),
           this.tagService.getTags(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+
+      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+        this.namespaces = namespaces;
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+          this.getSelectableNamespaces(), (e) => e.uri);
+      });
+
       this.lastRevision = revisionResponse;
-      this.namespaces = namespaces;
-      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
-        this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
 
@@ -173,6 +176,8 @@ export class BccpDetailComponent implements OnInit {
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+
+      this.workingRelease = rootNode.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as BccpFlatNode;
       this.rootNode.access = rootNode.access;
@@ -690,10 +695,7 @@ export class BccpDetailComponent implements OnInit {
   }
 
   isWorkingRelease(): boolean {
-    if (this.rootNode) {
-      return this.rootNode.releaseId === this.workingRelease.releaseId;
-    }
-    return false;
+    return this.workingRelease;
   }
 
   deleteNode(): void {

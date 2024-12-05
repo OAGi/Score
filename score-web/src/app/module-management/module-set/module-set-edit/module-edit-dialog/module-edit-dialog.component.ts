@@ -6,7 +6,7 @@ import {ConfirmDialogService} from '../../../../common/confirm-dialog/confirm-di
 import {initFilter, sha256} from '../../../../common/utility';
 import {SimpleNamespace} from '../../../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../../../namespace-management/domain/namespace.service';
-import {ModuleElement} from '../../../domain/module';
+import {ModuleElement, ModuleSet} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -27,6 +27,9 @@ export class ModuleEditDialogComponent implements OnInit {
 
   title: string;
 
+  element: ModuleElement;
+  moduleSet: ModuleSet;
+
   isUpdating = false;
 
   constructor(public dialogRef: MatDialogRef<ModuleEditDialogComponent>,
@@ -34,7 +37,9 @@ export class ModuleEditDialogComponent implements OnInit {
               private snackBar: MatSnackBar,
               private namespaceService: NamespaceService,
               private confirmDialogService: ConfirmDialogService,
-              @Inject(MAT_DIALOG_DATA) public element: ModuleElement, ) {
+              @Inject(MAT_DIALOG_DATA) public data: any ) {
+    this.element = data.module;
+    this.moduleSet = data.moduleSet;
   }
 
   ngOnInit() {
@@ -45,7 +50,7 @@ export class ModuleEditDialogComponent implements OnInit {
       namespaceId: (!!this.element.namespaceId) ? this.element.namespaceId : undefined
     }));
 
-    this.namespaceService.getSimpleNamespaces().subscribe(resp => {
+    this.namespaceService.getSimpleNamespaces(this.moduleSet.libraryId).subscribe(resp => {
       this.namespaceList = resp.filter(e => e.standard);
       initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
         this.namespaceList, (e) => e.uri);

@@ -881,6 +881,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         title: 'Select Profile BIE to reuse',
         asccpManifestId: asbiepNode.asccpNode.manifestId,
         den: asbiepNode.asccpNode.den,
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
       },
@@ -1002,6 +1003,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             title: 'Select Profile BIE to reuse',
             asccpManifestId: asbiepNode.asccpNode.manifestId,
             den: asbiepNode.asccpNode.den,
+            libraryId: this.rootNode.libraryId,
             releaseId: this.rootNode.releaseId,
             topLevelAsbiepId: this.topLevelAsbiepId,
             basedTopLevelAsbiepId: baseReusedTopLevelAsbiepId
@@ -1265,6 +1267,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         title: 'Select Base Profile BIE',
         asccpManifestId: abieNode.asccpNode.manifestId,
         den: abieNode.asccpNode.den,
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
       },

@@ -33,6 +33,7 @@ public class ModuleSetController {
     @RequestMapping(value = "/module_set", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetModuleSetListResponse getModuleSetList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                     @RequestParam(name = "libraryId") BigInteger libraryId,
                                                      @RequestParam(name = "name", required = false) String name,
                                                      @RequestParam(name = "description", required = false) String description,
                                                      @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -45,6 +46,7 @@ public class ModuleSetController {
 
         GetModuleSetListRequest request = new GetModuleSetListRequest(sessionService.asScoreUser(user));
 
+        request.setLibraryId(libraryId);
         request.setName(name);
         request.setDescription(description);
         request.setUpdaterUsernameList(!StringUtils.hasLength(updaterLoginIds) ? Collections.emptyList() :
@@ -93,6 +95,7 @@ public class ModuleSetController {
     public ModuleSet createModuleSet(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                      @RequestBody ModuleSetRequest moduleSet) {
         CreateModuleSetRequest request = new CreateModuleSetRequest(sessionService.asScoreUser(user));
+        request.setLibraryId(moduleSet.getLibraryId());
         request.setName(moduleSet.getName());
         request.setDescription(moduleSet.getDescription());
         request.setCreateModuleSetRelease(moduleSet.createModuleSetRelease);

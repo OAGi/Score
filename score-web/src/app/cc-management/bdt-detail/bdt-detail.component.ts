@@ -86,7 +86,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   selectedNode: CcFlatNode;
   cursorNode: CcFlatNode;
 
-  workingRelease = WorkingRelease;
+  workingRelease = false;
   namespaces: SimpleNamespace[];
   tags: Tag[] = [];
   commentControl: CommentControl;
@@ -175,15 +175,18 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
           this.service.getGraphNode(this.type, this.manifestId),
           this.service.getLastPublishedRevision(this.type, this.manifestId),
           this.service.getBdtNode(this.manifestId),
-          this.namespaceService.getSimpleNamespaces(),
           this.tagService.getTags(),
           this.preferencesService.load(this.auth.getUserToken())
         ]);
-      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces, tags, preferencesInfo]) => {
+      })).subscribe(([ccGraph, revisionResponse, rootNode, tags, preferencesInfo]) => {
+
+      this.namespaceService.getSimpleNamespaces(rootNode.libraryId).subscribe(namespaces => {
+        this.namespaces = namespaces;
+        initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
+          this.getSelectableNamespaces(), (e) => e.uri);
+      });
+
       this.lastRevision = revisionResponse;
-      this.namespaces = namespaces;
-      initFilter(this.namespaceListFilterCtrl, this.filteredNamespaceList,
-        this.getSelectableNamespaces(), (e) => e.uri);
       this.tags = tags;
       this.preferencesInfo = preferencesInfo;
 
@@ -218,15 +221,17 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
       this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, true);
 
+      this.workingRelease = rootNode.workingRelease;
+
       this.rootNode = this.dataSource.data[0] as DtFlatNode;
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
       this.rootNode.reset();
 
       forkJoin([
-        this.codeListService.getSimpleCodeLists(rootNode.releaseId),
-        this.agencyIdListservice.getSimpleAgencyIdLists(rootNode.releaseId),
-        this.ccListService.getSimpleXbtList(rootNode.releaseId),
+        this.codeListService.getSimpleCodeLists(rootNode.libraryId, rootNode.releaseId),
+        this.agencyIdListservice.getSimpleAgencyIdLists(rootNode.libraryId, rootNode.releaseId),
+        this.ccListService.getSimpleXbtList(rootNode.libraryId, rootNode.releaseId),
       ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
         this.codeLists = codeLists.list;
         this.agencyIdLists = agencyIdLists.results;
@@ -837,10 +842,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   }
 
   isWorkingRelease(): boolean {
-    if (this.rootNode) {
-      return this.rootNode.releaseId === this.workingRelease.releaseId;
-    }
-    return false;
+    return this.workingRelease;
   }
 
   deleteNode(): void {

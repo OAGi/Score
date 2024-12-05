@@ -6,6 +6,7 @@ import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.agency.AgencyIdListWriteRepository;
 import org.oagi.score.repo.api.agency.model.AgencyIdList;
+import org.oagi.score.repo.api.agency.model.AgencyIdListValue;
 import org.oagi.score.repo.api.agency.model.ModifyAgencyIdListValuesRepositoryRequest;
 import org.oagi.score.repo.api.agency.model.ModifyAgencyIdListValuesRepositoryResponse;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -30,6 +31,8 @@ import static org.oagi.score.repo.api.base.SortDirection.ASC;
 import static org.oagi.score.repo.api.base.SortDirection.DESC;
 import static org.oagi.score.repo.api.corecomponent.model.CcState.Deleted;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
+import static org.oagi.score.repo.api.impl.jooq.entity.tables.CodeList.CODE_LIST;
+import static org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CODE_LIST_MANIFEST;
 
 public class JooqAgencyIdListWriteRepository
         extends JooqScoreRepository
@@ -183,6 +186,14 @@ public class JooqAgencyIdListWriteRepository
 
         ModifyAgencyIdListValuesRepositoryRequest valueRequest = new ModifyAgencyIdListValuesRepositoryRequest();
         valueRequest.setAgencyIdListManifestId(agencyIdList.getAgencyIdListManifestId());
+
+        // Issue #1647
+        // Only one 'developer default' and one 'user default' are allowed.
+        AgencyIdListValue developerDefaultAgencyIdListValue =
+                agencyIdList.getValues().stream().filter(e -> e.isDeveloperDefault()).findAny().orElse(null);
+        AgencyIdListValue userDefaultAgencyIdListValue =
+                agencyIdList.getValues().stream().filter(e -> e.isUserDefault()).findAny().orElse(null);
+
         valueRequest.setAgencyIdListValueList(agencyIdList.getValues().stream().map(e -> {
             ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue agencyIdListValue =
                     new ModifyAgencyIdListValuesRepositoryRequest.AgencyIdListValue();
@@ -193,6 +204,12 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValue.setDefinition(e.getDefinition());
             agencyIdListValue.setDefinitionSource(e.getDefinitionSource());
             agencyIdListValue.setDeprecated(e.isDeprecated());
+            if (developerDefaultAgencyIdListValue != null && Objects.equals(developerDefaultAgencyIdListValue.getGuid(), e.getGuid())) {
+                agencyIdListValue.setDeveloperDefault(e.isDeveloperDefault());
+            }
+            if (userDefaultAgencyIdListValue != null && Objects.equals(userDefaultAgencyIdListValue.getGuid(), e.getGuid())) {
+                agencyIdListValue.setUserDefault(e.isUserDefault());
+            }
 
             return agencyIdListValue;
         }).collect(Collectors.toList()));
@@ -353,6 +370,22 @@ public class JooqAgencyIdListWriteRepository
                     throw new IllegalArgumentException("Only end-users can restore this component.");
                 }
             }
+
+            // Issue #1647
+            if (isOwnerDeveloper) {
+                int countOfNotDeletedOtherAgencyIdListRecords = dslContext().selectCount()
+                        .from(AGENCY_ID_LIST_MANIFEST)
+                        .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                        .where(and(
+                                AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(agencyIdListManifestRecord.getReleaseId()),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.notEqual(agencyIdListManifestRecord.getAgencyIdListManifestId()),
+                                AGENCY_ID_LIST.STATE.notEqual("Deleted")
+                        ))
+                        .fetchOptionalInto(Integer.class).orElse(0);
+                if (countOfNotDeletedOtherAgencyIdListRecords > 0) {
+                    throw new IllegalArgumentException("Another active Agency ID List has been found. Only one Agency ID List for developers is allowed.");
+                }
+            }
         } else {
             if (!agencyIdListRecord.getOwnerUserId().equals(userId) && !prevState.canForceMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
@@ -385,6 +418,80 @@ public class JooqAgencyIdListWriteRepository
 
         agencyIdListManifestRecord.setLogId(logRecord.getLogId());
         agencyIdListManifestRecord.update(AGENCY_ID_LIST_MANIFEST.LOG_ID);
+    }
+
+    @Override
+    public void purgeAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId) throws ScoreDataAccessException {
+        LocalDateTime timestamp = LocalDateTime.now();
+        ULong userId = ULong.valueOf(user.getUserId());
+
+        AgencyIdListManifestRecord agencyIdListManifestRecord = dslContext().selectFrom(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(
+                        ULong.valueOf(agencyIdListManifestId)
+                ))
+                .fetchOne();
+
+        AgencyIdListRecord agencyIdListRecord = dslContext().selectFrom(AGENCY_ID_LIST)
+                .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(agencyIdListManifestRecord.getAgencyIdListId()))
+                .fetchOne();
+
+        if (!CcState.Deleted.equals(CcState.valueOf(agencyIdListRecord.getState()))) {
+            throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
+        }
+
+        List<AgencyIdListValueManifestRecord> agencyIdListValueManifestRecordList =
+                dslContext().selectFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                        .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestRecord.getAgencyIdListManifestId()))
+                        .fetch();
+
+        if (!agencyIdListValueManifestRecordList.isEmpty()) {
+            // Remove foreign key references.
+            dslContext().update(AGENCY_ID_LIST_MANIFEST)
+                    .setNull(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(
+                            agencyIdListValueManifestRecordList.stream().map(e -> e.getAgencyIdListValueManifestId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+
+            dslContext().update(CODE_LIST_MANIFEST)
+                    .setNull(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(
+                            agencyIdListValueManifestRecordList.stream().map(e -> e.getAgencyIdListValueManifestId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+
+            dslContext().update(AGENCY_ID_LIST)
+                    .setNull(AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID)
+                    .where(AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID.in(
+                            agencyIdListValueManifestRecordList.stream().map(e -> e.getAgencyIdListValueId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+
+            // Delete records.
+            dslContext().deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
+                    .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.in(
+                            agencyIdListValueManifestRecordList.stream().map(e -> e.getAgencyIdListValueManifestId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+            dslContext().deleteFrom(AGENCY_ID_LIST_VALUE)
+                    .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.in(
+                            agencyIdListValueManifestRecordList.stream().map(e -> e.getAgencyIdListValueId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+        }
+
+        dslContext().deleteFrom(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestRecord.getAgencyIdListManifestId()))
+                .execute();
+
+        dslContext().deleteFrom(AGENCY_ID_LIST)
+                .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(agencyIdListManifestRecord.getAgencyIdListId()))
+                .execute();
     }
 
     @Override
@@ -853,6 +960,8 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValueRecord.setCreationTimestamp(timestamp);
             agencyIdListValueRecord.setLastUpdateTimestamp(timestamp);
             agencyIdListValueRecord.setIsDeprecated((byte) 0);
+            agencyIdListValueRecord.setIsDeveloperDefault(agencyIdListValue.isDeveloperDefault() ? (byte) 1 : (byte) 0);
+            agencyIdListValueRecord.setIsUserDefault(agencyIdListValue.isUserDefault() ? (byte) 1 : (byte) 0);
 
             agencyIdListValueRecord.setAgencyIdListValueId(
                     dslContext().insertInto(AGENCY_ID_LIST_VALUE)
@@ -905,11 +1014,14 @@ public class JooqAgencyIdListWriteRepository
             agencyIdListValueRecord.setDefinition(agencyIdListValue.getDefinition());
             agencyIdListValueRecord.setDefinitionSource(agencyIdListValue.getDefinitionSource());
             agencyIdListValueRecord.setIsDeprecated((byte) (agencyIdListValue.isDeprecated() ? 1 : 0));
+            agencyIdListValueRecord.setIsDeveloperDefault(agencyIdListValue.isDeveloperDefault() ? (byte) 1 : (byte) 0);
+            agencyIdListValueRecord.setIsUserDefault(agencyIdListValue.isUserDefault() ? (byte) 1 : (byte) 0);
             agencyIdListValueRecord.setLastUpdatedBy(userId);
             agencyIdListValueRecord.setLastUpdateTimestamp(timestamp);
 
             agencyIdListValueRecord.update(AGENCY_ID_LIST_VALUE.VALUE,
                     AGENCY_ID_LIST_VALUE.NAME, AGENCY_ID_LIST_VALUE.IS_DEPRECATED,
+                    AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT, AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT,
                     AGENCY_ID_LIST_VALUE.DEFINITION, AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
                     AGENCY_ID_LIST_VALUE.LAST_UPDATED_BY, AGENCY_ID_LIST_VALUE.LAST_UPDATE_TIMESTAMP);
         }

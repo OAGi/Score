@@ -42,10 +42,10 @@ export class CcListService {
   }
 
   getCcList(request: CcListRequest): Observable<PageResponse<CcList>> {
-    let params = new HttpParams();
-    if (request.release.releaseId) {
-      params = params.set('releaseId', '' + request.release.releaseId);
-    }
+    let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
+      .set('releaseId', '' + request.release.releaseId);
+
     if (request.page.sortActive) {
       params = params.set('sortActive', request.page.sortActive);
     }
@@ -256,8 +256,11 @@ export class CcListService {
     });
   }
 
-  getSimpleXbtList(releaseId: number): Observable<XbtForList[]> {
-    return this.http.get<XbtForList[]>('/api/xbt/simple_list/' + releaseId);
+  getSimpleXbtList(libraryId: number, releaseId: number): Observable<XbtForList[]> {
+    const params = new HttpParams()
+      .set('libraryId', libraryId.toString())
+      .set('releaseId', releaseId.toString());
+    return this.http.get<XbtForList[]>('/api/xbt/simple_list', {params});
   }
 
   createPrimitiveRestriction(releaseId: number, dtManifestId: number, type: string, primitiveXbtMapList: any[]): Observable<CcDtNodeDetail> {

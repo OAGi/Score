@@ -26,7 +26,7 @@ public class CreateCodeListRepositoryRequest extends RepositoryRequest {
         return initialName;
     }
 
-    public BigInteger getbasedCodeListManifestId() {
+    public BigInteger getBasedCodeListManifestId() {
         return this.basedCodeListManifestId;
     }
 

@@ -10,6 +10,7 @@ import java.math.BigInteger;
 public class BieEditNode {
 
     private BigInteger topLevelAsbiepId;
+    private BigInteger libraryId;
     private BigInteger releaseId;
 
     private String type;
@@ -26,6 +27,7 @@ public class BieEditNode {
     private String version;
     private String status;
 
+    private String libraryName;
     private String releaseNum;
     private BieState topLevelAsbiepState;
     private String ownerLoginId;

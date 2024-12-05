@@ -13,6 +13,7 @@ import java.util.Map;
 @Data
 public class CcListRequest {
 
+    private BigInteger libraryId = BigInteger.ZERO;
     private BigInteger releaseId = BigInteger.ZERO;
     private CcListTypes types = CcListTypes.fromString(null);
     private List<CcState> states = Collections.emptyList();

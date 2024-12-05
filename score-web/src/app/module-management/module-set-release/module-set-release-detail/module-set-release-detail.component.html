@@ -51,7 +51,7 @@
             <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
               <div class="d-flex">
                 <span class="release-num">{{release.releaseNum}}</span>
-                <span *ngIf="release.releaseNum !== 'Working'"
+                <span *ngIf="!release.workingRelease"
                       class="f12 ml-auto {{release.state}}">
                         {{ release.state | separate }}
                       </span>

@@ -20,6 +20,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,7 @@ public class ExternalController {
 
     @RequestMapping(value = "/ext/core_component", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CcList> getCcList(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestParam(name = "releaseId") BigInteger releaseId,
             @RequestParam(name = "den", required = false) String den,
             @RequestParam(name = "definition", required = false) String definition,
