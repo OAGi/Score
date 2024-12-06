@@ -996,11 +996,11 @@ public class BieEditService implements InitializingBean {
                         if (!hasLength(inheritedBbie.getFacetPattern())) {
                             inheritedBbie.setFacetPattern(baseBbie.getFacetPattern());
                         }
-                        if (!hasLength(inheritedBbie.getDefaultValue())) {
+                        if (hasLength(baseBbie.getDefaultValue())) {
                             inheritedBbie.setDefaultValue(baseBbie.getDefaultValue());
                             inheritedBbie.setFixedValue(null);
                         }
-                        if (!hasLength(inheritedBbie.getFixedValue())) {
+                        else if (hasLength(baseBbie.getFixedValue())) {
                             inheritedBbie.setFixedValue(baseBbie.getFixedValue());
                             inheritedBbie.setDefaultValue(null);
                         }
@@ -1077,11 +1077,11 @@ public class BieEditService implements InitializingBean {
                         if (!hasLength(inheritedBbieSc.getFacetPattern())) {
                             inheritedBbieSc.setFacetPattern(baseBbieSc.getFacetPattern());
                         }
-                        if (!hasLength(inheritedBbieSc.getDefaultValue())) {
+                        if (hasLength(baseBbieSc.getDefaultValue())) {
                             inheritedBbieSc.setDefaultValue(baseBbieSc.getDefaultValue());
                             inheritedBbieSc.setFixedValue(null);
                         }
-                        if (!hasLength(inheritedBbieSc.getFixedValue())) {
+                        else if (hasLength(baseBbieSc.getFixedValue())) {
                             inheritedBbieSc.setFixedValue(baseBbieSc.getFixedValue());
                             inheritedBbieSc.setDefaultValue(null);
                         }
@@ -1183,11 +1183,12 @@ public class BieEditService implements InitializingBean {
             throw new IllegalArgumentException("The BIE in " + e.getInvalidState() + " state cannot be edited.");
         }
 
-        doReuseBIE(user, requester, topLevelAsbiep.getTopLevelAsbiepId(), request);
+        doReuseBIE(user, requester, topLevelAsbiep.getTopLevelAsbiepId(), request, false);
     }
 
     private void doReuseBIE(AuthenticatedPrincipal user, AppUser requester,
-                            BigInteger topLevelAsbiepId, ReuseBIERequest request) {
+                            BigInteger topLevelAsbiepId, ReuseBIERequest request,
+                            boolean nestedCall) {
         TopLevelAsbiep reuseTopLevelAsbiep = topLevelAsbiepRepository.findById(request.getReuseTopLevelAsbiepId());
         ULong reuseAsbiepId = ULong.valueOf(reuseTopLevelAsbiep.getAsbiepId());
 
@@ -1226,7 +1227,7 @@ public class BieEditService implements InitializingBean {
                             .fetchOneInto(ULong.class);
 
 
-            if (!isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+            if (!nestedCall || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
                 asbieRecord.setToAsbiepId(reuseAsbiepId);
             }
 
@@ -1260,7 +1261,7 @@ public class BieEditService implements InitializingBean {
         List<TopLevelAsbiep> inheritedTopLevelAsbiepList =
                 topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiepId);
         for (TopLevelAsbiep inheritedTopLevelAsbiep : inheritedTopLevelAsbiepList) {
-            doReuseBIE(user, requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(), request);
+            doReuseBIE(user, requester, inheritedTopLevelAsbiep.getTopLevelAsbiepId(), request, true);
         }
     }
 

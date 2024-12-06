@@ -2451,8 +2451,6 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     let baseUsed = this._baseUsedAsbieMap[node.asccNode.manifestId];
     if (!!baseUsed && baseUsed.length > 0) {
       baseUsed = baseUsed.filter(u => {
-        console.log(node);
-        console.log(u);
         if (node.reused) {
           return u.ownerTopLevelAsbiepId === (node.parent as AbieFlatNode).basedTopLevelAsbiepId &&
             u.hashPath === node.asbieHashPath;

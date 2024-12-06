@@ -898,7 +898,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       if (!asbiepNode.used) {
         this.toggleTreeUsed(asbiepNode);
-        asbiepNode.locked = true; // In order to avoid creating the ASBIE.
       }
       this.updateDetails(asbiepNode.parents, () => {
         this.isUpdating = true;
@@ -963,9 +962,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const asbiepNode = (node as AsbiepFlatNode);
     // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
     this.service.getDetail((node.parent as AsbiepFlatNode).basedTopLevelAsbiepId, 'ASBIE',
-      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(asbie => {
-      this.service.getDetailById((asbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(asbiep => {
-        const baseReusedTopLevelAsbiepId = (asbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
+      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(baseAsbie => {
+      this.service.getDetailById((baseAsbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(baseAsbiep => {
+        const baseReusedTopLevelAsbiepId = (baseAsbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
 
         if (!asbiepNode.used) {
           this.toggleTreeUsed(asbiepNode);

@@ -125,9 +125,9 @@ public class BieCreateFromExistingBieService implements InitializingBean {
             BieCreateRequest bieRequest = new BieCreateRequest();
             bieRequest.setAsccpManifestId(request.getAsccpManifestId());
             List<BigInteger> bizCtxIds = dslContext.select(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID)
-            .from(BIZ_CTX_ASSIGNMENT)
-            .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
-            .fetchStreamInto(BigInteger.class).collect(Collectors.toList());
+                    .from(BIZ_CTX_ASSIGNMENT)
+                    .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
+                    .fetchStreamInto(BigInteger.class).collect(Collectors.toList());
             bieRequest.setBizCtxIds(bizCtxIds);
             bieService.createBie(user, bieRequest);
         }
