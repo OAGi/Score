@@ -120,6 +120,9 @@ public class SelectBaseProfileBIEDialogImpl extends SearchBarPageImpl implements
 
     @Override
     public void selectBaseBIE(TopLevelASBIEPObject bie) {
+        showAdvancedSearchPanel();
+        setOwner(bie.getOwnerLoginId());
+        hitSearchButton();
         retry(() -> {
             WebElement tr = getTableRecordByValue(bie.getPropertyTerm());
             WebElement td = getColumnByName(tr, "select");

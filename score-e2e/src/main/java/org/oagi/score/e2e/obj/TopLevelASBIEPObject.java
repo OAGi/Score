@@ -17,6 +17,8 @@ public class TopLevelASBIEPObject {
 
     private BigInteger ownerUserId;
 
+    private String ownerLoginId;
+
     private LocalDateTime lastUpdateTimestamp;
 
     private BigInteger lastUpdatedBy;
@@ -45,6 +47,7 @@ public class TopLevelASBIEPObject {
                                                                            String state) {
         TopLevelASBIEPObject topLevelAsbiep = new TopLevelASBIEPObject();
         topLevelAsbiep.setOwnerUserId(user.getAppUserId());
+        topLevelAsbiep.setOwnerLoginId(user.getLoginId());
         topLevelAsbiep.setLastUpdateTimestamp(LocalDateTime.now());
         topLevelAsbiep.setLastUpdatedBy(user.getAppUserId());
         topLevelAsbiep.setReleaseId(release.getReleaseId());

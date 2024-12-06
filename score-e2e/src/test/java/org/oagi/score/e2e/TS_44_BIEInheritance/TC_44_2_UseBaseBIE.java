@@ -80,17 +80,17 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBIE);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String baseBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
+        String baseRemark = "remark_" + randomAlphanumeric(5, 10);
+        String baseVersion = "version_" + randomAlphanumeric(5, 10);
+        String baseStatus = "status_" + randomAlphanumeric(5, 10);
+        String baseContextDefinition = randomPrint(50, 100).trim();
 
-        topLevelASBIEPPanel.setBusinessTerm(businessTerm);
-        topLevelASBIEPPanel.setRemark(remark);
-        topLevelASBIEPPanel.setVersion(version);
-        topLevelASBIEPPanel.setStatus(status);
-        topLevelASBIEPPanel.setContextDefinition(contextDefinition);
+        topLevelASBIEPPanel.setBusinessTerm(baseBusinessTerm);
+        topLevelASBIEPPanel.setRemark(baseRemark);
+        topLevelASBIEPPanel.setVersion(baseVersion);
+        topLevelASBIEPPanel.setStatus(baseStatus);
+        topLevelASBIEPPanel.setContextDefinition(baseContextDefinition);
 
         WebElement securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Security Classification");
         EditBIEPage.ASBIEPanel securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
@@ -165,11 +165,11 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
         assertDisabled(baseTopLevelASBIEPPanel.getStatusField());
         assertDisabled(baseTopLevelASBIEPPanel.getContextDefinitionField());
 
-        assertEquals(businessTerm, getText(baseTopLevelASBIEPPanel.getBusinessTermField()));
-        assertEquals(remark, getText(baseTopLevelASBIEPPanel.getRemarkField()));
-        assertEquals(version, getText(baseTopLevelASBIEPPanel.getVersionField()));
-        assertEquals(status, getText(baseTopLevelASBIEPPanel.getStatusField()));
-        assertEquals(contextDefinition, getText(baseTopLevelASBIEPPanel.getContextDefinitionField()));
+        assertEquals(baseBusinessTerm, getText(baseTopLevelASBIEPPanel.getBusinessTermField()));
+        assertEquals(baseRemark, getText(baseTopLevelASBIEPPanel.getRemarkField()));
+        assertEquals(baseVersion, getText(baseTopLevelASBIEPPanel.getVersionField()));
+        assertEquals(baseStatus, getText(baseTopLevelASBIEPPanel.getStatusField()));
+        assertEquals(baseContextDefinition, getText(baseTopLevelASBIEPPanel.getContextDefinitionField()));
 
         securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Security Classification");
         securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
