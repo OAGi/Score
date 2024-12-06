@@ -120,7 +120,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
         this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
         saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
       }
-      if (!this.request.library || this.request.library.libraryId === 0) {
+      if (!this.request.library || !this.request.library.libraryId) {
         this.request.library = this.libraries[0];
       }
       this.mappedLibraries = this.libraries.map(e => {

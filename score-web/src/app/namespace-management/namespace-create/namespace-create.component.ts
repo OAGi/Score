@@ -65,7 +65,7 @@ export class NamespaceCreateComponent implements OnInit {
         this.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
         saveLibrary(this.auth.getUserToken(), this.library.libraryId);
       }
-      if (!this.library || this.library.libraryId === 0) {
+      if (!this.library || !this.library.libraryId) {
         this.library = this.libraries[0];
       }
       this.mappedLibraries = this.libraries.map(e => {
