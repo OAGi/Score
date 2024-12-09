@@ -53,7 +53,7 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_2_1")
-    public void enduser_use_base_BIE() {
+    public void enduser_use_BaseBIE() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

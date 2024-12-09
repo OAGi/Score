@@ -52,7 +52,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_3_1")
-    public void enduser_create_inherited_BIE_with_base_reused_BIE() {
+    public void enduser_create_InheritedBIE_with_BaseReusedBIE() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -451,7 +451,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
     @Test
     @DisplayName("TC_44_3_2")
-    public void enduser_override_base_reused_BIE_in_inherited_BIE_with_base_reused_BIE() {
+    public void enduser_override_BaseReusedBIE_in_InheritedBIE_with_BaseReusedBIE() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 

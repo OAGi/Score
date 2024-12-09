@@ -101,3 +101,34 @@ The inherited BIE's reused Base BIE can be overridden with another Base BIE.
     - Attributes inherited from the new base match those of the inherited "BOM Header" (Assertion [#1.2](#test-assertion-4412)).
     - Previously locked attributes remain consistent and reflect the updated base BIE (e.g., "Status," "Effectivity," "Security Classification") (Assertion [#1.2](#test-assertion-4412)).
     - **ASBIE and BBIE Consistency**: The "BOM Option" ASBIE and "Action Code" BBIE are unaffected by the override and maintain their attribute values (Assertion [#1.3](#test-assertion-4413)).
+
+## Test Case 44.4
+
+**State Change Rules Between Base BIE and Inherited BIE**
+
+This test case validates compliance with state change rules between the Base BIE and its Inherited BIE.
+
+### Test Assertions:
+
+#### Test Assertion #44.4.1
+The state of the Base BIE must be equal to or ahead of the state of the Inherited BIE.
+
+#### Test Assertion #44.4.2
+The state of the Inherited BIE is dependent on the state of the Base BIE and cannot precede it.
+
+### Test Steps:
+
+1. Log in as an end user.
+2. Create a random business context (e.g., Manufacturing).
+3. Create a new Base BIE named "BOM Header" using the business context created in step 2.
+4. Navigate to the "BIE List" page.
+5. Create a new Inherited "BOM Header" BIE from the Base BIE created in step 3.
+6. Attempt to move the Inherited BIE to the QA state. It must display an error message (Assertion [#4.2](#test-assertion-4442)).
+7. Move the Base BIE to the QA state. It must succeed (Assertion [#4.1](#test-assertion-4441)).
+8. Move the Inherited BIE to the QA state. It must succeed (Assertion [#4.2](#test-assertion-4442)).
+9. Attempt to move the Base BIE back to the WIP state. It must display an error message (Assertion [#4.1](#test-assertion-4441)).
+10. Move the Inherited BIE back to the WIP state. It must succeed (Assertion [#4.2](#test-assertion-4442)).
+11. Move the Base BIE back to the WIP state. It must succeed (Assertion [#4.1](#test-assertion-4441)).
+12. Move the Base BIE to the QA state.
+13. Move the Inherited BIE to the QA state.
+14. Attempt to move the Inherited BIE to the Production state. It must display an error message (Assertion [#4.2](#test-assertion-4442)).
