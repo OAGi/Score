@@ -32,7 +32,7 @@ import static org.oagi.score.e2e.impl.PageHelper.getText;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_18_2_CodeListAccess extends BaseTest {
     String existingReleaseNum = null;
-    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+    String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
     CodeListObject codeListCandidate;
     RandomCodeListWithStateContainer developerCodeListWithStateContainer;
     RandomCodeListWithStateContainer euCodeListWithStateContainer;
@@ -50,10 +50,11 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     private void draft_creation() {
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         List<String> clStates = new ArrayList<>();
         clStates.add("WIP");
         clStates.add("Draft");
@@ -103,7 +104,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
 
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         timeout = Duration.ofSeconds(300L).toMillis();
         begin = System.currentTimeMillis();
         while (System.currentTimeMillis() - begin < timeout) {

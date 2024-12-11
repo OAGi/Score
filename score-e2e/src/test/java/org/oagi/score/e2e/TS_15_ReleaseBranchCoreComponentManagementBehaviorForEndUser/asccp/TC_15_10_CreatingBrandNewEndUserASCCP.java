@@ -76,9 +76,10 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        NamespaceObject namespaceForEndUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        NamespaceObject namespaceForEndUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("QA");
@@ -165,8 +166,9 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
         ASCCPCreateDialog asccpCreateDialog = viewEditCoreComponentPage.openASCCPCreateDialog(branch);
         ASCCPViewEditPage asccpViewEditPage = asccpCreateDialog.create(acc.getDen());
@@ -191,8 +193,9 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.createASCCPfromThis("/" + acc.getDen());
@@ -216,6 +219,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
             this.appUser = appUser;
             this.states = states;
 
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryById(release.getLibraryId());
 
             for (int i = 0; i < this.states.size(); ++i) {
                 ASCCPObject asccp;
@@ -227,7 +231,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
                     bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);

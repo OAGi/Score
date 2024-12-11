@@ -206,19 +206,7 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
 
     @Override
     public List<ForeignKey<AgencyIdListManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_BASED_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_LOG_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_PREV_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK);
     }
 
     private transient AgencyIdListPath _agencyIdList;
@@ -231,19 +219,6 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
             _agencyIdList = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_ID_FK, null);
 
         return _agencyIdList;
-    }
-
-    private transient AgencyIdListValueManifestPath _agencyIdListValueManifest;
-
-    /**
-     * Get the implicit join path to the
-     * <code>oagi.agency_id_list_value_manifest</code> table.
-     */
-    public AgencyIdListValueManifestPath agencyIdListValueManifest() {
-        if (_agencyIdListValueManifest == null)
-            _agencyIdListValueManifest = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, null);
-
-        return _agencyIdListValueManifest;
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifestBasedAgencyIdListManifestIdFk;
@@ -273,19 +248,19 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
         return _log;
     }
 
-    private transient AgencyIdListManifestPath _agencyIdListReplacementAgencyIdListManifestIdFk;
+    private transient AgencyIdListManifestPath _agencyIdListManifestNextAgencyIdListManifestIdFk;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table, via the
-     * <code>agency_id_list_replacement_agency_id_list_manifest_id_fk</code>
+     * <code>agency_id_list_manifest_next_agency_id_list_manifest_id_fk</code>
      * key.
      */
-    public AgencyIdListManifestPath agencyIdListReplacementAgencyIdListManifestIdFk() {
-        if (_agencyIdListReplacementAgencyIdListManifestIdFk == null)
-            _agencyIdListReplacementAgencyIdListManifestIdFk = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
+    public AgencyIdListManifestPath agencyIdListManifestNextAgencyIdListManifestIdFk() {
+        if (_agencyIdListManifestNextAgencyIdListManifestIdFk == null)
+            _agencyIdListManifestNextAgencyIdListManifestIdFk = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
-        return _agencyIdListReplacementAgencyIdListManifestIdFk;
+        return _agencyIdListManifestNextAgencyIdListManifestIdFk;
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifestPrevAgencyIdListManifestIdFk;
@@ -303,19 +278,44 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
         return _agencyIdListManifestPrevAgencyIdListManifestIdFk;
     }
 
-    private transient AgencyIdListManifestPath _agencyIdListManifestNextAgencyIdListManifestIdFk;
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.AGENCY_ID_LIST_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient AgencyIdListManifestPath _agencyIdListReplacementAgencyIdListManifestIdFk;
 
     /**
      * Get the implicit join path to the
      * <code>oagi.agency_id_list_manifest</code> table, via the
-     * <code>agency_id_list_manifest_next_agency_id_list_manifest_id_fk</code>
+     * <code>agency_id_list_replacement_agency_id_list_manifest_id_fk</code>
      * key.
      */
-    public AgencyIdListManifestPath agencyIdListManifestNextAgencyIdListManifestIdFk() {
-        if (_agencyIdListManifestNextAgencyIdListManifestIdFk == null)
-            _agencyIdListManifestNextAgencyIdListManifestIdFk = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_MANIFEST_NEXT_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
+    public AgencyIdListManifestPath agencyIdListReplacementAgencyIdListManifestIdFk() {
+        if (_agencyIdListReplacementAgencyIdListManifestIdFk == null)
+            _agencyIdListReplacementAgencyIdListManifestIdFk = new AgencyIdListManifestPath(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_MANIFEST_ID_FK, null);
 
-        return _agencyIdListManifestNextAgencyIdListManifestIdFk;
+        return _agencyIdListReplacementAgencyIdListManifestIdFk;
+    }
+
+    private transient AgencyIdListValueManifestPath _agencyIdListValueManifest;
+
+    /**
+     * Get the implicit join path to the
+     * <code>oagi.agency_id_list_value_manifest</code> table.
+     */
+    public AgencyIdListValueManifestPath agencyIdListValueManifest() {
+        if (_agencyIdListValueManifest == null)
+            _agencyIdListValueManifest = new AgencyIdListValueManifestPath(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_ID_FK, null);
+
+        return _agencyIdListValueManifest;
     }
 
     private transient BbiePath _bbie;

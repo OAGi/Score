@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.asccp;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.Duration.ofSeconds;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -61,8 +61,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
         String branch = "10.8.7.1";
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -72,7 +73,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -126,8 +127,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -136,7 +138,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
             bcc.setCardinalityMax(1);
@@ -163,8 +165,10 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_3() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
         ASCCPObject asccp;
         ACCObject acc;
         TopLevelASBIEPObject endUserBIE;
@@ -174,13 +178,13 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
-            endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             BusinessContextObject contextEndUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
             endUserBIE = getAPIFactory().getBusinessInformationEntityAPI().
@@ -237,10 +241,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_a() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        String branch = "10.8.7.1";
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -250,7 +255,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace_endUser, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace_endUser, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -292,9 +297,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
         String branch = "10.8.7.1";
-
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace_endUser = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -304,7 +309,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace_endUser, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace_endUser, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -328,9 +333,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage.hitAmendButton();
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        String newDefinitionSource = randomPrint(50, 100).trim();
+        String newDefinitionSource = RandomStringUtils.secure().nextPrint(50, 100).trim();
         asccpPanel.setDefinitionSource(newDefinitionSource);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         asccpPanel.setDefinition(newDefinition);
         asccpViewEditPage.hitUpdateButton();
 
@@ -346,10 +351,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_c() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
-        String branch = "10.8.7.1";
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         ASCCPObject asccp, asccp_not_reusable;
         BCCPObject bccp;
@@ -359,7 +365,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -417,9 +423,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_d_deprecated_in_previous_version() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -431,7 +439,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -466,8 +474,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -479,7 +488,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -510,9 +519,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_e_nillable_in_previous_revision() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -524,7 +535,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -556,9 +567,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_e_not_nillable_in_previous_revision() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -570,7 +583,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -606,8 +619,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
 
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -619,7 +633,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(anotherUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, anotherUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -630,7 +644,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             coreComponentAPI.appendBCC(acc_association, bccp_to_append, "Production");
 
             asccp = coreComponentAPI.createRandomASCCP(acc_association, anotherUser, namespace, "Production");
-            asccp.setDefinitionSource(randomPrint(50, 100).trim());
+            asccp.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
             asccp.setDefinition(null);
             coreComponentAPI.updateASCCP(asccp);
             ASCCObject ascc = coreComponentAPI.appendASCC(acc, asccp, "Production");
@@ -643,7 +657,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         //reload the page
         WebElement asccNode = asccpViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ASCCPViewEditPage.ASCCPPanel asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNode).getASCCPPanel();
-        asccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
+        asccpPanel.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
         ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
@@ -655,9 +669,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_g() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -669,7 +685,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -734,9 +750,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_4_h() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -748,7 +766,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -778,9 +796,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     public void test_TA_15_12_5() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -792,7 +812,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);
@@ -823,8 +843,9 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String branch = "10.8.7.1";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -836,7 +857,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUser, namespace, "Production");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Production");
             bcc.setCardinalityMax(1);

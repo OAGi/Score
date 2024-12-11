@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
@@ -26,7 +27,6 @@ import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -275,7 +275,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
                 endUserBusinessContext, endUserAdminBusinessContext)) {
             EditBusinessContextPage editBusinessContextPage = viewEditBusinessContextPage.openEditBusinessContextPageByBusinessContextName(businessContext.getName());
 
-            String newName = "bc_" + randomAlphanumeric(5, 10);
+            String newName = "bc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
             assertNotEquals(newName, businessContext.getName());
             editBusinessContextPage.setName(newName);
             click(editBusinessContextPage.getUpdateButton());
@@ -325,7 +325,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         ViewEditBusinessContextPage viewEditBusinessContextPage = contextMenu.openViewEditBusinessContextSubMenu();
         EditBusinessContextPage editBusinessContextPage = viewEditBusinessContextPage.openEditBusinessContextPageByBusinessContextName(randomBusinessContext.getName());
 
-        String newName = "bc_" + randomAlphanumeric(5, 10);
+        String newName = "bc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertNotEquals(newName, randomBusinessContext.getName());
         editBusinessContextPage.setName(newName);
 
@@ -459,8 +459,9 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
     public void developer_cannot_discard_business_context_referenced_by_BIE() {
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ASCCPObject asccp =
-                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Item Master. Item Master", "10.8.5");
+                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Item Master. Item Master", "10.8.5");
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(
                 Arrays.asList(businessContext), asccp, appUser, "WIP");
 
@@ -473,8 +474,9 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
     @Test
     @DisplayName("TC_5_3_TA_13")
     public void developer_can_update_BIE_referenced_business_context_created_by_any_user() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         ASCCPObject asccp =
-                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Item Master. Item Master", "10.8.5");
+                getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Item Master. Item Master", "10.8.5");
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -515,7 +517,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
                 endUserBusinessContext, endUserAdminBusinessContext)) {
             EditBusinessContextPage editBusinessContextPage = contextMenu.openViewEditBusinessContextSubMenu()
                     .openEditBusinessContextPageByBusinessContextName(businessContext.getName());
-            String newName = "bc_" + randomAlphanumeric(5, 10);
+            String newName = "bc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
             assertNotEquals(newName, businessContext.getName());
             businessContext.setName(newName);
             editBusinessContextPage.setName(newName);
@@ -565,7 +567,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
     public void test_checkbox_selection() {
         String namePrefix = "bc_TC53_TA15";
         List<BusinessContextObject> randomBusinessContexts = new ArrayList<>();
-        for (int i = 0; i < RandomUtils.nextInt(11, 20); ++i) {
+        for (int i = 0; i < RandomUtils.secure().randomInt(11, 20); ++i) {
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser, namePrefix);
             randomBusinessContexts.add(randomBusinessContext);
@@ -579,7 +581,7 @@ public class TC_5_3_OAGISDevelopersAuthorizedManagementOfBusinessContexts extend
         viewEditBusinessContextPage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
+                "/tr[" + RandomUtils.secure().randomInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(ofSeconds(3L))

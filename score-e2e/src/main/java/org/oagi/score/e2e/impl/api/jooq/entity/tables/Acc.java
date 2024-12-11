@@ -318,7 +318,7 @@ public class Acc extends TableImpl<AccRecord> {
 
     @Override
     public List<ForeignKey<AccRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ACC_BASED_ACC_ID_FK, Keys.ACC_NAMESPACE_ID_FK, Keys.ACC_CREATED_BY_FK, Keys.ACC_OWNER_USER_ID_FK, Keys.ACC_LAST_UPDATED_BY_FK, Keys.ACC_REPLACEMENT_ACC_ID_FK, Keys.ACC_PREV_ACC_ID_FK, Keys.ACC_NEXT_ACC_ID_FK);
+        return Arrays.asList(Keys.ACC_BASED_ACC_ID_FK, Keys.ACC_CREATED_BY_FK, Keys.ACC_LAST_UPDATED_BY_FK, Keys.ACC_NAMESPACE_ID_FK, Keys.ACC_NEXT_ACC_ID_FK, Keys.ACC_OWNER_USER_ID_FK, Keys.ACC_PREV_ACC_ID_FK, Keys.ACC_REPLACEMENT_ACC_ID_FK);
     }
 
     private transient AccPath _accBasedAccIdFk;
@@ -334,18 +334,6 @@ public class Acc extends TableImpl<AccRecord> {
         return _accBasedAccIdFk;
     }
 
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.ACC_NAMESPACE_ID_FK, null);
-
-        return _namespace;
-    }
-
     private transient AppUserPath _accCreatedByFk;
 
     /**
@@ -357,19 +345,6 @@ public class Acc extends TableImpl<AccRecord> {
             _accCreatedByFk = new AppUserPath(this, Keys.ACC_CREATED_BY_FK, null);
 
         return _accCreatedByFk;
-    }
-
-    private transient AppUserPath _accOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>acc_owner_user_id_fk</code> key.
-     */
-    public AppUserPath accOwnerUserIdFk() {
-        if (_accOwnerUserIdFk == null)
-            _accOwnerUserIdFk = new AppUserPath(this, Keys.ACC_OWNER_USER_ID_FK, null);
-
-        return _accOwnerUserIdFk;
     }
 
     private transient AppUserPath _accLastUpdatedByFk;
@@ -385,30 +360,16 @@ public class Acc extends TableImpl<AccRecord> {
         return _accLastUpdatedByFk;
     }
 
-    private transient AccPath _accReplacementAccIdFk;
+    private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc</code> table, via the
-     * <code>acc_replacement_acc_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public AccPath accReplacementAccIdFk() {
-        if (_accReplacementAccIdFk == null)
-            _accReplacementAccIdFk = new AccPath(this, Keys.ACC_REPLACEMENT_ACC_ID_FK, null);
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.ACC_NAMESPACE_ID_FK, null);
 
-        return _accReplacementAccIdFk;
-    }
-
-    private transient AccPath _accPrevAccIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc</code> table, via the
-     * <code>acc_prev_acc_id_fk</code> key.
-     */
-    public AccPath accPrevAccIdFk() {
-        if (_accPrevAccIdFk == null)
-            _accPrevAccIdFk = new AccPath(this, Keys.ACC_PREV_ACC_ID_FK, null);
-
-        return _accPrevAccIdFk;
+        return _namespace;
     }
 
     private transient AccPath _accNextAccIdFk;
@@ -424,6 +385,45 @@ public class Acc extends TableImpl<AccRecord> {
         return _accNextAccIdFk;
     }
 
+    private transient AppUserPath _accOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>acc_owner_user_id_fk</code> key.
+     */
+    public AppUserPath accOwnerUserIdFk() {
+        if (_accOwnerUserIdFk == null)
+            _accOwnerUserIdFk = new AppUserPath(this, Keys.ACC_OWNER_USER_ID_FK, null);
+
+        return _accOwnerUserIdFk;
+    }
+
+    private transient AccPath _accPrevAccIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.acc</code> table, via the
+     * <code>acc_prev_acc_id_fk</code> key.
+     */
+    public AccPath accPrevAccIdFk() {
+        if (_accPrevAccIdFk == null)
+            _accPrevAccIdFk = new AccPath(this, Keys.ACC_PREV_ACC_ID_FK, null);
+
+        return _accPrevAccIdFk;
+    }
+
+    private transient AccPath _accReplacementAccIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.acc</code> table, via the
+     * <code>acc_replacement_acc_id_fk</code> key.
+     */
+    public AccPath accReplacementAccIdFk() {
+        if (_accReplacementAccIdFk == null)
+            _accReplacementAccIdFk = new AccPath(this, Keys.ACC_REPLACEMENT_ACC_ID_FK, null);
+
+        return _accReplacementAccIdFk;
+    }
+
     private transient AccManifestPath _accManifest;
 
     /**
@@ -437,18 +437,6 @@ public class Acc extends TableImpl<AccRecord> {
         return _accManifest;
     }
 
-    private transient AsccpPath _asccp;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.asccp</code> table
-     */
-    public AsccpPath asccp() {
-        if (_asccp == null)
-            _asccp = new AsccpPath(this, null, Keys.ASCCP_ROLE_OF_ACC_ID_FK.getInverseKey());
-
-        return _asccp;
-    }
-
     private transient AsccPath _ascc;
 
     /**
@@ -459,6 +447,18 @@ public class Acc extends TableImpl<AccRecord> {
             _ascc = new AsccPath(this, null, Keys.ASCC_FROM_ACC_ID_FK.getInverseKey());
 
         return _ascc;
+    }
+
+    private transient AsccpPath _asccp;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asccp</code> table
+     */
+    public AsccpPath asccp() {
+        if (_asccp == null)
+            _asccp = new AsccpPath(this, null, Keys.ASCCP_ROLE_OF_ACC_ID_FK.getInverseKey());
+
+        return _asccp;
     }
 
     private transient BccPath _bcc;

@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
@@ -47,8 +44,9 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create WIP end-user Code List for a particular release branch.
@@ -77,8 +75,9 @@ public class TC_17_5_EndUserCodeListStateManagement extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create WIP end-user Code List for a particular release branch.

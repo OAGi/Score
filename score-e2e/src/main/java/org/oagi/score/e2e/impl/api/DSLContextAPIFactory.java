@@ -40,6 +40,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public LibraryAPI getLibraryAPI() {
+        return new DSLContextLibraryAPIImpl(dslContext);
+    }
+
+    @Override
     public NamespaceAPI getNamespaceAPI() {
         return new DSLContextNamespaceAPIImpl(dslContext);
     }

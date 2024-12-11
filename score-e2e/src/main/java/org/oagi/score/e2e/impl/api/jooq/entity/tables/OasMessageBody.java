@@ -183,20 +183,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
     @Override
     public List<ForeignKey<OasMessageBodyRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK);
-    }
-
-    private transient TopLevelAsbiepPath _topLevelAsbiep;
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table.
-     */
-    public TopLevelAsbiepPath topLevelAsbiep() {
-        if (_topLevelAsbiep == null)
-            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, null);
-
-        return _topLevelAsbiep;
+        return Arrays.asList(Keys.OAS_MESSAGE_BODY_CREATED_BY_FK, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient AppUserPath _oasMessageBodyCreatedByFk;
@@ -223,6 +210,19 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
             _oasMessageBodyLastUpdatedByFk = new AppUserPath(this, Keys.OAS_MESSAGE_BODY_LAST_UPDATED_BY_FK, null);
 
         return _oasMessageBodyLastUpdatedByFk;
+    }
+
+    private transient TopLevelAsbiepPath _topLevelAsbiep;
+
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table.
+     */
+    public TopLevelAsbiepPath topLevelAsbiep() {
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.OAS_MESSAGE_BODY_TOP_LEVEL_ASBIEP_ID_FK, null);
+
+        return _topLevelAsbiep;
     }
 
     private transient OasRequestPath _oasRequest;

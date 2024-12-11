@@ -39,17 +39,18 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
     String existingReleaseNum = null;
-    String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+    String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
     CodeListObject codeListCandidate;
     RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
     RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     public void draft_creation() {
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        ReleaseObject euBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
@@ -121,7 +122,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
         releaseAssignmentPage.hitAssignAllButton();
         releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         timeout = Duration.ofSeconds(300L).toMillis();
         begin = System.currentTimeMillis();
         while (System.currentTimeMillis() - begin < timeout) {
@@ -326,6 +327,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
             this.appUser = appUser;
             this.states = states;
 
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryById(release.getLibraryId());
 
             for (int i = 0; i < this.states.size(); ++i) {
                 ASCCPObject asccp;
@@ -337,7 +339,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
                     bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);

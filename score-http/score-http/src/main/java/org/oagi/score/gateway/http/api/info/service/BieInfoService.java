@@ -64,6 +64,7 @@ public class BieInfoService {
         pageRequest.setSortDirection("desc");
         pageRequest.setPageIndex(0);
         pageRequest.setPageSize(5);
+        request.setLibraryId(libraryId);
         request.setOwnerLoginIds(Arrays.asList(String.valueOf(requester.getLoginId())));
         request.setPageRequest(pageRequest);
         if (releaseId != null) {

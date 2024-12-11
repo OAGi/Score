@@ -14,7 +14,7 @@ export class NamespaceService {
 
   getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceList>> {
     let params = new HttpParams()
-      .set('libraryId', request.library.libraryId)
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)

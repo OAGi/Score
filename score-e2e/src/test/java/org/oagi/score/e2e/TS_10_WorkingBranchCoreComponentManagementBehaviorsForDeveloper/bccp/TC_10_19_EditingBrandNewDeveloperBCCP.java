@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.bccp;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
@@ -88,13 +87,13 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         assertTrue(bccpPanel.getDefinitionField().isEnabled());
         assertTrue(bccpPanel.getDefinitionSourceField().isEnabled());
 
-        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        String randomPropertyTerm = RandomStringUtils.secure().nextAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
         bccpPanel.toggleNillable();
         String namespace = "http://www.openapplications.org/oagis/10";
         bccpPanel.setNamespace(namespace);
-        String definition = randomPrint(50, 100).trim();
+        String definition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         bccpPanel.setDefinition(definition);
 
         assertTrue(bccpViewEditPage.getUpdateButton(true).isEnabled());
@@ -113,7 +112,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
 
-        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        String randomPropertyTerm = RandomStringUtils.secure().nextAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
 
@@ -135,11 +134,11 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
 
         bccpPanel.setValueConstraint("Fixed Value");
-        String fixedValue = randomAlphabetic(5, 10);
+        String fixedValue = RandomStringUtils.secure().nextAlphabetic(5, 10);
         bccpPanel.setFixedValue(fixedValue);
 
         bccpPanel.setValueConstraint("Default Value");
-        String defaultValue = randomAlphabetic(5, 10);
+        String defaultValue = RandomStringUtils.secure().nextAlphabetic(5, 10);
         bccpPanel.setDefaultValue(defaultValue);
 
         bccpPanel.setValueConstraint("Fixed Value");
@@ -163,7 +162,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
 
         bccpPanel.setValueConstraint("Fixed Value");
-        String fixedValue = randomAlphabetic(5, 10);
+        String fixedValue = RandomStringUtils.secure().nextAlphabetic(5, 10);
         bccpPanel.setFixedValue(fixedValue);
 
         bccpPanel.toggleNillable();
@@ -189,7 +188,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         BCCPViewEditPage bccpViewEditPage = bccpCreateDialog.create("System Environment_ Code. Type");
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
 
-        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        String randomPropertyTerm = RandomStringUtils.secure().nextAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         bccpPanel.setPropertyTerm("Test Object " + randomPropertyTerm);
         bccpPanel.toggleNillable();
@@ -239,7 +238,8 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -341,14 +341,15 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         ACCObject randomACC1 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
         ACCObject randomACC2 = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
 
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
         coreComponentAPI.appendBCC(randomACC1, randomBCCP, "WIP");
         coreComponentAPI.appendBCC(randomACC2, randomBCCP, "WIP");
@@ -358,7 +359,7 @@ public class TC_10_19_EditingBrandNewDeveloperBCCP extends BaseTest {
                 homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         BCCPViewEditPage bccpViewEditPage = viewEditCoreComponentPage.openBCCPViewEditPageByDenAndBranch(randomBCCP.getDen(), branch);
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
-        String randomPropertyTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        String randomPropertyTerm = RandomStringUtils.secure().nextAlphabetic(5, 10).replaceAll(" ", "");
         randomPropertyTerm = Character.toUpperCase(randomPropertyTerm.charAt(0)) + randomPropertyTerm.substring(1).toLowerCase();
         randomPropertyTerm = "Test Object " + randomPropertyTerm;
         bccpPanel.setPropertyTerm(randomPropertyTerm);

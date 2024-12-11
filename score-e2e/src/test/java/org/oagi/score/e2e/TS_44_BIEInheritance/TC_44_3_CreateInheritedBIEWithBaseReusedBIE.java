@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_44_BIEInheritance;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.oagi.score.e2e.AssertionHelper.*;
@@ -58,21 +57,22 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject bomHeaderAsccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBOMHeaderBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(bomHeaderAsccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, bomHeaderAsccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         ASCCPObject bomAsccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM. BOM", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM. BOM", release.getReleaseNumber());
         TopLevelASBIEPObject baseBOMBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(bomAsccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, bomAsccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -80,13 +80,13 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBOMHeaderBIE);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String baseBOMHeaderBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String baseBOMHeaderRemark = "remark_" + randomAlphanumeric(5, 10);
-        String baseBOMHeaderVersion = "version_" + randomAlphanumeric(5, 10);
+        String baseBOMHeaderBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMHeaderRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMHeaderVersion = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMHeaderBIE.setVersion(baseBOMHeaderVersion);
-        String baseBOMHeaderStatus = "status_" + randomAlphanumeric(5, 10);
+        String baseBOMHeaderStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMHeaderBIE.setStatus(baseBOMHeaderStatus);
-        String baseBOMHeaderContextDefinition = randomPrint(50, 100).trim();
+        String baseBOMHeaderContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(baseBOMHeaderBusinessTerm);
         topLevelASBIEPPanel.setRemark(baseBOMHeaderRemark);
@@ -97,10 +97,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Security Classification");
         EditBIEPage.ASBIEPanel securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
 
-        int securityClassificationCardinalityMin = nextInt(2, 5);
-        int securityClassificationCardinalityMax = nextInt(5, 10);
-        String securityClassificationRemark = "remark_" + randomAlphanumeric(5, 10);
-        String securityClassificationContextDefinition = randomPrint(50, 100).trim();
+        int securityClassificationCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int securityClassificationCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String securityClassificationRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String securityClassificationContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         securityClassificationAsbiePanel.toggleUsed();
         securityClassificationAsbiePanel.setCardinalityMin(securityClassificationCardinalityMin);
@@ -111,10 +111,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement statusAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Status");
         EditBIEPage.ASBIEPanel statusAsbiePanel = editBIEPage.getASBIEPanel(statusAsbieNode);
 
-        int statusCardinalityMin = nextInt(2, 5);
-        int statusCardinalityMax = nextInt(5, 10);
-        String statusRemark = "remark_" + randomAlphanumeric(5, 10);
-        String statusContextDefinition = randomPrint(50, 100).trim();
+        int statusCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int statusCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String statusRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String statusContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         statusAsbiePanel.toggleUsed();
         statusAsbiePanel.setCardinalityMin(statusCardinalityMin);
@@ -125,10 +125,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement effectivityAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Effectivity");
         EditBIEPage.ASBIEPanel effectivityAsbiePanel = editBIEPage.getASBIEPanel(effectivityAsbieNode);
 
-        int effectivityCardinalityMin = nextInt(2, 5);
-        int effectivityCardinalityMax = nextInt(5, 10);
-        String effectivityRemark = "remark_" + randomAlphanumeric(5, 10);
-        String effectivityContextDefinition = randomPrint(50, 100).trim();
+        int effectivityCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int effectivityCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String effectivityRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String effectivityContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         effectivityAsbiePanel.toggleUsed();
         effectivityAsbiePanel.setCardinalityMin(effectivityCardinalityMin);
@@ -144,13 +144,13 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBOMBIE);
         topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String baseBOMBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String baseBOMRemark = "remark_" + randomAlphanumeric(5, 10);
-        String baseBOMVersion = "version_" + randomAlphanumeric(5, 10);
+        String baseBOMBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMVersion = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMBIE.setVersion(baseBOMVersion);
-        String baseBOMStatus = "status_" + randomAlphanumeric(5, 10);
+        String baseBOMStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMBIE.setStatus(baseBOMStatus);
-        String baseBOMContextDefinition = randomPrint(50, 100).trim();
+        String baseBOMContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(baseBOMBusinessTerm);
         topLevelASBIEPPanel.setRemark(baseBOMRemark);
@@ -161,10 +161,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement bomOptionAsbieNode = editBIEPage.getNodeByPath("/" + bomAsccp.getPropertyTerm() + "/BOM Option");
         EditBIEPage.ASBIEPanel bomOptionAsbiePanel = editBIEPage.getASBIEPanel(bomOptionAsbieNode);
 
-        int bomOptionCardinalityMin = nextInt(2, 5);
-        int bomOptionCardinalityMax = nextInt(5, 10);
-        String bomOptionRemark = "remark_" + randomAlphanumeric(5, 10);
-        String bomOptionContextDefinition = randomPrint(50, 100).trim();
+        int bomOptionCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int bomOptionCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String bomOptionRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String bomOptionContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bomOptionAsbiePanel.toggleUsed();
         bomOptionAsbiePanel.setCardinalityMin(bomOptionCardinalityMin);
@@ -177,8 +177,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         int actionCodeCardinalityMin = 1;
         int actionCodeCardinalityMax = 1;
-        String actionCodeRemark = "remark_" + randomAlphanumeric(5, 10);
-        String actionCodeContextDefinition = randomPrint(50, 100).trim();
+        String actionCodeRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String actionCodeContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         actionCodeBbiePanel.toggleUsed();
         actionCodeBbiePanel.setCardinalityMin(actionCodeCardinalityMin);
@@ -197,7 +197,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         int bomHeaderCardinalityMin = 1;
         int bomHeaderCardinalityMax = 1;
-        String bomHeaderContextDefinition = randomPrint(50, 100).trim();
+        String bomHeaderContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bomHeaderAsbiePanel.setCardinalityMin(bomHeaderCardinalityMin);
         bomHeaderAsbiePanel.setCardinalityMax(bomHeaderCardinalityMax);
@@ -457,21 +457,22 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject bomHeaderAsccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBOMHeaderBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(bomHeaderAsccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, bomHeaderAsccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         ASCCPObject bomAsccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM. BOM", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM. BOM", release.getReleaseNumber());
         TopLevelASBIEPObject baseBOMBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(bomAsccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, bomAsccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -479,13 +480,13 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBOMHeaderBIE);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String baseBOMHeaderBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String baseBOMHeaderRemark = "remark_" + randomAlphanumeric(5, 10);
-        String baseBOMHeaderVersion = "version_" + randomAlphanumeric(5, 10);
+        String baseBOMHeaderBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMHeaderRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMHeaderVersion = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMHeaderBIE.setVersion(baseBOMHeaderVersion);
-        String baseBOMHeaderStatus = "status_" + randomAlphanumeric(5, 10);
+        String baseBOMHeaderStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMHeaderBIE.setStatus(baseBOMHeaderStatus);
-        String baseBOMHeaderContextDefinition = randomPrint(50, 100).trim();
+        String baseBOMHeaderContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(baseBOMHeaderBusinessTerm);
         topLevelASBIEPPanel.setRemark(baseBOMHeaderRemark);
@@ -496,10 +497,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Security Classification");
         EditBIEPage.ASBIEPanel securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
 
-        int securityClassificationCardinalityMin = nextInt(2, 5);
-        int securityClassificationCardinalityMax = nextInt(5, 10);
-        String securityClassificationRemark = "remark_" + randomAlphanumeric(5, 10);
-        String securityClassificationContextDefinition = randomPrint(50, 100).trim();
+        int securityClassificationCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int securityClassificationCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String securityClassificationRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String securityClassificationContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         securityClassificationAsbiePanel.toggleUsed();
         securityClassificationAsbiePanel.setCardinalityMin(securityClassificationCardinalityMin);
@@ -510,10 +511,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement statusAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Status");
         EditBIEPage.ASBIEPanel statusAsbiePanel = editBIEPage.getASBIEPanel(statusAsbieNode);
 
-        int statusCardinalityMin = nextInt(2, 5);
-        int statusCardinalityMax = nextInt(5, 10);
-        String statusRemark = "remark_" + randomAlphanumeric(5, 10);
-        String statusContextDefinition = randomPrint(50, 100).trim();
+        int statusCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int statusCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String statusRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String statusContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         statusAsbiePanel.toggleUsed();
         statusAsbiePanel.setCardinalityMin(statusCardinalityMin);
@@ -524,10 +525,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement effectivityAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Effectivity");
         EditBIEPage.ASBIEPanel effectivityAsbiePanel = editBIEPage.getASBIEPanel(effectivityAsbieNode);
 
-        int effectivityCardinalityMin = nextInt(2, 5);
-        int effectivityCardinalityMax = nextInt(5, 10);
-        String effectivityRemark = "remark_" + randomAlphanumeric(5, 10);
-        String effectivityContextDefinition = randomPrint(50, 100).trim();
+        int effectivityCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int effectivityCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String effectivityRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String effectivityContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         effectivityAsbiePanel.toggleUsed();
         effectivityAsbiePanel.setCardinalityMin(effectivityCardinalityMin);
@@ -543,13 +544,13 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBOMBIE);
         topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String baseBOMBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String baseBOMRemark = "remark_" + randomAlphanumeric(5, 10);
-        String baseBOMVersion = "version_" + randomAlphanumeric(5, 10);
+        String baseBOMBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String baseBOMVersion = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMBIE.setVersion(baseBOMVersion);
-        String baseBOMStatus = "status_" + randomAlphanumeric(5, 10);
+        String baseBOMStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         baseBOMBIE.setStatus(baseBOMStatus);
-        String baseBOMContextDefinition = randomPrint(50, 100).trim();
+        String baseBOMContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(baseBOMBusinessTerm);
         topLevelASBIEPPanel.setRemark(baseBOMRemark);
@@ -560,10 +561,10 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         WebElement bomOptionAsbieNode = editBIEPage.getNodeByPath("/" + bomAsccp.getPropertyTerm() + "/BOM Option");
         EditBIEPage.ASBIEPanel bomOptionAsbiePanel = editBIEPage.getASBIEPanel(bomOptionAsbieNode);
 
-        int bomOptionCardinalityMin = nextInt(2, 5);
-        int bomOptionCardinalityMax = nextInt(5, 10);
-        String bomOptionRemark = "remark_" + randomAlphanumeric(5, 10);
-        String bomOptionContextDefinition = randomPrint(50, 100).trim();
+        int bomOptionCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int bomOptionCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String bomOptionRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String bomOptionContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bomOptionAsbiePanel.toggleUsed();
         bomOptionAsbiePanel.setCardinalityMin(bomOptionCardinalityMin);
@@ -576,8 +577,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         int actionCodeCardinalityMin = 1;
         int actionCodeCardinalityMax = 1;
-        String actionCodeRemark = "remark_" + randomAlphanumeric(5, 10);
-        String actionCodeContextDefinition = randomPrint(50, 100).trim();
+        String actionCodeRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String actionCodeContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         actionCodeBbiePanel.toggleUsed();
         actionCodeBbiePanel.setCardinalityMin(actionCodeCardinalityMin);
@@ -596,7 +597,7 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
 
         int bomHeaderCardinalityMin = 1;
         int bomHeaderCardinalityMax = 1;
-        String bomHeaderContextDefinition = randomPrint(50, 100).trim();
+        String bomHeaderContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bomHeaderAsbiePanel.setCardinalityMin(bomHeaderCardinalityMin);
         bomHeaderAsbiePanel.setCardinalityMax(bomHeaderCardinalityMax);
@@ -643,13 +644,13 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
         TopLevelASBIEPObject inheritedBOMHeaderBIE = editBIEPage.getTopLevelASBIEP();
 
-        String inheritedBOMHeaderBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String inheritedBOMHeaderRemark = "remark_" + randomAlphanumeric(5, 10);
-        String inheritedBOMHeaderVersion = "version_" + randomAlphanumeric(5, 10);
+        String inheritedBOMHeaderBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String inheritedBOMHeaderRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String inheritedBOMHeaderVersion = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         inheritedBOMHeaderBIE.setVersion(inheritedBOMHeaderVersion);
-        String inheritedBOMHeaderStatus = "status_" + randomAlphanumeric(5, 10);
+        String inheritedBOMHeaderStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         inheritedBOMHeaderBIE.setStatus(inheritedBOMHeaderStatus);
-        String inheritedBOMHeaderContextDefinition = randomPrint(50, 100).trim();
+        String inheritedBOMHeaderContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(inheritedBOMHeaderBusinessTerm);
         topLevelASBIEPPanel.setRemark(inheritedBOMHeaderRemark);
@@ -660,8 +661,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Security Classification");
         securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
 
-        String inheritedSecurityClassificationRemark = "remark_" + randomAlphanumeric(5, 10);
-        String inheritedSecurityClassificationContextDefinition = randomPrint(50, 100).trim();
+        String inheritedSecurityClassificationRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String inheritedSecurityClassificationContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         securityClassificationAsbiePanel.setRemark(inheritedSecurityClassificationRemark);
         securityClassificationAsbiePanel.setContextDefinition(inheritedSecurityClassificationContextDefinition);
@@ -669,8 +670,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         statusAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Status");
         statusAsbiePanel = editBIEPage.getASBIEPanel(statusAsbieNode);
 
-        String inheritedStatusRemark = "remark_" + randomAlphanumeric(5, 10);
-        String inheritedStatusContextDefinition = randomPrint(50, 100).trim();
+        String inheritedStatusRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String inheritedStatusContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         statusAsbiePanel.setRemark(inheritedStatusRemark);
         statusAsbiePanel.setContextDefinition(inheritedStatusContextDefinition);
@@ -678,8 +679,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         effectivityAsbieNode = editBIEPage.getNodeByPath("/" + bomHeaderAsccp.getPropertyTerm() + "/Effectivity");
         effectivityAsbiePanel = editBIEPage.getASBIEPanel(effectivityAsbieNode);
 
-        String inheritedEffectivityRemark = "remark_" + randomAlphanumeric(5, 10);
-        String inheritedEffectivityContextDefinition = randomPrint(50, 100).trim();
+        String inheritedEffectivityRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String inheritedEffectivityContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         effectivityAsbiePanel.setRemark(inheritedEffectivityRemark);
         effectivityAsbiePanel.setContextDefinition(inheritedEffectivityContextDefinition);

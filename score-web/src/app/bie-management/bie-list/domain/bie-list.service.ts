@@ -12,8 +12,8 @@ export class BieListService {
   constructor(private http: HttpClient) {
   }
 
-  getSummaryBieList(releaseId: number): Observable<SummaryBieInfo> {
-    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?releaseId=' + releaseId).pipe(map(
+  getSummaryBieList(libraryId: number, releaseId: number): Observable<SummaryBieInfo> {
+    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?libraryId=' + libraryId + '&releaseId=' + releaseId).pipe(map(
       e => {
         if (e.myRecentBIEs) {
           e.myRecentBIEs = e.myRecentBIEs.map(elm => {
@@ -154,6 +154,7 @@ export class BieListService {
 
   getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)

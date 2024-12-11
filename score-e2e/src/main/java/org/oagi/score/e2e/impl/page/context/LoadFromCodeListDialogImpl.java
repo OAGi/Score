@@ -44,7 +44,7 @@ public class LoadFromCodeListDialogImpl extends SearchBarPageImpl implements Loa
     @Override
     public boolean isOpened() {
         try {
-            assert "Code List".equals(getText(getTitle()));
+            assert getText(getTitle()).startsWith("Code List");
         } catch (TimeoutException e) {
             return false;
         }
@@ -53,7 +53,9 @@ public class LoadFromCodeListDialogImpl extends SearchBarPageImpl implements Loa
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]/span"));
+        return visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]" +
+                        "//span[contains(@class, \"title\")]"));
     }
 
     @Override

@@ -202,19 +202,7 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
 
     @Override
     public List<ForeignKey<BbieBiztermRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BBIE_BIZTERM_BCC_BIZTERM_FK, Keys.BBIE_BIZTERM_BBIE_FK);
-    }
-
-    private transient BccBiztermPath _bccBizterm;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bcc_bizterm</code> table.
-     */
-    public BccBiztermPath bccBizterm() {
-        if (_bccBizterm == null)
-            _bccBizterm = new BccBiztermPath(this, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK, null);
-
-        return _bccBizterm;
+        return Arrays.asList(Keys.BBIE_BIZTERM_BBIE_FK, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK);
     }
 
     private transient BbiePath _bbie;
@@ -227,6 +215,18 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
             _bbie = new BbiePath(this, Keys.BBIE_BIZTERM_BBIE_FK, null);
 
         return _bbie;
+    }
+
+    private transient BccBiztermPath _bccBizterm;
+
+    /**
+     * Get the implicit join path to the <code>oagi.bcc_bizterm</code> table.
+     */
+    public BccBiztermPath bccBizterm() {
+        if (_bccBizterm == null)
+            _bccBizterm = new BccBiztermPath(this, Keys.BBIE_BIZTERM_BCC_BIZTERM_FK, null);
+
+        return _bccBizterm;
     }
 
     @Override

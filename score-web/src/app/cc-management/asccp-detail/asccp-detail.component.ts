@@ -25,12 +25,10 @@ import {
 } from '../domain/core-component-node';
 import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-asccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
 import {CommentControl} from '../domain/comment-component';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {SplitAreaDirective} from 'angular-split';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
@@ -82,8 +80,6 @@ export class AsccpDetailComponent implements OnInit {
   @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
   @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('leftPanel', {static: true}) public leftPanel: SplitAreaDirective;
-  @ViewChild('rightPanel', {static: true}) public rightPanel: SplitAreaDirective;
   @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
   virtualScrollItemSize = 33;
 
@@ -307,6 +303,8 @@ export class AsccpDetailComponent implements OnInit {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
+
+      this.workingRelease = rootNode.workingRelease;
 
       this.rootNode = this.dataSource.data[0] as AsccpFlatNode;
       this.rootNode.access = rootNode.access;
@@ -584,6 +582,7 @@ export class AsccpDetailComponent implements OnInit {
   changeAcc(node: CcFlatNode) {
     const dialogRef = this.dialog.open(CreateAsccpDialogComponent, {
       data: {
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         action: 'update',
         state: node.state,

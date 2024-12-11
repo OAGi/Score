@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -44,6 +44,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     @DisplayName("TC_11_7_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -51,8 +52,9 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
@@ -82,8 +84,9 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developerA);
 
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
 
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
@@ -91,7 +94,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
         DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", workingBranch.getReleaseNumber());
         dtViewEditPage.showValueDomain();
         dtViewEditPage.addCodeListValueDomain(codeList.getName());
-        String qualifier = "testDataType" + randomAlphabetic(5, 10);
+        String qualifier = "testDataType" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         dtViewEditPage.setQualifier(qualifier);
         String definition = getText(dtViewEditPage.getDefinitionField());
         if (definition == null) {
@@ -128,6 +131,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     @DisplayName("TC_11_7_TA_3")
     public void test_TA_3() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         ACCObject acc;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
@@ -136,8 +140,9 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             acc = getAPIFactory().getCoreComponentAPI().createRandomACC(developerA, workingBranch, namespace, "WIP");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
@@ -156,7 +161,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             dtViewEditPage.showValueDomain();
             dtViewEditPage.addCodeListValueDomain(codeList.getName());
             dtViewEditPage.setDefaultValueDomain(codeList.getName());
-            String qualifier = "testDataType" + randomAlphabetic(5, 10);
+            String qualifier = "testDataType" + RandomStringUtils.secure().nextAlphabetic(5, 10);
             dtViewEditPage.setQualifier(qualifier);
             String definition = getText(dtViewEditPage.getDefinitionField());
             if (definition == null) {
@@ -210,6 +215,7 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
     @DisplayName("TC_11_7_TA_4")
     public void test_TA_4() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -219,8 +225,9 @@ public class TC_11_7_DeletingACodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);

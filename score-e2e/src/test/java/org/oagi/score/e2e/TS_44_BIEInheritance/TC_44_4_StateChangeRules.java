@@ -55,13 +55,14 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(asccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, asccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherEndUser.getLoginId(), anotherEndUser.getPassword());
@@ -103,13 +104,14 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(asccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, asccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherEndUser.getLoginId(), anotherEndUser.getPassword());
@@ -193,13 +195,14 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(asccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, asccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherEndUser.getLoginId(), anotherEndUser.getPassword());
@@ -285,13 +288,14 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(asccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, asccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(anotherEndUser.getLoginId(), anotherEndUser.getPassword());

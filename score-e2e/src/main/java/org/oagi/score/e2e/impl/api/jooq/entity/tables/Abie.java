@@ -333,18 +333,6 @@ public class Abie extends TableImpl<AbieRecord> {
         return _topLevelAsbiep;
     }
 
-    private transient AsbiepPath _asbiep;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table
-     */
-    public AsbiepPath asbiep() {
-        if (_asbiep == null)
-            _asbiep = new AsbiepPath(this, null, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK.getInverseKey());
-
-        return _asbiep;
-    }
-
     private transient AsbiePath _asbie;
 
     /**
@@ -355,6 +343,18 @@ public class Abie extends TableImpl<AbieRecord> {
             _asbie = new AsbiePath(this, null, Keys.ASBIE_FROM_ABIE_ID_FK.getInverseKey());
 
         return _asbie;
+    }
+
+    private transient AsbiepPath _asbiep;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table
+     */
+    public AsbiepPath asbiep() {
+        if (_asbiep == null)
+            _asbiep = new AsbiepPath(this, null, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK.getInverseKey());
+
+        return _asbiep;
     }
 
     private transient BbiePath _bbie;

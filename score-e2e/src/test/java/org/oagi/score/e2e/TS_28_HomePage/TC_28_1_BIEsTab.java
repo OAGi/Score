@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_28_HomePage;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.*;
 
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
@@ -39,7 +39,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
@@ -61,8 +62,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
     private TopLevelASBIEPObject createTopLevelASBIEPByDEN(AppUserObject creator, BusinessContextObject businessContext,
                                                            String den, ReleaseObject release, String state) {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryById(release.getLibraryId());
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum(den, release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, den, release.getReleaseNumber());
         return getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext), asccp, creator, state);
     }
@@ -73,7 +75,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
@@ -121,7 +124,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
@@ -149,7 +153,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
         UserTopLevelASBIEPContainer container = new UserTopLevelASBIEPContainer(developer, release);
 
@@ -186,6 +191,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_5")
     public void developer_can_see_number_of_bies_per_user_and_per_state_in_bies_by_users_and_states_panel() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -196,10 +202,10 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_3.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3")
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3")
             ));
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4")
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4")
             ));
         }
 
@@ -278,6 +284,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_6")
     public void developer_can_select_user_to_narrow_down_the_list_and_see_only_number_of_his_bies_per_state() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -287,7 +294,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4")
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4")
             ));
         }
 
@@ -326,6 +333,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_7 (WIP)")
     public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_WIP() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -337,7 +345,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber)
             ));
         }
 
@@ -372,6 +380,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_7 (QA)")
     public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_QA() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -383,7 +392,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber)
             ));
         }
 
@@ -418,6 +427,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_7 (Production)")
     public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_Production() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -429,7 +439,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber)
             ));
         }
 
@@ -464,6 +474,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_7 (Total)")
     public void developer_can_click_on_table_cell_to_view_relevant_bies_in_bie_list_page_for_Total() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -475,7 +486,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber)
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber)
             ));
         }
 
@@ -513,6 +524,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_8")
     public void developer_can_see_last_5_bies_that_he_modified_or_created_in_my_recent_bies_panel() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -524,7 +536,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber),
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber),
                     2, 2, 1
             ));
         }
@@ -552,6 +564,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
     @DisplayName("TC_28_1_9")
     public void developer_can_click_on_bie_to_view_it_in_edit_bie_page_in_my_recent_bies_panel() {
         List<AppUserObject> developers = new ArrayList<>();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         for (int i = 0; i < 3; ++i) {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
@@ -563,7 +576,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         Map<String, UserTopLevelASBIEPContainer> containersFor10_8_4 = new HashMap<>();
         for (AppUserObject developer : developers) {
             containersFor10_8_4.put(developer.getLoginId(), new UserTopLevelASBIEPContainer(developer,
-                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber),
+                    getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber),
                     2, 2, 1
             ));
         }
@@ -616,7 +629,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         private List<String> recentBIEs = new ArrayList<>();
 
         public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release) {
-            this(appUser, release, nextInt(2, 5), nextInt(2, 5), nextInt(2, 5));
+            this(appUser, release, RandomUtils.secure().randomInt(2, 5), RandomUtils.secure().randomInt(2, 5), RandomUtils.secure().randomInt(2, 5));
         }
 
         public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release,

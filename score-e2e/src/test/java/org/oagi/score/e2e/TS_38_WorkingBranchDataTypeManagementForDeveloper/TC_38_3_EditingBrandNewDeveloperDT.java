@@ -9,7 +9,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebElement;
@@ -43,6 +42,7 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
     @DisplayName("TC_38_3_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
         CodeListObject codeList;
@@ -50,13 +50,14 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, branch, "WIP");
 
-            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
         }
@@ -70,7 +71,7 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
              * Test Assertion #38.3.1.a
              */
             assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
-            ArrayList<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getStandardNamespacesURIs();
+            List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getStandardNamespacesURIs(library);
             for (NamespaceObject namespace : standardNamespaces) {
                 assertDoesNotThrow(() -> {
                     dtViewEditPage.setNamespace(namespace);
@@ -115,6 +116,7 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
     @DisplayName("TC_38_3_TA_2_and_TA_3")
     public void test_TA_2_and_TA_3() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
         DTObject baseCDT;
@@ -122,10 +124,11 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
         }
@@ -147,6 +150,7 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
     @DisplayName("TC_38_3_TA_4")
     public void test_TA_4() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
         Map<DTObject, DTObject> derivedBDTs = new HashMap<>();
@@ -156,13 +160,14 @@ public class TC_38_3_EditingBrandNewDeveloperDT extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, branch, "WIP");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 

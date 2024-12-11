@@ -44,6 +44,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -53,8 +54,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
@@ -103,6 +105,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_2")
     public void test_TA_2() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, List<CodeListValueObject>> codeListCodeListValueMap = new HashMap<>();
@@ -112,8 +115,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             List<CodeListValueObject> values = new ArrayList<>();
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
@@ -158,6 +162,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_3")
     public void test_TA_3() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -167,8 +172,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
@@ -200,6 +206,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_4")
     public void test_TA_4() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -209,8 +216,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
@@ -240,6 +248,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_5")
     public void test_TA_5() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -249,8 +258,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
@@ -279,6 +289,7 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_5_TA_6")
     public void test_TA_6() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -288,8 +299,9 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "Published");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);

@@ -65,7 +65,7 @@ public class InfoController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryCcInfo getSummaryCcInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                          @RequestParam(name = "libraryId", required = false, defaultValue = "1") BigInteger libraryId) {
+                                          @RequestParam(name = "libraryId") BigInteger libraryId) {
         return ccInfoService.getSummaryCcInfo(user, libraryId);
     }
 
@@ -73,7 +73,7 @@ public class InfoController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryBieInfo getSummaryBieInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                            @RequestParam(name = "libraryId", required = false, defaultValue = "1") BigInteger libraryId,
+                                            @RequestParam(name = "libraryId") BigInteger libraryId,
                                             @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
         return bieInfoService.getSummaryBieInfo(user, libraryId, releaseId);
     }
@@ -82,7 +82,7 @@ public class InfoController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryCcExtInfo getSummaryCcExtInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                @RequestParam(name = "libraryId", required = false, defaultValue = "1") BigInteger libraryId,
+                                                @RequestParam(name = "libraryId") BigInteger libraryId,
                                                 @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
         return ccInfoService.getSummaryCcExtInfo(user, libraryId, releaseId);
     }

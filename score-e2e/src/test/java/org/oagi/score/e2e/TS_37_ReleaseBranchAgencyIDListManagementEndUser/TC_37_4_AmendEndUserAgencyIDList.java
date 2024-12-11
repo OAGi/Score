@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_37_ReleaseBranchAgencyIDListManagementEndUser;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -17,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -55,8 +54,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -102,7 +102,8 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
@@ -126,8 +127,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -164,8 +166,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -176,10 +179,10 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIDList.getName(), release.getReleaseNumber());
         editAgencyIDListPage.amend();
 
-        String versionId = randomAlphanumeric(5, 10);
-        String definition = randomPrint(50, 100).trim();
-        String definitionSource = randomAlphanumeric(5, 10);
-        String remark = randomPrint(50, 100).trim();
+        String versionId = RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String definition = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        String definitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String remark = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListPage.setVersion(versionId);
         editAgencyIDListPage.setDefinition(definition);
         editAgencyIDListPage.setDefinitionSource(definitionSource);
@@ -216,8 +219,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -259,8 +263,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -306,8 +311,9 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Production");
@@ -318,10 +324,10 @@ public class TC_37_4_AmendEndUserAgencyIDList extends BaseTest {
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIDList.getName(), release.getReleaseNumber());
         editAgencyIDListPage.amend();
 
-        String versionId = randomAlphanumeric(5, 10);
-        String definition = randomPrint(50, 100).trim();
-        String definitionSource = randomAlphanumeric(5, 10);
-        String remark = randomPrint(50, 100).trim();
+        String versionId = RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String definition = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        String definitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String remark = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListPage.setVersion(versionId);
         editAgencyIDListPage.setDefinition(definition);
         editAgencyIDListPage.setDefinitionSource(definitionSource);

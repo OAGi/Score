@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
@@ -52,10 +51,11 @@ public class TC_38_7_EditingInheritedSCInBrandNewDTOrRevisedDT extends BaseTest 
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 

@@ -163,6 +163,7 @@ public class BieListController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<AsbieListRecord> getAsbieAndBbieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                             @RequestParam(name = "libraryId") BigInteger libraryId,
                                                              @RequestParam(name = "topLevelAsccpPropertyTerm", required = false) String topLevelAsccpPropertyTerm,
                                                              @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                                              @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -186,6 +187,7 @@ public class BieListController {
         BieListRequest request = new BieListRequest();
         PageRequest pageRequest = new PageRequest();
 
+        request.setLibraryId(libraryId);
         request.setPropertyTerm(topLevelAsccpPropertyTerm);
         request.setBusinessContext(businessContext);
         request.setVersion(version);

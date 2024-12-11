@@ -314,7 +314,7 @@ public class Dt extends TableImpl<DtRecord> {
 
     @Override
     public List<ForeignKey<DtRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_BASED_DT_ID_FK, Keys.DT_NAMESPACE_ID_FK, Keys.DT_CREATED_BY_FK, Keys.DT_LAST_UPDATED_BY_FK, Keys.DT_OWNER_USER_ID_FK, Keys.DT_REPLACEMENT_DT_ID_FK, Keys.DT_PREV_DT_ID_FK, Keys.DT_NEXT_DT_ID_FK);
+        return Arrays.asList(Keys.DT_BASED_DT_ID_FK, Keys.DT_CREATED_BY_FK, Keys.DT_LAST_UPDATED_BY_FK, Keys.DT_NAMESPACE_ID_FK, Keys.DT_NEXT_DT_ID_FK, Keys.DT_OWNER_USER_ID_FK, Keys.DT_PREV_DT_ID_FK, Keys.DT_REPLACEMENT_DT_ID_FK);
     }
 
     private transient DtPath _dtBasedDtIdFk;
@@ -328,18 +328,6 @@ public class Dt extends TableImpl<DtRecord> {
             _dtBasedDtIdFk = new DtPath(this, Keys.DT_BASED_DT_ID_FK, null);
 
         return _dtBasedDtIdFk;
-    }
-
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.DT_NAMESPACE_ID_FK, null);
-
-        return _namespace;
     }
 
     private transient AppUserPath _dtCreatedByFk;
@@ -368,6 +356,31 @@ public class Dt extends TableImpl<DtRecord> {
         return _dtLastUpdatedByFk;
     }
 
+    private transient NamespacePath _namespace;
+
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.DT_NAMESPACE_ID_FK, null);
+
+        return _namespace;
+    }
+
+    private transient DtPath _dtNextDtIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt</code> table, via the
+     * <code>dt_next_dt_id_fk</code> key.
+     */
+    public DtPath dtNextDtIdFk() {
+        if (_dtNextDtIdFk == null)
+            _dtNextDtIdFk = new DtPath(this, Keys.DT_NEXT_DT_ID_FK, null);
+
+        return _dtNextDtIdFk;
+    }
+
     private transient AppUserPath _dtOwnerUserIdFk;
 
     /**
@@ -379,19 +392,6 @@ public class Dt extends TableImpl<DtRecord> {
             _dtOwnerUserIdFk = new AppUserPath(this, Keys.DT_OWNER_USER_ID_FK, null);
 
         return _dtOwnerUserIdFk;
-    }
-
-    private transient DtPath _dtReplacementDtIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.dt</code> table, via the
-     * <code>dt_replacement_dt_id_fk</code> key.
-     */
-    public DtPath dtReplacementDtIdFk() {
-        if (_dtReplacementDtIdFk == null)
-            _dtReplacementDtIdFk = new DtPath(this, Keys.DT_REPLACEMENT_DT_ID_FK, null);
-
-        return _dtReplacementDtIdFk;
     }
 
     private transient DtPath _dtPrevDtIdFk;
@@ -407,17 +407,17 @@ public class Dt extends TableImpl<DtRecord> {
         return _dtPrevDtIdFk;
     }
 
-    private transient DtPath _dtNextDtIdFk;
+    private transient DtPath _dtReplacementDtIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt</code> table, via the
-     * <code>dt_next_dt_id_fk</code> key.
+     * <code>dt_replacement_dt_id_fk</code> key.
      */
-    public DtPath dtNextDtIdFk() {
-        if (_dtNextDtIdFk == null)
-            _dtNextDtIdFk = new DtPath(this, Keys.DT_NEXT_DT_ID_FK, null);
+    public DtPath dtReplacementDtIdFk() {
+        if (_dtReplacementDtIdFk == null)
+            _dtReplacementDtIdFk = new DtPath(this, Keys.DT_REPLACEMENT_DT_ID_FK, null);
 
-        return _dtNextDtIdFk;
+        return _dtReplacementDtIdFk;
     }
 
     private transient BccpPath _bccp;

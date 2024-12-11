@@ -228,19 +228,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
 
     @Override
     public List<ForeignKey<CtxSchemeRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, Keys.CTX_SCHEME_CODE_LIST_ID_FK, Keys.CTX_SCHEME_CREATED_BY_FK, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
-    }
-
-    private transient CtxCategoryPath _ctxCategory;
-
-    /**
-     * Get the implicit join path to the <code>oagi.ctx_category</code> table.
-     */
-    public CtxCategoryPath ctxCategory() {
-        if (_ctxCategory == null)
-            _ctxCategory = new CtxCategoryPath(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, null);
-
-        return _ctxCategory;
+        return Arrays.asList(Keys.CTX_SCHEME_CODE_LIST_ID_FK, Keys.CTX_SCHEME_CREATED_BY_FK, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
     }
 
     private transient CodeListPath _codeList;
@@ -266,6 +254,18 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
             _ctxSchemeCreatedByFk = new AppUserPath(this, Keys.CTX_SCHEME_CREATED_BY_FK, null);
 
         return _ctxSchemeCreatedByFk;
+    }
+
+    private transient CtxCategoryPath _ctxCategory;
+
+    /**
+     * Get the implicit join path to the <code>oagi.ctx_category</code> table.
+     */
+    public CtxCategoryPath ctxCategory() {
+        if (_ctxCategory == null)
+            _ctxCategory = new CtxCategoryPath(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, null);
+
+        return _ctxCategory;
     }
 
     private transient AppUserPath _ctxSchemeLastUpdatedByFk;

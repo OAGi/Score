@@ -169,32 +169,7 @@ public class OasExternalDocDoc extends TableImpl<OasExternalDocDocRecord> {
 
     @Override
     public List<ForeignKey<OasExternalDocDocRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_EXTERNAL_DOC_OAS_EXTERNAL_DOC_ID_FK, Keys.OAS_EXTERNAL_DOC_OAS_DOC_ID_FK, Keys.OAS_EXTERNAL_DOC_DOC_CREATED_BY_FK, Keys.OAS_EXTERNAL_DOC_DOC_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasExternalDocPath _oasExternalDoc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_external_doc</code>
-     * table.
-     */
-    public OasExternalDocPath oasExternalDoc() {
-        if (_oasExternalDoc == null)
-            _oasExternalDoc = new OasExternalDocPath(this, Keys.OAS_EXTERNAL_DOC_OAS_EXTERNAL_DOC_ID_FK, null);
-
-        return _oasExternalDoc;
-    }
-
-    private transient OasDocPath _oasDoc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
-     */
-    public OasDocPath oasDoc() {
-        if (_oasDoc == null)
-            _oasDoc = new OasDocPath(this, Keys.OAS_EXTERNAL_DOC_OAS_DOC_ID_FK, null);
-
-        return _oasDoc;
+        return Arrays.asList(Keys.OAS_EXTERNAL_DOC_DOC_CREATED_BY_FK, Keys.OAS_EXTERNAL_DOC_DOC_LAST_UPDATED_BY_FK, Keys.OAS_EXTERNAL_DOC_OAS_DOC_ID_FK, Keys.OAS_EXTERNAL_DOC_OAS_EXTERNAL_DOC_ID_FK);
     }
 
     private transient AppUserPath _oasExternalDocDocCreatedByFk;
@@ -221,6 +196,31 @@ public class OasExternalDocDoc extends TableImpl<OasExternalDocDocRecord> {
             _oasExternalDocDocLastUpdatedByFk = new AppUserPath(this, Keys.OAS_EXTERNAL_DOC_DOC_LAST_UPDATED_BY_FK, null);
 
         return _oasExternalDocDocLastUpdatedByFk;
+    }
+
+    private transient OasDocPath _oasDoc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     */
+    public OasDocPath oasDoc() {
+        if (_oasDoc == null)
+            _oasDoc = new OasDocPath(this, Keys.OAS_EXTERNAL_DOC_OAS_DOC_ID_FK, null);
+
+        return _oasDoc;
+    }
+
+    private transient OasExternalDocPath _oasExternalDoc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_external_doc</code>
+     * table.
+     */
+    public OasExternalDocPath oasExternalDoc() {
+        if (_oasExternalDoc == null)
+            _oasExternalDoc = new OasExternalDocPath(this, Keys.OAS_EXTERNAL_DOC_OAS_EXTERNAL_DOC_ID_FK, null);
+
+        return _oasExternalDoc;
     }
 
     @Override

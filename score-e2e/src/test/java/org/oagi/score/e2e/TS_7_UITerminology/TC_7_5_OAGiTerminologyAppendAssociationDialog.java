@@ -41,14 +41,15 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
     @Test
     @DisplayName("TC_7_5_TA_1_and_TA_2")
     public void test_TA_1_and_TA_2() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -83,14 +84,15 @@ public class TC_7_5_OAGiTerminologyAppendAssociationDialog extends BaseTest {
     @Test
     @DisplayName("TC_7_5_TA_3_and_TA_4")
     public void test_TA_3_and_TA_4() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");

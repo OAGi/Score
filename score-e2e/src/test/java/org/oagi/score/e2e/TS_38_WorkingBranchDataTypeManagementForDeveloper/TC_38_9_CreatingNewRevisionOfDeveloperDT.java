@@ -46,10 +46,11 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Published");
             dtForTesting.add(randomBDT);
 
@@ -103,10 +104,11 @@ public class TC_38_9_CreatingNewRevisionOfDeveloperDT extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDTWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "WIP");
             dtForTesting.add(randomBDTWIP);
 

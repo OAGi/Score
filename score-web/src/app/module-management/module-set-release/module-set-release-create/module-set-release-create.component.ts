@@ -187,7 +187,7 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
   doCreateModuleSetRelease() {
     const request = new ModuleSetReleaseListRequest();
     request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-    request.library.libraryId = this.request.library.libraryId;
+    request.library = this.request.library;
     request.releaseId = this.moduleSetRelease.releaseId;
     request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
     this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {

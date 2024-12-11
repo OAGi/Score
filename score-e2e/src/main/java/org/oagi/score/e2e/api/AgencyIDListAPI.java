@@ -1,9 +1,6 @@
 package org.oagi.score.e2e.api;
 
-import org.oagi.score.e2e.obj.AgencyIDListObject;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
 import java.util.List;

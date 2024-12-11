@@ -51,11 +51,13 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -93,9 +95,11 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             /**
              * Create developer Code List for Working branch. States - WIP, Draft and Candidate
              */
@@ -150,11 +154,13 @@ public class TC_12_1_CodeListAccess extends BaseTest {
 
             AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserB);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB, library);
 
-            ReleaseObject codeListBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+
+            ReleaseObject codeListBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
             /**
              * Create end-user Code List for 10.8.5 branch. States - WIP, QA and Production
              */

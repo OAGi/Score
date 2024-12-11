@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.bccp;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -15,13 +16,10 @@ import org.oagi.score.e2e.page.core_component.BCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriverException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -57,12 +55,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -92,15 +91,16 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
-        randomBCCP.setFixedValue(randomAlphabetic(5, 10));
+        randomBCCP.setFixedValue(RandomStringUtils.secure().nextAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -127,12 +127,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setDeprecated(true);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -160,12 +161,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setDeprecated(false);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -193,12 +195,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setNillable(true);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -226,12 +229,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         randomBCCP.setNillable(false);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -259,14 +263,15 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-        randomBCCP.setDefaultValue(randomAlphabetic(5, 10));
+        randomBCCP.setDefaultValue(RandomStringUtils.secure().nextAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(randomBCCP);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -292,15 +297,16 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-        randomBCCP.setDefinitionSource(randomPrint(50, 100).trim());
-        randomBCCP.setDefinition(randomPrint(50, 100).trim());
+        randomBCCP.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        randomBCCP.setDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
         coreComponentAPI.updateBCCP(randomBCCP);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -319,9 +325,9 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         assertEquals(randomBCCP.getDefinitionSource(), getText(bccpPanel.getDefinitionSourceField()));
         assertEquals(randomBCCP.getDefinition(), getText(bccpPanel.getDefinitionField()));
 
-        String newDefinitionSource = randomPrint(50, 100).trim();
+        String newDefinitionSource = RandomStringUtils.secure().nextPrint(50, 100).trim();
         bccpPanel.setDefinitionSource(newDefinitionSource);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         bccpPanel.setDefinition(newDefinition);
         bccpViewEditPage.hitUpdateButton();
 
@@ -341,14 +347,15 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
-        randomBCCP.setDefinitionSource(randomPrint(50, 100).trim());
+        randomBCCP.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
         // No definition
         randomBCCP.setDefinition(null);
         coreComponentAPI.updateBCCP(randomBCCP);
@@ -366,7 +373,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
                 viewEditCoreComponentPage.openBCCPViewEditPageByManifestID(randomBCCP.getBccpManifestId());
 
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
-        bccpPanel.setDefinitionSource(randomPrint(50, 100).trim());
+        bccpPanel.setDefinitionSource(RandomStringUtils.secure().nextPrint(50, 100).trim());
         BCCPViewEditPage finalBccpViewEditPage = bccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalBccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
@@ -379,12 +386,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -427,12 +435,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("fea2278fc93f48b98cf5bb3e32c004e8", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "fea2278fc93f48b98cf5bb3e32c004e8", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -456,12 +465,13 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
         // Code. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", release.getReleaseNumber());
         BCCPObject randomBCCP = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());

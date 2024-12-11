@@ -50,8 +50,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public ACCObject getACCByDENAndReleaseNum(String den, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public ACCObject getACCByDENAndReleaseNum(LibraryObject library, String den, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(ACC_MANIFEST.ACC_MANIFEST_ID);
         fields.add(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
@@ -111,8 +111,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public ASCCPObject getASCCPByDENAndReleaseNum(String den, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public ASCCPObject getASCCPByDENAndReleaseNum(LibraryObject library, String den, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(ASCCP_MANIFEST.ASCCP_MANIFEST_ID);
         fields.add(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID);
@@ -168,8 +168,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public BCCPObject getBCCPByDENAndReleaseNum(String den, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public BCCPObject getBCCPByDENAndReleaseNum(LibraryObject library, String den, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(BCCP_MANIFEST.BCCP_MANIFEST_ID);
         fields.add(BCCP_MANIFEST.BDT_MANIFEST_ID);
@@ -215,8 +215,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public DTObject getCDTByDENAndReleaseNum(String den, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public DTObject getCDTByDENAndReleaseNum(LibraryObject library, String den, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
@@ -239,8 +239,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public DTObject getBDTByGuidAndReleaseNum(String guid, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public DTObject getBDTByGuidAndReleaseNum(LibraryObject library, String guid, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
@@ -258,8 +258,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public List<DTObject> getBDTByDENAndReleaseNum(String den, String releaseNum) {
-        ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
+    public List<DTObject> getBDTByDENAndReleaseNum(LibraryObject library, String den, String releaseNum) {
+        ULong releaseId = getReleaseIdByReleaseNum(library, releaseNum);
         List<Field<?>> fields = new ArrayList();
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
@@ -293,6 +293,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     public ACCObject createRandomACC(AppUserObject creator, ReleaseObject release,
                                      NamespaceObject namespace, String state,
                                      ComponentType type, String objectClassTerm) {
+        LibraryObject library = apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId());
         ACCObject basedAcc = null;
         ACCObject acc = ACCObject.createRandomACC(creator, namespace, state);
         acc.setComponentType(type);
@@ -306,7 +307,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         accRecord.setOagisComponentType(type.getValue());
         if (type == Extension) {
             accRecord.setType("Extension");
-            basedAcc = getACCByDENAndReleaseNum("All Extension. Details", release.getReleaseNumber());
+            basedAcc = getACCByDENAndReleaseNum(library, "All Extension. Details", release.getReleaseNumber());
         } else {
             accRecord.setType("Default");
         }
@@ -368,7 +369,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId())
+            );
             AccManifestRecord prevAccManifestRecord = accManifestRecord.copy();
             prevAccManifestRecord.setAccManifestId(null);
             prevAccManifestRecord.setAccId(accId);
@@ -402,7 +405,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
-    public DTObject getLatestDTCreated(String den, String branch) {
+    public DTObject getLatestDTCreated(LibraryObject library, String den, String branch) {
         ULong latestCreatedDT = dslContext.select(DSL.max(DT.DT_ID))
                 .from(DT)
                 .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
@@ -411,7 +414,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                         RELEASE.RELEASE_NUM.eq(branch),
                         DT_MANIFEST.DEN.eq(den)))
                 .fetchOneInto(ULong.class);
-        ULong releaseId = getReleaseIdByReleaseNum(branch);
+        ULong releaseId = getReleaseIdByReleaseNum(library, branch);
         List<Field<?>> fields = new ArrayList();
         fields.add(DT_MANIFEST.DT_MANIFEST_ID);
         fields.add(DT_MANIFEST.BASED_DT_MANIFEST_ID);
@@ -523,7 +526,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccpManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId().toBigInteger())
+            );
             AsccpManifestRecord prevAsccpManifestRecord = asccpManifestRecord.copy();
             prevAsccpManifestRecord.setAsccpManifestId(null);
             prevAsccpManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
@@ -616,7 +621,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccpManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId().toBigInteger())
+            );
             BccpManifestRecord prevBccpManifestRecord = bccpManifestRecord.copy();
             prevBccpManifestRecord.setBccpManifestId(null);
             prevBccpManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
@@ -1219,7 +1226,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(asccManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId().toBigInteger())
+            );
             AsccManifestRecord prevAsccManifestRecord = asccManifestRecord.copy();
             prevAsccManifestRecord.setAsccManifestId(null);
             prevAsccManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
@@ -1393,7 +1402,9 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                     .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bccManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId().toBigInteger())
+            );
             BccManifestRecord prevBccManifestRecord = bccManifestRecord.copy();
             prevBccManifestRecord.setBccManifestId(null);
             prevBccManifestRecord.setReleaseId(ULong.valueOf(latestRelease.getReleaseId()));
@@ -1554,11 +1565,8 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         return dt;
     }
 
-    private ULong getReleaseIdByReleaseNum(String releaseNum) {
-        return dslContext.select(RELEASE.RELEASE_ID)
-                .from(RELEASE)
-                .where(RELEASE.RELEASE_NUM.eq(releaseNum))
-                .fetchOneInto(ULong.class);
+    private ULong getReleaseIdByReleaseNum(LibraryObject library, String releaseNum) {
+        return ULong.valueOf(apiFactory.getReleaseAPI().getReleaseByReleaseNumber(library, releaseNum).getReleaseId());
     }
 
     @Override

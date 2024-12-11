@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.DTObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
@@ -54,11 +51,12 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
             DTObject dtDevPublished = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespaceDeveloper, "Published");
             dtForTesting.add(dtDevPublished);
 
@@ -100,10 +98,11 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtEUWIP = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, endUserA, namespaceEU, "WIP");
             dtForTesting.add(dtEUWIP);
@@ -137,10 +136,11 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtEUQA = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, endUserA, namespaceEU, "QA");
             dtForTesting.add(dtEUQA);
@@ -174,10 +174,11 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtEUProduction = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, endUserA, namespaceEU, "Production");
             dtForTesting.add(dtEUProduction);
@@ -211,10 +212,11 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtEUDeleted = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, endUserA, namespaceEU, "Deleted");
             dtForTesting.add(dtEUDeleted);
@@ -252,11 +254,12 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtDevPublished = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespaceDeveloper, "Published");
             dtForTesting.add(dtDevPublished);
@@ -296,11 +299,12 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            NamespaceObject namespaceDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", branch.getReleaseNumber());
+            DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", branch.getReleaseNumber());
 
             DTObject dtDevPublished = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseDT, developerB, namespaceDeveloper, "Published");
             dtForTesting.add(dtDevPublished);
@@ -329,7 +333,8 @@ public class TC_39_1_AccessToDTViewingEditingAndCommenting extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();

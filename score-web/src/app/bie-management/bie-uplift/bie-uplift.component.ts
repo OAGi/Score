@@ -98,6 +98,7 @@ export class BieUpliftComponent implements OnInit {
   targetReleaseId: number;
   bieGuid: string;
   bieName: string;
+  sourceLibraryId: number;
   sourceReleaseNum: string;
   targetReleaseNum: string;
 
@@ -143,6 +144,7 @@ export class BieUpliftComponent implements OnInit {
       ]).subscribe(([sourceCcGraph, sourceRootNode,
                       sourceUsedBieList, sourceRefBieList,
                       targetCcGraph]) => {
+        this.sourceLibraryId = sourceRootNode.libraryId;
         this.bieGuid = sourceRootNode.guid;
         this.bieName = sourceRootNode.name;
         this.sourceReleaseNum = sourceRootNode.releaseNum;
@@ -618,6 +620,7 @@ export class BieUpliftComponent implements OnInit {
         data: {
           title: 'Select Profile BIE to reuse',
           asccpManifestId: (node._node as unknown as AsbiepFlatNode).asccpNode.manifestId,
+          libraryId: this.sourceLibraryId,
           releaseId: this.targetReleaseId,
           topLevelAsbiepId: this.topLevelAsbiepId
         },

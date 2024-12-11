@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -275,12 +274,12 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         CreateContextSchemePage createContextSchemePage = viewEditContextSchemePage.openCreateContextSchemePage();
 
         String oldName = randomContextScheme.getSchemeName();
-        String newName = "cs_" + randomAlphanumeric(5, 10);
+        String newName = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertNotEquals(newName, oldName);
         randomContextScheme.setSchemeName(newName);
 
         String oldVersion = randomContextScheme.getSchemeVersionId();
-        String newVersion = "cs_version_id_" + randomAlphanumeric(5, 10);
+        String newVersion = "cs_version_id_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertNotEquals(newVersion, oldVersion);
         randomContextScheme.setSchemeVersionId(newVersion);
 
@@ -1118,9 +1117,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     @Test
     @DisplayName("TC_5_2_TA_18a")
     public void developer_can_add_context_scheme_from_developer_code_list_in_latest_release() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, latestRelease, "Published");
         List<CodeListValueObject> randomCodeListValues = Arrays.asList(
@@ -1150,7 +1150,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1164,9 +1164,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     @Test
     @DisplayName("TC_5_2_TA_18b")
     public void developer_can_add_context_scheme_from_developer_code_list_in_older_release() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, olderRelease, "Published");
         List<CodeListValueObject> randomCodeListValues = Arrays.asList(
@@ -1196,7 +1197,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1213,9 +1214,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+                getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum(
                 "oacl_RelatedCorrectiveActionCode", latestRelease.getReleaseNumber());
         CodeListObject derivedCodeList =
@@ -1244,7 +1246,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1261,9 +1263,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+                getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
         CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().getCodeListByCodeListNameAndReleaseNum(
                 "oacl_RelatedCorrectiveActionCode", latestRelease.getReleaseNumber());
         CodeListObject derivedCodeList =
@@ -1292,7 +1295,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1306,9 +1309,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     @Test
     @DisplayName("TC_5_2_TA_20")
     public void developer_can_change_context_scheme_values_added_by_code_list() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, latestRelease, "Published");
         List<CodeListValueObject> randomCodeListValues = Arrays.asList(
@@ -1338,8 +1342,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
             assertEquals(codeListValue.getMeaning(), getText(contextSchemeValueDialog.getMeaningField()));
 
             ContextSchemeValueObject randomContextSchemeValue = new ContextSchemeValueObject();
-            randomContextSchemeValue.setValue("csv_" + randomAlphanumeric(5, 10));
-            randomContextSchemeValue.setMeaning(randomPrint(50, 100).trim());
+            randomContextSchemeValue.setValue("csv_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+            randomContextSchemeValue.setMeaning(RandomStringUtils.secure().nextPrint(50, 100).trim());
             randomContextSchemeValues.add(randomContextSchemeValue);
 
             contextSchemeValueDialog.setValue(randomContextSchemeValue.getValue());
@@ -1349,7 +1353,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1369,9 +1373,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     @Test
     @DisplayName("TC_5_2_TA_21")
     public void developer_can_add_value_to_context_scheme_after_values_loaded_from_code_list() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, latestRelease, "Published");
         List<CodeListValueObject> randomCodeListValues = Arrays.asList(
@@ -1400,8 +1405,8 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
             ContextSchemeValueDialog contextSchemeValueDialog = createContextSchemePage.openContextSchemeValueDialog();
 
             ContextSchemeValueObject randomContextSchemeValue = new ContextSchemeValueObject();
-            randomContextSchemeValue.setValue("csv_" + randomAlphanumeric(5, 10));
-            randomContextSchemeValue.setMeaning(randomPrint(50, 100).trim());
+            randomContextSchemeValue.setValue("csv_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+            randomContextSchemeValue.setMeaning(RandomStringUtils.secure().nextPrint(50, 100).trim());
             randomContextSchemeValues.add(randomContextSchemeValue);
 
             contextSchemeValueDialog.setValue(randomContextSchemeValue.getValue());
@@ -1411,7 +1416,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1436,9 +1441,10 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
     @Test
     @DisplayName("TC_5_2_TA_22")
     public void developer_can_delete_value_from_context_scheme_added_by_selected_code_list() {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, latestRelease, "Published");
         List<CodeListValueObject> randomCodeListValues = Arrays.asList(
@@ -1467,7 +1473,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         }
 
         createContextSchemePage.setContextCategory(randomContextCategory);
-        String name = "cs_" + randomAlphanumeric(5, 10);
+        String name = "cs_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createContextSchemePage.setName(name);
         createContextSchemePage.hitCreateButton();
 
@@ -1513,7 +1519,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
                 getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
         String namePrefix = "cs_TC52_TA24";
         List<ContextSchemeObject> randomContextSchemes = new ArrayList<>();
-        for (int i = 0; i < RandomUtils.nextInt(11, 20); ++i) {
+        for (int i = 0; i < RandomUtils.secure().randomInt(11, 20); ++i) {
             ContextSchemeObject randomContextScheme =
                     getAPIFactory().getContextSchemeAPI().createRandomContextScheme(randomContextCategory, appUser, namePrefix);
             randomContextSchemes.add(randomContextScheme);
@@ -1527,7 +1533,7 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
         viewEditContextSchemePage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
+                "/tr[" + RandomUtils.secure().randomInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(Duration.ofSeconds(3L))

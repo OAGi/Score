@@ -213,6 +213,8 @@ export class AccDetailComponent implements OnInit {
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
 
+      this.workingRelease = rootNode.workingRelease;
+
       this.rootNode = this.dataSource.data[0] as AccFlatNode;
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
@@ -712,6 +714,7 @@ export class AccDetailComponent implements OnInit {
 
     const dialogRef = this.dialog.open(AppendAssociationDialogComponent, {
       data: {
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
@@ -828,6 +831,7 @@ export class AccDetailComponent implements OnInit {
     }
     const dialogRef = this.dialog.open(BasedAccDialogComponent, {
       data: {
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         manifestId: this.rootNode.manifestId,
         action: 'set'

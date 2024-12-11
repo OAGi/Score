@@ -44,9 +44,10 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -94,10 +95,11 @@ public class TC_42_3_BusinessTermFromBIEDetailPage extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());

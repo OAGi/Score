@@ -90,7 +90,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
      * The column <code>oagi.asccp_manifest.den</code>. The dictionary entry
      * name of the ASCCP.
      */
-    public final TableField<AsccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The dictionary entry name of the ASCCP.");
+    public final TableField<AsccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(202).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The dictionary entry name of the ASCCP.");
 
     /**
      * The column <code>oagi.asccp_manifest.conflict</code>. This indicates that
@@ -200,19 +200,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
 
     @Override
     public List<ForeignKey<AsccpManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASCCP_MANIFEST_RELEASE_ID_FK, Keys.ASCCP_MANIFEST_ASCCP_ID_FK, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_LOG_ID_FK, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_NEXT_ASCCP_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.ASCCP_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.ASCCP_MANIFEST_ASCCP_ID_FK, Keys.ASCCP_MANIFEST_LOG_ID_FK, Keys.ASCCP_MANIFEST_NEXT_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_RELEASE_ID_FK, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK);
     }
 
     private transient AsccpPath _asccp;
@@ -227,18 +215,6 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
         return _asccp;
     }
 
-    private transient AccManifestPath _accManifest;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
-     */
-    public AccManifestPath accManifest() {
-        if (_accManifest == null)
-            _accManifest = new AccManifestPath(this, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK, null);
-
-        return _accManifest;
-    }
-
     private transient LogPath _log;
 
     /**
@@ -249,32 +225,6 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
             _log = new LogPath(this, Keys.ASCCP_MANIFEST_LOG_ID_FK, null);
 
         return _log;
-    }
-
-    private transient AsccpManifestPath _asccpReplacementAsccpManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table,
-     * via the <code>asccp_replacement_asccp_manifest_id_fk</code> key.
-     */
-    public AsccpManifestPath asccpReplacementAsccpManifestIdFk() {
-        if (_asccpReplacementAsccpManifestIdFk == null)
-            _asccpReplacementAsccpManifestIdFk = new AsccpManifestPath(this, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK, null);
-
-        return _asccpReplacementAsccpManifestIdFk;
-    }
-
-    private transient AsccpManifestPath _asccpManifestPrevAsccpManifestIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table,
-     * via the <code>asccp_manifest_prev_asccp_manifest_id_fk</code> key.
-     */
-    public AsccpManifestPath asccpManifestPrevAsccpManifestIdFk() {
-        if (_asccpManifestPrevAsccpManifestIdFk == null)
-            _asccpManifestPrevAsccpManifestIdFk = new AsccpManifestPath(this, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK, null);
-
-        return _asccpManifestPrevAsccpManifestIdFk;
     }
 
     private transient AsccpManifestPath _asccpManifestNextAsccpManifestIdFk;
@@ -290,6 +240,56 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
         return _asccpManifestNextAsccpManifestIdFk;
     }
 
+    private transient AsccpManifestPath _asccpManifestPrevAsccpManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table,
+     * via the <code>asccp_manifest_prev_asccp_manifest_id_fk</code> key.
+     */
+    public AsccpManifestPath asccpManifestPrevAsccpManifestIdFk() {
+        if (_asccpManifestPrevAsccpManifestIdFk == null)
+            _asccpManifestPrevAsccpManifestIdFk = new AsccpManifestPath(this, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK, null);
+
+        return _asccpManifestPrevAsccpManifestIdFk;
+    }
+
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.ASCCP_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient AccManifestPath _accManifest;
+
+    /**
+     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     */
+    public AccManifestPath accManifest() {
+        if (_accManifest == null)
+            _accManifest = new AccManifestPath(this, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK, null);
+
+        return _accManifest;
+    }
+
+    private transient AsccpManifestPath _asccpReplacementAsccpManifestIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table,
+     * via the <code>asccp_replacement_asccp_manifest_id_fk</code> key.
+     */
+    public AsccpManifestPath asccpReplacementAsccpManifestIdFk() {
+        if (_asccpReplacementAsccpManifestIdFk == null)
+            _asccpReplacementAsccpManifestIdFk = new AsccpManifestPath(this, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK, null);
+
+        return _asccpReplacementAsccpManifestIdFk;
+    }
+
     private transient AsbiepPath _asbiep;
 
     /**
@@ -300,19 +300,6 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
             _asbiep = new AsbiepPath(this, null, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK.getInverseKey());
 
         return _asbiep;
-    }
-
-    private transient AsccpManifestTagPath _asccpManifestTag;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest_tag</code> table
-     */
-    public AsccpManifestTagPath asccpManifestTag() {
-        if (_asccpManifestTag == null)
-            _asccpManifestTag = new AsccpManifestTagPath(this, null, Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK.getInverseKey());
-
-        return _asccpManifestTag;
     }
 
     private transient AsccManifestPath _asccManifest;
@@ -326,6 +313,19 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
             _asccManifest = new AsccManifestPath(this, null, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK.getInverseKey());
 
         return _asccManifest;
+    }
+
+    private transient AsccpManifestTagPath _asccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest_tag</code> table
+     */
+    public AsccpManifestTagPath asccpManifestTag() {
+        if (_asccpManifestTag == null)
+            _asccpManifestTag = new AsccpManifestTagPath(this, null, Keys.ASCCP_MANIFEST_TAG_ASCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _asccpManifestTag;
     }
 
     private transient ModuleAsccpManifestPath _moduleAsccpManifest;

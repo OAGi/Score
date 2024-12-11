@@ -167,7 +167,9 @@ export class AgencyIdList {
 
   constructor(obj?: AgencyIdList) {
     if (!!obj) {
+      this.libraryId = obj.libraryId;
       this.releaseId = obj.releaseId;
+      this.workingRelease = obj.workingRelease;
       this.agencyIdListManifestId = obj.agencyIdListManifestId;
       this.agencyIdListValueManifestId = obj.agencyIdListValueManifestId;
       this.name = obj.name;
@@ -205,7 +207,7 @@ export class AgencyIdList {
   }
 
   get hashCode(): number {
-    return hashCode4Array(this.releaseId,
+    return hashCode4Array(this.libraryId, this.releaseId,
       this.agencyIdListManifestId, this.agencyIdListValueManifestId, this.basedAgencyIdListManifestId,
       this.name, this.agencyId, this.versionId, this.namespaceId,
       this.guid, this.listId, this.definition, this.definitionSource, this.remark, this.modulePath,

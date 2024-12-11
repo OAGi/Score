@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_4_EndUsersProfileManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -17,7 +18,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -61,7 +61,7 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = "eu_" + randomAlphanumeric(5, 10);
+        String newPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         settingsAccountPage.updatePassword(appUser.getPassword(), newPassword);
 
         homePage.logout();
@@ -77,7 +77,7 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = randomAlphanumeric(1, 1);
+        String newPassword = RandomStringUtils.secure().nextAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
                 settingsAccountPage.updatePassword(appUser.getPassword(), newPassword));
 
@@ -91,10 +91,10 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String wrongOldPassword = "eu_" + randomAlphanumeric(5, 10);
+        String wrongOldPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertFalse(wrongOldPassword.equals(appUser.getPassword()));
 
-        String newPassword = "eu_" + randomAlphanumeric(5, 10);
+        String newPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         AccountUpdateException error = assertThrows(AccountUpdateException.class, () ->
                 settingsAccountPage.updatePassword(wrongOldPassword, newPassword));
 
@@ -108,8 +108,8 @@ public class TC_4_1_EndUsersProfileManagement extends BaseTest {
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = "eu_" + randomAlphanumeric(5, 10);
-        String confirmNewPassword = "eu_" + randomAlphanumeric(5, 10);
+        String newPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String confirmNewPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertFalse(newPassword.equals(confirmNewPassword));
 
         assertThrows(TimeoutException.class, () ->

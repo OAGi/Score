@@ -170,13 +170,29 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
+     * Setter for <code>oagi.bbiep.display_name</code>. The display name of the
+     * BBIEP
+     */
+    public void setDisplayName(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbiep.display_name</code>. The display name of the
+     * BBIEP
+     */
+    public String getDisplayName() {
+        return (String) get(8);
+    }
+
+    /**
      * Setter for <code>oagi.bbiep.created_by</code>. A foreign key referring to
      * the user who creates the BBIEP. The creator of the BBIEP is also its
      * owner by default. BBIEPs created as children of another ABIE have the
      * same CREATED_BY',
      */
     public void setCreatedBy(ULong value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -186,7 +202,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * same CREATED_BY',
      */
     public ULong getCreatedBy() {
-        return (ULong) get(8);
+        return (ULong) get(9);
     }
 
     /**
@@ -194,7 +210,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * referring to the last user who has updated the BBIEP record. 
      */
     public void setLastUpdatedBy(ULong value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -202,7 +218,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * referring to the last user who has updated the BBIEP record. 
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(9);
+        return (ULong) get(10);
     }
 
     /**
@@ -211,7 +227,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * ABIE have the same CREATION_TIMESTAMP,
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
@@ -220,7 +236,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * ABIE have the same CREATION_TIMESTAMP,
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(10);
+        return (LocalDateTime) get(11);
     }
 
     /**
@@ -228,7 +244,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * when the BBIEP was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
@@ -236,7 +252,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * when the BBIEP was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(12);
     }
 
     /**
@@ -244,7 +260,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
@@ -252,7 +268,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(12);
+        return (ULong) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -278,7 +294,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     /**
      * Create a detached, initialised BbiepRecord
      */
-    public BbiepRecord(ULong bbiepId, String guid, ULong basedBccpManifestId, String path, String hashPath, String definition, String remark, String bizTerm, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
+    public BbiepRecord(ULong bbiepId, String guid, ULong basedBccpManifestId, String path, String hashPath, String definition, String remark, String bizTerm, String displayName, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
         super(Bbiep.BBIEP);
 
         setBbiepId(bbiepId);
@@ -289,6 +305,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
         setDefinition(definition);
         setRemark(remark);
         setBizTerm(bizTerm);
+        setDisplayName(displayName);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);
         setCreationTimestamp(creationTimestamp);

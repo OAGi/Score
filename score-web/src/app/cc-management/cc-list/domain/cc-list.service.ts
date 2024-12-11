@@ -15,8 +15,8 @@ export class CcListService {
   constructor(private http: HttpClient) {
   }
 
-  getSummaryCcList(): Observable<SummaryCcInfo> {
-    return this.http.get<SummaryCcInfo>('/api/info/cc_summary').pipe(map(
+  getSummaryCcList(libraryId: number): Observable<SummaryCcInfo> {
+    return this.http.get<SummaryCcInfo>('/api/info/cc_summary?libraryId=' + libraryId).pipe(map(
       e => {
         if (e.myRecentCCs) {
           e.myRecentCCs = e.myRecentCCs.map(elm => {
@@ -28,8 +28,8 @@ export class CcListService {
       }));
   }
 
-  getSummaryCcExtList(releaseId: number): Observable<SummaryCcExtInfo> {
-    return this.http.get<SummaryCcExtInfo>('/api/info/cc_ext_summary?releaseId=' + releaseId).pipe(map(
+  getSummaryCcExtList(libraryId: number, releaseId: number): Observable<SummaryCcExtInfo> {
+    return this.http.get<SummaryCcExtInfo>('/api/info/cc_ext_summary?libraryId=' + libraryId + '&releaseId=' + releaseId).pipe(map(
       e => {
         if (e.myExtensionsUnusedInBIEs) {
           e.myExtensionsUnusedInBIEs = e.myExtensionsUnusedInBIEs.map(elm => {

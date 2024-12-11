@@ -260,19 +260,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
     @Override
     public List<ForeignKey<CodeListValueRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK, Keys.CODE_LIST_VALUE_BASED_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_CREATED_BY_FK, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.CODE_LIST_VALUE_PREV_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK);
-    }
-
-    private transient CodeListPath _codeList;
-
-    /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table.
-     */
-    public CodeListPath codeList() {
-        if (_codeList == null)
-            _codeList = new CodeListPath(this, Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK, null);
-
-        return _codeList;
+        return Arrays.asList(Keys.CODE_LIST_VALUE_BASED_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK, Keys.CODE_LIST_VALUE_CREATED_BY_FK, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK, Keys.CODE_LIST_VALUE_PREV_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK);
     }
 
     private transient CodeListValuePath _codeListValueBasedCodeListValueIdFk;
@@ -289,18 +277,16 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
         return _codeListValueBasedCodeListValueIdFk;
     }
 
-    private transient CodeListValuePath _codeListValueReplacementCodeListValueIdFk;
+    private transient CodeListPath _codeList;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list_value</code>
-     * table, via the
-     * <code>code_list_value_replacement_code_list_value_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.code_list</code> table.
      */
-    public CodeListValuePath codeListValueReplacementCodeListValueIdFk() {
-        if (_codeListValueReplacementCodeListValueIdFk == null)
-            _codeListValueReplacementCodeListValueIdFk = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK, null);
+    public CodeListPath codeList() {
+        if (_codeList == null)
+            _codeList = new CodeListPath(this, Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK, null);
 
-        return _codeListValueReplacementCodeListValueIdFk;
+        return _codeList;
     }
 
     private transient AppUserPath _codeListValueCreatedByFk;
@@ -316,19 +302,6 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
         return _codeListValueCreatedByFk;
     }
 
-    private transient AppUserPath _codeListValueOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>code_list_value_owner_user_id_fk</code> key.
-     */
-    public AppUserPath codeListValueOwnerUserIdFk() {
-        if (_codeListValueOwnerUserIdFk == null)
-            _codeListValueOwnerUserIdFk = new AppUserPath(this, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK, null);
-
-        return _codeListValueOwnerUserIdFk;
-    }
-
     private transient AppUserPath _codeListValueLastUpdatedByFk;
 
     /**
@@ -340,6 +313,33 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
             _codeListValueLastUpdatedByFk = new AppUserPath(this, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK, null);
 
         return _codeListValueLastUpdatedByFk;
+    }
+
+    private transient CodeListValuePath _codeListValueNextCodeListValueIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.code_list_value</code>
+     * table, via the <code>code_list_value_next_code_list_value_id_fk</code>
+     * key.
+     */
+    public CodeListValuePath codeListValueNextCodeListValueIdFk() {
+        if (_codeListValueNextCodeListValueIdFk == null)
+            _codeListValueNextCodeListValueIdFk = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK, null);
+
+        return _codeListValueNextCodeListValueIdFk;
+    }
+
+    private transient AppUserPath _codeListValueOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>code_list_value_owner_user_id_fk</code> key.
+     */
+    public AppUserPath codeListValueOwnerUserIdFk() {
+        if (_codeListValueOwnerUserIdFk == null)
+            _codeListValueOwnerUserIdFk = new AppUserPath(this, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK, null);
+
+        return _codeListValueOwnerUserIdFk;
     }
 
     private transient CodeListValuePath _codeListValuePrevCodeListValueIdFk;
@@ -356,18 +356,18 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
         return _codeListValuePrevCodeListValueIdFk;
     }
 
-    private transient CodeListValuePath _codeListValueNextCodeListValueIdFk;
+    private transient CodeListValuePath _codeListValueReplacementCodeListValueIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.code_list_value</code>
-     * table, via the <code>code_list_value_next_code_list_value_id_fk</code>
-     * key.
+     * table, via the
+     * <code>code_list_value_replacement_code_list_value_id_fk</code> key.
      */
-    public CodeListValuePath codeListValueNextCodeListValueIdFk() {
-        if (_codeListValueNextCodeListValueIdFk == null)
-            _codeListValueNextCodeListValueIdFk = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK, null);
+    public CodeListValuePath codeListValueReplacementCodeListValueIdFk() {
+        if (_codeListValueReplacementCodeListValueIdFk == null)
+            _codeListValueReplacementCodeListValueIdFk = new CodeListValuePath(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK, null);
 
-        return _codeListValueNextCodeListValueIdFk;
+        return _codeListValueReplacementCodeListValueIdFk;
     }
 
     private transient CodeListValueManifestPath _codeListValueManifest;

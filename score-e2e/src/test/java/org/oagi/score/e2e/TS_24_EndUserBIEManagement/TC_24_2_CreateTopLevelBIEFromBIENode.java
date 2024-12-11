@@ -51,10 +51,11 @@ public class TC_24_2_CreateTopLevelBIEFromBIENode extends BaseTest {
         ASCCPObject asccp, asccp_for_usera, asccp_lv2;
         ACCObject acc, acc_association, acc_association_lv2;
         AppUserObject usera, userb;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -63,7 +64,7 @@ public class TC_24_2_CreateTopLevelBIEFromBIENode extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 

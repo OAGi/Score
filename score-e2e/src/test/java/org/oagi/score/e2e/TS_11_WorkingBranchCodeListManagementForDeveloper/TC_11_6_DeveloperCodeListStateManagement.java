@@ -39,6 +39,7 @@ public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
     @DisplayName("TC_11_6_from_TA_1_to_TA_4")
     public void test_from_TA_1_to_TA_4() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -46,8 +47,9 @@ public class TC_11_6_DeveloperCodeListStateManagement extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);

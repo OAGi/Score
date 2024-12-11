@@ -374,6 +374,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.dataSource.init();
       this.dataSource.hideProhibited = hideProhibited;
 
+      this.workingRelease = rootNode.workingRelease;
+
       this.rootNode = this.dataSource.data[0] as DtFlatNode;
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;

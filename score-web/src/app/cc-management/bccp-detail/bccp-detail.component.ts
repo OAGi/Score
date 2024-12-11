@@ -305,6 +305,8 @@ export class BccpDetailComponent implements OnInit {
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
+      this.workingRelease = rootNode.workingRelease;
+
       this.rootNode = this.dataSource.data[0] as BccpFlatNode;
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
@@ -569,6 +571,7 @@ export class BccpDetailComponent implements OnInit {
   changeBdt(node: CcFlatNode) {
     const dialogRef = this.dialog.open(CreateBccpDialogComponent, {
       data: {
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         action: 'update',
         state: node.state,

@@ -38,6 +38,7 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_8_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -45,8 +46,9 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerA);
@@ -78,6 +80,7 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
     public void test_TA_2() {
         AppUserObject developerA;
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         Map<BigInteger, CodeListValueObject> codeListCodeListValueMap = new HashMap<>();
@@ -88,8 +91,9 @@ public class TC_11_8_RestoringDeveloperCodeList extends BaseTest {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, workingBranch, "WIP");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);

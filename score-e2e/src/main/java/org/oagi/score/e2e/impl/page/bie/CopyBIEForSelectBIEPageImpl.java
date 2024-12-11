@@ -78,7 +78,7 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
 
     @Override
     public WebElement getSubtitle() {
-        return visibilityOfElementLocated(getDriver(), By.className("mat-mdc-card-subtitle"));
+        return visibilityOfElementLocated(getDriver(), By.className("subtitle"));
     }
 
     @Override

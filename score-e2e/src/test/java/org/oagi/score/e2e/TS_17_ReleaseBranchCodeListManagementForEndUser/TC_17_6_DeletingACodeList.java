@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_17_ReleaseBranchCodeListManagementForEndUser;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,22 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.escape;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -51,8 +47,9 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create WIP end-user Code List for a particular release branch.
@@ -81,8 +78,9 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-        NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+        NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
         CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespaceEU, branch, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -90,7 +88,7 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
         DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT("Process Category_ Code. Type", branch.getReleaseNumber());
         dtViewEditPage.showValueDomain();
         dtViewEditPage.addCodeListValueDomain(codeList.getName());
-        String qualifier = "testDataType" + randomAlphabetic(5, 10);
+        String qualifier = "testDataType" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         dtViewEditPage.setQualifier(qualifier);
         String definition = getText(dtViewEditPage.getDefinitionField());
         dtViewEditPage.setNamespace(namespaceEU);
@@ -135,8 +133,9 @@ public class TC_17_6_DeletingACodeList extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, branch, "Production");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);

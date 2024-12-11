@@ -13,8 +13,10 @@ public interface AgencyIdListReadRepository {
 
     GetAgencyIdListListResponse getAgencyIdListList(GetAgencyIdListListRequest request) throws ScoreDataAccessException;
 
-    AgencyIdList getAgencyIdList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
+    AgencyIdList getAgencyIdListByAgencyIdListManifestId(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
 
-    List<AgencyIdListValue> getAgencyIdListValueList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
+    AgencyIdList getAgencyIdListByAgencyIdListId(BigInteger agencyIdListId) throws ScoreDataAccessException;
+
+    List<AgencyIdListValue> getAgencyIdListValueListByAgencyIdListManifestId(BigInteger agencyIdListManifestId) throws ScoreDataAccessException;
     
 }

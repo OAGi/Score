@@ -44,13 +44,14 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
         AppUserObject endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUserA);
 
-        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
         CodeListObject codeList = getAPIFactory().getCodeListAPI().
                 createRandomCodeList(endUserA, endUserNamespace, branch, "WIP");
 
-        DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+        DTObject cdt = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
         DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(cdt, endUserA, endUserNamespace, "WIP");
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
@@ -61,7 +62,7 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
          * Test Assertion #41.3.1.a
          */
         assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
-        List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs();
+        List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs(library);
         for (NamespaceObject namespace : standardNamespaces) {
             click(dtViewEditPage.getNamespaceField());
             waitFor(ofMillis(1000L));
@@ -115,10 +116,11 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespace, "WIP");
             dtForTesting.add(randomBDT);
         }
@@ -148,13 +150,14 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
 
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUserA, namespace, branch, "WIP");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, endUserA, namespace, "WIP");
             dtForTesting.add(randomBDT);
 

@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_42_BusinessTerm;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.*;
+import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -65,8 +67,8 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.openCreateBusinessTermPage();
 
         BusinessTermObject businessTerm = new BusinessTermObject();
-        businessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
-        businessTerm.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
+        businessTerm.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        businessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
         EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditBusinessTermPageByTerm(businessTerm.getBusinessTerm());
         assertEquals(businessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
@@ -85,11 +87,11 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.openCreateBusinessTermPage();
 
         BusinessTermObject businessTerm1 = new BusinessTermObject();
-        businessTerm1.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
+        businessTerm1.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm1));
 
         BusinessTermObject businessTerm2 = new BusinessTermObject();
-        businessTerm2.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
+        businessTerm2.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm2));
     }
 
@@ -144,19 +146,19 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         EditBusinessTermPage editBusinessTermPage = bieMenu.openViewEditBusinessTermSubMenu().openEditBusinessTermPageByTerm(randomBusinessTerm.getBusinessTerm());
 
         String oldTermName = randomBusinessTerm.getBusinessTerm();
-        randomBusinessTerm.setBusinessTerm("bt_" + randomAlphanumeric(5, 10));
+        randomBusinessTerm.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         assertNotEquals(oldTermName, randomBusinessTerm.getBusinessTerm());
 
         String oldExternalRefUri = randomBusinessTerm.getExternalReferenceUri();
-        randomBusinessTerm.setExternalReferenceUri("http://www." + randomAscii(3, 8) + ".com");
+        randomBusinessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
         assertNotEquals(oldExternalRefUri, randomBusinessTerm.getExternalReferenceUri());
 
         String oldExternalRefID = randomBusinessTerm.getExternalReferenceId();
-        randomBusinessTerm.setExternalReferenceId(randomNumeric(1, 10));
+        randomBusinessTerm.setExternalReferenceId(Integer.toString(RandomUtils.secure().randomInt(1, 10)));
         assertNotEquals(oldExternalRefID, randomBusinessTerm.getExternalReferenceId());
 
         String oldComment = randomBusinessTerm.getComment();
-        randomBusinessTerm.setComment(randomPrint(20, 50).trim());
+        randomBusinessTerm.setComment(RandomStringUtils.secure().nextPrint(20, 50).trim());
         assertNotEquals(oldComment, randomBusinessTerm.getComment());
 
         editBusinessTermPage.updateBusinessTerm(randomBusinessTerm);
@@ -215,10 +217,11 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
 
         //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
@@ -265,9 +268,10 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
 
         //use pre-existing BBIE node
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         BusinessContextObject randomBusinessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Collections.singletonList(randomBusinessContext), asccp, endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());

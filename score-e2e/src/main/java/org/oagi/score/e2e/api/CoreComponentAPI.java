@@ -27,7 +27,7 @@ public interface CoreComponentAPI {
      * @param releaseNum release number
      * @return ACC object
      */
-    ACCObject getACCByDENAndReleaseNum(String den, String releaseNum);
+    ACCObject getACCByDENAndReleaseNum(LibraryObject library, String den, String releaseNum);
 
     /**
      * Return the ASCCP by the given manifest ID.
@@ -44,7 +44,7 @@ public interface CoreComponentAPI {
      * @param releaseNum release number
      * @return ASCCP object
      */
-    ASCCPObject getASCCPByDENAndReleaseNum(String den, String releaseNum);
+    ASCCPObject getASCCPByDENAndReleaseNum(LibraryObject library, String den, String releaseNum);
 
     /**
      * Return the BCCP by the given manifest ID.
@@ -61,7 +61,7 @@ public interface CoreComponentAPI {
      * @param releaseNum release number
      * @return BCCP object
      */
-    BCCPObject getBCCPByDENAndReleaseNum(String den, String releaseNum);
+    BCCPObject getBCCPByDENAndReleaseNum(LibraryObject library, String den, String releaseNum);
 
     /**
      * Return the CDT by the given manifest ID.
@@ -78,7 +78,7 @@ public interface CoreComponentAPI {
      * @param releaseNum release number
      * @return CDT object
      */
-    DTObject getCDTByDENAndReleaseNum(String den, String releaseNum);
+    DTObject getCDTByDENAndReleaseNum(LibraryObject library, String den, String releaseNum);
 
     /**
      * Return the BDT by the given manifest ID.
@@ -93,7 +93,7 @@ public interface CoreComponentAPI {
      * @param releaseNum
      * @return
      */
-    DTObject getBDTByGuidAndReleaseNum(String guid, String releaseNum);
+    DTObject getBDTByGuidAndReleaseNum(LibraryObject library, String guid, String releaseNum);
 
     /**
      * Return the BDT by the given DEN and release number.
@@ -102,7 +102,7 @@ public interface CoreComponentAPI {
      * @param releaseNum release number
      * @return a list of BDT objects
      */
-    List<DTObject> getBDTByDENAndReleaseNum(String den, String releaseNum);
+    List<DTObject> getBDTByDENAndReleaseNum(LibraryObject library, String den, String releaseNum);
 
     /**
      * Create a random ACC.
@@ -213,7 +213,7 @@ public interface CoreComponentAPI {
     ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,
                                                NamespaceObject namespace, String state);
 
-    DTObject getLatestDTCreated(String den, String branch);
+    DTObject getLatestDTCreated(LibraryObject library, String den, String branch);
 
     BCCPObject getLatestBCCPCreatedByUser(AppUserObject user, String branch);
 

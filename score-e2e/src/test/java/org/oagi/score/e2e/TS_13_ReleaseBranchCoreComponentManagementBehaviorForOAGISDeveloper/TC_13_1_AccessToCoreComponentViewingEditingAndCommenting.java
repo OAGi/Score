@@ -41,6 +41,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     @DisplayName("TC_13_1_TA_1")
     public void test_TA_1() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject release;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
         ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
@@ -59,12 +60,13 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             userNamespaceMap.put(developerA, namespace);
             userNamespaceMap.put(developerB, namespace);
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
             userNamespaceMap.put(endUser, namespaceEU);
 
             /**
@@ -73,7 +75,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
-            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             bccpForTesting.add(bccp);
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "Published");
@@ -103,7 +105,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             acc = coreComponentAPI.createRandomACC(developerB, workingBranch, namespace, "WIP");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "WIP");
-            DTObject dtWorkingRelease = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", workingBranch.getReleaseNumber());
+            DTObject dtWorkingRelease = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", workingBranch.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dtWorkingRelease, developerB, namespace, "WIP");
             bccpForTesting.add(bccp);
             bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
@@ -189,7 +191,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCExtensionViewEditPage accExtensionViewEditPage =
                     editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
             String den = accExtensionViewEditPage.getDENFieldValue();
-            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, release.getReleaseNumber());
             userExtensions.add(accExtension);
             accExtensionViewEditPage.setNamespace(namespace);
             accExtensionViewEditPage.hitUpdateButton();
@@ -286,6 +288,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     @DisplayName("TC_13_1_TA_2")
     public void test_TA_2() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject release;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
         ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
@@ -302,10 +305,11 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             userNamespaceMap.put(developerA, namespace);
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
             userNamespaceMap.put(endUser, namespaceEU);
 
             /**
@@ -313,7 +317,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
              */
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
-            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
@@ -351,7 +355,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCExtensionViewEditPage accExtensionViewEditPage =
                     editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
             String den = accExtensionViewEditPage.getDENFieldValue();
-            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, release.getReleaseNumber());
             userExtensions.add(accExtension);
             accExtensionViewEditPage.setNamespace(namespace);
             accExtensionViewEditPage.hitUpdateButton();
@@ -428,6 +432,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     @DisplayName("TC_13_1_TA_3")
     public void test_TA_3() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject release;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
         ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
@@ -444,10 +449,11 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             userNamespaceMap.put(developerA, namespace);
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
             userNamespaceMap.put(endUser, namespaceEU);
 
             /**
@@ -455,7 +461,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
              */
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
-            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
@@ -509,7 +515,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             accExtensionViewEditPage.setNamespace(namespace);
             accExtensionViewEditPage.hitUpdateButton();
             accExtensionViewEditPage.moveToQA();
-            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, release.getReleaseNumber());
             userExtensions.add(accExtension);
             homePage.logout();
         }
@@ -593,7 +599,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             String den = accExtensionViewEditPage.getDENFieldValue();
             accExtensionViewEditPage.backToWIP();
             accExtensionViewEditPage.hitDeleteButton();
-            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, release.getReleaseNumber());
             userExtensions.add(accExtension);
             homePage.logout();
         }
@@ -620,6 +626,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     @DisplayName("TC_13_1_TA_4")
     public void test_TA_4() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject release;
         ArrayList<ACCObject> accForTesting = new ArrayList<>();
         ArrayList<BCCPObject> bccpForTesting = new ArrayList<>();
@@ -636,10 +643,11 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             userNamespaceMap.put(developerA, namespace);
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
             userNamespaceMap.put(endUser, namespaceEU);
 
             /**
@@ -647,7 +655,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
              */
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
-            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developerB, namespace, "Published");
@@ -689,7 +697,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             accExtensionViewEditPage.hitUpdateButton();
             accExtensionViewEditPage.moveToQA();
             accExtensionViewEditPage.moveToProduction();
-            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, release.getReleaseNumber());
+            ACCObject accExtension = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, release.getReleaseNumber());
             userExtensions.add(accExtension);
             homePage.logout();
         }
@@ -790,9 +798,10 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
 
             /**
@@ -801,7 +810,7 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
             ACCObject acc = coreComponentAPI.createRandomACC(developerB, release, namespace, "Published");
             accForTesting.add(acc);
             coreComponentAPI.appendExtension(acc, developerB, namespace, "Published");
-            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dt = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dt, developerB, namespace, "Published");
             bccpForTesting.add(bccp);
             coreComponentAPI.appendBCC(acc, bccp, "Published");
@@ -881,11 +890,12 @@ public class TC_13_1_AccessToCoreComponentViewingEditingAndCommenting extends Ba
     public void test_TA_7() {
         AppUserObject developerA;
         ReleaseObject release;
-
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         }
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();

@@ -48,7 +48,7 @@ public class CcInfoService {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }
 
-        List<SummaryCc> summaryCcList = ccRepository.getSummaryCcList(requester);
+        List<SummaryCc> summaryCcList = ccRepository.getSummaryCcList(requester, libraryId);
 
         SummaryCcInfo info = new SummaryCcInfo();
         Map<CcState, Integer> numberOfTotalCcByStates =

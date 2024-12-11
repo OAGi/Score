@@ -125,11 +125,19 @@ public class NamespaceService {
 
     @Transactional
     public void update(AuthenticatedPrincipal user, Namespace namespace) {
+        ULong libraryId = dslContext.select(NAMESPACE.LIBRARY_ID)
+                .from(NAMESPACE)
+                .where(NAMESPACE.NAMESPACE_ID.eq(ULong.valueOf(namespace.getNamespaceId())))
+                .fetchOptionalInto(ULong.class).orElse(null);
+        if (libraryId == null) {
+            throw new IllegalArgumentException("Namespace '" + namespace.getUri() + "' does not exist.");
+        }
+
         String uri = namespace.getUri();
         boolean isUriExist = dslContext.selectCount()
                 .from(NAMESPACE)
                 .where(and(
-                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
+                        NAMESPACE.LIBRARY_ID.eq(libraryId),
                         NAMESPACE.URI.eq(uri),
                         NAMESPACE.NAMESPACE_ID.notEqual(ULong.valueOf(namespace.getNamespaceId()))
                 ))
@@ -141,7 +149,7 @@ public class NamespaceService {
         boolean isPrefixExist = dslContext.selectCount()
                 .from(NAMESPACE)
                 .where(and(
-                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(namespace.getLibraryId())),
+                        NAMESPACE.LIBRARY_ID.eq(libraryId),
                         NAMESPACE.PREFIX.eq(namespace.getPrefix()),
                         NAMESPACE.NAMESPACE_ID.notEqual(ULong.valueOf(namespace.getNamespaceId()))
                 ))

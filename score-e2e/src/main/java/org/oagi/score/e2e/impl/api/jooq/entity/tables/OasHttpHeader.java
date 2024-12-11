@@ -209,7 +209,7 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
 
     @Override
     public List<ForeignKey<OasHttpHeaderRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, Keys.OAS_HTTP_HEADER_CREATED_BY_FK, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK);
+        return Arrays.asList(Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK, Keys.OAS_HTTP_HEADER_CREATED_BY_FK, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK);
     }
 
     private transient AgencyIdListValuePath _agencyIdListValue;
@@ -223,19 +223,6 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
             _agencyIdListValue = new AgencyIdListValuePath(this, Keys.OAS_HTTP_HEADER_AGENCY_ID_LIST_VALUE_ID_FK, null);
 
         return _agencyIdListValue;
-    }
-
-    private transient AppUserPath _oasHttpHeaderOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_http_header_owner_user_id_fk</code> key.
-     */
-    public AppUserPath oasHttpHeaderOwnerUserIdFk() {
-        if (_oasHttpHeaderOwnerUserIdFk == null)
-            _oasHttpHeaderOwnerUserIdFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, null);
-
-        return _oasHttpHeaderOwnerUserIdFk;
     }
 
     private transient AppUserPath _oasHttpHeaderCreatedByFk;
@@ -262,6 +249,19 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
             _oasHttpHeaderLastUpdatedByFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_LAST_UPDATED_BY_FK, null);
 
         return _oasHttpHeaderLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _oasHttpHeaderOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>oas_http_header_owner_user_id_fk</code> key.
+     */
+    public AppUserPath oasHttpHeaderOwnerUserIdFk() {
+        if (_oasHttpHeaderOwnerUserIdFk == null)
+            _oasHttpHeaderOwnerUserIdFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, null);
+
+        return _oasHttpHeaderOwnerUserIdFk;
     }
 
     private transient OasParameterPath _oasParameter;

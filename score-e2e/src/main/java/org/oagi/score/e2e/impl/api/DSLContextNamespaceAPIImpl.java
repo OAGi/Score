@@ -5,12 +5,14 @@ import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.NamespaceAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.NamespaceRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.LibraryObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.NAMESPACE;
 
 public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
@@ -22,9 +24,12 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     }
 
     @Override
-    public NamespaceObject getNamespaceByURI(String uri) {
+    public NamespaceObject getNamespaceByURI(LibraryObject library, String uri) {
         NamespaceRecord namespaceRecord = dslContext.selectFrom(NAMESPACE)
-                .where(NAMESPACE.URI.eq(uri))
+                .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(library.getLibraryId())),
+                        NAMESPACE.URI.eq(uri)
+                ))
                 .fetchOne();
         return mapper(namespaceRecord);
     }
@@ -32,6 +37,7 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     private NamespaceObject mapper(NamespaceRecord namespaceRecord) {
         NamespaceObject namespace = new NamespaceObject();
         namespace.setNamespaceId(namespaceRecord.getNamespaceId().toBigInteger());
+        namespace.setLibraryId(namespaceRecord.getLibraryId().toBigInteger());
         namespace.setUri(namespaceRecord.getUri());
         namespace.setPrefix(namespaceRecord.getPrefix());
         namespace.setDescription(namespaceRecord.getDescription());
@@ -45,13 +51,14 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     }
 
     @Override
-    public NamespaceObject createRandomEndUserNamespace(AppUserObject creator) {
+    public NamespaceObject createRandomEndUserNamespace(AppUserObject creator, LibraryObject library) {
         if (creator.isDeveloper()) {
             throw new IllegalArgumentException("Developer cannot create an end-user namespace.");
         }
         NamespaceObject namespace = NamespaceObject.createRandomNamespace(creator);
 
         NamespaceRecord namespaceRecord = new NamespaceRecord();
+        namespaceRecord.setLibraryId(ULong.valueOf(library.getLibraryId()));
         namespaceRecord.setUri(namespace.getUri());
         namespaceRecord.setPrefix(namespace.getPrefix());
         namespaceRecord.setDescription(namespace.getDescription());
@@ -71,13 +78,14 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     }
 
     @Override
-    public NamespaceObject createRandomDeveloperNamespace(AppUserObject creator) {
+    public NamespaceObject createRandomDeveloperNamespace(AppUserObject creator, LibraryObject library) {
         if (!creator.isDeveloper()) {
             throw new IllegalArgumentException("End-user cannot create a developer namespace.");
         }
         NamespaceObject namespace = NamespaceObject.createRandomNamespace(creator);
 
         NamespaceRecord namespaceRecord = new NamespaceRecord();
+        namespaceRecord.setLibraryId(ULong.valueOf(library.getLibraryId()));
         namespaceRecord.setUri(namespace.getUri());
         namespaceRecord.setPrefix(namespace.getPrefix());
         namespaceRecord.setDescription(namespace.getDescription());
@@ -97,11 +105,14 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     }
 
     @Override
-    public ArrayList<NamespaceObject> getStandardNamespacesURIs() {
+    public List<NamespaceObject> getStandardNamespacesURIs(LibraryObject library) {
         List<NamespaceRecord> standardNamespaces = dslContext.selectFrom(NAMESPACE)
-                .where(NAMESPACE.IS_STD_NMSP.eq((byte) 1))
+                .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(library.getLibraryId())),
+                        NAMESPACE.IS_STD_NMSP.eq((byte) 1)
+                ))
                 .fetchInto(NamespaceRecord.class);
-        ArrayList<NamespaceObject> namespaceObjectsList = new ArrayList<>();
+        List<NamespaceObject> namespaceObjectsList = new ArrayList<>();
         for (NamespaceRecord record : standardNamespaces) {
             NamespaceObject namespace = mapper(record);
             namespaceObjectsList.add(namespace);
@@ -118,12 +129,15 @@ public class DSLContextNamespaceAPIImpl implements NamespaceAPI {
     }
 
     @Override
-    public ArrayList<NamespaceObject> getNonStandardNamespacesURIs() {
+    public List<NamespaceObject> getNonStandardNamespacesURIs(LibraryObject library) {
         List<NamespaceRecord> standardNamespaces = dslContext.selectFrom(NAMESPACE)
-                .where(NAMESPACE.IS_STD_NMSP.eq((byte) 0))
+                .where(and(
+                        NAMESPACE.LIBRARY_ID.eq(ULong.valueOf(library.getLibraryId())),
+                        NAMESPACE.IS_STD_NMSP.eq((byte) 0)
+                ))
                 .fetchInto(NamespaceRecord.class);
-        ArrayList<NamespaceObject> namespaceObjectsList = new ArrayList<>();
-        for (NamespaceRecord record: standardNamespaces){
+        List<NamespaceObject> namespaceObjectsList = new ArrayList<>();
+        for (NamespaceRecord record : standardNamespaces) {
             NamespaceObject namespace = mapper(record);
             namespaceObjectsList.add(namespace);
         }

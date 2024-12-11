@@ -190,20 +190,7 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
 
     @Override
     public List<ForeignKey<ModuleBccpManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
-    }
-
-    private transient ModuleSetReleasePath _moduleSetRelease;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set_release</code>
-     * table.
-     */
-    public ModuleSetReleasePath moduleSetRelease() {
-        if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
-
-        return _moduleSetRelease;
+        return Arrays.asList(Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
     }
 
     private transient BccpManifestPath _bccpManifest;
@@ -216,18 +203,6 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
             _bccpManifest = new BccpManifestPath(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, null);
 
         return _bccpManifest;
-    }
-
-    private transient ModulePath _module;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
-     */
-    public ModulePath module() {
-        if (_module == null)
-            _module = new ModulePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, null);
-
-        return _module;
     }
 
     private transient AppUserPath _moduleBccpManifestCreatedByFk;
@@ -254,6 +229,31 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
             _moduleBccpManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleBccpManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_ID_FK, null);
+
+        return _module;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
+
+        return _moduleSetRelease;
     }
 
     @Override

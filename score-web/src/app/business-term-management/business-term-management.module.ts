@@ -18,6 +18,7 @@ import {BusinessTermUploadFileComponent} from './business-term-upload-file/busin
 import {TranslateModule} from '@ngx-translate/core';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -78,18 +79,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule,
-    TranslateModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        TranslateModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     BusinessTermListComponent,
     BusinessTermCreateComponent,

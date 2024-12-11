@@ -211,6 +211,7 @@ public class CcListService {
                 .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASBIE).on(and(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ASBIE.BASED_ASCC_MANIFEST_ID), ASBIE.IS_USED.eq(isUsed)))
                 .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
@@ -220,7 +221,10 @@ public class CcListService {
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASBIEP.BASED_ASCCP_MANIFEST_ID))
                 .join(ASCCP.as("bie")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
-                .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds)
+                ))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
                     item.setAccId(e.get(Tables.ACC.ACC_ID).toBigInteger());
@@ -264,6 +268,7 @@ public class CcListService {
                 .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
                 .join(BBIE).on(and(BCC_MANIFEST.BCC_MANIFEST_ID.eq(BBIE.BASED_BCC_MANIFEST_ID), BBIE.IS_USED.eq(isUsed)))
                 .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
@@ -274,7 +279,10 @@ public class CcListService {
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("bie_manifest").ASCCP_MANIFEST_ID))
                 .join(ASCCP.as("bie")).on(ASCCP.as("bie").ASCCP_ID.eq(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID))
-                .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        ACC_MANIFEST.ACC_MANIFEST_ID.in(uegAccManifestIds)
+                ))
                 .fetchStream().map(e -> {
                     SummaryCcExt item = new SummaryCcExt();
                     item.setAccId(e.get(Tables.ACC.ACC_ID).toBigInteger());

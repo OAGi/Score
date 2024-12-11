@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.release;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
+import org.oagi.score.e2e.obj.LibraryObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
@@ -216,7 +217,9 @@ public class ViewEditReleasePageImpl extends BaseSearchBarPageImpl implements Vi
     public EditReleasePage openReleaseViewEditPageByReleaseAndState(String releaseNum, String state) {
         openReleaseByReleaseNumAndState(releaseNum, state);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNum);
         EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
         editReleasePage.openPage();
         assert editReleasePage.isOpened();
@@ -227,7 +230,9 @@ public class ViewEditReleasePageImpl extends BaseSearchBarPageImpl implements Vi
     public EditReleasePage openReleaseViewEditPage(WebElement tr) {
         String releaseNum = getReleaseNumFieldFromTheTable(tr);
         openReleaseByReleaseNum(releaseNum);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNum);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNum);
         EditReleasePage editReleasePage = new EditReleasePageImpl(this, release);
         editReleasePage.openPage();
         assert editReleasePage.isOpened();

@@ -179,12 +179,48 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     }
 
     /**
+     * Setter for <code>oagi.agency_id_list_value.is_developer_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by developers.
+     */
+    public void setIsDeveloperDefault(Byte value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>oagi.agency_id_list_value.is_developer_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by developers.
+     */
+    public Byte getIsDeveloperDefault() {
+        return (Byte) get(9);
+    }
+
+    /**
+     * Setter for <code>oagi.agency_id_list_value.is_user_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by users.
+     */
+    public void setIsUserDefault(Byte value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.agency_id_list_value.is_user_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by users.
+     */
+    public Byte getIsUserDefault() {
+        return (Byte) get(10);
+    }
+
+    /**
      * Setter for
      * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
      * This refers to a replacement if the record is deprecated.
      */
     public void setReplacementAgencyIdListValueId(ULong value) {
-        set(9, value);
+        set(11, value);
     }
 
     /**
@@ -193,7 +229,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * This refers to a replacement if the record is deprecated.
      */
     public ULong getReplacementAgencyIdListValueId() {
-        return (ULong) get(9);
+        return (ULong) get(11);
     }
 
     /**
@@ -201,7 +237,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * to the APP_USER table. It indicates the user who created the code list.
      */
     public void setCreatedBy(ULong value) {
-        set(10, value);
+        set(12, value);
     }
 
     /**
@@ -209,7 +245,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * to the APP_USER table. It indicates the user who created the code list.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(10);
+        return (ULong) get(12);
     }
 
     /**
@@ -222,7 +258,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
-        set(11, value);
+        set(13, value);
     }
 
     /**
@@ -235,7 +271,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * rollback the ownership.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(11);
+        return (ULong) get(13);
     }
 
     /**
@@ -244,7 +280,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * updated the code list.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(12, value);
+        set(14, value);
     }
 
     /**
@@ -253,7 +289,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * updated the code list.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(12);
+        return (ULong) get(14);
     }
 
     /**
@@ -261,7 +297,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Timestamp when the code list was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(13, value);
+        set(15, value);
     }
 
     /**
@@ -269,7 +305,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Timestamp when the code list was created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(13);
+        return (LocalDateTime) get(15);
     }
 
     /**
@@ -277,7 +313,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Timestamp when the code list was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(14, value);
+        set(16, value);
     }
 
     /**
@@ -285,7 +321,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Timestamp when the code list was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(14);
+        return (LocalDateTime) get(16);
     }
 
     /**
@@ -294,7 +330,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * self-foreign key to indicate the previous history record.
      */
     public void setPrevAgencyIdListValueId(ULong value) {
-        set(15, value);
+        set(17, value);
     }
 
     /**
@@ -303,7 +339,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * self-foreign key to indicate the previous history record.
      */
     public ULong getPrevAgencyIdListValueId() {
-        return (ULong) get(15);
+        return (ULong) get(17);
     }
 
     /**
@@ -312,7 +348,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * self-foreign key to indicate the next history record.
      */
     public void setNextAgencyIdListValueId(ULong value) {
-        set(16, value);
+        set(18, value);
     }
 
     /**
@@ -321,7 +357,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * self-foreign key to indicate the next history record.
      */
     public ULong getNextAgencyIdListValueId() {
-        return (ULong) get(16);
+        return (ULong) get(18);
     }
 
     // -------------------------------------------------------------------------
@@ -347,7 +383,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
     /**
      * Create a detached, initialised AgencyIdListValueRecord
      */
-    public AgencyIdListValueRecord(ULong agencyIdListValueId, String guid, String value, String name, String definition, String definitionSource, ULong ownerListId, ULong basedAgencyIdListValueId, Byte isDeprecated, ULong replacementAgencyIdListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevAgencyIdListValueId, ULong nextAgencyIdListValueId) {
+    public AgencyIdListValueRecord(ULong agencyIdListValueId, String guid, String value, String name, String definition, String definitionSource, ULong ownerListId, ULong basedAgencyIdListValueId, Byte isDeprecated, Byte isDeveloperDefault, Byte isUserDefault, ULong replacementAgencyIdListValueId, ULong createdBy, ULong ownerUserId, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong prevAgencyIdListValueId, ULong nextAgencyIdListValueId) {
         super(AgencyIdListValue.AGENCY_ID_LIST_VALUE);
 
         setAgencyIdListValueId(agencyIdListValueId);
@@ -359,6 +395,8 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
         setOwnerListId(ownerListId);
         setBasedAgencyIdListValueId(basedAgencyIdListValueId);
         setIsDeprecated(isDeprecated);
+        setIsDeveloperDefault(isDeveloperDefault);
+        setIsUserDefault(isUserDefault);
         setReplacementAgencyIdListValueId(replacementAgencyIdListValueId);
         setCreatedBy(createdBy);
         setOwnerUserId(ownerUserId);

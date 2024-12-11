@@ -16,10 +16,8 @@ import org.oagi.score.e2e.page.context.EditContextSchemePage;
 import org.oagi.score.e2e.page.context.LoadFromCodeListDialog;
 import org.oagi.score.e2e.page.context.ViewEditContextSchemePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -193,13 +191,15 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
              */
             AppUserObject developerUserForCodeList = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerUserForCodeList);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerUserForCodeList);
-            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerUserForCodeList, library);
+            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             CodeListObject codeListLatestRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, latestRelease, "Published");
             codeListValueMap.put(codeListLatestRelease, getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListLatestRelease, developerUserForCodeList));
             codeListsForTesting.add(codeListLatestRelease);
             codeListReleaseMap.put(codeListLatestRelease, latestRelease);
-            ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+            ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
             CodeListObject codeListOlderRelease = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, olderRelease, "Published");
             codeListValueMap.put(codeListOlderRelease, getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListOlderRelease, developerUserForCodeList));
             codeListsForTesting.add(codeListOlderRelease);
@@ -207,7 +207,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             codeListWorkingBranch = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespace, workingBranch, "WIP");
             codeListValueMap.put(codeListWorkingBranch, getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListLatestRelease, developerUserForCodeList));
             codeListReleaseMap.put(codeListWorkingBranch, workingBranch);
@@ -278,9 +278,11 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
              */
             AppUserObject developerUserForCodeList = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerUserForCodeList);
-            NamespaceObject namespaceDev = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerUserForCodeList);
-            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespaceDev = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerUserForCodeList, library);
+            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            ReleaseObject olderRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
 
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(developerUserForCodeList, namespaceDev, latestRelease, "WIP");
             codeListValueMap.put(codeListWIP, getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerUserForCodeList));
@@ -300,7 +302,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
 
             AppUserObject endUserForCodeList = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCodeList);
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserForCodeList);
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserForCodeList, library);
             CodeListObject codeListDerivedFromDevListLatestRelease = getAPIFactory().getCodeListAPI().createDerivedCodeList(codeListProductionLatestRelease, endUserForCodeList, namespaceEU, latestRelease, "Production");
             codeListValueMap.put(codeListDerivedFromDevListLatestRelease, value);
             codeListsForTesting.add(codeListDerivedFromDevListLatestRelease);
@@ -391,7 +393,7 @@ public class TC_6_1_EndUserAuthorizedManagementContextSchemes extends BaseTest {
         ViewEditContextSchemePage viewEditContextSchemePage = contextMenu.openViewEditContextSchemeSubMenu();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
+                "/tr[" + RandomUtils.secure().randomInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(ofSeconds(3L))

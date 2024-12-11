@@ -284,6 +284,7 @@ public class BieService {
         AppUser requester = sessionService.getAppUserByUsername(user);
 
         PaginationResponse<AsbieListRecord> result = bieRepository.selectBieLists()
+                .setLibraryId(request.getLibraryId())
                 .setPropertyTerm(request.getPropertyTerm())
                 .setBusinessContext(request.getBusinessContext())
                 .setVersion(request.getVersion())

@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +20,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -68,9 +67,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         assertEquals("true", createModuleSetPage.getNameField().getAttribute("aria-required"));
         assertEquals("false", createModuleSetPage.getDescriptionField().getAttribute("aria-required"));
 
-        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -93,13 +92,14 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
 
-        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
 
         createModuleSetPage.toggleCreateModuleSetRelease();
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
         createModuleSetPage.setRelease(release.getReleaseNumber());
         createModuleSetPage.setModuleSetRelease(release.getReleaseNumber());
         createModuleSetPage.hitCreateButton();
@@ -127,9 +127,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -138,9 +138,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         waitFor(Duration.ofSeconds(2L)); // wait loading for the description
         assertEquals(description, getText(editModuleSetPage.getDescriptionField()));
 
-        String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
+        String newModuleSetName = "Updated Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleSetPage.setName(newModuleSetName);
-        String newDescription = randomPrint(50, 100).trim();
+        String newDescription = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editModuleSetPage.setDescription(newDescription);
         editModuleSetPage.hitUpdateButton();
 
@@ -158,15 +158,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -174,10 +175,10 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
         assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
-        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
+        String moduleFileName = "New module file" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        String version = "Version " + randomAlphanumeric(5, 10);
+        String version = "Version " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileVersionNumber(version);
         assertEquals("false", createModuleFileDialog.getNamespaceField().getAttribute("aria-required"));
         assertEquals("false", createModuleFileDialog.getModuleFileVersionNumberField().getAttribute("aria-required"));
@@ -196,15 +197,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -212,10 +214,10 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
         assertEquals("true", createModuleFileDialog.getModuleFileNameField().getAttribute("aria-required"));
-        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
+        String moduleFileName = "New module file" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        String version = "Version " + randomAlphanumeric(5, 10);
+        String version = "Version " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileVersionNumber(version);
         assertEquals("false", createModuleFileDialog.getNamespaceField().getAttribute("aria-required"));
         assertEquals("false", createModuleFileDialog.getModuleFileVersionNumberField().getAttribute("aria-required"));
@@ -233,9 +235,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         editModuleSetPage.openPage();
         EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
-        String newModuleFileName = "Changed module file" + randomAlphanumeric(5, 10);
+        String newModuleFileName = "Changed module file" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleFileDialog.setModuleFileName(newModuleFileName);
-        String newVersion = "Version " + randomAlphanumeric(5, 10);
+        String newVersion = "Version " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleFileDialog.setModuleFileVersionNumber(newVersion);
         editModuleFileDialog.updateModuleFile();
 
@@ -256,16 +258,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
-        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
+        String moduleDirectoryName = "Directory " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertEquals("true", createModuleDirectoryDialog.getModuleDirectoryNameField().getAttribute("aria-required"));
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
@@ -286,16 +288,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
-        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
+        String moduleDirectoryName = "Directory " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
 
@@ -309,7 +311,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         editModuleSetPage.openPage();
         EditModuleDirectoryDialog editModuleDirectoryDialog = editModuleSetPage.editModuleDirectory(moduleDirectoryName);
-        String newModuleDirectoryName = "Changed Directory " + randomAlphanumeric(5, 10);
+        String newModuleDirectoryName = "Changed Directory " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleDirectoryDialog.setModuleDirectoryName(newModuleDirectoryName);
         editModuleDirectoryDialog.updateModuleDirectory();
 
@@ -329,9 +331,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -369,9 +371,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -402,24 +404,25 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         }
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
         editModuleSetPage.addModule();
         CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
-        String moduleFileName = "New module file" + randomAlphanumeric(5, 10);
+        String moduleFileName = "New module file" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileName(moduleFileName);
         createModuleFileDialog.setNamespace(namespace.getUri());
-        String version = "Version " + randomAlphanumeric(5, 10);
+        String version = "Version " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleFileDialog.setModuleFileVersionNumber(version);
         createModuleFileDialog.createModuleFile();
 
@@ -433,7 +436,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
 
         editModuleSetPage.addModule();
         CreateModuleDirectoryDialog createModuleDirectoryDialog = editModuleSetPage.addNewModuleDirectory();
-        String moduleDirectoryName = "Directory " + randomAlphanumeric(5, 10);
+        String moduleDirectoryName = "Directory " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleDirectoryDialog.setModuleDirectoryName(moduleDirectoryName);
         createModuleDirectoryDialog.createModuleDirectory();
 
@@ -464,9 +467,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -483,15 +486,16 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
 
@@ -499,7 +503,7 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
         String moduleSetReleaseName = "Test Module Set Release for " + moduleSetName;
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String moduleSetReleaseDescription = randomPrint(50, 100).trim();
+        String moduleSetReleaseDescription = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(moduleSetReleaseDescription);
         createModuleSetReleasePage.setModuleSet(moduleSetName);
         createModuleSetReleasePage.setRelease(release.getReleaseNumber());
@@ -527,9 +531,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
         homePage.logout();
@@ -558,9 +562,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
-        String moduleSetName = "Test Module Set " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetPage.setDescription(description);
         createModuleSetPage.hitCreateButton();
         homePage.logout();
@@ -569,9 +573,9 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
         viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
 
-        String newModuleSetName = "Updated Test Module Set " + randomAlphanumeric(5, 10);
+        String newModuleSetName = "Updated Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleSetPage.setName(newModuleSetName);
-        String newDescription = randomPrint(50, 100).trim();
+        String newDescription = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editModuleSetPage.setDescription(newDescription);
         editModuleSetPage.hitUpdateButton();
         homePage.logout();

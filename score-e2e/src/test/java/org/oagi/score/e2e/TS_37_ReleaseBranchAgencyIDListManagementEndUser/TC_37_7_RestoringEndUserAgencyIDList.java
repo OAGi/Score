@@ -50,8 +50,9 @@ public class TC_37_7_RestoringEndUserAgencyIDList extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(endUser, namespace, release, "Deleted");
@@ -97,8 +98,9 @@ public class TC_37_7_RestoringEndUserAgencyIDList extends BaseTest {
         AppUserObject anotherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherEndUser);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(anotherEndUser, library);
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherEndUser, namespace, release, "Deleted");

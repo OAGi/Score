@@ -114,7 +114,7 @@ public class AgencyIdService {
     }
 
     public AgencyIdList getAgencyIdListDetail(ScoreUser user, BigInteger agencyIdListManifestId) {
-        AgencyIdList agencyIdList = scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdList(agencyIdListManifestId);
+        AgencyIdList agencyIdList = scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdListByAgencyIdListManifestId(agencyIdListManifestId);
         boolean isWorkingRelease = "Working".equals(agencyIdList.getReleaseNum());
         agencyIdList.setWorkingRelease(isWorkingRelease);
         agencyIdList.setAccess(
@@ -124,7 +124,10 @@ public class AgencyIdService {
         );
         if (agencyIdList.getPrevAgencyIdListManifestId() != null) {
             agencyIdList.setPrev(scoreRepositoryFactory.createAgencyIdListReadRepository()
-                    .getAgencyIdList(agencyIdList.getPrevAgencyIdListManifestId()));
+                    .getAgencyIdListByAgencyIdListManifestId(agencyIdList.getPrevAgencyIdListManifestId()));
+        } else if (agencyIdList.getPrevAgencyIdListId() != null) {
+            agencyIdList.setPrev(scoreRepositoryFactory.createAgencyIdListReadRepository()
+                    .getAgencyIdListByAgencyIdListId(agencyIdList.getPrevAgencyIdListId()));
         }
         return agencyIdList;
     }

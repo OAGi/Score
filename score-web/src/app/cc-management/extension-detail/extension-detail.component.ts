@@ -331,6 +331,8 @@ export class ExtensionDetailComponent implements OnInit {
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
 
+      this.workingRelease = rootNode.workingRelease;
+
       this.rootNode = this.dataSource.data[0] as AccFlatNode;
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
@@ -668,6 +670,7 @@ export class ExtensionDetailComponent implements OnInit {
     }
     const dialogRef = this.dialog.open(AppendAssociationDialogComponent, {
       data: {
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,

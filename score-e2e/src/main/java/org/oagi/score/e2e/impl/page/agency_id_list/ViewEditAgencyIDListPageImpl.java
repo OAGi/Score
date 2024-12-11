@@ -23,7 +23,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implements ViewEditAgencyIDListPage {
 
     private static final By NEW_AGENCY_ID_LIST_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"New Agency ID List\")]//ancestor::button[1]");
+            By.xpath("//button[contains(@mattooltip, \"New Agency ID List\")]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");

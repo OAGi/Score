@@ -193,6 +193,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     if (this.moduleSetRelease.default) {
       const request = new ModuleSetReleaseListRequest();
       request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+      request.library.libraryId = this.moduleSetRelease.libraryId;
       request.releaseId = this.moduleSetRelease.releaseId;
       request.isDefault = true;
       this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
@@ -225,6 +226,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   doUpdateModuleSetRelease() {
     const request = new ModuleSetReleaseListRequest();
     request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
+    request.library.libraryId = this.moduleSetRelease.libraryId;
     request.releaseId = this.moduleSetRelease.releaseId;
     request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
     this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {

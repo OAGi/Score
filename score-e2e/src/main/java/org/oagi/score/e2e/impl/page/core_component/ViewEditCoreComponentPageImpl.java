@@ -204,8 +204,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public ACCViewEditPage openACCViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
-
-        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(den, branch);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().getACCByDENAndReleaseNum(library, den, branch);
         ACCViewEditPage accViewEditPage = new ACCViewEditPageImpl(this, acc);
         assert accViewEditPage.isOpened();
         return accViewEditPage;
@@ -250,8 +251,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public ASCCPViewEditPage openASCCPViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
-
-        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(den, branch);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, den, branch);
         ASCCPViewEditPage asccpViewEditPage = new ASCCPViewEditPageImpl(this, asccp);
         assert asccpViewEditPage.isOpened();
         return asccpViewEditPage;
@@ -297,8 +299,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public BCCPViewEditPage openBCCPViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
-
-        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(den, branch);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(library, den, branch);
         BCCPViewEditPage bccpViewEditPage = new BCCPViewEditPageImpl(this, bccp);
         assert bccpViewEditPage.isOpened();
         return bccpViewEditPage;
@@ -317,8 +320,9 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public DTViewEditPage openDTViewEditPageByDenAndBranch(String den, String branch) {
         setBranch(branch);
         openCoreComponentByDen(den);
-
-        List<DTObject> dtList = getAPIFactory().getCoreComponentAPI().getBDTByDENAndReleaseNum(den, branch);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        List<DTObject> dtList = getAPIFactory().getCoreComponentAPI().getBDTByDENAndReleaseNum(library, den, branch);
         if (dtList.size() > 1) {
             throw new IllegalArgumentException("Found out more than one DT record by given arguments [DEN: " + den + ", Branch: " + branch + "]");
         }
@@ -538,7 +542,7 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
         for (String componentType : componentTypes) {
             WebElement optionField = elementToBeClickable(getDriver(),
                     By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]//span[text() = \"" + componentType + "\"]//ancestor::mat-checkbox"));
-            selected = optionField.getAttribute("ng-reflect-model").equals("true");
+            selected = isChecked(optionField);
             if (!selected) {
                 click(getDriver(), optionField);
             }

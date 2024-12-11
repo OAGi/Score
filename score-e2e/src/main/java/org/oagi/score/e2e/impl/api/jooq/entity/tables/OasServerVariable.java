@@ -204,19 +204,7 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
 
     @Override
     public List<ForeignKey<OasServerVariableRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK, Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasServerPath _oasServer;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_server</code> table.
-     */
-    public OasServerPath oasServer() {
-        if (_oasServer == null)
-            _oasServer = new OasServerPath(this, Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK, null);
-
-        return _oasServer;
+        return Arrays.asList(Keys.OAS_SERVER_VARIABLE_CREATED_BY_FK, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK, Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK);
     }
 
     private transient AppUserPath _oasServerVariableCreatedByFk;
@@ -243,6 +231,18 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
             _oasServerVariableLastUpdatedByFk = new AppUserPath(this, Keys.OAS_SERVER_VARIABLE_LAST_UPDATED_BY_FK, null);
 
         return _oasServerVariableLastUpdatedByFk;
+    }
+
+    private transient OasServerPath _oasServer;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_server</code> table.
+     */
+    public OasServerPath oasServer() {
+        if (_oasServer == null)
+            _oasServer = new OasServerPath(this, Keys.OAS_SERVER_VARIABLE_OAS_SERVER_ID_FK, null);
+
+        return _oasServer;
     }
 
     @Override

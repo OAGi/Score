@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.*;
@@ -27,12 +28,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.*;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
-import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
@@ -77,11 +75,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         ACCObject roleOfAcc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-        ACCObject basedACC = coreComponentAPI.getACCByDENAndReleaseNum(
+        ACCObject basedACC = coreComponentAPI.getACCByDENAndReleaseNum(library, 
                 "Change Acknowledge Risk Control Library. Details", release.getReleaseNumber());
         coreComponentAPI.updateBasedACC(roleOfAcc, basedACC);
 
@@ -104,9 +103,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertTrue(editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Data Area/Change Acknowledge/Original Application Area").isDisplayed());
         assertTrue(editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Data Area/Risk Control Library/Control Process").isDisplayed());
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
         ACCObject revisedRoleOfAcc = coreComponentAPI.createRevisedACC(roleOfAcc, developer, nextRelease, "Published");
-        ACCObject newBasedACC = coreComponentAPI.getACCByDENAndReleaseNum(
+        ACCObject newBasedACC = coreComponentAPI.getACCByDENAndReleaseNum(library, 
                 "Acknowledge Inventory Count. Details", nextRelease.getReleaseNumber());
         coreComponentAPI.updateBasedACC(revisedRoleOfAcc, newBasedACC);
 
@@ -134,32 +133,33 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
         ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
         ACCObject revisedAcc = coreComponentAPI.createRevisedACC(acc, developer, nextRelease, "Published");
         ASCCObject asccAcceptableNameValueRange = coreComponentAPI.appendASCC(
                 revisedAcc,
-                coreComponentAPI.getASCCPByDENAndReleaseNum("Acceptable Name Value Range. Name Value Range", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getASCCPByDENAndReleaseNum(library, "Acceptable Name Value Range. Name Value Range", nextRelease.getReleaseNumber()),
                 "Published"
         );
         BCCObject bccAbsenceTypeCode = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Absence Type Code. Open_ Code", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum(library, "Absence Type Code. Open_ Code", nextRelease.getReleaseNumber()),
                 "Published"
         );
         ASCCObject asccFinancialAccountIdentifiersGroup = coreComponentAPI.appendASCC(
                 revisedAcc,
-                coreComponentAPI.getASCCPByDENAndReleaseNum("Financial Account Identifiers Group. Financial Account Identifiers Group", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getASCCPByDENAndReleaseNum(library, "Financial Account Identifiers Group. Financial Account Identifiers Group", nextRelease.getReleaseNumber()),
                 "Published"
         );
         ASCCObject asccAcknowledgeInventoryCount = coreComponentAPI.appendASCC(
                 revisedAcc,
-                coreComponentAPI.getASCCPByDENAndReleaseNum("Acknowledge Inventory Count. Acknowledge Inventory Count", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getASCCPByDENAndReleaseNum(library, "Acknowledge Inventory Count. Acknowledge Inventory Count", nextRelease.getReleaseNumber()),
                 "Published"
         );
         asccAcknowledgeInventoryCount.setCardinalityMax(1);
@@ -167,7 +167,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 revisedAcc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", nextRelease.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum(library, "Density Conversion Factor Number. Open_ Number", nextRelease.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -208,11 +208,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         // Date Time. Type
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
         BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         bccp.setNillable(false);
         coreComponentAPI.updateBCCP(bccp);
@@ -242,8 +243,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertDisabled(nillable);
 
         // Move to next release for the revised BCCP
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(dataType.getGuid(), nextRelease.getReleaseNumber());
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
+        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, dataType.getGuid(), nextRelease.getReleaseNumber());
         BCCPObject revisedBccp = coreComponentAPI.createRevisedBCCP(bccp, nextDataType, developer, nextRelease, "Published");
         revisedBccp.setNillable(true);
         coreComponentAPI.updateBCCP(revisedBccp);
@@ -276,10 +277,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
-        ACCObject roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum("Name Value Range. Details", release.getReleaseNumber());
+        ACCObject roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum(library, "Name Value Range. Details", release.getReleaseNumber());
         ASCCPObject asccp = coreComponentAPI.createRandomASCCP(roleOfAcc, developer, namespace, "Published");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -305,8 +307,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertNotChecked(nillable);
         assertDisabled(nillable);
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum("Name Value Range. Details", nextRelease.getReleaseNumber());
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
+        roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum(library, "Name Value Range. Details", nextRelease.getReleaseNumber());
         ASCCPObject revisedAsccp = coreComponentAPI.createRevisedASCCP(asccp, roleOfAcc, developer, nextRelease, "Published");
         revisedAsccp.setNillable(true);
         coreComponentAPI.updateASCCP(revisedAsccp);
@@ -337,13 +339,14 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
         coreComponentAPI.appendASCC(
                 acc,
-                coreComponentAPI.getASCCPByDENAndReleaseNum("Financial Account Identifiers Group. Financial Account Identifiers Group", release.getReleaseNumber()),
+                coreComponentAPI.getASCCPByDENAndReleaseNum(library, "Financial Account Identifiers Group. Financial Account Identifiers Group", release.getReleaseNumber()),
                 "Published"
         );
         ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
@@ -372,13 +375,14 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
         ASCCObject asccAcknowledgeInventoryCount = coreComponentAPI.appendASCC(
                 acc,
-                coreComponentAPI.getASCCPByDENAndReleaseNum("Acknowledge Inventory Count. Acknowledge Inventory Count", release.getReleaseNumber()),
+                coreComponentAPI.getASCCPByDENAndReleaseNum(library, "Acknowledge Inventory Count. Acknowledge Inventory Count", release.getReleaseNumber()),
                 "Published"
         );
         asccAcknowledgeInventoryCount.setCardinalityMax(1);
@@ -386,7 +390,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BCCObject bccDensityConversionFactorNumber = coreComponentAPI.appendBCC(
                 acc,
-                coreComponentAPI.getBCCPByDENAndReleaseNum("Density Conversion Factor Number. Open_ Number", release.getReleaseNumber()),
+                coreComponentAPI.getBCCPByDENAndReleaseNum(library, "Density Conversion Factor Number. Open_ Number", release.getReleaseNumber()),
                 "Published"
         );
         bccDensityConversionFactorNumber.setCardinalityMax(1);
@@ -424,20 +428,21 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         // Identifier. Type
         String identifierTypeGuid = "bea4dcd433d54aa698db2176cab33c19";
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(identifierTypeGuid, release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, release.getReleaseNumber());
         BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(identifierTypeGuid, nextRelease.getReleaseNumber());
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
+        dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, nextRelease.getReleaseNumber());
         BCCPObject revisedBccp = coreComponentAPI.createRevisedBCCP(bccp, dataType, developer, nextRelease, "Published");
 
         // Control Component_ Code. Type
-        dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("31e2c152a1c8458e8d0ecda03db61206", nextRelease.getReleaseNumber());
+        dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "31e2c152a1c8458e8d0ecda03db61206", nextRelease.getReleaseNumber());
         coreComponentAPI.updateBasedDT(revisedBccp, dataType);
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -484,10 +489,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
-        ACCObject roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum("Name Value Range. Details", release.getReleaseNumber());
+        ACCObject roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum(library, "Name Value Range. Details", release.getReleaseNumber());
         ASCCPObject asccp = coreComponentAPI.createRandomASCCP(roleOfAcc, developer, namespace, "Published");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -509,8 +515,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertTrue(node.isDisplayed());
         assertFalse(editBIEPage.isDeprecated(node));
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum("Name Value Range. Details", nextRelease.getReleaseNumber());
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
+        roleOfAcc = coreComponentAPI.getACCByDENAndReleaseNum(library, "Name Value Range. Details", nextRelease.getReleaseNumber());
         ASCCPObject revisedAsccp = coreComponentAPI.createRevisedASCCP(asccp, roleOfAcc, developer, nextRelease, "Published");
         revisedAsccp.setDeprecated(true);
         coreComponentAPI.updateASCCP(revisedAsccp);
@@ -537,12 +543,13 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         // Identifier. Type
         String identifierTypeGuid = "bea4dcd433d54aa698db2176cab33c19";
-        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(identifierTypeGuid, release.getReleaseNumber());
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, release.getReleaseNumber());
         BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
 
         ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -566,10 +573,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals("None", getText(bbiePanel.getValueConstraintSelectField()));
         assertTrue(StringUtils.isEmpty(getText(bbiePanel.getValueConstraintFieldByValue("None"))));
 
-        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
-        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(identifierTypeGuid, nextRelease.getReleaseNumber());
+        ReleaseObject nextRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
+        DTObject nextDataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, identifierTypeGuid, nextRelease.getReleaseNumber());
         BCCPObject revisedBccp = coreComponentAPI.createRevisedBCCP(bccp, nextDataType, developer, nextRelease, "Published");
-        revisedBccp.setDefaultValue("default_value_" + randomAlphabetic(5, 10));
+        revisedBccp.setDefaultValue("default_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10));
         coreComponentAPI.updateBCCP(revisedBccp);
 
         acc = coreComponentAPI.createRandomACC(developer, nextRelease, namespace, "Published");
@@ -634,9 +641,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUserAdmin);
         appUsers.add(endUserAdmin);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
 
         for (AppUserObject appUser : appUsers) {
             BusinessContextObject randomBusinessContext =
@@ -681,9 +689,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -715,6 +724,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
         otherUsers.add(anotherUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
 
         for (AppUserObject appUser : otherUsers) {
@@ -722,9 +732,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "WIP");
 
@@ -750,6 +760,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
         otherUsers.add(anotherUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
 
         for (AppUserObject appUser : otherUsers) {
@@ -757,9 +768,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "QA");
 
@@ -801,6 +812,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
         otherUsers.add(anotherUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
 
         for (AppUserObject appUser : otherUsers) {
@@ -808,9 +820,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "Production");
 
@@ -843,9 +855,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -854,11 +867,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 .openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String status = "status_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -885,9 +898,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -896,11 +910,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 .openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String status = "status_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -919,9 +933,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
 
@@ -947,9 +962,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
 
@@ -975,9 +991,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "Production");
 
@@ -1015,9 +1032,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Debit Transfer. Cancel Acknowledge Debit Transfer", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1026,11 +1044,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 .openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String status = "status_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -1052,9 +1070,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
 
@@ -1090,6 +1109,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherUser);
         otherUsers.add(anotherUser);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
 
         for (AppUserObject appUser : otherUsers) {
@@ -1097,9 +1117,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(appUser);
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, appUser, "WIP");
 
@@ -1129,9 +1149,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "Production");
 
@@ -1162,9 +1183,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1195,9 +1217,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1206,11 +1229,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 .openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String status = "status_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -1238,9 +1261,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1252,10 +1276,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement asbieNode = editBIEPage.getNodeByPath(path);
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asbieNode);
 
-        int cardinalityMin = nextInt(2, 5);
-        int cardinalityMax = nextInt(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        int cardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int cardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         asbiePanel.toggleUsed();
         asbiePanel.setCardinalityMin(cardinalityMin);
@@ -1285,9 +1309,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1300,12 +1325,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
 
-        int cardinalityMin = nextInt(2, 5);
-        int cardinalityMax = nextInt(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String example = "example_" + randomAlphanumeric(5, 10);
-        String fixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        int cardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int cardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String example = "example_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String fixedValue = "fixed_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bbiePanel.toggleUsed();
         bbiePanel.setCardinalityMin(cardinalityMin);
@@ -1341,9 +1366,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1356,11 +1382,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage.BBIESCPanel bbieScPanel = editBIEPage.getBBIESCPanel(bbieScNode);
 
         int cardinalityMin = 1;
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String example = "example_" + randomAlphanumeric(5, 10);
-        String fixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String example = "example_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String fixedValue = "fixed_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         bbieScPanel.toggleUsed();
         bbieScPanel.setCardinalityMin(cardinalityMin);
@@ -1397,9 +1423,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1421,7 +1448,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             assertTrue(bbieErrorMessage != null);
         });
 
-        String randStrForCardinalityMin = randomAlphanumeric(5, 10);
+        String randStrForCardinalityMin = RandomStringUtils.secure().nextAlphabetic(5, 10);
         clear(bbiePanel.getCardinalityMinField());
         sendKeys(bbiePanel.getCardinalityMinField(), randStrForCardinalityMin);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
@@ -1438,7 +1465,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             assertTrue(bbieErrorMessage != null);
         });
 
-        String randStrForCardinalityMax = randomAlphanumeric(5, 10);
+        String randStrForCardinalityMax = RandomStringUtils.secure().nextAlphabetic(5, 10);
         clear(bbiePanel.getCardinalityMaxField());
         sendKeys(bbiePanel.getCardinalityMaxField(), randStrForCardinalityMax);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
@@ -1456,9 +1483,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1479,7 +1507,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             assertTrue(bbieScErrorMessage != null);
         });
 
-        String randStrForCardinalityMin = randomAlphanumeric(5, 10);
+        String randStrForCardinalityMin = RandomStringUtils.secure().nextAlphabetic(5, 10);
         sendKeys(bbieScPanel.getCardinalityMinField(), randStrForCardinalityMin);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
         retry(() -> {
@@ -1494,7 +1522,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             assertTrue(bbieScErrorMessage != null);
         });
 
-        String randStrForCardinalityMax = randomAlphanumeric(5, 10);
+        String randStrForCardinalityMax = RandomStringUtils.secure().nextAlphabetic(5, 10);
         sendKeys(bbieScPanel.getCardinalityMaxField(), randStrForCardinalityMax);
         waitFor(ofMillis(1000L)); // wait for popping the error message up
         retry(() -> {
@@ -1511,9 +1539,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1552,9 +1581,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1571,7 +1601,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(Integer.toString(0), getText(bbiePanel.getCardinalityMinField()));
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
-        int randCardinalityMin = nextInt(5, 100);
+        int randCardinalityMin = RandomUtils.secure().randomInt(5, 100);
         bbiePanel.setCardinalityMin(randCardinalityMin);
         editBIEPage.hitUpdateButton();
 
@@ -1592,9 +1622,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1633,9 +1664,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Item Certificate Of Analysis. Get Item Certificate Of Analysis", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1669,9 +1701,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1685,10 +1718,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         bbiePanel.toggleUsed();
 
-        int randCardinalityMin = -nextInt(1, 100);
+        int randCardinalityMin = RandomUtils.secure().randomInt(2, 100);
         bbiePanel.setCardinalityMin(randCardinalityMin);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
-                "//mat-error[contains(text(), \"Cardinality Min must be greater than or equals to 0\")]")).isDisplayed());
+                "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to 1\")]")).isDisplayed());
     }
 
     @Test
@@ -1699,9 +1732,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1719,7 +1753,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(Integer.toString(0), getText(bbiePanel.getCardinalityMinField()));
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
-        int randCardinalityMax = nextInt(10, 100);
+        int randCardinalityMax = RandomUtils.secure().randomInt(10, 100);
         bbiePanel.setCardinalityMax(randCardinalityMax);
         editBIEPage.hitUpdateButton();
 
@@ -1740,9 +1774,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1760,10 +1795,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(Integer.toString(0), getText(bbiePanel.getCardinalityMinField()));
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
-        int randCardinalityMax = nextInt(10, 100);
+        int randCardinalityMax = RandomUtils.secure().randomInt(10, 100);
         bbiePanel.setCardinalityMax(randCardinalityMax);
 
-        int randCardinalityMin = nextInt(randCardinalityMax + 1, randCardinalityMax + 100);
+        int randCardinalityMin = RandomUtils.secure().randomInt(randCardinalityMax + 1, randCardinalityMax + 100);
         bbiePanel.setCardinalityMin(randCardinalityMin);
         assertTrue(visibilityOfElementLocated(getDriver(), By.xpath(
                 "//mat-error[contains(text(), \"Cardinality Min must be less than or equals to " + randCardinalityMax + "\")]")).isDisplayed());
@@ -1777,9 +1812,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1796,7 +1832,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(Integer.toString(0), getText(bbiePanel.getCardinalityMinField()));
         assertEquals("unbounded", getText(bbiePanel.getCardinalityMaxField()));
 
-        int randCardinalityMax = nextInt(10, 100);
+        int randCardinalityMax = RandomUtils.secure().randomInt(10, 100);
         bbiePanel.setCardinalityMax(randCardinalityMax);
         bbiePanel.setCardinalityMax(-1);
 
@@ -1822,9 +1858,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Source Activity. Source Activity", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1862,9 +1899,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Acknowledge Maintenance Order. Cancel Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Acknowledge Maintenance Order. Cancel Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1903,9 +1941,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Process Maintenance Order. Process Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Process Maintenance Order. Process Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1957,9 +1996,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Cancel Maintenance Order. Cancel Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Cancel Maintenance Order. Cancel Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -1996,17 +2036,18 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String releaseNumber = "10.8.5";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         CodeListObject randomCodeList =
                 getAPIFactory().getCodeListAPI().createRandomCodeList(developer, namespace, latestRelease, "Published");
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Maintenance Order. Sync Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Maintenance Order. Sync Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2042,9 +2083,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(developer);
 
         String releaseNumber = "10.8.5";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace =
-                getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         List<CodeListObject> randomCodeLists = new ArrayList<>();
         randomCodeLists.add(
                 getAPIFactory().getCodeListAPI().createRandomCodeList(developer, namespace, latestRelease, "WIP"));
@@ -2055,9 +2097,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Notify Maintenance Order. Notify Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Notify Maintenance Order. Notify Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2087,9 +2129,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Show Maintenance Order. Show Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Show Maintenance Order. Show Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2143,9 +2186,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Maintenance Order. Change Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Maintenance Order. Change Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2191,9 +2235,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get Maintenance Order. Get Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get Maintenance Order. Get Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "WIP");
 
@@ -2221,9 +2266,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -2258,9 +2304,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "QA");
 
@@ -2298,9 +2345,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, anotherDeveloper, "Production");
 
@@ -2339,11 +2387,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String releaseNumber = "10.8.3";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(anotherDeveloper, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, anotherDeveloper, namespace, "Published");
@@ -2412,11 +2461,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser);
 
         String releaseNumber = "10.8.3";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(anotherDeveloper, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, anotherDeveloper, namespace, "Published");
@@ -2487,9 +2537,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
         // end of the pre-condition
@@ -2537,9 +2588,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "QA");
         // end of the pre-condition
@@ -2567,9 +2619,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNumber = "10.8.5";
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(releaseNumber);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Maintenance Order. Sync Response Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "Production");
         // end of the pre-condition
@@ -2624,19 +2677,19 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                     BusinessContextObject randomBusinessContext = BusinessContextObject.createRandomBusinessContext(developer);
                     randomBusinessContext.setCreationTimestamp(LocalDateTime.of(
                             2000 + (idx * 2),
-                            RandomUtils.nextInt(1, 13),
-                            RandomUtils.nextInt(1, 29),
-                            RandomUtils.nextInt(0, 24),
-                            RandomUtils.nextInt(0, 60),
-                            RandomUtils.nextInt(0, 60)
+                            RandomUtils.secure().randomInt(1, 13),
+                            RandomUtils.secure().randomInt(1, 29),
+                            RandomUtils.secure().randomInt(0, 24),
+                            RandomUtils.secure().randomInt(0, 60),
+                            RandomUtils.secure().randomInt(0, 60)
                     ));
                     randomBusinessContext.setLastUpdateTimestamp(LocalDateTime.of(
                             2000 + ((idx * 2) + 1),
-                            RandomUtils.nextInt(1, 13),
-                            RandomUtils.nextInt(1, 29),
-                            RandomUtils.nextInt(0, 24),
-                            RandomUtils.nextInt(0, 60),
-                            RandomUtils.nextInt(0, 60)
+                            RandomUtils.secure().randomInt(1, 13),
+                            RandomUtils.secure().randomInt(1, 29),
+                            RandomUtils.secure().randomInt(0, 24),
+                            RandomUtils.secure().randomInt(0, 60),
+                            RandomUtils.secure().randomInt(0, 60)
                     ));
                     return getAPIFactory().getBusinessContextAPI()
                             .createBusinessContext(randomBusinessContext);
@@ -2756,20 +2809,21 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
         TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Accounting Period. Accounting Period", releaseNum),
                         developer, "QA");
         TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Work Time Period. Time Period", releaseNum),
                         developer, "Production");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -2807,10 +2861,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -2833,10 +2888,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -2858,10 +2914,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -2919,19 +2976,19 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                     BusinessContextObject randomBusinessContext = BusinessContextObject.createRandomBusinessContext(developer);
                     randomBusinessContext.setCreationTimestamp(LocalDateTime.of(
                             2000 + (idx * 2),
-                            RandomUtils.nextInt(1, 13),
-                            RandomUtils.nextInt(1, 29),
-                            RandomUtils.nextInt(0, 24),
-                            RandomUtils.nextInt(0, 60),
-                            RandomUtils.nextInt(0, 60)
+                            RandomUtils.secure().randomInt(1, 13),
+                            RandomUtils.secure().randomInt(1, 29),
+                            RandomUtils.secure().randomInt(0, 24),
+                            RandomUtils.secure().randomInt(0, 60),
+                            RandomUtils.secure().randomInt(0, 60)
                     ));
                     randomBusinessContext.setLastUpdateTimestamp(LocalDateTime.of(
                             2000 + ((idx * 2) + 1),
-                            RandomUtils.nextInt(1, 13),
-                            RandomUtils.nextInt(1, 29),
-                            RandomUtils.nextInt(0, 24),
-                            RandomUtils.nextInt(0, 60),
-                            RandomUtils.nextInt(0, 60)
+                            RandomUtils.secure().randomInt(1, 13),
+                            RandomUtils.secure().randomInt(1, 29),
+                            RandomUtils.secure().randomInt(0, 24),
+                            RandomUtils.secure().randomInt(0, 60),
+                            RandomUtils.secure().randomInt(0, 60)
                     ));
                     return getAPIFactory().getBusinessContextAPI()
                             .createBusinessContext(randomBusinessContext);
@@ -2973,10 +3030,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3002,10 +3060,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3031,20 +3090,21 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
         TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Accounting Period. Accounting Period", releaseNum),
                         developer, "QA");
         TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Work Time Period. Time Period", releaseNum),
                         developer, "Production");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3095,10 +3155,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Tool Actual. Tool Actual", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Tool Actual. Tool Actual", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3129,20 +3190,21 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         String releaseNum = "10.8.5";
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
         TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Accounting Period. Accounting Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Accounting Period. Accounting Period", releaseNum),
                         developer, "QA");
         TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Work Time Period. Time Period", releaseNum),
                         developer, "Production");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3212,10 +3274,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
         );
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3256,16 +3319,17 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
         );
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "QA");
 
         TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Work Time Period. Time Period", releaseNum),
                         developer, "Production");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3312,16 +3376,17 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(enduser)
         );
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_QA = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         enduser, "QA");
 
         TopLevelASBIEPObject topLevelASBIEP_Production = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Work Time Period. Time Period", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Work Time Period. Time Period", releaseNum),
                         enduser, "Production");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3365,10 +3430,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
         );
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContexts.get(0)),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3391,10 +3457,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer)
         );
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(businessContexts,
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3439,10 +3506,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         BusinessContextObject businessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
 
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         TopLevelASBIEPObject topLevelASBIEP_WIP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(businessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum("Customer Price List Price. Price", releaseNum),
+                                .getASCCPByDENAndReleaseNum(library, "Customer Price List Price. Price", releaseNum),
                         developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -3460,9 +3528,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3474,7 +3543,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bccpNode);
         bbiePanel.toggleUsed();
         assertTrue(bbiePanel.getExampleField().isEnabled());
-        bbiePanel.setExample("example_" + randomAlphanumeric(5, 10));
+        bbiePanel.setExample("example_" + RandomStringUtils.secure().nextAlphabetic(5, 10));
         editBIEPage.hitUpdateButton();
 
         WebElement bdtScNode = editBIEPage.getNodeByPath(
@@ -3482,7 +3551,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage.BBIESCPanel bbieScPanel = editBIEPage.getBBIESCPanel(bdtScNode);
         bbieScPanel.toggleUsed();
         assertTrue(bbieScPanel.getExampleField().isEnabled());
-        bbieScPanel.setExample("example_" + randomAlphanumeric(5, 10));
+        bbieScPanel.setExample("example_" + RandomStringUtils.secure().nextAlphabetic(5, 10));
         editBIEPage.hitUpdateButton();
     }
 
@@ -3494,9 +3563,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3508,7 +3578,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement bccpNode = editBIEPage.getNodeByPath(bccpNodePath);
         EditBIEPage.BBIEPanel bbiePanel_1 = editBIEPage.getBBIEPanel(bccpNode);
         bbiePanel_1.toggleUsed();
-        String randomFixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
+        String randomFixedValue = "fixed_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         bbiePanel_1.setValueConstraint("Fixed Value");
         bbiePanel_1.setFixedValue(randomFixedValue);
         editBIEPage.hitUpdateButton();
@@ -3520,7 +3590,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(randomFixedValue, getText(bbiePanel_2.getFixedValueField()));
         assertThrows(TimeoutException.class, () -> bbiePanel_2.getDefaultValueField());
 
-        String randomDefaultValue = "default_value_" + randomAlphanumeric(5, 10);
+        String randomDefaultValue = "default_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         bbiePanel_2.setValueConstraint("Default Value");
         bbiePanel_2.setDefaultValue(randomDefaultValue);
         editBIEPage.hitUpdateButton();
@@ -3537,7 +3607,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         WebElement bdtScNode = editBIEPage.getNodeByPath(bdtScNodePath);
         EditBIEPage.BBIESCPanel bbieScPanel_1 = editBIEPage.getBBIESCPanel(bdtScNode);
         bbieScPanel_1.toggleUsed();
-        randomFixedValue = "fixed_value_" + randomAlphanumeric(5, 10);
+        randomFixedValue = "fixed_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         bbieScPanel_1.setValueConstraint("Fixed Value");
         bbieScPanel_1.setFixedValue(randomFixedValue);
         editBIEPage.hitUpdateButton();
@@ -3549,7 +3619,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         assertEquals(randomFixedValue, getText(bbieScPanel_2.getFixedValueField()));
         assertThrows(TimeoutException.class, () -> bbieScPanel_2.getDefaultValueField());
 
-        randomDefaultValue = "default_value_" + randomAlphanumeric(5, 10);
+        randomDefaultValue = "default_value_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         bbieScPanel_2.setValueConstraint("Default Value");
         bbieScPanel_2.setDefaultValue(randomDefaultValue);
         editBIEPage.hitUpdateButton();
@@ -3570,9 +3640,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3621,10 +3692,11 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.1");
         List<TopLevelASBIEPObject> topLevelASBIEPs = asccpDens.stream().map(den -> {
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum(den, release.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, den, release.getReleaseNumber());
             return getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
         }).collect(Collectors.toList());
@@ -3662,9 +3734,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.3");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3704,9 +3777,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get BOM. Get BOM", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get BOM. Get BOM", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3714,7 +3788,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
-        String version = "version_" + randomAlphanumeric(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         topLevelASBIEPPanel.setVersion(version);
         String versionIdentifierPath = "/" + asccp.getPropertyTerm() + "/Version Identifier";
         WebElement versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
@@ -3734,9 +3808,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Get BOM. Get BOM", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Get BOM. Get BOM", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3744,7 +3819,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
-        String version = "version_" + randomAlphanumeric(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         topLevelASBIEPPanel.setVersion(version);
         String versionIdentifierPath = "/" + asccp.getPropertyTerm() + "/Version Identifier";
         WebElement versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
@@ -3760,7 +3835,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         editBIEPage.openPage();
         versionIdentifierNode = editBIEPage.getNodeByPath(versionIdentifierPath);
         versionIdentifierPanel = editBIEPage.getBBIEPanel(versionIdentifierNode);
-        String anotherVersion = "version_" + randomAlphanumeric(5, 10);
+        String anotherVersion = "version_" + RandomStringUtils.secure().nextAlphabetic(5, 10);
         versionIdentifierPanel.setFixedValue(anotherVersion);
         editBIEPage.hitUpdateButton();
 
@@ -3778,9 +3853,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Sync Response Table. Sync Response Table", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Sync Response Table. Sync Response Table", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3811,7 +3887,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage =
@@ -3838,9 +3915,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3878,9 +3956,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3913,9 +3992,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -3954,19 +4034,20 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.2");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.2");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Acknowledge Maintenance Order. Acknowledge Maintenance Order", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
-        topLevelASBIEPPanel.setRemark(randomPrint(50, 100).trim());
-        topLevelASBIEPPanel.setVersion("version_" + randomAlphanumeric(5, 10));
-        topLevelASBIEPPanel.setStatus("status_" + randomAlphanumeric(5, 10));
-        topLevelASBIEPPanel.setContextDefinition(randomPrint(50, 100).trim());
+        topLevelASBIEPPanel.setRemark(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        topLevelASBIEPPanel.setVersion("version_" + RandomStringUtils.secure().nextAlphabetic(5, 10));
+        topLevelASBIEPPanel.setStatus("status_" + RandomStringUtils.secure().nextAlphabetic(5, 10));
+        topLevelASBIEPPanel.setContextDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
         editBIEPage.hitUpdateButton();
 
         topLevelASBIEPPanel.resetDetail();
@@ -3981,8 +4062,8 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         waitFor(Duration.ofMillis(2000));
         EditBIEPage.ASBIEPanel applicationAreaPanel = editBIEPage.getASBIEPanel(applicationArea);
         applicationAreaPanel.toggleUsed();
-        applicationAreaPanel.setRemark(randomPrint(50, 100).trim());
-        applicationAreaPanel.setContextDefinition(randomPrint(50, 100).trim());
+        applicationAreaPanel.setRemark(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        applicationAreaPanel.setContextDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
         editBIEPage.hitUpdateButton();
 
         applicationAreaPanel.resetDetail();
@@ -3995,9 +4076,9 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         waitFor(Duration.ofMillis(2000));
         EditBIEPage.BBIEPanel scenarioIdentifierPanel = editBIEPage.getBBIEPanel(scenarioIdentifier);
         scenarioIdentifierPanel.toggleUsed();
-        scenarioIdentifierPanel.setRemark(randomPrint(50, 100).trim());
-        scenarioIdentifierPanel.setExample(randomPrint(50, 100).trim());
-        scenarioIdentifierPanel.setContextDefinition(randomPrint(50, 100).trim());
+        scenarioIdentifierPanel.setRemark(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        scenarioIdentifierPanel.setExample(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        scenarioIdentifierPanel.setContextDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
         editBIEPage.hitUpdateButton();
 
         scenarioIdentifierPanel.resetDetail();
@@ -4019,21 +4100,22 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject prevRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
-        ReleaseObject curRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.1");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject prevRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
+        ReleaseObject curRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.1");
 
         /*
          * 'Alternate UOM Code. Unit_ Code' in 10.6 changed to 'Alternate UOM Code. Open_ Code' in 10.7.0.1
          */
         BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(
-                "Alternate UOM Code. Unit_ Code", prevRelease.getReleaseNumber());
-        bccp.setDefaultValue(randomAlphabetic(5, 10));
+                library, "Alternate UOM Code. Unit_ Code", prevRelease.getReleaseNumber());
+        bccp.setDefaultValue(RandomStringUtils.secure().nextAlphabetic(5, 10));
         getAPIFactory().getCoreComponentAPI().updateBCCP(bccp);
         try {
             BusinessContextObject randomBusinessContext =
                     getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
             ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", prevRelease.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Item Master. Item Master", prevRelease.getReleaseNumber());
             TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -4046,7 +4128,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
             assertEquals(bccp.getDefaultValue(), getText(bbiePanel.getDefaultValueField()));
 
             asccp = getAPIFactory().getCoreComponentAPI()
-                    .getASCCPByDENAndReleaseNum("Item Master. Item Master", curRelease.getReleaseNumber());
+                    .getASCCPByDENAndReleaseNum(library, "Item Master. Item Master", curRelease.getReleaseNumber());
             topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
             editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
@@ -4066,11 +4148,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -4101,11 +4184,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -4137,11 +4221,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "Change Acknowledge Match Document. Change Acknowledge Match Document", release.getReleaseNumber());
         TopLevelASBIEPObject topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, developer, "WIP");
 
@@ -4162,7 +4247,7 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         node = editBIEPage.getNodeByPath(path);
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(node);
         asbiePanel.toggleUsed();
-        int randomCardinalityMax = Integer.valueOf(randomNumeric(2, 3));
+        int randomCardinalityMax = RandomUtils.secure().randomInt(2, 3);
         asbiePanel.setCardinalityMax(randomCardinalityMax);
         waitFor(ofMillis(1000L));
         nodeText = getText(node);

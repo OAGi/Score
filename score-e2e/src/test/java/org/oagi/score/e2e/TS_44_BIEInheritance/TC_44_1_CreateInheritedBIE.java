@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_44_BIEInheritance;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.oagi.score.e2e.AssertionHelper.*;
@@ -57,13 +56,14 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
 
         BusinessContextObject randomBusinessContext =
                 getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.11");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
         ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
-                .getASCCPByDENAndReleaseNum("BOM Header. BOM Header", release.getReleaseNumber());
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
         TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
                 .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext),
                         getAPIFactory().getCoreComponentAPI()
-                                .getASCCPByDENAndReleaseNum(asccp.getDen(), release.getReleaseNumber()),
+                                .getASCCPByDENAndReleaseNum(library, asccp.getDen(), release.getReleaseNumber()),
                         endUser, "WIP");
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -71,11 +71,11 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
                 homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBIE);
         EditBIEPage.TopLevelASBIEPPanel topLevelASBIEPPanel = editBIEPage.getTopLevelASBIEPPanel();
 
-        String businessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        String remark = "remark_" + randomAlphanumeric(5, 10);
-        String version = "version_" + randomAlphanumeric(5, 10);
-        String status = "status_" + randomAlphanumeric(5, 10);
-        String contextDefinition = randomPrint(50, 100).trim();
+        String businessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String remark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String version = "version_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String status = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String contextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         topLevelASBIEPPanel.setBusinessTerm(businessTerm);
         topLevelASBIEPPanel.setRemark(remark);
@@ -86,10 +86,10 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
         WebElement securityClassificationAsbieNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Security Classification");
         EditBIEPage.ASBIEPanel securityClassificationAsbiePanel = editBIEPage.getASBIEPanel(securityClassificationAsbieNode);
 
-        int securityClassificationCardinalityMin = nextInt(2, 5);
-        int securityClassificationCardinalityMax = nextInt(5, 10);
-        String securityClassificationRemark = "remark_" + randomAlphanumeric(5, 10);
-        String securityClassificationContextDefinition = randomPrint(50, 100).trim();
+        int securityClassificationCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int securityClassificationCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String securityClassificationRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String securityClassificationContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         securityClassificationAsbiePanel.toggleUsed();
         securityClassificationAsbiePanel.setCardinalityMin(securityClassificationCardinalityMin);
@@ -100,10 +100,10 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
         WebElement statusAsbieNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Status");
         EditBIEPage.ASBIEPanel statusAsbiePanel = editBIEPage.getASBIEPanel(statusAsbieNode);
 
-        int statusCardinalityMin = nextInt(2, 5);
-        int statusCardinalityMax = nextInt(5, 10);
-        String statusRemark = "remark_" + randomAlphanumeric(5, 10);
-        String statusContextDefinition = randomPrint(50, 100).trim();
+        int statusCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int statusCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String statusRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String statusContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         statusAsbiePanel.toggleUsed();
         statusAsbiePanel.setCardinalityMin(statusCardinalityMin);
@@ -114,10 +114,10 @@ public class TC_44_1_CreateInheritedBIE extends BaseTest {
         WebElement effectivityAsbieNode = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/Effectivity");
         EditBIEPage.ASBIEPanel effectivityAsbiePanel = editBIEPage.getASBIEPanel(effectivityAsbieNode);
 
-        int effectivityCardinalityMin = nextInt(2, 5);
-        int effectivityCardinalityMax = nextInt(5, 10);
-        String effectivityRemark = "remark_" + randomAlphanumeric(5, 10);
-        String effectivityContextDefinition = randomPrint(50, 100).trim();
+        int effectivityCardinalityMin = RandomUtils.secure().randomInt(2, 5);
+        int effectivityCardinalityMax = RandomUtils.secure().randomInt(5, 10);
+        String effectivityRemark = "remark_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String effectivityContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         effectivityAsbiePanel.toggleUsed();
         effectivityAsbiePanel.setCardinalityMin(effectivityCardinalityMin);

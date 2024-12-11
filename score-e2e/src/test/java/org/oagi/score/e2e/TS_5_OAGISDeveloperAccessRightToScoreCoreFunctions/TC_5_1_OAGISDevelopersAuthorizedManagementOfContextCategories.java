@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_5_OAGISDeveloperAccessRightToScoreCoreFunctions;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.*;
@@ -15,7 +16,6 @@ import org.oagi.score.e2e.page.context.CreateContextCategoryPage;
 import org.oagi.score.e2e.page.context.EditContextCategoryPage;
 import org.oagi.score.e2e.page.context.ViewEditContextCategoryPage;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.impl.PageHelper.click;
@@ -56,7 +54,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
     @DisplayName("TC_5_1_TA_1")
     public void developer_can_create_context_category_with_only_required_information() {
         ContextCategoryObject contextCategory = new ContextCategoryObject();
-        contextCategory.setName("cat_" + randomAlphanumeric(5, 10));
+        contextCategory.setName("cat_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -73,8 +71,8 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
     @DisplayName("TC_5_1_TA_2")
     public void developer_can_create_context_category_with_all_information_specified() {
         ContextCategoryObject contextCategory = new ContextCategoryObject();
-        contextCategory.setName("cat_" + randomAlphanumeric(5, 10));
-        contextCategory.setDescription(randomPrint(50, 100).trim());
+        contextCategory.setName("cat_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        contextCategory.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -91,7 +89,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
     @DisplayName("TC_5_1_TA_3")
     public void developer_cannot_create_context_category_without_required_information() {
         ContextCategoryObject contextCategory = new ContextCategoryObject();
-        contextCategory.setDescription(randomPrint(50, 100).trim());
+        contextCategory.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
 
         HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
         ContextMenu contextMenu = homePage.getContextMenu();
@@ -190,7 +188,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
                         .openEditContextCategoryPageByContextCategoryName(randomContextCategory.getName());
 
         String oldName = randomContextCategory.getName();
-        randomContextCategory.setName("cat_" + randomAlphanumeric(5, 10));
+        randomContextCategory.setName("cat_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         assertFalse(oldName.equals(randomContextCategory.getName()));
 
         String oldDescription = randomContextCategory.getDescription();
@@ -223,11 +221,11 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
                         .openEditContextCategoryPageByContextCategoryName(randomContextCategory.getName());
 
         String oldName = randomContextCategory.getName();
-        randomContextCategory.setName("cat_" + randomAlphanumeric(5, 10));
+        randomContextCategory.setName("cat_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         assertFalse(oldName.equals(randomContextCategory.getName()));
 
         String oldDescription = randomContextCategory.getDescription();
-        randomContextCategory.setDescription(randomPrint(50, 100).trim());
+        randomContextCategory.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
         assertFalse(oldDescription.equals(randomContextCategory.getDescription()));
 
         editContextCategoryPage.updateContextCategory(randomContextCategory);
@@ -260,7 +258,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         assertFalse(oldName.equals(randomContextCategory.getName()));
 
         String oldDescription = randomContextCategory.getDescription();
-        randomContextCategory.setDescription(randomPrint(50, 100).trim());
+        randomContextCategory.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
         assertFalse(oldDescription.equals(randomContextCategory.getDescription()));
 
         assertThrows(TimeoutException.class, () -> editContextCategoryPage.updateContextCategory(randomContextCategory));
@@ -358,20 +356,20 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
          */
         ContextCategoryObject randomContextCategory = ContextCategoryObject.newRandomContextCategory(appUser);
         randomContextCategory.setCreationTimestamp(LocalDateTime.of(
-                RandomUtils.nextInt(2000, 2011),
-                RandomUtils.nextInt(1, 13),
-                RandomUtils.nextInt(1, 29),
-                RandomUtils.nextInt(0, 24),
-                RandomUtils.nextInt(0, 60),
-                RandomUtils.nextInt(0, 60)
+                RandomUtils.secure().randomInt(2000, 2011),
+                RandomUtils.secure().randomInt(1, 13),
+                RandomUtils.secure().randomInt(1, 29),
+                RandomUtils.secure().randomInt(0, 24),
+                RandomUtils.secure().randomInt(0, 60),
+                RandomUtils.secure().randomInt(0, 60)
         ));
         randomContextCategory.setLastUpdateTimestamp(LocalDateTime.of(
-                RandomUtils.nextInt(2011, 2022),
-                RandomUtils.nextInt(1, 13),
-                RandomUtils.nextInt(1, 29),
-                RandomUtils.nextInt(0, 24),
-                RandomUtils.nextInt(0, 60),
-                RandomUtils.nextInt(0, 60)
+                RandomUtils.secure().randomInt(2011, 2022),
+                RandomUtils.secure().randomInt(1, 13),
+                RandomUtils.secure().randomInt(1, 29),
+                RandomUtils.secure().randomInt(0, 24),
+                RandomUtils.secure().randomInt(0, 60),
+                RandomUtils.secure().randomInt(0, 60)
         ));
         getAPIFactory().getContextCategoryAPI().createContextCategory(randomContextCategory, appUser);
 
@@ -446,7 +444,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
     public void test_checkbox_selection() {
         String namePrefix = "cs_TC51_TA12";
         List<ContextCategoryObject> randomContextCategories = new ArrayList<>();
-        for (int i = 0; i < RandomUtils.nextInt(11, 20); ++i) {
+        for (int i = 0; i < RandomUtils.secure().randomInt(11, 20); ++i) {
             ContextCategoryObject randomContextCategory =
                     getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser, namePrefix);
             randomContextCategories.add(randomContextCategory);
@@ -460,7 +458,7 @@ public class TC_5_1_OAGISDevelopersAuthorizedManagementOfContextCategories exten
         viewEditContextCategoryPage.hitSearchButton();
 
         By checkboxOfFirstRecordLocator = By.xpath("//table/tbody" +
-                "/tr[" + RandomUtils.nextInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
+                "/tr[" + RandomUtils.secure().randomInt(1, 10) + "]/td[1]//mat-checkbox[@ng-reflect-disabled=\"true\" or not(@disabled='true')]");
         retry(() -> {
             WebElement checkboxOfFirstRecord = new FluentWait<>(getDriver())
                     .withTimeout(Duration.ofSeconds(3L))

@@ -18,7 +18,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,8 +55,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
@@ -102,12 +102,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_2")
     public void test_TA_2() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -117,7 +117,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
@@ -181,12 +181,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_3")
     public void test_TA_3() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         ASCCPObject asccp;
         BCCPObject bccp;
@@ -196,7 +196,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
@@ -269,8 +269,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Draft");
@@ -347,12 +348,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_5")
     public void test_TA_5() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Published");
@@ -425,9 +426,9 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_6")
     public void test_TA_6() {
-
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
         thisAccountWillBeDeletedAfterTests(endUser);
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
@@ -435,18 +436,17 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         By ADD_CC_ICON_LOCATOR =
                 By.xpath("//mat-icon[contains(text(), \"add\")]");
         assertEquals(0, getDriver().findElements(ADD_CC_ICON_LOCATOR).size());
-
     }
 
     @Test
     @DisplayName("TC_10_1_TA_7")
     public void test_TA_7() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Deleted");
@@ -518,12 +518,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_8")
     public void test_TA_8() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Deleted");
@@ -591,12 +591,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_9")
     public void test_TA_9() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("Deleted");
@@ -669,18 +669,17 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @DisplayName("TC_10_1_TA_10")
     public void test_TA_10() {
 
-
     }
 
     @Test
     @DisplayName("TC_10_1_TA_11")
     public void test_TA_11() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -765,12 +764,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_12")
     public void test_TA_12() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -818,12 +817,12 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_13")
     public void test_TA_13() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
@@ -849,28 +848,28 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
              */
             LocalDateTime startTime = LocalDateTime.of(
                     2013,
-                    RandomUtils.nextInt(1, 13),
-                    RandomUtils.nextInt(1, 29),
-                    RandomUtils.nextInt(0, 24),
-                    RandomUtils.nextInt(0, 60),
-                    RandomUtils.nextInt(0, 60)
+                    RandomUtils.secure().randomInt(1, 13),
+                    RandomUtils.secure().randomInt(1, 29),
+                    RandomUtils.secure().randomInt(0, 24),
+                    RandomUtils.secure().randomInt(0, 60),
+                    RandomUtils.secure().randomInt(0, 60)
             );
             LocalDateTime endTime = LocalDateTime.of(
                     2015,
-                    RandomUtils.nextInt(1, 13),
-                    RandomUtils.nextInt(1, 29),
-                    RandomUtils.nextInt(0, 24),
-                    RandomUtils.nextInt(0, 60),
-                    RandomUtils.nextInt(0, 60)
+                    RandomUtils.secure().randomInt(1, 13),
+                    RandomUtils.secure().randomInt(1, 29),
+                    RandomUtils.secure().randomInt(0, 24),
+                    RandomUtils.secure().randomInt(0, 60),
+                    RandomUtils.secure().randomInt(0, 60)
             );
 
             LocalDateTime creationTime = LocalDateTime.of(
                     2014,
-                    RandomUtils.nextInt(1, 13),
-                    RandomUtils.nextInt(1, 29),
-                    RandomUtils.nextInt(0, 24),
-                    RandomUtils.nextInt(0, 60),
-                    RandomUtils.nextInt(0, 60)
+                    RandomUtils.secure().randomInt(1, 13),
+                    RandomUtils.secure().randomInt(1, 29),
+                    RandomUtils.secure().randomInt(0, 24),
+                    RandomUtils.secure().randomInt(0, 60),
+                    RandomUtils.secure().randomInt(0, 60)
             );
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc.setCreationTimestamp(creationTime);
@@ -919,7 +918,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_15")
     public void test_TA_15() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -944,7 +942,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_16")
     public void test_TA_16() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -968,7 +965,6 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_17")
     public void test_TA_17() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
 
@@ -1084,15 +1080,17 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("Draft");
         ccStates.add("Candidate");
 
-        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer =
+                new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
@@ -1310,10 +1308,11 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
     @Test
     @DisplayName("TC_10_1_TA_20")
     public void test_TA_20() {
-
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         CoreComponentMenu coreComponentMenu = homePage.getCoreComponentMenu();
@@ -1341,15 +1340,16 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         homePage.logout();
         homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
 
-        release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+        release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
         List<String> ccStates = new ArrayList<>();
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
 
-        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
+        RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer =
+                new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         ACCObject ACCendUserWIP, ACCendUserQA, ACCForBase;
         ASCCPObject ASCCPendUserQA;
@@ -1417,6 +1417,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             this.appUser = appUser;
             this.states = states;
 
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryById(release.getLibraryId());
 
             for (int i = 0; i < this.states.size(); ++i) {
                 ASCCPObject asccp;
@@ -1428,7 +1429,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
                     acc = coreComponentAPI.createRandomACC(this.appUser, release, namespace, state);
-                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+                    DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
                     bccp = coreComponentAPI.createRandomBCCP(dataType, this.appUser, namespace, state);
                     BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, state);
                     bcc.setCardinalityMax(1);

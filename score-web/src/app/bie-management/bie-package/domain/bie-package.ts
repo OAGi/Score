@@ -4,6 +4,7 @@ import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ScoreUser} from '../../../authentication/domain/auth';
 import {SimpleRelease} from '../../../release-management/domain/release';
+import {Library} from '../../../library-management/domain/library';
 
 export class BiePackage {
   biePackageId: number;
@@ -27,6 +28,7 @@ export class BiePackage {
 }
 
 export class BiePackageListRequest {
+  library: Library = new Library();
   releases: SimpleRelease[] = [];
   filters: {
     versionId: string;
