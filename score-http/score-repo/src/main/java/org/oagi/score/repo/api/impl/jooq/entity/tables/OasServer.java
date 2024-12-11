@@ -209,32 +209,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
 
     @Override
     public List<ForeignKey<OasServerRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_SERVER_OAS_DOC_ID_FK, Keys.OAS_SERVER_OWNER_USER_ID_FK, Keys.OAS_SERVER_CREATED_BY_FK, Keys.OAS_SERVER_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasDocPath _oasDoc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
-     */
-    public OasDocPath oasDoc() {
-        if (_oasDoc == null)
-            _oasDoc = new OasDocPath(this, Keys.OAS_SERVER_OAS_DOC_ID_FK, null);
-
-        return _oasDoc;
-    }
-
-    private transient AppUserPath _oasServerOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_server_owner_user_id_fk</code> key.
-     */
-    public AppUserPath oasServerOwnerUserIdFk() {
-        if (_oasServerOwnerUserIdFk == null)
-            _oasServerOwnerUserIdFk = new AppUserPath(this, Keys.OAS_SERVER_OWNER_USER_ID_FK, null);
-
-        return _oasServerOwnerUserIdFk;
+        return Arrays.asList(Keys.OAS_SERVER_CREATED_BY_FK, Keys.OAS_SERVER_LAST_UPDATED_BY_FK, Keys.OAS_SERVER_OAS_DOC_ID_FK, Keys.OAS_SERVER_OWNER_USER_ID_FK);
     }
 
     private transient AppUserPath _oasServerCreatedByFk;
@@ -261,6 +236,31 @@ public class OasServer extends TableImpl<OasServerRecord> {
             _oasServerLastUpdatedByFk = new AppUserPath(this, Keys.OAS_SERVER_LAST_UPDATED_BY_FK, null);
 
         return _oasServerLastUpdatedByFk;
+    }
+
+    private transient OasDocPath _oasDoc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     */
+    public OasDocPath oasDoc() {
+        if (_oasDoc == null)
+            _oasDoc = new OasDocPath(this, Keys.OAS_SERVER_OAS_DOC_ID_FK, null);
+
+        return _oasDoc;
+    }
+
+    private transient AppUserPath _oasServerOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>oas_server_owner_user_id_fk</code> key.
+     */
+    public AppUserPath oasServerOwnerUserIdFk() {
+        if (_oasServerOwnerUserIdFk == null)
+            _oasServerOwnerUserIdFk = new AppUserPath(this, Keys.OAS_SERVER_OWNER_USER_ID_FK, null);
+
+        return _oasServerOwnerUserIdFk;
     }
 
     private transient OasServerVariablePath _oasServerVariable;

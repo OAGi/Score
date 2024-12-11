@@ -61,19 +61,20 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         NamespaceObject useraNamespace;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -135,19 +136,20 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         TopLevelASBIEPObject userbBIE;
         NamespaceObject useraNamespace;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.0.1");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.0.1");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
 
             asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject contextFirstUser = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -239,12 +241,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         NamespaceObject useraNamespace;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.8");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.8");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -252,7 +255,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
-            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            useraNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             TopLevelASBIEPObject topLevelAsbiepWIP = getAPIFactory().getBusinessInformationEntityAPI().
@@ -308,12 +311,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         TopLevelASBIEPObject useraBIEWIP;
         BCCPObject bccpToAppend;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.2");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.2");
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -325,7 +329,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
             useraBIEWIP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
 
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         }
 
@@ -394,12 +398,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ASCCPObject, ACCObject> ASCCPassociatedACC = new HashMap<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8");
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, endUserForCC, namespace, "Published");
@@ -407,7 +412,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
@@ -415,7 +420,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             ASCCPassociatedACC.put(asccpToAppendWIP, accToAppend);
 
             accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
-            dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "Published");
             coreComponentAPI.appendBCC(accToAppend, bccp, "Published");
             accBCCPMap.put(accToAppend, bccp);
@@ -425,14 +430,14 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccpsForTesting.add(asccpToAppendWIP);
             asccpsForTesting.add(asccpToAppendQA);
 
-            dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccpToAppendWIP = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "WIP");
             BCCPObject bccpToAppendQA = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
             bccpsForTesting.add(bccpToAppendWIP);
             bccpsForTesting.add(bccpToAppendQA);
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -539,12 +544,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         Map<ASCCPObject, ACCObject> asccpACCMap = new HashMap<>();
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.3");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.3");
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, endUserForCC, namespace, "Published");
@@ -552,7 +558,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccp = coreComponentAPI.createRandomASCCP(acc, endUserForCC, namespace, "Published");
 
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "QA");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
@@ -561,7 +567,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccpACCMap.put(asccpToAppendProduction, accToAppend);
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -636,12 +642,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.4");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.4");
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, endUserForCC, namespace, "Published");
@@ -652,7 +659,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
              * The end user ACC of the ASCCP is also in the Production state and was amended.
              */
             ACCObject accToAppend = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
@@ -677,7 +684,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccpACCMap.put(asccpToAppendProduction, accToAppend);
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -752,12 +759,13 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
         Map<ACCObject, BCCPObject> accBCCPMap = new HashMap<>();
         Map<ACCObject, ASCCPObject> accASCCPPMap = new HashMap<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.7.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.7.5");
             AppUserObject endUserForCC = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserForCC);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(endUserForCC, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, endUserForCC, namespace, "Published");
@@ -768,7 +776,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
              * The end user ACC of the ASCCP has a Group component type and is NOT in the Production state.
              */
             ACCObject accToAppend = coreComponentAPI.createRandomACCSemanticGroupType(endUserForCC, release, namespace, "QA");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccpToAppend = coreComponentAPI.createRandomBCCP(dataType, endUserForCC, namespace, "QA");
             coreComponentAPI.appendBCC(accToAppend, bccpToAppend, "QA");
             accBCCPMap.put(accToAppend, bccpToAppend);
@@ -789,7 +797,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE_Global_Extension extends Base
             asccpACCMap.put(asccpToAppendProduction, accToAppend);
 
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
             thisAccountWillBeDeletedAfterTests(usera);
 
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);

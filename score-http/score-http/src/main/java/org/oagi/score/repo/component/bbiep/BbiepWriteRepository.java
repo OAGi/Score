@@ -49,6 +49,7 @@ public class BbiepWriteRepository {
             bbiepRecord.setDefinition(bbiep.getDefinition());
             bbiepRecord.setRemark(bbiep.getRemark());
             bbiepRecord.setBizTerm(bbiep.getBizTerm());
+            bbiepRecord.setDisplayName(bbiep.getDisplayName());
 
             bbiepRecord.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
 
@@ -76,6 +77,10 @@ public class BbiepWriteRepository {
                 bbiepRecord.setBizTerm(emptyToNull(bbiep.getBizTerm()));
             }
 
+            if (bbiep.getDisplayName() != null) {
+                bbiepRecord.setDisplayName(emptyToNull(bbiep.getDisplayName()));
+            }
+
             if (bbiepRecord.changed()) {
                 bbiepRecord.setLastUpdatedBy(requesterId);
                 bbiepRecord.setLastUpdateTimestamp(request.getLocalDateTime());
@@ -84,6 +89,7 @@ public class BbiepWriteRepository {
                         BBIEP.DEFINITION,
                         BBIEP.REMARK,
                         BBIEP.BIZ_TERM,
+                        BBIEP.DISPLAY_NAME,
                         BBIEP.LAST_UPDATED_BY,
                         BBIEP.LAST_UPDATE_TIMESTAMP
                 );

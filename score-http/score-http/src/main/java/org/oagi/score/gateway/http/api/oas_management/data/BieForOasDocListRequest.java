@@ -27,6 +27,7 @@ public class BieForOasDocListRequest {
     private List<String> messageBody = Collections.emptyList();
     private List<String> ownerLoginIds = Collections.emptyList();
     private List<String> updaterLoginIds = Collections.emptyList();
+    private BigInteger libraryId;
     private BigInteger releaseId;
     private Date updateStartDate;
     private Date updateEndDate;

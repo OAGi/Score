@@ -173,6 +173,7 @@ public class JooqBieWriteRepository
         asbiepRecord.setDefinition(asbiep.getDefinition());
         asbiepRecord.setRemark(asbiep.getRemark());
         asbiepRecord.setBizTerm(asbiep.getBizTerm());
+        asbiepRecord.setDisplayName(asbiep.getDisplayName());
         asbiepRecord.setCreatedBy(userId);
         asbiepRecord.setLastUpdatedBy(userId);
         asbiepRecord.setCreationTimestamp(LocalDateTime.now());
@@ -203,6 +204,7 @@ public class JooqBieWriteRepository
         bbiepRecord.setDefinition(bbiep.getDefinition());
         bbiepRecord.setRemark(bbiep.getRemark());
         bbiepRecord.setBizTerm(bbiep.getBizTerm());
+        bbiepRecord.setDisplayName(bbiep.getDisplayName());
         bbiepRecord.setCreatedBy(userId);
         bbiepRecord.setLastUpdatedBy(userId);
         bbiepRecord.setCreationTimestamp(LocalDateTime.now());
@@ -348,6 +350,7 @@ public class JooqBieWriteRepository
         bbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());
         bbieScRecord.setBizTerm(bbieSc.getBizTerm());
         bbieScRecord.setRemark(bbieSc.getRemark());
+        bbieScRecord.setDisplayName(bbieSc.getDisplayName());
         bbieScRecord.setExample(bbieSc.getExample());
         bbieScRecord.setIsDeprecated((byte) (bbieSc.isDeprecated() ? 1 : 0));
         bbieScRecord.setIsUsed((byte) (bbieSc.isUsed() ? 1 : 0));

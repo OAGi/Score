@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.namespace_management.data;
 import lombok.Data;
 import org.oagi.score.service.common.data.PageRequest;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 public class NamespaceListRequest {
 
+    private BigInteger libraryId;
     private String uri;
     private String prefix;
     private String description;

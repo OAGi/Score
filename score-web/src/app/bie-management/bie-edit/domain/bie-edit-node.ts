@@ -9,11 +9,13 @@ import {
   BieEditNodeDetail,
   ChangeListener
 } from '../../domain/bie-flat-tree';
-import {hashCode4String} from '../../../common/utility';
+import {hashCode4Array, hashCode4String} from '../../../common/utility';
 
 export class BieEditNode {
   ccManifestId: number;
   topLevelAsbiepId: number;
+  libraryId: number;
+  libraryName: string;
   releaseId: number;
   releaseNum: string;
   type: string;
@@ -21,12 +23,14 @@ export class BieEditNode {
   bieType: string;
   guid: string;
   name: string;
+  displayName: string;
   required: boolean;
   locked: boolean;
-  derived: boolean;
+  reused: boolean;
   topLevelAsbiepState: string;
   inverseMode: boolean;
   deprecated: boolean;
+  basedTopLevelAsbiepId: number;
   private $hashCode: number;
   private _version: string;
   private _status: string;
@@ -36,17 +40,21 @@ export class BieEditNode {
 
   constructor(obj?: BieEditNode) {
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
+    this.libraryId = obj && obj.libraryId || 0;
     this.releaseId = obj && obj.releaseId || 0;
     this.type = obj && obj.type || '';
     this.ccType = obj && obj.ccType || '';
     this.bieType = obj && obj.bieType || '';
     this.guid = obj && obj.guid || '';
     this.name = obj && obj.name || '';
+    this.displayName = obj && obj.displayName || '';
     this.required = obj && obj.required || false;
     this.locked = obj && obj.locked || false;
     this.topLevelAsbiepState = obj && obj.topLevelAsbiepState || '';
     this.inverseMode = obj && obj.inverseMode || false;
     this.deprecated = obj && obj.deprecated || false;
+    this.basedTopLevelAsbiepId = obj && obj.basedTopLevelAsbiepId || 0;
+    this.libraryName = obj && obj.libraryName || '';
     this.releaseNum = obj && obj.releaseNum || '';
     this.loginId = obj && obj.loginId || '';
     this.version = obj && obj.version || '';
@@ -72,8 +80,7 @@ export class BieEditNode {
   }
 
   get hashCode(): number {
-    return ((this.version) ? hashCode4String(this.version) : 0) +
-      ((this.status) ? hashCode4String(this.status) : 0);
+    return hashCode4Array(this.version, this.status);
   }
 
   reset(): void {
@@ -118,7 +125,7 @@ export class BieEditAbieNode extends BieEditNode {
   }
 
   get hashCode(): number {
-    return super.hashCode + ((this.inverseMode) ? 1 : 0);
+    return hashCode4Array(super.hashCode, this.inverseMode);
   }
 }
 
@@ -288,6 +295,7 @@ export class UsedBie {
   type: string;
   manifestId: number;
   ownerTopLevelAsbiepId: number;
+  displayName: string;
   cardinalityMin: number;
   cardinalityMax: number;
   deprecated: boolean;
@@ -299,6 +307,7 @@ export class UsedBie {
     this.type = obj && obj.type || '';
     this.manifestId = obj && obj.manifestId || 0;
     this.ownerTopLevelAsbiepId = obj && obj.ownerTopLevelAsbiepId || 0;
+    this.displayName = obj && obj.displayName || '';
     this.cardinalityMin = obj && obj.cardinalityMin || 0;
     this.cardinalityMax = obj && obj.cardinalityMax || 0;
     this.deprecated = obj && obj.deprecated || false;
@@ -310,6 +319,8 @@ export class RefBie {
   basedAsccManifestId: number;
   hashPath: string;
   topLevelAsbiepId: number;
+  basedTopLevelAsbiepId: number;
   refTopLevelAsbiepId: number;
+  refBasedTopLevelAsbiepId: number;
   refInverseMode: boolean;
 }

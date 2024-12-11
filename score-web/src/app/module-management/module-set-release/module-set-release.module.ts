@@ -15,6 +15,7 @@ import {
 } from './module-set-release-detail/module-set-release-validation-dialog/module-set-release-validation-dialog.component';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -44,17 +45,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    ScoreCommonModule,
-    DragDropModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        ScoreCommonModule,
+        DragDropModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     ModuleSetReleaseListComponent,
     ModuleSetReleaseCreateComponent,

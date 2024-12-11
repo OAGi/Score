@@ -45,6 +45,7 @@ public class BieListController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieList> getBieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @RequestParam(name = "libraryId") BigInteger libraryId,
                                             @RequestParam(name = "den", required = false) String den,
                                             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
                                             @RequestParam(name = "businessContext", required = false) String businessContext,
@@ -56,6 +57,7 @@ public class BieListController {
                                             @RequestParam(name = "deprecated", required = false) String deprecated,
                                             @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
                                             @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
+                                            @RequestParam(name = "basedTopLevelAsbiepIds", required = false) String basedTopLevelAsbiepIds,
                                             @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
                                             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -72,6 +74,7 @@ public class BieListController {
 
         BieListRequest request = new BieListRequest();
 
+        request.setLibraryId(libraryId);
         request.setDen(den);
         request.setPropertyTerm(propertyTerm);
         request.setBusinessContext(businessContext);
@@ -93,6 +96,8 @@ public class BieListController {
                 Arrays.asList(excludePropertyTerms.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).collect(Collectors.toList()));
         request.setTopLevelAsbiepIds(!StringUtils.hasLength(topLevelAsbiepIds) ? Collections.emptyList() :
                 Arrays.asList(topLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
+        request.setBasedTopLevelAsbiepIds(!StringUtils.hasLength(basedTopLevelAsbiepIds) ? Collections.emptyList() :
+                Arrays.asList(basedTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setExcludeTopLevelAsbiepIds(!StringUtils.hasLength(excludeTopLevelAsbiepIds) ? Collections.emptyList() :
                 Arrays.asList(excludeTopLevelAsbiepIds.split(",")).stream().map(e -> e.trim()).filter(e -> StringUtils.hasLength(e)).map(e -> new BigInteger(e)).collect(Collectors.toList()));
         request.setOwnerLoginIds(!StringUtils.hasLength(ownerLoginIds) ? Collections.emptyList() :
@@ -158,6 +163,7 @@ public class BieListController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<AsbieListRecord> getAsbieAndBbieList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                             @RequestParam(name = "libraryId") BigInteger libraryId,
                                                              @RequestParam(name = "topLevelAsccpPropertyTerm", required = false) String topLevelAsccpPropertyTerm,
                                                              @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
                                                              @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -181,6 +187,7 @@ public class BieListController {
         BieListRequest request = new BieListRequest();
         PageRequest pageRequest = new PageRequest();
 
+        request.setLibraryId(libraryId);
         request.setPropertyTerm(topLevelAsccpPropertyTerm);
         request.setBusinessContext(businessContext);
         request.setVersion(version);

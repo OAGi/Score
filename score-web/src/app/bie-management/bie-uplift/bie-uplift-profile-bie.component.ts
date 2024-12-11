@@ -14,7 +14,7 @@ import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepick
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {Location} from '@angular/common';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
@@ -24,6 +24,8 @@ import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../set
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-bie-uplift-profile-bie',
@@ -173,6 +175,8 @@ export class BieUpliftProfileBieComponent implements OnInit {
   preferencesInfo: PreferencesInfo;
 
   releases: SimpleRelease[] = [];
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
   sourceRelease: SimpleRelease;
   targetRelease: SimpleRelease;
   sourceReleaseListFilterCtrl: FormControl = new FormControl();
@@ -181,7 +185,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
   targetReleaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
 
   get targetReleaseList(): SimpleRelease[] {
-    const sourceRelease: SimpleRelease = this.request.releases[0];
+    const sourceRelease: SimpleRelease = this.sourceRelease;
     if (!!sourceRelease) {
       return this.releases.filter(val => val.releaseId > sourceRelease.releaseId);
     }
@@ -199,6 +203,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
               private bieListService: BieListService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private auth: AuthService,
               private preferencesService: SettingsPreferencesService,
               private location: Location,
@@ -213,68 +218,45 @@ export class BieUpliftProfileBieComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases(['Published']),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.releases = releases.filter(e => e.releaseNum !== 'Working');
-      if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
-        if (savedReleaseId) {
-          this.sourceRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.sourceRelease) {
-            this.sourceRelease = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'BIE', this.sourceRelease.releaseId);
-          }
-        } else {
-          this.sourceRelease = this.releases[0];
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
-      }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.loadBieList(true);
+      forkJoin([
+        this.accountService.getAccountNames(),
+        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
 
-      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, this.releases, (e) => e.releaseNum);
-      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      const targetReleaseList = this.targetReleaseList;
-      if (targetReleaseList.length > 0) {
-        this.targetRelease = targetReleaseList[0];
-      }
-    });
-
-    this.accountService.getAccountNames().subscribe(loginIds => {
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+        this.initReleases(releases);
+        this.loadBieList(true);
+      });
     });
   }
 
@@ -331,6 +313,57 @@ export class BieUpliftProfileBieComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || !this.request.library.libraryId) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = releases.filter(e => !e.workingRelease);
+    if (this.releases.length > 0) {
+      const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
+      if (savedReleaseId) {
+        this.sourceRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+        if (!this.sourceRelease) {
+          this.sourceRelease = this.releases[0];
+          saveBranch(this.auth.getUserToken(), 'BIE', this.sourceRelease.releaseId);
+        }
+      } else {
+        this.sourceRelease = this.releases[0];
+      }
+
+      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, this.releases, (e) => e.releaseNum);
+      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, this.targetReleaseList, (e) => e.releaseNum);
+
+      const targetReleaseList = this.targetReleaseList;
+      if (targetReleaseList.length > 0) {
+        this.targetRelease = targetReleaseList[0];
+      }
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.request.releases = [];
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
   }
 
   onSearch() {

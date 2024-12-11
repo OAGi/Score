@@ -152,6 +152,14 @@ export function saveProperty(userToken: UserToken, key: string, value: string) {
   localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
 }
 
+export function loadLibrary(userToken: UserToken): number | undefined {
+  return Number(loadProperty(userToken, 'Library-Selection', '0'));
+}
+
+export function saveLibrary(userToken: UserToken, libraryId: number) {
+  saveProperty(userToken, 'Library-Selection', '' + libraryId);
+}
+
 export function loadBranch(userToken: UserToken, type: string): number | undefined {
   if (!userToken || !type) {
     return undefined;

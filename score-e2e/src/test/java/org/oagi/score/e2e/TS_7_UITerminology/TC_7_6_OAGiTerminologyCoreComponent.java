@@ -49,14 +49,15 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_2_and_TA_3")
     public void test_TA_2_and_TA_3() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -91,7 +92,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_5_and_TA_6")
     public void test_TA_5_and_TA_6() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         ACCObject acc;
         {
@@ -99,7 +101,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -175,14 +177,15 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_9_and_TA_10")
     public void test_TA_9_and_TA_10() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -220,16 +223,17 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_12_and_TA_13")
     public void test_TA_12_and_TA_13() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         BCCPObject bccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Identifier. Type", release.getReleaseNumber());
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
         }
 
@@ -258,7 +262,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_15_and_TA_16")
     public void test_TA_15_and_TA_16() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ASCCPObject asccp;
         ACCObject accFrom;
         ACCObject accTo;
@@ -267,7 +272,7 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             accTo = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(accTo, developer, namespace, "Published");
             accFrom = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -303,7 +308,8 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_18_and_TA_19")
     public void test_TA_18_and_TA_19() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ACCObject acc;
         BCCPObject bccp;
         {
@@ -311,9 +317,9 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Identifier. Type", release.getReleaseNumber());
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
         }
@@ -348,16 +354,17 @@ public class TC_7_6_OAGiTerminologyCoreComponent extends BaseTest {
     @Test
     @DisplayName("TC_7_6_TA_21_to_TA_23")
     public void test_TA_21_to_TA_23() {
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
         ACCObject acc;
         BCCPObject bccp;
         {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
-            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Identifier. Type", release.getReleaseNumber());
+            DTObject dataType = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Identifier. Type", release.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, namespace, "Published");
             coreComponentAPI.appendBCC(acc, bccp, "Published");
         }

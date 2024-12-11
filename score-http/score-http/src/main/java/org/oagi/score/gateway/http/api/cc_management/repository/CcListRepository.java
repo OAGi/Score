@@ -230,6 +230,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         if ("Working".equals(release.getReleaseNum())) {
             conditions.add(ACC.OAGIS_COMPONENT_TYPE.notEqual(OagisComponentType.UserExtensionGroup.getValue()));
@@ -377,6 +378,8 @@ public class CcListRepository {
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(ACC.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
@@ -398,6 +401,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(ASCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         conditions.add(ASCC_MANIFEST.DEN.notContains("User Extension Group"));
 
@@ -486,6 +490,8 @@ public class CcListRepository {
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(ASCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(ACC.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
@@ -503,6 +509,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(BCC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         conditions.add(BCC_MANIFEST.DEN.notContains("User Extension Group"));
 
@@ -591,6 +598,8 @@ public class CcListRepository {
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(BCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(ACC.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
@@ -608,6 +617,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         conditions.add(ASCCP_MANIFEST.DEN.notContains("User Extension Group"));
 
@@ -708,6 +718,8 @@ public class CcListRepository {
                 .on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(ASCCP.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
@@ -729,6 +741,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(BCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         conditions.add(BCCP_MANIFEST.DEN.notContains("User Extension Group"));
         if (request.getDeprecated() != null) {
@@ -817,6 +830,8 @@ public class CcListRepository {
                 .on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(BCCP.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)
@@ -838,6 +853,7 @@ public class CcListRepository {
         AppUser appUserUpdater = APP_USER.as("updater");
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(DT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
         if (request.getDtTypes() != null && !request.getDtTypes().isEmpty()) {
             List<String> dtTypes = request.getDtTypes().stream()
@@ -948,6 +964,8 @@ public class CcListRepository {
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(RELEASE)
                 .on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(appUserOwner)
                 .on(DT.OWNER_USER_ID.eq(appUserOwner.APP_USER_ID))
                 .join(appUserUpdater)

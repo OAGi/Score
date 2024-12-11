@@ -5,6 +5,7 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
+import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.CreateInheritedBieRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.CreateBieFromExistingBieRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -124,12 +125,37 @@ public class BieCreateFromExistingBieService implements InitializingBean {
             BieCreateRequest bieRequest = new BieCreateRequest();
             bieRequest.setAsccpManifestId(request.getAsccpManifestId());
             List<BigInteger> bizCtxIds = dslContext.select(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID)
-            .from(BIZ_CTX_ASSIGNMENT)
-            .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
-            .fetchStreamInto(BigInteger.class).collect(Collectors.toList());
+                    .from(BIZ_CTX_ASSIGNMENT)
+                    .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
+                    .fetchStreamInto(BigInteger.class).collect(Collectors.toList());
             bieRequest.setBizCtxIds(bizCtxIds);
             bieService.createBie(user, bieRequest);
         }
+    }
+
+    @Transactional
+    public void createInheritedBie(AuthenticatedPrincipal user, CreateInheritedBieRequest request) {
+        AppUser requester = sessionService.getAppUserByUsername(user);
+
+        ULong basedTopLevelAsbiepId = ULong.valueOf(request.getBasedTopLevelAsbiepId());
+
+        TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(basedTopLevelAsbiepId))
+                .fetchOne();
+        ULong asbiepId = topLevelAsbiepRecord.getAsbiepId();
+        BigInteger copiedTopLevelAsbiepId =
+                repository.createTopLevelAsbiep(requester.getAppUserId(), topLevelAsbiepRecord.getReleaseId().toBigInteger(),
+                        topLevelAsbiepRecord.getTopLevelAsbiepId().toBigInteger(), Initiating,
+                        topLevelAsbiepRecord.getVersion(), topLevelAsbiepRecord.getStatus());
+        BieCreateFromExistingBieRequestEvent event = new BieCreateFromExistingBieRequestEvent(
+                topLevelAsbiepRecord.getTopLevelAsbiepId().toBigInteger(), copiedTopLevelAsbiepId, asbiepId.toBigInteger(),
+                Collections.emptyList(), requester.getAppUserId()
+        );
+
+        /*
+         * Message Publishing
+         */
+        redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, event);
     }
 
 

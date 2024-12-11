@@ -13,6 +13,7 @@ public class BieEditUsed {
     private BigInteger manifestId;
     private String type;
     private BigInteger ownerTopLevelAsbiepId;
+    private String displayName;
     private int cardinalityMin;
     private int cardinalityMax;
     private boolean deprecated;

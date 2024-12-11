@@ -124,6 +124,20 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
     public final TableField<AgencyIdListValueRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list value is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
+     * The column <code>oagi.agency_id_list_value.is_developer_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by developers.
+     */
+    public final TableField<AgencyIdListValueRecord, Byte> IS_DEVELOPER_DEFAULT = createField(DSL.name("is_developer_default"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether this agency ID list value can be used as the default for components referenced by developers.");
+
+    /**
+     * The column <code>oagi.agency_id_list_value.is_user_default</code>.
+     * Indicates whether this agency ID list value can be used as the default
+     * for components referenced by users.
+     */
+    public final TableField<AgencyIdListValueRecord, Byte> IS_USER_DEFAULT = createField(DSL.name("is_user_default"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether this agency ID list value can be used as the default for components referenced by users.");
+
+    /**
      * The column
      * <code>oagi.agency_id_list_value.replacement_agency_id_list_value_id</code>.
      * This refers to a replacement if the record is deprecated.
@@ -259,19 +273,7 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
 
     @Override
     public List<ForeignKey<AgencyIdListValueRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_BASED_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
-    }
-
-    private transient AgencyIdListPath _agencyIdList;
-
-    /**
-     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
-     */
-    public AgencyIdListPath agencyIdList() {
-        if (_agencyIdList == null)
-            _agencyIdList = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, null);
-
-        return _agencyIdList;
+        return Arrays.asList(Keys.AGENCY_ID_LIST_VALUE_BASED_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK);
     }
 
     private transient AgencyIdListValuePath _agencyIdListValueBasedAgencyIdListValueIdFk;
@@ -288,21 +290,6 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
         return _agencyIdListValueBasedAgencyIdListValueIdFk;
     }
 
-    private transient AgencyIdListValuePath _agencyIdListValueReplacementAgencyIdListValueIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
-     * table, via the
-     * <code>agency_id_list_value_replacement_agency_id_list_value_id_fk</code>
-     * key.
-     */
-    public AgencyIdListValuePath agencyIdListValueReplacementAgencyIdListValueIdFk() {
-        if (_agencyIdListValueReplacementAgencyIdListValueIdFk == null)
-            _agencyIdListValueReplacementAgencyIdListValueIdFk = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, null);
-
-        return _agencyIdListValueReplacementAgencyIdListValueIdFk;
-    }
-
     private transient AppUserPath _agencyIdListValueCreatedByFk;
 
     /**
@@ -316,19 +303,6 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
         return _agencyIdListValueCreatedByFk;
     }
 
-    private transient AppUserPath _agencyIdListValueOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>agency_id_list_value_owner_user_id_fk</code> key.
-     */
-    public AppUserPath agencyIdListValueOwnerUserIdFk() {
-        if (_agencyIdListValueOwnerUserIdFk == null)
-            _agencyIdListValueOwnerUserIdFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, null);
-
-        return _agencyIdListValueOwnerUserIdFk;
-    }
-
     private transient AppUserPath _agencyIdListValueLastUpdatedByFk;
 
     /**
@@ -340,6 +314,45 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
             _agencyIdListValueLastUpdatedByFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, null);
 
         return _agencyIdListValueLastUpdatedByFk;
+    }
+
+    private transient AgencyIdListValuePath _agencyIdListValueNextAgencyIdListValueIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
+     * table, via the
+     * <code>agency_id_list_value_next_agency_id_list_value_id_fk</code> key.
+     */
+    public AgencyIdListValuePath agencyIdListValueNextAgencyIdListValueIdFk() {
+        if (_agencyIdListValueNextAgencyIdListValueIdFk == null)
+            _agencyIdListValueNextAgencyIdListValueIdFk = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK, null);
+
+        return _agencyIdListValueNextAgencyIdListValueIdFk;
+    }
+
+    private transient AgencyIdListPath _agencyIdList;
+
+    /**
+     * Get the implicit join path to the <code>oagi.agency_id_list</code> table.
+     */
+    public AgencyIdListPath agencyIdList() {
+        if (_agencyIdList == null)
+            _agencyIdList = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, null);
+
+        return _agencyIdList;
+    }
+
+    private transient AppUserPath _agencyIdListValueOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>agency_id_list_value_owner_user_id_fk</code> key.
+     */
+    public AppUserPath agencyIdListValueOwnerUserIdFk() {
+        if (_agencyIdListValueOwnerUserIdFk == null)
+            _agencyIdListValueOwnerUserIdFk = new AppUserPath(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, null);
+
+        return _agencyIdListValueOwnerUserIdFk;
     }
 
     private transient AgencyIdListValuePath _agencyIdListValuePrevAgencyIdListValueIdFk;
@@ -356,18 +369,19 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
         return _agencyIdListValuePrevAgencyIdListValueIdFk;
     }
 
-    private transient AgencyIdListValuePath _agencyIdListValueNextAgencyIdListValueIdFk;
+    private transient AgencyIdListValuePath _agencyIdListValueReplacementAgencyIdListValueIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list_value</code>
      * table, via the
-     * <code>agency_id_list_value_next_agency_id_list_value_id_fk</code> key.
+     * <code>agency_id_list_value_replacement_agency_id_list_value_id_fk</code>
+     * key.
      */
-    public AgencyIdListValuePath agencyIdListValueNextAgencyIdListValueIdFk() {
-        if (_agencyIdListValueNextAgencyIdListValueIdFk == null)
-            _agencyIdListValueNextAgencyIdListValueIdFk = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK, null);
+    public AgencyIdListValuePath agencyIdListValueReplacementAgencyIdListValueIdFk() {
+        if (_agencyIdListValueReplacementAgencyIdListValueIdFk == null)
+            _agencyIdListValueReplacementAgencyIdListValueIdFk = new AgencyIdListValuePath(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, null);
 
-        return _agencyIdListValueNextAgencyIdListValueIdFk;
+        return _agencyIdListValueReplacementAgencyIdListValueIdFk;
     }
 
     private transient AgencyIdListValueManifestPath _agencyIdListValueManifest;

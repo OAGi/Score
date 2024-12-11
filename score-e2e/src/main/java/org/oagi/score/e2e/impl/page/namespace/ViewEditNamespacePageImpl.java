@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.namespace;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
+import org.oagi.score.e2e.obj.LibraryObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
@@ -197,7 +198,9 @@ public class ViewEditNamespacePageImpl extends BaseSearchBarPageImpl implements 
         showAdvancedSearchPanel();
         setOwner(owner);
         openNamespaceByURI(uri);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(uri);
+        // @TODO: Retrieve the name of the library from the UI.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, uri);
         waitFor(ofMillis(500L));
         EditNamespacePage editNamespacePage = new EditNamespacePageImpl(this, namespace);
         assert editNamespacePage.isOpened();

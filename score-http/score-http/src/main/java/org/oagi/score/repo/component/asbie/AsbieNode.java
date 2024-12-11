@@ -32,9 +32,11 @@ public class AsbieNode {
         private String toAsbiepHashPath;
         private BigInteger basedAsccManifestId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger asbieId;
+        private BigInteger toAsbiepId;
         private String guid;
-        private BigInteger seqKey;
+        private BigInteger seqKey = BigInteger.ZERO;
         private Integer cardinalityMin;
         private Integer cardinalityMax;
         private Boolean nillable;

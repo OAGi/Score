@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class BieListRequest {
 
+    private BigInteger libraryId;
     private String den;
     private String propertyTerm;
     private String businessContext;
@@ -23,6 +24,7 @@ public class BieListRequest {
     private AccessPrivilege access;
     private List<String> excludePropertyTerms = Collections.emptyList();
     private List<BigInteger> topLevelAsbiepIds = Collections.emptyList();
+    private List<BigInteger> basedTopLevelAsbiepIds = Collections.emptyList();
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();
     private List<BieState> states = Collections.emptyList();
     private Boolean deprecated;

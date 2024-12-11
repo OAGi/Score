@@ -45,6 +45,7 @@ public class BiePackageController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BiePackage> getBiePackageList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                      @RequestParam(name = "libraryId") BigInteger libraryId,
                                                       @RequestParam(name = "versionId", required = false) String versionId,
                                                       @RequestParam(name = "versionName", required = false) String versionName,
                                                       @RequestParam(name = "description", required = false) String description,
@@ -66,6 +67,7 @@ public class BiePackageController {
 
         BiePackageListRequest request = new BiePackageListRequest(sessionService.asScoreUser(user));
 
+        request.setLibraryId(libraryId);
         request.setVersionId(versionId);
         request.setVersionName(versionName);
         request.setDescription(description);

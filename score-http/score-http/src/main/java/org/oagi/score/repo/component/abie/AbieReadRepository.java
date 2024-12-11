@@ -58,6 +58,14 @@ public class AbieReadRepository {
         return abieNode;
     }
 
+    public AbieNode getAbieNode(BigInteger abieId) {
+        AbieRecord abieRecord = dslContext.selectFrom(ABIE)
+                .where(ABIE.ABIE_ID.eq(ULong.valueOf(abieId)))
+                .fetchOne();
+        return getAbieNode(abieRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                abieRecord.getBasedAccManifestId().toBigInteger(), abieRecord.getHashPath());
+    }
+
     public AbieNode.Abie getAbie(BigInteger topLevelAsbiepId, String hashPath) {
         AbieNode.Abie abie = new AbieNode.Abie();
         abie.setUsed(true);
@@ -65,6 +73,7 @@ public class AbieReadRepository {
 
         AbieRecord abieRecord = getAbieByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (abieRecord != null) {
+            abie.setOwnerTopLevelAsbiepId(abieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             abie.setAbieId(abieRecord.getAbieId().toBigInteger());
             abie.setGuid(abieRecord.getGuid());
             abie.setBasedAccManifestId(abieRecord.getBasedAccManifestId().toBigInteger());

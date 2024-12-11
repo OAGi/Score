@@ -4,8 +4,10 @@ import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {SimpleRelease} from '../../../release-management/domain/release';
+import {Library} from '../../../library-management/domain/library';
 
 export class BieListRequest {
+  library: Library = new Library();
   releases: SimpleRelease[] = [];
   filters: {
     propertyTerm: string;
@@ -17,6 +19,7 @@ export class BieListRequest {
   };
   excludePropertyTerms: string[] = [];
   topLevelAsbiepIds: number[] = [];
+  basedTopLevelAsbiepIds: number[] = [];
   excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
@@ -67,6 +70,7 @@ export class BieListRequest {
 
     this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
     this.topLevelAsbiepIds = (params.get('topLevelAsbiepIds')) ? Array.from(params.get('topLevelAsbiepIds').split(',').map(e => Number(e))) : [];
+    this.basedTopLevelAsbiepIds = (params.get('basedTopLevelAsbiepIds')) ? Array.from(params.get('basedTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access');
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
@@ -103,6 +107,9 @@ export class BieListRequest {
     }
     if (this.topLevelAsbiepIds && this.topLevelAsbiepIds.length > 0) {
       params = params.set('topLevelAsbiepIds', this.topLevelAsbiepIds.join(','));
+    }
+    if (this.basedTopLevelAsbiepIds && this.basedTopLevelAsbiepIds.length > 0) {
+      params = params.set('basedTopLevelAsbiepIds', this.basedTopLevelAsbiepIds.join(','));
     }
     if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));
@@ -163,6 +170,7 @@ export class BieList {
   topLevelAsbiepId: number;
   den: string;
   propertyTerm: string;
+  displayName: string;
   guid: string;
   releaseNum: string;
   bizCtxId: number;
@@ -170,6 +178,8 @@ export class BieList {
   access: string;
   owner: string;
   ownerUserId: number;
+  ownerIsDeveloper: boolean;
+  ownerIsAdmin: boolean;
   version: string;
   status: string;
   bizTerm: string;
@@ -184,9 +194,17 @@ export class BieList {
 
   sourceTopLevelAsbiepId: number;
   sourceReleaseId: number;
+  sourceReleaseNum: string;
   sourceDen: string;
+  sourceDisplayName: string;
   sourceAction: string;
   sourceTimestamp: Date;
+
+  basedTopLevelAsbiepId: number;
+  basedTopLevelAsbiepReleaseId: number;
+  basedTopLevelAsbiepReleaseNum: string;
+  basedTopLevelAsbiepDen: string;
+  basedTopLevelAsbiepDisplayName: string;
 }
 
 export class AsbieBbieList {

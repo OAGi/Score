@@ -64,6 +64,8 @@ public class JooqAgencyIdListReadRepository
                 RELEASE.RELEASE_NUM,
                 RELEASE.STATE.as("release_state"),
                 RELEASE.RELEASE_ID,
+                LIBRARY.LIBRARY_ID,
+                LIBRARY.NAME.as("library_name"),
                 LOG.REVISION_NUM,
                 MODULE.PATH,
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
@@ -83,6 +85,7 @@ public class JooqAgencyIdListReadRepository
                 .leftJoin(AGENCY_ID_LIST_MANIFEST.as("base_manifest")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("base_manifest").AGENCY_ID_LIST_MANIFEST_ID))
                 .leftJoin(AGENCY_ID_LIST.as("base")).on(AGENCY_ID_LIST_MANIFEST.as("base_manifest").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.as("base").AGENCY_ID_LIST_ID))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(AGENCY_ID_LIST_MANIFEST.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG).on(AGENCY_ID_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(APP_USER.as("creator")).on(AGENCY_ID_LIST.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("owner")).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
@@ -93,7 +96,7 @@ public class JooqAgencyIdListReadRepository
                 .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID));
     }
 
-    private RecordMapper<Record, AgencyIdList> mapper() {
+    private RecordMapper<Record, AgencyIdList> agencyIdListMapper() {
         return e -> {
             AgencyIdList agencyIdList = new AgencyIdList();
             agencyIdList.setAgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger());
@@ -138,13 +141,19 @@ public class JooqAgencyIdListReadRepository
             agencyIdList.setDeprecated(e.get(AGENCY_ID_LIST.IS_DEPRECATED) == 1);
             agencyIdList.setNewComponent(e.get(field("new_component", Boolean.class)));
             agencyIdList.setState(CcState.valueOf(e.get(AGENCY_ID_LIST.STATE)));
+            agencyIdList.setLibraryId(e.get(LIBRARY.LIBRARY_ID).toBigInteger());
+            agencyIdList.setLibraryName(e.get(LIBRARY.NAME.as("library_name")));
             agencyIdList.setReleaseState(e.get(RELEASE.STATE.as("release_state")));
             agencyIdList.setReleaseNum(e.get(RELEASE.RELEASE_NUM));
+            agencyIdList.setWorkingRelease("Working".equals(agencyIdList.getReleaseNum()));
             agencyIdList.setReleaseId(e.get(RELEASE.RELEASE_ID).toBigInteger());
             agencyIdList.setRevisionNum(e.get(LOG.REVISION_NUM).toString());
             agencyIdList.setModulePath(e.get(MODULE.PATH));
             agencyIdList.setCreationTimestamp(Date.from(e.get(AGENCY_ID_LIST.CREATION_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
             agencyIdList.setLastUpdateTimestamp(Date.from(e.get(AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP).atZone(ZoneId.systemDefault()).toInstant()));
+            if (e.get(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID) != null) {
+                agencyIdList.setPrevAgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID).toBigInteger());
+            }
             if (e.get(AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID) != null) {
                 agencyIdList.setPrevAgencyIdListId(e.get(AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID).toBigInteger());
             }
@@ -194,7 +203,7 @@ public class JooqAgencyIdListReadRepository
         }
 
         return new GetAgencyIdListListResponse(
-                finalStep.fetch(mapper()),
+                finalStep.fetch(agencyIdListMapper()),
                 request.getPageIndex(),
                 request.getPageSize(),
                 length
@@ -204,6 +213,7 @@ public class JooqAgencyIdListReadRepository
     private Collection<Condition> getConditions(GetAgencyIdListListRequest request) {
         List<Condition> conditions = new ArrayList();
 
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
 
         if (StringUtils.hasLength(request.getName())) {
@@ -304,46 +314,46 @@ public class JooqAgencyIdListReadRepository
 
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public AgencyIdList getAgencyIdList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException {
+    public AgencyIdList getAgencyIdListByAgencyIdListManifestId(BigInteger agencyIdListManifestId) throws ScoreDataAccessException {
         AgencyIdList agencyIdList = (AgencyIdList) select(null)
                 .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(ULong.valueOf(agencyIdListManifestId)))
-                .fetchOne(mapper());
+                .fetchOne(agencyIdListMapper());
         if (agencyIdList == null) {
-            throw new IllegalArgumentException("Can not found agency id list.");
+            throw new IllegalArgumentException("Cannot find agency ID list");
         }
-        agencyIdList.setValues(getAgencyIdListValueList(agencyIdListManifestId));
+        agencyIdList.setValues(getAgencyIdListValueListByAgencyIdListManifestId(agencyIdListManifestId));
         return agencyIdList;
     }
 
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public AgencyIdList getAgencyIdListById(BigInteger agencyIdListId) throws ScoreDataAccessException {
+    public AgencyIdList getAgencyIdListByAgencyIdListId(BigInteger agencyIdListId) throws ScoreDataAccessException {
         AgencyIdList agencyIdList = dslContext().select(AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
-                AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID,
-                AGENCY_ID_LIST.GUID,
-                AGENCY_ID_LIST.ENUM_TYPE_GUID,
-                AGENCY_ID_LIST.NAME,
-                AGENCY_ID_LIST.LIST_ID,
-                AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID,
-                AGENCY_ID_LIST.VERSION_ID,
-                AGENCY_ID_LIST.BASED_AGENCY_ID_LIST_ID,
-                AGENCY_ID_LIST.DEFINITION,
-                AGENCY_ID_LIST.DEFINITION_SOURCE,
-                AGENCY_ID_LIST.REMARK,
-                AGENCY_ID_LIST.NAMESPACE_ID,
-                AGENCY_ID_LIST.IS_DEPRECATED.as("deprecated"),
-                AGENCY_ID_LIST.STATE)
+                        AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID,
+                        AGENCY_ID_LIST.GUID,
+                        AGENCY_ID_LIST.ENUM_TYPE_GUID,
+                        AGENCY_ID_LIST.NAME,
+                        AGENCY_ID_LIST.LIST_ID,
+                        AGENCY_ID_LIST.AGENCY_ID_LIST_VALUE_ID,
+                        AGENCY_ID_LIST.VERSION_ID,
+                        AGENCY_ID_LIST.BASED_AGENCY_ID_LIST_ID,
+                        AGENCY_ID_LIST.DEFINITION,
+                        AGENCY_ID_LIST.DEFINITION_SOURCE,
+                        AGENCY_ID_LIST.REMARK,
+                        AGENCY_ID_LIST.NAMESPACE_ID,
+                        AGENCY_ID_LIST.IS_DEPRECATED.as("deprecated"),
+                        AGENCY_ID_LIST.STATE)
                 .from(AGENCY_ID_LIST)
                 .where(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(ULong.valueOf(agencyIdListId)))
                 .fetchOneInto(AgencyIdList.class);
 
         agencyIdList.setValues(dslContext().select(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID,
-                AGENCY_ID_LIST_VALUE.GUID,
-                AGENCY_ID_LIST_VALUE.NAME,
-                AGENCY_ID_LIST_VALUE.VALUE,
-                AGENCY_ID_LIST_VALUE.DEFINITION,
-                AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
-                AGENCY_ID_LIST_VALUE.IS_DEPRECATED.as("deprecated"))
+                        AGENCY_ID_LIST_VALUE.GUID,
+                        AGENCY_ID_LIST_VALUE.NAME,
+                        AGENCY_ID_LIST_VALUE.VALUE,
+                        AGENCY_ID_LIST_VALUE.DEFINITION,
+                        AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
+                        AGENCY_ID_LIST_VALUE.IS_DEPRECATED.as("deprecated"))
                 .from(AGENCY_ID_LIST_VALUE)
                 .where(AGENCY_ID_LIST_VALUE.OWNER_LIST_ID.eq(ULong.valueOf(agencyIdListId)))
                 .fetchInto(AgencyIdListValue.class));
@@ -352,34 +362,22 @@ public class JooqAgencyIdListReadRepository
 
     @Override
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
-    public List<AgencyIdListValue> getAgencyIdListValueList(BigInteger agencyIdListManifestId) throws ScoreDataAccessException {
+    public List<AgencyIdListValue> getAgencyIdListValueListByAgencyIdListManifestId(BigInteger agencyIdListManifestId) throws ScoreDataAccessException {
         List<AgencyIdListValue> agencyIdListValueList = dslContext().select(
-                AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                AGENCY_ID_LIST_VALUE_MANIFEST.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                AGENCY_ID_LIST_VALUE.GUID,
-                AGENCY_ID_LIST_VALUE.NAME,
-                AGENCY_ID_LIST_VALUE.VALUE,
-                AGENCY_ID_LIST_VALUE.DEFINITION,
-                AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
-                AGENCY_ID_LIST_VALUE.IS_DEPRECATED)
+                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        AGENCY_ID_LIST_VALUE_MANIFEST.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        AGENCY_ID_LIST_VALUE.GUID,
+                        AGENCY_ID_LIST_VALUE.NAME,
+                        AGENCY_ID_LIST_VALUE.VALUE,
+                        AGENCY_ID_LIST_VALUE.DEFINITION,
+                        AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE,
+                        AGENCY_ID_LIST_VALUE.IS_DEPRECATED,
+                        AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT,
+                        AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT)
                 .from(AGENCY_ID_LIST_VALUE)
                 .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID))
                 .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(ULong.valueOf(agencyIdListManifestId)))
-        .fetch(e -> {
-            AgencyIdListValue agencyIdListValue = new AgencyIdListValue();
-            agencyIdListValue.setAgencyIdListValueManifestId(e.get(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID).toBigInteger());
-            ULong basedAgencyIdListValueManifestId = e.get(AGENCY_ID_LIST_VALUE_MANIFEST.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID);
-            if (basedAgencyIdListValueManifestId != null) {
-                agencyIdListValue.setBasedAgencyIdListValueManifestId(basedAgencyIdListValueManifestId.toBigInteger());
-            }
-            agencyIdListValue.setDeprecated(e.get(AGENCY_ID_LIST_VALUE.IS_DEPRECATED) == 1);
-            agencyIdListValue.setGuid(e.get(AGENCY_ID_LIST_VALUE.GUID));
-            agencyIdListValue.setValue(e.get(AGENCY_ID_LIST_VALUE.VALUE));
-            agencyIdListValue.setName(e.get(AGENCY_ID_LIST_VALUE.NAME));
-            agencyIdListValue.setDefinition(e.get(AGENCY_ID_LIST_VALUE.DEFINITION));
-            agencyIdListValue.setDefinitionSource(e.get(AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE));
-            return agencyIdListValue;
-        });
+                .fetch(agencyIdListValueMapper());
 
         if (!agencyIdListValueList.isEmpty()) {
             List<ULong> agencyIdListValueIdList = agencyIdListValueList.stream()
@@ -409,5 +407,28 @@ public class JooqAgencyIdListReadRepository
         }
 
         return agencyIdListValueList;
+    }
+
+    private RecordMapper<Record, AgencyIdListValue> agencyIdListValueMapper() {
+        return e -> {
+            AgencyIdListValue agencyIdListValue = new AgencyIdListValue();
+            ULong agencyIdListValueManifestId = e.get(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID);
+            if (agencyIdListValueManifestId != null) {
+                agencyIdListValue.setAgencyIdListValueManifestId(agencyIdListValueManifestId.toBigInteger());
+            }
+            ULong basedAgencyIdListValueManifestId = e.get(AGENCY_ID_LIST_VALUE_MANIFEST.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID);
+            if (basedAgencyIdListValueManifestId != null) {
+                agencyIdListValue.setBasedAgencyIdListValueManifestId(basedAgencyIdListValueManifestId.toBigInteger());
+            }
+            agencyIdListValue.setDeprecated(e.get(AGENCY_ID_LIST_VALUE.IS_DEPRECATED) == 1);
+            agencyIdListValue.setDeveloperDefault(e.get(AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT) == 1);
+            agencyIdListValue.setUserDefault(e.get(AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT) == 1);
+            agencyIdListValue.setGuid(e.get(AGENCY_ID_LIST_VALUE.GUID));
+            agencyIdListValue.setValue(e.get(AGENCY_ID_LIST_VALUE.VALUE));
+            agencyIdListValue.setName(e.get(AGENCY_ID_LIST_VALUE.NAME));
+            agencyIdListValue.setDefinition(e.get(AGENCY_ID_LIST_VALUE.DEFINITION));
+            agencyIdListValue.setDefinitionSource(e.get(AGENCY_ID_LIST_VALUE.DEFINITION_SOURCE));
+            return agencyIdListValue;
+        };
     }
 }

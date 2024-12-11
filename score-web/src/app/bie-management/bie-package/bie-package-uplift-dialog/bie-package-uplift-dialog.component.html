@@ -4,7 +4,9 @@
   </div>
   <div>
     <div class="header d-flex align-items-center" mat-dialog-title>
-      <span>{{ title }}</span>
+      <score-title-with-library-selector [title]="title"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
       <div class="close pr-2">
         <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
           <mat-icon>close</mat-icon>
@@ -249,7 +251,10 @@
                   <div class="den word-break-all">
                     <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                        matTooltip="{{ element.den }}">
-                      <span>{{ element.den }}</span>
+                      <div class="d-inline-flex align-items-center">
+                        <span>{{ element.den }}</span>
+                        <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
+                      </div>
                     </a>
                   </div>
                   <div class="bie-guid">{{ element.guid }}</div>

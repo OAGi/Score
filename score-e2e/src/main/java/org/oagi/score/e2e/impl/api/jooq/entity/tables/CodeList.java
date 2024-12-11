@@ -288,19 +288,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
 
     @Override
     public List<ForeignKey<CodeListRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.CODE_LIST_NAMESPACE_ID_FK, Keys.CODE_LIST_BASED_CODE_LIST_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK, Keys.CODE_LIST_CREATED_BY_FK, Keys.CODE_LIST_OWNER_USER_ID_FK, Keys.CODE_LIST_LAST_UPDATED_BY_FK, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, Keys.CODE_LIST_NEXT_CODE_LIST_ID_FK);
-    }
-
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.CODE_LIST_NAMESPACE_ID_FK, null);
-
-        return _namespace;
+        return Arrays.asList(Keys.CODE_LIST_BASED_CODE_LIST_ID_FK, Keys.CODE_LIST_CREATED_BY_FK, Keys.CODE_LIST_LAST_UPDATED_BY_FK, Keys.CODE_LIST_NAMESPACE_ID_FK, Keys.CODE_LIST_NEXT_CODE_LIST_ID_FK, Keys.CODE_LIST_OWNER_USER_ID_FK, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK);
     }
 
     private transient CodeListPath _codeListBasedCodeListIdFk;
@@ -316,19 +304,6 @@ public class CodeList extends TableImpl<CodeListRecord> {
         return _codeListBasedCodeListIdFk;
     }
 
-    private transient CodeListPath _codeListReplacementCodeListIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_replacement_code_list_id_fk</code> key.
-     */
-    public CodeListPath codeListReplacementCodeListIdFk() {
-        if (_codeListReplacementCodeListIdFk == null)
-            _codeListReplacementCodeListIdFk = new CodeListPath(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK, null);
-
-        return _codeListReplacementCodeListIdFk;
-    }
-
     private transient AppUserPath _codeListCreatedByFk;
 
     /**
@@ -340,19 +315,6 @@ public class CodeList extends TableImpl<CodeListRecord> {
             _codeListCreatedByFk = new AppUserPath(this, Keys.CODE_LIST_CREATED_BY_FK, null);
 
         return _codeListCreatedByFk;
-    }
-
-    private transient AppUserPath _codeListOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>code_list_owner_user_id_fk</code> key.
-     */
-    public AppUserPath codeListOwnerUserIdFk() {
-        if (_codeListOwnerUserIdFk == null)
-            _codeListOwnerUserIdFk = new AppUserPath(this, Keys.CODE_LIST_OWNER_USER_ID_FK, null);
-
-        return _codeListOwnerUserIdFk;
     }
 
     private transient AppUserPath _codeListLastUpdatedByFk;
@@ -368,17 +330,16 @@ public class CodeList extends TableImpl<CodeListRecord> {
         return _codeListLastUpdatedByFk;
     }
 
-    private transient CodeListPath _codeListPrevCodeListIdFk;
+    private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_prev_code_list_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
      */
-    public CodeListPath codeListPrevCodeListIdFk() {
-        if (_codeListPrevCodeListIdFk == null)
-            _codeListPrevCodeListIdFk = new CodeListPath(this, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, null);
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.CODE_LIST_NAMESPACE_ID_FK, null);
 
-        return _codeListPrevCodeListIdFk;
+        return _namespace;
     }
 
     private transient CodeListPath _codeListNextCodeListIdFk;
@@ -392,6 +353,45 @@ public class CodeList extends TableImpl<CodeListRecord> {
             _codeListNextCodeListIdFk = new CodeListPath(this, Keys.CODE_LIST_NEXT_CODE_LIST_ID_FK, null);
 
         return _codeListNextCodeListIdFk;
+    }
+
+    private transient AppUserPath _codeListOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>code_list_owner_user_id_fk</code> key.
+     */
+    public AppUserPath codeListOwnerUserIdFk() {
+        if (_codeListOwnerUserIdFk == null)
+            _codeListOwnerUserIdFk = new AppUserPath(this, Keys.CODE_LIST_OWNER_USER_ID_FK, null);
+
+        return _codeListOwnerUserIdFk;
+    }
+
+    private transient CodeListPath _codeListPrevCodeListIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.code_list</code> table, via
+     * the <code>code_list_prev_code_list_id_fk</code> key.
+     */
+    public CodeListPath codeListPrevCodeListIdFk() {
+        if (_codeListPrevCodeListIdFk == null)
+            _codeListPrevCodeListIdFk = new CodeListPath(this, Keys.CODE_LIST_PREV_CODE_LIST_ID_FK, null);
+
+        return _codeListPrevCodeListIdFk;
+    }
+
+    private transient CodeListPath _codeListReplacementCodeListIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.code_list</code> table, via
+     * the <code>code_list_replacement_code_list_id_fk</code> key.
+     */
+    public CodeListPath codeListReplacementCodeListIdFk() {
+        if (_codeListReplacementCodeListIdFk == null)
+            _codeListReplacementCodeListIdFk = new CodeListPath(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_ID_FK, null);
+
+        return _codeListReplacementCodeListIdFk;
     }
 
     private transient CodeListManifestPath _codeListManifest;

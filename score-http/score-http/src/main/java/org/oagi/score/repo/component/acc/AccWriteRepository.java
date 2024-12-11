@@ -163,9 +163,17 @@ public class AccWriteRepository {
             }
         }
 
+        ReleaseRecord releaseRecord = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(accManifestRecord.getReleaseId()))
+                .fetchOne();
+
         ULong workingReleaseId = dslContext.select(RELEASE.RELEASE_ID)
                 .from(RELEASE)
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(releaseRecord.getLibraryId()),
+                        RELEASE.RELEASE_NUM.eq("Working")
+                ))
                 .fetchOneInto(ULong.class);
 
         ULong targetReleaseId = accManifestRecord.getReleaseId();

@@ -20,6 +20,13 @@ public interface APIFactory extends AutoCloseable {
     AppUserAPI getAppUserAPI();
 
     /**
+     * Return the library management API.
+     *
+     * @return the library management API
+     */
+    LibraryAPI getLibraryAPI();
+
+    /**
      * Return the namespace management API.
      *
      * @return the namespace management API

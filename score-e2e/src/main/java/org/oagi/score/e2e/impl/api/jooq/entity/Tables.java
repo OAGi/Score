@@ -68,6 +68,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtScManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Exception;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.Library;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Log;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Message;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Module;
@@ -562,6 +563,11 @@ public class Tables {
      * The table <code>oagi.exception</code>.
      */
     public static final Exception EXCEPTION = Exception.EXCEPTION;
+
+    /**
+     * The table <code>oagi.library</code>.
+     */
+    public static final Library LIBRARY = Library.LIBRARY;
 
     /**
      * The table <code>oagi.log</code>.

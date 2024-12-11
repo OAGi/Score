@@ -35,9 +35,11 @@ public class CodeList {
     private AccessPrivilege access;
 
     private String owner;
+    private BigInteger libraryId;
     private BigInteger releaseId;
     private String releaseState;
     private String releaseNum;
+    private boolean workingRelease;
     private BigInteger logId;
     private int revisionNum;
     private int revisionTrackingNum;

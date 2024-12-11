@@ -184,20 +184,7 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
 
     @Override
     public List<ForeignKey<OasMediaTypeRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK, Keys.OAS_MEDIA_TYPE_CREATED_BY_FK, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient AppUserPath _oasMediaTypeOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_media_type_owner_user_id_fk</code> key.
-     */
-    public AppUserPath oasMediaTypeOwnerUserIdFk() {
-        if (_oasMediaTypeOwnerUserIdFk == null)
-            _oasMediaTypeOwnerUserIdFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK, null);
-
-        return _oasMediaTypeOwnerUserIdFk;
+        return Arrays.asList(Keys.OAS_MEDIA_TYPE_CREATED_BY_FK, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK);
     }
 
     private transient AppUserPath _oasMediaTypeCreatedByFk;
@@ -224,6 +211,19 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
             _oasMediaTypeLastUpdatedByFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_LAST_UPDATED_BY_FK, null);
 
         return _oasMediaTypeLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _oasMediaTypeOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>oas_media_type_owner_user_id_fk</code> key.
+     */
+    public AppUserPath oasMediaTypeOwnerUserIdFk() {
+        if (_oasMediaTypeOwnerUserIdFk == null)
+            _oasMediaTypeOwnerUserIdFk = new AppUserPath(this, Keys.OAS_MEDIA_TYPE_OWNER_USER_ID_FK, null);
+
+        return _oasMediaTypeOwnerUserIdFk;
     }
 
     @Override

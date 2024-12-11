@@ -296,7 +296,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
 
     @Override
     public List<ForeignKey<AsbieRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK, Keys.ASBIE_FROM_ABIE_ID_FK, Keys.ASBIE_TO_ASBIEP_ID_FK, Keys.ASBIE_CREATED_BY_FK, Keys.ASBIE_LAST_UPDATED_BY_FK, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK, Keys.ASBIE_CREATED_BY_FK, Keys.ASBIE_FROM_ABIE_ID_FK, Keys.ASBIE_LAST_UPDATED_BY_FK, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK, Keys.ASBIE_TO_ASBIEP_ID_FK);
     }
 
     private transient AsccManifestPath _asccManifest;
@@ -311,30 +311,6 @@ public class Asbie extends TableImpl<AsbieRecord> {
         return _asccManifest;
     }
 
-    private transient AbiePath _abie;
-
-    /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
-     */
-    public AbiePath abie() {
-        if (_abie == null)
-            _abie = new AbiePath(this, Keys.ASBIE_FROM_ABIE_ID_FK, null);
-
-        return _abie;
-    }
-
-    private transient AsbiepPath _asbiep;
-
-    /**
-     * Get the implicit join path to the <code>oagi.asbiep</code> table.
-     */
-    public AsbiepPath asbiep() {
-        if (_asbiep == null)
-            _asbiep = new AsbiepPath(this, Keys.ASBIE_TO_ASBIEP_ID_FK, null);
-
-        return _asbiep;
-    }
-
     private transient AppUserPath _asbieCreatedByFk;
 
     /**
@@ -346,6 +322,18 @@ public class Asbie extends TableImpl<AsbieRecord> {
             _asbieCreatedByFk = new AppUserPath(this, Keys.ASBIE_CREATED_BY_FK, null);
 
         return _asbieCreatedByFk;
+    }
+
+    private transient AbiePath _abie;
+
+    /**
+     * Get the implicit join path to the <code>oagi.abie</code> table.
+     */
+    public AbiePath abie() {
+        if (_abie == null)
+            _abie = new AbiePath(this, Keys.ASBIE_FROM_ABIE_ID_FK, null);
+
+        return _abie;
     }
 
     private transient AppUserPath _asbieLastUpdatedByFk;
@@ -372,6 +360,18 @@ public class Asbie extends TableImpl<AsbieRecord> {
             _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient AsbiepPath _asbiep;
+
+    /**
+     * Get the implicit join path to the <code>oagi.asbiep</code> table.
+     */
+    public AsbiepPath asbiep() {
+        if (_asbiep == null)
+            _asbiep = new AsbiepPath(this, Keys.ASBIE_TO_ASBIEP_ID_FK, null);
+
+        return _asbiep;
     }
 
     private transient AsbieBiztermPath _asbieBizterm;

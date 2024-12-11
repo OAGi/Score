@@ -169,31 +169,7 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
 
     @Override
     public List<ForeignKey<OasDocTagRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK, Keys.OAS_DOC_TAG_CREATED_BY_FK, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasDocPath _oasDoc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
-     */
-    public OasDocPath oasDoc() {
-        if (_oasDoc == null)
-            _oasDoc = new OasDocPath(this, Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, null);
-
-        return _oasDoc;
-    }
-
-    private transient OasTagPath _oasTag;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_tag</code> table.
-     */
-    public OasTagPath oasTag() {
-        if (_oasTag == null)
-            _oasTag = new OasTagPath(this, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK, null);
-
-        return _oasTag;
+        return Arrays.asList(Keys.OAS_DOC_TAG_CREATED_BY_FK, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK, Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK);
     }
 
     private transient AppUserPath _oasDocTagCreatedByFk;
@@ -220,6 +196,30 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
             _oasDocTagLastUpdatedByFk = new AppUserPath(this, Keys.OAS_DOC_TAG_LAST_UPDATED_BY_FK, null);
 
         return _oasDocTagLastUpdatedByFk;
+    }
+
+    private transient OasDocPath _oasDoc;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     */
+    public OasDocPath oasDoc() {
+        if (_oasDoc == null)
+            _oasDoc = new OasDocPath(this, Keys.OAS_DOC_TAG_OAS_DOC_ID_FK, null);
+
+        return _oasDoc;
+    }
+
+    private transient OasTagPath _oasTag;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_tag</code> table.
+     */
+    public OasTagPath oasTag() {
+        if (_oasTag == null)
+            _oasTag = new OasTagPath(this, Keys.OAS_DOC_TAG_OAS_TAG_ID_FK, null);
+
+        return _oasTag;
     }
 
     @Override

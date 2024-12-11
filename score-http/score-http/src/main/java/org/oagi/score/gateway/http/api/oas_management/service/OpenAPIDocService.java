@@ -102,6 +102,7 @@ public class OpenAPIDocService {
                 .setExcludePropertyTerms(request.getExcludePropertyTerms())
                 .setExcludeTopLevelAsbiepIds(request.getExcludeTopLevelAsbiepIds())
                 .setStates(request.getStates())
+                .setLibraryId(request.getLibraryId())
                 .setReleaseId(request.getReleaseId())
                 .setOwnerLoginIds(request.getOwnerLoginIds())
                 .setUpdaterLoginIds(request.getUpdaterLoginIds())

@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>3.3.3</version>
+    <version>3.4.0</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -25,17 +25,17 @@
 
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.22.1</aspectj.version>
-        <lettuce.version>6.4.0.RELEASE</lettuce.version>
-        <redisson.version>3.37.0</redisson.version>
-        <netty.version>4.1.114.Final</netty.version>
-        <lombok.version>1.18.34</lombok.version>
-        <mariadb-client.version>3.5.0</mariadb-client.version>
-        <log4j.version>2.23.1</log4j.version>
-        <jOOQ.version>3.19.14</jOOQ.version>
-        <guava.version>33.2.1-jre</guava.version>
+        <lettuce.version>6.5.1.RELEASE</lettuce.version>
+        <redisson.version>3.40.1</redisson.version>
+        <netty.version>4.1.115.Final</netty.version>
+        <lombok.version>1.18.36</lombok.version>
+        <mariadb-client.version>3.5.1</mariadb-client.version>
+        <log4j.version>2.24.2</log4j.version>
+        <jOOQ.version>3.19.15</jOOQ.version>
+        <guava.version>33.3.1-jre</guava.version>
         <gson.version>2.11.0</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
-        <commons-io.version>2.17.0</commons-io.version>
+        <commons-io.version>2.18.0</commons-io.version>
         <commons-lang.version>3.17.0</commons-lang.version>
         <commons-text.version>1.12.0</commons-text.version>
         <fastods.version>0.8.1</fastods.version>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>score-service</artifactId>
-            <version>3.3.3</version>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

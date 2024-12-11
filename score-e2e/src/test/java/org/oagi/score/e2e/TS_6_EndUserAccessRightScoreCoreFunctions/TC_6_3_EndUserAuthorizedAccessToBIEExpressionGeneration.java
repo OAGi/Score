@@ -50,13 +50,14 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject earilerRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
-            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject earilerRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+            ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             /**
              * Earlier release
@@ -131,7 +132,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -139,7 +141,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -168,7 +170,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -176,7 +179,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -212,7 +215,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -220,7 +224,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -256,7 +260,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -264,7 +269,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -310,7 +315,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -318,7 +324,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -369,7 +375,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -377,7 +384,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -426,7 +433,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -434,7 +442,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -483,7 +491,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -491,7 +500,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -522,7 +531,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -530,7 +540,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -562,7 +572,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -570,7 +581,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -618,7 +629,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -626,7 +638,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -672,7 +684,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         AppUserObject usera;
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -680,7 +693,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -727,7 +740,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -735,7 +749,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -792,7 +806,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -800,7 +815,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -856,7 +871,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -864,7 +880,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -910,7 +926,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -918,7 +935,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -966,7 +983,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -974,7 +992,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -985,7 +1003,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -1031,7 +1049,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1039,7 +1058,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1050,7 +1069,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -1098,7 +1117,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1106,7 +1126,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1117,12 +1137,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -1169,7 +1189,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1177,7 +1198,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1188,12 +1209,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -1240,7 +1261,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1248,7 +1270,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1267,7 +1289,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -1300,8 +1322,9 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
-            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1309,7 +1332,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, releaseOne, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1347,7 +1370,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ASCCPObject asccp;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1355,7 +1379,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1390,7 +1414,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         List<TopLevelASBIEPObject> biesForTesting = new ArrayList<>();
         ASCCPObject asccp;
         {
-            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1398,7 +1423,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, releaseOne, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1447,7 +1472,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject paginationResponseASBIEP;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1455,7 +1481,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1466,12 +1492,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "Production");
         }
@@ -1526,7 +1552,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject paginationResponseASBIEP;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
 
@@ -1534,7 +1561,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1545,12 +1572,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "Production");
         }
@@ -1604,7 +1631,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1612,7 +1640,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1623,7 +1651,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -1667,7 +1695,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ASCCPObject asccp;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1675,7 +1704,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1686,7 +1715,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -1731,7 +1760,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         BusinessContextObject context;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             AppUserObject userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1739,7 +1769,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1755,10 +1785,10 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             TopLevelASBIEPObject useraBIEQA = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, userb, "QA");
             biesForTesting.add(useraBIEQA);
 
-            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+            ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
-            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+            ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
 
@@ -1787,16 +1817,17 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject reusableBIE;
         Map<TopLevelASBIEPObject, ASCCPObject> bieASCCPMap = new HashMap<>();
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
             thisAccountWillBeDeletedAfterTests(usera);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject accReusable = coreComponentAPI.createRandomACC(usera, release, namespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
             BCCPObject bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Published");
             coreComponentAPI.appendBCC(accReusable, bccp, "Published");
             reusableASCCP = coreComponentAPI.createRandomASCCP(accReusable, usera, namespace, "Published");
@@ -1875,7 +1906,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ASCCPObject asccp;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1883,7 +1915,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1928,7 +1960,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1936,7 +1969,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -1984,7 +2017,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ASCCPObject asccp;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -1992,7 +2026,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2037,7 +2071,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2045,7 +2080,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2094,7 +2129,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ASCCPObject asccp;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2102,7 +2138,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2149,7 +2185,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2157,7 +2194,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2209,7 +2246,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2217,7 +2255,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2228,7 +2266,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -2270,7 +2308,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2278,7 +2317,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2297,7 +2336,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -2335,7 +2374,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2343,7 +2383,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2354,12 +2394,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -2403,7 +2443,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2411,7 +2452,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2430,12 +2471,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -2472,7 +2513,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ASCCPObject asccp;
         BusinessContextObject context;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2480,7 +2522,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2527,7 +2569,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2535,7 +2578,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2586,7 +2629,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         BusinessContextObject context;
         TopLevelASBIEPObject metaHeaderASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2594,7 +2638,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2605,7 +2649,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -2647,7 +2691,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         ReleaseObject release;
         TopLevelASBIEPObject metaHeaderASBIEP;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2655,7 +2700,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2674,7 +2719,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
         }
@@ -2712,7 +2757,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2720,7 +2766,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2731,12 +2777,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -2781,7 +2827,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject paginationResponseASBIEP;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2789,7 +2836,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2807,12 +2854,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -2852,7 +2899,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2860,7 +2908,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2871,12 +2919,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -2925,7 +2973,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject paginationResponseASBIEP;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -2933,7 +2982,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -2951,12 +3000,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -3000,7 +3049,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject metaHeaderASBIEP;
         TopLevelASBIEPObject paginationResponseASBIEP;
         {
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -3008,7 +3058,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -3019,12 +3069,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEProduction);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }
@@ -3073,7 +3123,8 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         TopLevelASBIEPObject paginationResponseASBIEP;
         ReleaseObject release;
         {
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(this.release);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
 
@@ -3081,7 +3132,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             thisAccountWillBeDeletedAfterTests(userb);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             ACCObject acc = coreComponentAPI.createRandomACC(userb, release, namespace, "Published");
             asccp = coreComponentAPI.createRandomASCCP(acc, userb, namespace, "Published");
@@ -3099,12 +3150,12 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             biesForTesting.add(useraBIEQA);
 
             ASCCPObject metaHeaderASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Meta Header. Meta Header", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Meta Header. Meta Header", release.getReleaseNumber());
             metaHeaderASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), metaHeaderASCCP, userb, "QA");
 
             ASCCPObject paginationResponseASCCP = getAPIFactory().getCoreComponentAPI().
-                    getASCCPByDENAndReleaseNum("Pagination Response. Pagination Response", release.getReleaseNumber());
+                    getASCCPByDENAndReleaseNum(library, "Pagination Response. Pagination Response", release.getReleaseNumber());
             paginationResponseASBIEP = getAPIFactory().getBusinessInformationEntityAPI().
                     generateRandomTopLevelASBIEP(Arrays.asList(context), paginationResponseASCCP, userb, "QA");
         }

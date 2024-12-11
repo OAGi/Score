@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_20_NamespaceManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.LibraryObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.HomePage;
@@ -22,7 +24,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -60,7 +61,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         assertChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String randomDomain = randomAlphabetic(5, 10);
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
         String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
         createNamespacePage.hitCreateButton();
@@ -92,7 +93,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         assertChecked(createNamespacePage.getStandardCheckboxField());
         assertDisabled(createNamespacePage.getStandardCheckboxField());
 
-        String randomDomain = randomAlphabetic(5, 10);
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
         String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
         createNamespacePage.setPrefix(randomDomain);
@@ -130,8 +131,9 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
@@ -169,7 +171,9 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     public void test_TA_20_1_4() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
         developerNamespace.setStandardNamespace(true);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
@@ -189,11 +193,12 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
         String branch = "Working";
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
         HomePage homePage = loginPage().signIn(anotherDeveloper.getLoginId(), anotherDeveloper.getPassword());
         ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
         CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
-        String randomDomain = randomAlphabetic(5, 10);
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
         String testURI = "https://test." + randomDomain + ".com";
         createNamespacePage.setURI(testURI);
         createNamespacePage.hitCreateButton();

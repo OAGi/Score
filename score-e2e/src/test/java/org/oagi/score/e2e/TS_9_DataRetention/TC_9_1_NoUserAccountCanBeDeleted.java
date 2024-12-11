@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_9_DataRetention;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,6 @@ import org.oagi.score.e2e.page.admin.NewAccountPage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -44,8 +44,8 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("eu_" + randomAlphanumeric(5, 10));
-        newUser.setPassword("eu_" + randomAlphanumeric(5, 10));
+        newUser.setLoginId("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Test User-Agent");
         newUser.setDeveloper(false);
@@ -68,8 +68,8 @@ public class TC_9_1_NoUserAccountCanBeDeleted extends BaseTest {
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("dev_" + randomAlphanumeric(5, 10));
-        newUser.setPassword("dev_" + randomAlphanumeric(5, 10));
+        newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Developer-Agent");
         newUser.setDeveloper(true);

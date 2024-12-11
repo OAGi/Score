@@ -54,18 +54,17 @@ public class CodeListWriteRepository {
         CodeListManifestRecord basedCodeListManifestRecord = null;
         AgencyIdListValueManifestRecord agencyIdListValueManifestRecord;
 
-        if (request.getbasedCodeListManifestId() != null) {
+        if (request.getBasedCodeListManifestId() != null) {
             basedCodeListManifestRecord = dslContext.selectFrom(CODE_LIST_MANIFEST)
                     .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID
-                            .eq(ULong.valueOf(request.getbasedCodeListManifestId())))
+                            .eq(ULong.valueOf(request.getBasedCodeListManifestId())))
                     .fetchOne();
             if (basedCodeListManifestRecord == null) {
-                throw new IllegalArgumentException("Cannot find a based Code List [codeListManifestId=" + request.getbasedCodeListManifestId() + "]");
+                throw new IllegalArgumentException("Cannot find a based Code List [codeListManifestId=" + request.getBasedCodeListManifestId() + "]");
             }
 
             CodeListRecord basedCodeListRecord = dslContext.selectFrom(CODE_LIST)
-                    .where(CODE_LIST.CODE_LIST_ID
-                            .eq(basedCodeListManifestRecord.getCodeListId()))
+                    .where(CODE_LIST.CODE_LIST_ID.eq(basedCodeListManifestRecord.getCodeListId()))
                     .fetchOne();
 
             codeList.setName(basedCodeListRecord.getName());
@@ -89,30 +88,23 @@ public class CodeListWriteRepository {
                             .fetch();
         } else {
             codeList.setName(request.getInitialName());
-            String initialAgencyIdValueName;
-            if (user.isDeveloper()) {
-                initialAgencyIdValueName = "OAGi (Open Applications Group, Incorporated)";
-            } else {
-                initialAgencyIdValueName = "Mutually defined";
-            }
-
             agencyIdListValueManifestRecord = dslContext.select(AGENCY_ID_LIST_VALUE_MANIFEST.fields())
                     .from(AGENCY_ID_LIST_VALUE_MANIFEST)
                     .join(AGENCY_ID_LIST_VALUE)
                     .on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                    .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                     .join(APP_USER)
                     .on(AGENCY_ID_LIST_VALUE.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                    .where(and(AGENCY_ID_LIST_VALUE.NAME.eq(initialAgencyIdValueName),
+                    .where(and(
+                            ((user.isDeveloper()) ? AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT.eq((byte) 1) : AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT.eq((byte) 1)),
+                            AGENCY_ID_LIST.STATE.notEqual("Deleted"),
                             APP_USER.IS_DEVELOPER.eq((byte) 1),
                             AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId()))))
                     .fetchOneInto(AgencyIdListValueManifestRecord.class);
 
             codeList.setVersionId("1");
-            if (user.isDeveloper()) {
-                codeList.setExtensibleIndicator((byte) 1);
-            } else {
-                codeList.setExtensibleIndicator((byte) 0);
-            }
+            codeList.setExtensibleIndicator(user.isDeveloper() ? (byte) 1 : (byte) 0);
             codeList.setIsDeprecated((byte) 0);
         }
 
@@ -132,7 +124,9 @@ public class CodeListWriteRepository {
         if (basedCodeListManifestRecord != null) {
             codeListManifest.setBasedCodeListManifestId(basedCodeListManifestRecord.getCodeListManifestId());
         }
-        codeListManifest.setAgencyIdListValueManifestId(agencyIdListValueManifestRecord.getAgencyIdListValueManifestId());
+        if (agencyIdListValueManifestRecord != null) {
+            codeListManifest.setAgencyIdListValueManifestId(agencyIdListValueManifestRecord.getAgencyIdListValueManifestId());
+        }
 
         codeListManifest = dslContext.insertInto(CODE_LIST_MANIFEST)
                 .set(codeListManifest)
@@ -478,11 +472,11 @@ public class CodeListWriteRepository {
                 .fetchOne();
 
         if (!CcState.WIP.equals(CcState.valueOf(codeListRecord.getState()))) {
-            throw new IllegalArgumentException("Only the core component in 'WIP' state can be deleted.");
+            throw new IllegalArgumentException("Only the code list in 'WIP' state can be deleted.");
         }
 
         if (!codeListRecord.getOwnerUserId().equals(userId)) {
-            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+            throw new IllegalArgumentException("It only allows to modify the code list by the owner.");
         }
 
         // update codeList state.
@@ -506,6 +500,56 @@ public class CodeListWriteRepository {
         return new DeleteCodeListRepositoryResponse(codeListManifestRecord.getCodeListManifestId().toBigInteger());
     }
 
+    public PurgeCodeListRepositoryResponse purgeCodeList(PurgeCodeListRepositoryRequest request) {
+        AppUser user = sessionService.getAppUserByUsername(request.getUser());
+        ULong userId = ULong.valueOf(user.getAppUserId());
+        LocalDateTime timestamp = request.getLocalDateTime();
+
+        CodeListManifestRecord codeListManifestRecord = dslContext.selectFrom(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(
+                        ULong.valueOf(request.getCodeListManifestId())
+                ))
+                .fetchOne();
+
+        CodeListRecord codeListRecord = dslContext.selectFrom(CODE_LIST)
+                .where(CODE_LIST.CODE_LIST_ID.eq(codeListManifestRecord.getCodeListId()))
+                .fetchOne();
+
+        if (!CcState.Deleted.equals(CcState.valueOf(codeListRecord.getState()))) {
+            throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
+        }
+
+        List<CodeListValueManifestRecord> codeListValueManifestRecordList =
+                dslContext.selectFrom(CODE_LIST_VALUE_MANIFEST)
+                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))
+                        .fetch();
+
+        if (!codeListValueManifestRecordList.isEmpty()) {
+            dslContext.deleteFrom(CODE_LIST_VALUE_MANIFEST)
+                    .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID.in(
+                            codeListValueManifestRecordList.stream().map(e -> e.getCodeListValueManifestId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+            dslContext.deleteFrom(CODE_LIST_VALUE)
+                    .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.in(
+                            codeListValueManifestRecordList.stream().map(e -> e.getCodeListValueId())
+                                    .collect(Collectors.toSet())
+                    ))
+                    .execute();
+        }
+
+        dslContext.deleteFrom(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))
+                .execute();
+
+        dslContext.deleteFrom(CODE_LIST)
+                .where(CODE_LIST.CODE_LIST_ID.eq(codeListManifestRecord.getCodeListId()))
+                .execute();
+
+        return new PurgeCodeListRepositoryResponse(codeListManifestRecord.getCodeListManifestId().toBigInteger());
+    }
+
     public RestoreCodeListRepositoryResponse restoreCodeList(RestoreCodeListRepositoryRequest request) {
         AppUser user = sessionService.getAppUserByUsername(request.getUser());
         ULong userId = ULong.valueOf(user.getAppUserId());
@@ -522,14 +566,14 @@ public class CodeListWriteRepository {
                 .fetchOne();
 
         if (!CcState.Deleted.equals(CcState.valueOf(codeListRecord.getState()))) {
-            throw new IllegalArgumentException("Only the core component in 'Deleted' state can be deleted.");
+            throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
         }
 
         AppUserRecord owner = dslContext.selectFrom(APP_USER)
                 .where(APP_USER.APP_USER_ID.eq(codeListRecord.getOwnerUserId())).fetchOneInto(AppUserRecord.class);
         if (!owner.getIsDeveloper().equals(user.isDeveloper() ? (byte) 1 : 0)) {
             String role = user.isDeveloper() ? "'End'" : "'Developer";
-            throw new IllegalArgumentException("Only '" + role + " user' can restore the code list.");
+            throw new IllegalArgumentException("Only '" + role + " user' can restore the Code List.");
         }
 
         CcState prevState = CcState.valueOf(codeListRecord.getState());
@@ -537,7 +581,7 @@ public class CodeListWriteRepository {
         if (prevState == CcState.Deleted) {
             codeListRecord.setOwnerUserId(userId);
         } else if (!codeListRecord.getOwnerUserId().equals(userId)) {
-            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+            throw new IllegalArgumentException("It only allows to modify the Code List by the owner.");
         }
 
         // update codeList state.
@@ -578,27 +622,35 @@ public class CodeListWriteRepository {
 
         if (user.isDeveloper()) {
             if (!CcState.Published.equals(CcState.valueOf(prevCodeListRecord.getState()))) {
-                throw new IllegalArgumentException("Only the core component in 'Published' state can be revised.");
+                throw new IllegalArgumentException("Only the Code List in 'Published' state can be revised.");
             }
         } else {
             if (!CcState.Production.equals(CcState.valueOf(prevCodeListRecord.getState()))) {
-                throw new IllegalArgumentException("Only the core component in 'Production' state can be revised.");
+                throw new IllegalArgumentException("Only the Code List in 'Production' state can be revised.");
             }
         }
 
+        ReleaseRecord releaseRecord = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(codeListManifestRecord.getReleaseId()))
+                .fetchOne();
+
         ULong workingReleaseId = dslContext.select(RELEASE.RELEASE_ID)
                 .from(RELEASE)
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(releaseRecord.getLibraryId()),
+                        RELEASE.RELEASE_NUM.eq("Working")
+                ))
                 .fetchOneInto(ULong.class);
 
         ULong targetReleaseId = codeListManifestRecord.getReleaseId();
         if (user.isDeveloper()) {
             if (!targetReleaseId.equals(workingReleaseId)) {
-                throw new IllegalArgumentException("It only allows to revise the component in 'Working' branch for developers.");
+                throw new IllegalArgumentException("It only allows to revise the Code List in 'Working' branch for developers.");
             }
         } else {
             if (targetReleaseId.equals(workingReleaseId)) {
-                throw new IllegalArgumentException("It only allows to revise the component in non-'Working' branch for end-users.");
+                throw new IllegalArgumentException("It only allows to revise the Code List in non-'Working' branch for end-users.");
             }
         }
 
@@ -608,7 +660,7 @@ public class CodeListWriteRepository {
                 .fetchOneInto(Boolean.class);
 
         if (user.isDeveloper() != ownerIsDeveloper) {
-            throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
+            throw new IllegalArgumentException("It only allows to revise the Code List for users in the same roles.");
         }
 
         CodeListRecord nextCodeListRecord = prevCodeListRecord.copy();
@@ -774,11 +826,11 @@ public class CodeListWriteRepository {
                 .fetchOne();
 
         if (!CcState.WIP.equals(CcState.valueOf(codeListRecord.getState()))) {
-            throw new IllegalArgumentException("Only the code list in 'WIP' state can be modified.");
+            throw new IllegalArgumentException("Only the Code List in 'WIP' state can be modified.");
         }
 
         if (!codeListRecord.getOwnerUserId().equals(userId)) {
-            throw new IllegalArgumentException("It only allows to modify the code list by the owner.");
+            throw new IllegalArgumentException("It only allows to modify the Code List by the owner.");
         }
 
         codeListRecord.setOwnerUserId(ULong.valueOf(request.getOwnerId()));

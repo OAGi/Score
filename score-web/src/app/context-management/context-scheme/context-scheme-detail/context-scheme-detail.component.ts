@@ -501,7 +501,7 @@ export class ContextSchemeDetailComponent implements OnInit {
   }
 
   _loadFromCodeList() {
-    const codeListdialogConfig = {
+    const codeListDialogConfig = {
       data: {},
       width: '100%',
       maxWidth: '100%',
@@ -509,9 +509,9 @@ export class ContextSchemeDetailComponent implements OnInit {
       maxHeight: '100%',
       autoFocus: false
     };
-    codeListdialogConfig.width = window.innerWidth + 'px';
+    codeListDialogConfig.width = window.innerWidth + 'px';
 
-    const dialogRef = this.dialog.open(CodelistListDialogComponent, codeListdialogConfig);
+    const dialogRef = this.dialog.open(CodelistListDialogComponent, codeListDialogConfig);
     dialogRef.afterClosed().subscribe(codeList => {
       if (codeList) {
         this.contextScheme.schemeId = codeList.listId.toString();

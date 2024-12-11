@@ -39,28 +39,30 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_1")
     public void test_TA_1() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         ReleaseObject release;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Published");
 
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
         upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         upliftCodeListPage.selectCodeList(codeList.getName());
 
         /**
          * The target release must be greater than the source release.
          */
-        List<String> releasesBefore = getAPIFactory().getReleaseAPI().getAllReleasesBeforeRelease(release);
+        List<String> releasesBefore = getAPIFactory().getReleaseAPI().getAllReleasesBeforeRelease(library, release);
         for (String earlierRelease : releasesBefore) {
             assertThrows(WebDriverException.class, () -> upliftCodeListPage.setTargetRelease(earlierRelease));
         }
@@ -70,7 +72,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
          * The end user cannot select the Working branch.
          */
         escape(getDriver());
-        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         assertThrows(WebDriverException.class, () -> upliftCodeListPage.setSourceRelease(workingBranch.getReleaseNumber()));
         assertThrows(WebDriverException.class, () -> upliftCodeListPage.setTargetRelease(workingBranch.getReleaseNumber()));
     }
@@ -79,14 +81,16 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_2")
     public void test_TA_2() {
         AppUserObject endUser;
+        LibraryObject library;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         ReleaseObject release;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
             codeListForTesting.add(codeListWIP);
 
@@ -112,7 +116,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
         upliftCodeListPage.setSourceRelease(release.getReleaseNumber());
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         upliftCodeListPage.setTargetRelease(targetRelease.getReleaseNumber());
         for (CodeListObject cl : codeListForTesting) {
             assertDoesNotThrow(() -> upliftCodeListPage.selectCodeList(cl.getName()));
@@ -123,6 +127,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_3")
     public void test_TA_3() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -130,14 +135,15 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList, release, targetRelease);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
@@ -155,6 +161,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_4")
     public void test_TA_4() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -162,14 +169,15 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "QA");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList, release, targetRelease);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
@@ -187,6 +195,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_5")
     public void test_TA_5() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -194,15 +203,16 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Production");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList, release, targetRelease);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
@@ -220,6 +230,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_6")
     public void test_TA_6() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -227,14 +238,15 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Deleted");
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList, release, targetRelease);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
@@ -252,6 +264,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_7")
     public void test_TA_7() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -259,8 +272,9 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "WIP");
             codeList.setDeprecated(true);
             getAPIFactory().getCodeListAPI().updateCodeList(codeList);
@@ -269,7 +283,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         EditCodeListPage editCodeListPage = upliftCodeListPage.hitUpliftButton(codeList, release, targetRelease);
         assertEquals(codeList.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(codeList.getListId(), getText(editCodeListPage.getListIDField()));
@@ -287,6 +301,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_8")
     public void test_TA_8() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         CodeListValueObject value;
         ReleaseObject release;
@@ -294,8 +309,9 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUser, namespace, release, "Production");
 
             value = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
@@ -307,7 +323,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
         CodeListObject amendedCL = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUser, release.getReleaseNumber());
 
         UpliftCodeListPage upliftCodeListPage = homePage.getBIEMenu().openUpliftCodeListSubMenu();
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         upliftCodeListPage.hitUpliftButton(amendedCL, release, targetRelease);
         assertEquals(amendedCL.getName(), getText(editCodeListPage.getCodeListNameField()));
         assertEquals(amendedCL.getListId(), getText(editCodeListPage.getListIDField()));
@@ -325,6 +341,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_9")
     public void test_TA_9() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeList;
         List<CodeListValueObject> baseCodeListValues = new ArrayList<>();
         ReleaseObject release;
@@ -333,9 +350,10 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
             CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
                     getCodeListByCodeListNameAndReleaseNum("oacl_ControlCode", release.getReleaseNumber());
             baseCodeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(baseCodeList.getCodeListManifestId());
@@ -363,6 +381,7 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
     @DisplayName("TC_33_2_TA_10")
     public void test_TA_10() {
         AppUserObject endUser;
+        LibraryObject library;
         CodeListObject codeListEU;
         List<CodeListValueObject> baseCodeListValues;
         CodeListValueObject euCLValue;
@@ -372,9 +391,10 @@ public class TC_33_2_EndUserCodeListUplifting extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
             CodeListObject baseCodeList = getAPIFactory().getCodeListAPI().
                     getCodeListByCodeListNameAndReleaseNum("oacl_ControlCode", release.getReleaseNumber());
             baseCodeListValues = getAPIFactory().getCodeListValueAPI().getCodeListValuesByCodeListManifestId(baseCodeList.getCodeListManifestId());

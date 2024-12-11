@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.helper.filter;
 
+import org.apache.commons.lang3.stream.Streams;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.springframework.util.StringUtils;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static org.jooq.impl.DSL.or;
 
 public class ContainsFilterBuilder {
 
@@ -58,6 +61,21 @@ public class ContainsFilterBuilder {
         } else {
             return split(q).stream()
                     .map(_s -> field.containsIgnoreCase(_s))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public static Collection<Condition> contains(String s, Field<String>... fields) {
+        String q = s.trim();
+        if (isQuoted(q)) {
+            return Arrays.asList(
+                    or(Streams.of(fields).map(f -> f.containsIgnoreCase(unquote(q))).collect(Collectors.toList()))
+            );
+        } else {
+            return split(q).stream()
+                    .map(_s ->
+                            or(Streams.of(fields).map(f -> f.containsIgnoreCase(unquote(_s))).collect(Collectors.toList()))
+                    )
                     .collect(Collectors.toList());
         }
     }

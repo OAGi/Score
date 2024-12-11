@@ -187,6 +187,7 @@ export class BasedAccDialogComponent implements OnInit {
   ngOnInit() {
     this.action = this.data.action;
     this.request = new CcListRequest();
+    this.request.library.libraryId = this.data.libraryId;
     this.request.release.releaseId = this.data.releaseId;
     this.request.types = ['ACC'];
     this.request.excludes = [this.data.manifestId];

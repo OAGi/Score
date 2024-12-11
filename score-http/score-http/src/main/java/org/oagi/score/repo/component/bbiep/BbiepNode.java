@@ -41,11 +41,13 @@ public class BbiepNode {
         private String hashPath;
         private BigInteger basedBccpManifestId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger bbiepId;
         private String guid;
         private String remark;
         private String bizTerm;
         private String definition;
+        private String displayName;
     }
 
     private Bbiep bbiep = new Bbiep();

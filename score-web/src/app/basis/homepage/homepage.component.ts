@@ -12,11 +12,14 @@ import {StateProgressBarItem} from '../../common/state-progress-bar/state-progre
 import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Encode, initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {base64Encode, initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {CcList, SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
 import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {WebPageInfoService} from '../basis.service';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
+import {UserToken} from '../../authentication/domain/auth';
 
 export interface UserStatesItem {
   username: string;
@@ -45,6 +48,10 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     {state: 'ReleaseDraft', color: '#689F38'},
     {state: 'Published', color: '#388E3C'},
     {state: 'Deleted', color: '#616161'}];
+
+  library: Library = new Library();
+  libraries: Library[] = [];
+  mappedLibraries: { library: Library, selected: boolean }[] = [];
 
   /* CCs */
   numberOfTotalCCByStates: StateProgressBarItem[];
@@ -115,18 +122,56 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   constructor(private bieService: BieListService,
               private ccService: CcListService,
-              private authService: AuthService,
+              private auth: AuthService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private router: Router,
               public webPageInfo: WebPageInfoService) {
   }
 
   ngOnInit() {
-    const userToken = this.authService.getUserToken();
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
+
+      this.loadData();
+    });
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
+  }
+
+  get isDeveloper(): boolean {
+    return this.userToken.roles.includes('developer');
+  }
+
+  get isTenantEnabled(): boolean {
+    return this.userToken.tenant.enabled;
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+      }
+      if (!this.library || !this.library.libraryId) {
+        this.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  loadData() {
+    const userToken = this.userToken;
     forkJoin([
-      this.releaseService.getSimpleReleases()
+      this.releaseService.getSimpleReleases(this.library.libraryId)
     ]).subscribe(([resp]) => {
-      resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
+      resp = [{state: '', releaseId: -1, releaseNum : 'All', workingRelease: false}].concat(resp.filter(e => !e.workingRelease));
       initFilter(this.releaseListFilterCtrl, this.releaseFilteredList, resp, (e) => e.releaseNum);
 
       const branch = loadBranch(userToken, 'CC');
@@ -142,18 +187,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  get isDeveloper(): boolean {
-    const userToken = this.authService.getUserToken();
-    return userToken.roles.includes('developer');
-  }
-
-  get isTenantEnabled(): boolean {
-    const userToken = this.authService.getUserToken();
-    return userToken.tenant.enabled;
+  onLibraryChange(library: Library) {
+    this.library = library;
+    saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+    this.loadData();
   }
 
   onChangeRelease() {
-    const userToken = this.authService.getUserToken();
+    const userToken = this.userToken;
     this.initSummaryBIEs(userToken);
     this.initSummaryUserExtensions(userToken);
     saveBranch(userToken, 'CC', this.selectedRelease.releaseId);
@@ -162,7 +203,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   initSummaryCCs(userToken) {
     const releaseParam = {key: 'releaseId', value: WorkingRelease.releaseId};
-    this.ccService.getSummaryCcList().subscribe(summaryCcInfo => {
+    this.ccService.getSummaryCcList(this.library.libraryId).subscribe(summaryCcInfo => {
       this.numberOfTotalCCByStates = [];
       this.numberOfMyCCByStates = [];
       for (const item of this.stateColorList) {
@@ -217,7 +258,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   initSummaryBIEs(userToken) {
     const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
-    this.bieService.getSummaryBieList(this.selectedRelease.releaseId).subscribe(summaryBieInfo => {
+    this.bieService.getSummaryBieList(this.library.libraryId, this.selectedRelease.releaseId).subscribe(summaryBieInfo => {
       this.numberOfTotalBieByStates = [];
       this.numberOfMyBieByStates = [];
       for (const item of this.stateColorList) {
@@ -271,7 +312,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryUserExtensions(userToken) {
-    this.ccService.getSummaryCcExtList(this.selectedRelease.releaseId).subscribe(summaryCcExtInfo => {
+    this.ccService.getSummaryCcExtList(this.library.libraryId, this.selectedRelease.releaseId).subscribe(summaryCcExtInfo => {
       const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
       const typeParam = {key: 'types', value: 'ACC'};
       const componentTypeParam = {key: 'componentTypes', value: UserExtensionGroup.value};

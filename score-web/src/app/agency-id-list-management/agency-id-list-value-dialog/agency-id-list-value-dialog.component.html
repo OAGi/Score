@@ -39,11 +39,27 @@
         </mat-form-field>
 
         <div class="row">
-          <div class="col-12">
+          <div class="col-4">
             <mat-checkbox color="warn"
                           [disabled]="!isEditable || actionName === 'Add' || !isDeprecatedChangeable"
                           [(ngModel)]="agencyIdListValue.deprecated">
               <span>Deprecated</span>
+            </mat-checkbox>
+          </div>
+          <div class="col-4" *ngIf="isDeveloper"
+               [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by developers.'">
+            <mat-checkbox color="warn"
+                          [disabled]="!isEditable"
+                          [(ngModel)]="agencyIdListValue.developerDefault">
+              <span>Developer Default</span>
+            </mat-checkbox>
+          </div>
+          <div class="col-4" *ngIf="isDeveloper"
+               [matTooltip]="'When set, this will be used as the default agency ID list value in Code Lists created by end-users.'">
+            <mat-checkbox color="warn"
+                          [disabled]="!isEditable"
+                          [(ngModel)]="agencyIdListValue.userDefault">
+              <span>User Default</span>
             </mat-checkbox>
           </div>
         </div>

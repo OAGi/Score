@@ -45,7 +45,11 @@ public class CcNodeRepository {
     @Autowired
     private UserRepository userRepository;
 
-    private SelectOnConditionStep<Record16<ULong, String, String, ULong, Integer, String, String, Byte, String, ULong, UInteger, UInteger, ULong, String, ULong, ULong>> getSelectJoinStepForAccNode() {
+    private SelectOnConditionStep<Record17<
+            ULong, String, String, ULong, Integer,
+            String, String, Byte, String, ULong,
+            UInteger, UInteger, ULong, String, ULong,
+            ULong, ULong>> getSelectJoinStepForAccNode() {
         return dslContext.select(
                         ACC.ACC_ID,
                         ACC.GUID,
@@ -61,6 +65,7 @@ public class CcNodeRepository {
                         LOG.REVISION_TRACKING_NUM,
                         ACC_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
                         ACC.OWNER_USER_ID,
                         ACC_MANIFEST.ACC_MANIFEST_ID.as("manifest_id"))
                 .from(ACC)
@@ -68,6 +73,8 @@ public class CcNodeRepository {
                 .on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE)
                 .on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
     }
@@ -120,9 +127,10 @@ public class CcNodeRepository {
         OagisComponentType oagisComponentType =
                 OagisComponentType.valueOf(accNode.getOagisComponentType());
         accNode.setGroup(oagisComponentType.isGroup());
-        boolean isWorkingRelease = accNode.getReleaseNum().equals("Working");
+        boolean isWorkingRelease = "Working".equals(accNode.getReleaseNum());
+        accNode.setWorkingRelease(isWorkingRelease);
         accNode.setAccess(AccessPrivilege.toAccessPrivilege(
-                sessionService.getAppUserByUsername(user), sessionService.getAppUserByUsername(accNode.getOwnerUserId()),
+                sessionService.getAppUserByUsername(user), sessionService.getAppUserByUserId(accNode.getOwnerUserId()),
                 accNode.getState(), isWorkingRelease));
         accNode.setHasChild(hasChild(accNode));
         accNode.setHasExtension(hasExtension(user, accNode));
@@ -175,8 +183,11 @@ public class CcNodeRepository {
         }
     }
 
-    private SelectOnConditionStep<Record15<ULong, String, String, ULong, String, String, ULong, UInteger, UInteger,
-            ULong, String, ULong, ULong, ULong, ULong>> selectOnConditionStepForAsccpNode() {
+    private SelectOnConditionStep<Record16<
+            ULong, String, String, ULong, String,
+            String, ULong, UInteger, UInteger, ULong,
+            String, ULong, ULong, ULong, ULong,
+            ULong>> selectOnConditionStepForAsccpNode() {
         return dslContext.select(
                         ASCCP.ASCCP_ID,
                         ASCCP.GUID,
@@ -189,6 +200,7 @@ public class CcNodeRepository {
                         LOG.REVISION_TRACKING_NUM,
                         ASCCP_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
                         ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifest_id"),
                         ASCCP.OWNER_USER_ID,
                         ASCCP.PREV_ASCCP_ID,
@@ -198,6 +210,8 @@ public class CcNodeRepository {
                 .on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
                 .join(RELEASE)
                 .on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(ACC_MANIFEST)
@@ -210,8 +224,9 @@ public class CcNodeRepository {
                 .fetchOneInto(CcAsccpNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(asccpNode.getOwnerUserId());
-        boolean isWorkingRelease = asccpNode.getReleaseNum().equals("Working");
+        AppUser owner = sessionService.getAppUserByUserId(asccpNode.getOwnerUserId());
+        boolean isWorkingRelease = "Working".equals(asccpNode.getReleaseNum());
+        asccpNode.setWorkingRelease(isWorkingRelease);
         asccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, asccpNode.getState(), isWorkingRelease));
         asccpNode.setHasChild(true); // role_of_acc_id must not be null.
 
@@ -234,10 +249,10 @@ public class CcNodeRepository {
         return asccpNode;
     }
 
-    private SelectOnConditionStep<Record14<
+    private SelectOnConditionStep<Record15<
             ULong, String, String, ULong, String,
             ULong, UInteger, UInteger, ULong, String,
-            ULong, ULong, ULong, ULong>> selectOnConditionStepForBccpNode() {
+            ULong, ULong, ULong, ULong, ULong>> selectOnConditionStepForBccpNode() {
         return dslContext.select(
                         BCCP.BCCP_ID,
                         BCCP.GUID,
@@ -249,6 +264,7 @@ public class CcNodeRepository {
                         LOG.REVISION_TRACKING_NUM,
                         BCCP_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
                         BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifest_id"),
                         BCCP.OWNER_USER_ID,
                         BCCP.PREV_BCCP_ID,
@@ -258,13 +274,19 @@ public class CcNodeRepository {
                 .on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
                 .join(RELEASE)
                 .on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(DT_MANIFEST)
                 .on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID));
     }
 
-    private SelectOnConditionStep<Record15<ULong, String, String, String, String, ULong, UInteger, UInteger, ULong, String, ULong, ULong, ULong, ULong, ULong>> selectOnConditionStepForBdtNode() {
+    private SelectOnConditionStep<Record16<
+            ULong, String, String, String, String,
+            ULong, UInteger, UInteger, ULong, String,
+            ULong, ULong, ULong, ULong, ULong,
+            ULong>> selectOnConditionStepForBdtNode() {
         return dslContext.select(
                         DT.DT_ID.as("bdt_id"),
                         DT.GUID,
@@ -276,6 +298,7 @@ public class CcNodeRepository {
                         LOG.REVISION_TRACKING_NUM,
                         DT_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
                         DT_MANIFEST.DT_MANIFEST_ID.as("manifest_id"),
                         DT_MANIFEST.BASED_DT_MANIFEST_ID.as("based_manifest_id"),
                         DT.OWNER_USER_ID,
@@ -286,11 +309,16 @@ public class CcNodeRepository {
                 .on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
                 .join(RELEASE)
                 .on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
     }
 
-    private SelectOnConditionStep<Record13<ULong, String, String, String, ULong, UInteger, UInteger, ULong, String, ULong, ULong, ULong, ULong>> selectOnConditionStepForDtScNode() {
+    private SelectOnConditionStep<Record14<
+            ULong, String, String, String, ULong,
+            UInteger, UInteger, ULong, String, ULong,
+            ULong, ULong, ULong, ULong>> selectOnConditionStepForDtScNode() {
         return dslContext.select(
                         DT_SC.DT_SC_ID.as("dt_sc_id"),
                         DT_SC.GUID,
@@ -301,6 +329,7 @@ public class CcNodeRepository {
                         LOG.REVISION_TRACKING_NUM,
                         DT_SC_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
                         DT_SC_MANIFEST.DT_SC_MANIFEST_ID.as("manifest_id"),
                         DT.OWNER_USER_ID,
                         DT_SC.PREV_DT_SC_ID,
@@ -314,6 +343,8 @@ public class CcNodeRepository {
                 .on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .join(RELEASE)
                 .on(DT_SC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
     }
@@ -324,8 +355,9 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBccpNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(bccpNode.getOwnerUserId());
-        boolean isWorkingRelease = bccpNode.getReleaseNum().equals("Working");
+        AppUser owner = sessionService.getAppUserByUserId(bccpNode.getOwnerUserId());
+        boolean isWorkingRelease = "Working".equals(bccpNode.getReleaseNum());
+        bccpNode.setWorkingRelease(isWorkingRelease);
         bccpNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bccpNode.getState(), isWorkingRelease));
         bccpNode.setHasChild(hasChild(bccpNode));
 
@@ -338,8 +370,9 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBdtNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(bdtNode.getOwnerUserId());
-        boolean isWorkingRelease = bdtNode.getReleaseNum().equals("Working");
+        AppUser owner = sessionService.getAppUserByUserId(bdtNode.getOwnerUserId());
+        boolean isWorkingRelease = "Working".equals(bdtNode.getReleaseNum());
+        bdtNode.setWorkingRelease(isWorkingRelease);
         bdtNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, bdtNode.getState(), isWorkingRelease));
         bdtNode.setHasChild(hasChild(bdtNode));
 
@@ -352,8 +385,9 @@ public class CcNodeRepository {
                 .fetchOneInto(CcBdtScNode.class);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
-        AppUser owner = sessionService.getAppUserByUsername(dtScNode.getOwnerUserId());
-        boolean isWorkingRelease = dtScNode.getReleaseNum().equals("Working");
+        AppUser owner = sessionService.getAppUserByUserId(dtScNode.getOwnerUserId());
+        boolean isWorkingRelease = "Working".equals(dtScNode.getReleaseNum());
+        dtScNode.setWorkingRelease(isWorkingRelease);
         dtScNode.setAccess(AccessPrivilege.toAccessPrivilege(requester, owner, dtScNode.getState(), isWorkingRelease));
 
         return dtScNode;
@@ -481,6 +515,8 @@ public class CcNodeRepository {
                         ACC_MANIFEST.REPLACEMENT_ACC_MANIFEST_ID.as("replacement_acc_manifest_id"),
                         ACC.STATE,
                         APP_USER.LOGIN_ID.as("owner"),
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         ACC_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         ACC_MANIFEST.LOG_ID,
@@ -493,6 +529,8 @@ public class CcNodeRepository {
                 .on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ULong.valueOf(accNode.getManifestId())))
@@ -563,6 +601,8 @@ public class CcNodeRepository {
                             ASCC.DEFINITION_SOURCE,
                             ACC.STATE,
                             APP_USER.LOGIN_ID.as("owner"),
+                            LIBRARY.LIBRARY_ID,
+                            LIBRARY.NAME.as("library_name"),
                             ACC_MANIFEST.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
                             ACC_MANIFEST.LOG_ID,
@@ -579,6 +619,8 @@ public class CcNodeRepository {
                     .on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                     .join(RELEASE)
                     .on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .join(LIBRARY)
+                    .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                     .join(LOG)
                     .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ULong.valueOf(asccManifestId)))
@@ -606,6 +648,8 @@ public class CcNodeRepository {
                         APP_USER.LOGIN_ID.as("owner"),
                         ASCCP_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         ASCCP_MANIFEST.LOG_ID,
                         LOG.REVISION_NUM,
                         LOG.REVISION_TRACKING_NUM)
@@ -616,6 +660,8 @@ public class CcNodeRepository {
                 .on(ASCCP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
@@ -754,6 +800,8 @@ public class CcNodeRepository {
                             BCC_MANIFEST.BCC_MANIFEST_ID.as("manifest_id"),
                             ACC.STATE,
                             APP_USER.LOGIN_ID.as("owner"),
+                            LIBRARY.LIBRARY_ID,
+                            LIBRARY.NAME.as("library_name"),
                             ACC_MANIFEST.RELEASE_ID,
                             RELEASE.RELEASE_NUM,
                             ACC_MANIFEST.LOG_ID,
@@ -770,6 +818,8 @@ public class CcNodeRepository {
                     .on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                     .join(RELEASE)
                     .on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .join(LIBRARY)
+                    .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                     .join(LOG)
                     .on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(bccManifestId)))
@@ -796,6 +846,8 @@ public class CcNodeRepository {
                         BCCP_MANIFEST.REPLACEMENT_BCCP_MANIFEST_ID,
                         BCCP.STATE,
                         APP_USER.LOGIN_ID.as("owner"),
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         BCCP_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         BCCP_MANIFEST.LOG_ID,
@@ -808,6 +860,8 @@ public class CcNodeRepository {
                 .on(BCCP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
@@ -829,6 +883,8 @@ public class CcNodeRepository {
                         DT.DEFINITION_SOURCE,
                         DT.STATE,
                         APP_USER.LOGIN_ID.as("owner"),
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         DT_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         DT_MANIFEST.LOG_ID,
@@ -843,6 +899,8 @@ public class CcNodeRepository {
                 .on(DT.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccpManifestId)))
@@ -1077,6 +1135,8 @@ public class CcNodeRepository {
                         DT.STATE,
                         DT.NAMESPACE_ID,
                         APP_USER.LOGIN_ID.as("owner"),
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         DT_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         DT_MANIFEST.LOG_ID,
@@ -1093,6 +1153,8 @@ public class CcNodeRepository {
                 .on(DT.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(manifestId)))
@@ -1267,6 +1329,8 @@ public class CcNodeRepository {
                         DT_SC_MANIFEST.REPLACEMENT_DT_SC_MANIFEST_ID,
                         DT.STATE,
                         APP_USER.LOGIN_ID.as("owner"),
+                        LIBRARY.LIBRARY_ID,
+                        LIBRARY.NAME.as("library_name"),
                         DT_MANIFEST.RELEASE_ID,
                         RELEASE.RELEASE_NUM,
                         DT_MANIFEST.LOG_ID,
@@ -1285,6 +1349,8 @@ public class CcNodeRepository {
                 .on(DT.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(RELEASE)
                 .on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(LOG)
                 .on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .leftJoin(DT_SC.as("prev")).on(DT_SC.PREV_DT_SC_ID.eq(DT_SC.as("prev").DT_SC_ID))

@@ -40,7 +40,7 @@ tr.element-row:not(.expanded-row):active {
   color: #767676 !important;
 }
 
-.bie-source {
+.bie-source, .bie-based {
   font-size: 11px !important;
   color: #767676 !important;
 }

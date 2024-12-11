@@ -143,7 +143,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement getCheckBoxOfNodeInTargetBIE(String node) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//mat-card-content[contains(@class, \"mat-mdc-card-content\")]" +
-                "/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[1]/mat-checkbox[1]"));
+                "/div[2]/div[2]//cdk-virtual-scroll-viewport//*[contains(text(),\"" + node + "\")]//ancestor::div[contains(@class, \"mat-tree-node\")]/mat-checkbox[1]"));
     }
 
     @Override

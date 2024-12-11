@@ -90,7 +90,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
      * The column <code>oagi.bccp_manifest.den</code>. The dictionary entry name
      * of the BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.
      */
-    public final TableField<BccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(200).nullable(false), this, "The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + \". \" + REPRESENTATION_TERM.");
+    public final TableField<BccpManifestRecord, String> DEN = createField(DSL.name("den"), SQLDataType.VARCHAR(249).nullable(false), this, "The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + \". \" + REPRESENTATION_TERM.");
 
     /**
      * The column <code>oagi.bccp_manifest.conflict</code>. This indicates that
@@ -199,19 +199,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
 
     @Override
     public List<ForeignKey<BccpManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BCCP_MANIFEST_RELEASE_ID_FK, Keys.BCCP_MANIFEST_BCCP_ID_FK, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_LOG_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.BCCP_MANIFEST_BCCP_ID_FK, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_LOG_ID_FK, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_RELEASE_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK);
     }
 
     private transient BccpPath _bccp;
@@ -250,17 +238,17 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return _log;
     }
 
-    private transient BccpManifestPath _bccpReplacementBccpManifestIdFk;
+    private transient BccpManifestPath _bccpManifestNextBccpManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table,
-     * via the <code>bccp_replacement_bccp_manifest_id_fk</code> key.
+     * via the <code>bccp_manifest_next_bccp_manifest_id_fk</code> key.
      */
-    public BccpManifestPath bccpReplacementBccpManifestIdFk() {
-        if (_bccpReplacementBccpManifestIdFk == null)
-            _bccpReplacementBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, null);
+    public BccpManifestPath bccpManifestNextBccpManifestIdFk() {
+        if (_bccpManifestNextBccpManifestIdFk == null)
+            _bccpManifestNextBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK, null);
 
-        return _bccpReplacementBccpManifestIdFk;
+        return _bccpManifestNextBccpManifestIdFk;
     }
 
     private transient BccpManifestPath _bccpManifestPrevBccpManifestIdFk;
@@ -276,17 +264,29 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return _bccpManifestPrevBccpManifestIdFk;
     }
 
-    private transient BccpManifestPath _bccpManifestNextBccpManifestIdFk;
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient BccpManifestPath _bccpReplacementBccpManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bccp_manifest</code> table,
-     * via the <code>bccp_manifest_next_bccp_manifest_id_fk</code> key.
+     * via the <code>bccp_replacement_bccp_manifest_id_fk</code> key.
      */
-    public BccpManifestPath bccpManifestNextBccpManifestIdFk() {
-        if (_bccpManifestNextBccpManifestIdFk == null)
-            _bccpManifestNextBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK, null);
+    public BccpManifestPath bccpReplacementBccpManifestIdFk() {
+        if (_bccpReplacementBccpManifestIdFk == null)
+            _bccpReplacementBccpManifestIdFk = new BccpManifestPath(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, null);
 
-        return _bccpManifestNextBccpManifestIdFk;
+        return _bccpReplacementBccpManifestIdFk;
     }
 
     private transient BbiepPath _bbiep;
@@ -301,19 +301,6 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return _bbiep;
     }
 
-    private transient BccpManifestTagPath _bccpManifestTag;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bccp_manifest_tag</code> table
-     */
-    public BccpManifestTagPath bccpManifestTag() {
-        if (_bccpManifestTag == null)
-            _bccpManifestTag = new BccpManifestTagPath(this, null, Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK.getInverseKey());
-
-        return _bccpManifestTag;
-    }
-
     private transient BccManifestPath _bccManifest;
 
     /**
@@ -325,6 +312,19 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
             _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK.getInverseKey());
 
         return _bccManifest;
+    }
+
+    private transient BccpManifestTagPath _bccpManifestTag;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oagi.bccp_manifest_tag</code> table
+     */
+    public BccpManifestTagPath bccpManifestTag() {
+        if (_bccpManifestTag == null)
+            _bccpManifestTag = new BccpManifestTagPath(this, null, Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK.getInverseKey());
+
+        return _bccpManifestTag;
     }
 
     private transient ModuleBccpManifestPath _moduleBccpManifest;

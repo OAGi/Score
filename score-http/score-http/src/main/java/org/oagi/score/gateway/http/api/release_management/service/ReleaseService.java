@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.apache.commons.io.FileUtils;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.types.ULong;
 import org.oagi.score.data.Release;
 import org.oagi.score.export.ExportContext;
@@ -55,8 +56,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseState.Published;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.RELEASE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 import static org.oagi.score.repo.api.user.model.ScoreRole.ADMINISTRATOR;
 
 @Service
@@ -110,25 +110,19 @@ public class ReleaseService implements InitializingBean {
         AppUser requester = sessionService.getAppUserByUsername(request.getUser());
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(RELEASE.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         if (!request.getStates().isEmpty()) {
             conditions.add(RELEASE.STATE.in(request.getStates()));
         }
 
-        List<SimpleRelease> releases = new ArrayList(dslContext.select(RELEASE.RELEASE_ID, RELEASE.RELEASE_NUM, RELEASE.STATE)
+        List<SimpleRelease> releases = dslContext.select(RELEASE.RELEASE_ID, RELEASE.RELEASE_NUM, RELEASE.STATE)
                 .from(RELEASE)
                 .where(conditions)
                 .orderBy(RELEASE.RELEASE_ID.desc())
-                .fetch().map(row -> {
-                    SimpleRelease simpleRelease = new SimpleRelease();
-                    simpleRelease.setReleaseId(row.getValue(RELEASE.RELEASE_ID).toBigInteger());
-                    simpleRelease.setReleaseNum(row.getValue(RELEASE.RELEASE_NUM));
-                    simpleRelease.setState(ReleaseState.valueOf(row.getValue(RELEASE.STATE)));
-                    return simpleRelease;
-                })
-        );
+                .fetch(simpleReleaseMapper());
 
         SimpleRelease workingRelease =
-                releases.stream().filter(e -> "Working".equalsIgnoreCase(e.getReleaseNum())).findAny().orElse(null);
+                releases.stream().filter(e -> e.isWorkingRelease()).findAny().orElse(null);
         releases.remove(workingRelease);
 
         if (requester.isDeveloper()) {
@@ -140,11 +134,22 @@ public class ReleaseService implements InitializingBean {
         return releases;
     }
 
+    private RecordMapper<Record, SimpleRelease> simpleReleaseMapper() {
+        return record -> {
+            SimpleRelease simpleRelease = new SimpleRelease();
+            simpleRelease.setReleaseId(record.getValue(RELEASE.RELEASE_ID).toBigInteger());
+            simpleRelease.setReleaseNum(record.getValue(RELEASE.RELEASE_NUM));
+            simpleRelease.setState(ReleaseState.valueOf(record.getValue(RELEASE.STATE)));
+            simpleRelease.setWorkingRelease("Working".equals(simpleRelease.getReleaseNum()));
+            return simpleRelease;
+        };
+    }
+
     public SimpleRelease getSimpleReleaseByReleaseId(BigInteger releaseId) {
-        return dslContext.select(RELEASE.RELEASE_ID, RELEASE.RELEASE_NUM)
+        return dslContext.select(RELEASE.RELEASE_ID, RELEASE.RELEASE_NUM, RELEASE.STATE)
                 .from(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
-                .fetchOneInto(SimpleRelease.class);
+                .fetchOne(simpleReleaseMapper());
     }
 
     public List<ReleaseList> getReleaseList(AuthenticatedPrincipal user) {
@@ -183,6 +188,8 @@ public class ReleaseService implements InitializingBean {
                         APP_USER.as("updater").LOGIN_ID.as("last_updated_by"),
                         RELEASE.LAST_UPDATE_TIMESTAMP)
                 .from(RELEASE)
+                .join(LIBRARY)
+                .on(LIBRARY.LIBRARY_ID.eq(RELEASE.LIBRARY_ID))
                 .join(APP_USER.as("creator"))
                 .on(RELEASE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater"))
@@ -195,6 +202,7 @@ public class ReleaseService implements InitializingBean {
                 String, String, LocalDateTime, String, LocalDateTime>> step = getSelectOnConditionStep();
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         if (StringUtils.hasLength(request.getReleaseNum())) {
             conditions.add(RELEASE.RELEASE_NUM.containsIgnoreCase(request.getReleaseNum().trim()));
         }
@@ -303,6 +311,7 @@ public class ReleaseService implements InitializingBean {
                 releaseDetail.getReleaseNum(),
                 releaseDetail.getReleaseNote(),
                 releaseDetail.getReleaseLicense(),
+                releaseDetail.getLibraryId(),
                 releaseDetail.getNamespaceId());
 
         response.setStatus("success");
@@ -337,6 +346,7 @@ public class ReleaseService implements InitializingBean {
         Release release = repository.findById(releaseId);
         ReleaseDetail detail = new ReleaseDetail();
         detail.setReleaseId(release.getReleaseId());
+        detail.setLibraryId(release.getLibraryId());
         detail.setNamespaceId(release.getNamespaceId());
         detail.setReleaseNum(release.getReleaseNum());
         detail.setReleaseNote(release.getReleaseNote());
@@ -384,7 +394,7 @@ public class ReleaseService implements InitializingBean {
     public ReleaseValidationResponse validate(AuthenticatedPrincipal user,
                                               ReleaseValidationRequest request) {
 
-        ReleaseValidator validator = new ReleaseValidator(dslContext);
+        ReleaseValidator validator = new ReleaseValidator(request.getReleaseId(), dslContext);
         validator.setAssignedAccComponentManifestIds(request.getAssignedAccComponentManifestIds());
         validator.setAssignedAsccpComponentManifestIds(request.getAssignedAsccpComponentManifestIds());
         validator.setAssignedBccpComponentManifestIds(request.getAssignedBccpComponentManifestIds());
@@ -395,8 +405,8 @@ public class ReleaseService implements InitializingBean {
 
     @Transactional
     public ReleaseValidationResponse createDraft(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                                 BigInteger releaseId,
                                                  @RequestBody ReleaseValidationRequest request) {
+        BigInteger releaseId = request.getReleaseId();
         if (repository.isThereAnyDraftRelease(releaseId)) {
             throw new IllegalArgumentException("It cannot make any release to 'Draft' due to a release restriction.");
         }

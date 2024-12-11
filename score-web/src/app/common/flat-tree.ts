@@ -108,6 +108,10 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
     this._caseSensitive = caseSensitive || false;
   }
 
+  get caseSensitive(): boolean {
+    return this._caseSensitive;
+  }
+
   range(data: T[], current: T): T[] {
     if (this._root) {
       current = data[0];

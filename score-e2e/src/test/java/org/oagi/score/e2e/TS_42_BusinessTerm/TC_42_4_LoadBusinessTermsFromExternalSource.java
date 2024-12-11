@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_42_BusinessTerm;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,11 +24,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,7 +89,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         // write test business terms into csv file and save into a different name for upload
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
         if (csvFileForUpload.exists()) {
             csvFileForUpload.delete();
         }
@@ -146,7 +145,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         // write test business terms into csv file and save into a different name for upload
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
         if (csvFileForUpload.exists()) {
             csvFileForUpload.delete();
         }
@@ -214,7 +213,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         // write test business terms into csv file and save into a different name for upload
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
         if (csvFileForUpload.exists()) {
             csvFileForUpload.delete();
         }
@@ -276,7 +275,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         // write test business terms into csv file and save into a different name for upload
-        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + randomAlphabetic(5, 10) + ".csv");
+        File csvFileForUpload = new File(targetFolder, "businessTermTemplateWithExampleForUpload_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
         if (csvFileForUpload.exists()) {
             csvFileForUpload.delete();
         }

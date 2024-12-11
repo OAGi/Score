@@ -36,6 +36,8 @@ public class ModifyAgencyIdListValuesRepositoryRequest {
 
         private String definitionSource;
         private boolean deprecated;
+        private boolean developerDefault;
+        private boolean userDefault;
 
         public BigInteger getAgencyIdListValueManifestId() {
             return agencyIdListValueManifestId;
@@ -83,6 +85,22 @@ public class ModifyAgencyIdListValuesRepositoryRequest {
 
         public void setDeprecated(boolean deprecated) {
             this.deprecated = deprecated;
+        }
+
+        public boolean isDeveloperDefault() {
+            return developerDefault;
+        }
+
+        public void setDeveloperDefault(boolean developerDefault) {
+            this.developerDefault = developerDefault;
+        }
+
+        public boolean isUserDefault() {
+            return userDefault;
+        }
+
+        public void setUserDefault(boolean userDefault) {
+            this.userDefault = userDefault;
         }
     }
 

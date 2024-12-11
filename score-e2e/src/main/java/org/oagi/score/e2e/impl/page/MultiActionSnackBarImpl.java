@@ -34,7 +34,7 @@ public class MultiActionSnackBarImpl implements MultiActionSnackBar {
     public WebElement getActionButtonByName(String name) {
         return visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"actions\")]" +
-                        "//button[contains(text(), \"" + name + "\")]"));
+                        "//span[contains(text(), \"" + name + "\")]//ancestor::button[1]"));
     }
 
 }

@@ -22,6 +22,7 @@ import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {MessageManagementModule} from '../message-management/message-management.module';
 import {MarkdownModule} from 'ngx-markdown';
+import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -37,21 +38,22 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    RouterModule,
-    MaterialModule,
-    TranslateModule,
-    StateProgressBarModule,
-    NgxMatSelectSearchModule,
-    CommonModule,
-    ScoreCommonModule,
-    MessageManagementModule,
-    MarkdownModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        RouterModule,
+        MaterialModule,
+        TranslateModule,
+        StateProgressBarModule,
+        NgxMatSelectSearchModule,
+        CommonModule,
+        ScoreCommonModule,
+        MessageManagementModule,
+        MarkdownModule,
+        TitleWithLibrarySelector
+    ],
   exports: [
     HomepageComponent,
     LoginComponent,

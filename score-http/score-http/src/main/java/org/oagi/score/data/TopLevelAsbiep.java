@@ -10,6 +10,7 @@ import java.util.Date;
 public class TopLevelAsbiep {
 
     private BigInteger topLevelAsbiepId = BigInteger.ZERO;
+    private BigInteger basedTopLevelAsbiepId = BigInteger.ZERO;
     private BigInteger asbiepId = BigInteger.ZERO;
     private BigInteger ownerUserId = BigInteger.ZERO;
     private BigInteger releaseId = BigInteger.ZERO;
@@ -19,6 +20,7 @@ public class TopLevelAsbiep {
     private BigInteger lastUpdatedBy = BigInteger.ZERO;
     private Date lastUpdateTimestamp;
 
+    private boolean deprecated;
     private boolean inverseMode;
 
 }

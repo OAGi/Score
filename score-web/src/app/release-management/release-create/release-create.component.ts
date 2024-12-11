@@ -6,9 +6,12 @@ import {Router} from '@angular/router';
 import {ReleaseDetail} from '../domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {NamespaceList} from '../../namespace-management/domain/namespace';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {NamespaceList, NamespaceListRequest} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
+import {loadLibrary, saveLibrary} from '../../common/utility';
 
 @Component({
   selector: 'score-release-list',
@@ -20,6 +23,9 @@ export class ReleaseCreateComponent implements OnInit {
   title = 'Releases Detail';
 
   releaseDetail = new ReleaseDetail();
+  library: Library = new Library();
+  libraries: Library[] = [];
+  mappedLibraries: { library: Library, selected: boolean }[] = [];
   namespaceList: NamespaceList[];
   selectedNamespace: NamespaceList;
   namespaceListFilterCtrl: FormControl = new FormControl();
@@ -30,9 +36,11 @@ export class ReleaseCreateComponent implements OnInit {
   constructor(private service: ReleaseService,
               private accountService: AccountListService,
               private namespaceService: NamespaceService,
+              private libraryService: LibraryService,
               private snackBar: MatSnackBar,
               private router: Router,
               private auth: AuthService) {
+    this.library.libraryId = 0;
   }
 
   ngOnInit() {
@@ -40,15 +48,12 @@ export class ReleaseCreateComponent implements OnInit {
     if (!userToken.roles.includes('developer')) {
       this.router.navigateByUrl('/');
     }
-    this.namespaceService.getNamespaceList().subscribe(resp => {
-      this.namespaceList = resp.list.filter(e => e.std);
-      this.filteredNamespaceList.next(this.namespaceList.slice());
-    });
 
-    this.namespaceListFilterCtrl.valueChanges
-      .subscribe(() => {
-        this.filterNamespaceList();
-      });
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
+
+      this.loadNamespaces();
+    });
   }
 
   filterNamespaceList() {
@@ -64,7 +69,49 @@ export class ReleaseCreateComponent implements OnInit {
     );
   }
 
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+      }
+      if (!this.library || !this.library.libraryId) {
+        this.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  loadNamespaces() {
+    const request = new NamespaceListRequest();
+    request.library.libraryId = this.library.libraryId;
+    request.page.pageIndex = -1;
+    request.page.pageSize = -1;
+
+    this.namespaceService.getNamespaceList(request).subscribe(namespaceList => {
+      this.namespaceList = namespaceList.list.filter(e => e.std);
+      this.filteredNamespaceList.next(this.namespaceList.slice());
+      this.namespaceListFilterCtrl.valueChanges
+        .subscribe(() => {
+          this.filterNamespaceList();
+        });
+    });
+  }
+
+  onLibraryChange(library: Library) {
+    this.library = library;
+    saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+    this.loadNamespaces();
+  }
+
   create() {
+    if (this.library) {
+      this.releaseDetail.libraryId = this.library.libraryId;
+    }
     if (this.selectedNamespace) {
       this.releaseDetail.namespaceId = this.selectedNamespace.namespaceId;
     }

@@ -56,27 +56,28 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
         String prev_release = "10.8.6";
-        ReleaseObject prevReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
+        ReleaseObject prevReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, prev_release);
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             /**
              * The owner of the ASCCP is usera
              */
             acc = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", prevReleaseObject.getReleaseNumber());
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", prevReleaseObject.getReleaseNumber());
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
-            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("3292eaa5630b48ecb7c4249b0ddc760e", prevReleaseObject.getReleaseNumber());
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", prevReleaseObject.getReleaseNumber());
             bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, prevReleaseObject, namespace, "Production");
@@ -140,27 +141,28 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             /**
              * The owner of the ASCCP is usera
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", current_release);
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
-            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("3292eaa5630b48ecb7c4249b0ddc760e", current_release);
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", current_release);
             bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
@@ -207,27 +209,28 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         BCCPObject bccp, bccp_to_append, bccp_child, bccp_not_reuse;
         ACCObject acc;
         AppUserObject usera;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             /**
              * The owner of the ASCCP is usera
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", current_release);
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
             bccp = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             bccp_child = coreComponentAPI.createRandomBCCP(dataType, usera, namespace, "Production");
             coreComponentAPI.appendBCC(acc, bccp, "Production");
 
-            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum("3292eaa5630b48ecb7c4249b0ddc760e", current_release);
+            DTObject dataTypeWithSC = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "3292eaa5630b48ecb7c4249b0ddc760e", current_release);
             bccp_not_reuse = coreComponentAPI.createRandomBCCP(dataTypeWithSC, usera, namespace, "Production");
 
             ACCObject acc_association = coreComponentAPI.createRandomACC(usera, currentReleaseObject, namespace, "Production");
@@ -285,11 +288,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject acc, developer_acc, developer_acc_association;
         AppUserObject usera, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -297,7 +301,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -332,11 +336,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera, developer_asccp_lv2;
         ACCObject acc, developer_acc, developer_acc_association, developer_acc_association_lv2;
         AppUserObject usera, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, developerBIE_lv2;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -344,7 +349,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -388,11 +393,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject acc, developer_acc, developer_acc_association;
         AppUserObject usera, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -400,7 +406,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -439,11 +445,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -452,7 +459,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -507,11 +514,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -520,7 +528,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -582,11 +590,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -595,7 +604,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -661,11 +670,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -674,7 +684,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -731,11 +741,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -744,7 +755,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -805,11 +816,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -818,7 +830,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -890,11 +902,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -903,7 +916,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -950,7 +963,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
         click(td);
-        viewEditBIEPage.BackToWP();
+        viewEditBIEPage.backToWIP();
         viewEditBIEPage.setDEN(useraBIE.getDen());
         viewEditBIEPage.hitSearchButton();
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
@@ -964,11 +977,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -977,7 +991,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -1056,11 +1070,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1069,7 +1084,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -1142,11 +1157,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         BCCPObject bccp;
         ACCObject acc, acc_association, acc_lv2;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1157,8 +1173,8 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -1166,7 +1182,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
              * The owner of the ASCCP is usera
              */
             acc = coreComponentAPI.createRandomACC(usera, currentReleaseObject, euNamespace, "Production");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", current_release);
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
             bccp = coreComponentAPI.createRandomBCCP(dataType, developer, developerNamespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
@@ -1220,11 +1236,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_usera;
         ACCObject acc, acc_association;
         AppUserObject usera, userb, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject useraBIE, userbBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
@@ -1233,7 +1250,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
             userb = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(userb);
 
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 

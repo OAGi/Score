@@ -8,6 +8,7 @@ import java.math.BigInteger;
 public class Namespace {
 
     private BigInteger namespaceId = BigInteger.ZERO;
+    private BigInteger libraryId;
     private String uri;
     private String prefix;
     private String description;

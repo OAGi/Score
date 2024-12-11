@@ -59,13 +59,17 @@ public class AsbieWriteRepository {
                             ABIE.HASH_PATH.eq(asbie.getFromAbieHashPath())
                     ))
                     .fetchOneInto(ULong.class));
-            asbieRecord.setToAsbiepId(dslContext.select(ASBIEP.ASBIEP_ID)
-                    .from(ASBIEP)
-                    .where(and(
-                            ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId),
-                            ASBIEP.HASH_PATH.eq(asbie.getToAsbiepHashPath())
-                    ))
-                    .fetchOneInto(ULong.class));
+            if (asbie.getToAsbiepId() != null) {
+                asbieRecord.setToAsbiepId(ULong.valueOf(asbie.getToAsbiepId()));
+            } else {
+                asbieRecord.setToAsbiepId(dslContext.select(ASBIEP.ASBIEP_ID)
+                        .from(ASBIEP)
+                        .where(and(
+                                ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId),
+                                ASBIEP.HASH_PATH.eq(asbie.getToAsbiepHashPath())
+                        ))
+                        .fetchOneInto(ULong.class));
+            }
             asbieRecord.setSeqKey(BigDecimal.valueOf(asbie.getSeqKey().longValue()));
 
             if (asbie.getUsed() != null) {
@@ -118,6 +122,10 @@ public class AsbieWriteRepository {
             );
         } else {
             asbieRecord.setSeqKey(BigDecimal.valueOf(asbie.getSeqKey().longValue()));
+            if (asbie.getToAsbiepId() != null) {
+                asbieRecord.setToAsbiepId(ULong.valueOf(asbie.getToAsbiepId()));
+            }
+
             if (asbie.getUsed() != null) {
                 asbieRecord.setIsUsed((byte) (asbie.getUsed() ? 1 : 0));
             }
@@ -155,6 +163,7 @@ public class AsbieWriteRepository {
                 asbieRecord.setLastUpdateTimestamp(request.getLocalDateTime());
                 asbieRecord.update(
                         ASBIE.SEQ_KEY,
+                        ASBIE.TO_ASBIEP_ID,
                         ASBIE.IS_USED,
                         ASBIE.IS_NILLABLE,
                         ASBIE.IS_DEPRECATED,

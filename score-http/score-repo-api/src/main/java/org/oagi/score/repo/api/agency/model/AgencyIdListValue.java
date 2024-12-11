@@ -6,6 +6,7 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class AgencyIdListValue extends Auditable implements CoreComponent, Serializable {
 
@@ -28,6 +29,10 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
     private ScoreUser owner;
 
     private boolean deprecated;
+
+    private boolean developerDefault;
+
+    private boolean userDefault;
 
     private boolean used;
 
@@ -120,6 +125,22 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
         this.deprecated = deprecated;
     }
 
+    public boolean isDeveloperDefault() {
+        return developerDefault;
+    }
+
+    public void setDeveloperDefault(boolean developerDefault) {
+        this.developerDefault = developerDefault;
+    }
+
+    public boolean isUserDefault() {
+        return userDefault;
+    }
+
+    public void setUserDefault(boolean userDefault) {
+        this.userDefault = userDefault;
+    }
+
     public boolean isUsed() {
         return used;
     }
@@ -143,4 +164,5 @@ public class AgencyIdListValue extends Auditable implements CoreComponent, Seria
     public void setNextAgencyIdListValueId(BigInteger nextAgencyIdListValueId) {
         this.nextAgencyIdListValueId = nextAgencyIdListValueId;
     }
+
 }

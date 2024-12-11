@@ -199,31 +199,7 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
 
     @Override
     public List<ForeignKey<DtManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.DT_MANIFEST_RELEASE_ID_FK, Keys.DT_MANIFEST_DT_ID_FK, Keys.DT_MANIFEST_BASED_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_LOG_ID_FK, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_PREV_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK);
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.DT_MANIFEST_RELEASE_ID_FK, null);
-
-        return _release;
-    }
-
-    private transient DtPath _dt;
-
-    /**
-     * Get the implicit join path to the <code>oagi.dt</code> table.
-     */
-    public DtPath dt() {
-        if (_dt == null)
-            _dt = new DtPath(this, Keys.DT_MANIFEST_DT_ID_FK, null);
-
-        return _dt;
+        return Arrays.asList(Keys.DT_MANIFEST_BASED_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_DT_ID_FK, Keys.DT_MANIFEST_LOG_ID_FK, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_PREV_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_RELEASE_ID_FK, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK);
     }
 
     private transient DtManifestPath _dtManifestBasedDtManifestIdFk;
@@ -239,6 +215,18 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return _dtManifestBasedDtManifestIdFk;
     }
 
+    private transient DtPath _dt;
+
+    /**
+     * Get the implicit join path to the <code>oagi.dt</code> table.
+     */
+    public DtPath dt() {
+        if (_dt == null)
+            _dt = new DtPath(this, Keys.DT_MANIFEST_DT_ID_FK, null);
+
+        return _dt;
+    }
+
     private transient LogPath _log;
 
     /**
@@ -251,17 +239,17 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return _log;
     }
 
-    private transient DtManifestPath _dtReplacementDtManifestIdFk;
+    private transient DtManifestPath _dtManifestNextDtManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table,
-     * via the <code>dt_replacement_dt_manifest_id_fk</code> key.
+     * via the <code>dt_manifest_next_dt_manifest_id_fk</code> key.
      */
-    public DtManifestPath dtReplacementDtManifestIdFk() {
-        if (_dtReplacementDtManifestIdFk == null)
-            _dtReplacementDtManifestIdFk = new DtManifestPath(this, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK, null);
+    public DtManifestPath dtManifestNextDtManifestIdFk() {
+        if (_dtManifestNextDtManifestIdFk == null)
+            _dtManifestNextDtManifestIdFk = new DtManifestPath(this, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK, null);
 
-        return _dtReplacementDtManifestIdFk;
+        return _dtManifestNextDtManifestIdFk;
     }
 
     private transient DtManifestPath _dtManifestPrevDtManifestIdFk;
@@ -277,17 +265,29 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return _dtManifestPrevDtManifestIdFk;
     }
 
-    private transient DtManifestPath _dtManifestNextDtManifestIdFk;
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.DT_MANIFEST_RELEASE_ID_FK, null);
+
+        return _release;
+    }
+
+    private transient DtManifestPath _dtReplacementDtManifestIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.dt_manifest</code> table,
-     * via the <code>dt_manifest_next_dt_manifest_id_fk</code> key.
+     * via the <code>dt_replacement_dt_manifest_id_fk</code> key.
      */
-    public DtManifestPath dtManifestNextDtManifestIdFk() {
-        if (_dtManifestNextDtManifestIdFk == null)
-            _dtManifestNextDtManifestIdFk = new DtManifestPath(this, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK, null);
+    public DtManifestPath dtReplacementDtManifestIdFk() {
+        if (_dtReplacementDtManifestIdFk == null)
+            _dtReplacementDtManifestIdFk = new DtManifestPath(this, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK, null);
 
-        return _dtManifestNextDtManifestIdFk;
+        return _dtReplacementDtManifestIdFk;
     }
 
     private transient BccpManifestPath _bccpManifest;

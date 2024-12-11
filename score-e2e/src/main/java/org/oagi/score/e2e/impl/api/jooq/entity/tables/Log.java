@@ -218,20 +218,19 @@ public class Log extends TableImpl<LogRecord> {
 
     @Override
     public List<ForeignKey<LogRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.LOG_PREV_LOG_ID_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_CREATED_BY_FK);
+        return Arrays.asList(Keys.LOG_CREATED_BY_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_PREV_LOG_ID_FK);
     }
 
-    private transient LogPath _logPrevLogIdFk;
+    private transient AppUserPath _appUser;
 
     /**
-     * Get the implicit join path to the <code>oagi.log</code> table, via the
-     * <code>log_prev_log_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.app_user</code> table.
      */
-    public LogPath logPrevLogIdFk() {
-        if (_logPrevLogIdFk == null)
-            _logPrevLogIdFk = new LogPath(this, Keys.LOG_PREV_LOG_ID_FK, null);
+    public AppUserPath appUser() {
+        if (_appUser == null)
+            _appUser = new AppUserPath(this, Keys.LOG_CREATED_BY_FK, null);
 
-        return _logPrevLogIdFk;
+        return _appUser;
     }
 
     private transient LogPath _logNextLogIdFk;
@@ -247,16 +246,17 @@ public class Log extends TableImpl<LogRecord> {
         return _logNextLogIdFk;
     }
 
-    private transient AppUserPath _appUser;
+    private transient LogPath _logPrevLogIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     * Get the implicit join path to the <code>oagi.log</code> table, via the
+     * <code>log_prev_log_id_fk</code> key.
      */
-    public AppUserPath appUser() {
-        if (_appUser == null)
-            _appUser = new AppUserPath(this, Keys.LOG_CREATED_BY_FK, null);
+    public LogPath logPrevLogIdFk() {
+        if (_logPrevLogIdFk == null)
+            _logPrevLogIdFk = new LogPath(this, Keys.LOG_PREV_LOG_ID_FK, null);
 
-        return _appUser;
+        return _logPrevLogIdFk;
     }
 
     private transient AccManifestPath _accManifest;

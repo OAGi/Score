@@ -15,6 +15,7 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ReleaseWhatsChangedDialogComponent} from './release-detail/release-whats-changed-dialog/release-whats-changed-dialog.component';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -45,18 +46,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    CommonModule,
-    DragDropModule,
-    ScoreCommonModule,
-    FontAwesomeModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        CommonModule,
+        DragDropModule,
+        ScoreCommonModule,
+        FontAwesomeModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     ReleaseListComponent,
     ReleaseCreateComponent,

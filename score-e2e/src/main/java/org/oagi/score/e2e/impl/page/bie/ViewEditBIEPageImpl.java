@@ -5,6 +5,7 @@ import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.obj.TopLevelASBIEPObject;
 import org.oagi.score.e2e.page.BasePage;
+import org.oagi.score.e2e.page.MultiActionSnackBar;
 import org.oagi.score.e2e.page.bie.CreateBIEForSelectBusinessContextsPage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.TransferBIEOwnershipDialog;
@@ -249,6 +250,24 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     }
 
     @Override
+    public void hitCreateInheritedBIE(WebElement tr) {
+        WebElement td = getColumnByName(tr, "more");
+        click(td.findElement(By.tagName("button")));
+
+        WebElement createInheritedBIEButton = elementToBeClickable(getDriver(), By.xpath(
+                "//div[@class=\"cdk-overlay-container\"]" +
+                        "//span[text() = \"Create Inherited BIE\"]//ancestor::button[1]"));
+        click(createInheritedBIEButton);
+
+        MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
+        assert "This may take a moment, so please check back shortly.".equals(
+                getText(multiActionSnackBar.getMessageElement())
+        );
+        waitFor(ofMillis(1000L));
+        click(multiActionSnackBar.getActionButtonByName("Search"));
+    }
+
+    @Override
     public WebElement getNewBIEButton() {
         return elementToBeClickable(getDriver(), NEW_BIE_BUTTON_LOCATOR);
     }
@@ -285,7 +304,7 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + topLevelASBIEP.getDen(), e);
             }
-            if (!topLevelASBIEP.getDen().equals(getText(td.findElement(By.cssSelector("a > span"))))) {
+            if (!getText(td.findElement(By.cssSelector("a > div > span"))).startsWith(topLevelASBIEP.getDen())) {
                 throw new NoSuchElementException("Cannot locate a BIE using " + topLevelASBIEP.getDen());
             }
             WebElement tdName = td.findElement(By.tagName("a"));
@@ -415,7 +434,7 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     }
 
     @Override
-    public void BackToWP() {
+    public void backToWIP() {
         click(getBackToWIP(true));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));

@@ -13,6 +13,8 @@ public class NamespaceObject {
 
     private BigInteger namespaceId;
 
+    private BigInteger libraryId;
+
     private String uri;
 
     private String prefix;

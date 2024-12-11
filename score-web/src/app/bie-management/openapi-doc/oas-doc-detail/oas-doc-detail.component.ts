@@ -48,7 +48,6 @@ export class OasDocDetailComponent implements OnInit {
   title = 'Edit OpenAPI Document';
   oasDocs: SimpleOasDoc[];
   oasDoc: OasDoc;
-  workingRelease = WorkingRelease;
   businessContextIdList: number[] = [];
   businessContextList: BusinessContext[] = [];
   hashCodeForOasDoc;
@@ -588,7 +587,7 @@ export class OasDocDetailComponent implements OnInit {
 
   isWorkingRelease(): boolean {
     if (this.oasDoc) {
-      return this.oasDoc.releaseId === this.workingRelease.releaseId;
+      return this.oasDoc.workingRelease;
     }
     return false;
   }

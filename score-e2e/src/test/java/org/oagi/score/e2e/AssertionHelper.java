@@ -79,7 +79,7 @@ public class AssertionHelper {
                             element.sendKeys("abc");
                             waitFor(ofMillis(300L));
                             String fieldNameVal = element.getAttribute("value");
-                            assertTrue(!fieldNameVal.contentEquals("abc"));
+                            assertTrue(!"abc".equals(fieldNameVal));
                         }
                     }
                 }

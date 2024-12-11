@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_29_BIEUplifting;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,6 @@ import java.util.*;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -82,7 +81,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
 
-        Preconditions_TA_29_1_2 preconditionsTa2912 = preconditions_TA_29_1_2_Uplift_BIEUserbProduction(usera, prevRelease);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_2 preconditionsTa2912 = preconditions_TA_29_1_2_Uplift_BIEUserbProduction(usera, library, prevRelease);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -141,8 +141,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals(preconditionsTa2912.bbieScContextDefinition, getText(bbiescPanel.getContextDefinitionField()));
     }
 
-    private Preconditions_TA_29_1_2 preconditions_TA_29_1_2_Uplift_BIEUserbProduction(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_2 preconditionsTa2912 = new Preconditions_TA_29_1_2(usera, prevRelease);
+    private Preconditions_TA_29_1_2 preconditions_TA_29_1_2_Uplift_BIEUserbProduction(
+            AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_2 preconditionsTa2912 = new Preconditions_TA_29_1_2(usera, library, prevRelease);
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -188,9 +189,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2912;
     }
 
-    private Preconditions_TA_29_1_BIE1QA preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_BIE1QA preconditionsTa2914 = new Preconditions_TA_29_1_BIE1QA(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_BIE1QA preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(
+            AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_BIE1QA preconditionsTa2914 = new Preconditions_TA_29_1_BIE1QA(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -417,7 +419,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(userb);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        Preconditions_TA_29_1_BIE1QA preconditionsTa2914 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_BIE1QA preconditionsTa2914 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, library, prev_release);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -509,7 +512,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        Preconditions_TA_29_1_BIE1QA preconditionsTa2915 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_BIE1QA preconditionsTa2915 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, library, prev_release);
 
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -548,7 +552,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(userb);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        Preconditions_TA_29_1_BIE1QA preconditionsTa2915 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, prev_release);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_BIE1QA preconditionsTa2915 = preconditions_TA_9_1_4_and_TA_29_1_5a_and_TA_29_1_6a(usera, library, prev_release);
 
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -745,9 +751,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(userb);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915dReusedChild = preconditions_ta_29_1_5d_ReusedChild(userb, prev_release);
-        Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915dReusedParent = preconditions_ta_29_1_5d_ReusedParent(userb, prev_release);
-        Preconditions_TA_29_1_5d_BIEReusedScenario preconditionsTa2915dReusedScenario = new Preconditions_TA_29_1_5d_BIEReusedScenario(userb, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915dReusedChild = preconditions_ta_29_1_5d_ReusedChild(userb, library, prev_release);
+        Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915dReusedParent = preconditions_ta_29_1_5d_ReusedParent(userb, library, prev_release);
+        Preconditions_TA_29_1_5d_BIEReusedScenario preconditionsTa2915dReusedScenario = new Preconditions_TA_29_1_5d_BIEReusedScenario(userb, library, prev_release);
         HomePage homePage = loginPage().signIn(userb.getLoginId(), userb.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -889,9 +896,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private Preconditions_TA_29_1_5d_BIEReusedChild preconditions_ta_29_1_5d_ReusedChild(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedChild(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_5d_BIEReusedChild preconditions_ta_29_1_5d_ReusedChild(
+            AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_5d_BIEReusedChild preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedChild(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -941,9 +949,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2915d;
     }
 
-    private Preconditions_TA_29_1_5d_BIEReusedParent preconditions_ta_29_1_5d_ReusedParent(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedParent(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_5d_BIEReusedParent preconditions_ta_29_1_5d_ReusedParent(
+            AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_5d_BIEReusedParent preconditionsTa2915d = new Preconditions_TA_29_1_5d_BIEReusedParent(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -982,8 +991,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919_TOPBIEGETBOM = preconditions_TA_29_1_TOPBIEGETBOM(usera, prev_release);
-        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919_BIEPrimitiveDate = preconditions_TA_29_1_BIEPrimitiveDate(usera, prev_release);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919_TOPBIEGETBOM = preconditions_TA_29_1_TOPBIEGETBOM(usera, library, prev_release);
+        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919_BIEPrimitiveDate = preconditions_TA_29_1_BIEPrimitiveDate(usera, library, prev_release);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1043,9 +1054,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private Preconditions_TA_29_1_TOPBIEGETBOM preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919a = new Preconditions_TA_29_1_TOPBIEGETBOM(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_TOPBIEGETBOM preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919a = new Preconditions_TA_29_1_TOPBIEGETBOM(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1106,9 +1117,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         return preconditionsTa2919a;
     }
 
-    private Preconditions_TA_29_1_BIEPrimitiveDate preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919a = new Preconditions_TA_29_1_BIEPrimitiveDate(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_BIEPrimitiveDate preconditions_TA_29_1_BIEPrimitiveDate(
+            AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919a = new Preconditions_TA_29_1_BIEPrimitiveDate(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1130,11 +1142,13 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919TOPBIEGETBOM = preconditions_TA_29_1_TOPBIEGETBOM(usera, prev_release);
-        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919BiePrimitiveDate = preconditions_TA_29_1_BIEPrimitiveDate(usera, prev_release);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_TOPBIEGETBOM preconditionsTa2919TOPBIEGETBOM = preconditions_TA_29_1_TOPBIEGETBOM(usera, library, prev_release);
+        Preconditions_TA_29_1_BIEPrimitiveDate preconditionsTa2919BiePrimitiveDate = preconditions_TA_29_1_BIEPrimitiveDate(usera, library, prev_release);
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         BIEMenu bieMenu = homePage.getBIEMenu();
         //TOPBIEGETBOM prev_release
         bieMenu = homePage.getBIEMenu();
@@ -1390,12 +1404,15 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     public void test_TA_29_1_10a() {
         String prev_release = "10.8.7.1";
         String curr_release = "10.9";
+
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+
         //BIEBOMDoubleNested previousRelease
-        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910BIEBOMDoubleNested = preconditions_TA_29_10a_BIEBOMDoubleNested(developer, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910BIEBOMDoubleNested = preconditions_TA_29_10a_BIEBOMDoubleNested(developer, library, prev_release);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1432,9 +1449,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private Preconditions_TA_29_1_BIEBOMDoubleNested preconditions_TA_29_10a_BIEBOMDoubleNested(AppUserObject developer, String prevRelease) {
-        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910a = new Preconditions_TA_29_1_BIEBOMDoubleNested(developer, prevRelease);
-        NamespaceObject devNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+    private Preconditions_TA_29_1_BIEBOMDoubleNested preconditions_TA_29_10a_BIEBOMDoubleNested(
+            AppUserObject developer, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_BIEBOMDoubleNested preconditionsTa2910a = new Preconditions_TA_29_1_BIEBOMDoubleNested(developer, library, prevRelease);
+        NamespaceObject devNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1475,10 +1493,11 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        Preconditions_TA_29_1_JournalEntry preconditionsTa2910JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_JournalEntry preconditionsTa2910JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, library, prev_release);
 
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
         //JournalEntry prev_release
@@ -1530,9 +1549,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         homePage.logout();
     }
 
-    private Preconditions_TA_29_1_JournalEntry preconditions_TA_29_10b_JournalEntry(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_JournalEntry preconditionsTa2910b = new Preconditions_TA_29_1_JournalEntry(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_JournalEntry preconditions_TA_29_10b_JournalEntry(AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_JournalEntry preconditionsTa2910b = new Preconditions_TA_29_1_JournalEntry(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -1585,11 +1604,12 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         //BIECAGUplift prev_release
-        Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911BIECAGUplift = preconditions_TA_29_11_BIECAGUplift(usera, prev_release);
+        Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911BIECAGUplift = preconditions_TA_29_11_BIECAGUplift(usera, library, prev_release);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
-        ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
+        ReleaseObject prev_releaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, prev_release);
         RandomCodeListWithStateContainer euCodeListWithStateContainer = new RandomCodeListWithStateContainer(
                 usera, prev_releaseObject, euNamespace, Arrays.asList("WIP", "QA", "Production", "Deleted"));
         CodeListObject CLaccessUseraDeprecated = getAPIFactory().getCodeListAPI().createRandomCodeList(usera, euNamespace, prev_releaseObject, "Production");
@@ -1874,8 +1894,8 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertEquals("normalized string", getText(bbiePanel.getValueDomainField()));
 
         //Uplift codeList page
-        ReleaseObject sourceRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(prev_release);
-        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(curr_release);
+        ReleaseObject sourceRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, prev_release);
+        ReleaseObject targetRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, curr_release);
         UpliftCodeListPage upliftCodeListPage = bieMenu.openUpliftCodeListSubMenu();
 
         for (CodeListObject codeList : Arrays.asList(
@@ -2037,9 +2057,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertTrue(getText(bbiePanel.getValueDomainField()).startsWith("clm6TimeFormatCode1_TimeFormatCode"));
     }
 
-    private Preconditions_TA_29_1_BIECAGUplift preconditions_TA_29_11_BIECAGUplift(AppUserObject usera, String prevRelease) {
-        Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911 = new Preconditions_TA_29_1_BIECAGUplift(usera, prevRelease);
-        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera);
+    private Preconditions_TA_29_1_BIECAGUplift preconditions_TA_29_11_BIECAGUplift(AppUserObject usera, LibraryObject library, String prevRelease) {
+        Preconditions_TA_29_1_BIECAGUplift preconditionsTa2911 = new Preconditions_TA_29_1_BIECAGUplift(usera, library, prevRelease);
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
@@ -2088,8 +2108,10 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         thisAccountWillBeDeletedAfterTests(usera);
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+
         //JournalEntry prev_release
-        Preconditions_TA_29_1_JournalEntry preconditionsTa2912JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, prev_release);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        Preconditions_TA_29_1_JournalEntry preconditionsTa2912JournalEntry = preconditions_TA_29_10b_JournalEntry(usera, library, prev_release);
         HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
         BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
         BIEMenu bieMenu = homePage.getBIEMenu();
@@ -2144,32 +2166,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final String asbiePath = "/Change Acknowledge Shipment Status/Application Area";
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final String bbiePath = "/Change Acknowledge Shipment Status/System Environment Code";
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final String bbieScPath = "/Change Acknowledge Shipment Status/Application Area/Scenario Identifier/Scheme Version Identifier";
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_2(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_2(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Change Acknowledge Shipment Status. Change Acknowledge Shipment Status", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2179,38 +2201,38 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
     private class Preconditions_TA_29_1_BIE1QA {
         private final TopLevelASBIEPObject topLevelASBIEP;
-        private final String topLevelASBIEPBusinessTerm = "biz_term_" + randomAlphanumeric(5, 10);
-        private final String topLevelASBIEPRemark = randomPrint(50, 100).trim();
-        private final String topLevelASBIEPStatus = "status_" + randomAlphanumeric(5, 10);
+        private final String topLevelASBIEPBusinessTerm = "biz_term_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        private final String topLevelASBIEPRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String topLevelASBIEPStatus = "status_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_BIE1QA(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_BIE1QA(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Enterprise Unit. Enterprise Unit", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2239,32 +2261,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         private final TopLevelASBIEPObject topLevelASBIEP;
         // ASBIE
         private final String asbiePath = "/Unit Packaging/Dimensions";
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final String bbiePath = "/Unit Packaging/Capacity Per Package Quantity";
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final String bbieScPath = "/Unit Packaging/UPC Packaging Level Code/List Agency Identifier";
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_5d_BIEReusedChild(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_5d_BIEReusedChild(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Unit Packaging. Packaging", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2275,22 +2297,22 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         private final TopLevelASBIEPObject topLevelASBIEP;
         // ASBIE
         private final String asbiePath = "/From UOM Package/Unit Packaging";
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final String bbiePath = "/From UOM Package/UOM Code";
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
-        Preconditions_TA_29_1_5d_BIEReusedParent(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_5d_BIEReusedParent(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "From UOM Package. UOM Package", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2300,9 +2322,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     private class Preconditions_TA_29_1_5d_BIEReusedScenario {
         private final TopLevelASBIEPObject topLevelASBIEP;
 
-        Preconditions_TA_29_1_5d_BIEReusedScenario(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_5d_BIEReusedScenario(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "UOM Code Conversion Rate. UOM Code Conversion Rate", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2314,32 +2336,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_TOPBIEGETBOM(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Get BOM. Get BOM", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2351,32 +2373,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_BIEPrimitiveDate(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Start Separate Date Time. Separate Date Time", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2388,32 +2410,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject developer, String prevRelease) {
+        Preconditions_TA_29_1_BIEBOMDoubleNested(AppUserObject developer, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "BOM. BOM", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, developer, "WIP");
@@ -2425,32 +2447,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_JournalEntry(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_JournalEntry(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Post Acknowledge Journal Entry. Post Acknowledge Journal Entry", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");
@@ -2462,32 +2484,32 @@ public class TC_29_1_BIEUplifting extends BaseTest {
 
         // ASBIE
         private final ArrayList<String> asbiePaths = new ArrayList<>();
-        private final String asbieRemark = randomPrint(50, 100).trim();
-        private final String asbieContextDefinition = randomPrint(50, 100).trim();
+        private final String asbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String asbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
 
         // BBIE
         private final ArrayList<String> bbiePaths = new ArrayList<>();
-        private final String bbieRemark = randomPrint(50, 100).trim();
-        private final String bbieExample = randomPrint(50, 100).trim();
-        private final String bbieContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieValueConstraint = "Fixed Value";
-        private final String bbieFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieValueDomainRestriction = "Code";
         private final String bbieValueDomain = "oacl_SystemEnvironmentCode";
 
         // BBIE_SC
         private final ArrayList<String> bbieScPaths = new ArrayList<>();
-        private final String bbieScRemark = randomPrint(50, 100).trim();
-        private final String bbieScExample = randomPrint(50, 100).trim();
-        private final String bbieScContextDefinition = randomPrint(50, 100).trim();
+        private final String bbieScRemark = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScExample = RandomStringUtils.secure().nextPrint(50, 100).trim();
+        private final String bbieScContextDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         private final String bbieScValueConstraint = "Fixed Value";
-        private final String bbieScFixedValue = randomAlphanumeric(50, 100).trim();
+        private final String bbieScFixedValue = RandomStringUtils.secure().nextAlphanumeric(50, 100).trim();
         private final String bbieScValueDomainRestriction = "Agency";
         private final String bbieScValueDomain = "clm63055D16B_AgencyIdentification";
 
-        Preconditions_TA_29_1_BIECAGUplift(AppUserObject usera, String prevRelease) {
+        Preconditions_TA_29_1_BIECAGUplift(AppUserObject usera, LibraryObject library, String prevRelease) {
             BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
-            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(
+            ASCCPObject asccp = getAPIFactory().getCoreComponentAPI().getASCCPByDENAndReleaseNum(library, 
                     "Child Item Reference. Child Item Reference", prevRelease);
             this.topLevelASBIEP = getAPIFactory().getBusinessInformationEntityAPI()
                     .generateRandomTopLevelASBIEP(Collections.singletonList(context), asccp, usera, "WIP");

@@ -9,6 +9,7 @@ import org.oagi.score.repo.api.base.SortDirection;
 import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
+import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,6 +37,8 @@ public class BusinessInformationEntityRepository {
 
     @Autowired
     private ApplicationConfigurationService configService;
+    @Autowired
+    private TopLevelAsbiepRepository topLevelAsbiepRepository;
 
     public class InsertTopLevelAsbiepArguments {
         private ULong releaseId;
@@ -46,6 +49,8 @@ public class BusinessInformationEntityRepository {
 
         private boolean inverseMode;
         private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
+
+        private ULong basedTopLevelAsbiepId;
 
         private ULong sourceTopLevelAsbiepId;
         private String sourceAction;
@@ -102,6 +107,15 @@ public class BusinessInformationEntityRepository {
             return this;
         }
 
+        public InsertTopLevelAsbiepArguments setBasedTopLevelAsbiepId(BigInteger basedTopLevelAsbiepId) {
+            return setBasedTopLevelAsbiepId(ULong.valueOf(basedTopLevelAsbiepId));
+        }
+
+        public InsertTopLevelAsbiepArguments setBasedTopLevelAsbiepId(ULong basedTopLevelAsbiepId) {
+            this.basedTopLevelAsbiepId = basedTopLevelAsbiepId;
+            return this;
+        }
+
         public InsertTopLevelAsbiepArguments setSource(BigInteger sourceTopLevelAsbiepId, String sourceAction) {
             this.sourceTopLevelAsbiepId = ULong.valueOf(sourceTopLevelAsbiepId);
             this.sourceAction = sourceAction;
@@ -136,6 +150,10 @@ public class BusinessInformationEntityRepository {
             return timestamp;
         }
 
+        public ULong getBasedTopLevelAsbiepId() {
+            return basedTopLevelAsbiepId;
+        }
+
         public ULong getSourceTopLevelAsbiepId() {
             return sourceTopLevelAsbiepId;
         }
@@ -167,6 +185,10 @@ public class BusinessInformationEntityRepository {
         record.setInverseMode((byte) (arguments.isInverseMode() ? 1 : 0));
         record.setLastUpdatedBy(arguments.getUserId());
         record.setLastUpdateTimestamp(arguments.getTimestamp());
+
+        if (arguments.getBasedTopLevelAsbiepId() != null) {
+            record.setBasedTopLevelAsbiepId(arguments.getBasedTopLevelAsbiepId());
+        }
 
         if (arguments.getSourceTopLevelAsbiepId() != null) {
             record.setSourceTopLevelAsbiepId(arguments.getSourceTopLevelAsbiepId());
@@ -495,9 +517,12 @@ public class BusinessInformationEntityRepository {
                     ASBIEP.GUID,
                     ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
+                    ASBIEP.DISPLAY_NAME,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                     APP_USER.as("owner").LOGIN_ID.as("owner"),
+                    APP_USER.as("owner").IS_DEVELOPER.as("owner_is_developer"),
+                    APP_USER.as("owner").IS_ADMIN.as("owner_is_admin"),
                     ASBIEP.BIZ_TERM,
                     ASBIEP.REMARK,
                     TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
@@ -506,21 +531,36 @@ public class BusinessInformationEntityRepository {
                     TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
                     APP_USER.as("updater").LOGIN_ID.as("last_update_user"),
                     TOP_LEVEL_ASBIEP.STATE,
+
                     TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID,
                     TOP_LEVEL_ASBIEP.SOURCE_ACTION,
                     TOP_LEVEL_ASBIEP.SOURCE_TIMESTAMP,
                     TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.as("source_release_id"),
                     ASCCP_MANIFEST.as("source_asccp_manifest").DEN.as("source_den"),
-                    RELEASE.as("source_release").RELEASE_NUM.as("source_release_num")));
+                    ASBIEP.as("source_asbiep").DISPLAY_NAME.as("source_display_name"),
+                    RELEASE.as("source_release").RELEASE_NUM.as("source_release_num"),
+
+                    TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID.as("based_top_level_asbiep_id"),
+                    TOP_LEVEL_ASBIEP.as("based").RELEASE_ID.as("based_top_level_asbiep_release_id"),
+                    RELEASE.as("based_release").RELEASE_NUM.as("based_top_level_asbiep_release_num"),
+                    ASCCP_MANIFEST.as("based_asccp_manifest").DEN.as("based_top_level_asbiep_den"),
+                    ASBIEP.as("based_asbiep").DISPLAY_NAME.as("based_top_level_asbiep_display_name")));
         }
 
         public List<Field> selectFields() {
             return this.selectFields;
         }
 
+        public SelectBieListArguments setLibraryId(BigInteger libraryId) {
+            if (libraryId != null) {
+                conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
+            }
+            return this;
+        }
+
         public SelectBieListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN, ASBIEP.DISPLAY_NAME));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
@@ -581,6 +621,24 @@ public class BusinessInformationEntityRepository {
                 conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
                         topLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
                 ));
+            }
+            return this;
+        }
+
+        public SelectBieListArguments setBasedTopLevelAsbiepIds(List<BigInteger> basedTopLevelAsbiepIds) {
+            if (!basedTopLevelAsbiepIds.isEmpty()) {
+                List<ULong> result = basedTopLevelAsbiepIds.stream()
+                        .map(e -> ULong.valueOf(e)).collect(Collectors.toList());
+                List<ULong> allInheritedTopLevelAsbiepIds = new ArrayList<>();
+                while (!result.isEmpty()) {
+                    allInheritedTopLevelAsbiepIds.addAll(result);
+                    result = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                            .from(TOP_LEVEL_ASBIEP)
+                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(result))
+                            .fetchInto(ULong.class);
+                }
+
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(allInheritedTopLevelAsbiepIds));
             }
             return this;
         }
@@ -842,14 +900,21 @@ public class BusinessInformationEntityRepository {
                 .join(APP_USER.as("owner")).on(APP_USER.as("owner").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
                 .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID))
+
                 .leftJoin(TOP_LEVEL_ASBIEP.as("source")).on(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("source").TOP_LEVEL_ASBIEP_ID))
                 .leftJoin(RELEASE.as("source_release")).on(TOP_LEVEL_ASBIEP.as("source").RELEASE_ID.eq(RELEASE.as("source_release").RELEASE_ID))
                 .leftJoin(ASBIEP.as("source_asbiep")).on(TOP_LEVEL_ASBIEP.as("source").ASBIEP_ID.eq(ASBIEP.as("source_asbiep").ASBIEP_ID))
                 .leftJoin(ASCCP_MANIFEST.as("source_asccp_manifest")).on(ASBIEP.as("source_asbiep").BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("source_asccp_manifest").ASCCP_MANIFEST_ID))
-                .leftJoin(ASCCP.as("source_asccp")).on(ASCCP_MANIFEST.as("source_asccp_manifest").ASCCP_ID.eq(ASCCP.as("source_asccp").ASCCP_ID));
+                .leftJoin(ASCCP.as("source_asccp")).on(ASCCP_MANIFEST.as("source_asccp_manifest").ASCCP_ID.eq(ASCCP.as("source_asccp").ASCCP_ID))
+
+                .leftJoin(TOP_LEVEL_ASBIEP.as("based")).on(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID))
+                .leftJoin(RELEASE.as("based_release")).on(TOP_LEVEL_ASBIEP.as("based").RELEASE_ID.eq(RELEASE.as("based_release").RELEASE_ID))
+                .leftJoin(ASBIEP.as("based_asbiep")).on(TOP_LEVEL_ASBIEP.as("based").ASBIEP_ID.eq(ASBIEP.as("based_asbiep").ASBIEP_ID))
+                .leftJoin(ASCCP_MANIFEST.as("based_asccp_manifest")).on(ASBIEP.as("based_asbiep").BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("based_asccp_manifest").ASCCP_MANIFEST_ID));
     }
 
     private <E> PaginationResponse<E> selectBieList(SelectBieListArguments arguments, Class<? extends E> type) {
@@ -963,6 +1028,7 @@ public class BusinessInformationEntityRepository {
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
 //                join w RELEASE to get RELEASE_NUM
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
 //                next two joins to get BIZ_CTX.NAME
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))
@@ -1015,6 +1081,7 @@ public class BusinessInformationEntityRepository {
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 //                join w RELEASE to get RELEASE_NUM
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 //                next two joins to get BIZ_CTX.NAME
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID))

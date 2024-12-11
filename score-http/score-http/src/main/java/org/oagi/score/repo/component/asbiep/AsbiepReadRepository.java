@@ -63,6 +63,14 @@ public class AsbiepReadRepository {
         return asbiepNode;
     }
 
+    public AsbiepNode getAsbiepNode(BigInteger asbiepId) {
+        AsbiepRecord asbiepRecord = dslContext.selectFrom(ASBIEP)
+                .where(ASBIEP.ASBIEP_ID.eq(ULong.valueOf(asbiepId)))
+                .fetchOne();
+        return getAsbiepNode(asbiepRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                asbiepRecord.getBasedAsccpManifestId().toBigInteger(), asbiepRecord.getHashPath());
+    }
+
     public AsbiepNode.Asbiep getAsbiep(BigInteger topLevelAsbiepId, String hashPath) {
         AsbiepNode.Asbiep asbiep = new AsbiepNode.Asbiep();
         asbiep.setUsed(true);
@@ -70,8 +78,9 @@ public class AsbiepReadRepository {
 
         AsbiepRecord asbiepRecord = getAsbiepByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (asbiepRecord != null) {
-
+            asbiep.setOwnerTopLevelAsbiepId(asbiepRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             asbiep.setAsbiepId(asbiepRecord.getAsbiepId().toBigInteger());
+            asbiep.setRoleOfAbieId(asbiepRecord.getRoleOfAbieId().toBigInteger());
             if (asbiepRecord.getRoleOfAbieId() != null) {
                 asbiep.setRoleOfAbieHashPath(dslContext.select(ABIE.HASH_PATH)
                         .from(ABIE)
@@ -92,6 +101,7 @@ public class AsbiepReadRepository {
             asbiep.setRemark(asbiepRecord.getRemark());
             asbiep.setBizTerm(asbiepRecord.getBizTerm());
             asbiep.setDefinition(asbiepRecord.getDefinition());
+            asbiep.setDisplayName(asbiepRecord.getDisplayName());
         }
 
         return asbiep;

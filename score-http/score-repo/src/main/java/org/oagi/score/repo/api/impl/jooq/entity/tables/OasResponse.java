@@ -221,60 +221,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
 
     @Override
     public List<ForeignKey<OasResponseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasOperationPath _oasOperation;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_operation</code> table.
-     */
-    public OasOperationPath oasOperation() {
-        if (_oasOperation == null)
-            _oasOperation = new OasOperationPath(this, Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, null);
-
-        return _oasOperation;
-    }
-
-    private transient OasMessageBodyPath _oasMessageBody;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_message_body</code>
-     * table.
-     */
-    public OasMessageBodyPath oasMessageBody() {
-        if (_oasMessageBody == null)
-            _oasMessageBody = new OasMessageBodyPath(this, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, null);
-
-        return _oasMessageBody;
-    }
-
-    private transient TopLevelAsbiepPath _oasResponseMetaHeaderTopLevelAsbiepIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the
-     * <code>oas_response_meta_header_top_level_asbiep_id_fk</code> key.
-     */
-    public TopLevelAsbiepPath oasResponseMetaHeaderTopLevelAsbiepIdFk() {
-        if (_oasResponseMetaHeaderTopLevelAsbiepIdFk == null)
-            _oasResponseMetaHeaderTopLevelAsbiepIdFk = new TopLevelAsbiepPath(this, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, null);
-
-        return _oasResponseMetaHeaderTopLevelAsbiepIdFk;
-    }
-
-    private transient TopLevelAsbiepPath _oasResponsePaginationTopLevelAsbiepIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table, via the
-     * <code>oas_response_pagination_top_level_asbiep_id_fk</code> key.
-     */
-    public TopLevelAsbiepPath oasResponsePaginationTopLevelAsbiepIdFk() {
-        if (_oasResponsePaginationTopLevelAsbiepIdFk == null)
-            _oasResponsePaginationTopLevelAsbiepIdFk = new TopLevelAsbiepPath(this, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK, null);
-
-        return _oasResponsePaginationTopLevelAsbiepIdFk;
+        return Arrays.asList(Keys.OAS_RESPONSE_CREATED_BY_FK, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
     private transient AppUserPath _oasResponseCreatedByFk;
@@ -301,6 +248,59 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
             _oasResponseLastUpdatedByFk = new AppUserPath(this, Keys.OAS_RESPONSE_LAST_UPDATED_BY_FK, null);
 
         return _oasResponseLastUpdatedByFk;
+    }
+
+    private transient TopLevelAsbiepPath _oasResponseMetaHeaderTopLevelAsbiepIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table, via the
+     * <code>oas_response_meta_header_top_level_asbiep_id_fk</code> key.
+     */
+    public TopLevelAsbiepPath oasResponseMetaHeaderTopLevelAsbiepIdFk() {
+        if (_oasResponseMetaHeaderTopLevelAsbiepIdFk == null)
+            _oasResponseMetaHeaderTopLevelAsbiepIdFk = new TopLevelAsbiepPath(this, Keys.OAS_RESPONSE_META_HEADER_TOP_LEVEL_ASBIEP_ID_FK, null);
+
+        return _oasResponseMetaHeaderTopLevelAsbiepIdFk;
+    }
+
+    private transient OasMessageBodyPath _oasMessageBody;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_message_body</code>
+     * table.
+     */
+    public OasMessageBodyPath oasMessageBody() {
+        if (_oasMessageBody == null)
+            _oasMessageBody = new OasMessageBodyPath(this, Keys.OAS_RESPONSE_OAS_MESSAGE_BODY_ID_FK, null);
+
+        return _oasMessageBody;
+    }
+
+    private transient OasOperationPath _oasOperation;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_operation</code> table.
+     */
+    public OasOperationPath oasOperation() {
+        if (_oasOperation == null)
+            _oasOperation = new OasOperationPath(this, Keys.OAS_RESPONSE_OAS_OPERATION_ID_FK, null);
+
+        return _oasOperation;
+    }
+
+    private transient TopLevelAsbiepPath _oasResponsePaginationTopLevelAsbiepIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
+     * table, via the
+     * <code>oas_response_pagination_top_level_asbiep_id_fk</code> key.
+     */
+    public TopLevelAsbiepPath oasResponsePaginationTopLevelAsbiepIdFk() {
+        if (_oasResponsePaginationTopLevelAsbiepIdFk == null)
+            _oasResponsePaginationTopLevelAsbiepIdFk = new TopLevelAsbiepPath(this, Keys.OAS_RESPONSE_PAGINATION_TOP_LEVEL_ASBIEP_ID_FK, null);
+
+        return _oasResponsePaginationTopLevelAsbiepIdFk;
     }
 
     private transient OasParameterLinkPath _oasParameterLink;

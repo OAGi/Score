@@ -19,11 +19,13 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {initFilter, loadBranch, saveBranch} from '../../../common/utility';
+import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
 import {PreferencesInfo, TableColumnsProperty} from '../../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../../common/search-bar/search-bar.component';
+import {Library} from '../../../library-management/domain/library';
+import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-oas-doc-assign-dialog',
@@ -32,8 +34,7 @@ import {SearchBarComponent} from '../../../common/search-bar/search-bar.componen
 })
 export class OasDocAssignDialogComponent implements OnInit {
 
-  title = 'Add BIE';
-  subtitle = 'Selected Top-Level ASBIEPs';
+  title = 'Add BIE For OpenAPI Document';
 
   get columns(): TableColumnsProperty[] {
     if (!this.preferencesInfo) {
@@ -151,6 +152,8 @@ export class OasDocAssignDialogComponent implements OnInit {
   oasDoc: OasDoc;
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  libraries: Library[] = [];
+  mappedLibraries: {library: Library, selected: boolean}[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -174,6 +177,7 @@ export class OasDocAssignDialogComponent implements OnInit {
     private openAPIService: OpenAPIService,
     private accountService: AccountListService,
     private releaseService: ReleaseService,
+    private libraryService: LibraryService,
     private auth: AuthService,
     private dialog: MatDialog,
     private location: Location,
@@ -196,50 +200,85 @@ export class OasDocAssignDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, releases, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
-      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-      const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
-      if (savedReleaseId) {
-        this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-        if (!this.request.release) {
-          this.request.release = this.releases[0];
-          saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
-      } else {
-        this.request.release = this.releases[0];
-      }
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.selectBieForOasDocList(true);
+      forkJoin([
+        this.accountService.getAccountNames(),
+        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([loginIds, releases, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
+
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.initReleases(releases);
+
+        this.selectBieForOasDocList(true);
+      });
+    });
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || !this.request.library.libraryId) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = releases.filter(e => !e.workingRelease);
+    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+    const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
+    if (savedReleaseId) {
+      this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+      if (!this.request.release) {
+        this.request.release = this.releases[0];
+        saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+      }
+    } else {
+      this.request.release = this.releases[0];
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.request.release.releaseId = 0;
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
     });
   }
 

@@ -10,6 +10,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px;
+  cursor: pointer; /* Makes the cursor a pointer */
+  transition: background-color 0.2s ease, border-radius 0.2s ease; /* Smooth background and border-radius transition */
+  border-radius: 4px; /* Ensures the default state has the same radius */
+}
+
+.column-selector .column:hover {
+  background-color: #f0f0f0; /* Light gray background on hover */
 }
 
 .column-selector .column mat-checkbox {

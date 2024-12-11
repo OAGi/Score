@@ -12,6 +12,7 @@ public class BieReuseReport {
     private String reusingDeprecatedReason;
     private String reusingDeprecatedRemark;
     private String reusingPropertyTerm;
+    private String reusingDisplayName;
     private String reusingDen;
     private String reusingGuid;
     private String reusingOwner;
@@ -27,6 +28,7 @@ public class BieReuseReport {
     private String reusedDeprecatedReason;
     private String reusedDeprecatedRemark;
     private String reusedPropertyTerm;
+    private String reusedDisplayName;
     private String reusedDen;
     private String reusedGuid;
     private String reusedOwner;

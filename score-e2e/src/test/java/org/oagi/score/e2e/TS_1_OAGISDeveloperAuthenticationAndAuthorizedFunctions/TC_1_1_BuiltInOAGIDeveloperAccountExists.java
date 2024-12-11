@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_1_OAGISDeveloperAuthenticationAndAuthorizedFunctions;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.openqa.selenium.WebElement;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.getSnackBar;
 
@@ -59,7 +59,7 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     @DisplayName("TC_1_TA_4")
     public void test_login_oagis_with_wrong_password() {
         SignInException exception = assertThrows(SignInException.class, () -> {
-            loginPage().signIn("oagis", randomAlphanumeric(5, 10));
+            loginPage().signIn("oagis", RandomStringUtils.secure().nextAlphanumeric(5, 10));
         });
 
         assertEquals("Invalid username or password", exception.getMessage());
@@ -68,7 +68,7 @@ public class TC_1_1_BuiltInOAGIDeveloperAccountExists extends BaseTest {
     @Test
     public void test_login_random_username() {
         SignInException exception = assertThrows(SignInException.class, () -> {
-            loginPage().signIn(randomAlphanumeric(5, 10), randomAlphanumeric(5, 10));
+            loginPage().signIn(RandomStringUtils.secure().nextAlphanumeric(5, 10), RandomStringUtils.secure().nextAlphanumeric(5, 10));
         });
 
         assertEquals("Invalid username or password", exception.getMessage());

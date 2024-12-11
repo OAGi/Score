@@ -210,31 +210,7 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
 
     @Override
     public List<ForeignKey<ModuleSetReleaseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK, Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK);
-    }
-
-    private transient ModuleSetPath _moduleSet;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set</code> table.
-     */
-    public ModuleSetPath moduleSet() {
-        if (_moduleSet == null)
-            _moduleSet = new ModuleSetPath(this, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK, null);
-
-        return _moduleSet;
-    }
-
-    private transient ReleasePath _release;
-
-    /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
-     */
-    public ReleasePath release() {
-        if (_release == null)
-            _release = new ReleasePath(this, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK, null);
-
-        return _release;
+        return Arrays.asList(Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK);
     }
 
     private transient AppUserPath _moduleSetReleaseAssignmentCreatedByFk;
@@ -261,6 +237,30 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
             _moduleSetReleaseAssignmentLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK, null);
 
         return _moduleSetReleaseAssignmentLastUpdatedByFk;
+    }
+
+    private transient ModuleSetPath _moduleSet;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set</code> table.
+     */
+    public ModuleSetPath moduleSet() {
+        if (_moduleSet == null)
+            _moduleSet = new ModuleSetPath(this, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK, null);
+
+        return _moduleSet;
+    }
+
+    private transient ReleasePath _release;
+
+    /**
+     * Get the implicit join path to the <code>oagi.release</code> table.
+     */
+    public ReleasePath release() {
+        if (_release == null)
+            _release = new ReleasePath(this, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK, null);
+
+        return _release;
     }
 
     private transient ModuleAccManifestPath _moduleAccManifest;

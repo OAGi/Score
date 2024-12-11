@@ -5,8 +5,10 @@ import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 import {ShortTag} from '../../../tag-management/domain/tag';
+import {Library} from '../../../library-management/domain/library';
 
 export class CcListRequest {
+  library: Library = new Library();
   release: SimpleRelease;
   types: string[] = [];
   states: string[] = [];
@@ -100,12 +102,12 @@ export class CcListRequest {
 
   toQuery(extras?): string {
     let params = new HttpParams()
+      .set('releaseId', '' + this.release.releaseId)
       .set('sortActive', this.page.sortActive)
       .set('sortDirection', this.page.sortDirection)
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    params = params.set('releaseId', '' + this.release.releaseId);
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
     }

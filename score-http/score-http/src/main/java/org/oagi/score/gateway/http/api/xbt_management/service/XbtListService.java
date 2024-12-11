@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.XBT;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.XBT_MANIFEST;
+import static org.jooq.impl.DSL.and;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,7 +21,7 @@ public class XbtListService {
     @Autowired
     private DSLContext dslContext;
 
-    public List<Xbt> getXbtSimpleList(AuthenticatedPrincipal user, BigInteger releaseId) {
+    public List<Xbt> getXbtSimpleList(AuthenticatedPrincipal user, BigInteger libraryId, BigInteger releaseId) {
 
         return dslContext.select(XBT.XBT_ID,
                 XBT_MANIFEST.XBT_MANIFEST_ID.as("manifestId"),
@@ -40,7 +40,12 @@ public class XbtListService {
                 XBT.IS_DEPRECATED
             ).from(XBT_MANIFEST)
                 .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                .where(XBT_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .join(RELEASE).on(XBT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId))
+                ))
                 .fetchInto(Xbt.class);
     }
 }

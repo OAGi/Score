@@ -2,7 +2,6 @@ package org.oagi.score.repo.api.bie.model;
 
 import org.oagi.score.repo.api.base.Auditable;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class BbieSc extends Auditable {
@@ -43,6 +42,8 @@ public class BbieSc extends Auditable {
     private String remark;
 
     private String bizTerm;
+
+    private String displayName;
 
     private String example;
 
@@ -210,6 +211,14 @@ public class BbieSc extends Auditable {
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getExample() {

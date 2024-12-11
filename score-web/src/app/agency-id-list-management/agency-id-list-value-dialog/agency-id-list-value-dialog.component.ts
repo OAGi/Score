@@ -11,6 +11,7 @@ import {hashCode} from '../../common/utility';
 export class AgencyIdListValueDialogComponent implements OnInit {
 
   _hashCode;
+  userRoles: string[] = [];
   isAddAction;
   actionName;
   agencyIdListValue: AgencyIdListValue;
@@ -24,10 +25,15 @@ export class AgencyIdListValueDialogComponent implements OnInit {
 
     this.agencyIdListValue = new AgencyIdListValue(data.agencyIdListValue);
     this.lastRevisionValue = data.lastRevisionValue;
+    this.userRoles = data.userRoles;
     this.agencyId = data.agencyId;
     this.isEditable = data.isEditable;
 
     this._hashCode = this.agencyIdListValue.hashCode;
+  }
+
+  get isDeveloper(): boolean {
+    return this.userRoles.includes('developer');
   }
 
   get hasRevision(): boolean {

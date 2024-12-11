@@ -13,6 +13,7 @@ public class Release {
     private String releaseNum;
     private String releaseNote;
     private String releaseLicense;
+    private BigInteger libraryId = BigInteger.ZERO;
     private BigInteger namespaceId = BigInteger.ZERO;
     private BigInteger createdBy = BigInteger.ZERO;
     private BigInteger lastUpdatedBy = BigInteger.ZERO;

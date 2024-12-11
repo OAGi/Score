@@ -6,6 +6,7 @@ import java.math.BigInteger;
 
 @Data
 public class ModuleSetRequest {
+    public BigInteger libraryId;
     public String name;
     public String description;
     public boolean createModuleSetRelease;

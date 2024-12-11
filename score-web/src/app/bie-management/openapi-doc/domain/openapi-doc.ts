@@ -6,6 +6,7 @@ import {base64Decode, base64Encode, hashCode4Array} from '../../../common/utilit
 import {ScoreUser} from '../../../authentication/domain/auth';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {ChangeListener} from '../../domain/bie-flat-tree';
+import {Library} from '../../../library-management/domain/library';
 
 export class OasDocListRequest {
   filters: {
@@ -94,7 +95,9 @@ export class OasDocListRequest {
 export class OasDoc {
   oasDocId: number;
   guid: string;
+  libraryId: number;
   releaseId: number;
+  workingRelease: boolean;
   openAPIVersion: string;
   title: string;
   description: string;
@@ -126,6 +129,7 @@ export interface SimpleOasDoc {
 }
 
 export class BieForOasDocListRequest {
+  library: Library = new Library();
   release: SimpleRelease;
   filters: {
     propertyTerm: string;
@@ -268,6 +272,7 @@ export class BieForOasDoc {
   oasOperationId: number;
   den: string;
   propertyTerm: string;
+  displayName: string;
   remark: string;
   guid: string;
   bizCtxId: number;
@@ -298,6 +303,7 @@ export class BieForOasDoc {
     this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
     this.den = obj && obj.den || '';
     this.propertyTerm = obj && obj.propertyTerm || '';
+    this.displayName = obj && obj.displayName || '';
     this.remark = obj && obj.remark || '';
     this.guid = obj && obj.guid || '';
     this.bizCtxId = obj && obj.bizCtxId || 0;

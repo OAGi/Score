@@ -43,7 +43,8 @@ public class CodeListController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CodeListForList> getCodeLists(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestParam(name = "releaseId") long releaseId,
+            @RequestParam(name = "libraryId") BigInteger libraryId,
+            @RequestParam(name = "releaseId") BigInteger releaseId,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "definition", required = false) String definition,
             @RequestParam(name = "module", required = false) String module,
@@ -65,6 +66,7 @@ public class CodeListController {
 
         CodeListForListRequest request = new CodeListForListRequest();
 
+        request.setLibraryId(libraryId);
         request.setReleaseId(releaseId);
         request.setName(name);
         request.setDefinition(definition);
@@ -175,14 +177,21 @@ public class CodeListController {
 
     @RequestMapping(value = "/code_list/delete", method = RequestMethod.POST)
     public ResponseEntity deleteCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                  @RequestBody DeleteCodeListRequest request) {
+                                         @RequestBody DeleteCodeListRequest request) {
         service.deleteCodeList(user, request.getCodeListManifestIds());
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/code_list/purge", method = RequestMethod.POST)
+    public ResponseEntity purgeCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                        @RequestBody PurgeCodeListRequest request) {
+        service.purgeCodeList(user, request.getCodeListManifestIds());
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/code_list/restore", method = RequestMethod.POST)
     public ResponseEntity restoreCodeList(@AuthenticationPrincipal AuthenticatedPrincipal user,
-                                  @RequestBody DeleteCodeListRequest request) {
+                                          @RequestBody DeleteCodeListRequest request) {
         service.restoreCodeList(user, request.getCodeListManifestIds());
         return ResponseEntity.noContent().build();
     }

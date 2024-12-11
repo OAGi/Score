@@ -43,11 +43,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_1")
     public void test_TA_1() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -77,11 +80,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_2")
     public void test_TA_2() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -113,11 +119,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_3")
     public void test_TA_3() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -144,11 +153,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_4")
     public void test_TA_4() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -165,14 +177,17 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_5")
     public void test_TA_5() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject release;
         CodeListObject codeList;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerB);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerB, library);
             codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(developerB, namespace, release, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, developerB);
         }
@@ -187,11 +202,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_6")
     public void test_TA_6() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject release;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -204,11 +222,14 @@ public class TC_11_2_CreatingABrandNewDeveloperCodeList extends BaseTest {
     @DisplayName("TC_11_2_TA_7")
     public void test_TA_7() {
         AppUserObject developer;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());

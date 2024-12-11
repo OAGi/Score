@@ -442,6 +442,32 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _appOauth2User;
     }
 
+    private transient AsbiePath _asbieCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
+     * via the <code>asbie_created_by_fk</code> key
+     */
+    public AsbiePath asbieCreatedByFk() {
+        if (_asbieCreatedByFk == null)
+            _asbieCreatedByFk = new AsbiePath(this, null, Keys.ASBIE_CREATED_BY_FK.getInverseKey());
+
+        return _asbieCreatedByFk;
+    }
+
+    private transient AsbiePath _asbieLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
+     * via the <code>asbie_last_updated_by_fk</code> key
+     */
+    public AsbiePath asbieLastUpdatedByFk() {
+        if (_asbieLastUpdatedByFk == null)
+            _asbieLastUpdatedByFk = new AsbiePath(this, null, Keys.ASBIE_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _asbieLastUpdatedByFk;
+    }
+
     private transient AsbiepPath _asbiepCreatedByFk;
 
     /**
@@ -468,30 +494,43 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _asbiepLastUpdatedByFk;
     }
 
-    private transient AsbiePath _asbieCreatedByFk;
+    private transient AsccPath _asccCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
-     * via the <code>asbie_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_created_by_fk</code> key
      */
-    public AsbiePath asbieCreatedByFk() {
-        if (_asbieCreatedByFk == null)
-            _asbieCreatedByFk = new AsbiePath(this, null, Keys.ASBIE_CREATED_BY_FK.getInverseKey());
+    public AsccPath asccCreatedByFk() {
+        if (_asccCreatedByFk == null)
+            _asccCreatedByFk = new AsccPath(this, null, Keys.ASCC_CREATED_BY_FK.getInverseKey());
 
-        return _asbieCreatedByFk;
+        return _asccCreatedByFk;
     }
 
-    private transient AsbiePath _asbieLastUpdatedByFk;
+    private transient AsccPath _asccLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
-     * via the <code>asbie_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_last_updated_by_fk</code> key
      */
-    public AsbiePath asbieLastUpdatedByFk() {
-        if (_asbieLastUpdatedByFk == null)
-            _asbieLastUpdatedByFk = new AsbiePath(this, null, Keys.ASBIE_LAST_UPDATED_BY_FK.getInverseKey());
+    public AsccPath asccLastUpdatedByFk() {
+        if (_asccLastUpdatedByFk == null)
+            _asccLastUpdatedByFk = new AsccPath(this, null, Keys.ASCC_LAST_UPDATED_BY_FK.getInverseKey());
 
-        return _asbieLastUpdatedByFk;
+        return _asccLastUpdatedByFk;
+    }
+
+    private transient AsccPath _asccOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
+     * via the <code>ascc_owner_user_id_fk</code> key
+     */
+    public AsccPath asccOwnerUserIdFk() {
+        if (_asccOwnerUserIdFk == null)
+            _asccOwnerUserIdFk = new AsccPath(this, null, Keys.ASCC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _asccOwnerUserIdFk;
     }
 
     private transient AsccpPath _asccpCreatedByFk;
@@ -546,71 +585,6 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _asccpOwnerUserIdFk;
     }
 
-    private transient AsccPath _asccCreatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_created_by_fk</code> key
-     */
-    public AsccPath asccCreatedByFk() {
-        if (_asccCreatedByFk == null)
-            _asccCreatedByFk = new AsccPath(this, null, Keys.ASCC_CREATED_BY_FK.getInverseKey());
-
-        return _asccCreatedByFk;
-    }
-
-    private transient AsccPath _asccLastUpdatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_last_updated_by_fk</code> key
-     */
-    public AsccPath asccLastUpdatedByFk() {
-        if (_asccLastUpdatedByFk == null)
-            _asccLastUpdatedByFk = new AsccPath(this, null, Keys.ASCC_LAST_UPDATED_BY_FK.getInverseKey());
-
-        return _asccLastUpdatedByFk;
-    }
-
-    private transient AsccPath _asccOwnerUserIdFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_owner_user_id_fk</code> key
-     */
-    public AsccPath asccOwnerUserIdFk() {
-        if (_asccOwnerUserIdFk == null)
-            _asccOwnerUserIdFk = new AsccPath(this, null, Keys.ASCC_OWNER_USER_ID_FK.getInverseKey());
-
-        return _asccOwnerUserIdFk;
-    }
-
-    private transient BbiepPath _bbiepCreatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
-     * via the <code>bbiep_created_by_fk</code> key
-     */
-    public BbiepPath bbiepCreatedByFk() {
-        if (_bbiepCreatedByFk == null)
-            _bbiepCreatedByFk = new BbiepPath(this, null, Keys.BBIEP_CREATED_BY_FK.getInverseKey());
-
-        return _bbiepCreatedByFk;
-    }
-
-    private transient BbiepPath _bbiepLastUpdatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
-     * via the <code>bbiep_last_updated_by_fk</code> key
-     */
-    public BbiepPath bbiepLastUpdatedByFk() {
-        if (_bbiepLastUpdatedByFk == null)
-            _bbiepLastUpdatedByFk = new BbiepPath(this, null, Keys.BBIEP_LAST_UPDATED_BY_FK.getInverseKey());
-
-        return _bbiepLastUpdatedByFk;
-    }
-
     private transient BbiePath _bbieCreatedByFk;
 
     /**
@@ -663,6 +637,71 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _bbieScLastUpdatedByFk;
     }
 
+    private transient BbiepPath _bbiepCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
+     * via the <code>bbiep_created_by_fk</code> key
+     */
+    public BbiepPath bbiepCreatedByFk() {
+        if (_bbiepCreatedByFk == null)
+            _bbiepCreatedByFk = new BbiepPath(this, null, Keys.BBIEP_CREATED_BY_FK.getInverseKey());
+
+        return _bbiepCreatedByFk;
+    }
+
+    private transient BbiepPath _bbiepLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
+     * via the <code>bbiep_last_updated_by_fk</code> key
+     */
+    public BbiepPath bbiepLastUpdatedByFk() {
+        if (_bbiepLastUpdatedByFk == null)
+            _bbiepLastUpdatedByFk = new BbiepPath(this, null, Keys.BBIEP_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bbiepLastUpdatedByFk;
+    }
+
+    private transient BccPath _bccCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_created_by_fk</code> key
+     */
+    public BccPath bccCreatedByFk() {
+        if (_bccCreatedByFk == null)
+            _bccCreatedByFk = new BccPath(this, null, Keys.BCC_CREATED_BY_FK.getInverseKey());
+
+        return _bccCreatedByFk;
+    }
+
+    private transient BccPath _bccLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_last_updated_by_fk</code> key
+     */
+    public BccPath bccLastUpdatedByFk() {
+        if (_bccLastUpdatedByFk == null)
+            _bccLastUpdatedByFk = new BccPath(this, null, Keys.BCC_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _bccLastUpdatedByFk;
+    }
+
+    private transient BccPath _bccOwnerUserIdFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
+     * via the <code>bcc_owner_user_id_fk</code> key
+     */
+    public BccPath bccOwnerUserIdFk() {
+        if (_bccOwnerUserIdFk == null)
+            _bccOwnerUserIdFk = new BccPath(this, null, Keys.BCC_OWNER_USER_ID_FK.getInverseKey());
+
+        return _bccOwnerUserIdFk;
+    }
+
     private transient BccpPath _bccpCreatedByFk;
 
     /**
@@ -713,45 +752,6 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _bccpOwnerUserIdFk = new BccpPath(this, null, Keys.BCCP_OWNER_USER_ID_FK.getInverseKey());
 
         return _bccpOwnerUserIdFk;
-    }
-
-    private transient BccPath _bccCreatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_created_by_fk</code> key
-     */
-    public BccPath bccCreatedByFk() {
-        if (_bccCreatedByFk == null)
-            _bccCreatedByFk = new BccPath(this, null, Keys.BCC_CREATED_BY_FK.getInverseKey());
-
-        return _bccCreatedByFk;
-    }
-
-    private transient BccPath _bccLastUpdatedByFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_last_updated_by_fk</code> key
-     */
-    public BccPath bccLastUpdatedByFk() {
-        if (_bccLastUpdatedByFk == null)
-            _bccLastUpdatedByFk = new BccPath(this, null, Keys.BCC_LAST_UPDATED_BY_FK.getInverseKey());
-
-        return _bccLastUpdatedByFk;
-    }
-
-    private transient BccPath _bccOwnerUserIdFk;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_owner_user_id_fk</code> key
-     */
-    public BccPath bccOwnerUserIdFk() {
-        if (_bccOwnerUserIdFk == null)
-            _bccOwnerUserIdFk = new BccPath(this, null, Keys.BCC_OWNER_USER_ID_FK.getInverseKey());
-
-        return _bccOwnerUserIdFk;
     }
 
     private transient BiePackagePath _biePackageCreatedByFk;

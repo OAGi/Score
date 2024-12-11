@@ -190,19 +190,7 @@ public class Comment extends TableImpl<CommentRecord> {
 
     @Override
     public List<ForeignKey<CommentRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.COMMENT_PREV_COMMENT_ID_FK, Keys.COMMENT_CREATED_BY_FK);
-    }
-
-    private transient CommentPath _comment;
-
-    /**
-     * Get the implicit join path to the <code>oagi.comment</code> table.
-     */
-    public CommentPath comment() {
-        if (_comment == null)
-            _comment = new CommentPath(this, Keys.COMMENT_PREV_COMMENT_ID_FK, null);
-
-        return _comment;
+        return Arrays.asList(Keys.COMMENT_CREATED_BY_FK, Keys.COMMENT_PREV_COMMENT_ID_FK);
     }
 
     private transient AppUserPath _appUser;
@@ -215,6 +203,18 @@ public class Comment extends TableImpl<CommentRecord> {
             _appUser = new AppUserPath(this, Keys.COMMENT_CREATED_BY_FK, null);
 
         return _appUser;
+    }
+
+    private transient CommentPath _comment;
+
+    /**
+     * Get the implicit join path to the <code>oagi.comment</code> table.
+     */
+    public CommentPath comment() {
+        if (_comment == null)
+            _comment = new CommentPath(this, Keys.COMMENT_PREV_COMMENT_ID_FK, null);
+
+        return _comment;
     }
 
     @Override

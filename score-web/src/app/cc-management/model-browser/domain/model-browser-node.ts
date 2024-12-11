@@ -16,7 +16,7 @@ export interface ModelBrowserNode extends FlatNode {
 
   required?: boolean;
   locked?: boolean;
-  derived?: boolean;
+  reused?: boolean;
 
   isGroup: boolean;
   isChanged: boolean;
@@ -111,12 +111,12 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
       });
   }
 
-  get derived(): boolean {
-    return this._derived || false;
+  get reused(): boolean {
+    return this._reused || false;
   }
 
-  set derived(derived: boolean) {
-    this._derived = derived;
+  set reused(reused: boolean) {
+    this._reused = reused;
   }
 
   get hashCode() {
@@ -165,7 +165,7 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
   _expandable: boolean = undefined;
   required?: boolean;
   locked?: boolean;
-  _derived?: boolean;
+  _reused?: boolean;
   isCycle = false;
 
   parent?: ModelBrowserNode;
@@ -377,7 +377,7 @@ export class ModelBrowserAsccpNode extends ModelBrowserAccNode {
 
   get asccpPath(): string {
     if (!this._asccpPath) {
-      if (this.derived) {
+      if (this.reused) {
         this._asccpPath = 'ASCCP-' + this.asccpNode.manifestId;
       } else {
         this._asccpPath = [this.asccPath, 'ASCCP-' + this.asccpNode.manifestId].join('>');
@@ -386,12 +386,12 @@ export class ModelBrowserAsccpNode extends ModelBrowserAccNode {
     return this._asccpPath;
   }
 
-  get derived(): boolean {
-    return this._derived || false;
+  get reused(): boolean {
+    return this._reused || false;
   }
 
-  set derived(derived: boolean) {
-    this._derived = derived;
+  set reused(reused: boolean) {
+    this._reused = reused;
     this._asccPath = undefined;
   }
 
@@ -732,6 +732,7 @@ export class AsccpDetail {
 
   asccpManifestId: number;
   asccManifestId: number;
+  libraryName: string;
   releaseNum: string;
   owner: string;
   guid: string;
@@ -1032,6 +1033,7 @@ export class ModelBrowserAccNodeDetail extends ModelBrowserNodeDetail {
 
   updateAsccp(asccp: any) {
     this.asccp.asccpManifestId = asccp.manifestId;
+    this.asccp.libraryName = asccp.libraryName;
     this.asccp.releaseNum = asccp.releaseNum;
     this.asccp.owner = asccp.owner;
     this.asccp.guid = asccp.guid;
@@ -1697,7 +1699,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = ascc.intermediateAccNodes;
-    if (parent.derived) {
+    if (parent.reused) {
       node.locked = true;
     } else {
       node.locked = parent.locked;
@@ -1726,7 +1728,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = bcc.intermediateAccNodes;
-    if (parent.derived) {
+    if (parent.reused) {
       node.locked = true;
     } else {
       node.locked = parent.locked;
@@ -1746,7 +1748,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     node.name = node.bdtScNode.propertyTerm + ' ' + node.bdtScNode.representationTerm;
     node.level = parent.level + 1;
     node.parent = parent;
-    if (parent.derived) {
+    if (parent.reused) {
       node.locked = true;
     } else {
       node.locked = parent.locked;

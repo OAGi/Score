@@ -39,11 +39,27 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
+     * Setter for <code>oagi.release.library_id</code>. A foreign key pointed to
+     * a library of the current record.
+     */
+    public void setLibraryId(ULong value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>oagi.release.library_id</code>. A foreign key pointed to
+     * a library of the current record.
+     */
+    public ULong getLibraryId() {
+        return (ULong) get(1);
+    }
+
+    /**
      * Setter for <code>oagi.release.guid</code>. A globally unique identifier
      * (GUID).
      */
     public void setGuid(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
@@ -51,7 +67,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * (GUID).
      */
     public String getGuid() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
@@ -59,7 +75,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * 10.0, 10.1, etc. 
      */
     public void setReleaseNum(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
@@ -67,7 +83,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * 10.0, 10.1, etc. 
      */
     public String getReleaseNum() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
@@ -75,7 +91,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * associated with the release.
      */
     public void setReleaseNote(String value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
@@ -83,7 +99,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * associated with the release.
      */
     public String getReleaseNote() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
@@ -91,7 +107,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * with the release.
      */
     public void setReleaseLicense(String value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
@@ -99,7 +115,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * with the release.
      */
     public String getReleaseLicense() {
-        return (String) get(4);
+        return (String) get(5);
     }
 
     /**
@@ -111,7 +127,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * override at the module level.
      */
     public void setNamespaceId(ULong value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
@@ -123,7 +139,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * override at the module level.
      */
     public ULong getNamespaceId() {
-        return (ULong) get(5);
+        return (ULong) get(6);
     }
 
     /**
@@ -131,7 +147,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * APP_USER table identifying user who created the namespace.
      */
     public void setCreatedBy(ULong value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
@@ -139,7 +155,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * APP_USER table identifying user who created the namespace.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(6);
+        return (ULong) get(7);
     }
 
     /**
@@ -147,7 +163,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * APP_USER table identifying the user who last updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -155,7 +171,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * APP_USER table identifying the user who last updated the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(7);
+        return (ULong) get(8);
     }
 
     /**
@@ -163,7 +179,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -171,7 +187,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(8);
+        return (LocalDateTime) get(9);
     }
 
     /**
@@ -179,7 +195,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -187,7 +203,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(9);
+        return (LocalDateTime) get(10);
     }
 
     /**
@@ -195,7 +211,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * life cycle state of the Release.
      */
     public void setState(String value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
@@ -203,7 +219,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
      * life cycle state of the Release.
      */
     public String getState() {
-        return (String) get(10);
+        return (String) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -229,10 +245,11 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     /**
      * Create a detached, initialised ReleaseRecord
      */
-    public ReleaseRecord(ULong releaseId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state) {
+    public ReleaseRecord(ULong releaseId, ULong libraryId, String guid, String releaseNum, String releaseNote, String releaseLicense, ULong namespaceId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, String state) {
         super(Release.RELEASE);
 
         setReleaseId(releaseId);
+        setLibraryId(libraryId);
         setGuid(guid);
         setReleaseNum(releaseNum);
         setReleaseNote(releaseNote);

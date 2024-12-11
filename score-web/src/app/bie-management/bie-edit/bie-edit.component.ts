@@ -1,5 +1,5 @@
-import {Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {faRecycle} from '@fortawesome/free-solid-svg-icons';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -17,8 +17,8 @@ import {
 } from '../bie-edit/domain/bie-edit-node';
 import {
   AbieFlatNode,
-  AsbiepFlatNode,
-  BbiepFlatNode,
+  AsbiepFlatNode, BbieDetail,
+  BbiepFlatNode, BbieScDetail,
   BbieScFlatNode,
   BieEditAbieNodeDetail,
   BieEditAsbiepNodeDetail,
@@ -65,6 +65,7 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   faRecycle = faRecycle;
+  faSitemap = faSitemap;
   loading = false;
   paddingPixel = 12;
 
@@ -76,6 +77,66 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
+
+  // For renaming 'displayName' of a node.
+  renamingNode: BieFlatNode;
+  originalDisplayName: string;
+
+  startChangingDisplayName(node: BieFlatNode, $event?: MouseEvent): void {
+    if (!this.canChangeDisplayName(node)) {
+      return;
+    }
+
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    this.renamingNode = node;
+    this.cdr.detectChanges();
+
+    if (node.displayName) {
+      this.originalDisplayName = node.displayName;
+    } else {
+      node.displayName = node.name;
+      this.originalDisplayName = undefined;
+    }
+
+    setTimeout(() => {
+      const editInput = this.el.nativeElement.querySelector('.edit-input');
+      if (editInput) {
+        this.renderer.selectRootElement(editInput).focus();
+        this.renderer.selectRootElement(editInput).select();
+      }
+    });
+  }
+
+  stopChangingDisplayName(revert: boolean = false): void {
+    if (revert) {
+      this.renamingNode.displayName = this.originalDisplayName;  // Revert the value
+    }
+    this.renamingNode = undefined;
+    this.cdr.detectChanges();
+  }
+
+  @HostListener('document:click', ['$event.target'])
+  onClickOutside(targetElement: HTMLElement): void {
+    const clickedInside = targetElement.closest('.mat-tree-node');
+    if (!clickedInside || !this.renamingNode) {
+      this.stopChangingDisplayName();
+    }
+  }
+
+  // Listen for 'esc' key press within the input
+  @HostListener('document:keydown.escape', ['$event'])
+  cancelEditing($event: KeyboardEvent): void {
+    if (this.renamingNode) {
+      this.stopChangingDisplayName(true);
+      $event.preventDefault();
+    }
+  }
+  // End of 'displayName'
+
   isUpdating = false;
   _versionChanged: boolean;
   _changedVersionValue: string;
@@ -92,6 +153,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   reusedBusinessContexts: BusinessContext[] = [];
   reusedNode: BieEditNode;
   reusedNodeDetail: BieEditAsbiepNodeDetail;
+
+  /* business contexts in base BIE */
+  basedBusinessContexts?: BusinessContext[] = [];
+  baseNode?: BieEditAbieNode; // If 'rootNode' has basedTopLevelAsbiepId, this must not be null.
+
+  /* reused base BIE */
+  reusedBaseBusinessContexts: BusinessContext[] = [];
+  reusedBaseNode: BieEditNode;
+  reusedBaseNodeDetail: BieEditAsbiepNodeDetail;
 
   /* cardinality management */
   bieCardinalityMin: FormControl;
@@ -164,6 +234,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               private auth: AuthService,
               private stompService: RxStompService,
               private clipboard: Clipboard,
+              private renderer: Renderer2,
+              private el: ElementRef,
+              private cdr: ChangeDetectorRef,
               public webPageInfo: WebPageInfoService) {
   }
 
@@ -213,26 +286,43 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
-      this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
-      this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
-      this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
-      // Issue #1254
-      // Initial expanding by the query path
-      const url = this.router.url;
-      const topLevelAsbiepId = this.topLevelAsbiepId.toString();
-      const queryPath = url.substring(url.indexOf(topLevelAsbiepId) + topLevelAsbiepId.length + 1);
+      const doAfter = () => {
+        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
+        this.dataSource.init();
+        this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+        this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
-      if (!!queryPath) {
-        this.goToPath(queryPath);
+        // Issue #1254
+        // Initial expanding by the query path
+        const url = this.router.url;
+        const topLevelAsbiepId = this.topLevelAsbiepId.toString();
+        const queryPath = url.substring(url.indexOf(topLevelAsbiepId) + topLevelAsbiepId.length + 1);
+
+        if (!!queryPath) {
+          this.goToPath(queryPath);
+        } else {
+          this.onClick(this.dataSource.data[0]);
+        }
+
+        this.loading = false;
+      };
+
+      if (!!rootNode.basedTopLevelAsbiepId) {
+        forkJoin([
+          this.service.getRootNode(rootNode.basedTopLevelAsbiepId),
+          this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(rootNode.basedTopLevelAsbiepId),
+          this.service.getUsedBieList(rootNode.basedTopLevelAsbiepId)
+        ]).subscribe(([baseNode, basedBizCtxResp, baseUsedBieList]) => {
+          this.baseNode = new BieEditAbieNode(baseNode);
+          this.basedBusinessContexts = basedBizCtxResp.list;
+          database.setBaseUsedBieList(baseUsedBieList);
+          doAfter();
+        });
       } else {
-        this.onClick(this.dataSource.data[0]);
+        doAfter();
       }
-
-      this.loading = false;
-      return;
     }, err => {
       let errorMessage;
       if (err.status === 403) {
@@ -323,22 +413,45 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.valueDomainFilterValues(detailNode);
       this.assignVersionToVersionIdIfPossible(node);
 
-      if (node.bieType.toUpperCase() === 'ASBIEP' && node.derived) {
-        this.service.getRootNode(node.topLevelAsbiepId).subscribe(resp => {
-          this.reusedNode = resp as BieEditAbieNode;
+      if (node.bieType.toUpperCase() === 'ASBIEP' && node.reused) {
+        forkJoin([
+          this.service.getRootNode(node.topLevelAsbiepId),
           this.service.getDetail(node.topLevelAsbiepId, 'ASBIEP',
-            resp.asccpManifestId, (node as AsbiepFlatNode).asbiepPath).subscribe(detail => {
-            this.reusedNodeDetail = detail as BieEditAsbiepNodeDetail;
-          });
+            (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
+          this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(node.topLevelAsbiepId)
+        ]).subscribe(([resp, detail, bizCtxResp]) => {
+          this.reusedNode = resp as BieEditAbieNode;
+          this.reusedNodeDetail = detail as BieEditAsbiepNodeDetail;
+          this.reusedBusinessContexts = bizCtxResp.list;
+
+          if (node.inherited) {
+            if (this.asAsbiepDetail(node).asbie.toAsbiepId !== this.asAsbiepDetail(node).base.asbie.toAsbiepId) {
+              const inheritedReuseTopLevelAsbiepId = this.asAsbiepDetail(node).base.asbiep.ownerTopLevelAsbiepId;
+              forkJoin([
+                this.service.getRootNode(inheritedReuseTopLevelAsbiepId),
+                this.service.getDetail(inheritedReuseTopLevelAsbiepId, 'ASBIEP',
+                  (node as AsbiepFlatNode).asccpNode.manifestId, (node as AsbiepFlatNode).asbiepPath),
+                this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(inheritedReuseTopLevelAsbiepId)
+              ]).subscribe(([baseResp, baseDetail, baseBizCtxResp]) => {
+                this.reusedBaseNode = baseResp as BieEditAbieNode;
+                this.reusedBaseNodeDetail = baseDetail as BieEditAsbiepNodeDetail;
+                this.reusedBaseBusinessContexts = baseBizCtxResp.list;
+              });
+            } else {
+              this.reusedBaseNode = this.reusedNode;
+              this.reusedBaseNodeDetail = this.reusedNodeDetail;
+              this.reusedBaseBusinessContexts = this.reusedBusinessContexts;
+            }
+          }
         });
-        this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(node.topLevelAsbiepId)
-          .subscribe(bizCtxResp => {
-            this.reusedBusinessContexts = bizCtxResp.list;
-          });
       } else {
         this.reusedNode = undefined;
         this.reusedNodeDetail = undefined;
         this.reusedBusinessContexts = [];
+
+        this.reusedBaseNode = undefined;
+        this.reusedBaseNodeDetail = undefined;
+        this.reusedBaseBusinessContexts = [];
       }
     });
   }
@@ -351,6 +464,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
+    // Skip if the target is an input, textarea, or contenteditable element
+    const target = $event.target as HTMLElement;
+    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    if (isInputField) {
+      return;
+    }
+
     const charCode = $event.key?.toLowerCase();
 
     // Handle 'Ctrl/Command+S'
@@ -364,6 +484,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
+    // Skip if the target is an input, textarea, or contenteditable element
+    const target = $event.target as HTMLElement;
+    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    if (isInputField) {
+      return;
+    }
+
     if ($event.key === 'ArrowDown') {
       this.cursorNode = this.searcher.next(this.cursorNode);
     } else if ($event.key === 'ArrowUp') {
@@ -427,7 +554,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  openNewEditBieTab(node: BieFlatNode) {
+  openNewEditBieTab(node: BieFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
     window.open('/profile_bie/' + node.topLevelAsbiepId, '_blank');
   }
 
@@ -492,7 +624,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (node.required && this.used(node)) {
       return false;
     }
-    return this.canEdit && !node.locked && !node.isCycle;
+    return this.canEdit && !node.inherited && !node.locked && !node.isCycle;
   }
 
   used(node: BieFlatNode): boolean {
@@ -535,14 +667,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (!node) {
       return false;
     }
-    return !node.locked && !node.isCycle && !node.derived;
+    return !node.locked && !node.isCycle && !node.reused;
   }
 
   isCardinalityEditable(node: BieFlatNode): boolean {
     if (!node) {
       return false;
     }
-    return !node.locked && !node.isCycle && !node.derived;
+    return !node.locked && !node.isCycle && !node.reused;
   }
 
   get isChanged(): boolean {
@@ -558,6 +690,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   toggleTreeUsed(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
+      // Using $event.preventDefault() prevents the [checked] behavior from functioning correctly.
       $event.stopPropagation();
     }
 
@@ -610,15 +743,31 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   canCreateBIEFromThis(node: BieFlatNode): boolean {
-    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.derived;
+    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.reused;
   }
 
   canReuseBIE(node: BieFlatNode): boolean {
-    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.derived;
+    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && !node.reused;
   }
 
   canRemoveReusedBIE(node: BieFlatNode): boolean {
-    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && node.derived;
+    return !!node && node.bieType.toUpperCase() === 'ASBIEP' && !node.locked && node.reused;
+  }
+
+  canOverrideBaseReusedBIE(node: BieFlatNode): boolean {
+    return this.canRemoveReusedBIE(node) && node.inherited;
+  }
+
+  canChangeDisplayName(node: BieFlatNode): boolean {
+    return !!node && this.canEdit && !node.reused && !node.locked;
+  }
+
+  canUseBaseBIE(node: BieFlatNode): boolean {
+    return !!node && node.level === 0 && !node.inherited;
+  }
+
+  canRemoveBaseBIE(node: BieFlatNode): boolean {
+    return !!node && node.level === 0 && node.inherited;
   }
 
   copyPath(node: BieFlatNode) {
@@ -636,8 +785,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  copyLink(node: BieFlatNode, $event?) {
-    if ($event) {
+  copyLink(node: BieFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
       $event.preventDefault();
       $event.stopPropagation();
     }
@@ -665,37 +814,59 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
     const expandedNodes = this.dataSource.data.filter(e => e.expanded);
     this.loading = true;
+
     forkJoin([
       this.service.getGraphNode(this.topLevelAsbiepId),
       this.service.getUsedBieList(this.topLevelAsbiepId),
       this.service.getRefBieList(this.topLevelAsbiepId),
-    ]).subscribe(([ccGraph, usedBieList, refBieList]) => {
+      this.service.getRootNode(this.topLevelAsbiepId)
+    ]).subscribe((
+      [ccGraph, usedBieList, refBieList, rootNode]) => {
+      this.initRootNode(rootNode);
+
+      const doAfter = () => {
+        this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
+        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
+        this.dataSource.init();
+
+        // recover the tree expansion status
+        for (const expandedNode of expandedNodes) {
+          for (const datum of this.dataSource.data) {
+            if (expandedNode.hashPath === datum.hashPath && !datum.expanded) {
+              this.dataSource.expand(datum);
+              break;
+            }
+          }
+        }
+        // recover the selected node.
+        if (!!selectedNodeHashPath) {
+          for (const datum of this.dataSource.data) {
+            if (datum.hashPath === selectedNodeHashPath) {
+              this.onClick(datum);
+              break;
+            }
+          }
+        }
+
+        this.loading = false;
+      };
+
       const database = new BieFlatNodeDatabase<BieFlatNode>(ccGraph,
         this.rootNode, this.topLevelAsbiepId, usedBieList, refBieList);
-      this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, [this,]);
-      this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
-      this.dataSource.init();
-
-      // recover the tree expansion status
-      for (const expandedNode of expandedNodes) {
-        for (const datum of this.dataSource.data) {
-          if (expandedNode.hashPath === datum.hashPath && !datum.expanded) {
-            this.dataSource.expand(datum);
-            break;
-          }
-        }
+      if (!!this.rootNode.basedTopLevelAsbiepId) {
+        forkJoin([
+          this.service.getRootNode(rootNode.basedTopLevelAsbiepId),
+          this.bizCtxService.getBusinessContextsByTopLevelAsbiepId(rootNode.basedTopLevelAsbiepId),
+          this.service.getUsedBieList(rootNode.basedTopLevelAsbiepId)
+        ]).subscribe(([baseNode, basedBizCtxResp, baseUsedBieList]) => {
+          this.baseNode = new BieEditAbieNode(baseNode);
+          this.basedBusinessContexts = basedBizCtxResp.list;
+          database.setBaseUsedBieList(baseUsedBieList);
+          doAfter();
+        });
+      } else {
+        doAfter();
       }
-      // recover the selected node.
-      if (!!selectedNodeHashPath) {
-        for (const datum of this.dataSource.data) {
-          if (datum.hashPath === selectedNodeHashPath) {
-            this.onClick(datum);
-            break;
-          }
-        }
-      }
-
-      this.loading = false;
     });
   }
 
@@ -707,8 +878,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     const asbiepNode = (node as AsbiepFlatNode);
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
+        title: 'Select Profile BIE to reuse',
         asccpManifestId: asbiepNode.asccpNode.manifestId,
         den: asbiepNode.asccpNode.den,
+        libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
         topLevelAsbiepId: this.topLevelAsbiepId
       },
@@ -781,6 +954,86 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.isUpdating = false;
         })).subscribe(_ => {
         this.reloadTree(node);
+      });
+    });
+  }
+
+  removeOverrideReusedBIE(node: BieFlatNode) {
+    const asbiepNode = (node as AsbiepFlatNode);
+    // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
+    this.service.getDetail((node.parent as AsbiepFlatNode).basedTopLevelAsbiepId, 'ASBIE',
+      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(baseAsbie => {
+      this.service.getDetailById((baseAsbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(baseAsbiep => {
+        const baseReusedTopLevelAsbiepId = (baseAsbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
+
+        if (!asbiepNode.used) {
+          this.toggleTreeUsed(asbiepNode);
+        }
+        this.updateDetails(asbiepNode.parents, () => {
+          this.isUpdating = true;
+          /*
+           * The reuse ASBIEP is referencing the topLevelAsbiepId of the Reuse BIE,
+           * so this will be overwritten with the current topLevelAsbiepId.
+           */
+          asbiepNode.topLevelAsbiepId = this.rootNode.topLevelAsbiepId;
+          this.service.reuseBIE(asbiepNode, baseReusedTopLevelAsbiepId)
+            .pipe(finalize(() => this.isUpdating = false)).subscribe(__ => {
+            this.reloadTree(node);
+          });
+        });
+      });
+    });
+  }
+
+  overrideBaseReusedBIE(node: BieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const asbiepNode = (node as AsbiepFlatNode);
+    // Base.ASBIE -> ASBIEP.OwnerTopLevelAsbiepId = Base Reuse BIE
+    this.service.getDetail(asbiepNode.parent.basedTopLevelAsbiepId, 'ASBIE',
+      (node as AsbiepFlatNode).asccNode.manifestId, (node as AsbiepFlatNode).asbiePath).subscribe(asbie => {
+      this.service.getDetailById((asbie as BieEditAsbiepNodeDetail).asbie.toAsbiepId, 'ASBIEP').subscribe(asbiep => {
+        const baseReusedTopLevelAsbiepId = (asbiep as BieEditAsbiepNodeDetail).asbiep.ownerTopLevelAsbiepId;
+
+        const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
+          data: {
+            title: 'Select Profile BIE to reuse',
+            asccpManifestId: asbiepNode.asccpNode.manifestId,
+            den: asbiepNode.asccpNode.den,
+            libraryId: this.rootNode.libraryId,
+            releaseId: this.rootNode.releaseId,
+            topLevelAsbiepId: this.topLevelAsbiepId,
+            basedTopLevelAsbiepId: baseReusedTopLevelAsbiepId
+          },
+          width: '100%',
+          maxWidth: '100%',
+          height: '100%',
+          maxHeight: '100%',
+          autoFocus: false
+        });
+        dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+          if (!selectedTopLevelAsbiepId) {
+            return;
+          }
+
+          if (!asbiepNode.used) {
+            this.toggleTreeUsed(asbiepNode);
+          }
+          this.updateDetails(asbiepNode.parents, () => {
+            this.isUpdating = true;
+            /*
+             * The reuse ASBIEP is referencing the topLevelAsbiepId of the Reuse BIE,
+             * so this will be overwritten with the current topLevelAsbiepId.
+             */
+            asbiepNode.topLevelAsbiepId = this.rootNode.topLevelAsbiepId;
+            this.service.reuseBIE(asbiepNode, selectedTopLevelAsbiepId)
+              .pipe(finalize(() => this.isUpdating = false)).subscribe(__ => {
+              this.reloadTree(node);
+            });
+          });
+        });
       });
     });
   }
@@ -1002,6 +1255,89 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
+  useBaseBIE(node: BieFlatNode) {
+    if (!this.canUseBaseBIE(node)) {
+      return;
+    }
+
+    const abieNode = (node as AbieFlatNode);
+    const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
+      data: {
+        title: 'Select Base Profile BIE',
+        asccpManifestId: abieNode.asccpNode.manifestId,
+        den: abieNode.asccpNode.den,
+        libraryId: this.rootNode.libraryId,
+        releaseId: this.rootNode.releaseId,
+        topLevelAsbiepId: this.topLevelAsbiepId
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+      if (!selectedTopLevelAsbiepId) {
+        return;
+      }
+
+      this.isUpdating = true;
+
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Use Base BIE';
+      dialogConfig.data.content = [
+        'Proceeding may lead to data loss as the current data could be overwritten by the selected Base BIE.',
+        'Are you sure you want to proceed?'
+      ];
+      dialogConfig.data.action = 'Proceed';
+
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+        .pipe(
+          finalize(() => {
+            this.isUpdating = false;
+          })
+        )
+        .subscribe(result => {
+          if (!result) {
+            return;
+          }
+
+          this.isUpdating = true;
+
+          if (!abieNode.used) {
+            this.toggleTreeUsed(abieNode);
+          }
+          this.updateDetails(abieNode.parents, () => {
+            this.isUpdating = true;
+            this.service.useBaseBIE(abieNode, selectedTopLevelAsbiepId)
+              .pipe(finalize(() => this.isUpdating = false)).subscribe(__ => {
+              this.reloadTree(node);
+            });
+          });
+        });
+    });
+  }
+
+  removeBaseBIE(node: BieFlatNode) {
+    if (!this.canRemoveBaseBIE(node)) {
+      return;
+    }
+
+    this.isUpdating = true;
+
+    const abieNode = (node as AbieFlatNode);
+    if (!abieNode.used) {
+      this.toggleTreeUsed(abieNode);
+    }
+    this.updateDetails(abieNode.parents, () => {
+      this.isUpdating = true;
+      this.service.removeBaseBIE(abieNode)
+        .pipe(finalize(() => this.isUpdating = false)).subscribe(__ => {
+        this.reloadTree(node);
+      });
+    });
+  }
+
   openConfirmDialog(url: string) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Attention!';
@@ -1062,16 +1398,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return validState.indexOf(state) > -1;
   }
 
-  goToBusinessTermsForBie(detailNode: BieEditNodeDetail, bieType: string) {
-    let bieId: number;
+  goToBusinessTermsForBie(bieId: number, bieType: string) {
     if (bieType === 'ASBIE') {
-      bieId = (detailNode as BieEditAsbiepNodeDetail).asbie.asbieId;
       const link = this.router.serializeUrl(
         this.router.createUrlTree(['/business_term_management/assign_business_term/'],
           {queryParams: {bieId, bieType}}));
       window.open(link, '_blank');
     } else if (bieType === 'BBIE') {
-      bieId = (detailNode as BieEditBbiepNodeDetail).bbie.bbieId;
       const link = this.router.serializeUrl(
         this.router.createUrlTree(['/business_term_management/assign_business_term/'],
           {queryParams: {bieId, bieType}}));
@@ -1191,20 +1524,34 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   initFixedOrDefault(detail?: BieFlatNode) {
     if (this.isBbiepDetail(detail)) {
-      if (this.asBbiepDetail(detail).bbie.defaultValue) {
-        this.asBbiepDetail(detail).bbie.fixedOrDefault = 'default';
-      } else if (this.asBbiepDetail(detail).bbie.fixedValue) {
-        this.asBbiepDetail(detail).bbie.fixedOrDefault = 'fixed';
-      } else {
-        this.asBbiepDetail(detail).bbie.fixedOrDefault = 'none';
+      const setFixedOrDefaultValueForBbie = (bbie: BbieDetail) => {
+        if (bbie.defaultValue) {
+          bbie.fixedOrDefault = 'default';
+        } else if (bbie.fixedValue) {
+          bbie.fixedOrDefault = 'fixed';
+        } else {
+          bbie.fixedOrDefault = 'none';
+        }
+      };
+
+      setFixedOrDefaultValueForBbie(this.asBbiepDetail(detail).bbie);
+      if (this.asBbiepDetail(detail).base) {
+        setFixedOrDefaultValueForBbie(this.asBbiepDetail(detail).base.bbie);
       }
     } else if (this.isBbieScDetail(detail)) {
-      if (this.asBbieScDetail(detail).bbieSc.defaultValue) {
-        this.asBbieScDetail(detail).bbieSc.fixedOrDefault = 'default';
-      } else if (this.asBbieScDetail(detail).bbieSc.fixedValue) {
-        this.asBbieScDetail(detail).bbieSc.fixedOrDefault = 'fixed';
-      } else {
-        this.asBbieScDetail(detail).bbieSc.fixedOrDefault = 'none';
+      const setFixedOrDefaultValueForBbieSc = (bbieSc: BbieScDetail) => {
+        if (bbieSc.defaultValue) {
+          bbieSc.fixedOrDefault = 'default';
+        } else if (bbieSc.fixedValue) {
+          bbieSc.fixedOrDefault = 'fixed';
+        } else {
+          bbieSc.fixedOrDefault = 'none';
+        }
+      };
+
+      setFixedOrDefaultValueForBbieSc(this.asBbieScDetail(detail).bbieSc);
+      if (this.asBbieScDetail(detail).base) {
+        setFixedOrDefaultValueForBbieSc(this.asBbieScDetail(detail).base.bbieSc);
       }
     }
   }
@@ -1234,15 +1581,27 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (this.isAsbiepDetail(detailNode)) {
       bieCardinalityMin = this.asAsbiepDetail(detailNode).asbie.cardinalityMin;
       bieCardinalityMax = this.asAsbiepDetail(detailNode).asbie.cardinalityMax;
-      ccCardinalityMin = this.asAsbiepDetail(detailNode).ascc.cardinalityMin;
+      if (detailNode.inherited) {
+        ccCardinalityMin = this.asAsbiepDetail(detailNode).base.asbie.cardinalityMin;
+      } else {
+        ccCardinalityMin = this.asAsbiepDetail(detailNode).ascc.cardinalityMin;
+      }
     } else if (this.isBbiepDetail(detailNode)) {
       bieCardinalityMin = this.asBbiepDetail(detailNode).bbie.cardinalityMin;
       bieCardinalityMax = this.asBbiepDetail(detailNode).bbie.cardinalityMax;
-      ccCardinalityMin = this.asBbiepDetail(detailNode).bcc.cardinalityMin;
+      if (detailNode.inherited) {
+        ccCardinalityMin = this.asBbiepDetail(detailNode).base.bbie.cardinalityMin;
+      } else {
+        ccCardinalityMin = this.asBbiepDetail(detailNode).bcc.cardinalityMin;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
       bieCardinalityMax = this.asBbieScDetail(detailNode).bbieSc.cardinalityMax;
-      ccCardinalityMin = this.asBbieScDetail(detailNode).bdtSc.cardinalityMin;
+      if (detailNode.inherited) {
+        ccCardinalityMin = this.asBbieScDetail(detailNode).base.bbieSc.cardinalityMin;
+      } else {
+        ccCardinalityMin = this.asBbieScDetail(detailNode).bdtSc.cardinalityMin;
+      }
     } else {
       return;
     }
@@ -1301,15 +1660,27 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (this.isAsbiepDetail(detailNode)) {
       bieCardinalityMin = this.asAsbiepDetail(detailNode).asbie.cardinalityMin;
       bieCardinalityMax = this.asAsbiepDetail(detailNode).asbie.cardinalityMax;
-      ccCardinalityMax = this.asAsbiepDetail(detailNode).ascc.cardinalityMax;
+      if (detailNode.inherited) {
+        ccCardinalityMax = this.asAsbiepDetail(detailNode).base.asbie.cardinalityMax;
+      } else {
+        ccCardinalityMax = this.asAsbiepDetail(detailNode).ascc.cardinalityMax;
+      }
     } else if (this.isBbiepDetail(detailNode)) {
       bieCardinalityMin = this.asBbiepDetail(detailNode).bbie.cardinalityMin;
       bieCardinalityMax = this.asBbiepDetail(detailNode).bbie.cardinalityMax;
-      ccCardinalityMax = this.asBbiepDetail(detailNode).bcc.cardinalityMax;
+      if (detailNode.inherited) {
+        ccCardinalityMax = this.asBbiepDetail(detailNode).base.bbie.cardinalityMax;
+      } else {
+        ccCardinalityMax = this.asBbiepDetail(detailNode).bcc.cardinalityMax;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
       bieCardinalityMax = this.asBbieScDetail(detailNode).bbieSc.cardinalityMax;
-      ccCardinalityMax = this.asBbieScDetail(detailNode).bdtSc.cardinalityMax;
+      if (detailNode.inherited) {
+        ccCardinalityMax = this.asBbieScDetail(detailNode).base.bbieSc.cardinalityMax;
+      } else {
+        ccCardinalityMax = this.asBbieScDetail(detailNode).bdtSc.cardinalityMax;
+      }
     } else {
       return;
     }
@@ -1392,6 +1763,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         bieMinLength = bbiepDetail.bbie.facetMinLength;
         bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetMinLength) {
@@ -1401,6 +1775,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         bieMinLength = bbieScDetail.bbieSc.facetMinLength;
         bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetMinimumLength = undefined;
@@ -1469,6 +1846,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         bieMinLength = bbiepDetail.bbie.facetMinLength;
         bieMaxLength = bbiepDetail.bbie.facetMaxLength;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetMinLength) {
@@ -1478,6 +1858,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         bieMinLength = bbieScDetail.bbieSc.facetMinLength;
         bieMaxLength = bbieScDetail.bbieSc.facetMaxLength;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetMaximumLength = undefined;
@@ -1543,6 +1926,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       } else {
         biePattern = bbiepDetail.bbie.facetPattern;
       }
+      if (bbiepDetail.base && (bbiepDetail.base.bbie.facetMinLength || bbiepDetail.base.bbie.facetMaxLength || bbiepDetail.base.bbie.facetPattern)) {
+        disabled = true;
+      }
     } else if (this.isBbieScDetail(detailNode)) {
       const bbieScDetail = this.asBbieScDetail(detailNode);
       if (!!bbieScDetail.bdtSc.facetPattern) {
@@ -1550,6 +1936,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         disabled = true;
       } else {
         biePattern = bbieScDetail.bbieSc.facetPattern;
+      }
+      if (bbieScDetail.base && (bbieScDetail.base.bbieSc.facetMinLength || bbieScDetail.base.bbieSc.facetMaxLength || bbieScDetail.base.bbieSc.facetPattern)) {
+        disabled = true;
       }
     } else {
       this.facetPattern = undefined;
@@ -1793,7 +2182,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         case 'ASBIEP':
           if (!node.locked) {
             request.asbieDetails.push((node.detail as BieEditAsbiepNodeDetail).asbie);
-            if (!node.derived) {
+            if (!node.reused) {
               request.abieDetails.push((node.detail as BieEditAsbiepNodeDetail).abie);
               request.asbiepDetails.push((node.detail as BieEditAsbiepNodeDetail).asbiep);
             }

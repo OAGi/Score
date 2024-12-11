@@ -38,6 +38,7 @@ public class ModuleSetReleaseController {
     @RequestMapping(value = "/module_set_release_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetModuleSetReleaseListResponse getModuleSetReleaseList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                                   @RequestParam(name = "libraryId") BigInteger libraryId,
                                                                    @RequestParam(name = "name", required = false) String name,
                                                                    @RequestParam(name = "releaseId", required = false) BigInteger releaseId,
                                                                    @RequestParam(name = "default", required = false) Boolean isDefault,
@@ -51,6 +52,7 @@ public class ModuleSetReleaseController {
 
         GetModuleSetReleaseListRequest request = new GetModuleSetReleaseListRequest(sessionService.asScoreUser(user));
 
+        request.setLibraryId(libraryId);
         request.setName(name);
         request.setReleaseId(releaseId);
         request.setDefault(isDefault);

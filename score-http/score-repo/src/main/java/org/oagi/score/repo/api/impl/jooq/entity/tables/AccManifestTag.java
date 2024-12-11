@@ -155,7 +155,7 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
 
     @Override
     public List<ForeignKey<AccManifestTagRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ACC_MANIFEST_TAG_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_TAG_TAG_ID_FK, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK);
+        return Arrays.asList(Keys.ACC_MANIFEST_TAG_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK, Keys.ACC_MANIFEST_TAG_TAG_ID_FK);
     }
 
     private transient AccManifestPath _accManifest;
@@ -170,18 +170,6 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
         return _accManifest;
     }
 
-    private transient TagPath _tag;
-
-    /**
-     * Get the implicit join path to the <code>oagi.tag</code> table.
-     */
-    public TagPath tag() {
-        if (_tag == null)
-            _tag = new TagPath(this, Keys.ACC_MANIFEST_TAG_TAG_ID_FK, null);
-
-        return _tag;
-    }
-
     private transient AppUserPath _appUser;
 
     /**
@@ -192,6 +180,18 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
             _appUser = new AppUserPath(this, Keys.ACC_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
+    }
+
+    private transient TagPath _tag;
+
+    /**
+     * Get the implicit join path to the <code>oagi.tag</code> table.
+     */
+    public TagPath tag() {
+        if (_tag == null)
+            _tag = new TagPath(this, Keys.ACC_MANIFEST_TAG_TAG_ID_FK, null);
+
+        return _tag;
     }
 
     @Override

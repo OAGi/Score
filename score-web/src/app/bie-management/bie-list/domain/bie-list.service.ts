@@ -12,8 +12,8 @@ export class BieListService {
   constructor(private http: HttpClient) {
   }
 
-  getSummaryBieList(releaseId: number): Observable<SummaryBieInfo> {
-    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?releaseId=' + releaseId).pipe(map(
+  getSummaryBieList(libraryId: number, releaseId: number): Observable<SummaryBieInfo> {
+    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?libraryId=' + libraryId + '&releaseId=' + releaseId).pipe(map(
       e => {
         if (e.myRecentBIEs) {
           e.myRecentBIEs = e.myRecentBIEs.map(elm => {
@@ -27,6 +27,7 @@ export class BieListService {
 
   getBieListWithRequest(request: BieListRequest): Observable<PageResponse<BieList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActives', request.page.sortActives.join(','))
       .set('sortDirections', request.page.sortDirections.join(','))
       .set('pageIndex', '' + request.page.pageIndex)
@@ -75,6 +76,9 @@ export class BieListService {
     }
     if (request.topLevelAsbiepIds.length > 0) {
       params = params.set('topLevelAsbiepIds', request.topLevelAsbiepIds.join(','));
+    }
+    if (request.basedTopLevelAsbiepIds.length > 0) {
+      params = params.set('basedTopLevelAsbiepIds', request.basedTopLevelAsbiepIds.join(','));
     }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
@@ -150,6 +154,7 @@ export class BieListService {
 
   getAsbieBbieListWithRequest(request: BieListRequest): Observable<PageResponse<AsbieBbieList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
@@ -200,6 +205,7 @@ export class BieListService {
   }
 
   confirmAsbieBbieListByIdAndType(biesToAssign: BieToAssign[]): Observable<PageResponse<AsbieBbieList>> {
-    return this.http.post<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie/confirm', { biesToAssign });
+    return this.http.post<PageResponse<AsbieBbieList>>('/api/bie_list/asbie_bbie/confirm', {biesToAssign});
   }
+
 }

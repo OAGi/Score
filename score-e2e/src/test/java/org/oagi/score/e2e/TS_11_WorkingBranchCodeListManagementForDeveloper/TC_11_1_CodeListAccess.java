@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -48,6 +45,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_1_and_TA_14() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -55,11 +53,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -89,15 +89,18 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_2() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -143,17 +146,20 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_3() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -180,17 +186,20 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_4() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Draft");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
@@ -232,17 +241,20 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_5() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Published Code List
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListPublished = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListPublished, developerA);
@@ -274,20 +286,23 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_6() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         AppUserObject endUser;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             thisAccountWillBeDeletedAfterTests(developerB);
 
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
             /**
              * End user Code Lists. States - WIP, Draft, Candidate and Published
              */
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, namespace, release, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, endUser);
@@ -325,17 +340,20 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - Deleted
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListDeleted = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Deleted");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDeleted, developerA);
@@ -369,6 +387,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -376,11 +395,12 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Draft");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
@@ -422,6 +442,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject endUser;
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -429,11 +450,12 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - Draft, Candidate, Deleted
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListDraft = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "Draft");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListDraft, developerA);
@@ -475,6 +497,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_10() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         Map<CodeListObject, ReleaseObject> codeListReleaseMap = new HashMap<>();
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -482,11 +505,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Release 10.8.4. States - WIP, Draft and Candidate
              */
-            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, releaseOne, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -508,7 +533,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             /**
              * Create Code List for Release 10.8.6. States - WIP, Draft and Candidate
              */
-            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
+            ReleaseObject releaseTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.6");
             codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, releaseTwo, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -542,15 +567,18 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_11() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             codeListWIP.setDeprecated(true);
@@ -600,15 +628,18 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_12() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -650,6 +681,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_13() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerA, developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -657,12 +689,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
 
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -694,6 +727,7 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_15() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         ReleaseObject workingBranch;
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
@@ -701,11 +735,13 @@ public class TC_11_1_CodeListAccess extends BaseTest {
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developerA, library);
             /**
              * Create Code List for Working branch. States - WIP, Draft and Candidate
              */
-            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             CodeListObject codeListWIP = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, workingBranch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListWIP, developerA);
@@ -734,17 +770,19 @@ public class TC_11_1_CodeListAccess extends BaseTest {
     public void test_TA_16() {
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         AppUserObject developerB;
+        LibraryObject library;
         Map<CodeListObject, ReleaseObject> codeListRelease = new HashMap<>();
         {
             developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
             CodeListObject existingCodeList = getAPIFactory().getCodeListAPI().
                     getCodeListByCodeListNameAndReleaseNum("oacl_ChargeCode", release.getReleaseNumber());
             codeListForTesting.add(existingCodeList);
             codeListRelease.put(existingCodeList, release);
-            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.6");
+            release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.6");
             existingCodeList = getAPIFactory().getCodeListAPI().
                     getCodeListByCodeListNameAndReleaseNum("clm6DateFormatCode1_DateFormatCode", release.getReleaseNumber());
             codeListForTesting.add(existingCodeList);

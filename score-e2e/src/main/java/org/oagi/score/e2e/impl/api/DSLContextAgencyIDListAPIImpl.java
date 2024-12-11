@@ -13,10 +13,7 @@ import org.oagi.score.e2e.api.AgencyIDListAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AgencyIdListRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.LogRecord;
-import org.oagi.score.e2e.obj.AgencyIDListObject;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -96,7 +93,9 @@ public class DSLContextAgencyIDListAPIImpl implements AgencyIDListAPI {
                     .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId())
+            );
             AgencyIdListManifestRecord prevAgencyIdListManifestRecord = agencyIdListManifestRecord.copy();
             prevAgencyIdListManifestRecord.setAgencyIdListManifestId(null);
             prevAgencyIdListManifestRecord.setAgencyIdListId(agencyIdListId);

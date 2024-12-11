@@ -75,7 +75,7 @@
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
-                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{ selectedNode.name }}</mat-label>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
@@ -291,7 +291,7 @@
                         </div>
 
                         <div class="ml-auto align-self-center mr-2">
-                          <mat-icon [hidden]="!node.showCopyLinkIcon"
+                          <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
                                     matTooltip="Copy Link"
                                     (click)="copyLink(node, $event)">
                             link
@@ -362,9 +362,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Aggregate Core Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="ACC" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asAccDetail().libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -412,7 +412,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Aggregate Core Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="ACC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -537,9 +543,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Association Core Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="ASCC" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asAsccpDetail().ascc.libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -581,7 +587,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Association Core Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="ASCC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -667,9 +679,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Association Core Component Property">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="ASCCP" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asAsccpDetail().asccp.libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -717,7 +729,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Association Core Component Property">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="ASCCP" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -737,7 +755,7 @@
                         <div class="col-12">
                           <mat-form-field>
                             <mat-label>{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
-                            <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="60"
+                            <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="100"
                                    [(ngModel)]="asAsccpDetail().asccp.propertyTerm"
                                    [required]="true"
                                    [disabled]="!isEditable() || hasRevision()">
@@ -854,9 +872,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Basic Core Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="BCC" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBccpDetail().bcc.libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -898,7 +916,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Basic Core Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="BCC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -1034,9 +1058,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Basic Core Component Property">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="BCCP" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBccpDetail().bccp.libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1084,7 +1108,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Basic Core Component Property">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="BCCP" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -1227,9 +1257,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Data Type">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="DT" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBccpDetail().bdt.libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1277,7 +1307,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DT" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"
@@ -1373,9 +1409,9 @@
                     <div class="cc-node-detail-container">
                       <div class="row">
                         <div class="col-2">
-                          <mat-form-field matTooltip="Data Type Supplementary Component">
-                            <mat-label>Core Component</mat-label>
-                            <input matInput value="DTSC" [disabled]="true">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput [(ngModel)]="asBdtScDetail().libraryName" [disabled]="true">
                           </mat-form-field>
                         </div>
                         <div class="col-2">
@@ -1417,7 +1453,13 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-6">
+                        <div class="col-2">
+                          <mat-form-field matTooltip="Data Type Supplementary Component">
+                            <mat-label>Core Component</mat-label>
+                            <input matInput value="DTSC" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-4">
                           <mat-form-field>
                             <mat-label>GUID</mat-label>
                             <input matInput maxlength="41"

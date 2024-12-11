@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_34_WorkingBranchAgencyIDListManagementforDeveloper;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -16,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
@@ -52,8 +51,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -82,8 +82,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -100,11 +101,11 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         assertEquals(release.getReleaseNumber(), getText(editAgencyIDListPage.getReleaseField()));
         assertEquals("WIP", getText(editAgencyIDListPage.getStateField()));
         assertEquals("2", getText(editAgencyIDListPage.getRevisionField()));
-        String newVersion = randomAlphanumeric(5, 10);
+        String newVersion = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListPage.setVersion(newVersion);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListPage.setDefinition(newDefinition);
-        String newDefinitionSource = randomAlphanumeric(5, 10);
+        String newDefinitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListPage.setDefinitionSource(newDefinitionSource);
         editAgencyIDListPage.hitUpdateButton();
 
@@ -127,8 +128,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -146,11 +148,11 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         for (AgencyIDListValueObject agencyIDListValue : agencyIDListValues) {
             EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.openAgencyIDListValueDialogByValue(agencyIDListValue.getValue());
             assertDisabled(editAgencyIDListValueDialog.getValueField());
-            String newMeaning = randomAlphanumeric(5, 10);
+            String newMeaning = RandomStringUtils.secure().nextAlphanumeric(5, 10);
             editAgencyIDListValueDialog.setMeaning(newMeaning);
-            String newDefinition = randomPrint(50, 100).trim();
+            String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
             editAgencyIDListValueDialog.setDefinition(newDefinition);
-            String newDefinitionSource = randomAlphanumeric(5, 10);
+            String newDefinitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
             editAgencyIDListValueDialog.setDefinitionSource(newDefinitionSource);
             editAgencyIDListValueDialog.hitSaveButton();
 
@@ -172,8 +174,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -189,13 +192,13 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
         assertDisabled(editAgencyIDListValueDialog.getDeprecatedSelectField());
 
-        String newValue = randomAlphanumeric(5, 10).trim();
+        String newValue = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         editAgencyIDListValueDialog.setValue(newValue);
-        String newMeaning = randomAlphanumeric(5, 10).trim();
+        String newMeaning = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         editAgencyIDListValueDialog.setMeaning(newMeaning);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListValueDialog.setDefinition(newDefinition);
-        String newDefinitionSource = randomAlphanumeric(5, 10);
+        String newDefinitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListValueDialog.setDefinitionSource(newDefinitionSource);
         editAgencyIDListValueDialog.hitAddButton();
 
@@ -215,8 +218,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -247,8 +251,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -264,13 +269,13 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
         assertDisabled(editAgencyIDListValueDialog.getDeprecatedSelectField());
 
-        String newValue = randomAlphanumeric(5, 10).trim();
+        String newValue = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         editAgencyIDListValueDialog.setValue(newValue);
-        String newMeaning = randomAlphanumeric(5, 10).trim();
+        String newMeaning = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         editAgencyIDListValueDialog.setMeaning(newMeaning);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListValueDialog.setDefinition(newDefinition);
-        String newDefinitionSource = randomAlphanumeric(5, 10);
+        String newDefinitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListValueDialog.setDefinitionSource(newDefinitionSource);
         editAgencyIDListValueDialog.hitAddButton();
 
@@ -294,8 +299,9 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Published");
@@ -308,21 +314,21 @@ public class TC_34_4_EditingRevisionDeveloperAgencyIDList extends BaseTest {
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(agencyIDList.getName(), release.getReleaseNumber());
         editAgencyIDListPage.revise();
 
-        String newVersion = randomAlphanumeric(5, 10);
+        String newVersion = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListPage.setVersion(newVersion);
-        String newDefinition = randomPrint(50, 100).trim();
+        String newDefinition = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editAgencyIDListPage.setDefinition(newDefinition);
-        String newDefinitionSource = randomAlphanumeric(5, 10);
+        String newDefinitionSource = RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAgencyIDListPage.setDefinitionSource(newDefinitionSource);
 
         EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
         assertDisabled(editAgencyIDListValueDialog.getDeprecatedSelectField());
 
-        String newValue = randomAlphanumeric(5, 10).trim();
+        String newValue = RandomStringUtils.secure().nextAlphanumeric(5, 10).trim();
         editAgencyIDListValueDialog.setValue(newValue);
-        editAgencyIDListValueDialog.setMeaning(randomAlphanumeric(5, 10).trim());
-        editAgencyIDListValueDialog.setDefinition(randomPrint(50, 100).trim());
-        editAgencyIDListValueDialog.setDefinitionSource(randomAlphanumeric(5, 10));
+        editAgencyIDListValueDialog.setMeaning(RandomStringUtils.secure().nextAlphanumeric(5, 10).trim());
+        editAgencyIDListValueDialog.setDefinition(RandomStringUtils.secure().nextPrint(50, 100).trim());
+        editAgencyIDListValueDialog.setDefinitionSource(RandomStringUtils.secure().nextAlphanumeric(5, 10));
         editAgencyIDListValueDialog.hitAddButton();
 
         editAgencyIDListPage.hitUpdateButton();

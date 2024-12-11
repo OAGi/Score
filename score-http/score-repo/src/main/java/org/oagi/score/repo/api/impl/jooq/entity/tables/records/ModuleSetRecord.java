@@ -35,11 +35,27 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
     }
 
     /**
+     * Setter for <code>oagi.module_set.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public void setLibraryId(ULong value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>oagi.module_set.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public ULong getLibraryId() {
+        return (ULong) get(1);
+    }
+
+    /**
      * Setter for <code>oagi.module_set.guid</code>. A globally unique
      * identifier (GUID).
      */
     public void setGuid(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
@@ -47,7 +63,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * identifier (GUID).
      */
     public String getGuid() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
@@ -55,7 +71,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * module set.
      */
     public void setName(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
@@ -63,7 +79,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * module set.
      */
     public String getName() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
@@ -71,7 +87,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * explanation about the module set or use of the module set.
      */
     public void setDescription(String value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
@@ -79,7 +95,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * explanation about the module set or use of the module set.
      */
     public String getDescription() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
@@ -87,7 +103,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * APP_USER table. It indicates the user who created this MODULE_SET.
      */
     public void setCreatedBy(ULong value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
@@ -95,7 +111,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * APP_USER table. It indicates the user who created this MODULE_SET.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(4);
+        return (ULong) get(5);
     }
 
     /**
@@ -103,7 +119,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * the APP_USER table referring to the last user who updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
@@ -111,7 +127,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * the APP_USER table referring to the last user who updated the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(5);
+        return (ULong) get(6);
     }
 
     /**
@@ -119,7 +135,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
@@ -127,7 +143,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(6);
+        return (LocalDateTime) get(7);
     }
 
     /**
@@ -135,7 +151,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * timestamp when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -143,7 +159,7 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
      * timestamp when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(7);
+        return (LocalDateTime) get(8);
     }
 
     // -------------------------------------------------------------------------
@@ -169,10 +185,11 @@ public class ModuleSetRecord extends UpdatableRecordImpl<ModuleSetRecord> {
     /**
      * Create a detached, initialised ModuleSetRecord
      */
-    public ModuleSetRecord(ULong moduleSetId, String guid, String name, String description, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public ModuleSetRecord(ULong moduleSetId, ULong libraryId, String guid, String name, String description, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(ModuleSet.MODULE_SET);
 
         setModuleSetId(moduleSetId);
+        setLibraryId(libraryId);
         setGuid(guid);
         setName(name);
         setDescription(description);

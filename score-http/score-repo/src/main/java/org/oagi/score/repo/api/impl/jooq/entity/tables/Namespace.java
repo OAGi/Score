@@ -40,6 +40,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Asccp.AsccpPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Bccp.BccpPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeList.CodeListPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt.DtPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.NamespaceRecord;
@@ -72,6 +73,12 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * database key.
      */
     public final TableField<NamespaceRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+
+    /**
+     * The column <code>oagi.namespace.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public final TableField<NamespaceRecord, ULong> LIBRARY_ID = createField(DSL.name("library_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointed to a library of the current record.");
 
     /**
      * The column <code>oagi.namespace.uri</code>. This is the URI of the
@@ -215,20 +222,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
 
     @Override
     public List<ForeignKey<NamespaceRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.NAMESPACE_OWNER_USER_ID_FK, Keys.NAMESPACE_CREATED_BY_FK, Keys.NAMESPACE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient AppUserPath _namespaceOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>namespace_owner_user_id_fk</code> key.
-     */
-    public AppUserPath namespaceOwnerUserIdFk() {
-        if (_namespaceOwnerUserIdFk == null)
-            _namespaceOwnerUserIdFk = new AppUserPath(this, Keys.NAMESPACE_OWNER_USER_ID_FK, null);
-
-        return _namespaceOwnerUserIdFk;
+        return Arrays.asList(Keys.NAMESPACE_CREATED_BY_FK, Keys.NAMESPACE_LAST_UPDATED_BY_FK, Keys.NAMESPACE_LIBRARY_ID_FK, Keys.NAMESPACE_OWNER_USER_ID_FK);
     }
 
     private transient AppUserPath _namespaceCreatedByFk;
@@ -255,6 +249,31 @@ public class Namespace extends TableImpl<NamespaceRecord> {
             _namespaceLastUpdatedByFk = new AppUserPath(this, Keys.NAMESPACE_LAST_UPDATED_BY_FK, null);
 
         return _namespaceLastUpdatedByFk;
+    }
+
+    private transient LibraryPath _library;
+
+    /**
+     * Get the implicit join path to the <code>oagi.library</code> table.
+     */
+    public LibraryPath library() {
+        if (_library == null)
+            _library = new LibraryPath(this, Keys.NAMESPACE_LIBRARY_ID_FK, null);
+
+        return _library;
+    }
+
+    private transient AppUserPath _namespaceOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>namespace_owner_user_id_fk</code> key.
+     */
+    public AppUserPath namespaceOwnerUserIdFk() {
+        if (_namespaceOwnerUserIdFk == null)
+            _namespaceOwnerUserIdFk = new AppUserPath(this, Keys.NAMESPACE_OWNER_USER_ID_FK, null);
+
+        return _namespaceOwnerUserIdFk;
     }
 
     private transient AccPath _acc;

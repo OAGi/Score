@@ -11,6 +11,7 @@ import java.util.List;
 
 public class BiePackageListRequest extends PaginationRequest<BiePackage> {
 
+    private BigInteger libraryId;
     private String versionId;
     private String versionName;
     private String description;
@@ -28,6 +29,14 @@ public class BiePackageListRequest extends PaginationRequest<BiePackage> {
 
     public BiePackageListRequest(ScoreUser requester) {
         super(requester, BiePackage.class);
+    }
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
     }
 
     public String getVersionId() {

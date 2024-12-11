@@ -192,6 +192,15 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
     TransferBIEOwnershipDialog openTransferBIEOwnershipDialog(WebElement tr);
 
     /**
+     * Clicks the 'Create Inherited BIE' option from the context menu of the specified table record.
+     * <p>
+     * This action assumes that the context menu is accessible from the given table row (tr).
+     *
+     * @param tr the WebElement representing the table row for which the 'Create Inherited BIE' action is triggered
+     */
+    void hitCreateInheritedBIE(WebElement tr);
+
+    /**
      * Return the UI element of the 'New BIE' button.
      *
      * @return the UI element of the 'New BIE' button
@@ -289,6 +298,6 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
      *
      * @throws org.openqa.selenium.TimeoutException if the BIE is not in the QA state or the 'Update' button is enabled.
      */
-    void BackToWP();
+    void backToWIP();
 
 }

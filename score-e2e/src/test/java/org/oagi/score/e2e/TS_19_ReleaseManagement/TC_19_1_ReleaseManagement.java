@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_19_ReleaseManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.time.Duration.ofSeconds;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -65,14 +65,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_1() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
+        String newReleaseNum = String.valueOf((RandomUtils.secure().randomInt(20230716, 20231231)));
         createReleasePage.setReleaseNumber(newReleaseNum);
         assertThrows(TimeoutException.class, () -> createReleasePage.hitCreateButton());
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.setReleaseNote("A release note");
         createReleasePage.setReleaseLicense("A release license");
@@ -87,13 +88,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_2() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230716, 20231231)));
+        String newReleaseNum = String.valueOf((RandomUtils.secure().randomInt(20230716, 20231231)));
         createReleasePage.setReleaseNumber(newReleaseNum);
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.setReleaseNote("A release note");
         createReleasePage.setReleaseLicense("A release license");
@@ -113,13 +115,13 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         assertThrows(NoSuchElementException.class, () -> viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Initialized"));
     }
 
-    private TestTC_19_PreConditions create(AppUserObject developer, NamespaceObject developerNamespace) {
-        if (!getAPIFactory().getReleaseAPI().getReleasesByStates(Arrays.asList("Initialized", "Draft")).isEmpty()) {
+    private TestTC_19_PreConditions create(AppUserObject developer, LibraryObject library, NamespaceObject developerNamespace) {
+        if (!getAPIFactory().getReleaseAPI().getReleasesByStates(library, Arrays.asList("Initialized", "Draft")).isEmpty()) {
             throw new IllegalStateException("Pre-conditions must be created before creating a new random release");
         }
 
         TestTC_19_PreConditions conditions = new TestTC_19_PreConditions();
-        ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
         conditions.ACCreleaseTA3devxwip = coreComponentAPI.createRandomACC(developer, workingRelease, developerNamespace, "WIP");
@@ -137,7 +139,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
                 developer, developerNamespace, "Candidate");
 
         DTObject bdtForRandomBCCPs = coreComponentAPI.getBDTByDENAndReleaseNum(
-                "System Environment_ Code. Type", workingRelease.getReleaseNumber()).get(0);
+                library, "System Environment_ Code. Type", workingRelease.getReleaseNumber()).get(0);
         conditions.BCCPreleaseTA3devxwip = coreComponentAPI.createRandomBCCP(bdtForRandomBCCPs,
                 developer, developerNamespace, "WIP");
         conditions.BCCPreleaseTA3devxdraft = coreComponentAPI.createRandomBCCP(bdtForRandomBCCPs,
@@ -158,37 +160,37 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
 
         conditions.ASCCPreleaseTA3revisionwip = coreComponentAPI.createRevisedASCCP(
                 coreComponentAPI.createRandomASCCP(
-                        coreComponentAPI.getACCByDENAndReleaseNum("Message. Details", workingRelease.getReleaseNumber()),
+                        coreComponentAPI.getACCByDENAndReleaseNum(library, "Message. Details", workingRelease.getReleaseNumber()),
                         developer, developerNamespace, "Published"),
-                coreComponentAPI.getACCByDENAndReleaseNum("Message. Details", workingRelease.getReleaseNumber()),
+                coreComponentAPI.getACCByDENAndReleaseNum(library, "Message. Details", workingRelease.getReleaseNumber()),
                 developer, workingRelease, "WIP");
         conditions.ASCCPreleaseTA3revisiondraft = coreComponentAPI.createRevisedASCCP(
                 coreComponentAPI.createRandomASCCP(
-                        coreComponentAPI.getACCByDENAndReleaseNum("Document Reference. Details", workingRelease.getReleaseNumber()),
+                        coreComponentAPI.getACCByDENAndReleaseNum(library, "Document Reference. Details", workingRelease.getReleaseNumber()),
                         developer, developerNamespace, "Published"),
-                coreComponentAPI.getACCByDENAndReleaseNum("Document Reference. Details", workingRelease.getReleaseNumber()),
+                coreComponentAPI.getACCByDENAndReleaseNum(library, "Document Reference. Details", workingRelease.getReleaseNumber()),
                 developer, workingRelease, "WIP");
         conditions.ASCCPreleaseTA3revisioncandidate = coreComponentAPI.createRevisedASCCP(
                 coreComponentAPI.createRandomASCCP(
-                        coreComponentAPI.getACCByDENAndReleaseNum("Shipping Route. Details", workingRelease.getReleaseNumber()),
+                        coreComponentAPI.getACCByDENAndReleaseNum(library, "Shipping Route. Details", workingRelease.getReleaseNumber()),
                         developer, developerNamespace, "Published"),
-                coreComponentAPI.getACCByDENAndReleaseNum("Shipping Route. Details", workingRelease.getReleaseNumber()),
+                coreComponentAPI.getACCByDENAndReleaseNum(library, "Shipping Route. Details", workingRelease.getReleaseNumber()),
                 developer, workingRelease, "WIP");
 
         conditions.BCCPreleaseTA3revisionwip = coreComponentAPI.createRevisedBCCP(
                 coreComponentAPI.createRandomBCCP(
-                        coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
-                coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0),
+                        coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
+                coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Quantity. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "WIP");
         conditions.BCCPreleaseTA3revisiondraft = coreComponentAPI.createRevisedBCCP(
                 coreComponentAPI.createRandomBCCP(
-                        coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
-                coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
+                        coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
+                coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "Draft");
         conditions.BCCPreleaseTA3revisioncandidate = coreComponentAPI.createRevisedBCCP(
                 coreComponentAPI.createRandomBCCP(
-                        coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
-                coreComponentAPI.getBDTByDENAndReleaseNum("Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
+                        coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0), developer, developerNamespace, "Published"),
+                coreComponentAPI.getBDTByDENAndReleaseNum(library, "Open_ Indicator. Type", workingRelease.getReleaseNumber()).get(0),
                 developer, workingRelease, "Candidate");
 
         return conditions;
@@ -227,13 +229,14 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3a() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(developer, developerNamespace);
+            conditions = create(developer, library, developerNamespace);
         }
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(developer, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(developer, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -257,20 +260,21 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3c_case2_and_case3() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
         ACCObject randomACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "Candidate");
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "Candidate");
         getAPIFactory().getCoreComponentAPI().appendASCC(randomACC, conditions.ASCCPreleaseTA3devxwip, "Candidate");
         getAPIFactory().getCoreComponentAPI().appendASCC(randomACC, conditions.ASCCPreleaseTA3devxdraft, "Candidate");
         getAPIFactory().getCoreComponentAPI().appendBCC(randomACC, conditions.BCCPreleaseTA3devxwip, "Candidate");
         getAPIFactory().getCoreComponentAPI().appendBCC(randomACC, conditions.BCCPreleaseTA3devxdraft, "Candidate");
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -293,14 +297,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3c_case1() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         ACCObject randomACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "WIP");
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "WIP");
         ASCCPObject randomASCCP = getAPIFactory().getCoreComponentAPI().createRandomASCCP(
                 randomACC, devx, developerNamespace, "Candidate");
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -326,15 +331,16 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3c_case7() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         ACCObject randomBaseACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "WIP");
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "WIP");
         ACCObject randomACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "Candidate");
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "Candidate");
         getAPIFactory().getCoreComponentAPI().updateBasedACC(randomACC, randomBaseACC);
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -365,20 +371,21 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3d_and_1_3e_and_1_3f_and_1_3g() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
-        String randomObjectClassTerm = randomAlphabetic(5, 10).replaceAll(" ", "");
+        String randomObjectClassTerm = RandomStringUtils.secure().nextAlphabetic(5, 10).replaceAll(" ", "");
         randomObjectClassTerm = Character.toUpperCase(randomObjectClassTerm.charAt(0)) + randomObjectClassTerm.substring(1).toLowerCase();
         ACCObject extensionACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "Candidate",
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "Candidate",
                 Extension, randomObjectClassTerm + " Extension");
         ASCCPObject extensionASCCP = getAPIFactory().getCoreComponentAPI().createRandomASCCP(
                 extensionACC, devx, developerNamespace, "WIP");
         ACCObject randomACC = getAPIFactory().getCoreComponentAPI().createRandomACC(devx,
-                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working"), developerNamespace, "Candidate");
+                getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working"), developerNamespace, "Candidate");
         getAPIFactory().getCoreComponentAPI().appendASCC(randomACC, extensionASCCP, "Candidate");
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -427,14 +434,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_3j() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -461,7 +469,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         // move back to initialize to Cancel
@@ -481,7 +489,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Initialized", randomRelease.getState());
     }
 
@@ -490,14 +498,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -524,7 +533,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         editReleasePage.openPage();
@@ -543,7 +552,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Published", randomRelease.getState());
     }
 
@@ -551,9 +560,10 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_4() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -586,14 +596,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     public void test_TA_19_1_6_and_TA_19_1_7_and_TA_19_1_8() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -620,7 +631,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -676,7 +687,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Initialized", randomRelease.getState());
 
         viewEditCoreComponentPage.openPage();
@@ -694,14 +705,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -728,7 +740,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         viewEditReleasePage.openPage();
@@ -758,7 +770,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Published", randomRelease.getState());
 
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
@@ -782,14 +794,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -816,7 +829,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         editReleasePage.openPage();
@@ -835,7 +848,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Published", randomRelease.getState());
 
         editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum, "Published");
@@ -848,14 +861,15 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(devx);
-        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
         TestTC_19_PreConditions conditions;
         {
-            conditions = create(devx, developerNamespace);
+            conditions = create(devx, library, developerNamespace);
         }
 
-        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, developerNamespace);
+        ReleaseObject randomRelease = getAPIFactory().getReleaseAPI().createRandomRelease(devx, library, developerNamespace);
         String newReleaseNum = randomRelease.getReleaseNumber();
 
         HomePage homePage = loginPage().signIn(devx.getLoginId(), devx.getPassword());
@@ -882,7 +896,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", randomRelease.getState());
 
         editReleasePage.openPage();
@@ -901,7 +915,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
             }
         }
 
-        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        randomRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Published", randomRelease.getState());
 
         AppUserObject usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);

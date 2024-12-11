@@ -1,19 +1,29 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
+      <score-title-with-library-selector [title]="title"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ml-2" color="primary" (click)="createAgencyIdList()"
+      <button mat-icon-button class="ml-2" matTooltip="New Agency ID List"
+              (click)="createAgencyIdList()"
               *ngIf="showCreateAgencyIdListBtn">
-        New Agency ID List
+        <mat-icon>add</mat-icon>
       </button>
-      <button mat-raised-button class="ml-2" color="warn" (click)="openDialogAgencyIdListListDelete()"
+      <button mat-icon-button class="ml-2" matTooltip="Delete"
+              (click)="openDialogAgencyIdListListDelete()"
               *ngIf="showDiscardBtn">
-        Delete
+        <mat-icon>delete</mat-icon>
       </button>
-      <button mat-raised-button class="ml-2" color="accent" (click)="openDialogAgencyIdListListRestore()"
+      <button mat-icon-button class="ml-2" matTooltip="Purge"
+              (click)="openDialogAgencyIdListListPurge()"
               *ngIf="showRestoreBtn">
-        Restore
+        <mat-icon>delete_forever</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Restore"
+              (click)="openDialogAgencyIdListListRestore()"
+              *ngIf="showRestoreBtn">
+        <mat-icon>restore_from_trash</mat-icon>
       </button>
     </mat-toolbar>
   </div>
@@ -51,13 +61,13 @@
               <div class="col-md-2 col-sm-12">
                 <mat-form-field>
                   <mat-label>State</mat-label>
-                  <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId"
+                  <mat-select *ngIf="request.release.workingRelease"
                               [(ngModel)]="request.states" multiple>
                     <mat-option *ngFor="let state of workingStateList" [value]="state">
                       {{state}}
                     </mat-option>
                   </mat-select>
-                  <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId"
+                  <mat-select *ngIf="!request.release.workingRelease"
                               [(ngModel)]="request.states" multiple>
                     <mat-option *ngFor="let state of releaseStateList" [value]="state">
                       {{state}}
@@ -231,8 +241,6 @@
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
                               [disabled]="row.owner.username !== currentUser || canSelect.indexOf(row.state) == -1 || hasRevision(row)"
-                              matTooltip="This agency ID list cannot be modified."
-                              [matTooltipDisabled]="row.state === 'WIP'"
                               (change)="$event ? toggle(row) : null"
                               [checked]="isSelected(row)">
                 </mat-checkbox>

@@ -2,6 +2,7 @@ package org.oagi.score.repo.component.bbiep;
 
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbieRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.DtRecord;
@@ -84,6 +85,14 @@ public class BbiepReadRepository {
         return bbiepNode;
     }
 
+    public BbiepNode getBbiepNode(BigInteger bbiepId) {
+        BbiepRecord bbiepRecord = dslContext.selectFrom(BBIEP)
+                .where(BBIEP.BBIEP_ID.eq(ULong.valueOf(bbiepId)))
+                .fetchOne();
+        return getBbiepNode(bbiepRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                bbiepRecord.getBasedBccpManifestId().toBigInteger(), bbiepRecord.getHashPath());
+    }
+
     public BbiepNode.Bbiep getBbiep(BigInteger topLevelAsbiepId, String hashPath) {
         BbiepNode.Bbiep bbiep = new BbiepNode.Bbiep();
         bbiep.setUsed(true);
@@ -91,12 +100,14 @@ public class BbiepReadRepository {
 
         BbiepRecord bbiepRecord = getBbiepByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (bbiepRecord != null) {
+            bbiep.setOwnerTopLevelAsbiepId(bbiepRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             bbiep.setBbiepId(bbiepRecord.getBbiepId().toBigInteger());
             bbiep.setBasedBccpManifestId(bbiepRecord.getBasedBccpManifestId().toBigInteger());
             bbiep.setGuid(bbiepRecord.getGuid());
             bbiep.setRemark(bbiepRecord.getRemark());
             bbiep.setBizTerm(bbiepRecord.getBizTerm());
             bbiep.setDefinition(bbiepRecord.getDefinition());
+            bbiep.setDisplayName(bbiepRecord.getDisplayName());
         }
 
         return bbiep;

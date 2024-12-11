@@ -46,6 +46,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListManifest.CodeList
 import org.oagi.score.repo.api.impl.jooq.entity.tables.CodeListValueManifest.CodeListValueManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest.DtScManifestPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSetRelease.ModuleSetReleasePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
@@ -80,6 +81,12 @@ public class Release extends TableImpl<ReleaseRecord> {
      * interpreted to be released later than the other.
      */
     public final TableField<ReleaseRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.");
+
+    /**
+     * The column <code>oagi.release.library_id</code>. A foreign key pointed to
+     * a library of the current record.
+     */
+    public final TableField<ReleaseRecord, ULong> LIBRARY_ID = createField(DSL.name("library_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointed to a library of the current record.");
 
     /**
      * The column <code>oagi.release.guid</code>. A globally unique identifier
@@ -224,19 +231,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public List<ForeignKey<ReleaseRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
-    }
-
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
-
-        return _namespace;
+        return Arrays.asList(Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK, Keys.RELEASE_LIBRARY_ID_FK, Keys.RELEASE_NAMESPACE_ID_FK);
     }
 
     private transient AppUserPath _releaseCreatedByFk;
@@ -263,6 +258,30 @@ public class Release extends TableImpl<ReleaseRecord> {
             _releaseLastUpdatedByFk = new AppUserPath(this, Keys.RELEASE_LAST_UPDATED_BY_FK, null);
 
         return _releaseLastUpdatedByFk;
+    }
+
+    private transient LibraryPath _library;
+
+    /**
+     * Get the implicit join path to the <code>oagi.library</code> table.
+     */
+    public LibraryPath library() {
+        if (_library == null)
+            _library = new LibraryPath(this, Keys.RELEASE_LIBRARY_ID_FK, null);
+
+        return _library;
+    }
+
+    private transient NamespacePath _namespace;
+
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.RELEASE_NAMESPACE_ID_FK, null);
+
+        return _namespace;
     }
 
     private transient AccManifestPath _accManifest;
@@ -304,19 +323,6 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _agencyIdListValueManifest;
     }
 
-    private transient AsccpManifestPath _asccpManifest;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest</code> table
-     */
-    public AsccpManifestPath asccpManifest() {
-        if (_asccpManifest == null)
-            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
-
-        return _asccpManifest;
-    }
-
     private transient AsccManifestPath _asccManifest;
 
     /**
@@ -330,17 +336,17 @@ public class Release extends TableImpl<ReleaseRecord> {
         return _asccManifest;
     }
 
-    private transient BccpManifestPath _bccpManifest;
+    private transient AsccpManifestPath _asccpManifest;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
-     * table
+     * Get the implicit to-many join path to the
+     * <code>oagi.asccp_manifest</code> table
      */
-    public BccpManifestPath bccpManifest() {
-        if (_bccpManifest == null)
-            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+    public AsccpManifestPath asccpManifest() {
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifestPath(this, null, Keys.ASCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
-        return _bccpManifest;
+        return _asccpManifest;
     }
 
     private transient BccManifestPath _bccManifest;
@@ -354,6 +360,19 @@ public class Release extends TableImpl<ReleaseRecord> {
             _bccManifest = new BccManifestPath(this, null, Keys.BCC_MANIFEST_RELEASE_ID_FK.getInverseKey());
 
         return _bccManifest;
+    }
+
+    private transient BccpManifestPath _bccpManifest;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.bccp_manifest</code>
+     * table
+     */
+    public BccpManifestPath bccpManifest() {
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifestPath(this, null, Keys.BCCP_MANIFEST_RELEASE_ID_FK.getInverseKey());
+
+        return _bccpManifest;
     }
 
     private transient BlobContentManifestPath _blobContentManifest;

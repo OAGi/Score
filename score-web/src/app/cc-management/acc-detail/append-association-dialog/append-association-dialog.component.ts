@@ -196,6 +196,7 @@ export class AppendAssociationDialogComponent implements OnInit {
 
   ngOnInit() {
     this.request = new CcListRequest();
+    this.request.library.libraryId = this.data.libraryId;
     this.request.release.releaseId = this.data.releaseId;
     this.request.types = this.data.isGlobal ? ['BCCP'] : this.typeList;
     this.request.excludes = this.data.excludes ? this.data.excludes : [];

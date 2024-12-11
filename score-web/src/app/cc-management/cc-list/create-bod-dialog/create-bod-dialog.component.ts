@@ -270,7 +270,9 @@ export class CreateBodDialogComponent implements OnInit {
   ngOnInit() {
     this.verbRequest = new CcListRequest();
     this.nounRequest = new CcListRequest();
+    this.verbRequest.library.libraryId = this.data.libraryId;
     this.verbRequest.release.releaseId = this.data.releaseId;
+    this.nounRequest.library.libraryId = this.data.libraryId;
     this.nounRequest.release.releaseId = this.data.releaseId;
     this.action = this.data.action;
     this.verbRequest.types = ['ASCCP'];

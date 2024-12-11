@@ -332,31 +332,7 @@ public class Bcc extends TableImpl<BccRecord> {
 
     @Override
     public List<ForeignKey<BccRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BCC_TO_BCCP_ID_FK, Keys.BCC_FROM_ACC_ID_FK, Keys.BCC_CREATED_BY_FK, Keys.BCC_OWNER_USER_ID_FK, Keys.BCC_LAST_UPDATED_BY_FK, Keys.BCC_REPLACEMENT_BCC_ID_FK, Keys.BCC_PREV_BCC_ID_FK, Keys.BCC_NEXT_BCC_ID_FK);
-    }
-
-    private transient BccpPath _bccp;
-
-    /**
-     * Get the implicit join path to the <code>oagi.bccp</code> table.
-     */
-    public BccpPath bccp() {
-        if (_bccp == null)
-            _bccp = new BccpPath(this, Keys.BCC_TO_BCCP_ID_FK, null);
-
-        return _bccp;
-    }
-
-    private transient AccPath _acc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc</code> table.
-     */
-    public AccPath acc() {
-        if (_acc == null)
-            _acc = new AccPath(this, Keys.BCC_FROM_ACC_ID_FK, null);
-
-        return _acc;
+        return Arrays.asList(Keys.BCC_CREATED_BY_FK, Keys.BCC_FROM_ACC_ID_FK, Keys.BCC_LAST_UPDATED_BY_FK, Keys.BCC_NEXT_BCC_ID_FK, Keys.BCC_OWNER_USER_ID_FK, Keys.BCC_PREV_BCC_ID_FK, Keys.BCC_REPLACEMENT_BCC_ID_FK, Keys.BCC_TO_BCCP_ID_FK);
     }
 
     private transient AppUserPath _bccCreatedByFk;
@@ -372,17 +348,16 @@ public class Bcc extends TableImpl<BccRecord> {
         return _bccCreatedByFk;
     }
 
-    private transient AppUserPath _bccOwnerUserIdFk;
+    private transient AccPath _acc;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bcc_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.acc</code> table.
      */
-    public AppUserPath bccOwnerUserIdFk() {
-        if (_bccOwnerUserIdFk == null)
-            _bccOwnerUserIdFk = new AppUserPath(this, Keys.BCC_OWNER_USER_ID_FK, null);
+    public AccPath acc() {
+        if (_acc == null)
+            _acc = new AccPath(this, Keys.BCC_FROM_ACC_ID_FK, null);
 
-        return _bccOwnerUserIdFk;
+        return _acc;
     }
 
     private transient AppUserPath _bccLastUpdatedByFk;
@@ -398,17 +373,30 @@ public class Bcc extends TableImpl<BccRecord> {
         return _bccLastUpdatedByFk;
     }
 
-    private transient BccPath _bccReplacementBccIdFk;
+    private transient BccPath _bccNextBccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table, via the
-     * <code>bcc_replacement_bcc_id_fk</code> key.
+     * <code>bcc_next_bcc_id_fk</code> key.
      */
-    public BccPath bccReplacementBccIdFk() {
-        if (_bccReplacementBccIdFk == null)
-            _bccReplacementBccIdFk = new BccPath(this, Keys.BCC_REPLACEMENT_BCC_ID_FK, null);
+    public BccPath bccNextBccIdFk() {
+        if (_bccNextBccIdFk == null)
+            _bccNextBccIdFk = new BccPath(this, Keys.BCC_NEXT_BCC_ID_FK, null);
 
-        return _bccReplacementBccIdFk;
+        return _bccNextBccIdFk;
+    }
+
+    private transient AppUserPath _bccOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>bcc_owner_user_id_fk</code> key.
+     */
+    public AppUserPath bccOwnerUserIdFk() {
+        if (_bccOwnerUserIdFk == null)
+            _bccOwnerUserIdFk = new AppUserPath(this, Keys.BCC_OWNER_USER_ID_FK, null);
+
+        return _bccOwnerUserIdFk;
     }
 
     private transient BccPath _bccPrevBccIdFk;
@@ -424,17 +412,29 @@ public class Bcc extends TableImpl<BccRecord> {
         return _bccPrevBccIdFk;
     }
 
-    private transient BccPath _bccNextBccIdFk;
+    private transient BccPath _bccReplacementBccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.bcc</code> table, via the
-     * <code>bcc_next_bcc_id_fk</code> key.
+     * <code>bcc_replacement_bcc_id_fk</code> key.
      */
-    public BccPath bccNextBccIdFk() {
-        if (_bccNextBccIdFk == null)
-            _bccNextBccIdFk = new BccPath(this, Keys.BCC_NEXT_BCC_ID_FK, null);
+    public BccPath bccReplacementBccIdFk() {
+        if (_bccReplacementBccIdFk == null)
+            _bccReplacementBccIdFk = new BccPath(this, Keys.BCC_REPLACEMENT_BCC_ID_FK, null);
 
-        return _bccNextBccIdFk;
+        return _bccReplacementBccIdFk;
+    }
+
+    private transient BccpPath _bccp;
+
+    /**
+     * Get the implicit join path to the <code>oagi.bccp</code> table.
+     */
+    public BccpPath bccp() {
+        if (_bccp == null)
+            _bccp = new BccpPath(this, Keys.BCC_TO_BCCP_ID_FK, null);
+
+        return _bccp;
     }
 
     private transient BccBiztermPath _bccBizterm;

@@ -182,20 +182,7 @@ public class Message extends TableImpl<MessageRecord> {
 
     @Override
     public List<ForeignKey<MessageRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MESSAGE_SENDER_ID_FK, Keys.MESSAGE_RECIPIENT_ID_FK);
-    }
-
-    private transient AppUserPath _messageSenderIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>message_sender_id_fk</code> key.
-     */
-    public AppUserPath messageSenderIdFk() {
-        if (_messageSenderIdFk == null)
-            _messageSenderIdFk = new AppUserPath(this, Keys.MESSAGE_SENDER_ID_FK, null);
-
-        return _messageSenderIdFk;
+        return Arrays.asList(Keys.MESSAGE_RECIPIENT_ID_FK, Keys.MESSAGE_SENDER_ID_FK);
     }
 
     private transient AppUserPath _messageRecipientIdFk;
@@ -209,6 +196,19 @@ public class Message extends TableImpl<MessageRecord> {
             _messageRecipientIdFk = new AppUserPath(this, Keys.MESSAGE_RECIPIENT_ID_FK, null);
 
         return _messageRecipientIdFk;
+    }
+
+    private transient AppUserPath _messageSenderIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>message_sender_id_fk</code> key.
+     */
+    public AppUserPath messageSenderIdFk() {
+        if (_messageSenderIdFk == null)
+            _messageSenderIdFk = new AppUserPath(this, Keys.MESSAGE_SENDER_ID_FK, null);
+
+        return _messageSenderIdFk;
     }
 
     @Override

@@ -1,0 +1,14 @@
+<div class="d-flex align-items-center">
+  <div class="d-flex flex-column" *ngIf="title">
+    <span class="title">{{ title }}</span>
+    <span class="subtitle f14" *ngIf="subtitle">{{ subtitle }}</span>
+  </div>
+  <span class="library-divider pl-2 pr-2" *ngIf="title">|</span>
+  <score-column-selector [title]="selectedLibrary ? selectedLibrary.name : '-'"
+                         [classes]="['f12', 'font-weight-bold']"
+                         [columns]="filterLibraries"
+                         [draggable]="false"
+                         [multiple]="false"
+                         (columnsChange)="onFilterLibraryChange($event)">
+  </score-column-selector>
+</div>

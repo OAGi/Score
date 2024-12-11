@@ -238,20 +238,7 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
 
     @Override
     public List<ForeignKey<OasParameterRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK, Keys.OAS_PARAMETER_CREATED_BY_FK, Keys.OAS_PARAMETER_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasHttpHeaderPath _oasHttpHeader;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_http_header</code>
-     * table.
-     */
-    public OasHttpHeaderPath oasHttpHeader() {
-        if (_oasHttpHeader == null)
-            _oasHttpHeader = new OasHttpHeaderPath(this, Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK, null);
-
-        return _oasHttpHeader;
+        return Arrays.asList(Keys.OAS_PARAMETER_CREATED_BY_FK, Keys.OAS_PARAMETER_LAST_UPDATED_BY_FK, Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK);
     }
 
     private transient AppUserPath _oasParameterCreatedByFk;
@@ -278,6 +265,19 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
             _oasParameterLastUpdatedByFk = new AppUserPath(this, Keys.OAS_PARAMETER_LAST_UPDATED_BY_FK, null);
 
         return _oasParameterLastUpdatedByFk;
+    }
+
+    private transient OasHttpHeaderPath _oasHttpHeader;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_http_header</code>
+     * table.
+     */
+    public OasHttpHeaderPath oasHttpHeader() {
+        if (_oasHttpHeader == null)
+            _oasHttpHeader = new OasHttpHeaderPath(this, Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK, null);
+
+        return _oasHttpHeader;
     }
 
     private transient OasParameterLinkPath _oasParameterLink;

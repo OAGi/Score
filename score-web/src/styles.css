@@ -414,6 +414,10 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
   cursor: pointer;
 }
 
+.multi-line-snackbar {
+  white-space: pre-line; /* Allows line breaks */
+}
+
 /*******************************
          Activity Feed
 *******************************/
@@ -1155,6 +1159,17 @@ mat-paginator .mat-mdc-select, mat-paginator .mat-mdc-select-value-text {
 
 .bie-checkbox .mdc-checkbox__checkmark {
   pointer-events: auto;
+}
+
+.bie-display-name {
+  border: 1px solid;
+  font-size: 12px;
+  padding: 0px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: bold;
+  background-color: rgb(0, 92, 187);
+  color: rgb(255, 255, 255);
 }
 
 .mat-mdc-card {

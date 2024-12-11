@@ -296,7 +296,7 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
 
     @Override
     public List<ForeignKey<AgencyIdListRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, Keys.AGENCY_ID_LIST_CREATED_BY_FK, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
+        return Arrays.asList(Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_CREATED_BY_FK, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK);
     }
 
     private transient AgencyIdListValuePath _agencyIdListValue;
@@ -325,18 +325,6 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         return _agencyIdListBasedAgencyIdListIdFk;
     }
 
-    private transient NamespacePath _namespace;
-
-    /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
-     */
-    public NamespacePath namespace() {
-        if (_namespace == null)
-            _namespace = new NamespacePath(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, null);
-
-        return _namespace;
-    }
-
     private transient AppUserPath _agencyIdListCreatedByFk;
 
     /**
@@ -363,17 +351,29 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         return _agencyIdListLastUpdatedByFk;
     }
 
-    private transient AgencyIdListPath _agencyIdListReplacementAgencyIdListIdFk;
+    private transient NamespacePath _namespace;
+
+    /**
+     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     */
+    public NamespacePath namespace() {
+        if (_namespace == null)
+            _namespace = new NamespacePath(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, null);
+
+        return _namespace;
+    }
+
+    private transient AgencyIdListPath _agencyIdListNextAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
-     * via the <code>agency_id_list_replacement_agency_id_list_id_fk</code> key.
+     * via the <code>agency_id_list_next_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdListPath agencyIdListReplacementAgencyIdListIdFk() {
-        if (_agencyIdListReplacementAgencyIdListIdFk == null)
-            _agencyIdListReplacementAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, null);
+    public AgencyIdListPath agencyIdListNextAgencyIdListIdFk() {
+        if (_agencyIdListNextAgencyIdListIdFk == null)
+            _agencyIdListNextAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK, null);
 
-        return _agencyIdListReplacementAgencyIdListIdFk;
+        return _agencyIdListNextAgencyIdListIdFk;
     }
 
     private transient AppUserPath _agencyIdListOwnerUserIdFk;
@@ -402,17 +402,17 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
         return _agencyIdListPrevAgencyIdListIdFk;
     }
 
-    private transient AgencyIdListPath _agencyIdListNextAgencyIdListIdFk;
+    private transient AgencyIdListPath _agencyIdListReplacementAgencyIdListIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.agency_id_list</code> table,
-     * via the <code>agency_id_list_next_agency_id_list_id_fk</code> key.
+     * via the <code>agency_id_list_replacement_agency_id_list_id_fk</code> key.
      */
-    public AgencyIdListPath agencyIdListNextAgencyIdListIdFk() {
-        if (_agencyIdListNextAgencyIdListIdFk == null)
-            _agencyIdListNextAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK, null);
+    public AgencyIdListPath agencyIdListReplacementAgencyIdListIdFk() {
+        if (_agencyIdListReplacementAgencyIdListIdFk == null)
+            _agencyIdListReplacementAgencyIdListIdFk = new AgencyIdListPath(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, null);
 
-        return _agencyIdListNextAgencyIdListIdFk;
+        return _agencyIdListReplacementAgencyIdListIdFk;
     }
 
     private transient AgencyIdListManifestPath _agencyIdListManifest;

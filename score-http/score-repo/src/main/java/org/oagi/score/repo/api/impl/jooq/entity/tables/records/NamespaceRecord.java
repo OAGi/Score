@@ -38,11 +38,27 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     }
 
     /**
+     * Setter for <code>oagi.namespace.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public void setLibraryId(ULong value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>oagi.namespace.library_id</code>. A foreign key pointed
+     * to a library of the current record.
+     */
+    public ULong getLibraryId() {
+        return (ULong) get(1);
+    }
+
+    /**
      * Setter for <code>oagi.namespace.uri</code>. This is the URI of the
      * namespace.
      */
     public void setUri(String value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
@@ -50,7 +66,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * namespace.
      */
     public String getUri() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
@@ -60,7 +76,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * an XML schema.
      */
     public void setPrefix(String value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
@@ -70,7 +86,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * an XML schema.
      */
     public String getPrefix() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
@@ -78,7 +94,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * explanation about the namespace or use of the namespace.
      */
     public void setDescription(String value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
@@ -86,7 +102,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * explanation about the namespace or use of the namespace.
      */
     public String getDescription() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
@@ -96,7 +112,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * namespace for the end user CCs.
      */
     public void setIsStdNmsp(Byte value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
@@ -106,7 +122,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * namespace for the end user CCs.
      */
     public Byte getIsStdNmsp() {
-        return (Byte) get(4);
+        return (Byte) get(5);
     }
 
     /**
@@ -114,7 +130,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * APP_USER table identifying the user who can update or delete the record.
      */
     public void setOwnerUserId(ULong value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
@@ -122,7 +138,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * APP_USER table identifying the user who can update or delete the record.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(5);
+        return (ULong) get(6);
     }
 
     /**
@@ -130,7 +146,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * APP_USER table identifying user who created the namespace.
      */
     public void setCreatedBy(ULong value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
@@ -138,7 +154,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * APP_USER table identifying user who created the namespace.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(6);
+        return (ULong) get(7);
     }
 
     /**
@@ -146,7 +162,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * the APP_USER table identifying the user who last updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -154,7 +170,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * the APP_USER table identifying the user who last updated the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(7);
+        return (ULong) get(8);
     }
 
     /**
@@ -162,7 +178,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * when the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -170,7 +186,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * when the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(8);
+        return (LocalDateTime) get(9);
     }
 
     /**
@@ -178,7 +194,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * timestamp when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
@@ -186,7 +202,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
      * timestamp when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(9);
+        return (LocalDateTime) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -212,10 +228,11 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     /**
      * Create a detached, initialised NamespaceRecord
      */
-    public NamespaceRecord(ULong namespaceId, String uri, String prefix, String description, Byte isStdNmsp, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public NamespaceRecord(ULong namespaceId, ULong libraryId, String uri, String prefix, String description, Byte isStdNmsp, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(Namespace.NAMESPACE);
 
         setNamespaceId(namespaceId);
+        setLibraryId(libraryId);
         setUri(uri);
         setPrefix(prefix);
         setDescription(description);

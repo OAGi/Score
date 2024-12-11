@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.CodeListObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
@@ -46,11 +43,14 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_2_TA_1")
     public void test_TA_1() {
         AppUserObject endUserA;
+        LibraryObject library;
         ReleaseObject branch;
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -72,7 +72,7 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
         assertEquals("1", getText(editCodeListPage.getRevisionField()));
 
         CodeListObject codeList = getAPIFactory().getCodeListAPI().getNewlyCreatedCodeList(endUserA, branch.getReleaseNumber());
-        ReleaseObject anotherBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
+        ReleaseObject anotherBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.6");
         homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         assertThrows(NoSuchElementException.class, () -> {
             viewEditCodeListPage.searchCodeListByNameAndBranch(codeList.getName(), anotherBranch.getReleaseNumber());
@@ -89,8 +89,9 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -130,8 +131,9 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -166,8 +168,9 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
         }
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -192,11 +195,12 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
 
             AppUserObject developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             /**
              * Create Published developer Code List for a particular release branch.
              */
@@ -225,11 +229,12 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
 
             AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserB);
-            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+            NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB, library);
 
             /**
              * Create end-user Code List for a particular release branch. States - WIP, Draft and Production
@@ -271,13 +276,14 @@ public class TC_17_2_CreatingABrandNewEndUserCodeList extends BaseTest {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
 
-            ReleaseObject branchOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            branchTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            ReleaseObject branchThree = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.6");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject branchOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            branchTwo = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            ReleaseObject branchThree = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.6");
 
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
             /**
              * Create Published developer Code List for a particular release branch.
              */

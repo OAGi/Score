@@ -56,8 +56,9 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(endUser, endUserNamespace, latestRelease, "WIP");
@@ -103,7 +104,8 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
@@ -163,8 +165,9 @@ public class TC_36_1_AgencyIdListAccess extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
-        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease();
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(endUser, endUserNamespace, latestRelease, "WIP");

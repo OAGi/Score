@@ -196,43 +196,7 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
 
     @Override
     public List<ForeignKey<OasParameterLinkRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_PARAMETER_LINK_OAS_RESPONSE_ID_FK, Keys.OAS_PARAMETER_LINK_OAS_PARAMETER_ID_FK, Keys.OAS_PARAMETER_LINK_OAS_OPERATION_ID_FK, Keys.OAS_PARAMETER_LINK_CREATED_BY_FK, Keys.OAS_PARAMETER_LINK_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasResponsePath _oasResponse;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_response</code> table.
-     */
-    public OasResponsePath oasResponse() {
-        if (_oasResponse == null)
-            _oasResponse = new OasResponsePath(this, Keys.OAS_PARAMETER_LINK_OAS_RESPONSE_ID_FK, null);
-
-        return _oasResponse;
-    }
-
-    private transient OasParameterPath _oasParameter;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_parameter</code> table.
-     */
-    public OasParameterPath oasParameter() {
-        if (_oasParameter == null)
-            _oasParameter = new OasParameterPath(this, Keys.OAS_PARAMETER_LINK_OAS_PARAMETER_ID_FK, null);
-
-        return _oasParameter;
-    }
-
-    private transient OasOperationPath _oasOperation;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_operation</code> table.
-     */
-    public OasOperationPath oasOperation() {
-        if (_oasOperation == null)
-            _oasOperation = new OasOperationPath(this, Keys.OAS_PARAMETER_LINK_OAS_OPERATION_ID_FK, null);
-
-        return _oasOperation;
+        return Arrays.asList(Keys.OAS_PARAMETER_LINK_CREATED_BY_FK, Keys.OAS_PARAMETER_LINK_LAST_UPDATED_BY_FK, Keys.OAS_PARAMETER_LINK_OAS_OPERATION_ID_FK, Keys.OAS_PARAMETER_LINK_OAS_PARAMETER_ID_FK, Keys.OAS_PARAMETER_LINK_OAS_RESPONSE_ID_FK);
     }
 
     private transient AppUserPath _oasParameterLinkCreatedByFk;
@@ -259,6 +223,42 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
             _oasParameterLinkLastUpdatedByFk = new AppUserPath(this, Keys.OAS_PARAMETER_LINK_LAST_UPDATED_BY_FK, null);
 
         return _oasParameterLinkLastUpdatedByFk;
+    }
+
+    private transient OasOperationPath _oasOperation;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_operation</code> table.
+     */
+    public OasOperationPath oasOperation() {
+        if (_oasOperation == null)
+            _oasOperation = new OasOperationPath(this, Keys.OAS_PARAMETER_LINK_OAS_OPERATION_ID_FK, null);
+
+        return _oasOperation;
+    }
+
+    private transient OasParameterPath _oasParameter;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_parameter</code> table.
+     */
+    public OasParameterPath oasParameter() {
+        if (_oasParameter == null)
+            _oasParameter = new OasParameterPath(this, Keys.OAS_PARAMETER_LINK_OAS_PARAMETER_ID_FK, null);
+
+        return _oasParameter;
+    }
+
+    private transient OasResponsePath _oasResponse;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_response</code> table.
+     */
+    public OasResponsePath oasResponse() {
+        if (_oasResponse == null)
+            _oasResponse = new OasResponsePath(this, Keys.OAS_PARAMETER_LINK_OAS_RESPONSE_ID_FK, null);
+
+        return _oasResponse;
     }
 
     @Override

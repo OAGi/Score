@@ -174,8 +174,9 @@
                 <div class="den word-break-all">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
-                    <div>
+                    <div class="d-inline-flex align-items-center">
                       <span>{{ element.den }}</span>
+                      <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
                     </div>
                     <div>
                       <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>

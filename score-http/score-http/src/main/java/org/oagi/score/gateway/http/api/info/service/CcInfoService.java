@@ -42,13 +42,13 @@ public class CcInfoService {
     @Autowired
     private SessionService sessionService;
 
-    public SummaryCcInfo getSummaryCcInfo(AuthenticatedPrincipal user) {
+    public SummaryCcInfo getSummaryCcInfo(AuthenticatedPrincipal user, BigInteger libraryId) {
         AppUser requester = sessionService.getAppUserByUsername(user);
         if (user == null || requester == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }
 
-        List<SummaryCc> summaryCcList = ccRepository.getSummaryCcList(requester);
+        List<SummaryCc> summaryCcList = ccRepository.getSummaryCcList(requester, libraryId);
 
         SummaryCcInfo info = new SummaryCcInfo();
         Map<CcState, Integer> numberOfTotalCcByStates =
@@ -77,7 +77,7 @@ public class CcInfoService {
         request.setOwnerLoginIds(Arrays.asList(String.valueOf(requester.getLoginId())));
         request.setPageRequest(pageRequest);
 
-        Release workingRelease = releaseRepository.findByReleaseNum("Working").stream().findFirst().get();
+        Release workingRelease = releaseRepository.findByReleaseNum(libraryId, "Working").stream().findFirst().get();
         request.setReleaseId(workingRelease.getReleaseId());
 
         info.setMyRecentCCs(ccListService.getCcList(request).getList());
@@ -85,13 +85,13 @@ public class CcInfoService {
         return info;
     }
 
-    public SummaryCcExtInfo getSummaryCcExtInfo(AuthenticatedPrincipal user, BigInteger releaseId) {
+    public SummaryCcExtInfo getSummaryCcExtInfo(AuthenticatedPrincipal user, BigInteger libraryId, BigInteger releaseId) {
         AppUser requester = sessionService.getAppUserByUsername(user);
         if (user == null || requester == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }
 
-        List<SummaryCcExt> summaryCcExtList = ccRepository.getSummaryCcExtList(releaseId);
+        List<SummaryCcExt> summaryCcExtList = ccRepository.getSummaryCcExtList(libraryId, releaseId);
 
         SummaryCcExtInfo info = new SummaryCcExtInfo();
         Map<CcState, Integer> numberOfCcExtByStates =
@@ -114,7 +114,7 @@ public class CcInfoService {
                         Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum)));
         info.setCcExtByUsersAndStates(ccExtByUsersAndStates);
 
-        info.setMyExtensionsUnusedInBIEs(ccListService.getMyExtensionsUnusedInBIEs(user));
+        info.setMyExtensionsUnusedInBIEs(ccListService.getMyExtensionsUnusedInBIEs(user, libraryId));
 
         return info;
     }

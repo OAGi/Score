@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 
 @Data
 public class TopLevelASBIEPObject {
@@ -15,6 +16,8 @@ public class TopLevelASBIEPObject {
     private BigInteger asbiepId;
 
     private BigInteger ownerUserId;
+
+    private String ownerLoginId;
 
     private LocalDateTime lastUpdateTimestamp;
 
@@ -44,6 +47,7 @@ public class TopLevelASBIEPObject {
                                                                            String state) {
         TopLevelASBIEPObject topLevelAsbiep = new TopLevelASBIEPObject();
         topLevelAsbiep.setOwnerUserId(user.getAppUserId());
+        topLevelAsbiep.setOwnerLoginId(user.getLoginId());
         topLevelAsbiep.setLastUpdateTimestamp(LocalDateTime.now());
         topLevelAsbiep.setLastUpdatedBy(user.getAppUserId());
         topLevelAsbiep.setReleaseId(release.getReleaseId());

@@ -2,11 +2,13 @@ import {PageRequest} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../common/utility';
+import {Library} from '../../library-management/domain/library';
 
 export class SimpleRelease {
   releaseId: number;
   releaseNum: string;
   state: string;
+  workingRelease: boolean;
 }
 
 export class ReleaseList {
@@ -25,11 +27,13 @@ export class ReleaseDetail {
   releaseNote: string;
   releaseLicense: string;
   state: string;
+  libraryId: number;
   namespaceId: number;
   latestRelease: boolean;
 }
 
 export class ReleaseListRequest {
+  library: Library = new Library();
   filters: {
     releaseNum: string;
   };
@@ -141,7 +145,8 @@ export const WorkingRelease = {
   releaseNum: 'Working',
   // @TODO: this must be retrieved from server.
   releaseId: 2,
-  state: ''
+  state: '',
+  working: true
 };
 
 export class AssignableMap {

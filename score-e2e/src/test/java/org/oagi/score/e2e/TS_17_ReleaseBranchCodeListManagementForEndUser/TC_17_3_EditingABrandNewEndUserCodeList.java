@@ -44,14 +44,16 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_1")
     public void test_TA_1() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create WIP end-user Code List for a particular release branch.
@@ -85,7 +87,9 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         assertEquals("true", editCodeListPage.getNamespaceSelectField().getAttribute("aria-required"));
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
         assertNotChecked(editCodeListPage.getDeprecatedSelectField());
-        ArrayList<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getStandardNamespacesURIs();
+        List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getStandardNamespacesURIs(
+                getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec")
+        );
         for (NamespaceObject namespace : standardNamespaces) {
             assertThrows(Exception.class, () -> {
                 editCodeListPage.setNamespace(namespace);
@@ -106,14 +110,16 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_2")
     public void test_TA_2() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create WIP end-user Code List for a particular release branch.
@@ -151,6 +157,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_3")
     public void test_TA_3() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         List<CodeListValueObject> values;
@@ -158,8 +165,9 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.
@@ -184,6 +192,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_4")
     public void test_TA_4() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         List<CodeListValueObject> values;
@@ -191,8 +200,9 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.
@@ -220,14 +230,16 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_5")
     public void test_TA_5() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.
@@ -254,14 +266,16 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_6")
     public void test_TA_6() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.
@@ -286,14 +300,16 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_7")
     public void test_TA_7() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.
@@ -322,6 +338,7 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
     @DisplayName("TC_17_3_TA_8")
     public void test_TA_8() {
         AppUserObject endUser;
+        LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
         NamespaceObject namespaceEU;
@@ -329,8 +346,9 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser);
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
 
             /**
              * Create derived WIP end-user Code List for a particular release branch.

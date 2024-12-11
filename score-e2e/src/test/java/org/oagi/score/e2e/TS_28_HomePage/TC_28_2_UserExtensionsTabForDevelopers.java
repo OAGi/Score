@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_28_HomePage;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -56,9 +56,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1, library);
 
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
@@ -92,9 +93,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1, library);
 
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
@@ -185,9 +187,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         thisAccountWillBeDeletedAfterTests(endUser2);
         String branch = "10.8.4";
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1, library);
 
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
@@ -248,9 +251,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser2 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser2);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1, library);
 
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
         UserTopLevelASBIEPContainer container2 = new UserTopLevelASBIEPContainer(endUser2, release, endUserNamespace);
@@ -307,9 +311,10 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         AppUserObject endUser1 = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser1);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
 
-        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1);
+        NamespaceObject endUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser1, library);
 
         UserTopLevelASBIEPContainer container1 = new UserTopLevelASBIEPContainer(endUser1, release, endUserNamespace);
 
@@ -384,7 +389,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
         private List<Pair<String, String>> ccProductionList = new ArrayList<Pair<String, String>>();
 
         public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject namespace) {
-            this(appUser, release, namespace, nextInt(1, 3), nextInt(1, 3), nextInt(1, 3));
+            this(appUser, release, namespace, RandomUtils.secure().randomInt(1, 3), RandomUtils.secure().randomInt(1, 3), RandomUtils.secure().randomInt(1, 3));
         }
 
         public UserTopLevelASBIEPContainer(AppUserObject appUser, ReleaseObject release, NamespaceObject userNamespace,
@@ -399,12 +404,14 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
             AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
 
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryById(release.getLibraryId());
+
             HomePage homePage = loginPage().signIn(this.appUser.getLoginId(), this.appUser.getPassword());
             for (int i = 0; i < numberOfWIPUEGs; ++i) {
                 ASCCPObject asccp;
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
                     ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -428,7 +435,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                 ASCCPObject asccp;
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
                     ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
@@ -458,7 +465,7 @@ public class TC_28_2_UserExtensionsTabForDevelopers extends BaseTest {
                 ASCCPObject asccp;
                 {
                     CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+                    NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
                     ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
                     coreComponentAPI.appendExtension(acc, developer, namespace, "Published");

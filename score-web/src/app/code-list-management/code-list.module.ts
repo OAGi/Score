@@ -15,6 +15,7 @@ import {CodeListUpliftComponent} from './code-list-uplift/code-list-uplift.compo
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
+import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -50,18 +51,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule,
-    FontAwesomeModule,
-    ColumnSelectorModule,
-    SearchBarModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        FontAwesomeModule,
+        ColumnSelectorModule,
+        SearchBarModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     CodeListListComponent,
     CodeListDetailComponent,

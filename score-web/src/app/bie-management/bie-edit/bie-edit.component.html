@@ -19,7 +19,7 @@
                       <div class="col-9">
                         <mat-form-field>
                           <mat-label *ngIf="!selectedNode">Search</mat-label>
-                          <mat-label *ngIf="selectedNode">Search > {{selectedNode.name}}</mat-label>
+                          <mat-label *ngIf="selectedNode">Search > {{ (selectedNode.displayName ? selectedNode.displayName : selectedNode.name) }}</mat-label>
                           <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
                                  [disabled]="searcher.isSearching"
                                  (keyup.enter)="search(searcher.inputKeyword)">
@@ -116,9 +116,9 @@
                          *ngFor="let bread of selectedNode.parents; let last = last;">
                       <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
                       <span *ngIf="last"
-                            class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
+                            class="tree-breadcrumb-item-last">{{ bread.displayName ? bread.displayName : bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
                       <span *ngIf="!last" class="tree-breadcrumb-item"
-                            (click)="scrollToNode(bread)">{{ bread.name }}</span>
+                            (click)="scrollToNode(bread)">{{ bread.displayName ? bread.displayName : bread.name }}</span>
                     </div>
                   </div>
                 </div>
@@ -138,7 +138,7 @@
                                                [style.height.px]="innerHeight" #virtualScroll>
                     <div *cdkVirtualFor="let node of dataSource" class="example-item"
                          (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
-                      <div class="mat-tree-node d-flex pointer"
+                      <div class="mat-tree-node d-flex align-items-center pointer"
                            tabIndex="0"
                            [attr.data-level]="node.level"
                            [attr.data-path]="node.path"
@@ -148,7 +148,6 @@
                            [style.padding-left]="node.level * paddingPixel + 'px'">
                         <button *ngIf="dataSource.isExpandable(node); else disabledRef;"
                                 (click)="toggle(node, $event)"
-                                class="align-self-center"
                                 mat-icon-button>
                           <mat-icon class="mat-icon-rtl-mirror">
                             {{ node.expanded ? 'expand_more' : 'chevron_right' }}
@@ -168,35 +167,54 @@
                                       [matTooltipDisabled]="getNodeTooltip(node) === ''">
                         </mat-checkbox>
 
-                        <span [class]="['align-self-center', node.type.toLowerCase(),
-                                        this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
-                              [class.deprecated]="node.deprecated"
-                              [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                              [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
-                              [innerHTML]="node.name | highlight : searcher.searchKeyword">
-                        </span>
+                        <div class="d-inline-flex align-items-center flex-grow-1"
+                             *ngIf="renamingNode !== node; else editMode">
+                          <span [class]="[node.type.toLowerCase(),
+                                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                                [style.padding-right.px]="2"
+                                [class.deprecated]="node.deprecated"
+                                [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                                [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
+                                [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
+                                (dblclick)="startChangingDisplayName(node)">
+                          </span>
 
-                        <span [class]="['pl-3']" *ngIf="!dataSource.hideCardinality">
-                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                        </span>
+                          <span [class]="['pl-4']" *ngIf="!dataSource.hideCardinality">
+                            {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                          </span>
 
-                        <fa-icon [icon]="faRecycle"
-                                 matTooltip="Reused"
-                                 [class]="['pl-3', 'pointer']" *ngIf="node.derived"
-                                 (click)="openNewEditBieTab(node)"></fa-icon>
-                        <div class="ml-auto align-self-center mr-2" style="margin-bottom: 3px">
-                          <mat-icon [hidden]="!node.showCopyLinkIcon"
-                                    class="copy-link-icon"
-                                    matTooltip="Copy Link"
-                                    (click)="copyLink(node, $event)">
-                            link
-                          </mat-icon>
-                          <mat-icon class="context-menu-icon"
-                                    [matMenuTriggerFor]="contextMenu"
-                                    [matMenuTriggerData]="{'menuId': 'contextMenu'}"
-                                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                          </mat-icon>
+                          <fa-icon [icon]="faRecycle"
+                                   matTooltip="Reused"
+                                   [class]="['pl-3', 'pointer']" *ngIf="node.reused"
+                                   (click)="openNewEditBieTab(node, $event)"></fa-icon>
+                          <fa-icon [icon]="faSitemap"
+                                   matTooltip="Inherited"
+                                   [class]="['pl-3', 'pointer']" *ngIf="node.inherited"></fa-icon>
+                          <div class="ml-auto mr-2">
+                            <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
+                                      class="copy-link-icon"
+                                      matTooltip="Copy Link"
+                                      (click)="copyLink(node, $event)">
+                              link
+                            </mat-icon>
+                            <mat-icon class="context-menu-icon"
+                                      [matMenuTriggerFor]="contextMenu"
+                                      [matMenuTriggerData]="{'menuId': 'contextMenu'}"
+                                      (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                            </mat-icon>
+                          </div>
                         </div>
+
+                        <ng-template #editMode>
+                          <div class="node-edit-container d-flex flex-column">
+                            <input matInput #editInput
+                                   [(ngModel)]="node.displayName"
+                                   [maxLength]="100"
+                                   (blur)="stopChangingDisplayName()"
+                                   (keydown.enter)="stopChangingDisplayName()"
+                                   class="edit-input"/>
+                          </div>
+                        </ng-template>
                       </div>
                     </div>
                   </cdk-virtual-scroll-viewport>
@@ -206,6 +224,11 @@
                     <button mat-menu-item (click)="copyPath(contextMenuItem)">
                       <span class="context-menu-item">Copy Path</span>
                     </button>
+                    <button mat-menu-item (click)="startChangingDisplayName(contextMenuItem, $event)"
+                            *ngIf="canEdit"
+                            [disabled]="!canChangeDisplayName(contextMenuItem)">
+                      <span class="context-menu-item">Change Display Name</span>
+                    </button>
                     <mat-divider *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)"
                             *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)">
@@ -214,6 +237,15 @@
                     <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)"
                             *ngIf="dataSource && dataSource.isExpandable(contextMenuItem)">
                       <span class="context-menu-item">Expand 3</span>
+                    </button>
+                    <mat-divider *ngIf="canEdit && (canUseBaseBIE(contextMenuItem) || canRemoveBaseBIE(contextMenuItem))"></mat-divider>
+                    <button mat-menu-item (click)="useBaseBIE(contextMenuItem)"
+                            *ngIf="canEdit && canUseBaseBIE(contextMenuItem)">
+                      <span class="context-menu-item">Use Base BIE</span>
+                    </button>
+                    <button mat-menu-item (click)="removeBaseBIE(contextMenuItem)"
+                            *ngIf="canEdit && canRemoveBaseBIE(contextMenuItem)">
+                      <span class="context-menu-item">Remove Base BIE</span>
                     </button>
                     <mat-divider *ngIf="canReuseBIE(contextMenuItem) || canCreateBIEFromThis(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="reuseBIE(contextMenuItem)"
@@ -231,12 +263,20 @@
                       <span class="context-menu-item">Find Reuses</span>
                     </button>
                     <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
-                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem) && !contextMenuItem.inherited">
                       <span class="context-menu-item">Remove Reused BIE</span>
                     </button>
                     <button mat-menu-item (click)="retainReusedBIE(contextMenuItem)"
-                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem)">
+                            *ngIf="canEdit && canRemoveReusedBIE(contextMenuItem) && !contextMenuItem.inherited">
                       <span class="context-menu-item">Retain Reused BIE</span>
+                    </button>
+                    <button mat-menu-item (click)="overrideBaseReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canOverrideBaseReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Override Base Reused BIE</span>
+                    </button>
+                    <button mat-menu-item (click)="removeOverrideReusedBIE(contextMenuItem)"
+                            *ngIf="canEdit && canOverrideBaseReusedBIE(contextMenuItem)">
+                      <span class="context-menu-item">Remove Override Reused BIE</span>
                     </button>
                     <mat-divider *ngIf="canEdit && isExtension(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="createLocalAbieExtension(contextMenuItem)"
@@ -266,11 +306,13 @@
                     </button>
                     <mat-divider *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"></mat-divider>
                     <button mat-menu-item (click)="checkNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
+                            [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Check nillable on Child BCCs</span>
                     </button>
                     <button mat-menu-item (click)="uncheckNillableOnChildBCCs(contextMenuItem)"
-                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)">
+                            *ngIf="canEdit && dataSource && dataSource.isExpandable(contextMenuItem)"
+                            [disabled]="!isUsableChildren(contextMenuItem)">
                       <span class="context-menu-item">Uncheck nillable on Child BCCs</span>
                     </button>
                   </mat-menu>
@@ -281,22 +323,28 @@
               <!-- ABIE -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ selectedNode.name }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput placeholder="Library" [(ngModel)]="rootNode.libraryName" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>Release</mat-label>
                             <input matInput placeholder="Release" [(ngModel)]="rootNode.releaseNum" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                           <mat-form-field>
                             <mat-label>State</mat-label>
                             <input matInput placeholder="State" [(ngModel)]="rootNode.topLevelAsbiepState" [disabled]="true">
                           </mat-form-field>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                           <mat-form-field>
                             <mat-label>Owner</mat-label>
                             <input matInput placeholder="Owner" [(ngModel)]="rootNode.loginId" [disabled]="true">
@@ -316,7 +364,7 @@
                           <mat-form-field>
                             <mat-label>Business Contexts</mat-label>
                             <mat-chip-grid #businessContextChipList>
-                              @for (businessContext of businessContexts; track businessContext) {
+                              @for (businessContext of businessContexts; track businessContext.businessContextId) {
                                 <mat-chip-row
                                     [removable]="isBusinessContextRemovable"
                                     (removed)="removeBusinessContext(businessContext)">
@@ -336,7 +384,7 @@
                                 [matChipInputAddOnBlur]="addOnBlur">
                             </mat-chip-grid>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBusinessContext($event)">
-                              @for (businessContext of filteredBusinessContexts | async; track businessContext) {
+                              @for (businessContext of filteredBusinessContexts | async; track businessContext.businessContextId) {
                                 <mat-option [value]="businessContext">{{ businessContext.name }}</mat-option>
                               }
                             </mat-autocomplete>
@@ -453,13 +501,164 @@
                       </div>
                     </div>
                   </mat-tab>
+
+                  <!-- Inherited -->
+                  <mat-tab *ngIf="selectedNode.inherited">
+                    <ng-template mat-tab-label>
+                      <div>
+                        <span>Inherits from </span>
+                        <span [class.deprecated]="baseNode.deprecated">{{ ((asAbieDetail().base.asbiep.displayName) ? asAbieDetail().base.asbiep.displayName : asAbieDetail().base.asccp.propertyTerm) }}</span>
+                      </div>
+                    </ng-template>
+                    <div class="bie-edit-detail-container">
+                      <div class="row">
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Library</mat-label>
+                            <input matInput placeholder="Release" [(ngModel)]="baseNode.libraryName" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Release</mat-label>
+                            <input matInput placeholder="Release" [(ngModel)]="baseNode.releaseNum" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>State</mat-label>
+                            <input matInput placeholder="State" [(ngModel)]="baseNode.topLevelAsbiepState" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                          <mat-form-field>
+                            <mat-label>Owner</mat-label>
+                            <input matInput placeholder="Owner" [(ngModel)]="baseNode.loginId" [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Business Contexts</mat-label>
+                            <mat-chip-grid #basedBusinessContextChipList>
+                              <mat-chip-row *ngFor="let businessContext of basedBusinessContexts"
+                                            [removable]="false">
+                                {{ businessContext.name }}
+                              </mat-chip-row>
+                              <input
+                                [matChipInputFor]="basedBusinessContextChipList"
+                                [disabled]="true">
+                            </mat-chip-grid>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-3 col-sm-6">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="baseNode.deprecated"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6" *ngIf="isBIEInverseModeEnabled">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="baseNode.inverseMode">
+                              Inverse Mode
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Legacy Business Term</mat-label>
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                   [(ngModel)]="asAbieDetail().base.asbiep.bizTerm"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Remark</mat-label>
+                            <input matInput placeholder="Remark" maxlength="225"
+                                   [(ngModel)]="asAbieDetail().base.asbiep.remark"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Version</mat-label>
+                            <input matInput placeholder="Version" maxlength="45"
+                                   [(ngModel)]="baseNode.version"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Status</mat-label>
+                            <input matInput placeholder="Status" maxlength="45"
+                                   [(ngModel)]="baseNode.status"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Context Definition"
+                                        [(ngModel)]="asAbieDetail().base.asbiep.definition"
+                                        [readonly]="true">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asAbieDetail().base.asccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Type Definition" [readonly]="true"
+                                        value="{{ asAbieDetail().base.acc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
                 </mat-tab-group>
               </div>
 
               <!-- ASBIEP -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isAsbiepDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ selectedNode.name }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
@@ -479,7 +678,8 @@
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asAsbiepDetail().asbie.deprecated"
                                           [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
-                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated ||
+                                          (selectedNode.inherited && asAsbiepDetail().base.asbie.deprecated)">
                               Deprecated
                             </mat-checkbox>
                           </div>
@@ -490,8 +690,8 @@
                                           [(ngModel)]="asAsbiepDetail().asbie.nillable"
                                           matTooltip="This property cannot change since the Core Component is not nillable."
                                           [matTooltipDisabled]="asAsbiepDetail().asccp.nillable"
-                                          [disabled]="!isEditable(selectedNode) ||
-                                                      !asAsbiepDetail().asccp.nillable">
+                                          [disabled]="!isEditable(selectedNode) || !asAsbiepDetail().asccp.nillable ||
+                                          (selectedNode.inherited && asAsbiepDetail().base.asbie.nillable)">
                               Nillable
                             </mat-checkbox>
                           </div>
@@ -522,7 +722,7 @@
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
                               Cardinality Min must be greater than or equals
-                              to {{ asAsbiepDetail().ascc && asAsbiepDetail().ascc.cardinalityMin }}
+                              to {{ (asAsbiepDetail().base) ? (asAsbiepDetail().base.asbie.cardinalityMin) : (asAsbiepDetail().ascc && asAsbiepDetail().ascc.cardinalityMin) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -557,11 +757,11 @@
                         </div>
                       </div>
 
-                      <div class="row" *ngIf="selectedNode && !selectedNode.derived && !reusedNode">
+                      <div class="row" *ngIf="selectedNode && !selectedNode.reused && !reusedNode">
                         <div class="col-md-6 col-sm-12">
                           <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
                             <button class="hover-button" mat-raised-button color="primary"
-                                    (click)="goToBusinessTermsForBie(selectedNode.detail, 'ASBIE')">
+                                    (click)="goToBusinessTermsForBie(asAsbiepDetail().asbie.asbieId, 'ASBIE')">
                               Show Business Terms
                             </button>
                             <button mat-raised-button
@@ -602,22 +802,28 @@
                         </div>
                       </div>
 
-                      <div *ngIf="selectedNode && selectedNode.derived && reusedNode && reusedNodeDetail" class="detail-reused">
+                      <div *ngIf="selectedNode && selectedNode.reused && reusedNode && reusedNodeDetail" class="detail-reused">
                         <h4 class="mb-2"> From Reused BIE</h4>
                         <div class="row">
-                          <div class="col-4">
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="reusedNode.libraryName" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Release</mat-label>
                               <input matInput [(ngModel)]="reusedNode.releaseNum" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>State</mat-label>
                               <input matInput [(ngModel)]="reusedNode.topLevelAsbiepState" [disabled]="true">
                             </mat-form-field>
                           </div>
-                          <div class="col-4">
+                          <div class="col-3">
                             <mat-form-field>
                               <mat-label>Owner</mat-label>
                               <input matInput [(ngModel)]="reusedNode.loginId" [disabled]="true">
@@ -627,7 +833,7 @@
                         <mat-form-field *ngIf="reusedBusinessContexts.length > 0">
                           <mat-label>Business Contexts</mat-label>
                           <mat-chip-grid #reusedBusinessContextChipList>
-                            @for (businessContext of reusedBusinessContexts; track businessContext) {
+                            @for (businessContext of reusedBusinessContexts; track businessContext.businessContextId) {
                               <mat-chip-row
                                 [selectable]="false"
                                 [removable]="false">
@@ -635,8 +841,8 @@
                               </mat-chip-row>
                             }
                             <input
-                              placeholder="Business Context"
-                              [matChipInputFor]="reusedBusinessContextChipList">
+                              [matChipInputFor]="reusedBusinessContextChipList"
+                              [disabled]="true">
                           </mat-chip-grid>
                         </mat-form-field>
 
@@ -771,13 +977,270 @@
                       </div>
                     </div>
                   </mat-tab>
+
+                  <!-- Inherited -->
+                  <mat-tab *ngIf="selectedNode.inherited">
+                    <ng-template mat-tab-label>
+                      <div>
+                        <span>Inherits from </span>
+                        <span [class.deprecated]="asAsbiepDetail().base.asbie.deprecated">{{ ((asAsbiepDetail().base.asbiep.displayName) ? asAsbiepDetail().base.asbiep.displayName : asAsbiepDetail().base.asccp.propertyTerm) }}</span>
+                      </div>
+                    </ng-template>
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [disabled]="true"
+                                          [checked]="used(selectedNode)">
+                              Used
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsbiepDetail().base.asbie.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asAsbiepDetail().base.asbie.nillable"
+                                          matTooltip="This property cannot change since the Core Component is not nillable."
+                                          [matTooltipDisabled]="asAsbiepDetail().base.asccp.nillable"
+                                          [disabled]="true">
+                              Nillable
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required
+                                   [value]="asAsbiepDetail().base.asbie.cardinalityMin"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().base.ascc.cardinalityMax | unbounded}})" required
+                                   [value]="asAsbiepDetail().base.asbie.cardinalityMax | unbounded"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row" *ngIf="selectedNode.inherited && !selectedNode.reused && !reusedBaseNode">
+                        <div class="col-md-6 col-sm-12">
+                          <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
+                            <button class="hover-button" mat-raised-button color="primary"
+                                    (click)="goToBusinessTermsForBie(asAsbiepDetail().base.asbie.asbieId, 'ASBIE')">
+                              Show Business Terms
+                            </button>
+                          </div>
+                          <mat-form-field *ngIf="!isBusinessTermEnabled || isDeveloper">
+                            <mat-label>Legacy Business Term</mat-label>
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                   [(ngModel)]="asAsbiepDetail().base.asbiep.bizTerm"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Remark</mat-label>
+                            <input matInput placeholder="Remark" maxlength="225"
+                                   [(ngModel)]="asAsbiepDetail().base.asbiep.remark"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Context Definition"
+                                        [(ngModel)]="asAsbiepDetail().base.asbie.definition"
+                                        [readonly]="true">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div *ngIf="selectedNode.inherited && selectedNode.reused && reusedBaseNode && reusedBaseNodeDetail" class="detail-reused">
+                        <h4 class="mb-2"> From Reused BIE</h4>
+                        <div class="row">
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Library</mat-label>
+                              <input matInput [(ngModel)]="reusedBaseNode.libraryName" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Release</mat-label>
+                              <input matInput [(ngModel)]="reusedBaseNode.releaseNum" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>State</mat-label>
+                              <input matInput [(ngModel)]="reusedBaseNode.topLevelAsbiepState" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-3">
+                            <mat-form-field>
+                              <mat-label>Owner</mat-label>
+                              <input matInput [(ngModel)]="reusedBaseNode.loginId" [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <mat-form-field *ngIf="reusedBaseBusinessContexts.length > 0">
+                          <mat-label>Business Contexts</mat-label>
+                          <mat-chip-grid #reusedBaseBusinessContextChipList>
+                            @for (businessContext of reusedBaseBusinessContexts; track businessContext.businessContextId) {
+                              <mat-chip-row
+                                [selectable]="false"
+                                [removable]="false">
+                                {{ businessContext.name }}
+                              </mat-chip-row>
+                            }
+                            <input
+                              [matChipInputFor]="reusedBaseBusinessContextChipList"
+                              [disabled]="true">
+                          </mat-chip-grid>
+                        </mat-form-field>
+
+                        <div class="row">
+                          <div class="col-md-3 col-sm-6">
+                            <div class="checkbox">
+                              <mat-checkbox color="primary"
+                                            [(ngModel)]="reusedBaseNode.deprecated"
+                                            [disabled]="true">
+                                Deprecated
+                              </mat-checkbox>
+                            </div>
+                          </div>
+                          <div class="col-md-3 col-sm-6" *ngIf="isBIEInverseModeEnabled">
+                            <div class="checkbox">
+                              <mat-checkbox color="primary"
+                                            [(ngModel)]="reusedBaseNode.inverseMode"
+                                            [disabled]="true">
+                                Inverse Mode
+                              </mat-checkbox>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <mat-label>Legacy Business Term</mat-label>
+                              <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                     [value]="reusedBaseNodeDetail.asbiep.bizTerm"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <mat-label>Remark</mat-label>
+                              <input matInput placeholder="Remark" maxlength="225"
+                                     [value]="reusedBaseNodeDetail.asbiep.remark"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <mat-label>Version</mat-label>
+                              <input matInput placeholder="Version" maxlength="225"
+                                     [value]="reusedBaseNode.version"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-6 col-sm-12">
+                            <mat-form-field>
+                              <mat-label>Status</mat-label>
+                              <input matInput placeholder="Status" maxlength="225"
+                                     [value]="reusedBaseNode.status"
+                                     [disabled]="true">
+                            </mat-form-field>
+                          </div>
+                        </div>
+
+                        <mat-form-field>
+                          <mat-label>Context Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                                      placeholder="Context Definition"
+                                      [value]="reusedBaseNodeDetail.asbiep.definition"
+                                      [readonly]="true"></textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Association Definition" [readonly]="true"
+                                        value="{{ asAsbiepDetail().base.ascc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asAsbiepDetail().base.asccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Type Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Type Definition" [readonly]="true"
+                                        value="{{ asAsbiepDetail().base.acc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
                 </mat-tab-group>
               </div>
 
               <!-- BBIEP -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isBbiepDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ selectedNode.name }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
@@ -797,7 +1260,8 @@
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbiepDetail().bbie.deprecated"
                                           [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
-                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated ||
+                                          (selectedNode.inherited && asBbiepDetail().base.bbie.deprecated)">
                               Deprecated
                             </mat-checkbox>
                           </div>
@@ -808,8 +1272,8 @@
                                           [(ngModel)]="asBbiepDetail().bbie.nillable"
                                           matTooltip="This property cannot change since the Core Component is not nillable."
                                           [matTooltipDisabled]="asBbiepDetail().bccp.nillable"
-                                          [disabled]="!isEditable(selectedNode)||
-                                                      !asBbiepDetail().bccp.nillable">
+                                          [disabled]="!isEditable(selectedNode)|| !asBbiepDetail().bccp.nillable ||
+                                          (selectedNode.inherited && asBbiepDetail().base.bbie.nillable)">
                               Nillable
                             </mat-checkbox>
                           </div>
@@ -838,7 +1302,8 @@
                               '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
-                              Cardinality Min must be greater than or equals to {{ asBbiepDetail().bcc.cardinalityMin }}
+                              Cardinality Min must be greater than or equals
+                              to {{ (asBbiepDetail().base) ? (asBbiepDetail().base.bbie.cardinalityMin) : (asBbiepDetail().bcc && asBbiepDetail().bcc.cardinalityMin) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -877,7 +1342,7 @@
                         <div class="col-md-6 col-sm-12">
                           <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
                             <button class="hover-button" mat-raised-button color="primary"
-                                    (click)="goToBusinessTermsForBie(selectedNode.detail, 'BBIE')">
+                                    (click)="goToBusinessTermsForBie(asBbiepDetail().bbie.bbieId, 'BBIE')">
                               Show Business Terms
                             </button>
                             <button mat-raised-button
@@ -916,13 +1381,14 @@
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
                             <mat-card-content
-                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity."
-                              [matTooltipDisabled]="!isReflectValue()">
+                              matTooltip="This value constraint cannot be modified by the definition of the {{ isReflectValue() ? 'Business Information Entity' : 'Base BIE' }}."
+                              [matTooltipDisabled]="!isReflectValue() && !(asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
                                 <mat-select [(ngModel)]="asBbiepDetail().bbie.fixedOrDefault"
                                             [disabled]="!isEditable(selectedNode) ||
-                                                        isReflectValue()"
+                                                        isReflectValue() ||
+                                                        (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')"
                                             (ngModelChange)="onChangeFixedOrDefault(asBbiepDetail().bbie.fixedOrDefault)">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
@@ -940,7 +1406,8 @@
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbiepDetail().bbie.fixedValue"
                                        [disabled]="!isEditable(selectedNode) ||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbiepDetail().bbie.fixedOrDefault == 'default'">
@@ -949,20 +1416,23 @@
                                        [(ngModel)]="asBbiepDetail().bbie.defaultValue"
                                        [disabled]="!isEditable(selectedNode) ||
                                                    !!(isVersionIdNode(selectedNode) && rootNode.version) ||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbiepDetail().base && asBbiepDetail().base.bbie.fixedOrDefault == 'fixed')">
                               </mat-form-field>
                             </mat-card-content>
                           </mat-card>
                         </div>
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
-                            <mat-card-content>
+                            <mat-card-content
+                              matTooltip="This value domain restriction cannot be modified by the definition of the Base BIE."
+                              [matTooltipDisabled]="!asBbiepDetail().base">
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbiepDetail().bbie.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option *ngFor="let valueDomainType of valueDomainTypes"
                                               [value]="valueDomainType.valueOf()">
                                     {{ valueDomainType.toString() | separate }}
@@ -974,7 +1444,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.bdtPriRestriId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -994,7 +1464,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1023,7 +1493,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbiepDetail().bbie.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbiepDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1172,13 +1642,295 @@
                       </div>
                     </div>
                   </mat-tab>
+
+                  <!-- Inherited -->
+                  <mat-tab *ngIf="selectedNode.inherited">
+                    <ng-template mat-tab-label>
+                      <div>
+                        <span>Inherits from </span>
+                        <span [class.deprecated]="asBbiepDetail().base.bbie.deprecated">{{ ((asBbiepDetail().base.bbiep.displayName) ? asBbiepDetail().base.bbiep.displayName : asBbiepDetail().base.bccp.propertyTerm) }}</span>
+                      </div>
+                    </ng-template>
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [checked]="used(selectedNode)"
+                                          [disabled]="true">
+                              Used
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbiepDetail().base.bbie.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbiepDetail().base.bbie.nillable"
+                                          matTooltip="This property cannot change since the Core Component is not nillable."
+                                          [matTooltipDisabled]="asBbiepDetail().base.bccp.nillable"
+                                          [disabled]="true">
+                              Nillable
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required
+                                   [value]="asBbiepDetail().base.bbie.cardinalityMin"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().base.bcc.cardinalityMax | unbounded}})" required
+                                   [value]="asBbiepDetail().base.bbie.cardinalityMax | unbounded"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                          <div class="actions" *ngIf="isBusinessTermEnabled && !isDeveloper">
+                            <button class="hover-button" mat-raised-button color="primary"
+                                    (click)="goToBusinessTermsForBie(asBbiepDetail().base.bbie.bbieId, 'BBIE')">
+                              Show Business Terms
+                            </button>
+                          </div>
+                          <mat-form-field *ngIf="!isBusinessTermEnabled || isDeveloper">
+                            <mat-label>Legacy Business Term</mat-label>
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                   [(ngModel)]="asBbiepDetail().base.bbiep.bizTerm"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Remark</mat-label>
+                            <input matInput placeholder="Remark" maxlength="225"
+                                   [(ngModel)]="asBbiepDetail().base.bbiep.remark"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Example</mat-label>
+                            <input matInput placeholder="Example"
+                                   [(ngModel)]="asBbiepDetail().base.bbie.example"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="row form-field-box">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content
+                              matTooltip="This value constraint cannot be modified by the definition of the Business Information Entity."
+                              [matTooltipDisabled]="!isReflectValue()">
+                              <mat-form-field>
+                                <mat-label>Value Constraint</mat-label>
+                                <mat-select [(ngModel)]="asBbiepDetail().base.bbie.fixedOrDefault"
+                                            [disabled]="true">
+                                  <mat-option value="none">None</mat-option>
+                                  <mat-option value="fixed">Fixed Value</mat-option>
+                                  <mat-option value="default">Default Value</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                       [(ngModel)]="asBbiepDetail().base.bbie.fixedValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                       [(ngModel)]="asBbiepDetail().base.bbie.defaultValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Domain Restriction</mat-label>
+                                <mat-select placeholder="Value Domain Restriction" required
+                                            [(ngModel)]="asBbiepDetail().base.bbie.valueDomainType"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let valueDomainType of valueDomainTypes"
+                                              [value]="valueDomainType.valueOf()">
+                                    {{ valueDomainType.toString() | separate }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.valueDomainType === 'Primitive'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbiepDetail().base.bbie.bdtPriRestriId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let xbt of filteredValueDomains | async"
+                                              [value]="xbt.id">
+                                    {{ xbt.name }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.valueDomainType === 'Code'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbiepDetail().base.bbie.codeListManifestId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let codeList of filteredValueDomains | async"
+                                              [value]="codeList.id">
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
+                                         [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
+                                      <span>{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                    </div>
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbiepDetail().base.bbie.valueDomainType === 'Agency'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbiepDetail().base.bbie.agencyIdListManifestId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let agency of filteredValueDomains | async"
+                                              [value]="agency.id">
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
+                                         [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
+                                      <span>{{ agency.name }}</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
+                                    </div>
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="pt-2 pb-2">
+                        <mat-card>
+                          <mat-card-subtitle>Facets</mat-card-subtitle>
+                          <mat-card-content>
+                            <div class="row">
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Minimum Length</mat-label>
+                                  <input matInput placeholder="Minimum Length"
+                                         [value]="asBbiepDetail().base.bbie.facetMinLength"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Maximum Length</mat-label>
+                                  <input matInput placeholder="Maximum Length"
+                                         [value]="asBbiepDetail().base.bbie.facetMaxLength"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Pattern</mat-label>
+                                  <input matInput placeholder="Pattern"
+                                         [value]="asBbiepDetail().base.bbie.facetPattern"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+
+                      <div class="row pt-2">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Context Definition"
+                                        [(ngModel)]="asBbiepDetail().base.bbie.definition"
+                                        [readonly]="true">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Association Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Association Definition" [readonly]="true"
+                                        value="{{ asBbiepDetail().base.bcc.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asBbiepDetail().base.bccp.definition || ' ' }}">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
                 </mat-tab-group>
               </div>
 
               <!-- BBIE_SC -->
               <div class="bie-edit-detail-panel scroll" *ngIf="isBbieScDetail()">
                 <mat-tab-group mat-align-tabs="start">
-                  <mat-tab label="{{ selectedNode.name }}">
+                  <mat-tab label="{{ ((selectedNode.displayName && selectedNode.displayName !== selectedNode.name) ? (selectedNode.displayName + ' (' + selectedNode.name + ')') : selectedNode.name) }}">
                     <div class="bie-edit-detail-container">
                       <div class="row align-items-center">
                         <div class="col-3">
@@ -1198,7 +1950,8 @@
                             <mat-checkbox color="primary"
                                           [(ngModel)]="asBbieScDetail().bbieSc.deprecated"
                                           [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
-                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated">
+                                          [disabled]="!isEditable(selectedNode) || selectedNode.ccDeprecated ||
+                                          (selectedNode.inherited && asBbieScDetail().base.bbieSc.deprecated)">
                               Deprecated
                             </mat-checkbox>
                           </div>
@@ -1230,7 +1983,7 @@
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('min')">
                               Cardinality Min must be greater than or equals
-                              to {{ asBbieScDetail().bbieSc.cardinalityMin }}
+                              to {{ (asBbieScDetail().base) ? (asBbieScDetail().base.bbieSc.cardinalityMin) : (asBbieScDetail().bdtSc && asBbieScDetail().bdtSc.cardinalityMin) }}
                             </mat-error>
                             <mat-error *ngIf="bieCardinalityMin.hasError('max')">
                               {{ bieCardinalityMin.getError('max') }}
@@ -1299,13 +2052,14 @@
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
                             <mat-card-content
-                              matTooltip="This value constraint cannot modify by the definition of the Business Information Entity."
-                              [matTooltipDisabled]="!isReflectValue()">
+                              matTooltip="This value constraint cannot be modified by the definition of the {{ isReflectValue() ? 'Business Information Entity' : 'Base BIE' }}."
+                              [matTooltipDisabled]="!isReflectValue() && !(asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
                                 <mat-select [(ngModel)]="asBbieScDetail().bbieSc.fixedOrDefault"
                                             [disabled]="!isEditable(selectedNode)||
-                                                        isReflectValue()"
+                                                        isReflectValue() ||
+                                                        (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')"
                                             (ngModelChange)="onChangeFixedOrDefault(asBbieScDetail().bbieSc.fixedOrDefault)">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
@@ -1323,7 +2077,8 @@
                                 <input matInput placeholder="Fixed Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.fixedValue"
                                        [disabled]="!isEditable(selectedNode)||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               </mat-form-field>
 
                               <mat-form-field *ngIf="asBbieScDetail().bbieSc.fixedOrDefault == 'default'">
@@ -1331,20 +2086,23 @@
                                 <input matInput placeholder="Default Value"
                                        [(ngModel)]="asBbieScDetail().bbieSc.defaultValue"
                                        [disabled]="!isEditable(selectedNode)||
-                                                   isReflectValue()">
+                                                   isReflectValue() ||
+                                                   (asBbieScDetail().base && asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed')">
                               </mat-form-field>
                             </mat-card-content>
                           </mat-card>
                         </div>
                         <div class="col-md-6 col-sm-12">
                           <mat-card>
-                            <mat-card-content>
+                            <mat-card-content
+                              matTooltip="This value domain restriction cannot be modified by the definition of the Base BIE."
+                              [matTooltipDisabled]="!asBbieScDetail().base">
                               <mat-form-field>
                                 <mat-label>Value Domain Restriction</mat-label>
                                 <mat-select placeholder="Value Domain Restriction" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.valueDomainType"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option *ngFor="let valueDomainType of valueDomainTypes"
                                               [value]="valueDomainType.valueOf()">
                                     {{ valueDomainType.toString() | separate }}
@@ -1357,7 +2115,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.bdtScPriRestriId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1377,7 +2135,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.codeListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1406,7 +2164,7 @@
                                 <mat-select placeholder="Value Domain" required
                                             [(ngModel)]="asBbieScDetail().bbieSc.agencyIdListManifestId"
                                             (ngModelChange)="changeValueDomainType(selectedNode)"
-                                            [disabled]="!isEditable(selectedNode)">
+                                            [disabled]="!isEditable(selectedNode) || (!!asBbieScDetail().base)">
                                   <mat-option>
                                     <ngx-mat-select-search [formControl]="valueDomainFilterCtrl"
                                                            [placeholderLabel]="'Search...'"
@@ -1530,6 +2288,259 @@
                                       matTooltip="Copy to Context Definition">
                                 <mat-icon>content_paste</mat-icon>
                               </button>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-tab>
+
+                  <!-- Inherited -->
+                  <mat-tab *ngIf="selectedNode.inherited">
+                    <ng-template mat-tab-label>
+                      <div>
+                        <span>Inherits from </span>
+                        <span [class.deprecated]="asBbieScDetail().base.bbieSc.deprecated">{{ ((asBbieScDetail().base.bbieSc.displayName) ? asBbieScDetail().base.bbieSc.displayName : (asBbieScDetail().base.bdtSc.propertyTerm + ' ' + asBbieScDetail().base.bdtSc.representationTerm)) }}</span>
+                      </div>
+                    </ng-template>
+                    <div class="bie-edit-detail-container">
+                      <div class="row align-items-center">
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [checked]="used(selectedNode)"
+                                          [disabled]="true">
+                              Used
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="col-3">
+                          <div class="checkbox">
+                            <mat-checkbox color="primary"
+                                          [(ngModel)]="asBbieScDetail().base.bbieSc.deprecated"
+                                          [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                                          [disabled]="true">
+                              Deprecated
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Min</mat-label>
+                            <input matInput placeholder="Cardinality Min" required
+                                   [value]="asBbieScDetail().base.bbieSc.cardinalityMin"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                          <mat-form-field>
+                            <mat-label>Cardinality Max</mat-label>
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().base.bdtSc.cardinalityMax | unbounded}})" required
+                                   [value]="asBbieScDetail().base.bbieSc.cardinalityMax | unbounded"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Legacy Business Term</mat-label>
+                            <input matInput placeholder="Legacy Business Term" maxlength="225"
+                                   [(ngModel)]="asBbieScDetail().base.bbieSc.bizTerm"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Remark</mat-label>
+                            <input matInput placeholder="Remark" maxlength="225"
+                                   [(ngModel)]="asBbieScDetail().base.bbieSc.remark"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                          <mat-form-field>
+                            <mat-label>Example</mat-label>
+                            <input matInput placeholder="Example"
+                                   [(ngModel)]="asBbieScDetail().base.bbieSc.example"
+                                   [disabled]="true">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row form-field-box">
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Constraint</mat-label>
+                                <mat-select [(ngModel)]="asBbieScDetail().base.bbieSc.fixedOrDefault"
+                                            [disabled]="true">
+                                  <mat-option value="none">None</mat-option>
+                                  <mat-option value="fixed">Fixed Value</mat-option>
+                                  <mat-option value="default">Default Value</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.fixedOrDefault == 'none'">
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.fixedOrDefault == 'fixed'">
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                       [(ngModel)]="asBbieScDetail().base.bbieSc.fixedValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.fixedOrDefault == 'default'">
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                       [(ngModel)]="asBbieScDetail().base.bbieSc.defaultValue"
+                                       [disabled]="true">
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                          <mat-card>
+                            <mat-card-content>
+                              <mat-form-field>
+                                <mat-label>Value Domain Restriction</mat-label>
+                                <mat-select placeholder="Value Domain Restriction" required
+                                            [(ngModel)]="asBbieScDetail().base.bbieSc.valueDomainType"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let valueDomainType of valueDomainTypes"
+                                              [value]="valueDomainType.valueOf()">
+                                    {{ valueDomainType.toString() | separate }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.valueDomainType === 'Primitive'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbieScDetail().base.bbieSc.bdtScPriRestriId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let xbt of filteredValueDomains | async"
+                                              [value]="xbt.id">
+                                    {{ xbt.name }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.valueDomainType === 'Code'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbieScDetail().base.bbieSc.codeListManifestId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let codeList of filteredValueDomains | async"
+                                              [value]="codeList.id">
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="codeList.state !== 'Deleted' && !isValidState(codeList.state)"
+                                         [class.text-danger]="codeList.state === 'Deleted'"
+                                         [class.text-line-through]="codeList.state === 'Deleted'"
+                                         [class.deprecated]="codeList.deprecated"
+                                         [matTooltip]="codeList.state === 'Deleted' ? 'This code list is deleted' : 'This code list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
+                                      <span>{{ codeList.name }}</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ codeList.versionId }}<span *ngIf="codeList.deprecated">, Deprecated</span><span *ngIf="codeList.state === 'Deleted'">, Deleted</span>)</span>
+                                    </div>
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="asBbieScDetail().base.bbieSc.valueDomainType === 'Agency'">
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                            [(ngModel)]="asBbieScDetail().base.bbieSc.agencyIdListManifestId"
+                                            [disabled]="true">
+                                  <mat-option *ngFor="let agency of filteredValueDomains | async"
+                                              [value]="agency.id">
+                                    <div [class]="['d-flex']"
+                                         [class.text-warning]="agency.state !== 'Deleted' && !isValidState(agency.state)"
+                                         [class.text-danger]="agency.state === 'Deleted'"
+                                         [class.text-line-through]="agency.state === 'Deleted'"
+                                         [class.deprecated]="agency.deprecated"
+                                         [matTooltip]="agency.state === 'Deleted' ? 'This agency ID list is deleted' : 'This agency ID list is usable but unstable'"
+                                         [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
+                                      <span>{{ agency.name }}</span>
+                                      <span class="f12 ml-auto pr-2"> ({{ agency.versionId }}<span *ngIf="agency.deprecated">, Deprecated</span><span *ngIf="agency.state === 'Deleted'">, Deleted</span>)</span>
+                                    </div>
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+
+                      <div class="pt-2 pb-2">
+                        <mat-card>
+                          <mat-card-subtitle>Facets</mat-card-subtitle>
+                          <mat-card-content>
+                            <div class="row">
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Minimum Length</mat-label>
+                                  <input matInput placeholder="Minimum Length"
+                                         [value]="asBbieScDetail().base.bbieSc.facetMinLength"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Maximum Length</mat-label>
+                                  <input matInput placeholder="Maximum Length"
+                                         [value]="asBbieScDetail().base.bbieSc.facetMaxLength"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                              <div class="col-3">
+                                <mat-form-field>
+                                  <mat-label>Pattern</mat-label>
+                                  <input matInput placeholder="Pattern"
+                                         [value]="asBbieScDetail().base.bbieSc.facetPattern"
+                                         [disabled]="true">
+                                </mat-form-field>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+
+                      <div class="row pt-2">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Context Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Context Definition"
+                                        [(ngModel)]="asBbieScDetail().base.bbieSc.definition"
+                                        [readonly]="true">
+                              </textarea>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field>
+                            <mat-label>Component Definition</mat-label>
+                            <div class="textarea-container">
+                              <textarea matInput rows="6"
+                                        placeholder="Component Definition" [readonly]="true"
+                                        value="{{ asBbieScDetail().base.bdtSc.definition || ' ' }}">
+                              </textarea>
                             </div>
                           </mat-form-field>
                         </div>

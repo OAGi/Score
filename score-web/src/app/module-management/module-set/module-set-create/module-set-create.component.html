@@ -4,7 +4,9 @@
   </div>
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
+      <score-title-with-library-selector [title]="title"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
       <span class="flex-11-auto"></span>
     </mat-toolbar>
   </div>
@@ -39,7 +41,7 @@
             <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
               <div class="d-flex">
                 <span class="release-num">{{release.releaseNum}}</span>
-                <span *ngIf="release.releaseNum !== 'Working'"
+                <span *ngIf="!release.workingRelease"
                       class="f12 ml-auto {{release.state}}">
                         {{ release.state | separate }}
                       </span>

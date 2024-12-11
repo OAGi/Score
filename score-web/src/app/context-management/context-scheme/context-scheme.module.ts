@@ -15,6 +15,7 @@ import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.mo
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
   {
@@ -40,18 +41,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    ConfirmDialogModule,
-    CommonModule,
-    ScoreCommonModule,
-    FontAwesomeModule,
-    SearchBarModule,
-    ColumnSelectorModule
-  ],
+    imports: [
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        ConfirmDialogModule,
+        CommonModule,
+        ScoreCommonModule,
+        FontAwesomeModule,
+        SearchBarModule,
+        ColumnSelectorModule,
+        TitleWithLibrarySelector
+    ],
   declarations: [
     ContextSchemeListComponent,
     ContextSchemeCreateComponent,

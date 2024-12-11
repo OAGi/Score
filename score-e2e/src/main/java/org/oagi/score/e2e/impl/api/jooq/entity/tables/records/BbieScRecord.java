@@ -416,12 +416,28 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     }
 
     /**
+     * Setter for <code>oagi.bbie_sc.display_name</code>. The display name of
+     * the BBIE_SC
+     */
+    public void setDisplayName(String value) {
+        set(20, value);
+    }
+
+    /**
+     * Getter for <code>oagi.bbie_sc.display_name</code>. The display name of
+     * the BBIE_SC
+     */
+    public String getDisplayName() {
+        return (String) get(20);
+    }
+
+    /**
      * Setter for <code>oagi.bbie_sc.is_used</code>. Flag to indicate whether
      * the field/component is used in the content model. It indicates whether
      * the field/component should be generated.
      */
     public void setIsUsed(Byte value) {
-        set(20, value);
+        set(21, value);
     }
 
     /**
@@ -430,7 +446,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the field/component should be generated.
      */
     public Byte getIsUsed() {
-        return (Byte) get(20);
+        return (Byte) get(21);
     }
 
     /**
@@ -438,7 +454,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * BBIE_SC is deprecated.
      */
     public void setIsDeprecated(Byte value) {
-        set(21, value);
+        set(22, value);
     }
 
     /**
@@ -446,7 +462,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * BBIE_SC is deprecated.
      */
     public Byte getIsDeprecated() {
-        return (Byte) get(21);
+        return (Byte) get(22);
     }
 
     /**
@@ -455,7 +471,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * its owner by default.
      */
     public void setCreatedBy(ULong value) {
-        set(22, value);
+        set(23, value);
     }
 
     /**
@@ -464,7 +480,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * its owner by default.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(22);
+        return (ULong) get(23);
     }
 
     /**
@@ -472,7 +488,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * referring to the user who has last updated the BBIE_SC record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(23, value);
+        set(24, value);
     }
 
     /**
@@ -480,7 +496,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * referring to the user who has last updated the BBIE_SC record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(23);
+        return (ULong) get(24);
     }
 
     /**
@@ -488,7 +504,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the BBIE_SC record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(24, value);
+        set(25, value);
     }
 
     /**
@@ -496,7 +512,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * the BBIE_SC record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(24);
+        return (LocalDateTime) get(25);
     }
 
     /**
@@ -504,7 +520,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * when the BBIE_SC was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(25, value);
+        set(26, value);
     }
 
     /**
@@ -512,7 +528,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * when the BBIE_SC was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(25);
+        return (LocalDateTime) get(26);
     }
 
     /**
@@ -520,7 +536,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
-        set(26, value);
+        set(27, value);
     }
 
     /**
@@ -528,7 +544,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {
-        return (ULong) get(26);
+        return (ULong) get(27);
     }
 
     // -------------------------------------------------------------------------
@@ -554,7 +570,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
     /**
      * Create a detached, initialised BbieScRecord
      */
-    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong dtScPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
+    public BbieScRecord(ULong bbieScId, String guid, ULong basedDtScManifestId, String path, String hashPath, ULong bbieId, ULong dtScPriRestriId, ULong codeListManifestId, ULong agencyIdListManifestId, Integer cardinalityMin, Integer cardinalityMax, ULong facetMinLength, ULong facetMaxLength, String facetPattern, String defaultValue, String fixedValue, String definition, String example, String remark, String bizTerm, String displayName, Byte isUsed, Byte isDeprecated, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp, ULong ownerTopLevelAsbiepId) {
         super(BbieSc.BBIE_SC);
 
         setBbieScId(bbieScId);
@@ -577,6 +593,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
         setExample(example);
         setRemark(remark);
         setBizTerm(bizTerm);
+        setDisplayName(displayName);
         setIsUsed(isUsed);
         setIsDeprecated(isDeprecated);
         setCreatedBy(createdBy);

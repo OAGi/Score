@@ -12,14 +12,9 @@ export class NamespaceService {
   constructor(private http: HttpClient) {
   }
 
-  getNamespaceList(request?: NamespaceListRequest): Observable<PageResponse<NamespaceList>> {
-    if (!request) {
-      request = new NamespaceListRequest();
-      request.page.pageIndex = -1;
-      request.page.pageSize = -1;
-    }
-
+  getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
@@ -61,8 +56,9 @@ export class NamespaceService {
     return this.http.get<Namespace>('/api/namespace/' + namespaceId);
   }
 
-  getSimpleNamespaces(): Observable<SimpleNamespace[]> {
-    return this.http.get<SimpleNamespace[]>('/api/simple_namespaces');
+  getSimpleNamespaces(libraryId: number): Observable<SimpleNamespace[]> {
+    const params = new HttpParams().set('libraryId', libraryId);
+    return this.http.get<SimpleNamespace[]>('/api/simple_namespaces', {params});
   }
 
   getSimpleModules(): Observable<SimpleModule[]> {
@@ -71,6 +67,7 @@ export class NamespaceService {
 
   create(namespace: Namespace): Observable<any> {
     return this.http.put<any>('/api/namespace', {
+      libraryId: namespace.libraryId,
       uri: namespace.uri,
       prefix: namespace.prefix,
       description: namespace.description

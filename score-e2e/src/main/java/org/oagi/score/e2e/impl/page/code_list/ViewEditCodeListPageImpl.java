@@ -26,7 +26,7 @@ public class ViewEditCodeListPageImpl extends BaseSearchBarPageImpl implements V
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"New Code List\")]//ancestor::button[1]");
+            By.xpath("//button[contains(@mattooltip, \"New Code List\")]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Deprecated\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By STATE_SELECT_FIELD_LOCATOR =

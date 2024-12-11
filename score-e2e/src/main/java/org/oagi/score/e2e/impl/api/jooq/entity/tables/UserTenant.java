@@ -159,19 +159,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
 
     @Override
     public List<ForeignKey<UserTenantRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.USER_TENANT_TENANT_ID_FK, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK);
-    }
-
-    private transient TenantPath _tenant;
-
-    /**
-     * Get the implicit join path to the <code>oagi.tenant</code> table.
-     */
-    public TenantPath tenant() {
-        if (_tenant == null)
-            _tenant = new TenantPath(this, Keys.USER_TENANT_TENANT_ID_FK, null);
-
-        return _tenant;
+        return Arrays.asList(Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK, Keys.USER_TENANT_TENANT_ID_FK);
     }
 
     private transient AppUserPath _appUser;
@@ -184,6 +172,18 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
             _appUser = new AppUserPath(this, Keys.USER_TENANT_TENANT_ID_APP_USER_ID_FK, null);
 
         return _appUser;
+    }
+
+    private transient TenantPath _tenant;
+
+    /**
+     * Get the implicit join path to the <code>oagi.tenant</code> table.
+     */
+    public TenantPath tenant() {
+        if (_tenant == null)
+            _tenant = new TenantPath(this, Keys.USER_TENANT_TENANT_ID_FK, null);
+
+        return _tenant;
     }
 
     @Override

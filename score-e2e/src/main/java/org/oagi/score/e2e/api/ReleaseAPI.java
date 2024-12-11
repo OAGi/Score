@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.api;
 
 import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.LibraryObject;
 import org.oagi.score.e2e.obj.NamespaceObject;
 import org.oagi.score.e2e.obj.ReleaseObject;
 
@@ -8,52 +9,68 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * APIs for the release management.
+ * APIs for managing releases.
  */
 public interface ReleaseAPI {
 
     /**
-     * Return the release by the given ID.
+     * Retrieves a release by its unique ID.
      *
-     * @param releaseId release ID
-     * @return release object
+     * @param releaseId The unique identifier of the release.
+     * @return The release object associated with the given ID.
      */
     ReleaseObject getReleaseById(BigInteger releaseId);
 
     /**
-     * Return the release by the given release number.
+     * Retrieves a release by its release number within the specified library.
      *
-     * @param releaseNumber release number
-     * @return release object
+     * @param library       The library associated with the release.
+     * @param releaseNumber The release number.
+     * @return The release object with the specified release number.
      */
-    ReleaseObject getReleaseByReleaseNumber(String releaseNumber);
+    ReleaseObject getReleaseByReleaseNumber(LibraryObject library, String releaseNumber);
 
     /**
-     * Return releases by the given states.
+     * Retrieves all releases within the specified library that match the given states.
      *
-     * @param states states
-     * @return release objects
+     * @param library The library to search for releases.
+     * @param states  A list of states to filter releases.
+     * @return A list of release objects matching the given states.
      */
-    List<ReleaseObject> getReleasesByStates(List<String> states);
+    List<ReleaseObject> getReleasesByStates(LibraryObject library, List<String> states);
 
     /**
-     * Return the releases.
+     * Retrieves all releases associated with the specified library.
      *
-     * @return release objects.
+     * @param library The library to retrieve releases from.
+     * @return A list of all release objects in the library.
      */
-    List<ReleaseObject> getReleases();
-
-    ReleaseObject getTheLatestRelease();
-
-    List<String> getAllReleasesBeforeRelease(ReleaseObject releaseNumber);
+    List<ReleaseObject> getReleases(LibraryObject library);
 
     /**
-     * Create a random release object.
+     * Retrieves the latest release within the specified library.
      *
-     * @param creator a creator
-     * @param namespace a namespace
-     * @return a random release object
+     * @param library The library to retrieve the latest release from.
+     * @return The latest release object in the library.
      */
-    ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace);
+    ReleaseObject getTheLatestRelease(LibraryObject library);
 
+    /**
+     * Retrieves all releases before the specified release in the given library.
+     *
+     * @param library The library containing the releases.
+     * @param release The reference release object.
+     * @return A list of release numbers for releases created before the specified release.
+     */
+    List<String> getAllReleasesBeforeRelease(LibraryObject library, ReleaseObject release);
+
+    /**
+     * Creates a random release object associated with a given library and namespace.
+     *
+     * @param creator   The user creating the release.
+     * @param library   The library to associate with the release.
+     * @param namespace The namespace to associate with the release.
+     * @return A newly created random release object.
+     */
+    ReleaseObject createRandomRelease(AppUserObject creator, LibraryObject library, NamespaceObject namespace);
 }

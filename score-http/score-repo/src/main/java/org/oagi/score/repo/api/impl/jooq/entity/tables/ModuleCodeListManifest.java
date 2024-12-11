@@ -197,20 +197,7 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
 
     @Override
     public List<ForeignKey<ModuleCodeListManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
-    }
-
-    private transient ModuleSetReleasePath _moduleSetRelease;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set_release</code>
-     * table.
-     */
-    public ModuleSetReleasePath moduleSetRelease() {
-        if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
-
-        return _moduleSetRelease;
+        return Arrays.asList(Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
     }
 
     private transient CodeListManifestPath _codeListManifest;
@@ -224,18 +211,6 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
             _codeListManifest = new CodeListManifestPath(this, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, null);
 
         return _codeListManifest;
-    }
-
-    private transient ModulePath _module;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
-     */
-    public ModulePath module() {
-        if (_module == null)
-            _module = new ModulePath(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, null);
-
-        return _module;
     }
 
     private transient AppUserPath _moduleCodeListManifestCreatedByFk;
@@ -262,6 +237,31 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
             _moduleCodeListManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleCodeListManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_ID_FK, null);
+
+        return _module;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
+
+        return _moduleSetRelease;
     }
 
     @Override

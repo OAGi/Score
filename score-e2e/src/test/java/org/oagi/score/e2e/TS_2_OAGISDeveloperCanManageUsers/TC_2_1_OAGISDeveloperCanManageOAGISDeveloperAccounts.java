@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_2_OAGISDeveloperCanManageUsers;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
@@ -54,8 +54,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("dev_" + randomAlphanumeric(5, 10));
-        newUser.setPassword("dev_" + randomAlphanumeric(5, 10));
+        newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Test User-Agent");
         newUser.setDeveloper(true);
@@ -99,8 +99,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("dev_" + randomAlphanumeric(5, 10));
-        newUser.setPassword(randomAlphanumeric(1, 1)); // short password
+        newUser.setLoginId("dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword(RandomStringUtils.secure().nextAlphanumeric(1, 1)); // short password
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Test User-Agent");
         newUser.setDeveloper(true);
@@ -142,7 +142,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
-        String newPassword = "dev_" + randomAlphanumeric(5, 10);
+        String newPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAccountPage.updatePassword(newPassword);
 
         homePage.logout();
@@ -164,7 +164,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
-        String newPassword = randomAlphanumeric(1, 1);
+        String newPassword = RandomStringUtils.secure().nextAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
                 editAccountPage.updatePassword(newPassword));
 
@@ -203,7 +203,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = "dev_" + randomAlphanumeric(5, 10);
+        String newPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         settingsAccountPage.updatePassword(appUser.getPassword(), newPassword);
 
         homePage.logout();
@@ -224,10 +224,10 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String wrongOldPassword = "dev_" + randomAlphanumeric(5, 10);
+        String wrongOldPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertFalse(wrongOldPassword.equals(appUser.getPassword()));
 
-        String newPassword = "dev_" + randomAlphanumeric(5, 10);
+        String newPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         AccountUpdateException error = assertThrows(AccountUpdateException.class, () ->
                 settingsAccountPage.updatePassword(wrongOldPassword, newPassword));
 
@@ -246,7 +246,7 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = randomAlphanumeric(1, 1);
+        String newPassword = RandomStringUtils.secure().nextAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
                 settingsAccountPage.updatePassword(appUser.getPassword(), newPassword));
 
@@ -265,8 +265,8 @@ public class TC_2_1_OAGISDeveloperCanManageOAGISDeveloperAccounts extends BaseTe
         LoginIDMenu loginIDMenu = homePage.getLoginIDMenu();
         SettingsAccountPage settingsAccountPage = loginIDMenu.openSettingsSubMenu();
 
-        String newPassword = "dev_" + randomAlphanumeric(5, 10);
-        String confirmNewPassword = "dev_" + randomAlphanumeric(5, 10);
+        String newPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String confirmNewPassword = "dev_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         assertFalse(newPassword.equals(confirmNewPassword));
 
         assertThrows(TimeoutException.class, () ->

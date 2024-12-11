@@ -13,6 +13,7 @@ public class GetModuleSetReleaseListRequest extends PaginationRequest<ModuleSetR
         super(requester, ModuleSetRelease.class);
     }
 
+    private BigInteger libraryId;
     private String name;
     private String description;
     private BigInteger releaseId;
@@ -21,6 +22,14 @@ public class GetModuleSetReleaseListRequest extends PaginationRequest<ModuleSetR
     private Collection<String> updaterUsernameList;
     private LocalDateTime updateStartDate;
     private LocalDateTime updateEndDate;
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
+    }
 
     public String getName() {
         return name;

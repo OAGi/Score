@@ -19,28 +19,30 @@ export class ReleaseService {
   constructor(private http: HttpClient) {
   }
 
-  getSimpleReleases(states?: string[]): Observable<SimpleRelease[]> {
-    let params = new HttpParams();
+  getSimpleReleases(libraryId: number, states?: string[]): Observable<SimpleRelease[]> {
+    let params = new HttpParams().set('libraryId', libraryId);
     if (!!states && states.length > 0) {
       params = params.set('states', states.join(','));
     }
     return this.http.get<SimpleRelease[]>('/api/simple_releases', {params});
   }
 
-  getSimpleRelease(id): Observable<SimpleRelease> {
+  getSimpleRelease(libraryId: number, id): Observable<SimpleRelease> {
     return this.http.get<SimpleRelease>('/api/simple_release/' + id);
   }
 
-  getReleaseList(): Observable<ReleaseList[]> {
+  getReleaseList(libraryId: number): Observable<ReleaseList[]> {
     return this.http.get<ReleaseList[]>('/api/release_list');
   }
 
   getReleases(request: ReleaseListRequest): Observable<PageResponse<ReleaseList>> {
     let params = new HttpParams()
+      .set('libraryId', '' + request.library.libraryId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+
     if (request.creatorLoginIds.length > 0) {
       params = params.set('creatorLoginIds', request.creatorLoginIds.join(','));
     }
@@ -104,8 +106,8 @@ export class ReleaseService {
     return this.http.get<AssignableMap>('/api/release/' + releaseId + '/assignable');
   }
 
-  validate(request: ReleaseValidationRequest): Observable<ReleaseValidationResponse> {
-    return this.http.post<ReleaseValidationResponse>('/api/release/validate', request);
+  validate(releaseId: number, request: ReleaseValidationRequest): Observable<ReleaseValidationResponse> {
+    return this.http.post<ReleaseValidationResponse>('/api/release/' + releaseId + '/validate', request);
   }
 
   makeDraft(releaseId: number, request: ReleaseValidationRequest): Observable<ReleaseValidationResponse> {

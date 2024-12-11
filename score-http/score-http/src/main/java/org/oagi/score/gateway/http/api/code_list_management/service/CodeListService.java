@@ -69,6 +69,8 @@ public class CodeListService extends EventHandler {
                 MODULE.PATH.as("module_path"),
                 LOG.REVISION_NUM.as("revision"))
                 .from(CODE_LIST_MANIFEST)
+                .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .join(APP_USER.as("owner")).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(CODE_LIST.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
@@ -97,6 +99,7 @@ public class CodeListService extends EventHandler {
         SelectOnConditionStep<Record> step = getSelectOnConditionStep(defaultModuleSetReleaseId);
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         conditions.add(CODE_LIST_MANIFEST.RELEASE_ID.eq(ULong.valueOf(request.getReleaseId())));
 
         if (StringUtils.hasLength(request.getName())) {
@@ -188,7 +191,7 @@ public class CodeListService extends EventHandler {
         AppUser requester = sessionService.getAppUserByUsername(user);
         result.stream().forEach(e -> {
             e.setAccess(
-                    AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUsername(e.getOwnerId()),
+                    AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUserId(e.getOwnerId()),
                             CcState.valueOf(e.getState()), isWorkingRelease)
             );
             e.setOwnerId(null); // hide sensitive information
@@ -200,6 +203,8 @@ public class CodeListService extends EventHandler {
         response.setSize(pageRequest.getPageSize());
         response.setLength(dslContext.selectCount()
                 .from(CODE_LIST_MANIFEST)
+                .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .join(APP_USER.as("owner")).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(CODE_LIST.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
@@ -276,6 +281,7 @@ public class CodeListService extends EventHandler {
 
     public CodeList getCodeList(AuthenticatedPrincipal user, BigInteger manifestId) {
         CodeList codeList = dslContext.select(
+                LIBRARY.LIBRARY_ID,
                 CODE_LIST_MANIFEST.RELEASE_ID,
                 RELEASE.STATE.as("release_state"),
                 RELEASE.RELEASE_NUM,
@@ -304,6 +310,7 @@ public class CodeListService extends EventHandler {
                 LOG.REVISION_TRACKING_NUM)
                 .from(CODE_LIST_MANIFEST)
                 .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
                 .join(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                 .join(APP_USER.as("owner")).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
@@ -322,10 +329,11 @@ public class CodeListService extends EventHandler {
         String releaseNum = dslContext.select(RELEASE.RELEASE_NUM).from(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(codeList.getReleaseId()))).fetchOneInto(String.class);
         boolean isWorkingRelease = releaseNum.equals("Working");
+        codeList.setWorkingRelease(isWorkingRelease);
 
         AppUser requester = sessionService.getAppUserByUsername(user);
         codeList.setAccess(
-                AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUsername(codeList.getOwnerId()),
+                AccessPrivilege.toAccessPrivilege(requester, sessionService.getAppUserByUserId(codeList.getOwnerId()),
                         CcState.valueOf(codeList.getState()), isWorkingRelease)
         );
         codeList.setOwnerId(null); // hide sensitive information
@@ -716,6 +724,17 @@ public class CodeListService extends EventHandler {
     }
 
     @Transactional
+    public void purgeCodeList(AuthenticatedPrincipal user, BigInteger codeListManifestIds) {
+        PurgeCodeListRepositoryRequest repositoryRequest =
+                new PurgeCodeListRepositoryRequest(user, codeListManifestIds);
+
+        PurgeCodeListRepositoryResponse repositoryResponse =
+                codeListWriteRepository.purgeCodeList(repositoryRequest);
+
+        fireEvent(new PurgedCodeListEvent());
+    }
+
+    @Transactional
     public void restoreCodeList(AuthenticatedPrincipal user, BigInteger codeListManifestIds) {
         RestoreCodeListRepositoryRequest repositoryRequest =
                 new RestoreCodeListRepositoryRequest(user, codeListManifestIds);
@@ -729,6 +748,11 @@ public class CodeListService extends EventHandler {
     @Transactional
     public void deleteCodeList(AuthenticatedPrincipal user, List<BigInteger> codeListManifestIds) {
         codeListManifestIds.stream().forEach(e -> deleteCodeList(user, e));
+    }
+
+    @Transactional
+    public void purgeCodeList(AuthenticatedPrincipal user, List<BigInteger> codeListManifestIds) {
+        codeListManifestIds.stream().forEach(e -> purgeCodeList(user, e));
     }
 
     @Transactional

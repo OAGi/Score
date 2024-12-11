@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
-import org.oagi.score.e2e.obj.AppUserObject;
-import org.oagi.score.e2e.obj.DTObject;
-import org.oagi.score.e2e.obj.NamespaceObject;
-import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.AddCommentDialog;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
@@ -43,19 +40,22 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
     @DisplayName("TC_41_2_TA_1")
     public void test_TA_1() {
         AppUserObject endUserA;
+        LibraryObject library;
         ReleaseObject branch;
         NamespaceObject namespace;
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.4");
-            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.4");
+            namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         assertFalse(endUserA.isDeveloper());
-        DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Numeric. Type", "10.8.4");
+        DTObject baseDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Numeric. Type", "10.8.4");
         DTViewEditPage dtViewEditPage = viewEditCoreComponentPage.createDT(baseDT.getDen(), branch.getReleaseNumber());
         assertTrue(dtViewEditPage.getBasedDataTypeFieldValue().equals(baseDT.getDen()));
         assertDisabled(dtViewEditPage.getDataTypeTermField());
@@ -103,7 +103,7 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         click(dtViewEditPage.getUpdateButton(true));
         dtViewEditPage.hitUpdateAnywayButton();
         homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+        ReleaseObject workingRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         viewEditCoreComponentPage.setBranch(workingRelease.getReleaseNumber());
         viewEditCoreComponentPage.setDEN(newQualifier + "_" + baseDT.getDen());
         viewEditCoreComponentPage.hitSearchButton();
@@ -117,7 +117,8 @@ public class TC_41_2_CreatingBrandNewDT extends BaseTest {
         {
             endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserA);
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         }
 
         HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());

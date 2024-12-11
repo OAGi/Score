@@ -169,32 +169,7 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
 
     @Override
     public List<ForeignKey<OasResponseHeadersRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_RESPONSE_HEADERS_OAS_RESPONSE_ID_FK, Keys.OAS_RESPONSE_HEADERS_OAS_HTTP_HEADER_ID_FK, Keys.OAS_RESPONSE_HEADERS_CREATED_BY_FK, Keys.OAS_RESPONSE_HEADERS_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasResponsePath _oasResponse;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_response</code> table.
-     */
-    public OasResponsePath oasResponse() {
-        if (_oasResponse == null)
-            _oasResponse = new OasResponsePath(this, Keys.OAS_RESPONSE_HEADERS_OAS_RESPONSE_ID_FK, null);
-
-        return _oasResponse;
-    }
-
-    private transient OasHttpHeaderPath _oasHttpHeader;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_http_header</code>
-     * table.
-     */
-    public OasHttpHeaderPath oasHttpHeader() {
-        if (_oasHttpHeader == null)
-            _oasHttpHeader = new OasHttpHeaderPath(this, Keys.OAS_RESPONSE_HEADERS_OAS_HTTP_HEADER_ID_FK, null);
-
-        return _oasHttpHeader;
+        return Arrays.asList(Keys.OAS_RESPONSE_HEADERS_CREATED_BY_FK, Keys.OAS_RESPONSE_HEADERS_LAST_UPDATED_BY_FK, Keys.OAS_RESPONSE_HEADERS_OAS_HTTP_HEADER_ID_FK, Keys.OAS_RESPONSE_HEADERS_OAS_RESPONSE_ID_FK);
     }
 
     private transient AppUserPath _oasResponseHeadersCreatedByFk;
@@ -221,6 +196,31 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
             _oasResponseHeadersLastUpdatedByFk = new AppUserPath(this, Keys.OAS_RESPONSE_HEADERS_LAST_UPDATED_BY_FK, null);
 
         return _oasResponseHeadersLastUpdatedByFk;
+    }
+
+    private transient OasHttpHeaderPath _oasHttpHeader;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_http_header</code>
+     * table.
+     */
+    public OasHttpHeaderPath oasHttpHeader() {
+        if (_oasHttpHeader == null)
+            _oasHttpHeader = new OasHttpHeaderPath(this, Keys.OAS_RESPONSE_HEADERS_OAS_HTTP_HEADER_ID_FK, null);
+
+        return _oasHttpHeader;
+    }
+
+    private transient OasResponsePath _oasResponse;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_response</code> table.
+     */
+    public OasResponsePath oasResponse() {
+        if (_oasResponse == null)
+            _oasResponse = new OasResponsePath(this, Keys.OAS_RESPONSE_HEADERS_OAS_RESPONSE_ID_FK, null);
+
+        return _oasResponse;
     }
 
     @Override

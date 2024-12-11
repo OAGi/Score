@@ -228,20 +228,7 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
 
     @Override
     public List<ForeignKey<BiePackageRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BIE_PACKAGE_OWNER_USER_ID_FK, Keys.BIE_PACKAGE_CREATED_BY_FK, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK, Keys.BIE_PACKAGE_SOURCE_BIE_PACKAGE_ID_FK);
-    }
-
-    private transient AppUserPath _biePackageOwnerUserIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bie_package_owner_user_id_fk</code> key.
-     */
-    public AppUserPath biePackageOwnerUserIdFk() {
-        if (_biePackageOwnerUserIdFk == null)
-            _biePackageOwnerUserIdFk = new AppUserPath(this, Keys.BIE_PACKAGE_OWNER_USER_ID_FK, null);
-
-        return _biePackageOwnerUserIdFk;
+        return Arrays.asList(Keys.BIE_PACKAGE_CREATED_BY_FK, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK, Keys.BIE_PACKAGE_OWNER_USER_ID_FK, Keys.BIE_PACKAGE_SOURCE_BIE_PACKAGE_ID_FK);
     }
 
     private transient AppUserPath _biePackageCreatedByFk;
@@ -268,6 +255,19 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
             _biePackageLastUpdatedByFk = new AppUserPath(this, Keys.BIE_PACKAGE_LAST_UPDATED_BY_FK, null);
 
         return _biePackageLastUpdatedByFk;
+    }
+
+    private transient AppUserPath _biePackageOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>bie_package_owner_user_id_fk</code> key.
+     */
+    public AppUserPath biePackageOwnerUserIdFk() {
+        if (_biePackageOwnerUserIdFk == null)
+            _biePackageOwnerUserIdFk = new AppUserPath(this, Keys.BIE_PACKAGE_OWNER_USER_ID_FK, null);
+
+        return _biePackageOwnerUserIdFk;
     }
 
     private transient BiePackagePath _biePackage;

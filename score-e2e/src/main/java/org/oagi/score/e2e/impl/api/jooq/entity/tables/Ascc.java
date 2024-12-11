@@ -297,44 +297,7 @@ public class Ascc extends TableImpl<AsccRecord> {
 
     @Override
     public List<ForeignKey<AsccRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.ASCC_FROM_ACC_ID_FK, Keys.ASCC_TO_ASCCP_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_ID_FK, Keys.ASCC_CREATED_BY_FK, Keys.ASCC_OWNER_USER_ID_FK, Keys.ASCC_LAST_UPDATED_BY_FK, Keys.ASCC_PREV_ASCC_ID_FK, Keys.ASCC_NEXT_ASCC_ID_FK);
-    }
-
-    private transient AccPath _acc;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc</code> table.
-     */
-    public AccPath acc() {
-        if (_acc == null)
-            _acc = new AccPath(this, Keys.ASCC_FROM_ACC_ID_FK, null);
-
-        return _acc;
-    }
-
-    private transient AsccpPath _asccp;
-
-    /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table.
-     */
-    public AsccpPath asccp() {
-        if (_asccp == null)
-            _asccp = new AsccpPath(this, Keys.ASCC_TO_ASCCP_ID_FK, null);
-
-        return _asccp;
-    }
-
-    private transient AsccPath _asccReplacementAsccIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.ascc</code> table, via the
-     * <code>ascc_replacement_ascc_id_fk</code> key.
-     */
-    public AsccPath asccReplacementAsccIdFk() {
-        if (_asccReplacementAsccIdFk == null)
-            _asccReplacementAsccIdFk = new AsccPath(this, Keys.ASCC_REPLACEMENT_ASCC_ID_FK, null);
-
-        return _asccReplacementAsccIdFk;
+        return Arrays.asList(Keys.ASCC_CREATED_BY_FK, Keys.ASCC_FROM_ACC_ID_FK, Keys.ASCC_LAST_UPDATED_BY_FK, Keys.ASCC_NEXT_ASCC_ID_FK, Keys.ASCC_OWNER_USER_ID_FK, Keys.ASCC_PREV_ASCC_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_ID_FK, Keys.ASCC_TO_ASCCP_ID_FK);
     }
 
     private transient AppUserPath _asccCreatedByFk;
@@ -350,17 +313,16 @@ public class Ascc extends TableImpl<AsccRecord> {
         return _asccCreatedByFk;
     }
 
-    private transient AppUserPath _asccOwnerUserIdFk;
+    private transient AccPath _acc;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>ascc_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>oagi.acc</code> table.
      */
-    public AppUserPath asccOwnerUserIdFk() {
-        if (_asccOwnerUserIdFk == null)
-            _asccOwnerUserIdFk = new AppUserPath(this, Keys.ASCC_OWNER_USER_ID_FK, null);
+    public AccPath acc() {
+        if (_acc == null)
+            _acc = new AccPath(this, Keys.ASCC_FROM_ACC_ID_FK, null);
 
-        return _asccOwnerUserIdFk;
+        return _acc;
     }
 
     private transient AppUserPath _asccLastUpdatedByFk;
@@ -376,6 +338,32 @@ public class Ascc extends TableImpl<AsccRecord> {
         return _asccLastUpdatedByFk;
     }
 
+    private transient AsccPath _asccNextAsccIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.ascc</code> table, via the
+     * <code>ascc_next_ascc_id_fk</code> key.
+     */
+    public AsccPath asccNextAsccIdFk() {
+        if (_asccNextAsccIdFk == null)
+            _asccNextAsccIdFk = new AsccPath(this, Keys.ASCC_NEXT_ASCC_ID_FK, null);
+
+        return _asccNextAsccIdFk;
+    }
+
+    private transient AppUserPath _asccOwnerUserIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>ascc_owner_user_id_fk</code> key.
+     */
+    public AppUserPath asccOwnerUserIdFk() {
+        if (_asccOwnerUserIdFk == null)
+            _asccOwnerUserIdFk = new AppUserPath(this, Keys.ASCC_OWNER_USER_ID_FK, null);
+
+        return _asccOwnerUserIdFk;
+    }
+
     private transient AsccPath _asccPrevAsccIdFk;
 
     /**
@@ -389,17 +377,29 @@ public class Ascc extends TableImpl<AsccRecord> {
         return _asccPrevAsccIdFk;
     }
 
-    private transient AsccPath _asccNextAsccIdFk;
+    private transient AsccPath _asccReplacementAsccIdFk;
 
     /**
      * Get the implicit join path to the <code>oagi.ascc</code> table, via the
-     * <code>ascc_next_ascc_id_fk</code> key.
+     * <code>ascc_replacement_ascc_id_fk</code> key.
      */
-    public AsccPath asccNextAsccIdFk() {
-        if (_asccNextAsccIdFk == null)
-            _asccNextAsccIdFk = new AsccPath(this, Keys.ASCC_NEXT_ASCC_ID_FK, null);
+    public AsccPath asccReplacementAsccIdFk() {
+        if (_asccReplacementAsccIdFk == null)
+            _asccReplacementAsccIdFk = new AsccPath(this, Keys.ASCC_REPLACEMENT_ASCC_ID_FK, null);
 
-        return _asccNextAsccIdFk;
+        return _asccReplacementAsccIdFk;
+    }
+
+    private transient AsccpPath _asccp;
+
+    /**
+     * Get the implicit join path to the <code>oagi.asccp</code> table.
+     */
+    public AsccpPath asccp() {
+        if (_asccp == null)
+            _asccp = new AsccpPath(this, Keys.ASCC_TO_ASCCP_ID_FK, null);
+
+        return _asccp;
     }
 
     private transient AsccBiztermPath _asccBizterm;

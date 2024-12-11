@@ -1,8 +1,10 @@
 <div class="context-section">
   <div class="pl-2 pr-2">
     <mat-toolbar class="bg-white d-flex flex-column align-items-start">
-      <span class="title">{{ "BIE_COPY.TITLE" | translate }} with {{ businessContextNames }}</span>
-      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+      <score-title-with-library-selector [title]="('BIE_COPY.TITLE' | translate) + ' with ' + businessContextNames"
+                                         [subtitle]="subtitle"
+                                         [libraries]="mappedLibraries"
+                                         (libraryChange)="onLibraryChange($event)"/>
     </mat-toolbar>
   </div>
 
@@ -224,7 +226,10 @@
                 <div class="den word-break-all">
                   <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
                      matTooltip="{{ element.den }}">
-                    <span>{{ element.den }}</span>
+                    <div class="d-inline-flex align-items-center">
+                      <span>{{ element.den }}</span>
+                      <span *ngIf="element.displayName" class="bie-display-name ml-2">{{ element.displayName }}</span>
+                    </div>
                   </a>
                 </div>
                 <div class="bie-guid">{{ element.guid }}</div>
@@ -236,7 +241,19 @@
                       releaseIds: element.sourceReleaseId,
                       topLevelAsbiepIds: element.sourceTopLevelAsbiepId }) }}">
                     <span class="d-inline" matTooltip="{{ element.sourceAction | pastTense }} at {{ element.sourceTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                      {{ element.sourceDen }} in {{ element.sourceReleaseNum }}
+                      {{ element.sourceDen + ((element.sourceDisplayName) ? (' (' + element.sourceDisplayName + ')') : '') }} in {{ element.sourceReleaseNum }}
+                    </span>
+                  </a>
+                </div>
+                <div class="bie-based" *ngIf="!!element.basedTopLevelAsbiepId && !!element.basedTopLevelAsbiepReleaseId">
+                  <span>Based on:</span>
+                  <a target="_blank" rel="noopener noreferrer"
+                     href="/profile_bie?{{ request.toQuery({
+                      den: element.basedTopLevelAsbiepDen,
+                      releaseIds: element.basedTopLevelAsbiepReleaseId,
+                      topLevelAsbiepIds: element.basedTopLevelAsbiepId }) }}">
+                    <span class="d-inline">
+                      {{ element.basedTopLevelAsbiepDen + ((element.basedTopLevelAsbiepDisplayName) ? (' (' + element.basedTopLevelAsbiepDisplayName + ')') : '') }} in {{ element.basedTopLevelAsbiepReleaseNum }}
                     </span>
                   </a>
                 </div>

@@ -6,6 +6,7 @@ export class ReuseReport {
   reusingDeprecatedReason: string;
   reusingDeprecatedRemark: string;
   reusingPropertyTerm: string;
+  reusingDisplayName: string;
   reusingDen: string;
   reusingGuid: string;
   reusingOwner: string;
@@ -20,6 +21,7 @@ export class ReuseReport {
   reusedDeprecatedReason: string;
   reusedDeprecatedRemark: string;
   reusedPropertyTerm: string;
+  reusedDisplayName: string;
   reusedDen: string;
   reusedGuid: string;
   reusedOwner: string;

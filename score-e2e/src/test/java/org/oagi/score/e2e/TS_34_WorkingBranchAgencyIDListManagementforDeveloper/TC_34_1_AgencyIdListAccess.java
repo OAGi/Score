@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_34_WorkingBranchAgencyIDListManagementforDeveloper;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -20,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
 import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
@@ -55,8 +55,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
@@ -96,8 +97,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
@@ -137,8 +139,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "WIP");
@@ -174,8 +177,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject draftAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Draft");
@@ -212,8 +216,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject candidateAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Candidate");
@@ -250,8 +255,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject deletedAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Deleted");
@@ -288,8 +294,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject releaseDraftAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "ReleaseDraft");
@@ -326,8 +333,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject publishedAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Published");
@@ -389,8 +397,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "WIP");
@@ -400,7 +409,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(wipAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -420,8 +429,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject draftAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Draft");
@@ -431,7 +441,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(draftAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -451,8 +461,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject candidateAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "Candidate");
@@ -462,7 +473,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(candidateAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -482,8 +493,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject candidateAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(anotherDeveloper, namespace, release, "ReleaseDraft");
@@ -493,7 +505,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(candidateAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -513,8 +525,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject wipAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
@@ -524,7 +537,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(wipAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -544,8 +557,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject draftAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Draft");
@@ -555,7 +569,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(draftAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -575,8 +589,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject candidateAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "Candidate");
@@ -586,7 +601,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(candidateAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -606,8 +621,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject releaseDraftAgencyIdList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "ReleaseDraft");
@@ -617,7 +633,7 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         EditAgencyIDListPage editAgencyIDListPage =
                 viewEditAgencyIDListPage.openEditAgencyIDListPageByNameAndBranch(releaseDraftAgencyIdList.getName(), release.getReleaseNumber());
         AddCommentDialog commentDialog = editAgencyIDListPage.openCommentDialog();
-        String commentText = randomPrint(50, 100).trim();
+        String commentText = RandomStringUtils.secure().nextPrint(50, 100).trim();
         commentDialog.setComment(commentText);
         homePage.logout();
 
@@ -635,9 +651,10 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         List<AgencyIDListObject> agencyIDLists = Arrays.asList("10.6", "10.7.0.1", "10.7.1").stream()
-                .map(branch -> getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(branch))
+                .map(branch -> getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch))
                 .map(release -> getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP"))
                 .collect(Collectors.toList());
 
@@ -660,8 +677,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList =
                 getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
@@ -686,8 +704,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         List<AgencyIDListObject> agencyIDLists = Arrays.asList("WIP", "Draft", "Candidate", "ReleaseDraft", "Published", "Deleted").stream()
                 .map(state -> getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, state))
                 .collect(Collectors.toList());
@@ -713,8 +732,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
         agencyIDList.setCreationTimestamp(LocalDateTime.of(1999, 1, 1, 1, 1, 1));
@@ -739,8 +759,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
 
@@ -759,8 +780,9 @@ public class TC_34_1_AgencyIdListAccess extends BaseTest {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
 
-        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
         AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, namespace, release, "WIP");
 

@@ -15,12 +15,14 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {initFilter, saveBranch} from '../../../common/utility';
+import {initFilter, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {BieList} from '../../bie-list/domain/bie-list';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {BieListInBiePackageRequest, BiePackage} from '../domain/bie-package';
 import {BiePackageService} from '../domain/bie-package.service';
+import {Library} from '../../../library-management/domain/library';
+import {LibraryService} from '../../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-bie-package-uplift-dialog',
@@ -52,6 +54,9 @@ export class BiePackageUpliftDialogComponent implements OnInit {
 
   loginIdList: string[] = [];
   releases: SimpleRelease[] = [];
+  library: Library = new Library();
+  libraries: Library[] = [];
+  mappedLibraries: { library: Library, selected: boolean }[] = [];
   sourceRelease: SimpleRelease;
   targetRelease: SimpleRelease;
   sourceReleaseListFilterCtrl: FormControl = new FormControl();
@@ -73,6 +78,7 @@ export class BiePackageUpliftDialogComponent implements OnInit {
   constructor(private biePackageService: BiePackageService,
               private accountService: AccountListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private auth: AuthService,
               private location: Location,
               private router: Router,
@@ -92,51 +98,53 @@ export class BiePackageUpliftDialogComponent implements OnInit {
     // Init BIE list table for BIE package
     this.request = new BieListInBiePackageRequest(undefined,
       new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
 
-    this.table.sortParams = this.request.page.sortActives;
-    this.table.sortDirs = this.request.page.sortDirections;
-    this.table.sortObservable.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadBieListInBiePackage();
-    });
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-    this.request.biePackageId = this.data.biePackageId;
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    forkJoin([
-      this.biePackageService.get(this.request.biePackageId),
-      this.accountService.getAccountNames(),
-      this.releaseService.getSimpleReleases()
-    ]).subscribe(([biePackage, loginIds, releases]) => {
-      this.init(biePackage);
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
-      if (!!this.data.releaseId) {
-        this.releases = this.releases.filter(e => e.releaseId === this.data.releaseId);
-      }
-
-      this.loadBieListInBiePackage();
-    }, error => {
-      this.loading = false;
-      let errorMessage;
-      if (error.status === 403) {
-        errorMessage = 'You do not have access permission.';
-      } else {
-        errorMessage = 'Something\'s wrong.';
-      }
-      this.snackBar.open(errorMessage, '', {
-        duration: 3000
+      this.table.sortParams = this.request.page.sortActives;
+      this.table.sortDirs = this.request.page.sortDirections;
+      this.table.sortObservable.subscribe(() => {
+        this.paginator.pageIndex = 0;
+        this.loadBieListInBiePackage();
       });
-      this.onNoClick();
+
+      this.request.page = new PageRequest(
+        this.table.sortParams, this.table.sortDirs,
+        this.paginator.pageIndex, this.paginator.pageSize);
+      this.request.biePackageId = this.data.biePackageId;
+
+      forkJoin([
+        this.biePackageService.get(this.request.biePackageId),
+        this.accountService.getAccountNames(),
+        this.releaseService.getSimpleReleases(this.library.libraryId, ['Published'])
+      ]).subscribe(([biePackage, loginIds, releases]) => {
+        this.init(biePackage);
+
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.initReleases(releases);
+
+        this.loadBieListInBiePackage();
+      }, error => {
+        this.loading = false;
+        let errorMessage;
+        if (error.status === 403) {
+          errorMessage = 'You do not have access permission.';
+        } else {
+          errorMessage = 'Something\'s wrong.';
+        }
+        this.snackBar.open(errorMessage, '', {
+          duration: 3000
+        });
+        this.onNoClick();
+      });
     });
   }
 
@@ -160,6 +168,44 @@ export class BiePackageUpliftDialogComponent implements OnInit {
     const urlTree = this.router.createUrlTree(commands);
     const path = this.location.prepareExternalUrl(urlTree.toString());
     return window.location.origin + path;
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+      }
+      if (!this.library || !this.library.libraryId) {
+        this.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = releases.filter(e => !e.workingRelease);
+    if (!!this.data.releaseId) {
+      this.releases = this.releases.filter(e => e.releaseId === this.data.releaseId);
+    }
+  }
+
+  onLibraryChange(library: Library) {
+    this.library = library;
+    this.releaseService.getSimpleReleases(this.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
+  }
+
+  onSearch() {
+    this.paginator.pageIndex = 0;
+    this.loadBieListInBiePackage();
   }
 
   loadBieListInBiePackage() {

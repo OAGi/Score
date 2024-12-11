@@ -2,9 +2,11 @@ import {PageRequest} from '../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../common/utility';
 import {HttpParams} from '@angular/common/http';
+import {Library} from '../../library-management/domain/library';
 
 export class Namespace {
   namespaceId: number;
+  libraryId: number;
   uri: string;
   prefix: string;
   description: string;
@@ -31,6 +33,7 @@ export class SimpleNamespace {
 }
 
 export class NamespaceListRequest {
+  library: Library = new Library();
   filters: {
     uri: string;
     prefix: string;

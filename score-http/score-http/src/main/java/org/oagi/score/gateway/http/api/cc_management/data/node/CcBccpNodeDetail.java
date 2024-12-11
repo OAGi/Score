@@ -35,6 +35,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
 
         private CcState state;
         private String owner;
+        private BigInteger libraryId;
+        private String libraryName;
         private BigInteger releaseId;
         private String releaseNum;
         private BigInteger logId;
@@ -68,6 +70,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
 
         private CcState state;
         private String owner;
+        private BigInteger libraryId;
+        private String libraryName;
         private BigInteger releaseId;
         private String releaseNum;
         private BigInteger logId;
@@ -98,6 +102,8 @@ public class CcBccpNodeDetail implements CcNodeDetail {
 
         private CcState state;
         private String owner;
+        private BigInteger libraryId;
+        private String libraryName;
         private BigInteger releaseId;
         private String releaseNum;
         private BigInteger logId;

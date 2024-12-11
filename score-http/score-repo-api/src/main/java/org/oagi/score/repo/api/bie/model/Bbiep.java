@@ -22,6 +22,8 @@ public class Bbiep extends Auditable {
 
     private String bizTerm;
 
+    private String displayName;
+
     private BigInteger ownerTopLevelAsbiepId;
 
     public BigInteger getBbiepId() {
@@ -86,6 +88,14 @@ public class Bbiep extends Auditable {
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public BigInteger getOwnerTopLevelAsbiepId() {

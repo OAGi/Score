@@ -62,13 +62,11 @@ public class AgencyIdService {
                     .on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                     .join(RELEASE)
                     .on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .join(LIBRARY)
+                    .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                     .where(and(
                             RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                            RELEASE.STATE.in(Published.name(), Production.name()),
-                            or(
-                                    AGENCY_ID_LIST.STATE.in(Published.name(), Production.name()),
-                                    AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID.isNotNull()
-                            )
+                            RELEASE.STATE.in(Published.name(), Production.name())
                     ))
                     .fetchInto(SimpleAgencyIdList.class);
         } else {
@@ -81,15 +79,12 @@ public class AgencyIdService {
                     .on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                     .join(RELEASE)
                     .on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                    .join(LIBRARY)
+                    .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                     .join(APP_USER)
                     .on(AGENCY_ID_LIST.LAST_UPDATED_BY.eq(APP_USER.APP_USER_ID))
                     .where(and(
                             RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)),
-                            RELEASE.STATE.in(Published.name(), Production.name()),
-                            or(
-                                    AGENCY_ID_LIST.STATE.in(Published.name(), Production.name()),
-                                    AGENCY_ID_LIST.PREV_AGENCY_ID_LIST_ID.isNotNull()
-                            ),
                             APP_USER.IS_DEVELOPER.eq((byte) 1)
                     ))
                     .fetchInto(SimpleAgencyIdList.class);
@@ -118,16 +113,21 @@ public class AgencyIdService {
         return response;
     }
 
-    public AgencyIdList getAgencyIdListDetail(ScoreUser user, BigInteger manifestId) {
-        AgencyIdList agencyIdList = scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdList(manifestId);
-        boolean isWorkingRelease = agencyIdList.getReleaseNum().equals("Working");
+    public AgencyIdList getAgencyIdListDetail(ScoreUser user, BigInteger agencyIdListManifestId) {
+        AgencyIdList agencyIdList = scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdListByAgencyIdListManifestId(agencyIdListManifestId);
+        boolean isWorkingRelease = "Working".equals(agencyIdList.getReleaseNum());
+        agencyIdList.setWorkingRelease(isWorkingRelease);
         agencyIdList.setAccess(
-                AccessPrivilege.toAccessPrivilege(sessionService.getAppUserByUsername(user.getUserId()),
-                        sessionService.getAppUserByUsername(agencyIdList.getOwner().getUserId()),
+                AccessPrivilege.toAccessPrivilege(sessionService.getAppUserByUserId(user.getUserId()),
+                        sessionService.getAppUserByUserId(agencyIdList.getOwner().getUserId()),
                         agencyIdList.getState().name(), isWorkingRelease).name()
         );
-        if (agencyIdList.getPrevAgencyIdListId() != null) {
-            agencyIdList.setPrev(scoreRepositoryFactory.createAgencyIdListReadRepository().getAgencyIdListById(agencyIdList.getPrevAgencyIdListId()));
+        if (agencyIdList.getPrevAgencyIdListManifestId() != null) {
+            agencyIdList.setPrev(scoreRepositoryFactory.createAgencyIdListReadRepository()
+                    .getAgencyIdListByAgencyIdListManifestId(agencyIdList.getPrevAgencyIdListManifestId()));
+        } else if (agencyIdList.getPrevAgencyIdListId() != null) {
+            agencyIdList.setPrev(scoreRepositoryFactory.createAgencyIdListReadRepository()
+                    .getAgencyIdListByAgencyIdListId(agencyIdList.getPrevAgencyIdListId()));
         }
         return agencyIdList;
     }
@@ -155,6 +155,11 @@ public class AgencyIdService {
     public void updateAgencyIdListState(AuthenticatedPrincipal user, LocalDateTime timestamp, BigInteger agencyIdListManifestId, String state) {
         scoreRepositoryFactory.createAgencyIdListWriteRepository().updateAgencyIdListState(sessionService.asScoreUser(user),
                 agencyIdListManifestId, CcState.valueOf(state));
+    }
+
+    @Transactional
+    public void purgeAgencyIdList(ScoreUser user, BigInteger agencyIdListManifestId) {
+        scoreRepositoryFactory.createAgencyIdListWriteRepository().purgeAgencyIdList(user, agencyIdListManifestId);
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,17 +18,16 @@ import org.oagi.score.e2e.page.release.CreateReleasePage;
 import org.oagi.score.e2e.page.release.EditReleasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.oagi.score.e2e.AssertionHelper.assertEnabled;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -61,13 +61,16 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
          * Thus, it should be executed in this class to use the SAME_THREAD concurrent condition.
          */
         AppUserObject developer;
+        LibraryObject library;
         NamespaceObject namespace;
         CodeListObject codeListCandidate;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             codeListCandidate = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developer, namespace, workingBranch, "Published");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeListCandidate, developer);
@@ -107,7 +110,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         }
 
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
@@ -133,7 +136,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
             }
         }
 
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", newDraftRelease.getState());
 
         /**
@@ -141,9 +144,9 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
          */
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet("10.8.1");
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
@@ -175,7 +178,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
             }
         }
 
-        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Initialized", newDraftRelease.getState());
 
         viewEditModuleSetReleasePage.openPage();
@@ -221,14 +224,16 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
     @DisplayName("TC_21_3_TA_3")
     public void test_TA_3() {
         AppUserObject developer;
+        LibraryObject library;
         NamespaceObject namespace;
         ACCObject newACC;
         ASCCPObject newASCCP;
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             newACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, workingBranch, namespace, "Candidate");
             newASCCP = getAPIFactory().getCoreComponentAPI().createRandomASCCP(newACC, developer, namespace, "Candidate");
         }
@@ -237,9 +242,9 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
 
-        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        createModuleSetPage.setDescription(randomPrint(50, 100).trim());
+        createModuleSetPage.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
         createModuleSetPage.hitCreateButton();
 
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getModuleSetByName(moduleSetName);
@@ -258,7 +263,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
 
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
@@ -283,14 +288,14 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
             }
         }
 
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", newDraftRelease.getState());
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        createModuleSetReleasePage.setDescription(randomPrint(50, 100).trim());
+        createModuleSetReleasePage.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
         createModuleSetReleasePage.setModuleSet(moduleSet.getName());
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());
         createModuleSetReleasePage.hitCreateButton();
@@ -342,6 +347,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
     public void test_TA_4() {
         AppUserObject developer;
         AppUserObject endUser;
+        LibraryObject library;
         NamespaceObject namespace;
         ACCObject newACC;
         ASCCPObject newASCCP;
@@ -350,8 +356,10 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
             thisAccountWillBeDeletedAfterTests(developer);
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
-            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
+
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ReleaseObject workingBranch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
             newACC = getAPIFactory().getCoreComponentAPI().createRandomACC(developer, workingBranch, namespace, "Candidate");
             newASCCP = getAPIFactory().getCoreComponentAPI().createRandomASCCP(newACC, developer, namespace, "Candidate");
         }
@@ -360,9 +368,9 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
         CreateModuleSetPage createModuleSetPage =  viewEditModuleSetPage.hitNewModuleSetButton();
 
-        String moduleSetName = "Test Module " + randomAlphanumeric(5, 10);
+        String moduleSetName = "Test Module " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetPage.setName(moduleSetName);
-        createModuleSetPage.setDescription(randomPrint(50, 100).trim());
+        createModuleSetPage.setDescription(RandomStringUtils.secure().nextPrint(50, 100).trim());
         createModuleSetPage.hitCreateButton();
 
         ModuleSetObject moduleSet = getAPIFactory().getModuleSetAPI().getTheLatestModuleSetCreatedBy(developer);
@@ -381,7 +389,7 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
 
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
@@ -407,12 +415,12 @@ public class TC_21_3_ManageCCModuleAssignment extends BaseTest {
             }
         }
 
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
         assertEquals("Draft", newDraftRelease.getState());
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        createModuleSetReleasePage.setName("Module Set Release Test" + randomAlphanumeric(5, 10));
+        createModuleSetReleasePage.setName("Module Set Release Test" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         createModuleSetReleasePage.setDescription("Description Test");
         createModuleSetReleasePage.setModuleSet(moduleSet.getName());
         createModuleSetReleasePage.setRelease(newDraftRelease.getReleaseNumber());

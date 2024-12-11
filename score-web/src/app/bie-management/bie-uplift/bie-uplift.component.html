@@ -36,7 +36,7 @@
             <div class="col-8">
               <mat-form-field>
                 <mat-label *ngIf="!sourceSelectedNode">Search</mat-label>
-                <mat-label *ngIf="sourceSelectedNode">Search > {{sourceSelectedNode.name}}</mat-label>
+                <mat-label *ngIf="sourceSelectedNode">Search > {{ (sourceSelectedNode.displayName ? sourceSelectedNode.displayName : sourceSelectedNode.name) }}</mat-label>
                 <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
                        [disabled]="sourceSearcher.isSearching"
                        (keyup.enter)="search('source')">
@@ -98,9 +98,9 @@
                    *ngFor="let bread of sourceSelectedNode.parents; let last = last;">
                 <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
                 <span *ngIf="last"
-                      class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('bc-source') : '' }}</span>
+                      class="tree-breadcrumb-item-last">{{ bread.displayName ? bread.displayName : bread.name }} {{ last ? scrollBreadcrumb('bc-source') : '' }}</span>
                 <span *ngIf="!last" class="tree-breadcrumb-item"
-                      (click)="onSourceBreadCrumbClick(bread)">{{ bread.name }}</span>
+                      (click)="onSourceBreadCrumbClick(bread)">{{ bread.displayName ? bread.displayName : bread.name }}</span>
               </div>
             </div>
           </div>
@@ -110,7 +110,7 @@
               <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                            [style.height.px]="innerHeight" #sourceVirtualScroll>
                 <div *cdkVirtualFor="let node of sourceDataSource" class="example-item">
-                  <div class="mat-tree-node d-flex pointer"
+                  <div class="mat-tree-node d-flex align-items-center pointer"
                        tabIndex="0"
                        [attr.data-path]="node.path"
                        [class]="{'tree-node-selected': sourceSelectedNode === node}"
@@ -118,7 +118,6 @@
                        [style.padding-left]="node.level * paddingPixel + 'px'">
                     <button *ngIf="sourceDataSource.isExpandable(node); else disabledRef;"
                             (click)="sourceDataSource.toggle(node)"
-                            class="align-self-center"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
                         {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
@@ -131,27 +130,34 @@
                     <mat-checkbox *ngIf="(node.level > 0 && !node.fixed)"
                                   [checked]="node.target !== undefined"
                                   [disabled]="true"></mat-checkbox>
-                    <span [class]="['align-self-center', node.typeClass.toLowerCase(),
-                                    this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
-                          [class.deprecated]="node.deprecated"
-                          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                          [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
-                          [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
-                    </span>
 
-                    <span [class]="['pl-3']" *ngIf="!sourceDataSource.hideCardinality">
-                      {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                    </span>
+                    <div class="d-inline-flex align-items-center flex-grow-1">
+                      <span [class]="[node.typeClass.toLowerCase(),
+                                      this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                            [style.padding-right.px]="2"
+                            [class.deprecated]="node.deprecated"
+                            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                            [class.search-index]="this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex"
+                            [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
+                      </span>
 
-                    <fa-icon [icon]="faRecycle"
-                             matTooltip="Reused"
-                             [class]="['pl-3', 'pointer']" class="pointer"
-                             *ngIf="node.derived"></fa-icon>
-                    <mat-icon class="align-self-center ml-auto"
-                              *ngIf="sourceDataSource.isExpandable(node)"
-                              [matMenuTriggerFor]="contextMenu"
-                              (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                    </mat-icon>
+                      <span [class]="['pl-4']" *ngIf="!sourceDataSource.hideCardinality">
+                        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                      </span>
+
+                      <fa-icon [icon]="faRecycle"
+                               matTooltip="Reused"
+                               [class]="['pl-3', 'pointer']" class="pointer"
+                               *ngIf="node.reused"></fa-icon>
+
+                      <div class="ml-auto mr-2">
+                        <mat-icon *ngIf="sourceDataSource.isExpandable(node)"
+                                  class="context-menu-icon"
+                                  [matMenuTriggerFor]="contextMenu"
+                                  (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                        </mat-icon>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </cdk-virtual-scroll-viewport>
@@ -243,7 +249,7 @@
               <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
                                            [style.height.px]="innerHeight" #targetVirtualScroll>
                 <div *cdkVirtualFor="let node of targetDataSource" class="example-item">
-                  <div class="mat-tree-node d-flex pointer"
+                  <div class="mat-tree-node d-flex align-items-center pointer"
                        tabIndex="0"
                        [attr.data-path]="node.path"
                        [class]="{'tree-node-selected': targetSelectedNode === node}"
@@ -251,7 +257,6 @@
                        [style.padding-left]="node.level * paddingPixel + 'px'">
                     <button *ngIf="targetDataSource.isExpandable(node); else disabledRef;"
                             (click)="targetDataSource.toggle(node)"
-                            class="align-self-center"
                             mat-icon-button>
                       <mat-icon class="mat-icon-rtl-mirror">
                         {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
@@ -260,37 +265,45 @@
                     <ng-template #disabledRef>
                       <button mat-icon-button disabled></button>
                     </ng-template>
+
                     <mat-checkbox *ngIf="node.level > 0"
                                   [checked]="node.source !== undefined"
                                   (change)="checkMatch($event, node)"
                                   [disabled]="!canMatch(node)"></mat-checkbox>
-                    <span [class]="['align-self-center', node.typeClass.toLowerCase(),
-                                    this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
-                          [class.deprecated]="node.deprecated"
-                          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                          [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
-                          [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
-                    </span>
 
-                    <span [class]="['pl-3']" *ngIf="!targetDataSource.hideCardinality">
-                      {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                    </span>
+                    <div class="d-inline-flex align-items-center flex-grow-1">
+                      <span [class]="[node.typeClass.toLowerCase(),
+                                      this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                            [style.padding-right.px]="2"
+                            [class.deprecated]="node.deprecated"
+                            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                            [class.search-index]="this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex"
+                            [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
+                      </span>
 
-                    <fa-icon [icon]="faCircleExclamation"
-                             matTooltip="Select BIE"
-                             (click)="matchReused(node)"
-                             [class]="['pl-3', 'pointer', 'warn']" class="pointer"
-                             *ngIf="node.source && node.source.derived && !node.reusedTopLevelAsbiepId"></fa-icon>
-                    <fa-icon [icon]="faRecycle"
-                             matTooltip="Reused"
-                             (click)="matchReused(node)"
-                             [class]="['pl-3', 'pointer']" class="pointer"
-                             *ngIf="node.reusedTopLevelAsbiepId"></fa-icon>
-                    <mat-icon class="align-self-center ml-auto"
-                              *ngIf="targetDataSource.isExpandable(node)"
-                              [matMenuTriggerFor]="contextMenu"
-                              (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                    </mat-icon>
+                      <span [class]="['pl-4']" *ngIf="!targetDataSource.hideCardinality">
+                        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                      </span>
+
+                      <fa-icon [icon]="faCircleExclamation"
+                               matTooltip="Select BIE"
+                               (click)="matchReused(node)"
+                               [class]="['pl-3', 'pointer', 'warn']" class="pointer"
+                               *ngIf="node.source && node.source.reused && !node.reusedTopLevelAsbiepId"></fa-icon>
+                      <fa-icon [icon]="faRecycle"
+                               matTooltip="Reused"
+                               (click)="matchReused(node)"
+                               [class]="['pl-3', 'pointer']" class="pointer"
+                               *ngIf="node.reusedTopLevelAsbiepId"></fa-icon>
+
+                      <div class="ml-auto mr-2">
+                        <mat-icon *ngIf="targetDataSource.isExpandable(node)"
+                                  class="context-menu-icon"
+                                  [matMenuTriggerFor]="contextMenu"
+                                  (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                        </mat-icon>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </cdk-virtual-scroll-viewport>

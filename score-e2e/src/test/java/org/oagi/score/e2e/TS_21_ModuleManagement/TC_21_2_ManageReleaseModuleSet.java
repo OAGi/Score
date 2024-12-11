@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_21_ModuleManagement;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,15 +11,16 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
-import org.oagi.score.e2e.page.bie.EditBIEPage;
-import org.oagi.score.e2e.page.code_list.EditCodeListPage;
-import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
-import org.oagi.score.e2e.page.module.*;
+import org.oagi.score.e2e.page.module.CreateModuleSetReleasePage;
+import org.oagi.score.e2e.page.module.EditModuleSetReleasePage;
+import org.oagi.score.e2e.page.module.ModuleSetReleaseXMLSchemaValidationDialog;
+import org.oagi.score.e2e.page.module.ViewEditModuleSetReleasePage;
 import org.oagi.score.e2e.page.release.CreateReleasePage;
-import org.oagi.score.e2e.page.release.EditReleasePage;
-import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.oagi.score.e2e.page.release.ViewEditReleasePage;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.time.Duration;
@@ -27,8 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomPrint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.*;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -68,15 +68,17 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         List<ModuleSetObject> existingModuleSets = getAPIFactory().getModuleSetAPI().getAllModuleSets();
         for (ModuleSetObject moduleSet : existingModuleSets.stream().filter(e -> !e.getName().contains("Test")).collect(Collectors.toList())) {
             assertDoesNotThrow(() -> createModuleSetReleasePage.setModuleSet(moduleSet.getName()));
         }
-        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases();
+        List<ReleaseObject> existingReleases = getAPIFactory().getReleaseAPI().getReleases(
+                getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec")
+        );
         for (ReleaseObject release : existingReleases.stream().filter(e -> e.getState().equals("Published")).collect(Collectors.toList())) {
             assertDoesNotThrow(() -> createModuleSetReleasePage.setRelease(release.getReleaseNumber()));
         }
@@ -109,9 +111,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
             ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
             CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-            String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+            String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
             createModuleSetReleasePage.setName(moduleSetReleaseName);
-            String description = randomPrint(50, 100).trim();
+            String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
             createModuleSetReleasePage.setDescription(description);
             createModuleSetReleasePage.setModuleSet(releaseNumber);
             createModuleSetReleasePage.setRelease(releaseNumber);
@@ -154,9 +156,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
             HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
             ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
             CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-            String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+            String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
             createModuleSetReleasePage.setName(moduleSetReleaseName);
-            String description = randomPrint(50, 100).trim();
+            String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
             createModuleSetReleasePage.setDescription(description);
             createModuleSetReleasePage.setModuleSet(releaseNumber);
             createModuleSetReleasePage.setRelease(releaseNumber);
@@ -208,9 +210,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet(releaseNumber);
         createModuleSetReleasePage.setRelease(releaseNumber);
@@ -221,9 +223,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         homePage = loginPage().signIn(developerB.getLoginId(), developerB.getPassword());
         viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         EditModuleSetReleasePage editModuleSetReleasePage = viewEditModuleSetReleasePage.openModuleSetReleaseByName(moduleSetReleaseName);
-        String newModuleSetReleaseName = "Updated Test Module Set Release " + randomAlphanumeric(5, 10);
+        String newModuleSetReleaseName = "Updated Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editModuleSetReleasePage.setName(newModuleSetReleaseName);
-        String newDescription = randomPrint(50, 100).trim();
+        String newDescription = RandomStringUtils.secure().nextPrint(50, 100).trim();
         editModuleSetReleasePage.setDescription(newDescription);
         editModuleSetReleasePage.hitUpdateButton();
         homePage.logout();
@@ -279,9 +281,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet(releaseNumber);
         createModuleSetReleasePage.setRelease(releaseNumber);
@@ -307,26 +309,29 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(
+                    getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec"),
+                    "http://www.openapplications.org/oagis/10");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
         ViewEditReleasePage viewEditReleasePage = homePage.getCoreComponentMenu().openViewEditReleaseSubMenu();
 
         CreateReleasePage createReleasePage = viewEditReleasePage.createRelease();
-        String newReleaseNum = String.valueOf((RandomUtils.nextInt(20230519, 20231231)));
+        String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
         createReleasePage.setReleaseNumber(newReleaseNum);
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
 
-        ReleaseObject newRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(newReleaseNum);
+        ReleaseObject newRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(
+                getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec"), newReleaseNum);
 
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet("10.7.5");
         createModuleSetReleasePage.setRelease(newRelease.getReleaseNumber());
@@ -351,9 +356,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet("10.7.4");
         createModuleSetReleasePage.setRelease("10.7.4");
@@ -382,9 +387,9 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         HomePage homePage = loginPage().signIn(developerA.getLoginId(), developerA.getPassword());
         ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
         CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
-        String moduleSetReleaseName = "Test Module Set Release " + randomAlphanumeric(5, 10);
+        String moduleSetReleaseName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createModuleSetReleasePage.setName(moduleSetReleaseName);
-        String description = randomPrint(50, 100).trim();
+        String description = RandomStringUtils.secure().nextPrint(50, 100).trim();
         createModuleSetReleasePage.setDescription(description);
         createModuleSetReleasePage.setModuleSet("10.7.3");
         createModuleSetReleasePage.setRelease("10.7.3");

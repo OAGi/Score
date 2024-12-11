@@ -199,7 +199,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
     @Override
     public List<ForeignKey<BieUserExtRevisionRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
+        return Arrays.asList(Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK);
     }
 
     private transient AbiePath _abie;
@@ -227,19 +227,6 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
         return _bieUserExtRevisionExtAccIdFk;
     }
 
-    private transient AccPath _bieUserExtRevisionUserExtAccIdFk;
-
-    /**
-     * Get the implicit join path to the <code>oagi.acc</code> table, via the
-     * <code>bie_user_ext_revision_user_ext_acc_id_fk</code> key.
-     */
-    public AccPath bieUserExtRevisionUserExtAccIdFk() {
-        if (_bieUserExtRevisionUserExtAccIdFk == null)
-            _bieUserExtRevisionUserExtAccIdFk = new AccPath(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, null);
-
-        return _bieUserExtRevisionUserExtAccIdFk;
-    }
-
     private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
@@ -251,6 +238,19 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
             _topLevelAsbiep = new TopLevelAsbiepPath(this, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK, null);
 
         return _topLevelAsbiep;
+    }
+
+    private transient AccPath _bieUserExtRevisionUserExtAccIdFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.acc</code> table, via the
+     * <code>bie_user_ext_revision_user_ext_acc_id_fk</code> key.
+     */
+    public AccPath bieUserExtRevisionUserExtAccIdFk() {
+        if (_bieUserExtRevisionUserExtAccIdFk == null)
+            _bieUserExtRevisionUserExtAccIdFk = new AccPath(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, null);
+
+        return _bieUserExtRevisionUserExtAccIdFk;
     }
 
     @Override

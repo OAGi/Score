@@ -169,31 +169,7 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
 
     @Override
     public List<ForeignKey<OasRequestParameterRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK, Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK);
-    }
-
-    private transient OasParameterPath _oasParameter;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_parameter</code> table.
-     */
-    public OasParameterPath oasParameter() {
-        if (_oasParameter == null)
-            _oasParameter = new OasParameterPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, null);
-
-        return _oasParameter;
-    }
-
-    private transient OasRequestPath _oasRequest;
-
-    /**
-     * Get the implicit join path to the <code>oagi.oas_request</code> table.
-     */
-    public OasRequestPath oasRequest() {
-        if (_oasRequest == null)
-            _oasRequest = new OasRequestPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK, null);
-
-        return _oasRequest;
+        return Arrays.asList(Keys.OAS_REQUEST_PARAMETER_CREATED_BY_FK, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK, Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK);
     }
 
     private transient AppUserPath _oasRequestParameterCreatedByFk;
@@ -220,6 +196,30 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
             _oasRequestParameterLastUpdatedByFk = new AppUserPath(this, Keys.OAS_REQUEST_PARAMETER_LAST_UPDATED_BY_FK, null);
 
         return _oasRequestParameterLastUpdatedByFk;
+    }
+
+    private transient OasParameterPath _oasParameter;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_parameter</code> table.
+     */
+    public OasParameterPath oasParameter() {
+        if (_oasParameter == null)
+            _oasParameter = new OasParameterPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_PARAMETER_ID_FK, null);
+
+        return _oasParameter;
+    }
+
+    private transient OasRequestPath _oasRequest;
+
+    /**
+     * Get the implicit join path to the <code>oagi.oas_request</code> table.
+     */
+    public OasRequestPath oasRequest() {
+        if (_oasRequest == null)
+            _oasRequest = new OasRequestPath(this, Keys.OAS_REQUEST_PARAMETER_OAS_REQUEST_ID_FK, null);
+
+        return _oasRequest;
     }
 
     @Override

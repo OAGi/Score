@@ -1,5 +1,6 @@
 package org.oagi.score.e2e.TS_2_OAGISDeveloperCanManageUsers;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.Duration.ofMillis;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
@@ -51,8 +51,8 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("eu_" + randomAlphanumeric(5, 10));
-        newUser.setPassword("eu_" + randomAlphanumeric(5, 10));
+        newUser.setLoginId("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Test User-Agent");
         newUser.setDeveloper(false);
@@ -96,8 +96,8 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         NewAccountPage newAccountPage = accountsPage.openNewAccountPage();
 
         AppUserObject newUser = new AppUserObject();
-        newUser.setLoginId("eu_" + randomAlphanumeric(5, 10));
-        newUser.setPassword(randomAlphanumeric(1, 1)); // short password
+        newUser.setLoginId("eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        newUser.setPassword(RandomStringUtils.secure().nextAlphanumeric(1, 1)); // short password
         newUser.setName(newUser.getLoginId());
         newUser.setOrganization("Test User-Agent");
         newUser.setDeveloper(false);
@@ -139,7 +139,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
-        String newPassword = "eu_" + randomAlphanumeric(5, 10);
+        String newPassword = "eu_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         editAccountPage.updatePassword(newPassword);
 
         homePage.logout();
@@ -161,7 +161,7 @@ public class TC_2_2_OAGISDeveloperCanManageEndUserAccounts extends BaseTest {
         AccountsPage accountsPage = adminMenu.openAccountsSubMenu();
         EditAccountPage editAccountPage = accountsPage.openEditAccountPageByLoginID(appUser.getLoginId());
 
-        String newPassword = randomAlphanumeric(1, 1);
+        String newPassword = RandomStringUtils.secure().nextAlphanumeric(1, 1);
         assertThrows(TimeoutException.class, () ->
                 editAccountPage.updatePassword(newPassword));
 

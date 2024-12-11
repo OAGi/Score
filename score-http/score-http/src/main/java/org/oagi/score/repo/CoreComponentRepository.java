@@ -225,7 +225,7 @@ public class CoreComponentRepository {
                 .fetchOneInto(CcBccpNode.class);
     }
 
-    public List<SummaryCc> getSummaryCcList(AppUser requester) {
+    public List<SummaryCc> getSummaryCcList(AppUser requester, BigInteger libraryId) {
         List<SummaryCc> unionOfSummaryCcList = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID.as("manifestId"),
                         inline("ACC").as("type"),
                         ACC.LAST_UPDATE_TIMESTAMP,
@@ -236,8 +236,12 @@ public class CoreComponentRepository {
                 .from(ACC_MANIFEST)
                 .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                .where(and(RELEASE.RELEASE_NUM.eq("Working"), ACC.STATE.in("WIP", "Draft", "Candidate")))
+                .where(and(
+                        LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                        RELEASE.RELEASE_NUM.eq("Working"),
+                        ACC.STATE.in("WIP", "Draft", "Candidate")))
                 .union(dslContext.select(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifestId"),
                                 inline("ASCCP").as("type"),
                                 ASCCP.LAST_UPDATE_TIMESTAMP,
@@ -248,8 +252,12 @@ public class CoreComponentRepository {
                         .from(ASCCP_MANIFEST)
                         .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                         .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                        .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                         .join(APP_USER).on(ASCCP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                        .where(and(RELEASE.RELEASE_NUM.eq("Working"), ASCCP.STATE.in("WIP", "Draft", "Candidate"))))
+                        .where(and(
+                                LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                                RELEASE.RELEASE_NUM.eq("Working"),
+                                ASCCP.STATE.in("WIP", "Draft", "Candidate"))))
                 .union(dslContext.select(BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifestId"),
                                 inline("BCCP").as("type"),
                                 BCCP.LAST_UPDATE_TIMESTAMP,
@@ -260,8 +268,12 @@ public class CoreComponentRepository {
                         .from(BCCP_MANIFEST)
                         .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                         .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                        .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                         .join(APP_USER).on(BCCP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                        .where(and(RELEASE.RELEASE_NUM.eq("Working"), BCCP.STATE.in("WIP", "Draft", "Candidate"))))
+                        .where(and(
+                                LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                                RELEASE.RELEASE_NUM.eq("Working"),
+                                BCCP.STATE.in("WIP", "Draft", "Candidate"))))
                 .union(dslContext.select(DT_MANIFEST.DT_MANIFEST_ID.as("manifestId"),
                                 inline("BDT").as("type"),
                                 DT.LAST_UPDATE_TIMESTAMP,
@@ -272,22 +284,29 @@ public class CoreComponentRepository {
                         .from(DT_MANIFEST)
                         .join(DT).on(and(DT_MANIFEST.DT_ID.eq(DT.DT_ID), DT_MANIFEST.BASED_DT_MANIFEST_ID.isNotNull()))
                         .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                        .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                         .join(APP_USER).on(DT.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
-                        .where(and(RELEASE.RELEASE_NUM.eq("Working"), DT.STATE.in("WIP", "Draft", "Candidate"))))
+                        .where(and(
+                                LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)),
+                                RELEASE.RELEASE_NUM.eq("Working"),
+                                DT.STATE.in("WIP", "Draft", "Candidate"))))
                 .fetchInto(SummaryCc.class);
 
         return unionOfSummaryCcList;
     }
 
-    public List<SummaryCcExt> getSummaryCcExtList(BigInteger releaseId) {
+    public List<SummaryCcExt> getSummaryCcExtList(BigInteger libraryId, BigInteger releaseId) {
         List<ULong> uegAccIds;
         if (releaseId.longValue() > 0) {
             uegAccIds = dslContext.select(max(ACC.ACC_ID).as("id"))
                             .from(ACC)
                             .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                            .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                            .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                             .where(and(
                                     ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
-                                    ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))
+                                    ACC_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                    LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId))
                             ))
                             .groupBy(ACC.GUID)
                             .fetchInto(ULong.class);
@@ -296,9 +315,12 @@ public class CoreComponentRepository {
             uegAccIds = dslContext.select(max(ACC.ACC_ID).as("id"))
                             .from(ACC)
                             .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                            .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                            .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                             .where(and(
                                     ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
-                                    ACC_MANIFEST.RELEASE_ID.greaterThan(ULong.valueOf(0))
+                                    ACC_MANIFEST.RELEASE_ID.greaterThan(ULong.valueOf(0)),
+                                    LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId))
                             ))
                             .groupBy(ACC.GUID)
                             .fetchInto(ULong.class);

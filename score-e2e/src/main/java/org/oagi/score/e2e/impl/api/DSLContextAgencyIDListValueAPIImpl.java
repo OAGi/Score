@@ -35,7 +35,7 @@ public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI 
     }
 
     @Override
-    public AgencyIDListValueObject createRandomAgencyIDListValue(AppUserObject creator, AgencyIDListObject agencyIDList) {
+    public AgencyIDListValueObject createRandomAgencyIDListValue(AppUserObject creator,AgencyIDListObject agencyIDList) {
         AgencyIDListValueObject agencyIDListValue = AgencyIDListValueObject.createRandomAgencyIDListValue(creator);
 
         AgencyIdListValueRecord agencyIdListValueRecord = new AgencyIdListValueRecord();
@@ -77,7 +77,9 @@ public class DSLContextAgencyIDListValueAPIImpl implements AgencyIDListValueAPI 
                     .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(agencyIdListValueManifestId))
                     .fetchOne();
 
-            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease();
+            ReleaseObject latestRelease = apiFactory.getReleaseAPI().getTheLatestRelease(
+                    apiFactory.getLibraryAPI().getLibraryById(release.getLibraryId())
+            );
             AgencyIdListValueManifestRecord prevAgencyIdListValueManifestRecord = agencyIdListValueManifestRecord.copy();
             prevAgencyIdListValueManifestRecord.setAgencyIdListValueManifestId(null);
             prevAgencyIdListValueManifestRecord.setAgencyIdListManifestId(dslContext.select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)

@@ -12,10 +12,9 @@
   font-size: 13px;
   min-height: 33px;
   font-family: Roboto;
-  align-items: center;
 }
 
-.mat-tree-node .deprecated, .mat-option .deprecated {
+.mat-tree-node .deprecated, .mat-option .deprecated, span.deprecated {
   text-decoration: line-through;
   background-color: #ececec;
 }
@@ -292,4 +291,10 @@
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.mat-tree-node .node-edit-container {
+  width: 100%;
+  height: 100%;
+  padding-right: 64px;
 }

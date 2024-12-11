@@ -25,6 +25,18 @@ public interface SelectProfileBIEToReuseDialog extends Dialog, SearchBarPage {
 
     void setUpdatedEndDate(LocalDateTime updatedEndDate);
 
+    WebElement getBusinessContextField();
+
+    void setBusinessContext(String businessContext);
+
+    WebElement getVersionField();
+
+    void setVersion(String version);
+
+    WebElement getRemarkField();
+
+    void setRemark(String remark);
+
     void hitSearchButton();
 
     void selectBIEToReuse(TopLevelASBIEPObject bie);

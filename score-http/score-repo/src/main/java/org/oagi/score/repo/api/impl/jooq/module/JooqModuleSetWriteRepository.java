@@ -40,6 +40,7 @@ public class JooqModuleSetWriteRepository
         }
 
         ModuleSetRecord moduleSetRecord = dslContext().insertInto(MODULE_SET)
+                .set(MODULE_SET.LIBRARY_ID, ULong.valueOf(request.getLibraryId()))
                 .set(MODULE_SET.GUID, randomGuid())
                 .set(MODULE_SET.NAME, request.getName())
                 .set(MODULE_SET.DESCRIPTION, request.getDescription())
@@ -52,6 +53,7 @@ public class JooqModuleSetWriteRepository
 
         ModuleSet moduleSet = new ModuleSet();
         moduleSet.setModuleSetId(moduleSetRecord.getModuleSetId().toBigInteger());
+        moduleSet.setLibraryId(moduleSetRecord.getLibraryId().toBigInteger());
         moduleSet.setName(moduleSetRecord.getName());
         moduleSet.setDescription(moduleSetRecord.getDescription());
         moduleSet.setCreatedBy(requester);

@@ -7,6 +7,8 @@ import java.math.BigInteger;
 
 public class CreateModuleSetRequest extends Request {
 
+    private BigInteger libraryId;
+
     private String guid;
 
     private String name;
@@ -21,6 +23,14 @@ public class CreateModuleSetRequest extends Request {
 
     public CreateModuleSetRequest(ScoreUser requester) {
         super(requester);
+    }
+
+    public BigInteger getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(BigInteger libraryId) {
+        this.libraryId = libraryId;
     }
 
     public String getGuid() {

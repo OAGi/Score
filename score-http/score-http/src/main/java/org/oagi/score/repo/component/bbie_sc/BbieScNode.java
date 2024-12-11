@@ -36,6 +36,7 @@ public class BbieScNode {
         private String bbieHashPath;
         private BigInteger basedDtScManifestId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger bbieScId;
         private String guid;
         private Integer cardinalityMin;
@@ -46,6 +47,7 @@ public class BbieScNode {
         private String remark;
         private String bizTerm;
         private String definition;
+        private String displayName;
         private String defaultValue;
         private String fixedValue;
         private String example;

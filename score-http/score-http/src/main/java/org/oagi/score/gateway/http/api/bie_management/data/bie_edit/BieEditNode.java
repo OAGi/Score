@@ -10,12 +10,14 @@ import java.math.BigInteger;
 public class BieEditNode {
 
     private BigInteger topLevelAsbiepId;
+    private BigInteger libraryId;
     private BigInteger releaseId;
 
     private String type;
     private String guid;
     private String hashPath;
     private String name;
+    private String displayName;
     private boolean used;
     private boolean required;
     private boolean locked;
@@ -25,6 +27,7 @@ public class BieEditNode {
     private String version;
     private String status;
 
+    private String libraryName;
     private String releaseNum;
     private BieState topLevelAsbiepState;
     private String ownerLoginId;
@@ -32,6 +35,9 @@ public class BieEditNode {
     private boolean deprecated;
     private String deprecatedReason;
     private String deprecatedRemark;
+
+    // Issue #1635
+    private BigInteger basedTopLevelAsbiepId;
 
     // Issue #1519
     private BieForOasDoc bieForOasDoc;

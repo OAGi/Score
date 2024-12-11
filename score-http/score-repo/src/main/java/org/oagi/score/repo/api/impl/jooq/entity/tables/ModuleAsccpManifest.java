@@ -190,20 +190,7 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
 
     @Override
     public List<ForeignKey<ModuleAsccpManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
-    }
-
-    private transient ModuleSetReleasePath _moduleSetRelease;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module_set_release</code>
-     * table.
-     */
-    public ModuleSetReleasePath moduleSetRelease() {
-        if (_moduleSetRelease == null)
-            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
-
-        return _moduleSetRelease;
+        return Arrays.asList(Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
     }
 
     private transient AsccpManifestPath _asccpManifest;
@@ -216,18 +203,6 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
             _asccpManifest = new AsccpManifestPath(this, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, null);
 
         return _asccpManifest;
-    }
-
-    private transient ModulePath _module;
-
-    /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
-     */
-    public ModulePath module() {
-        if (_module == null)
-            _module = new ModulePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, null);
-
-        return _module;
     }
 
     private transient AppUserPath _moduleAsccpManifestCreatedByFk;
@@ -254,6 +229,31 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
             _moduleAsccpManifestLastUpdatedByFk = new AppUserPath(this, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK, null);
 
         return _moduleAsccpManifestLastUpdatedByFk;
+    }
+
+    private transient ModulePath _module;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module</code> table.
+     */
+    public ModulePath module() {
+        if (_module == null)
+            _module = new ModulePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_ID_FK, null);
+
+        return _module;
+    }
+
+    private transient ModuleSetReleasePath _moduleSetRelease;
+
+    /**
+     * Get the implicit join path to the <code>oagi.module_set_release</code>
+     * table.
+     */
+    public ModuleSetReleasePath moduleSetRelease() {
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetReleasePath(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, null);
+
+        return _moduleSetRelease;
     }
 
     @Override

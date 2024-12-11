@@ -39,7 +39,9 @@ public class BbieNode {
         private String toBbiepHashPath;
         private BigInteger basedBccManifestId;
 
+        private BigInteger ownerTopLevelAsbiepId;
         private BigInteger bbieId;
+        private BigInteger toBbiepId;
         private String guid;
         private BigInteger seqKey;
         private Integer cardinalityMin;

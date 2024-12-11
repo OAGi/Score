@@ -64,24 +64,27 @@ public class InfoController {
     @RequestMapping(value = "/info/cc_summary",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SummaryCcInfo getSummaryCcInfo(@AuthenticationPrincipal AuthenticatedPrincipal user) {
-        return ccInfoService.getSummaryCcInfo(user);
+    public SummaryCcInfo getSummaryCcInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                          @RequestParam(name = "libraryId") BigInteger libraryId) {
+        return ccInfoService.getSummaryCcInfo(user, libraryId);
     }
 
     @RequestMapping(value = "/info/bie_summary",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryBieInfo getSummaryBieInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @RequestParam(name = "libraryId") BigInteger libraryId,
                                             @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
-        return bieInfoService.getSummaryBieInfo(user, releaseId);
+        return bieInfoService.getSummaryBieInfo(user, libraryId, releaseId);
     }
 
     @RequestMapping(value = "/info/cc_ext_summary",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SummaryCcExtInfo getSummaryCcExtInfo(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                                @RequestParam(name = "libraryId") BigInteger libraryId,
                                                 @RequestParam(name = "releaseId", required = false, defaultValue = "-1") BigInteger releaseId) {
-        return ccInfoService.getSummaryCcExtInfo(user, releaseId);
+        return ccInfoService.getSummaryCcExtInfo(user, libraryId, releaseId);
     }
 
     @RequestMapping(value = "/info/oauth2_providers", method = RequestMethod.GET,

@@ -1,5 +1,7 @@
 package org.oagi.score.e2e.TS_43_OpenAPIDocument;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -65,8 +66,8 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         CreateOpenAPIDocumentPage createOpenAPIDocumentPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
 
         String openApiVersion = "3.0.3";
-        String randomTitle = "oas_doc_" + randomAlphanumeric(5, 10);
-        String randomDocumentVersion = "oas_doc_ver_" + randomNumeric(3, 7);
+        String randomTitle = "oas_doc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        String randomDocumentVersion = "oas_doc_ver_" + RandomUtils.secure().randomInt(3, 7);
 
         createOpenAPIDocumentPage.setOpenAPIVersion(openApiVersion);
         createOpenAPIDocumentPage.setTitle(randomTitle);
@@ -94,12 +95,12 @@ public class TC_43_1_DefineOpenAPIDocumentDefinition extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         CreateOpenAPIDocumentPage createOpenAPIDocumentPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
 
-        String randomTitle = "oas_doc_" + randomAlphanumeric(5, 10);
+        String randomTitle = "oas_doc_" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
         createOpenAPIDocumentPage.setTitle(randomTitle);
         assertThrows(TimeoutException.class, () -> createOpenAPIDocumentPage.create());
 
         createOpenAPIDocumentPage.openPage();
-        String randomDocumentVersion = "oas_doc_ver_" + randomNumeric(3, 7);
+        String randomDocumentVersion = "oas_doc_ver_" + RandomUtils.secure().randomInt(3, 7);
         createOpenAPIDocumentPage.setDocumentVersion(randomDocumentVersion);
         assertThrows(TimeoutException.class, () -> createOpenAPIDocumentPage.create());
     }

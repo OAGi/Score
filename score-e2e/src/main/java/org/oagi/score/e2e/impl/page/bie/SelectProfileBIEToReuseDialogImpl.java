@@ -18,22 +18,31 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl implements SelectProfileBIEToReuseDialog {
 
     private static final By OWNER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//score-reuse-bie-dialog//*[contains(text(), \"Owner\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
+            By.xpath("//score-reuse-bie-dialog//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
 
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
+            By.xpath("//score-reuse-bie-dialog//input[@aria-label=\"dropdown search\"]");
 
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
+            By.xpath("//score-reuse-bie-dialog//input[contains(@placeholder, \"Updated start date\")]");
 
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
-            By.xpath("//input[contains(@placeholder, \"Updated end date\")]");
+            By.xpath("//score-reuse-bie-dialog//input[contains(@placeholder, \"Updated end date\")]");
+
+    private static final By BUSINESS_CONTEXT_FIELD_LOCATOR =
+            By.xpath("//score-reuse-bie-dialog//input[contains(@placeholder, \"Business Context\")]");
+
+    private static final By VERSION_FIELD_LOCATOR =
+            By.xpath("//score-reuse-bie-dialog//input[contains(@placeholder, \"Version\")]");
+
+    private static final By REMARK_FIELD_LOCATOR =
+            By.xpath("//score-reuse-bie-dialog//input[contains(@placeholder, \"Remark\")]");
 
     private static final By SELECT_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
+            By.xpath("//score-reuse-bie-dialog//span[contains(text(), \"Select\")]//ancestor::button[1]");
 
     private final BasePageImpl parent;
 
@@ -113,6 +122,36 @@ public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl impleme
     }
 
     @Override
+    public WebElement getBusinessContextField() {
+        return visibilityOfElementLocated(getDriver(), BUSINESS_CONTEXT_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setBusinessContext(String businessContext) {
+        sendKeys(getBusinessContextField(), businessContext);
+    }
+
+    @Override
+    public WebElement getVersionField() {
+        return visibilityOfElementLocated(getDriver(), VERSION_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setVersion(String version) {
+        sendKeys(getVersionField(), version);
+    }
+
+    @Override
+    public WebElement getRemarkField() {
+        return visibilityOfElementLocated(getDriver(), REMARK_FIELD_LOCATOR);
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        sendKeys(getRemarkField(), remark);
+    }
+
+    @Override
     public void hitSearchButton() {
         click(getSearchButton());
         waitFor(ofMillis(500L));
@@ -121,6 +160,10 @@ public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl impleme
     @Override
     public void selectBIEToReuse(TopLevelASBIEPObject bie) {
         retry(() -> {
+            showAdvancedSearchPanel();
+            setVersion(bie.getVersion());
+            hitSearchButton();
+
             WebElement tr = getTableRecordByValue(bie.getPropertyTerm());
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox")));

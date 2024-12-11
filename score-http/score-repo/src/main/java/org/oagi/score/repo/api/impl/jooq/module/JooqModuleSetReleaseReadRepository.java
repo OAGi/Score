@@ -43,6 +43,7 @@ public class JooqModuleSetReleaseReadRepository
                 MODULE_SET_RELEASE.RELEASE_ID,
                 MODULE_SET.NAME,
                 RELEASE.RELEASE_NUM,
+                LIBRARY.LIBRARY_ID,
                 MODULE_SET_RELEASE.IS_DEFAULT,
                 APP_USER.as("creator").APP_USER_ID.as("creator_user_id"),
                 APP_USER.as("creator").LOGIN_ID.as("creator_login_id"),
@@ -60,7 +61,11 @@ public class JooqModuleSetReleaseReadRepository
                 .join(APP_USER.as("creator")).on(MODULE_SET_RELEASE.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(MODULE_SET_RELEASE.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(MODULE_SET_RELEASE.RELEASE_ID))
-                .join(MODULE_SET).on(MODULE_SET.MODULE_SET_ID.eq(MODULE_SET_RELEASE.MODULE_SET_ID));
+                .join(MODULE_SET).on(MODULE_SET.MODULE_SET_ID.eq(MODULE_SET_RELEASE.MODULE_SET_ID))
+                .join(LIBRARY).on(and(
+                        RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID),
+                        MODULE_SET.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID)
+                ));
     }
 
     private RecordMapper<Record, ModuleSetRelease> mapper() {
@@ -73,6 +78,7 @@ public class JooqModuleSetReleaseReadRepository
             moduleSetRelease.setModuleSetName(record.get(MODULE_SET.NAME));
             moduleSetRelease.setReleaseId(record.get(MODULE_SET_RELEASE.RELEASE_ID).toBigInteger());
             moduleSetRelease.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
+            moduleSetRelease.setLibraryId(record.get(LIBRARY.LIBRARY_ID).toBigInteger());
             moduleSetRelease.setDefault(record.get(MODULE_SET_RELEASE.IS_DEFAULT) == 1);
 
             ScoreRole creatorRole = (byte) 1 == record.get(APP_USER.as("creator").IS_DEVELOPER.as("creator_is_developer")) ? DEVELOPER : END_USER;
@@ -167,6 +173,7 @@ public class JooqModuleSetReleaseReadRepository
     private Collection<Condition> getConditions(GetModuleSetReleaseListRequest request) {
         List<Condition> conditions = new ArrayList();
 
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         if (StringUtils.hasLength(request.getName())) {
             conditions.addAll(contains(request.getName(), MODULE_SET_RELEASE.NAME));
         }

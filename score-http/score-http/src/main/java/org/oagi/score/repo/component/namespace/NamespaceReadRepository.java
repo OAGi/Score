@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.APP_USER;
-import static org.oagi.score.repo.api.impl.jooq.entity.Tables.NAMESPACE;
+import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
 public class NamespaceReadRepository {
@@ -28,14 +27,16 @@ public class NamespaceReadRepository {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectOnConditionStep<Record9<ULong, String, String, ULong, String, String,
-            LocalDateTime, Byte, String>> getSelectOnConditionStep() {
-        return dslContext.select(NAMESPACE.NAMESPACE_ID, NAMESPACE.URI, NAMESPACE.PREFIX,
+    private SelectOnConditionStep<Record10<
+            ULong, ULong, String, String, ULong,
+            String, String, LocalDateTime, Byte, String>> getSelectOnConditionStep() {
+        return dslContext.select(NAMESPACE.NAMESPACE_ID, LIBRARY.LIBRARY_ID, NAMESPACE.URI, NAMESPACE.PREFIX,
                 APP_USER.as("owner").APP_USER_ID.as("owner_user_id"),
                 APP_USER.as("owner").LOGIN_ID.as("owner"),
                 NAMESPACE.DESCRIPTION, NAMESPACE.LAST_UPDATE_TIMESTAMP, NAMESPACE.IS_STD_NMSP,
                 APP_USER.as("updater").LOGIN_ID.as("last_update_user"))
                 .from(NAMESPACE)
+                .join(LIBRARY).on(NAMESPACE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(APP_USER.as("owner"))
                 .on(NAMESPACE.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("updater"))
@@ -50,10 +51,12 @@ public class NamespaceReadRepository {
                                              NamespaceListRequest request) {
 
         PageRequest pageRequest = request.getPageRequest();
-        SelectOnConditionStep<Record9<ULong, String, String, ULong, String, String,
-                LocalDateTime, Byte, String>> selectOnConditionStep = getSelectOnConditionStep();
+        SelectOnConditionStep<Record10<
+                ULong, ULong, String, String, ULong,
+                String, String, LocalDateTime, Byte, String>> selectOnConditionStep = getSelectOnConditionStep();
 
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(request.getLibraryId())));
         if (StringUtils.hasLength(request.getUri())) {
             conditions.add(NAMESPACE.URI.containsIgnoreCase(request.getUri()));
         }
@@ -81,8 +84,9 @@ public class NamespaceReadRepository {
             conditions.add(NAMESPACE.IS_STD_NMSP.eq((byte) (request.getStandard() ? 1 : 0)));
         }
 
-        SelectConditionStep<Record9<ULong, String, String, ULong, String, String,
-                LocalDateTime, Byte, String>> conditionStep = selectOnConditionStep.where(conditions);
+        SelectConditionStep<Record10<
+                ULong, ULong, String, String, ULong,
+                String, String, LocalDateTime, Byte, String>> conditionStep = selectOnConditionStep.where(conditions);
 
         int length = dslContext.fetchCount(conditionStep);
 
@@ -125,9 +129,9 @@ public class NamespaceReadRepository {
             }
         }
 
-        ResultQuery<Record9<
-                ULong, String, String, ULong, String, String,
-                LocalDateTime, Byte, String>> query;
+        ResultQuery<Record10<
+                ULong, ULong, String, String, ULong,
+                String, String, LocalDateTime, Byte, String>> query;
         if (sortField != null) {
             if (pageRequest.getOffset() >= 0 && pageRequest.getPageSize() >= 0) {
                 query = conditionStep.orderBy(sortField)
@@ -157,6 +161,7 @@ public class NamespaceReadRepository {
     private NamespaceList mapper(Record record) {
         NamespaceList namespaceList = new NamespaceList();
         namespaceList.setNamespaceId(record.get(NAMESPACE.NAMESPACE_ID).toBigInteger());
+        namespaceList.setLibraryId(record.get(LIBRARY.LIBRARY_ID).toBigInteger());
         namespaceList.setUri(record.get(NAMESPACE.URI));
         namespaceList.setPrefix(record.get(NAMESPACE.PREFIX));
         namespaceList.setDescription(record.get(NAMESPACE.DESCRIPTION));

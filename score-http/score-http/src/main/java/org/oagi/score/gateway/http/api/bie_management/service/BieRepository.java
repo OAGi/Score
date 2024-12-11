@@ -45,7 +45,7 @@ public class BieRepository {
     @Autowired
     private TenantService tenantService;
 
-    public List<SummaryBie> getSummaryBieList(BigInteger releaseId, AppUser requester) {
+    public List<SummaryBie> getSummaryBieList(BigInteger libraryId, BigInteger releaseId, AppUser requester) {
 
         SelectOnConditionStep step = dslContext.selectDistinct(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
@@ -59,6 +59,13 @@ public class BieRepository {
                 .join(ASBIEP).on(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(RELEASE)
+                .on(and(
+                        TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID),
+                        ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID)
+                ))
+                .join(LIBRARY)
+                .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID));
 
         if (configService.isTenantEnabled()) {
@@ -70,6 +77,7 @@ public class BieRepository {
 
         SelectConditionStep cond;
         List<Condition> conditions = new ArrayList();
+        conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
         if (releaseId.longValue() > 0) {
             conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
         } else {
@@ -354,18 +362,6 @@ public class BieRepository {
                 .fetchOptionalInto(BieEditAbie.class).orElse(null);
     }
 
-    public List<TopLevelAsbiep> getReusedTopLevelAsbiepListByTopLevelAsbiepId(BigInteger topLevelAsbiepId) {
-        return dslContext.select(TOP_LEVEL_ASBIEP.fields())
-                .from(TOP_LEVEL_ASBIEP)
-                .join(ASBIEP).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID))
-                .join(ASBIE).on(ASBIEP.ASBIEP_ID.eq(ASBIE.TO_ASBIEP_ID))
-                .where(and(
-                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
-                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
-                ))
-                .fetchInto(TopLevelAsbiep.class);
-    }
-
     public List<BieEditAsbie> getAsbieListByFromAbieId(BigInteger fromAbieId, BieEditNode node) {
         return dslContext.select(
                 ASBIE.ASBIE_ID,
@@ -506,11 +502,22 @@ public class BieRepository {
     }
 
     public BigInteger createTopLevelAsbiep(BigInteger userId, BigInteger releaseId, BieState state) {
+        return createTopLevelAsbiep(userId, releaseId, null, state, null, null);
+    }
+
+    public BigInteger createTopLevelAsbiep(BigInteger userId, BigInteger releaseId,
+                                           BigInteger basedTopLevelAsbiepId, BieState state,
+                                           String version, String status) {
         TopLevelAsbiepRecord record = new TopLevelAsbiepRecord();
         LocalDateTime timestamp = LocalDateTime.now();
         record.setOwnerUserId(ULong.valueOf(userId));
         record.setReleaseId(ULong.valueOf(releaseId));
+        if (basedTopLevelAsbiepId != null) {
+            record.setBasedTopLevelAsbiepId(ULong.valueOf(basedTopLevelAsbiepId));
+        }
         record.setState(state.name());
+        record.setVersion(version);
+        record.setStatus(status);
         record.setLastUpdatedBy(ULong.valueOf(userId));
         record.setLastUpdateTimestamp(timestamp);
 
@@ -791,6 +798,7 @@ public class BieRepository {
                 TOP_LEVEL_ASBIEP.DEPRECATED_REASON.as("reusingDeprecatedReason"),
                 TOP_LEVEL_ASBIEP.DEPRECATED_REMARK.as("reusingDeprecatedRemark"),
                 ASCCP.as("reusing_asccp").PROPERTY_TERM.as("reusingPropertyTerm"),
+                ASBIEP.as("reusing_asbiep").DISPLAY_NAME.as("reusingDisplayName"),
                 ASCCP_MANIFEST.as("reusing_asccp_manifest").DEN.as("reusingDen"),
                 ABIE.as("reusing_abie").GUID.as("reusingGuid"),
                 APP_USER.as("reusing_app_user").LOGIN_ID.as("reusingOwner"),
@@ -805,6 +813,7 @@ public class BieRepository {
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").DEPRECATED_REASON.as("reusedDeprecatedReason"),
                 TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").DEPRECATED_REMARK.as("reusedDeprecatedRemark"),
                 ASCCP.as("reused_asccp").PROPERTY_TERM.as("reusedPropertyTerm"),
+                ASBIEP.DISPLAY_NAME.as("reusedDisplayName"),
                 ASCCP_MANIFEST.as("reused_asccp_manifest").DEN.as("reusedDen"),
                 ABIE.as("reused_abie").GUID.as("reusedGuid"),
                 APP_USER.as("reused_app_user").LOGIN_ID.as("reusedOwner"),

@@ -49,9 +49,10 @@ public class TC_17_7_RestoringEndUserCodeList extends BaseTest {
             AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserB);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("10.8.5");
-            NamespaceObject namespaceEUa = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA);
-            NamespaceObject namespaceEUb = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB);
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+            NamespaceObject namespaceEUa = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserA, library);
+            NamespaceObject namespaceEUb = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUserB, library);
 
             CodeListObject codeList = getAPIFactory().getCodeListAPI().createRandomCodeList(endUserA, namespaceEUa, branch, "Deleted");
             CodeListValueObject codeListValue = getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUserA);

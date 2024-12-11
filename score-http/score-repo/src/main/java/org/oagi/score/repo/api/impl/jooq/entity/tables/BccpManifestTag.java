@@ -155,7 +155,7 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
 
     @Override
     public List<ForeignKey<BccpManifestTagRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK);
+        return Arrays.asList(Keys.BCCP_MANIFEST_TAG_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK);
     }
 
     private transient BccpManifestPath _bccpManifest;
@@ -170,18 +170,6 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
         return _bccpManifest;
     }
 
-    private transient TagPath _tag;
-
-    /**
-     * Get the implicit join path to the <code>oagi.tag</code> table.
-     */
-    public TagPath tag() {
-        if (_tag == null)
-            _tag = new TagPath(this, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK, null);
-
-        return _tag;
-    }
-
     private transient AppUserPath _appUser;
 
     /**
@@ -192,6 +180,18 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
             _appUser = new AppUserPath(this, Keys.BCCP_MANIFEST_TAG_CREATED_BY_FK, null);
 
         return _appUser;
+    }
+
+    private transient TagPath _tag;
+
+    /**
+     * Get the implicit join path to the <code>oagi.tag</code> table.
+     */
+    public TagPath tag() {
+        if (_tag == null)
+            _tag = new TagPath(this, Keys.BCCP_MANIFEST_TAG_TAG_ID_FK, null);
+
+        return _tag;
     }
 
     @Override

@@ -20,6 +20,8 @@ public class ReleaseObject {
 
     private String releaseLicence;
 
+    private BigInteger libraryId;
+
     private BigInteger namespaceId;
 
     private BigInteger createdby;
@@ -32,7 +34,8 @@ public class ReleaseObject {
 
     private String state;
 
-    public static ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace, String state) {
+    public static ReleaseObject createRandomRelease(AppUserObject creator, LibraryObject library,
+                                                    NamespaceObject namespace, String state) {
         if (!namespace.isStandardNamespace()) {
             throw new IllegalArgumentException("Standard namespace needs to create a new release.");
         }
@@ -40,6 +43,7 @@ public class ReleaseObject {
         ReleaseObject release = new ReleaseObject();
         release.setGuid(UUID.randomUUID().toString().replaceAll("-", ""));
         release.setReleaseNumber(String.valueOf((RandomUtils.nextInt(20230519, 20231231))));
+        release.setLibraryId(library.getLibraryId());
         release.setNamespaceId(namespace.getNamespaceId());
         release.setCreatedby(creator.getAppUserId());
         release.setLastUpdatedBy(creator.getAppUserId());
@@ -49,12 +53,14 @@ public class ReleaseObject {
         return release;
     }
 
-    public static ReleaseObject createRandomRelease(AppUserObject creator, NamespaceObject namespace) {
-        return createRandomRelease(creator, namespace, "Initialized");
+    public static ReleaseObject createRandomRelease(AppUserObject creator, LibraryObject library,
+                                                    NamespaceObject namespace) {
+        return createRandomRelease(creator, library, namespace, "Initialized");
     }
 
-    public static ReleaseObject createDraftRelease(AppUserObject creator, NamespaceObject namespace) {
-        return createRandomRelease(creator, namespace, "Draft");
+    public static ReleaseObject createDraftRelease(AppUserObject creator, LibraryObject library,
+                                                   NamespaceObject namespace) {
+        return createRandomRelease(creator, library, namespace, "Draft");
     }
 
 }

@@ -75,7 +75,7 @@ public class BbieScWriteRepository {
             if (bbieSc.getDeprecated() != null) {
                 bbieScRecord.setIsDeprecated((byte) (bbieSc.getDeprecated() ? 1 : 0));
             }
-            
+
             bbieScRecord.setDefinition(bbieSc.getDefinition());
             DtScRecord dtScRecord = dtScReadRepository.getDtScByManifestId(bbieSc.getBasedDtScManifestId());
             if (dtScRecord == null) {
@@ -123,6 +123,7 @@ public class BbieScWriteRepository {
             bbieScRecord.setBizTerm(bbieSc.getBizTerm());
             bbieScRecord.setExample(bbieSc.getExample());
             bbieScRecord.setRemark(bbieSc.getRemark());
+            bbieScRecord.setDisplayName(bbieSc.getDisplayName());
 
             if (StringUtils.hasLength(bbieSc.getDefaultValue())) {
                 bbieScRecord.setDefaultValue(bbieSc.getDefaultValue());
@@ -245,6 +246,10 @@ public class BbieScWriteRepository {
                 bbieScRecord.setRemark(emptyToNull(bbieSc.getRemark()));
             }
 
+            if (bbieSc.getDisplayName() != null) {
+                bbieScRecord.setDisplayName(emptyToNull(bbieSc.getDisplayName()));
+            }
+
             if (StringUtils.hasLength(bbieSc.getDefaultValue())) {
                 bbieScRecord.setDefaultValue(bbieSc.getDefaultValue());
                 bbieScRecord.setFixedValue(null);
@@ -285,6 +290,7 @@ public class BbieScWriteRepository {
                         BBIE_SC.BIZ_TERM,
                         BBIE_SC.EXAMPLE,
                         BBIE_SC.REMARK,
+                        BBIE_SC.DISPLAY_NAME,
                         BBIE_SC.DEFAULT_VALUE,
                         BBIE_SC.FIXED_VALUE,
                         BBIE_SC.DT_SC_PRI_RESTRI_ID,

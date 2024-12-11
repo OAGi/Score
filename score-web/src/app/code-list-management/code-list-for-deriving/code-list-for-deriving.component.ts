@@ -12,17 +12,18 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
-import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
+import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
-import {WorkingRelease} from '../../release-management/domain/release';
+import {SimpleRelease, WorkingRelease} from '../../release-management/domain/release';
 import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {Library} from '../../library-management/domain/library';
+import {LibraryService} from '../../library-management/domain/library.service';
 
 @Component({
   selector: 'score-code-list-for-deriving',
@@ -142,12 +143,14 @@ export class CodeListForDerivingComponent implements OnInit {
   selection = new SelectionModel<number>(false, []);
   loading = false;
 
-  releases: Release[];
+  releases: SimpleRelease[];
+  libraries: Library[] = [];
+  mappedLibraries: { library: Library, selected: boolean }[] = [];
   loginIdList: string[] = [];
   releaseListFilterCtrl: FormControl = new FormControl();
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<Release[]> = new ReplaySubject<Release[]>(1);
+  filteredReleaseList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
@@ -164,6 +167,7 @@ export class CodeListForDerivingComponent implements OnInit {
 
   constructor(private service: CodeListService,
               private releaseService: ReleaseService,
+              private libraryService: LibraryService,
               private accountService: AccountListService,
               private preferencesService: SettingsPreferencesService,
               private auth: AuthService,
@@ -177,57 +181,48 @@ export class CodeListForDerivingComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.states.push('Published');
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
+    this.libraryService.getLibraries().subscribe(libraries => {
+      this.initLibraries(libraries);
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
+      this.searchBar.showAdvancedSearch =
+        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
 
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
+      this.paginator.pageIndex = this.request.page.pageIndex;
+      this.paginator.pageSize = this.request.page.pageSize;
+      this.paginator.length = 0;
 
-    this.releases = [];
-
-    forkJoin([
-      this.releaseService.getSimpleReleases(['Published', ]),
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([releases, loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.releases.push(...releases);
-      if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
-        if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
-          }
-        } else {
-          this.request.release = this.releases[0];
+      this.sort.active = this.request.page.sortActive;
+      this.sort.direction = this.request.page.sortDirection as SortDirection;
+      // Prevent the sorting event from being triggered if any columns are currently resizing.
+      const originalSort = this.sort.sort;
+      this.sort.sort = (sortChange) => {
+        if (this.tableColumnResizeDirectives &&
+          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
+          return;
         }
-      }
-      initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+        originalSort.apply(this.sort, [sortChange]);
+      };
+      this.sort.sortChange.subscribe(() => {
+        this.onSearch();
+      });
 
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      this.releases = [];
 
-      this.loadCodeList(true);
+      forkJoin([
+        this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published', ]),
+        this.accountService.getAccountNames(),
+        this.preferencesService.load(this.auth.getUserToken())
+      ]).subscribe(([releases, loginIds, preferencesInfo]) => {
+        this.preferencesInfo = preferencesInfo;
+
+        this.initReleases(releases);
+
+        this.loginIdList.push(...loginIds);
+        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+        this.loadCodeList(true);
+      });
     });
   }
 
@@ -263,6 +258,54 @@ export class CodeListForDerivingComponent implements OnInit {
         this.request.updatedDate.end = null;
         break;
     }
+  }
+
+  initLibraries(libraries: Library[]) {
+    this.libraries = libraries;
+    if (this.libraries.length > 0) {
+      const savedLibraryId = loadLibrary(this.auth.getUserToken());
+      if (savedLibraryId) {
+        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
+        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      }
+      if (!this.request.library || !this.request.library.libraryId) {
+        this.request.library = this.libraries[0];
+      }
+      this.mappedLibraries = this.libraries.map(e => {
+        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
+      });
+    }
+  }
+
+  initReleases(releases: SimpleRelease[]) {
+    this.releases = [...releases];
+    if (this.releases.length > 0) {
+      if (this.request.release.releaseId === 0) {
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
+        if (savedReleaseId) {
+          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+          if (!this.request.release) {
+            this.request.release = this.releases[0];
+            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
+          }
+        }
+      } else {
+        this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
+      }
+    }
+    if (!this.request.release || this.request.release.releaseId === 0) {
+      this.request.release = this.releases[0];
+    }
+    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+  }
+
+  onLibraryChange(library: Library) {
+    this.request.library = library;
+    this.releaseService.getSimpleReleases(this.request.library.libraryId, ['Published']).subscribe(releases => {
+      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
+      this.initReleases(releases);
+      this.onSearch();
+    });
   }
 
   onSearch() {

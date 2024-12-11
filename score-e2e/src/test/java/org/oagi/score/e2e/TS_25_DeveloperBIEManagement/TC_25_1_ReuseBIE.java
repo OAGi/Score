@@ -57,11 +57,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject devx_asccp, devx_asccp_for_devy;
         ACCObject acc, devx_acc, devx_acc_association;
         AppUserObject usera, devx, devy;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject devxBIE_WIP, devxBIE_QA, devxBIE_Production, devyBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(usera);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
@@ -71,7 +72,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             devy = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(devy);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -105,11 +106,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject acc, developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject namespace, developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -117,7 +119,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -157,11 +159,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp_indicator_type, bccp_code_type;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -169,18 +172,18 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
              */
             // Indicator. Type
-            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
+            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
             bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
 
-            DTObject dt_code = coreComponentAPI.getBDTByGuidAndReleaseNum("8954f848e8f448c0a72785acd5a3a805", current_release);
+            DTObject dt_code = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "8954f848e8f448c0a72785acd5a3a805", current_release);
             bccp_code_type = coreComponentAPI.createRandomBCCP(dt_code, developer, developerNamespace, "Published");
             bccp_code_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_code_type);
@@ -231,11 +234,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -243,7 +247,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -305,11 +309,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject reuseTopLevelASBIEP, topLevelASBIEP;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -317,7 +322,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -360,11 +365,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -372,7 +378,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -440,11 +446,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp_indicator_type, bccp_code_type;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -452,10 +459,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             // Indicator. Type
-            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
+            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
             bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             bccp_indicator_type.setDefinition("BCCP definition");
@@ -518,11 +525,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -530,10 +538,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             // Indicator. Type
-            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
+            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
             bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
@@ -616,11 +624,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -628,10 +637,10 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             // Indicator. Type
-            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum("ef32205ede95407f981064a45ffa652c", current_release);
+            DTObject dt_indicator = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "ef32205ede95407f981064a45ffa652c", current_release);
             bccp_indicator_type = coreComponentAPI.createRandomBCCP(dt_indicator, developer, developerNamespace, "Published");
             bccp_indicator_type.setNillable(false);
             coreComponentAPI.updateBCCP(bccp_indicator_type);
@@ -704,11 +713,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp_indicator_type;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -717,7 +727,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -774,11 +784,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -787,7 +798,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -852,11 +863,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -865,7 +877,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -921,11 +933,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -934,7 +947,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -994,11 +1007,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -1007,7 +1021,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -1071,11 +1085,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -1084,7 +1099,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -1142,11 +1157,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -1155,7 +1171,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -1231,11 +1247,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
         AppUserObject anotherDeveloper, developer;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject developerBIE, reusedBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
         anotherDeveloper = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherDeveloper);
         context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(anotherDeveloper);
@@ -1244,7 +1261,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
             developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developer);
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
 
             /**
              * The owner of the ASCCP is developer
@@ -1315,11 +1332,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         BCCPObject bccp;
         ACCObject acc, acc_association, acc_lv2;
         AppUserObject devx, devy, usera;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject devxBIE, devyBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -1330,7 +1348,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(usera);
 
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 
@@ -1338,7 +1356,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
              * The owner of the ASCCP is deva
              */
             acc = coreComponentAPI.createRandomACC(devx, currentReleaseObject, developerNamespace, "Published");
-            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum("dd0c8f86b160428da3a82d2866a5b48d", current_release);
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", current_release);
             bccp = coreComponentAPI.createRandomBCCP(dataType, devx, developerNamespace, "WIP");
             BCCObject bcc = coreComponentAPI.appendBCC(acc, bccp, "WIP");
             bcc.setCardinalityMax(1);
@@ -1394,11 +1412,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         ASCCPObject asccp, asccp_for_devx;
         ACCObject acc, acc_association;
         AppUserObject devx, devy;
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
         NamespaceObject developerNamespace;
         BusinessContextObject context;
         TopLevelASBIEPObject devxBIE, devyBIE;
         String current_release = "10.8.8";
-        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(current_release);
+        ReleaseObject currentReleaseObject = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, current_release);
 
         devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -1407,7 +1426,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
             devy = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(devy);
 
-            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx);
+            developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(devx, library);
 
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
 

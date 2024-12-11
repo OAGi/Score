@@ -18,10 +18,12 @@ import org.oagi.score.repo.BusinessInformationEntityRepository;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.bie.BieReadRepository;
 import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.bie.model.GetInheritedBieListRequest;
 import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocRequest;
 import org.oagi.score.repo.api.openapidoc.model.GetBieForOasDocResponse;
+import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.OagisComponentType;
@@ -84,6 +86,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     private AccessPrivilege accessPrivilege;
     private BieState state;
     private boolean forceBieUpdate;
+    @Autowired
+    private TopLevelAsbiepRepository topLevelAsbiepRepository;
 
     public void initialize(AuthenticatedPrincipal user, TopLevelAsbiep topLevelAsbiep) {
         this.user = user;
@@ -104,8 +108,10 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 if (topLevelAsbiep.getOwnerUserId().equals(userId)) {
                     accessPrivilege = AccessPrivilege.CanEdit;
                 } else {
-                    // Issue #1010, #1576
-                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) || appUser.isAdmin()) {
+                    // Issue #1010, #1576, #1635
+                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) ||
+                        useAsBaseBie(user, topLevelAsbiep.getTopLevelAsbiepId()) ||
+                        appUser.isAdmin()) {
                         accessPrivilege = AccessPrivilege.CanView;
                     } else {
                         throw new DataAccessForbiddenException("'" + appUser.getLoginId() +
@@ -138,6 +144,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .getTopLevelAsbiepList().isEmpty();
     }
 
+    public boolean useAsBaseBie(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
+        BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
+        return !bieReadRepository.getInheritedBieList(new GetInheritedBieListRequest(sessionService.asScoreUser(user))
+                .withTopLevelAsbiepId(topLevelAsbiepId))
+                .getTopLevelAsbiepList().isEmpty();
+    }
+
     private boolean isForceBieUpdate() {
         return forceBieUpdate;
     }
@@ -145,15 +158,18 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     public BieEditAbieNode getRootNode(BigInteger topLevelAsbiepId) {
         BieEditAbieNode rootNode = dslContext.select(
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                LIBRARY.LIBRARY_ID,
                 TOP_LEVEL_ASBIEP.RELEASE_ID,
                 TOP_LEVEL_ASBIEP.STATE.as("top_level_asbiep_state"),
                 TOP_LEVEL_ASBIEP.OWNER_USER_ID,
                 TOP_LEVEL_ASBIEP.VERSION,
                 TOP_LEVEL_ASBIEP.STATUS,
+                LIBRARY.NAME.as("library_name"),
                 RELEASE.RELEASE_NUM,
                 APP_USER.LOGIN_ID,
                 ASCCP.GUID,
                 ASCCP.PROPERTY_TERM.as("name"),
+                ASBIEP.DISPLAY_NAME,
                 ASBIEP.ASBIEP_ID,
                 ASBIEP.BASED_ASCCP_MANIFEST_ID.as("asccp_manifest_id"),
                 ABIE.ABIE_ID,
@@ -163,7 +179,8 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 TOP_LEVEL_ASBIEP.IS_DEPRECATED.as("deprecated"),
                 TOP_LEVEL_ASBIEP.DEPRECATED_REASON,
                 TOP_LEVEL_ASBIEP.DEPRECATED_REMARK,
-                TOP_LEVEL_ASBIEP.INVERSE_MODE)
+                TOP_LEVEL_ASBIEP.INVERSE_MODE,
+                TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID.as("based_top_level_asbiep_id"))
                 .from(TOP_LEVEL_ASBIEP)
                 .join(ASBIEP).on(and(
                         TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID),
@@ -176,7 +193,9 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(APP_USER).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .leftJoin(TOP_LEVEL_ASBIEP.as("based")).on(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.as("based").TOP_LEVEL_ASBIEP_ID))
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchOneInto(BieEditAbieNode.class);
         rootNode.setHasChild(hasChild(rootNode));
@@ -1137,7 +1156,15 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
             // Issue #1604
             // Apply cascade state update to reused BIEs.
             topLevelAsbiepQueue.addAll(
-                    repository.getReusedTopLevelAsbiepListByTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
+                    topLevelAsbiepRepository.getReusedTopLevelAsbiepListByTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
+                            .stream().filter(e -> topLevelAsbiep.getOwnerUserId().equals(e.getOwnerUserId()))
+                            .collect(Collectors.toList())
+            );
+
+            // Issue #1635
+            // Apply cascade state update to inherited BIEs.
+            topLevelAsbiepQueue.addAll(
+                    topLevelAsbiepRepository.findByBasedTopLevelAsbiepId(topLevelAsbiep.getTopLevelAsbiepId())
                             .stream().filter(e -> topLevelAsbiep.getOwnerUserId().equals(e.getOwnerUserId()))
                             .collect(Collectors.toList())
             );

@@ -112,6 +112,14 @@ public class BbieReadRepository {
         return bbieNode;
     }
 
+    public BbieNode getBbieNode(BigInteger bbieId) {
+        BbieRecord bbieRecord = dslContext.selectFrom(BBIE)
+                .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbieId)))
+                .fetchOne();
+        return getBbieNode(bbieRecord.getOwnerTopLevelAsbiepId().toBigInteger(),
+                bbieRecord.getBasedBccManifestId().toBigInteger(), bbieRecord.getHashPath());
+    }
+
     public BigInteger getDefaultBdtPriRestriIdByBdtManifestId(BigInteger bdtManifestId) {
         ULong dtManifestId = ULong.valueOf(bdtManifestId);
         String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
@@ -163,7 +171,9 @@ public class BbieReadRepository {
 
         BbieRecord bbieRecord = getBbieByTopLevelAsbiepIdAndHashPath(topLevelAsbiepId, hashPath);
         if (bbieRecord != null) {
+            bbie.setOwnerTopLevelAsbiepId(bbieRecord.getOwnerTopLevelAsbiepId().toBigInteger());
             bbie.setBbieId(bbieRecord.getBbieId().toBigInteger());
+            bbie.setToBbiepId(bbieRecord.getToBbiepId().toBigInteger());
             bbie.setFromAbieHashPath(dslContext.select(ABIE.HASH_PATH)
                     .from(ABIE)
                     .where(and(
@@ -212,6 +222,7 @@ public class BbieReadRepository {
     public List<BieEditUsed> getUsedBbieList(BigInteger topLevelAsbiepId) {
         return dslContext.select(BBIE.IS_USED, BBIE.BBIE_ID, BBIE.BASED_BCC_MANIFEST_ID,
                         BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
+                        BBIEP.DISPLAY_NAME,
                         BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX,
                         BBIE.IS_DEPRECATED)
                 .from(BBIE)
@@ -228,6 +239,7 @@ public class BbieReadRepository {
                     bieEditUsed.setManifestId(record.get(BBIE.BASED_BCC_MANIFEST_ID).toBigInteger());
                     bieEditUsed.setHashPath(record.get(BBIE.HASH_PATH));
                     bieEditUsed.setOwnerTopLevelAsbiepId(record.get(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID).toBigInteger());
+                    bieEditUsed.setDisplayName(record.get(BBIEP.DISPLAY_NAME));
                     bieEditUsed.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(BBIE.IS_DEPRECATED) == 1);

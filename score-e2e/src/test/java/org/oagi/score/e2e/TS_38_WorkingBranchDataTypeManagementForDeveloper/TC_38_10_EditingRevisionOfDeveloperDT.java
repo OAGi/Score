@@ -13,10 +13,10 @@ import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.click;
@@ -51,10 +51,11 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             AppUserObject developerB = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerB);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Published");
             dtForTesting.add(randomBDT);
 
@@ -136,6 +137,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
     @DisplayName("TC_38_10_TA_2")
     public void test_TA_2() {
         AppUserObject developerA;
+        LibraryObject library;
         ReleaseObject branch;
         ArrayList<DTObject> dtForTesting = new ArrayList<>();
         DTObject baseCDT;
@@ -144,13 +146,14 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             developerA = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
             thisAccountWillBeDeletedAfterTests(developerA);
 
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber("Working");
-            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI("http://www.openapplications.org/oagis/10");
+            library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
 
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(developerA, namespace, branch, "Published");
 
-            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum("Code. Type", branch.getReleaseNumber());
+            baseCDT = getAPIFactory().getCoreComponentAPI().getCDTByDENAndReleaseNum(library, "Code. Type", branch.getReleaseNumber());
             DTObject randomBDT = getAPIFactory().getCoreComponentAPI().createRandomBDT(baseCDT, developerA, namespace, "Published");
             dtForTesting.add(randomBDT);
         }
@@ -174,7 +177,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             dtViewEditPage.setContentComponentDefinition(derivedBDTContentComponentDefinition);
             dtViewEditPage.setQualifier("newDerivedDT");
             dtViewEditPage.hitUpdateButton();
-            DTObject derivedDT = getAPIFactory().getCoreComponentAPI().getBDTByGuidAndReleaseNum(dtViewEditPage.getGUIDFieldValue(), branch.getReleaseNumber());
+            DTObject derivedDT = getAPIFactory().getCoreComponentAPI().getBDTByGuidAndReleaseNum(library, dtViewEditPage.getGUIDFieldValue(), branch.getReleaseNumber());
 
             homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
             viewEditCoreComponentPage.openDTViewEditPageByDenAndBranch(revisedDT.getDen(), branch.getReleaseNumber());

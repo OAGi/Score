@@ -94,6 +94,7 @@ public class OasDocRepository {
                     ASBIEP.GUID,
                     ASCCP_MANIFEST.DEN,
                     ASCCP.PROPERTY_TERM,
+                    ASBIEP.DISPLAY_NAME,
                     ASBIEP.REMARK,
                     RELEASE.RELEASE_NUM,
                     TOP_LEVEL_ASBIEP.OWNER_USER_ID,
@@ -116,7 +117,7 @@ public class OasDocRepository {
 
         public SelectBieForOasDocListArguments setDen(String den) {
             if (StringUtils.hasLength(den)) {
-                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN));
+                conditions.addAll(contains(den, ASCCP_MANIFEST.DEN, ASBIEP.DISPLAY_NAME));
                 selectFields.add(
                         val(1).minus(levenshtein(lower(ASCCP.PROPERTY_TERM), val(den.toLowerCase()))
                                         .div(greatest(length(ASCCP.PROPERTY_TERM), length(den))))
@@ -196,6 +197,7 @@ public class OasDocRepository {
             }
             return this;
         }
+
         public SelectBieForOasDocListArguments setType(String type) {
             this.type = type;
             return this;
@@ -329,6 +331,13 @@ public class OasDocRepository {
             return this;
         }
 
+        public SelectBieForOasDocListArguments setLibraryId(BigInteger libraryId) {
+            if (libraryId != null && libraryId.longValue() > 0) {
+                conditions.add(LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId)));
+            }
+            return this;
+        }
+
         public SelectBieForOasDocListArguments setReleaseId(BigInteger releaseId) {
             if (releaseId != null && releaseId.longValue() > 0) {
                 conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)));
@@ -411,6 +420,7 @@ public class OasDocRepository {
                 .join(APP_USER).on(APP_USER.APP_USER_ID.eq(TOP_LEVEL_ASBIEP.OWNER_USER_ID))
                 .join(APP_USER.as("updater")).on(APP_USER.as("updater").APP_USER_ID.eq(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY))
                 .join(RELEASE).on(RELEASE.RELEASE_ID.eq(TOP_LEVEL_ASBIEP.RELEASE_ID))
+                .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(BIZ_CTX_ASSIGNMENT).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID))
                 .join(BIZ_CTX).on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID));
     }

@@ -56,6 +56,8 @@ public class AgencyIdController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public GetAgencyIdListListResponse getAgencyIdListList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "libraryId") BigInteger libraryId,
+            @RequestParam(name = "releaseId") BigInteger releaseId,
             @RequestParam(name = "states", required = false) String states,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "definition", required = false) String definition,
@@ -67,12 +69,12 @@ public class AgencyIdController {
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
             @RequestParam(name = "updateStart", required = false) String updateStart,
             @RequestParam(name = "updateEnd", required = false) String updateEnd,
-            @RequestParam(name = "releaseId", required = true) BigInteger releaseId,
             @RequestParam(name = "sortActive") String sortActive,
             @RequestParam(name = "sortDirection") String sortDirection,
             @RequestParam(name = "pageIndex") int pageIndex,
             @RequestParam(name = "pageSize") int pageSize) {
         GetAgencyIdListListRequest request = new GetAgencyIdListListRequest(sessionService.asScoreUser(user));
+        request.setLibraryId(libraryId);
         request.setReleaseId(releaseId);
         request.setName(name);
         request.setDefinition(definition);
@@ -138,6 +140,16 @@ public class AgencyIdController {
         ScoreUser requester = sessionService.asScoreUser(user);
         for (BigInteger agencyIdListManifestId : request.getAgencyIdListManifestIds()) {
             service.updateAgencyIdListState(requester, agencyIdListManifestId, CcState.Deleted);
+        }
+    }
+
+    @RequestMapping(value = "/agency_id_list/purge", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public void purgeAgencyIdLists(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                   @RequestBody UpdateAgencyIdListListRequest request) {
+        ScoreUser requester = sessionService.asScoreUser(user);
+        for (BigInteger agencyIdListManifestId : request.getAgencyIdListManifestIds()) {
+            service.purgeAgencyIdList(requester, agencyIdListManifestId);
         }
     }
 

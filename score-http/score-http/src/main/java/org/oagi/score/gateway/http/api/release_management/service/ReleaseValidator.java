@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseValidationResponse.ValidationMessageCode.NAMESPACE;
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseValidationResponse.ValidationMessageCode.*;
 import static org.oagi.score.gateway.http.api.release_management.data.ReleaseValidationResponse.ValidationMessageLevel.Error;
@@ -21,6 +22,7 @@ import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 public class ReleaseValidator {
 
+    private final BigInteger releaseId;
     private final DSLContext dslContext;
 
     private List<BigInteger> assignedAccComponentManifestIds = Collections.emptyList();
@@ -68,7 +70,8 @@ public class ReleaseValidator {
     private List<DtRecord> dtRecords;
     private Map<ULong, DtRecord> dtRecordMap;
 
-    public ReleaseValidator(DSLContext dslContext) {
+    public ReleaseValidator(BigInteger releaseId, DSLContext dslContext) {
+        this.releaseId = releaseId;
         this.dslContext = dslContext;
     }
 
@@ -108,10 +111,15 @@ public class ReleaseValidator {
     }
 
     private void loadManifests() {
+        ULong libraryId = dslContext.select(RELEASE.LIBRARY_ID)
+                .from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(ULong.valueOf(releaseId)))
+                .fetchOneInto(ULong.class);
+
         accManifestRecords = dslContext.select(ACC_MANIFEST.fields())
                 .from(ACC_MANIFEST)
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AccManifestRecord.class);
         accManifestRecordMap = accManifestRecords.stream()
                 .collect(Collectors.toMap(AccManifestRecord::getAccManifestId, Function.identity()));
@@ -120,7 +128,7 @@ public class ReleaseValidator {
                 .from(ACC)
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AccRecord.class);
         accRecordMap = accRecords.stream()
                 .collect(Collectors.toMap(AccRecord::getAccId, Function.identity()));
@@ -128,33 +136,33 @@ public class ReleaseValidator {
         asccManifestRecords = dslContext.select(ASCC_MANIFEST.fields())
                 .from(ASCC_MANIFEST)
                 .join(RELEASE).on(ASCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AsccManifestRecord.class);
 
         asccRecords = dslContext.select(ASCC.fields())
                 .from(ASCC)
                 .join(ASCC_MANIFEST).on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID))
                 .join(RELEASE).on(ASCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AsccRecord.class);
 
         bccManifestRecords = dslContext.select(BCC_MANIFEST.fields())
                 .from(BCC_MANIFEST)
                 .join(RELEASE).on(BCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(BccManifestRecord.class);
 
         bccRecords = dslContext.select(BCC.fields())
                 .from(BCC)
                 .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
                 .join(RELEASE).on(BCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(BccRecord.class);
 
         asccpManifestRecords = dslContext.select(ASCCP_MANIFEST.fields())
                 .from(ASCCP_MANIFEST)
                 .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AsccpManifestRecord.class);
         asccpManifestRecordMap = asccpManifestRecords.stream()
                 .collect(Collectors.toMap(AsccpManifestRecord::getAsccpManifestId, Function.identity()));
@@ -163,7 +171,7 @@ public class ReleaseValidator {
                 .from(ASCCP)
                 .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
                 .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AsccpRecord.class);
         asccpRecordMap = asccpRecords.stream()
                 .collect(Collectors.toMap(AsccpRecord::getAsccpId, Function.identity()));
@@ -171,7 +179,7 @@ public class ReleaseValidator {
         bccpManifestRecords = dslContext.select(BCCP_MANIFEST.fields())
                 .from(BCCP_MANIFEST)
                 .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(BccpManifestRecord.class);
         bccpManifestRecordMap = bccpManifestRecords.stream()
                 .collect(Collectors.toMap(BccpManifestRecord::getBccpManifestId, Function.identity()));
@@ -180,14 +188,14 @@ public class ReleaseValidator {
                 .from(BCCP)
                 .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
                 .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(BccpRecord.class);
         bccpRecordMap = bccpRecords.stream().collect(Collectors.toMap(BccpRecord::getBccpId, Function.identity()));
 
         codeListManifestRecords = dslContext.select(CODE_LIST_MANIFEST.fields())
                 .from(CODE_LIST_MANIFEST)
                 .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(CodeListManifestRecord.class);
         codeListManifestRecordMap = codeListManifestRecords.stream()
                 .collect(Collectors.toMap(CodeListManifestRecord::getCodeListManifestId, Function.identity()));
@@ -196,14 +204,14 @@ public class ReleaseValidator {
                 .from(CODE_LIST)
                 .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
                 .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(CodeListRecord.class);
         codeListRecordMap = codeListRecords.stream().collect(Collectors.toMap(CodeListRecord::getCodeListId, Function.identity()));
 
         agencyIdListManifestRecords = dslContext.select(AGENCY_ID_LIST_MANIFEST.fields())
                 .from(AGENCY_ID_LIST_MANIFEST)
                 .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AgencyIdListManifestRecord.class);
         agencyIdListManifestRecordMap = agencyIdListManifestRecords.stream()
                 .collect(Collectors.toMap(AgencyIdListManifestRecord::getAgencyIdListManifestId, Function.identity()));
@@ -212,14 +220,14 @@ public class ReleaseValidator {
                 .from(AGENCY_ID_LIST)
                 .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID))
                 .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(AgencyIdListRecord.class);
         agencyIdListRecordMap = agencyIdListRecords.stream().collect(Collectors.toMap(AgencyIdListRecord::getAgencyIdListId, Function.identity()));
 
         dtManifestRecords = dslContext.select(DT_MANIFEST.fields())
                 .from(DT_MANIFEST)
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(DtManifestRecord.class);
         dtManifestRecordMap = dtManifestRecords.stream()
                 .collect(Collectors.toMap(DtManifestRecord::getDtManifestId, Function.identity()));
@@ -228,7 +236,7 @@ public class ReleaseValidator {
                 .from(DT)
                 .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
                 .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(RELEASE.RELEASE_NUM.eq("Working"))
+                .where(and(RELEASE.RELEASE_NUM.eq("Working"), RELEASE.LIBRARY_ID.eq(libraryId)))
                 .fetchInto(DtRecord.class);
         dtRecordMap = dtRecords.stream().collect(Collectors.toMap(DtRecord::getDtId, Function.identity()));
     }
