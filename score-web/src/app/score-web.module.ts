@@ -27,11 +27,12 @@ import {CcManagementModule} from './cc-management/cc-management.module';
 import {NamespaceManagementModule} from './namespace-management/namespace-management.module';
 import {ReleaseManagementModule} from './release-management/release-management.module';
 import {ModuleManagementModule} from './module-management/module-management.module';
+import {LibraryManagementModule} from './library-management/library-management.module';
 import {MessageManagementModule} from './message-management/message-management.module';
 import {BusinessTermManagementModule} from './business-term-management/business-term-management.module';
+import {SettingsManagementModule} from './settings-management/settings-management.module';
 
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
-import {SettingsManagementModule} from './settings-management/settings-management.module';
 import {WebPageInfoService} from './basis/basis.service';
 import {MailService} from './common/score-mail.service';
 
@@ -92,6 +93,7 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
     NamespaceManagementModule,
     ReleaseManagementModule,
     ModuleManagementModule,
+    LibraryManagementModule,
     MessageManagementModule,
     BusinessTermManagementModule,
     FontAwesomeModule

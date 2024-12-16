@@ -4,6 +4,8 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables.records;
 
 
+import java.time.LocalDateTime;
+
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.ULong;
@@ -48,6 +50,152 @@ public class LibraryRecord extends UpdatableRecordImpl<LibraryRecord> {
         return (String) get(1);
     }
 
+    /**
+     * Setter for <code>oagi.library.organization</code>. The name of the
+     * organization responsible for maintaining or managing the library.
+     */
+    public void setOrganization(String value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.organization</code>. The name of the
+     * organization responsible for maintaining or managing the library.
+     */
+    public String getOrganization() {
+        return (String) get(2);
+    }
+
+    /**
+     * Setter for <code>oagi.library.description</code>. A brief summary or
+     * overview of the library's purpose and functionality.
+     */
+    public void setDescription(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.description</code>. A brief summary or
+     * overview of the library's purpose and functionality.
+     */
+    public String getDescription() {
+        return (String) get(3);
+    }
+
+    /**
+     * Setter for <code>oagi.library.link</code>. A URL directing to the
+     * library's homepage, documentation, or repository for further details.
+     */
+    public void setLink(String value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.link</code>. A URL directing to the
+     * library's homepage, documentation, or repository for further details.
+     */
+    public String getLink() {
+        return (String) get(4);
+    }
+
+    /**
+     * Setter for <code>oagi.library.domain</code>. Specifies the area of focus
+     * or application domain of the library (e.g., agriculture, finance, or
+     * aerospace).
+     */
+    public void setDomain(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.domain</code>. Specifies the area of focus
+     * or application domain of the library (e.g., agriculture, finance, or
+     * aerospace).
+     */
+    public String getDomain() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>oagi.library.is_enabled</code>. Indicates whether the
+     * library is active (1) or inactive (0).
+     */
+    public void setIsEnabled(Byte value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.is_enabled</code>. Indicates whether the
+     * library is active (1) or inactive (0).
+     */
+    public Byte getIsEnabled() {
+        return (Byte) get(6);
+    }
+
+    /**
+     * Setter for <code>oagi.library.created_by</code>. Foreign key to the
+     * APP_USER table referring to the user who creates the record.
+     */
+    public void setCreatedBy(ULong value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.created_by</code>. Foreign key to the
+     * APP_USER table referring to the user who creates the record.
+     */
+    public ULong getCreatedBy() {
+        return (ULong) get(7);
+    }
+
+    /**
+     * Setter for <code>oagi.library.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record.
+     */
+    public void setLastUpdatedBy(ULong value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record.
+     */
+    public ULong getLastUpdatedBy() {
+        return (ULong) get(8);
+    }
+
+    /**
+     * Setter for <code>oagi.library.creation_timestamp</code>. Timestamp when
+     * the record was created.
+     */
+    public void setCreationTimestamp(LocalDateTime value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.creation_timestamp</code>. Timestamp when
+     * the record was created.
+     */
+    public LocalDateTime getCreationTimestamp() {
+        return (LocalDateTime) get(9);
+    }
+
+    /**
+     * Setter for <code>oagi.library.last_update_timestamp</code>. Timestamp
+     * when the record was last updated.
+     */
+    public void setLastUpdateTimestamp(LocalDateTime value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oagi.library.last_update_timestamp</code>. Timestamp
+     * when the record was last updated.
+     */
+    public LocalDateTime getLastUpdateTimestamp() {
+        return (LocalDateTime) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -71,11 +219,20 @@ public class LibraryRecord extends UpdatableRecordImpl<LibraryRecord> {
     /**
      * Create a detached, initialised LibraryRecord
      */
-    public LibraryRecord(ULong libraryId, String name) {
+    public LibraryRecord(ULong libraryId, String name, String organization, String description, String link, String domain, Byte isEnabled, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(Library.LIBRARY);
 
         setLibraryId(libraryId);
         setName(name);
+        setOrganization(organization);
+        setDescription(description);
+        setLink(link);
+        setDomain(domain);
+        setIsEnabled(isEnabled);
+        setCreatedBy(createdBy);
+        setLastUpdatedBy(lastUpdatedBy);
+        setCreationTimestamp(creationTimestamp);
+        setLastUpdateTimestamp(lastUpdateTimestamp);
         resetChangedOnNotNull();
     }
 }

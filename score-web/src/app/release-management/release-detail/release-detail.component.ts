@@ -54,6 +54,7 @@ export class ReleaseDetailComponent implements OnInit {
         this.service.getReleaseDetail(params.get('id')))
     ).subscribe(resp => {
       this.releaseDetail = resp;
+      console.log(this.releaseDetail);
       this.$hashCode = hashCode(this.releaseDetail);
 
       const request = new NamespaceListRequest();

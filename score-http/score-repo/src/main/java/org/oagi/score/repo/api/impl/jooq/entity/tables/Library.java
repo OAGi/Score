@@ -4,7 +4,10 @@
 package org.oagi.score.repo.api.impl.jooq.entity.tables;
 
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -30,6 +33,7 @@ import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
 import org.oagi.score.repo.api.impl.jooq.entity.Keys;
 import org.oagi.score.repo.api.impl.jooq.entity.Oagi;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleSet.ModuleSetPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Release.ReleasePath;
@@ -67,6 +71,61 @@ public class Library extends TableImpl<LibraryRecord> {
      * The column <code>oagi.library.name</code>. A library name.
      */
     public final TableField<LibraryRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A library name.");
+
+    /**
+     * The column <code>oagi.library.organization</code>. The name of the
+     * organization responsible for maintaining or managing the library.
+     */
+    public final TableField<LibraryRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of the organization responsible for maintaining or managing the library.");
+
+    /**
+     * The column <code>oagi.library.description</code>. A brief summary or
+     * overview of the library's purpose and functionality.
+     */
+    public final TableField<LibraryRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief summary or overview of the library's purpose and functionality.");
+
+    /**
+     * The column <code>oagi.library.link</code>. A URL directing to the
+     * library's homepage, documentation, or repository for further details.
+     */
+    public final TableField<LibraryRecord, String> LINK = createField(DSL.name("link"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A URL directing to the library's homepage, documentation, or repository for further details.");
+
+    /**
+     * The column <code>oagi.library.domain</code>. Specifies the area of focus
+     * or application domain of the library (e.g., agriculture, finance, or
+     * aerospace).
+     */
+    public final TableField<LibraryRecord, String> DOMAIN = createField(DSL.name("domain"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Specifies the area of focus or application domain of the library (e.g., agriculture, finance, or aerospace).");
+
+    /**
+     * The column <code>oagi.library.is_enabled</code>. Indicates whether the
+     * library is active (1) or inactive (0).
+     */
+    public final TableField<LibraryRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the library is active (1) or inactive (0).");
+
+    /**
+     * The column <code>oagi.library.created_by</code>. Foreign key to the
+     * APP_USER table referring to the user who creates the record.
+     */
+    public final TableField<LibraryRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the record.");
+
+    /**
+     * The column <code>oagi.library.last_updated_by</code>. Foreign key to the
+     * APP_USER table referring to the last user who updated the record.
+     */
+    public final TableField<LibraryRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record.");
+
+    /**
+     * The column <code>oagi.library.creation_timestamp</code>. Timestamp when
+     * the record was created.
+     */
+    public final TableField<LibraryRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was created.");
+
+    /**
+     * The column <code>oagi.library.last_update_timestamp</code>. Timestamp
+     * when the record was last updated.
+     */
+    public final TableField<LibraryRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was last updated.");
 
     private Library(Name alias, Table<LibraryRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -143,6 +202,37 @@ public class Library extends TableImpl<LibraryRecord> {
     @Override
     public UniqueKey<LibraryRecord> getPrimaryKey() {
         return Keys.KEY_LIBRARY_PRIMARY;
+    }
+
+    @Override
+    public List<ForeignKey<LibraryRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.LIBRARY_CREATED_BY_FK, Keys.LIBRARY_LAST_UPDATED_BY_FK);
+    }
+
+    private transient AppUserPath _libraryCreatedByFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>library_created_by_fk</code> key.
+     */
+    public AppUserPath libraryCreatedByFk() {
+        if (_libraryCreatedByFk == null)
+            _libraryCreatedByFk = new AppUserPath(this, Keys.LIBRARY_CREATED_BY_FK, null);
+
+        return _libraryCreatedByFk;
+    }
+
+    private transient AppUserPath _libraryLastUpdatedByFk;
+
+    /**
+     * Get the implicit join path to the <code>oagi.app_user</code> table, via
+     * the <code>library_last_updated_by_fk</code> key.
+     */
+    public AppUserPath libraryLastUpdatedByFk() {
+        if (_libraryLastUpdatedByFk == null)
+            _libraryLastUpdatedByFk = new AppUserPath(this, Keys.LIBRARY_LAST_UPDATED_BY_FK, null);
+
+        return _libraryLastUpdatedByFk;
     }
 
     private transient ModuleSetPath _moduleSet;

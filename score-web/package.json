@@ -34,6 +34,7 @@
     "@types/uuid": "^8.3.4",
     "angular-split": "^18.0.0",
     "bootstrap": "^4.6.2",
+    "component": "^1.1.0",
     "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.26.0",
     "crypto-js": "^4.1.1",

@@ -61,6 +61,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.Dt.DtPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtManifestTag.DtManifestTagPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtSc.DtScPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Exception.ExceptionPath;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Library.LibraryPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Log.LogPath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Message.MessagePath;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Module.ModulePath;
@@ -1066,6 +1067,32 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _exception = new ExceptionPath(this, null, Keys.EXCEPTION_CREATED_BY_FK.getInverseKey());
 
         return _exception;
+    }
+
+    private transient LibraryPath _libraryCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.library</code>
+     * table, via the <code>library_created_by_fk</code> key
+     */
+    public LibraryPath libraryCreatedByFk() {
+        if (_libraryCreatedByFk == null)
+            _libraryCreatedByFk = new LibraryPath(this, null, Keys.LIBRARY_CREATED_BY_FK.getInverseKey());
+
+        return _libraryCreatedByFk;
+    }
+
+    private transient LibraryPath _libraryLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the <code>oagi.library</code>
+     * table, via the <code>library_last_updated_by_fk</code> key
+     */
+    public LibraryPath libraryLastUpdatedByFk() {
+        if (_libraryLastUpdatedByFk == null)
+            _libraryLastUpdatedByFk = new LibraryPath(this, null, Keys.LIBRARY_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _libraryLastUpdatedByFk;
     }
 
     private transient LogPath _log;

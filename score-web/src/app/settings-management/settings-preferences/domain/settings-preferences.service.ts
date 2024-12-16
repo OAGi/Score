@@ -32,6 +32,8 @@ export class SettingsPreferencesService {
   TABLE_COLUMNS_FOR_MODULE_SET_PAGE_KEY = 'TableColumns-ModuleSetPage';
   TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY = 'TableColumns-ModuleSetReleasePage';
 
+  TABLE_COLUMNS_FOR_LIBRARY_PAGE_KEY = 'TableColumns-LibraryPage';
+
   TABLE_COLUMNS_FOR_BIE_PAGE_KEY = 'TableColumns-BiePage';
   TABLE_COLUMNS_FOR_BIE_REUSE_REPORT_PAGE_KEY = 'TableColumns-BieReuseReportPage';
   TABLE_COLUMNS_FOR_BIE_UPLIFT_REPORT_PAGE_KEY = 'TableColumns-BieUpliftReportPage';
@@ -301,6 +303,11 @@ export class SettingsPreferencesService {
   updateTableColumnsForModuleSetReleasePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
     return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_MODULE_SET_RELEASE_PAGE_KEY,
       preferencesInfo.tableColumnsInfo.columnsOfModuleSetReleasePage);
+  }
+
+  updateTableColumnsForLibraryPage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {
+    return this.updateTableColumnsInfo(userToken, this.TABLE_COLUMNS_FOR_LIBRARY_PAGE_KEY,
+      preferencesInfo.tableColumnsInfo.columnsOfLibraryPage);
   }
 
   updateTableColumnsForBiePage(userToken: UserToken, preferencesInfo: PreferencesInfo): Observable<any> {

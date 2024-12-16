@@ -78,6 +78,15 @@
       </ng-template>
     </mat-menu>
 
+    <button *ngIf="!isTenantEnabled" mat-button [matMenuTriggerFor]="libraryMenu" title="Library">Library</button>
+    <mat-menu #libraryMenu="matMenu" [overlapTrigger]="false">
+      <ng-template matMenuContent>
+        <button mat-menu-item routerLink="library">
+          {{ (roles.includes('admin')) ? 'View/Edit Library' : 'View Library' }}
+        </button>
+      </ng-template>
+    </mat-menu>
+
     <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="roles.includes('admin')">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>

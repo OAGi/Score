@@ -1,0 +1,72 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
+  </div>
+
+  <div class="p-3">
+    <mat-card>
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput required [(ngModel)]="library.name" maxlength="100"
+                 [disabled]="!isAdmin"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Organization</mat-label>
+          <input matInput required [(ngModel)]="library.organization" maxlength="100"
+                 [disabled]="!isAdmin"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Link</mat-label>
+          <input matInput required
+                 [formControl]="uriForm"
+                 [value]="uriForm.value">
+          <mat-error *ngIf="uriForm.hasError('pattern')">
+            '{{ uriForm.value }}' is not allow for URI format
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Domain</mat-label>
+          <input matInput [(ngModel)]="library.domain" maxlength="100"
+                 [disabled]="!isAdmin"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="library.description"
+                    [disabled]="!isAdmin"></textarea>
+        </mat-form-field>
+
+        <mat-checkbox [checked]="library.enabled" [disabled]="true">Enable</mat-checkbox>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button (click)="back()">Back</button>
+        <button mat-raised-button color="primary" *ngIf="isAdmin"
+                [disabled]="updateDisabled"
+                (click)="update()">
+          Update
+        </button>
+        <button mat-raised-button color="warn" *ngIf="!library.enabled && isAdmin"
+                (click)="discard()">
+          Discard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
