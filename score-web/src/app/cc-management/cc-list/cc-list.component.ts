@@ -85,6 +85,18 @@ export class CcListComponent implements OnInit {
     this.onSearch();
   }
 
+  onFilterTypesOnlyAsccp() {
+    const defaultTableColumnInfo = new TableColumnsInfo();
+    defaultTableColumnInfo.filterTypesOfCoreComponentPage.forEach((columnInfo: TableColumnsProperty) => {
+      if ('ASCCP' === columnInfo.name) {
+        columnInfo.selected = true;
+      } else {
+        columnInfo.selected = false;
+      }
+    });
+    this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
+  }
+
   onFilterTypesReset() {
     const defaultTableColumnInfo = new TableColumnsInfo();
     this.onFilterTypesChange(defaultTableColumnInfo.filterTypesOfCoreComponentPage);
@@ -226,6 +238,12 @@ export class CcListComponent implements OnInit {
 
   onBrowserModeChange($event: MatSlideToggleChange) {
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = $event.checked;
+    // Issue #1650
+    if (this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode) {
+      this.onFilterTypesOnlyAsccp();
+    } else {
+      this.onFilterTypesReset();
+    }
     this.preferencesService.updateViewSettingsInfo(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
     });
   }
