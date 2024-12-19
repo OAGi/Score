@@ -251,7 +251,7 @@ export class CcAccNodeDetail extends CcNodeDetail {
   }
 
   get den(): string {
-    return this.objectClassTerm + '. Details';
+    return ((this.objectClassTerm) ? this.objectClassTerm : '') + '. Details';
   }
 
   get group(): boolean {

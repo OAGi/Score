@@ -502,6 +502,7 @@
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
                                    [(ngModel)]="asAccDetail().definitionSource"
+                                   (focusout)="asAccDetail().definitionSource = trim(asAccDetail().definitionSource)"
                                    [disabled]="selectedNode.level !== 0 || !isEditable()">
                           </mat-form-field>
                         </div>
@@ -515,6 +516,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asAccDetail().definition"
+                                        (focusout)="asAccDetail().definition = trim(asAccDetail().definition)"
                                         [readonly]="selectedNode.level !== 0 || !isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0"
@@ -660,6 +662,7 @@
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
                                    [(ngModel)]="asAsccpDetail().ascc.definitionSource"
+                                   (focusout)="asAsccpDetail().ascc.definitionSource = trim(asAsccpDetail().ascc.definitionSource)"
                                    [disabled]="selectedNode.level !== 1 || !isEditable()">
                           </mat-form-field>
                         </div>
@@ -673,6 +676,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asAsccpDetail().ascc.definition"
+                                        (focusout)="asAsccpDetail().ascc.definition = trim(asAsccpDetail().ascc.definition)"
                                         [readonly]="selectedNode.level !== 1 || !isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
@@ -1039,6 +1043,7 @@
                             <mat-label>Definition Source</mat-label>
                             <input matInput placeholder="Definition Source" maxlength="100"
                                    [(ngModel)]="asBccpDetail().bcc.definitionSource"
+                                   (focusout)="asBccpDetail().bcc.definitionSource = trim(asBccpDetail().bcc.definitionSource)"
                                    [disabled]="selectedNode.level !== 1 || !isEditable()">
                           </mat-form-field>
                         </div>
@@ -1052,6 +1057,7 @@
                               <textarea matInput rows="6" cols="30"
                                         placeholder="Definition"
                                         [(ngModel)]="asBccpDetail().bcc.definition"
+                                        (focusout)="asBccpDetail().bcc.definition = trim(asBccpDetail().bcc.definition)"
                                         [readonly]="selectedNode.level !== 1 || !isEditable()"></textarea>
                               <button mat-icon-button mat-small-icon-button
                                       *ngIf="this.state === 'WIP' && this.access === 'CanEdit'"
